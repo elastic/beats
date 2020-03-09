@@ -18,7 +18,7 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const modulesConfigYml = "build/config.modules.yml"
@@ -45,6 +45,9 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 		DockerParts: []string{
 			devtools.OSSBeatDir("_meta/beat.docker.yml"),
 			devtools.LibbeatDir("_meta/config.docker.yml"),
+		},
+		ExtraVars: map[string]interface{}{
+			"UseKubernetesMetadataProcessor": true,
 		},
 	}
 }

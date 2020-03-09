@@ -9,15 +9,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import generate
+	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 )
 
 func init() {
@@ -67,7 +70,12 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseElasticBeatXPackPackaging()
+	if v, found := os.LookupEnv("AGENT_PACKAGING"); found && v != "" {
+		devtools.UseElasticBeatXPackReducedPackaging()
+	} else {
+		devtools.UseElasticBeatXPackPackaging()
+	}
+
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 
@@ -134,7 +142,9 @@ func Update() {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*", "processors/*"}, []string{"module"})
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"input/*", "processors/*"}
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
@@ -172,6 +182,9 @@ func PythonUnitTest() error {
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
+// Use GENERATE=true to generate expected log files.
+// Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
+// Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
@@ -181,5 +194,5 @@ func PythonIntegTest(ctx context.Context) error {
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
-	})
+	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
 }

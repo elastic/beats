@@ -5,7 +5,7 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // XPackConfigFileParams returns the configuration of sample and reference configuration data.
@@ -20,10 +20,11 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		ExtraVars: map[string]interface{}{
-			"ExcludeConsole":    true,
-			"ExcludeFileOutput": true,
-			"ExcludeKafka":      true,
-			"ExcludeRedis":      true,
+			"ExcludeConsole":             true,
+			"ExcludeFileOutput":          true,
+			"ExcludeKafka":               true,
+			"ExcludeRedis":               true,
+			"UseDockerMetadataProcessor": false,
 		},
 	}
 }

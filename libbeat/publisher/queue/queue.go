@@ -20,18 +20,18 @@ package queue
 import (
 	"io"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(Eventer, *logp.Logger, *common.Config) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *common.Config) (Queue, error)
 
-// Eventer listens to special events to be send by queue implementations.
-type Eventer interface {
-	OnACK(int) // number of consecutively published messages, acked by producers
+// ACKListener listens to special events to be send by queue implementations.
+type ACKListener interface {
+	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
 
 // Queue is responsible for accepting, forwarding and ACKing events.
@@ -80,23 +80,37 @@ type ProducerConfig struct {
 	DropOnCancel bool
 }
 
-// Producer interface to be used by the pipelines client to forward events to be
-// published to the queue.
-// When a producer calls `Cancel`, it's up to the queue to send or remove
-// events not yet ACKed.
-// Note: A queue is still allowed to send the ACK signal after Cancel. The
-//       pipeline client must filter out ACKs after cancel.
+// Producer is an interface to be used by the pipelines client to forward
+// events to a queue.
 type Producer interface {
+	// Publish adds an event to the queue, blocking if necessary, and returns
+	// true on success.
 	Publish(event publisher.Event) bool
+
+	// TryPublish adds an event to the queue if doing so will not block the
+	// caller, otherwise it immediately returns. The reasons a publish attempt
+	// might block are defined by the specific queue implementation and its
+	// configuration. Returns true if the event was successfully added, false
+	// otherwise.
 	TryPublish(event publisher.Event) bool
+
+	// Cancel closes this Producer endpoint. If the producer is configured to
+	// drop its events on Cancel, the number of dropped events is returned.
+	// Note: A queue may still send ACK signals even after Cancel is called on
+	//       the originating Producer. The pipeline client must accept and
+	//       discard these ACKs.
 	Cancel() int
 }
 
-// Consumer interface to be used by the pipeline output workers.
-// The `Get` method retrieves a batch of events up to size `sz`. If sz <= 0,
-// the batch size is up to the queue.
+// Consumer is an interface to be used by the pipeline output workers,
+// used to read events from the head of the queue.
 type Consumer interface {
-	Get(sz int) (Batch, error)
+	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
+	// there is no bound on the number of returned events.
+	Get(eventCount int) (Batch, error)
+
+	// Close closes this Consumer. Returns an error if the Consumer is
+	// already closed.
 	Close() error
 }
 

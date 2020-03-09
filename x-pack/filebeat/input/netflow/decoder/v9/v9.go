@@ -12,16 +12,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/protocol"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
 const (
 	ProtocolName                 = "v9"
 	LogPrefix                    = "[netflow-v9] "
 	ProtocolID            uint16 = 9
-	MaxSequenceDifference        = 100
+	MaxSequenceDifference        = 1000
 )
 
 type NetflowV9Protocol struct {
@@ -83,8 +83,10 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	remote := source.String()
 
 	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
-	if p.detectReset && session.CheckReset(header.SequenceNo) {
-		p.logger.Printf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, session.lastSequence)
+	if p.detectReset {
+		if prev, reset := session.CheckReset(header.SequenceNo); reset {
+			p.logger.Printf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, prev)
+		}
 	}
 
 	for ; numFlowSets > 0; numFlowSets-- {

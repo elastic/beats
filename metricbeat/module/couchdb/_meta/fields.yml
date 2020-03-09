@@ -2,7 +2,7 @@
   title: "couchdb"
   description: >
     couchdb module
-  release: beta
+  release: ga
   fields:
     - name: couchdb
       type: group

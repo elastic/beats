@@ -18,6 +18,7 @@
 package gotool
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -37,10 +38,35 @@ type Args struct {
 // ArgOpt is a functional option adding info to Args once executed.
 type ArgOpt func(args *Args)
 
+type goInstall func(opts ...ArgOpt) error
+
+// Install runs `go install` and provides optionals for adding command line arguments.
+var Install goInstall = runGoInstall
+
+func runGoInstall(opts ...ArgOpt) error {
+	args := buildArgs(opts)
+	return runVGo("install", args)
+}
+
+func (goInstall) Package(pkg string) ArgOpt { return posArg(pkg) }
+func (goInstall) Vendored() ArgOpt          { return flagArg("-mod", "vendor") }
+
 type goTest func(opts ...ArgOpt) error
 
 // Test runs `go test` and provides optionals for adding command line arguments.
 var Test goTest = runGoTest
+
+// GetModuleName returns the name of the module.
+func GetModuleName() (string, error) {
+	lines, err := getLines(callGo(nil, "list", "-m"))
+	if err != nil {
+		return "", err
+	}
+	if len(lines) != 1 {
+		return "", fmt.Errorf("unexpected number of lines")
+	}
+	return lines[0], nil
+}
 
 // ListProjectPackages lists all packages in the current project
 func ListProjectPackages() ([]string, error) {
@@ -52,12 +78,53 @@ func ListPackages(pkgs ...string) ([]string, error) {
 	return getLines(callGo(nil, "list", pkgs...))
 }
 
+// ListDeps calls `go list -dep` for every package spec given.
+func ListDeps(pkg string) ([]string, error) {
+	const tmpl = `{{if not .Standard}}{{.ImportPath}}{{end}}`
+
+	return getLines(callGo(nil, "list", "-deps", "-f", tmpl, pkg))
+}
+
 // ListTestFiles lists all go and cgo test files available in a package.
 func ListTestFiles(pkg string) ([]string, error) {
 	const tmpl = `{{ range .TestGoFiles }}{{ printf "%s\n" . }}{{ end }}` +
 		`{{ range .XTestGoFiles }}{{ printf "%s\n" . }}{{ end }}`
 
 	return getLines(callGo(nil, "list", "-f", tmpl, pkg))
+}
+
+// ListModuleCacheDir returns the module cache directory containing
+// the specified module. If the module does not exist in the cache,
+// an error will be returned.
+func ListModuleCacheDir(pkg string) (string, error) {
+	return listModuleDir(pkg, false)
+}
+
+// ListModuleVendorDir returns the vendor directory containing the
+// specified module. If the module has not been vendored, an error
+// will be returned.
+func ListModuleVendorDir(pkg string) (string, error) {
+	return listModuleDir(pkg, true)
+}
+
+func listModuleDir(pkg string, vendor bool) (string, error) {
+	env := map[string]string{
+		// Make sure GOFLAGS does not influence behaviour.
+		"GOFLAGS": "",
+	}
+	args := []string{"-m", "-f", "{{.Dir}}"}
+	if vendor {
+		args = append(args, "-mod=vendor")
+	}
+	args = append(args, pkg)
+	lines, err := getLines(callGo(env, "list", args...))
+	if err != nil {
+		return "", err
+	}
+	if n := len(lines); n != 1 {
+		return "", fmt.Errorf("expected 1 line, got %d while looking for %s", n, pkg)
+	}
+	return lines[0], nil
 }
 
 // HasTests returns true if the given package contains test files.

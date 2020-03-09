@@ -23,7 +23,7 @@ data:
     #filebeat.autodiscover:
     #  providers:
     #    - type: kubernetes
-    #      host: ${NODE_NAME}
+    #      node: ${NODE_NAME}
     #      hints.enabled: true
     #      hints.default_config:
     #        type: container
@@ -42,7 +42,7 @@ data:
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
@@ -50,6 +50,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -123,7 +126,7 @@ spec:
           path: /var/lib/filebeat-data
           type: DirectoryOrCreate
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: filebeat
@@ -136,7 +139,7 @@ roleRef:
   name: filebeat
   apiGroup: rbac.authorization.k8s.io
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: filebeat

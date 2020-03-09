@@ -24,32 +24,35 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
 )
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts          []string          `config:"hosts" validate:"required"`
-	Topics         []string          `config:"topics" validate:"required"`
-	GroupID        string            `config:"group_id" validate:"required"`
-	ClientID       string            `config:"client_id"`
-	Version        kafka.Version     `config:"version"`
-	InitialOffset  initialOffset     `config:"initial_offset"`
-	ConnectBackoff time.Duration     `config:"connect_backoff" validate:"min=0"`
-	ConsumeBackoff time.Duration     `config:"consume_backoff" validate:"min=0"`
-	WaitClose      time.Duration     `config:"wait_close" validate:"min=0"`
-	MaxWaitTime    time.Duration     `config:"max_wait_time"`
-	IsolationLevel isolationLevel    `config:"isolation_level"`
-	Fetch          kafkaFetch        `config:"fetch"`
-	Rebalance      kafkaRebalance    `config:"rebalance"`
-	TLS            *tlscommon.Config `config:"ssl"`
-	Username       string            `config:"username"`
-	Password       string            `config:"password"`
+	Hosts                    []string          `config:"hosts" validate:"required"`
+	Topics                   []string          `config:"topics" validate:"required"`
+	GroupID                  string            `config:"group_id" validate:"required"`
+	ClientID                 string            `config:"client_id"`
+	Version                  kafka.Version     `config:"version"`
+	InitialOffset            initialOffset     `config:"initial_offset"`
+	ConnectBackoff           time.Duration     `config:"connect_backoff" validate:"min=0"`
+	ConsumeBackoff           time.Duration     `config:"consume_backoff" validate:"min=0"`
+	WaitClose                time.Duration     `config:"wait_close" validate:"min=0"`
+	MaxWaitTime              time.Duration     `config:"max_wait_time"`
+	IsolationLevel           isolationLevel    `config:"isolation_level"`
+	Fetch                    kafkaFetch        `config:"fetch"`
+	Rebalance                kafkaRebalance    `config:"rebalance"`
+	TLS                      *tlscommon.Config `config:"ssl"`
+	Kerberos                 *kerberos.Config  `config:"kerberos"`
+	Username                 string            `config:"username"`
+	Password                 string            `config:"password"`
+	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
 }
 
 type kafkaFetch struct {
@@ -168,13 +171,26 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Kerberos != nil {
+		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
+			AuthType:           int(config.Kerberos.AuthType),
+			KeyTabPath:         config.Kerberos.KeyTabPath,
+			KerberosConfigPath: config.Kerberos.ConfigPath,
+			ServiceName:        config.Kerberos.ServiceName,
+			Username:           config.Kerberos.Username,
+			Password:           config.Kerberos.Password,
+			Realm:              config.Kerberos.Realm,
+		}
 	}
 
 	if config.Username != "" {

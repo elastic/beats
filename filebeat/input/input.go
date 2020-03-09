@@ -24,11 +24,11 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 var (
@@ -60,7 +60,7 @@ type Runner struct {
 // New instantiates a new Runner
 func New(
 	conf *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
 	dynFields *common.MapStrPointer,
@@ -99,7 +99,7 @@ func New(
 		Meta:          nil,
 	}
 	var ipt Input
-	ipt, err = f(conf, outlet, context)
+	ipt, err = f(conf, connector, context)
 	if err != nil {
 		return input, err
 	}

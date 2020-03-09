@@ -26,25 +26,25 @@ import (
 
 	"github.com/tsg/gopacket/layers"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/service"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/service"
 
-	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/decoder"
-	"github.com/elastic/beats/packetbeat/flows"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/icmp"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/protos/udp"
-	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/elastic/beats/packetbeat/sniffer"
+	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/decoder"
+	"github.com/elastic/beats/v7/packetbeat/flows"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/protos/udp"
+	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/beats/v7/packetbeat/sniffer"
 
 	// Add packetbeat default processors
-	_ "github.com/elastic/beats/packetbeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/v7/packetbeat/processor/add_kubernetes_metadata"
 )
 
 // Beater object. Contains all objects needed to run the beat
@@ -181,6 +181,7 @@ func (pb *packetbeat) setupFlows() error {
 		Processing: beat.ProcessingConfig{
 			EventMetadata: config.Flows.EventMetadata,
 			Processor:     processors,
+			KeepNull:      config.Flows.KeepNull,
 		},
 	})
 	if err != nil {

@@ -19,86 +19,77 @@ package api
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// Start starts the metrics api endpoint on the configured host and port
-func Start(cfg *common.Config) {
-	cfgwarn.Experimental("Metrics endpoint is enabled.")
-	config := DefaultConfig
-	cfg.Unpack(&config)
-
-	logp.Info("Starting stats endpoint")
-	go func() {
-		mux := http.NewServeMux()
-
-		// register handlers
-		mux.HandleFunc("/", rootHandler())
-		mux.HandleFunc("/state", stateHandler)
-		mux.HandleFunc("/stats", statsHandler)
-		mux.HandleFunc("/dataset", datasetHandler)
-
-		url := config.Host + ":" + strconv.Itoa(config.Port)
-		logp.Info("Metrics endpoint listening on: %s", url)
-		endpoint := http.ListenAndServe(url, mux)
-		logp.Info("finished starting stats endpoint: %v", endpoint)
-	}()
+// Server takes cares of correctly starting the HTTP component of the API
+// and will answers all the routes defined in the received ServeMux.
+type Server struct {
+	log    *logp.Logger
+	mux    *http.ServeMux
+	l      net.Listener
+	config Config
 }
 
-func rootHandler() func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Return error page
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-		data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("info").GetRegistry(), monitoring.Full, false)
-
-		print(w, data, r.URL)
+// New creates a new API Server.
+func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, error) {
+	if log == nil {
+		log = logp.NewLogger("")
 	}
+
+	cfg := DefaultConfig
+	err := config.Unpack(&cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	l, err := makeListener(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Server{mux: mux, l: l, config: cfg, log: log.Named("api")}, nil
 }
 
-// stateHandler reports state metrics
-func stateHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("state").GetRegistry(), monitoring.Full, false)
-
-	print(w, data, r.URL)
+// Start starts the HTTP server and accepting new connection.
+func (s *Server) Start() {
+	s.log.Info("Starting stats endpoint")
+	go func(l net.Listener) {
+		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
+		http.Serve(l, s.mux)
+		s.log.Infof("Finished starting stats endpoint: %s", l.Addr().String())
+	}(s.l)
 }
 
-// statsHandler report expvar and all libbeat/monitoring metrics
-func statsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("stats").GetRegistry(), monitoring.Full, false)
-
-	print(w, data, r.URL)
+// Stop stops the API server and free any resource associated with the process like unix sockets.
+func (s *Server) Stop() error {
+	return s.l.Close()
 }
 
-func datasetHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+func parse(host string, port int) (string, string, error) {
+	url, err := url.Parse(host)
+	if err != nil {
+		return "", "", err
+	}
 
-	data := monitoring.CollectStructSnapshot(monitoring.GetNamespace("dataset").GetRegistry(), monitoring.Full, false)
+	// When you don't explicitely define the Scheme we fallback on tcp + host.
+	if len(url.Host) == 0 && len(url.Scheme) == 0 {
+		addr := host + ":" + strconv.Itoa(port)
+		return "tcp", addr, nil
+	}
 
-	print(w, data, r.URL)
-}
-
-func print(w http.ResponseWriter, data common.MapStr, u *url.URL) {
-	query := u.Query()
-	if _, ok := query["pretty"]; ok {
-		fmt.Fprintf(w, data.StringToPrint())
-	} else {
-		fmt.Fprintf(w, data.String())
+	switch url.Scheme {
+	case "http":
+		return "tcp", url.Host, nil
+	case "unix":
+		return url.Scheme, url.Path, nil
+	default:
+		return "", "", fmt.Errorf("unknown scheme %s for host string %s", url.Scheme, host)
 	}
 }

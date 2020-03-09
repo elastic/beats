@@ -24,13 +24,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/couchbase"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/couchbase"
 )
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "couchbase")
+	service := compose.EnsureUpWithTimeout(t, 120, "couchbase")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -43,7 +43,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "couchbase")
+	service := compose.EnsureUpWithTimeout(t, 120, "couchbase")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

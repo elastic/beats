@@ -20,9 +20,9 @@ package config
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/packetbeat/procs"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
 type Config struct {
@@ -36,17 +36,18 @@ type Config struct {
 }
 
 type InterfacesConfig struct {
-	Device       string `config:"device"`
-	Type         string `config:"type"`
-	File         string `config:"file"`
-	WithVlans    bool   `config:"with_vlans"`
-	BpfFilter    string `config:"bpf_filter"`
-	Snaplen      int    `config:"snaplen"`
-	BufferSizeMb int    `config:"buffer_size_mb"`
-	TopSpeed     bool
-	Dumpfile     string
-	OneAtATime   bool
-	Loop         int
+	Device                string `config:"device"`
+	Type                  string `config:"type"`
+	File                  string `config:"file"`
+	WithVlans             bool   `config:"with_vlans"`
+	BpfFilter             string `config:"bpf_filter"`
+	Snaplen               int    `config:"snaplen"`
+	BufferSizeMb          int    `config:"buffer_size_mb"`
+	EnableAutoPromiscMode bool   `config:"auto_promisc_mode"`
+	TopSpeed              bool
+	Dumpfile              string
+	OneAtATime            bool
+	Loop                  int
 }
 
 type Flows struct {
@@ -55,6 +56,7 @@ type Flows struct {
 	Period        string                  `config:"period"`
 	EventMetadata common.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
+	KeepNull      bool                    `config:"keep_null"`
 }
 
 type ProtocolCommon struct {

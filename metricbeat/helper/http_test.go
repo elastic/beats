@@ -18,17 +18,21 @@
 package helper
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestGetAuthHeaderFromToken(t *testing.T) {
@@ -156,6 +160,88 @@ func TestAuthentication(t *testing.T) {
 	response.Body.Close()
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
+}
+
+func TestOverUnixSocket(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skipf("unix domain socket aren't supported under Windows")
+		return
+	}
+
+	t.Run("at root", func(t *testing.T) {
+		tmpDir, err := ioutil.TempDir("", "testsocket")
+		require.NoError(t, err)
+		defer os.RemoveAll(tmpDir)
+
+		sockFile := tmpDir + "/test.sock"
+
+		l, err := net.Listen("unix", sockFile)
+		require.NoError(t, err)
+
+		defer l.Close()
+
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "ehlo!")
+		})
+
+		go http.Serve(l, mux)
+
+		cfg := defaultConfig()
+		hostData := mb.HostData{
+			Transport:    dialer.NewUnixDialerBuilder(sockFile),
+			URI:          "http://unix/",
+			SanitizedURI: "http://unix",
+		}
+
+		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		require.NoError(t, err)
+
+		r, err := h.FetchResponse()
+		require.NoError(t, err)
+		defer r.Body.Close()
+		content, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+		assert.Equal(t, []byte("ehlo!"), content)
+	})
+
+	t.Run("at specific path", func(t *testing.T) {
+		tmpDir, err := ioutil.TempDir("", "testsocket")
+		require.NoError(t, err)
+		defer os.RemoveAll(tmpDir)
+
+		sockFile := tmpDir + "/test.sock"
+		uri := "http://unix/ok"
+
+		l, err := net.Listen("unix", sockFile)
+		require.NoError(t, err)
+
+		defer l.Close()
+
+		mux := http.NewServeMux()
+		mux.HandleFunc("/ok", func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "ehlo!")
+		})
+
+		go http.Serve(l, mux)
+
+		cfg := defaultConfig()
+		hostData := mb.HostData{
+			Transport:    dialer.NewUnixDialerBuilder(sockFile),
+			URI:          uri,
+			SanitizedURI: uri,
+		}
+
+		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		require.NoError(t, err)
+
+		r, err := h.FetchResponse()
+		require.NoError(t, err)
+		defer r.Body.Close()
+		content, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+		assert.Equal(t, []byte("ehlo!"), content)
+	})
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {

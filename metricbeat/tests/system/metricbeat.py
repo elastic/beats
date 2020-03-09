@@ -1,10 +1,12 @@
 import re
 import sys
 import os
+import yaml
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
 
 from beat.beat import TestCase
+from parameterized import parameterized_class
 
 COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
                  "metricset.module", "metricset.rtt", "host.name", "service.name", "event", "ecs"]
@@ -73,7 +75,7 @@ class BaseTest(TestCase):
             for r in replace:
                 pattern = self.build_log_regex(r)
                 log = pattern.sub("", log)
-        self.assertNotRegexpMatches(log, "\tERROR\t|\tWARN\t")
+        self.assertNotRegex(log, "\tERROR\t|\tWARN\t")
 
     def build_log_regex(self, message):
         return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
@@ -95,13 +97,45 @@ class BaseTest(TestCase):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        print output
+        print(output)
         self.assertTrue(len(output) >= 1)
         evt = output[0]
         print(evt)
 
         fields = COMMON_FIELDS + fields
-        print fields
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        print(fields)
+        self.assertCountEqual(self.de_dot(fields), evt.keys())
 
         self.assert_fields_are_documented(evt)
+
+
+def supported_versions(path):
+    """
+    Returns variants information as expected by parameterized_class,
+    that is as a list of lists with an only element that is used to
+    override the value of COMPOSE_ENV.
+    """
+    if not os.path.exists(path):
+        # Return an empty variant so a class is instantiated with defaults
+        return [[{}]]
+
+    variants = []
+    with open(path) as f:
+        versions_info = yaml.safe_load(f)
+
+        for variant in versions_info['variants']:
+            variants += [[variant]]
+
+    return variants
+
+
+def parameterized_with_supported_versions(base_class):
+    """
+    Decorates a class so instead of the base class, multiple copies
+    of it are registered, one for each supported version.
+    """
+    class_dir = os.path.abspath(os.path.dirname(sys.modules[base_class.__module__].__file__))
+    versions_path = os.path.join(class_dir, '_meta', 'supported-versions.yml')
+    variants = supported_versions(versions_path)
+    decorator = parameterized_class(['COMPOSE_ENV'], variants)
+    decorator(base_class)

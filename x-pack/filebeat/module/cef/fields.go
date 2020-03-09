@@ -7,7 +7,7 @@
 package cef
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetCef returns asset data.
 // This is the base64 encoded gzipped contents of module/cef.
 func AssetCef() string {
-	return "eJwszDEOwjAQRNHep5gLJAdwQYOgo4IeBe84sTDeyGuCcnuUQDfFn9fhydUjMHYvlXemA1pqmR7H09kBQgs1zS1p8Tg4ALjsIaJWVAamJZVxq5F1NOjCiutqWccet4n4uRCloWjDIIKYmMV27cFVi+AzDQ1tIoRBhffAiLlqoJnWbS1JaL3D/+vdNwAA//95Jj6g"
+	return "eJx8kMFq8zAQhO9+inmB5AF0+C/5a+ihp5RejZFWzhJZK7Syi9++yImDk0L3JHZGsx9zwJUWA0v+MIqbAjVA4RLI4PTWNoAjtZlTYYkG/xoA+FiN8JKRyRLPHIfqRpBBITNlnBcNMhzxeSHcctE7p5gpOslriiay7NnCMwWn4FgtXA+hCMqFNqU+HVlx1FnySFksqd5jUpaZHemxwd1v1n2dA2I/kqmklpJwLA8JKEsigyHLlHZbR76fQunWKAPfB6Un+Vcb27Q32NpK+7iH06RFRpxLriWNfUocB919fGXec8+cJ+3YPYkb+ZWWb8mv2h+Adb5qIt7/Nz8BAAD//0k3k/4="
 }

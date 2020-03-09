@@ -22,13 +22,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -62,6 +64,8 @@ type enricher struct {
 	isPod              bool
 }
 
+const selector = "kubernetes"
+
 // GetWatcher initializes a kubernetes watcher with the given
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
@@ -87,12 +91,16 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		SyncTimeout: config.SyncPeriod,
 	}
 
+	log := logp.NewLogger(selector)
+
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		options.Node = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
-	return kubernetes.NewWatcher(client, resource, options)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+
+	return kubernetes.NewWatcher(client, resource, options, nil)
 }
 
 // NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
@@ -112,13 +120,16 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.DefaultMetaGeneratorConfig()
+	metaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
-	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
+	cfg, _ := common.NewConfigFrom(&metaConfig)
+
+	metaGen := metadata.NewResourceMetadataGenerator(cfg)
+	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -127,7 +138,7 @@ func NewResourceMetadataEnricher(
 
 			switch r := r.(type) {
 			case *kubernetes.Pod:
-				m[id] = metaGen.PodMetadata(r)
+				m[id] = podMetaGen.Generate(r)
 
 			case *kubernetes.Node:
 				// Report node allocatable resources to PerfMetrics cache
@@ -143,10 +154,18 @@ func NewResourceMetadataEnricher(
 					}
 				}
 
-				m[id] = metaGen.ResourceMetadata(r)
+				m[id] = metaGen.Generate("node", r)
 
+			case *kubernetes.Deployment:
+				m[id] = metaGen.Generate("deployment", r)
+			case *kubernetes.StatefulSet:
+				m[id] = metaGen.Generate("statefulset", r)
+			case *kubernetes.Namespace:
+				m[id] = metaGen.Generate("namespace", r)
+			case *kubernetes.ReplicaSet:
+				m[id] = metaGen.Generate("replicaset", r)
 			default:
-				m[id] = metaGen.ResourceMetadata(r)
+				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
 		},
 		// delete
@@ -186,18 +205,20 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaConfig := kubernetes.DefaultMetaGeneratorConfig()
+	metaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&metaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
 
-	metaGen := kubernetes.NewMetaGeneratorFromConfig(&metaConfig)
+	cfg, _ := common.NewConfigFrom(&metaConfig)
+
+	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
-			meta := metaGen.PodMetadata(pod)
+			meta := metaGen.Generate(pod)
 
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)

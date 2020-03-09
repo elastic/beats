@@ -29,13 +29,15 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
-	errorSuccess            syscall.Errno = 0
-	ioctlDiskPerformance                  = 0x70020
-	ioctlDiskPerformanceOff               = 0x70060
+	errorSuccess syscall.Errno = 0
+	// ioctlDiskPerformance is used to enable performance counters that provide disk performance information.
+	ioctlDiskPerformance = 0x70020
+	// ioctlDiskPerformanceOff used to disable performance counters that provide disk performance information.
+	ioctlDiskPerformanceOff = 0x70060
 )
 
 var (
@@ -47,21 +49,6 @@ var (
 type logicalDrive struct {
 	Name    string
 	UNCPath string
-}
-
-type diskPerformance struct {
-	BytesRead           int64
-	BytesWritten        int64
-	ReadTime            int64
-	WriteTime           int64
-	IdleTime            int64
-	ReadCount           uint32
-	WriteCount          uint32
-	QueueDepth          uint32
-	SplitCount          uint32
-	QueryTime           int64
-	StorageDeviceNumber uint32
-	StorageManagerName  [8]uint16
 }
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.
@@ -95,8 +82,9 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 			WriteCount: uint64(counter.WriteCount),
 			ReadBytes:  uint64(counter.BytesRead),
 			WriteBytes: uint64(counter.BytesWritten),
-			ReadTime:   uint64(counter.ReadTime),
-			WriteTime:  uint64(counter.WriteTime),
+			// Ticks (which is equal to 100 nanoseconds) will be converted to milliseconds for consistency reasons for both ReadTime and WriteTime (https://docs.microsoft.com/en-us/dotnet/api/system.timespan.ticks?redirectedfrom=MSDN&view=netframework-4.8#remarks)
+			ReadTime:  uint64(counter.ReadTime / 10000),
+			WriteTime: uint64(counter.WriteTime / 10000),
 		}
 	}
 	return ret, nil
@@ -134,6 +122,16 @@ func ioCounter(path string, diskPerformance *diskPerformance) error {
 // enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
 func enablePerformanceCounters() error {
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\partmgr", registry.READ|registry.WRITE)
+	// closing handler for the registry key. If the key is not one of the predefined registry keys (which is the case here), a call the RegCloseKey function should be executed after using the handle.
+	defer func() {
+		if key != 0 {
+			clErr := key.Close()
+			if clErr != nil {
+				logp.L().Named("diskio").Errorf("cannot close handler for HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry: %s", clErr)
+			}
+		}
+	}()
+
 	if err != nil {
 		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
 	}
@@ -144,6 +142,7 @@ func enablePerformanceCounters() error {
 		}
 		logp.L().Named("diskio").Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
+
 	return nil
 }
 

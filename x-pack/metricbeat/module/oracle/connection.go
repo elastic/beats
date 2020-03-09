@@ -7,10 +7,10 @@ package oracle
 import (
 	"database/sql"
 
-	"gopkg.in/goracle.v2"
+	"github.com/godror/godror"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )
@@ -37,7 +37,7 @@ func init() {
 
 // NewConnection returns a connection already established with Oracle
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
-	params, err := goracle.ParseConnString(c.Hosts[0])
+	params, err := godror.ParseConnString(c.Hosts[0])
 	if err != nil {
 		return nil, errors.Wrap(err, "error trying to parse connection string in field 'hosts'")
 	}
@@ -54,7 +54,7 @@ func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
 		return nil, errors.New("a user with DBA permissions are required, check your connection details on field `hosts`")
 	}
 
-	db, err := sql.Open("goracle", params.StringWithPassword())
+	db, err := sql.Open("godror", params.StringWithPassword())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not open database")
 	}

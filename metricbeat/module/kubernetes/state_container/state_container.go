@@ -18,13 +18,15 @@
 package state_container
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	p "github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v7/libbeat/common"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const (
@@ -131,6 +133,22 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 		}
 
+		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
+		var rootFields common.MapStr
+		if containerID, ok := event["id"]; ok {
+			// we don't expect errors here, but if any we would obtain an
+			// empty string
+			cID := (containerID).(string)
+			split := strings.Index(cID, "://")
+			if split != -1 {
+				rootFields = common.MapStr{
+					"container": common.MapStr{
+						"runtime": cID[:split],
+						"id":      cID[split+3:],
+					}}
+			}
+		}
+
 		var moduleFieldsMapStr common.MapStr
 		moduleFields, ok := event[mb.ModuleDataKey]
 		if ok {
@@ -142,6 +160,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		delete(event, mb.ModuleDataKey)
 
 		if reported := reporter.Event(mb.Event{
+			RootFields:      rootFields,
 			MetricSetFields: event,
 			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.container",

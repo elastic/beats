@@ -28,15 +28,16 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/generator/common/beatgen"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
 	// BeatsWithDashboards is a list of Beats to collect dashboards from.
 	BeatsWithDashboards = []string{
 		"heartbeat",
-		"journalbeat",
 		"packetbeat",
 		"winlogbeat",
 		"x-pack/auditbeat",
@@ -44,6 +45,11 @@ var (
 		"x-pack/metricbeat",
 	}
 )
+
+// GenerateCustomBeat generates a new custom beat
+func GenerateCustomBeat() error {
+	return beatgen.Generate()
+}
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
@@ -103,8 +109,8 @@ func AddLicenseHeaders() error {
 		licenser(
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
-			licenser.Exclude("generator/beat/{beat}"),
-			licenser.Exclude("generator/metricbeat/{beat}"),
+			licenser.Exclude("generator/_templates/beat/{beat}"),
+			licenser.Exclude("generator/_templates/metricbeat/{beat}"),
 		),
 		licenser(
 			licenser.License("Elastic"),
@@ -127,8 +133,9 @@ func CheckLicenseHeaders() error {
 			licenser.Check(),
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
-			licenser.Exclude("generator/beat/{beat}"),
-			licenser.Exclude("generator/metricbeat/{beat}"),
+			licenser.Exclude("generator/_templates/beat/{beat}"),
+			licenser.Exclude("generator/_templates/metricbeat/{beat}"),
+			licenser.Exclude("generator/_templates/beat/{beat}"),
 		),
 		licenser(
 			licenser.Check(),
@@ -141,4 +148,9 @@ func CheckLicenseHeaders() error {
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
 	return devtools.DumpVariables()
+}
+
+// Vendor moves dependencies to the repo using go modules.
+func Vendor() error {
+	return devtools.Vendor()
 }

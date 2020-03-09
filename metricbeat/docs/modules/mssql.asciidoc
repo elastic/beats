@@ -11,25 +11,51 @@ beta[]
 This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
 
 [float]
-== Compatibility
+=== Compatibility
 
 The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux
 
 [float]
-== Metricsets
+=== Metricsets
 
 The following Metricsets are already included:
 
 [float]
-=== `transaction_log`
+==== `transaction_log`
 
 `transaction_log` Metricset fetches information about the operation and transaction log of each MSSQL database in the monitored instance. All data is extracted from the https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/database-related-dynamic-management-views-transact-sql?view=sql-server-2017[Database Dynamic Management Views]
 
 [float]
-=== `performance`
+==== `performance`
 
 `performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
 
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you can specify native user credentials 
+as part of the host string with the following format:
+
+----
+hosts: ["sqlserver://sa@localhost"]]
+----
+
+To use Active Directory domain credentials, you can separately specify the username and password
+using the respective configuration options to allow the domain to be included in the username:
+
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10
+----
+
+Store sensitive values like passwords in the <<keystore,secrets keystore>>.
 
 [float]
 === Example configuration
@@ -44,7 +70,9 @@ metricbeat.modules:
   metricsets:
     - "transaction_log"
     - "performance"
-  hosts: ["sqlserver://sa@localhost"]
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
   period: 10s
 
 ----

@@ -55,10 +55,6 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
-The location where you clone is important. Make a directory structure under
-`GOPATH` that matches the URL used for Elastic repositories, then clone the
-beats repository under the new directory:
-
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
@@ -96,6 +92,8 @@ and documentation. The primary command used for this is:
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
+Each Beat has its own `update` target, as well as a master `update` in the repository root. 
+If a PR adds or removes a dependency, run `make update` in the root `beats` directory.
 
 Another command properly formats go source files and adds a copyright header:
 
@@ -104,16 +102,23 @@ Another command properly formats go source files and adds a copyright header:
 make fmt
 --------------------------------------------------------------------------------
 
+Both of these commands should be run before submitting a PR. You can view all
+the available make targets with `make help`.
+
 These commands have the following dependencies:
 
 * Python >= {python}
-* https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
+* Python https://docs.python.org/3/library/venv.html[venv module]
 * https://github.com/magefile/mage[Mage]
 
-Virtualenv can be installed with the command `easy_install virtualenv` or `pip
-install virtualenv`. More details can be found
-https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR. You can view all the available make targets with `make help`.
+Python venv module is included in the standard library in Python 3. On Debian/Ubuntu
+systems it also requires to install the `python3-venv` package, that includes
+additional support scripts:
 
+[source,shell]
+--------------------------------------------------------------------------------
+sudo apt-get install python3-venv
+--------------------------------------------------------------------------------
 
 [float]
 [[build-target-env-vars]]
@@ -170,11 +175,34 @@ your browser with the docs for preview.
 [[dependencies]]
 === Dependencies
 
-To manage the `vendor/` folder we use
-https://github.com/kardianos/govendor[govendor]. Please see
-the govendor documentation on how to add or update vendored dependencies.
+In order to create Beats we rely on Golang libraries and other
+external tools.
 
-In most cases `govendor fetch your/dependency@version +out` will get the job done.
+[float]
+==== Golang
+
+To manage the `vendor/` folder we use go modules.
+
+To update the contents of `vendor/`, run `mage vendor`.
+
+[float]
+==== Other dependencies
+
+Besides Go libraries, we are using development tools to generate parsers for inputs and processors.
+
+The following packages are required to run `go generate`:
+
+[float]
+===== Auditbeat
+
+* FlatBuffers >= 1.9
+
+[float]
+===== Filebeat
+
+* Graphviz >= 2.43.0
+* Ragel >= 6.10
+
 
 [float]
 [[changelog]]

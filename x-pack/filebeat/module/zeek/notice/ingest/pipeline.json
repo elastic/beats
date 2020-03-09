@@ -2,9 +2,20 @@
   "description": "Pipeline for normalizing Zeek notice.log",
   "processors": [
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['notice']['ts'] * 1000; ctx.zeek.notice.remove('ts');"
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.notice.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.notice.ts"
       }
     },
     {
@@ -95,10 +106,10 @@
       }
     }
   ],
-  "on_failure" : [{ 
-    "set" : { 
-      "field" : "error.message", 
-      "value" : "{{ _ingest.on_failure_message }}" 
-    } 
+  "on_failure": [{
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
   }]
 }

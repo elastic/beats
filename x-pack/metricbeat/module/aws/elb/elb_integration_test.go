@@ -7,18 +7,40 @@
 package elb
 
 import (
+	"fmt"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestData(t *testing.T) {
+	namespaceIs := func(namespace string) func(e common.MapStr) bool {
+		return func(e common.MapStr) bool {
+			v, err := e.GetValue("aws.cloudwatch.namespace")
+			return err == nil && v == namespace
+		}
+	}
+
+	dataFiles := []struct {
+		namespace string
+		path      string
+	}{
+		{"AWS/ELB", "./_meta/data.json"},
+		{"AWS/ApplicationELB", "./_meta/data_alb.json"},
+		{"AWS/NetworkELB", "./_meta/data_nlb.json"},
+	}
+
 	config, info := mtest.GetConfigForTest("elb", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}
 
-	metricSet := mbtest.NewFetcher(t, config)
-	metricSet.WriteEvents(t, "/")
+	for _, df := range dataFiles {
+		metricSet := mbtest.NewFetcher(t, config)
+		t.Run(fmt.Sprintf("namespace: %s", df.namespace), func(t *testing.T) {
+			metricSet.WriteEventsCond(t, df.path, namespaceIs(df.namespace))
+		})
+	}
 }

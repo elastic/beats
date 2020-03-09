@@ -23,8 +23,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Test metadata updates don't replace existing pod metrics
@@ -38,6 +39,7 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 	}
 
 	processor := kubernetesAnnotator{
+		log:   logp.NewLogger(selector),
 		cache: newCache(10 * time.Second),
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},

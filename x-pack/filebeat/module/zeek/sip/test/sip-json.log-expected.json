@@ -1,0 +1,134 @@
+[
+    {
+        "@timestamp": "2013-02-26T22:02:39.055Z",
+        "destination.address": "74.63.41.218",
+        "destination.ip": "74.63.41.218",
+        "destination.port": 5060,
+        "event.dataset": "zeek.sip",
+        "event.id": "CPRLCB4eWHdjP852Bk",
+        "event.module": "zeek",
+        "fileset.name": "sip",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:t8Jl0amIXPHemzxKgsLjtkB+ewo=",
+        "network.protocol": "sip",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "172.16.133.19",
+        "source.ip": "172.16.133.19",
+        "source.port": 5060,
+        "tags": [
+            "zeek.sip"
+        ],
+        "zeek.session_id": "CPRLCB4eWHdjP852Bk",
+        "zeek.sip.call_id": "8694cd7e-976e4fc3-d76f6e38@172.16.133.19",
+        "zeek.sip.request.body_length": 0,
+        "zeek.sip.request.from": "\"AppNeta\" <sip:116954_Boston6@newyork.voip.ms>",
+        "zeek.sip.request.path": [
+            "SIP/2.0/UDP 172.16.133.19:5060"
+        ],
+        "zeek.sip.request.to": "<sip:116954_Boston6@newyork.voip.ms>",
+        "zeek.sip.response.body_length": 0,
+        "zeek.sip.response.from": "\"AppNeta\" <sip:116954_Boston6@newyork.voip.ms>",
+        "zeek.sip.response.path": [
+            "SIP/2.0/UDP 172.16.133.19:5060"
+        ],
+        "zeek.sip.response.to": "<sip:116954_Boston6@newyork.voip.ms>;tag=as023f66a5",
+        "zeek.sip.sequence.method": "REGISTER",
+        "zeek.sip.sequence.number": "4127",
+        "zeek.sip.status.code": 401,
+        "zeek.sip.status.msg": "Unauthorized",
+        "zeek.sip.transaction_depth": 0,
+        "zeek.sip.uri": "sip:newyork.voip.ms:5060",
+        "zeek.sip.user_agent": "PolycomSoundStationIP-SSIP_5000-UA/3.2.4.0267"
+    },
+    {
+        "@timestamp": "2005-01-14T17:58:02.965Z",
+        "destination.address": "200.57.7.195",
+        "destination.ip": "200.57.7.195",
+        "destination.port": 5060,
+        "event.dataset": "zeek.sip",
+        "event.id": "ComJz236lSOcuOmix3",
+        "event.module": "zeek",
+        "fileset.name": "sip",
+        "input.type": "log",
+        "log.offset": 805,
+        "network.community_id": "1:U/Makwsc8lm6pVKLfRMzoNTI++0=",
+        "network.protocol": "sip",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "200.57.7.204",
+        "source.ip": "200.57.7.204",
+        "source.port": 5061,
+        "tags": [
+            "zeek.sip"
+        ],
+        "zeek.session_id": "ComJz236lSOcuOmix3",
+        "zeek.sip.call_id": "12013223@200.57.7.195",
+        "zeek.sip.request.body_length": 229,
+        "zeek.sip.request.from": "<sip:200.57.7.195:55061;user=phone>",
+        "zeek.sip.request.path": [
+            "SIP/2.0/UDP 200.57.7.195",
+            "SIP/2.0/UDP 200.57.7.195:55061"
+        ],
+        "zeek.sip.request.to": "\"francisco@bestel.com\" <sip:francisco@bestel.com:55060>",
+        "zeek.sip.response.body_length": 0,
+        "zeek.sip.response.from": "<sip:200.57.7.195:55061;user=phone>",
+        "zeek.sip.response.path": [
+            "SIP/2.0/UDP 200.57.7.195",
+            "SIP/2.0/UDP 200.57.7.195:55061",
+            "SIP/2.0/UDP 200.57.7.195",
+            "SIP/2.0/UDP 200.57.7.195:55061"
+        ],
+        "zeek.sip.response.to": "\"francisco@bestel.com\" <sip:francisco@bestel.com:55060>;tag=298852044",
+        "zeek.sip.sequence.method": "INVITE",
+        "zeek.sip.sequence.number": "1",
+        "zeek.sip.status.code": 180,
+        "zeek.sip.status.msg": "Ringing",
+        "zeek.sip.transaction_depth": 0,
+        "zeek.sip.uri": "sip:francisco@bestel.com:55060"
+    },
+    {
+        "@timestamp": "2005-01-14T17:58:07.022Z",
+        "destination.address": "200.57.7.195",
+        "destination.ip": "200.57.7.195",
+        "destination.port": 5060,
+        "event.dataset": "zeek.sip",
+        "event.id": "CJZDWgixtwqXctWEg",
+        "event.module": "zeek",
+        "fileset.name": "sip",
+        "input.type": "log",
+        "log.offset": 1654,
+        "network.community_id": "1:0hvHF/bh5wFKg7nfRXxsno4F198=",
+        "network.protocol": "sip",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "200.57.7.205",
+        "source.ip": "200.57.7.205",
+        "source.port": 5061,
+        "tags": [
+            "zeek.sip"
+        ],
+        "zeek.session_id": "CJZDWgixtwqXctWEg",
+        "zeek.sip.call_id": "46E1C3CB36304F84A020CF6DD3F96461@Verso.com",
+        "zeek.sip.request.body_length": 0,
+        "zeek.sip.request.from": "Ivan <sip:Ivan@Verso.com>",
+        "zeek.sip.request.path": [
+            "SIP/2.0/UDP 200.57.7.205:5061;rport"
+        ],
+        "zeek.sip.request.to": "Ivan <sip:Ivan@Verso.com>",
+        "zeek.sip.response.body_length": 0,
+        "zeek.sip.response.from": "\"Ivan\" <sip:Ivan@Verso.com>",
+        "zeek.sip.response.path": [
+            "SIP/2.0/UDP 200.57.7.205:5061;received=200.57.7.205;rport=5061"
+        ],
+        "zeek.sip.response.to": "\"Ivan\" <sip:Ivan@Verso.com>",
+        "zeek.sip.sequence.method": "REGISTER",
+        "zeek.sip.sequence.number": "37764",
+        "zeek.sip.status.code": 200,
+        "zeek.sip.status.msg": "OK",
+        "zeek.sip.transaction_depth": 0,
+        "zeek.sip.uri": "sip:Verso.com",
+        "zeek.sip.user_agent": "Verso Softphone release 1104w"
+    }
+]

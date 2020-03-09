@@ -20,7 +20,7 @@ package udp
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 )
 
 // Config options for the UDPServer
@@ -28,5 +28,5 @@ type Config struct {
 	Host           string           `config:"host"`
 	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"positive,nonzero"`
 	Timeout        time.Duration    `config:"timeout"`
-	ReadBuffer     cfgtype.ByteSize `config:"read_buffer" validate:"positive,nonzero"`
+	ReadBuffer     cfgtype.ByteSize `config:"read_buffer" validate:"positive"`
 }

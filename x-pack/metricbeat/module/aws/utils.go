@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"math"
 	"strings"
 	"time"
 
@@ -16,8 +17,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -32,20 +33,30 @@ func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
-	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
-	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+	var metricsTotal []cloudwatch.Metric
+	init := true
+	var nextToken *string
 
-	// List metrics of a given namespace for each region
-	listMetricsOutput, err := reqListMetrics.Send(context.TODO())
-	if err != nil {
-		return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
+	for init || nextToken != nil {
+		init = false
+		listMetricsInput := &cloudwatch.ListMetricsInput{
+			NextToken: nextToken,
+		}
+		if namespace != "*" {
+			listMetricsInput.Namespace = &namespace
+		}
+		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+
+		// List metrics of a given namespace for each region
+		listMetricsOutput, err := reqListMetrics.Send(context.TODO())
+		if err != nil {
+			return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
+		}
+		metricsTotal = append(metricsTotal, listMetricsOutput.Metrics...)
+		nextToken = listMetricsOutput.NextToken
 	}
 
-	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-		// No metrics in this region
-		return nil, nil
-	}
-	return listMetricsOutput.Metrics, nil
+	return metricsTotal, nil
 }
 
 func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
@@ -67,18 +78,15 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
 	init := true
+	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
 		// Split metricDataQueries into smaller slices that length no longer than 100.
+		// 100 is defined in maxQuerySize.
 		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-		iter := len(metricDataQueries) / 100
-		for i := 0; i <= iter; i++ {
-			metricDataQueriesPartial := metricDataQueries[iter*100:]
-			if i != iter {
-				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
-			}
-
+		for i := 0; i < len(metricDataQueries); i += maxQuerySize {
+			metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
 			if len(metricDataQueriesPartial) == 0 {
 				return getMetricDataOutput.MetricDataResults, nil
 			}
@@ -204,6 +212,9 @@ func findIdentifierFromARN(resourceARN string) (string, error) {
 	} else if strings.Contains(arnParsed.Resource, "/") {
 		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
 	}
-	identifier := resourceARNSplit[len(resourceARNSplit)-1]
-	return identifier, nil
+
+	if len(resourceARNSplit) <= 1 {
+		return resourceARNSplit[0], nil
+	}
+	return strings.Join(resourceARNSplit[1:], "/"), nil
 }

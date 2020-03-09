@@ -18,9 +18,11 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 )
 
 // ConnectorFunc is an adapter for using ordinary functions as Connector.
@@ -51,22 +53,9 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return nil, err
 	}
 
-	var err error
-	var userProcessors beat.ProcessorList
-
-	userProcessors, err = processors.New(config.Processors)
+	procs, err := processorsForConfig(c.parent.beatInfo, config, clientCfg)
 	if err != nil {
 		return nil, err
-	}
-
-	if lst := clientCfg.Processing.Processor; lst != nil {
-		if len(userProcessors.All()) == 0 {
-			userProcessors = lst
-		} else if orig := lst.All(); len(orig) > 0 {
-			newLst := processors.NewList(nil)
-			newLst.List = append(newLst.List, lst, userProcessors)
-			userProcessors = newLst
-		}
 	}
 
 	setOptional := func(to common.MapStr, key string, value string) {
@@ -105,7 +94,8 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	clientCfg.Processing.EventMetadata = config.EventMetadata
 	clientCfg.Processing.Meta = meta
 	clientCfg.Processing.Fields = fields
-	clientCfg.Processing.Processor = userProcessors
+	clientCfg.Processing.Processor = procs
+	clientCfg.Processing.KeepNull = config.KeepNull
 	client, err := c.pipeline.ConnectWith(clientCfg)
 	if err != nil {
 		return nil, err
@@ -116,4 +106,38 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 		return CloseOnSignal(outlet, c.parent.done), nil
 	}
 	return outlet, nil
+}
+
+// processorsForConfig assembles the Processors for a pipelineConnector.
+func processorsForConfig(
+	beatInfo beat.Info, config inputOutletConfig, clientCfg beat.ClientConfig,
+) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor ordering is important:
+	// 1. Index configuration
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
+
+	// 2. ClientConfig processors
+	if lst := clientCfg.Processing.Processor; lst != nil {
+		procs.AddProcessor(lst)
+	}
+
+	// 3. User processors
+	userProcessors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcessors)
+
+	return procs, nil
 }

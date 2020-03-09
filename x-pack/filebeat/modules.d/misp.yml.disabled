@@ -1,0 +1,20 @@
+# Module: misp
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-misp.html
+
+- module: misp
+  threat:
+    enabled: true
+    # API key to access MISP
+    #var.api_key
+
+    # Array object in MISP response
+    #var.json_objects_array
+
+    # URL of the MISP REST API
+    #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }

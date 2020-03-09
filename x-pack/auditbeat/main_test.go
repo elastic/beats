@@ -10,12 +10,14 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/auditbeat/cmd"
+	"github.com/elastic/beats/v7/auditbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
 var systemTest *bool
 
 func init() {
+	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
@@ -27,4 +29,8 @@ func TestSystem(t *testing.T) {
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, cmd.Name)
 }

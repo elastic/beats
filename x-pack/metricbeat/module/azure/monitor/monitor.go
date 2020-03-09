@@ -5,11 +5,8 @@
 package monitor
 
 import (
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -25,44 +22,18 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
-	mb.BaseMetricSet
-	client *azure.Client
+	*azure.MetricSet
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The azure monitor metricset is beta.")
-	var config azure.Config
-	err := base.Module().UnpackConfig(&config)
+	ms, err := azure.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, err
 	}
-	if len(config.Resources) == 0 {
-		return nil, errors.New("no resource options defined: module azure - monitor metricset")
-	}
-	monitorClient, err := azure.NewClient(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error initializing the monitor client: module azure - monitor metricset")
-	}
+	ms.MapMetrics = mapMetrics
 	return &MetricSet{
-		BaseMetricSet: base,
-		client:        monitorClient,
+		MetricSet: ms,
 	}, nil
-}
-
-// Fetch methods implements the data gathering and data conversion to the right
-// format. It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	// initialize or refresh the resources configured
-	err := m.client.InitResources(mapMetric, report)
-	if err != nil {
-		return err
-	}
-	err = m.client.GetMetricValues(report)
-	if err != nil {
-		return err
-	}
-	return azure.EventsMapping(report, m.client.Resources.Metrics, m.BaseMetricSet.Name())
 }

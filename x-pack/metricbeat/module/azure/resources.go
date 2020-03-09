@@ -11,13 +11,16 @@ import (
 
 // Resource will contain the main azure resource details
 type Resource struct {
-	ID           string
+	// SubId is used for the metric values api as namespaces can apply to sub resrouces ex. storage account: container, blob, vm scaleset: vms
+	SubId        string
+	Id           string
 	Name         string
 	Location     string
 	Type         string
 	Group        string
 	Tags         map[string]string
 	Subscription string
+	Size         string
 }
 
 // Metric will contain the main azure metric details

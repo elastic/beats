@@ -1,12 +1,13 @@
 [
     {
-        "@timestamp": "2018-01-10T23:00:27.000-02:00",
+        "@timestamp": "2018-01-11T01:00:27.000-02:00",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.security.application_protocol": "http",
         "cisco.ftd.security.client": "webserver",
         "cisco.ftd.security.dst_ip": "10.8.12.47",
         "cisco.ftd.security.message": "Intrusion attempt",
         "cisco.ftd.security.src_ip": "10.1.123.45",
+        "destination.address": "10.8.12.47",
         "destination.ip": "10.8.12.47",
         "event.action": "intrusion-detected",
         "event.code": 430001,
@@ -26,13 +27,14 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "service.type": "cisco",
+        "source.address": "10.1.123.45",
         "source.ip": "10.1.123.45",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2018-01-10T23:00:27.000-02:00",
+        "@timestamp": "2018-01-11T01:00:27.000-02:00",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.security.http_response": "404",
         "cisco.ftd.security.message": "Some message here (1:36330:2).",
@@ -58,7 +60,7 @@
         ]
     },
     {
-        "@timestamp": "2018-01-10T23:00:27.000-02:00",
+        "@timestamp": "2018-01-11T01:00:27.000-02:00",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.security.http_response": "404",
         "cisco.ftd.security.message": "Some message here (1:36330:2)",
@@ -84,7 +86,7 @@
         ]
     },
     {
-        "@timestamp": "2018-01-10T23:00:27.000-02:00",
+        "@timestamp": "2018-01-11T01:00:27.000-02:00",
         "cisco.ftd.message_id": "430005",
         "cisco.ftd.security.dst_ip": "192.168.3.33",
         "cisco.ftd.security.dst_port": "64311",
@@ -95,6 +97,7 @@
         ],
         "cisco.ftd.security.src_ip": "127.0.0.1",
         "cisco.ftd.security.src_port": "512",
+        "destination.address": "192.168.3.33",
         "destination.ip": "192.168.3.33",
         "destination.port": 64311,
         "event.action": "malware-detected",
@@ -117,6 +120,7 @@
         "process.name": "ftd",
         "process.pid": 1234,
         "service.type": "cisco",
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 512,
         "tags": [

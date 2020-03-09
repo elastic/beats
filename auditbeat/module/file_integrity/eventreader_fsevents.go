@@ -20,7 +20,6 @@
 package file_integrity
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,14 +28,8 @@ import (
 	"github.com/fsnotify/fsevents"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
-
-var underTest = false
-
-func init() {
-	underTest = flag.Lookup("test.v") != nil
-}
 
 type fsreader struct {
 	stream      *fsevents.EventStream

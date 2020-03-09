@@ -20,27 +20,26 @@
 package elasticsearch
 
 import (
+	"context"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 )
-
-func TestClientConnect(t *testing.T) {
-	client := getTestingElasticsearch(t)
-	err := client.Connect()
-	assert.NoError(t, err)
-}
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
@@ -49,7 +48,7 @@ func TestClientPublishEvent(t *testing.T) {
 	})
 
 	// drop old index preparing test
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -64,12 +63,12 @@ func TestClientPublishEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, resp, err := client.CountSearchURI(index, "", nil)
+	_, resp, err := client.conn.CountSearchURI(index, "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,10 +88,10 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	// Check version
-	if client.Connection.version.Major < 5 {
+	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
@@ -104,7 +103,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -125,8 +124,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +149,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 			"testfield": 0,
 		}})
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,9 +170,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
-	if client.Connection.version.Major < 5 {
+	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
@@ -185,7 +184,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -206,8 +205,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +232,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 			}},
 	)
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,9 +243,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            internal.GetEsHost(),
-		"username":         internal.GetUser(),
-		"password":         internal.GetPass(),
+		"hosts":            eslegtest.GetEsHost(),
+		"username":         eslegtest.GetUser(),
+		"password":         eslegtest.GetPass(),
 		"template.enabled": false,
 	})
 	if err != nil {
@@ -282,20 +281,6 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	return client, client
 }
 
-// getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t internal.TestLogger) *Client {
-	client, err := NewClient(ClientSettings{
-		URL:              internal.GetURL(),
-		Index:            outil.MakeSelector(),
-		Username:         internal.GetUser(),
-		Password:         internal.GetUser(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	internal.InitClient(t, client, err)
-	return client
-}
-
 func randomClient(grp outputs.Group) outputs.NetworkClient {
 	L := len(grp.Clients)
 	if L == 0 {
@@ -304,4 +289,33 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 
 	client := grp.Clients[rand.Intn(L)]
 	return client.(outputs.NetworkClient)
+}
+
+// startTestProxy starts a proxy that redirects all connections to the specified URL
+func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
+	t.Helper()
+
+	realURL, err := url.Parse(redirectURL)
+	require.NoError(t, err)
+
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := r.Clone(context.Background())
+		req.RequestURI = ""
+		req.URL.Scheme = realURL.Scheme
+		req.URL.Host = realURL.Host
+
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+
+		for _, header := range []string{"Content-Encoding", "Content-Type"} {
+			w.Header().Set(header, resp.Header.Get(header))
+		}
+		w.WriteHeader(resp.StatusCode)
+		w.Write(body)
+	}))
+	return proxy
 }

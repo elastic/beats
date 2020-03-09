@@ -30,11 +30,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 type testParser struct {
@@ -990,6 +990,43 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 	}
 }
 
+func TestHttpParser_RedactHeaders(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
+
+	http := httpModForTests(nil)
+	http.redactAuthorization = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	http.redactHeaders = []string{"header-to-redact", "should-not-exist"}
+
+	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
+		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
+		"Content-Type: text/xml; charset=utf-8\r\n" +
+		"SOAPAction: \"\"\r\n" +
+		"Header-To-Redact: sensitive-value\r\n" +
+		"Host: production.example.com\r\n" +
+		"Content-Length: 0\r\n" +
+		"Expect: 100-continue\r\n" +
+		"Accept-Encoding: gzip\r\n" +
+		"X-Forwarded-For: 10.216.89.132\r\n" +
+		"\r\n")
+
+	st := &stream{data: data, message: new(message)}
+
+	ok, _ := testParseStream(http, st, 0)
+
+	http.hideHeaders(st.message)
+
+	assert.True(t, ok)
+	var redactedString common.NetString = []byte("REDACTED")
+	var expectedAcceptEncoding common.NetString = []byte("gzip")
+	assert.Equal(t, redactedString, st.message.headers["header-to-redact"])
+	assert.Equal(t, expectedAcceptEncoding, st.message.headers["accept-encoding"])
+
+	_, invalidHeaderExists := st.message.headers["should-not-exist"]
+	assert.False(t, invalidHeaderExists)
+}
+
 func Test_splitCookiesHeader(t *testing.T) {
 	type io struct {
 		Input  string
@@ -1657,6 +1694,124 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 	}
 
 	assert.Equal(t, deflateBody, body)
+}
+
+func TestHttpParser_hostHeader(t *testing.T) {
+	template := "HEAD /_cat/shards HTTP/1.1\r\n" +
+		"Host: %s\r\n" +
+		"\r\n"
+	var store eventStore
+	http := httpModForTests(&store)
+	for _, test := range []struct {
+		title, host string
+		port        uint16
+		expected    common.MapStr
+	}{
+		{
+			title: "domain alone",
+			host:  "elasticsearch",
+			expected: common.MapStr{
+				"destination.domain": "elasticsearch",
+				"url.full":           "http://elasticsearch/_cat/shards",
+			},
+		},
+		{
+			title: "domain with port",
+			port:  9200,
+			host:  "elasticsearch:9200",
+			expected: common.MapStr{
+				"destination.domain": "elasticsearch",
+				"url.full":           "http://elasticsearch:9200/_cat/shards",
+			},
+		},
+		{
+			title: "ipv4",
+			host:  "127.0.0.1",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://127.0.0.1/_cat/shards",
+			},
+		},
+		{
+			title: "ipv4 with port",
+			port:  9200,
+			host:  "127.0.0.1:9200",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://127.0.0.1:9200/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 unboxed",
+			host:  "fd00::42",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::42]/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 boxed",
+			host:  "[fd00::42]",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::42]/_cat/shards",
+			},
+		},
+		{
+			title: "ipv6 boxed with port",
+			port:  9200,
+			host:  "[::1]:9200",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[::1]:9200/_cat/shards",
+			},
+		},
+		{
+			title: "non boxed ipv6",
+			// This one is now illegal but it seems at some point the RFC
+			// didn't enforce the brackets when the port was omitted.
+			host: "fd00::1234",
+			expected: common.MapStr{
+				"destination.domain": nil,
+				"url.full":           "http://[fd00::1234]/_cat/shards",
+			},
+		},
+		{
+			title: "non-matching port",
+			port:  80,
+			host:  "myhost:9200",
+			expected: common.MapStr{
+				"destination.domain": "myhost",
+				"url.full":           "http://myhost:9200/_cat/shards",
+				"error.message":      []string{"Unmatched request", "Host header port number mismatch"},
+			},
+		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			request := fmt.Sprintf(template, test.host)
+			tcptuple := testCreateTCPTuple()
+			if test.port != 0 {
+				tcptuple.DstPort = test.port
+			}
+			packet := protos.Packet{Payload: []byte(request)}
+			private := protos.ProtocolData(&httpConnectionData{})
+			private = http.Parse(&packet, tcptuple, 1, private)
+			http.Expired(tcptuple, private)
+			trans := expectTransaction(t, &store)
+			if !assert.NotNil(t, trans) {
+				t.Fatal("nil transaction")
+			}
+			for field, expected := range test.expected {
+				actual, err := trans.GetValue(field)
+				assert.Equal(t, expected, actual, field)
+				if expected != nil {
+					assert.Nil(t, err, field)
+				} else {
+					assert.Equal(t, common.ErrKeyNotFound, err, field)
+				}
+			}
+		})
+	}
 }
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {

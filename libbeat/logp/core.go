@@ -32,12 +32,13 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 var (
-	_log unsafe.Pointer // Pointer to a coreLogger. Access via atomic.LoadPointer.
+	_log          unsafe.Pointer // Pointer to a coreLogger. Access via atomic.LoadPointer.
+	_defaultGoLog = golog.Writer()
 )
 
 func init() {
@@ -86,6 +87,10 @@ func Configure(cfg Config) error {
 		return errors.Wrap(err, "failed to build log output")
 	}
 
+	// Default logger is always discard, debug level below will
+	// possibly re-enable it.
+	golog.SetOutput(ioutil.Discard)
+
 	// Enabled selectors when debug is enabled.
 	selectors := make(map[string]struct{}, len(cfg.Selectors))
 	if cfg.Level.Enabled(DebugLevel) && len(cfg.Selectors) > 0 {
@@ -98,10 +103,12 @@ func Configure(cfg Config) error {
 			selectors["*"] = struct{}{}
 		}
 
-		if _, enabled := selectors["stdlog"]; !enabled {
-			// Disable standard logging by default (this is sometimes used by
-			// libraries and we don't want their spam).
-			golog.SetOutput(ioutil.Discard)
+		// Re-enable the default go logger output when either stdlog
+		// or all selector is enabled.
+		_, stdlogEnabled := selectors["stdlog"]
+		_, allEnabled := selectors["*"]
+		if stdlogEnabled || allEnabled {
+			golog.SetOutput(_defaultGoLog)
 		}
 
 		sink = selectiveWrapper(sink, selectors)

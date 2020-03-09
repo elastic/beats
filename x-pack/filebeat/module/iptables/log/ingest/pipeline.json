@@ -62,19 +62,23 @@
             },
             {
                 "date": {
+                    "if": "ctx.event.timezone == null",
                     "field": "iptables.raw_date",
-                    "ignore_failure": true,
                     "formats": [
                         "MMM  d HH:mm:ss",
                         "MMM dd HH:mm:ss"
-                    ]
+                    ],
+                    "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
                 }
             },
             {
                 "date": {
                     "if": "ctx.event.timezone != null",
-                    "field": "@timestamp",
-                    "formats": ["ISO8601"],
+                    "field": "iptables.raw_date",
+                    "formats": [
+                        "MMM  d HH:mm:ss",
+                        "MMM dd HH:mm:ss"
+                    ],
                     "timezone": "{{ event.timezone }}",
                     "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
                 }

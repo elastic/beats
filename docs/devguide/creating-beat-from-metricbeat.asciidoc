@@ -11,9 +11,17 @@ To create your own Beat, you must have Go {go-version} or later installed, and t
 must be set up correctly. In addition, the following tools are required:
 
 * https://www.python.org/downloads/[python]
-* https://virtualenv.pypa.io/en/stable/[virtualenv]
+* https://docs.python.org/3/library/venv.html[python venv module]
+* https://github.com/magefile/mage[mage]
 
-Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
+Python venv module is already included in the standard library. In Ubuntu/Debian
+it requires additional support scripts that can be installed with the
+`python3-venv` package:
+
+[source,bash]
+----
+sudo apt-get install python3-venv
+----
 
 [float]
 ==== Step 1 - Get the metricbeat source code
@@ -43,34 +51,20 @@ This directory is normally located under `$GOPATH/src/github.com/{your-github-na
 [float]
 ==== Step 2 - Create the Beat
 
-Run the command:
+Run the command from the root `beats` directory:
 
 [source,bash]
 ----
-python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+NEWBEAT_TYPE=metricbeat mage GenerateCustomBeat
 ----
 
-When prompted, enter the Beat name and path.
+When prompted, enter the Beat name and path, along with an initial module and metricset name for your beat. For more details about creating a metricset, see the docs <<creating-metricsets>>.
+
+After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-name}/{beat}`
 
 
 [float]
-==== Step 3 - Init and create the metricset
-
-After creating the Beat, change the directory to `$GOPATH/src/github.com/{your-github-name}/{beat}` and run:
-
-[source,bash]
-----
-make setup
-----
-
-This will do the initial setup for your Beat and also run `make create-metricset`, which will ask you for the
-module name and metricset name of your Beat.
-
-For more details about creating a metricset, see the docs <<creating-metricsets>>.
-
-
-[float]
-==== Step 4 - Build & Run
+==== Step 3 - Build & Run
 
 To create a binary run the `make` command. This will create the binary in your beats directory.
 
@@ -84,7 +78,7 @@ To run it, execute the binary. This will automatically load the default configur
 This will run the beat with debug output enabled to the console to directly see what is happening. Stop the beat with `CTRL-C`.
 
 [float]
-==== Step 5 - Package
+==== Step 4 - Package
 
 To create packages and binaries for different platforms, https://www.docker.com/[docker] is required.
 The first step is to get the most recent packaging tools into your beat:

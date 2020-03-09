@@ -26,11 +26,13 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import generate
+	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 )
 
 func init() {
@@ -112,7 +114,9 @@ func configYML() error {
 
 // includeList generates include/list.go with imports for inputs.
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"input/*"}
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
@@ -194,9 +198,7 @@ func GoUnitTest(ctx context.Context) error {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // PythonUnitTest executes the python system tests.
@@ -206,6 +208,9 @@ func PythonUnitTest() error {
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
+// Use GENERATE=true to generate expected log files.
+// Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
+// Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
@@ -215,5 +220,5 @@ func PythonIntegTest(ctx context.Context) error {
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
-	})
+	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
 }

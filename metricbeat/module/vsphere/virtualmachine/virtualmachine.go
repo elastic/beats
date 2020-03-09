@@ -23,9 +23,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
@@ -151,12 +151,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 						"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
 					},
 					"host": common.MapStr{
-						"bytes": (int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024),
+						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
 					},
 				},
 				"total": common.MapStr{
 					"guest": common.MapStr{
-						"bytes": (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024),
+						"bytes": int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024,
 					},
 				},
 				"free": common.MapStr{
@@ -168,13 +168,19 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 
 		if vm.Summary.Runtime.Host != nil {
-			event["host"] = vm.Summary.Runtime.Host.Value
+			event["host.id"] = vm.Summary.Runtime.Host.Value
 		} else {
 			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
 				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
 				"from host/guest")
 		}
 
+		hostSystem, err := getHostSystem(ctx, c, vm.Summary.Runtime.Host.Reference())
+		if err != nil {
+			m.Logger().Debug(err.Error())
+		} else {
+			event["host.hostname"] = hostSystem.Summary.Config.Name
+		}
 		// Get custom fields (attributes) values if get_custom_fields is true.
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
 			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
@@ -284,4 +290,15 @@ func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]st
 	}
 
 	return customFieldsMap, nil
+}
+
+func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) (*mo.HostSystem, error) {
+	pc := property.DefaultCollector(c)
+
+	var hs mo.HostSystem
+	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving host information: %v", err)
+	}
+	return &hs, nil
 }

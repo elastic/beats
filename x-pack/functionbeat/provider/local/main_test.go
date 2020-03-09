@@ -10,12 +10,13 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/x-pack/functionbeat/provider/local/cmd"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/local/cmd"
 )
 
 var systemTest *bool
 
 func init() {
+	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))

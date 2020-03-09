@@ -23,12 +23,12 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 const (
@@ -37,9 +37,9 @@ const (
 	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
 	// not return ErrTempBulkFailure
 	defaultMaxWaitRetry = 60 * time.Second
-)
 
-var debugf = logp.MakeDebug("kafka")
+	logSelector = "kafka"
+)
 
 var (
 	errNoTopicSet = errors.New("No topic configured")
@@ -47,7 +47,7 @@ var (
 )
 
 func init() {
-	sarama.Logger = kafkaLogger{}
+	sarama.Logger = kafkaLogger{log: logp.NewLogger(logSelector)}
 
 	outputs.RegisterType("kafka", makeKafka)
 }
@@ -58,7 +58,8 @@ func makeKafka(
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
-	debugf("initialize kafka output")
+	log := logp.NewLogger(logSelector)
+	log.Debug("initialize kafka output")
 
 	config, err := readConfig(cfg)
 	if err != nil {
@@ -75,7 +76,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(config)
+	libCfg, err := newSaramaConfig(log, config)
 	if err != nil {
 		return outputs.Fail(err)
 	}

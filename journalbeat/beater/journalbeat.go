@@ -22,19 +22,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/cmd/instance"
-	"github.com/elastic/beats/journalbeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/cmd/instance"
+	"github.com/elastic/beats/v7/journalbeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/journalbeat/config"
-	_ "github.com/elastic/beats/journalbeat/include"
+	"github.com/elastic/beats/v7/journalbeat/config"
+	_ "github.com/elastic/beats/v7/journalbeat/include"
 
 	// Add dedicated processors
-	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
+	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
 )
 
 // Journalbeat instance
@@ -67,7 +67,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	var inputs []*input.Input
 	for _, c := range config.Inputs {
-		i, err := input.New(c, b.Publisher, done, cp.States())
+		i, err := input.New(c, b, done, cp.States())
 		if err != nil {
 			return nil, err
 		}

@@ -8,6 +8,14 @@ package licenser
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Inactive-0]
+	_ = x[Active-1]
+}
+
 const _State_name = "InactiveActive"
 
 var _State_index = [...]uint8{0, 8, 14}

@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: azure-eventhub
+  - name: eventhub
+    default: "insights-logs-auditlogs"
+  - name: consumer_group
+    default: "$Default"
+  - name: connection_string
+  - name: storage_account
+  - name: storage_account_key
+
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ../azure-shared-pipeline.json
+input: config/{{.input}}.yml

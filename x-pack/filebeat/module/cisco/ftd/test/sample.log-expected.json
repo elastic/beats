@@ -1,10 +1,11 @@
 [
     {
-        "@timestamp": "2013-04-15T07:36:50.000-02:00",
+        "@timestamp": "2013-04-15T09:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
         "cisco.ftd.source_interface": "dmz",
+        "destination.address": "192.0.0.8",
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -22,6 +23,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
@@ -29,11 +31,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-15T07:36:50.000-02:00",
+        "@timestamp": "2013-04-15T09:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
         "cisco.ftd.source_interface": "dmz",
+        "destination.address": "192.0.0.8",
         "destination.ip": "192.0.0.8",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -51,6 +54,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.30",
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
@@ -58,12 +62,13 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T11:34:34.000-02:00",
+        "@timestamp": "2014-04-15T09:34:34.000-04:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
         "cisco.ftd.suffix": "session",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -81,6 +86,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.2.16",
         "source.ip": "10.1.2.16",
         "source.port": 2241,
         "tags": [
@@ -88,11 +94,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T14:00:28.000-02:00",
+        "@timestamp": "2013-04-24T16:00:28.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.2.10",
         "destination.ip": "192.0.2.10",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -111,6 +118,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "172.29.2.101",
         "source.ip": "172.29.2.101",
         "source.port": 1039,
         "tags": [
@@ -118,11 +126,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T14:00:27.000-02:00",
+        "@timestamp": "2013-04-24T16:00:27.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.2.57",
         "destination.ip": "192.0.2.57",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -141,6 +150,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "172.29.2.3",
         "source.ip": "172.29.2.3",
         "source.port": 1065,
         "tags": [
@@ -148,7 +158,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -167,7 +177,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -186,7 +196,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -205,7 +215,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -224,7 +234,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -243,7 +253,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -262,22 +272,23 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743275",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 5025000000000,
-        "event.end": "2013-04-29T10:59:50.000-02:00",
+        "event.end": "2013-04-29T12:59:50.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 89743275 for outside:192.0.2.222/53 to inside:10.123.1.35/52925 duration 1:23:45 bytes 140",
         "event.severity": 6,
-        "event.start": "2013-04-29T11:36:05.000Z",
+        "event.start": "2013-04-29T13:36:05.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
@@ -287,6 +298,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
@@ -294,24 +306,25 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "666",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.destination_username": "user2",
         "cisco.ftd.message_id": "302016",
         "cisco.ftd.source_interface": "outside",
         "cisco.ftd.source_username": "user1",
+        "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
         "event.action": "flow-expiration",
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 36000000000000,
-        "event.end": "2013-04-29T10:59:50.000-02:00",
+        "event.end": "2013-04-29T12:59:50.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 666 for outside:192.0.2.222/53 user1 to inside:10.123.1.35/52925 user2 duration 10:00:00 bytes 9999999",
         "event.severity": 6,
-        "event.start": "2013-04-29T02:59:50.000Z",
+        "event.start": "2013-04-29T04:59:50.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
@@ -321,6 +334,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
@@ -328,10 +342,10 @@
         ]
     },
     {
-        "@timestamp": "2011-06-04T19:59:52.000-02:00",
-        "cisco.ftd.icmp_code": 17233,
+        "@timestamp": "2011-06-04T21:59:52.000-02:00",
         "cisco.ftd.mapped_source_ip": "192.168.132.46",
         "cisco.ftd.message_id": "302021",
+        "destination.address": "172.24.177.29",
         "destination.ip": "172.24.177.29",
         "event.action": "flow-expiration",
         "event.code": 302021,
@@ -348,13 +362,14 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "192.168.132.46",
         "source.ip": "192.168.132.46",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "305011",
         "event.action": "firewall-rule",
         "event.code": 305011,
@@ -373,7 +388,7 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T10:59:50.000-02:00",
+        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -392,8 +407,9 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:33.000-02:00",
+        "@timestamp": "2013-04-30T09:22:33.000-02:00",
         "cisco.ftd.message_id": "106007",
+        "destination.address": "10.1.2.60",
         "destination.ip": "10.1.2.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -413,6 +429,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.0.66",
         "source.ip": "192.0.0.66",
         "source.port": 12981,
         "tags": [
@@ -420,11 +437,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:38.000-02:00",
+        "@timestamp": "2013-04-30T09:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -442,6 +460,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2006,
         "tags": [
@@ -449,11 +468,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:38.000-02:00",
+        "@timestamp": "2013-04-30T09:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -471,6 +491,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49734,
         "tags": [
@@ -478,11 +499,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:39.000-02:00",
+        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -500,6 +522,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49735,
         "tags": [
@@ -507,11 +530,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:39.000-02:00",
+        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -529,6 +553,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49736,
         "tags": [
@@ -536,11 +561,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:39.000-02:00",
+        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -558,6 +584,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49737,
         "tags": [
@@ -565,11 +592,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:40.000-02:00",
+        "@timestamp": "2013-04-30T09:22:40.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -587,6 +615,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49738,
         "tags": [
@@ -594,11 +623,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:41.000-02:00",
+        "@timestamp": "2013-04-30T09:22:41.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -616,6 +646,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49746,
         "tags": [
@@ -623,11 +654,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:47.000-02:00",
+        "@timestamp": "2013-04-30T09:22:47.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -645,6 +677,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2007,
         "tags": [
@@ -652,11 +685,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:48.000-02:00",
+        "@timestamp": "2013-04-30T09:22:48.000-02:00",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.168.33.31",
         "destination.ip": "192.168.33.31",
         "destination.port": 25,
         "event.action": "firewall-rule",
@@ -674,6 +708,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.13",
         "source.ip": "10.0.0.13",
         "source.port": 43013,
         "tags": [
@@ -681,11 +716,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:22:56.000-02:00",
+        "@timestamp": "2013-04-30T09:22:56.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -703,6 +739,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2008,
         "tags": [
@@ -710,9 +747,10 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:02.000-02:00",
+        "@timestamp": "2013-04-30T09:23:02.000-02:00",
         "cisco.ftd.message_id": "106006",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "10.1.2.42",
         "destination.ip": "10.1.2.42",
         "destination.port": 137,
         "event.action": "firewall-rule",
@@ -731,6 +769,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 137,
         "tags": [
@@ -738,8 +777,9 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:03.000-02:00",
+        "@timestamp": "2013-04-30T09:23:03.000-02:00",
         "cisco.ftd.message_id": "106007",
+        "destination.address": "10.1.5.60",
         "destination.ip": "10.1.5.60",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -759,6 +799,7 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.0.2.66",
         "source.ip": "192.0.2.66",
         "source.port": 12981,
         "tags": [
@@ -766,11 +807,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:06.000-02:00",
+        "@timestamp": "2013-04-30T09:23:06.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -788,6 +830,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2009,
         "tags": [
@@ -795,11 +838,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:08.000-02:00",
+        "@timestamp": "2013-04-30T09:23:08.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -817,6 +861,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49776,
         "tags": [
@@ -824,11 +869,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:15.000-02:00",
+        "@timestamp": "2013-04-30T09:23:15.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -846,6 +892,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2010,
         "tags": [
@@ -853,11 +900,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:24.000-02:00",
+        "@timestamp": "2013-04-30T09:23:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -875,6 +923,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2011,
         "tags": [
@@ -882,11 +931,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:34.000-02:00",
+        "@timestamp": "2013-04-30T09:23:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -904,6 +954,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2012,
         "tags": [
@@ -911,11 +962,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:40.000-02:00",
+        "@timestamp": "2013-04-30T09:23:40.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.0.0.132",
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
@@ -933,6 +985,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
@@ -940,11 +993,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:41.000-02:00",
+        "@timestamp": "2013-04-30T09:23:41.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.0.0.132",
         "destination.ip": "10.0.0.132",
         "destination.port": 8111,
         "event.action": "firewall-rule",
@@ -962,6 +1016,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.126",
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
@@ -969,11 +1024,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:43.000-02:00",
+        "@timestamp": "2013-04-30T09:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.88",
         "destination.ip": "192.0.0.88",
         "destination.port": 40443,
         "event.action": "firewall-rule",
@@ -991,6 +1047,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.46",
         "source.ip": "10.0.0.46",
         "source.port": 49840,
         "tags": [
@@ -998,11 +1055,12 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T07:23:43.000-02:00",
+        "@timestamp": "2013-04-30T09:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.89",
         "destination.ip": "192.0.0.89",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -1020,6 +1078,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2013,
         "tags": [
@@ -1027,12 +1086,13 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T11:34:34.000-02:00",
+        "@timestamp": "2018-04-15T09:34:34.000-04:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
         "cisco.ftd.source_interface": "inside",
         "cisco.ftd.suffix": "session",
+        "destination.address": "192.0.0.99",
         "destination.ip": "192.0.0.99",
         "destination.port": 2000,
         "event.action": "firewall-rule",
@@ -1050,6 +1110,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.0.0.16",
         "source.ip": "10.0.0.16",
         "source.port": 2241,
         "tags": [
@@ -1057,7 +1118,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:24.000-02:00",
+        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1077,7 +1138,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:24.000-02:00",
+        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.message_id": "302015",
         "event.action": "firewall-rule",
         "event.code": 302015,
@@ -1097,11 +1158,12 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:24.000-02:00",
+        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
         "cisco.ftd.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -1120,6 +1182,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
@@ -1127,11 +1190,12 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:24.000-02:00",
+        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
         "cisco.ftd.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 53,
         "event.action": "firewall-rule",
@@ -1150,6 +1214,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.168.1.33",
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
@@ -1157,7 +1222,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:31.000-02:00",
+        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1177,7 +1242,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:31.000-02:00",
+        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1197,22 +1262,23 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:31.000-02:00",
+        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.connection_id": "447236",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5678,
         "event.action": "flow-expiration",
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 0,
-        "event.end": "2018-12-11T06:01:31.000-02:00",
+        "event.end": "2018-12-11T08:01:31.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447236 for outside:192.0.2.222/1234 to dmz:192.168.1.34/5678 duration 0:00:00 bytes 14804 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-12-11T08:01:31.000Z",
+        "event.start": "2018-12-11T10:01:31.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -1223,6 +1289,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1230,22 +1297,23 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:38.000-02:00",
+        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.35",
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-12-11T06:01:38.000-02:00",
+        "event.end": "2018-12-11T08:01:38.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-12-11T08:00:30.000Z",
+        "event.start": "2018-12-11T10:00:30.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -1256,6 +1324,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1263,22 +1332,23 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:38.000-02:00",
+        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.35",
         "destination.ip": "192.168.1.35",
         "destination.port": 5678,
         "event.action": "flow-expiration",
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 68000000000,
-        "event.end": "2018-12-11T06:01:38.000-02:00",
+        "event.end": "2018-12-11T08:01:38.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-12-11T08:00:30.000Z",
+        "event.start": "2018-12-11T10:00:30.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -1289,6 +1359,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1296,9 +1367,10 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:38.000-02:00",
+        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
@@ -1317,6 +1389,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1324,9 +1397,10 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:38.000-02:00",
+        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "192.168.1.34",
         "destination.ip": "192.168.1.34",
         "destination.port": 5679,
         "event.action": "firewall-rule",
@@ -1345,6 +1419,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1352,11 +1427,12 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:39.000-02:00",
+        "@timestamp": "2018-12-11T08:01:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
         "cisco.ftd.source_interface": "dmz",
+        "destination.address": "192.0.0.12",
         "destination.ip": "192.0.0.12",
         "destination.port": 5000,
         "event.action": "firewall-rule",
@@ -1375,6 +1451,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "192.168.1.34",
         "source.ip": "192.168.1.34",
         "source.port": 5679,
         "tags": [
@@ -1382,7 +1459,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:53.000-02:00",
+        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1402,7 +1479,7 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:53.000-02:00",
+        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.message_id": "302013",
         "event.action": "firewall-rule",
         "event.code": 302013,
@@ -1422,22 +1499,23 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T06:01:53.000-02:00",
+        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.connection_id": "447237",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
         "destination.port": 1235,
         "event.action": "flow-expiration",
         "event.code": 302014,
         "event.dataset": "cisco.ftd",
         "event.duration": 86399000000000,
-        "event.end": "2018-12-11T06:01:53.000-02:00",
+        "event.end": "2018-12-11T08:01:53.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302014: Teardown TCP connection 447237 for outside:192.0.2.222/1234 to dmz:10.10.10.10/1235 duration 23:59:59 bytes 11420 TCP FINs",
         "event.severity": 6,
-        "event.start": "2018-12-10T08:01:54.000Z",
+        "event.start": "2018-12-10T10:01:54.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
@@ -1448,6 +1526,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
@@ -1455,22 +1534,23 @@
         ]
     },
     {
-        "@timestamp": "2012-08-15T21:30:09.000-02:00",
+        "@timestamp": "2012-08-15T23:30:09.000-02:00",
         "cisco.ftd.connection_id": "40",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.44.2.2",
         "destination.ip": "10.44.2.2",
         "destination.port": 500,
         "event.action": "flow-expiration",
         "event.code": 302016,
         "event.dataset": "cisco.ftd",
         "event.duration": 122000000000,
-        "event.end": "2012-08-15T21:30:09.000-02:00",
+        "event.end": "2012-08-15T23:30:09.000-02:00",
         "event.module": "cisco",
         "event.original": "%FTD-6-302016: Teardown UDP connection 40 for outside:10.44.4.4/500 to inside:10.44.2.2/500 duration 0:02:02 bytes 1416",
         "event.severity": 6,
-        "event.start": "2012-08-15T23:28:07.000Z",
+        "event.start": "2012-08-16T01:28:07.000Z",
         "event.timezone": "-02:00",
         "fileset.name": "ftd",
         "input.type": "log",
@@ -1480,6 +1560,7 @@
         "network.iana_number": 17,
         "network.transport": "udp",
         "service.type": "cisco",
+        "source.address": "10.44.4.4",
         "source.ip": "10.44.4.4",
         "source.port": 500,
         "tags": [
@@ -1487,9 +1568,10 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:50:53.000-02:00",
+        "@timestamp": "2014-09-12T06:50:53.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1505,15 +1587,17 @@
         "log.level": "critical",
         "log.offset": 8624,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:51:01.000-02:00",
+        "@timestamp": "2014-09-12T06:51:01.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1529,15 +1613,17 @@
         "log.level": "critical",
         "log.offset": 8745,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:51:05.000-02:00",
+        "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1553,15 +1639,17 @@
         "log.level": "critical",
         "log.offset": 8866,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:51:05.000-02:00",
+        "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.47",
         "destination.ip": "192.88.99.47",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1577,15 +1665,17 @@
         "log.level": "critical",
         "log.offset": 8987,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:51:06.000-02:00",
+        "@timestamp": "2014-09-12T06:51:06.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1601,15 +1691,17 @@
         "log.level": "critical",
         "log.offset": 9108,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:51:17.000-02:00",
+        "@timestamp": "2014-09-12T06:51:17.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.88.99.57",
         "destination.ip": "192.88.99.57",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1625,15 +1717,17 @@
         "log.level": "critical",
         "log.offset": 9229,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:52:48.000-02:00",
+        "@timestamp": "2014-09-12T06:52:48.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1649,15 +1743,17 @@
         "log.level": "critical",
         "log.offset": 9350,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:53:00.000-02:00",
+        "@timestamp": "2014-09-12T06:53:00.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
+        "destination.address": "192.168.1.255",
         "destination.ip": "192.168.1.255",
         "event.action": "firewall-rule",
         "event.code": 106016,
@@ -1673,17 +1769,19 @@
         "log.level": "critical",
         "log.offset": 9472,
         "service.type": "cisco",
+        "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:53:01.000-02:00",
+        "@timestamp": "2014-09-12T06:53:01.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "PERMIT_IN",
         "cisco.ftd.source_interface": "outside",
+        "destination.address": "10.32.112.125",
         "destination.ip": "10.32.112.125",
         "destination.port": 25,
         "event.action": "firewall-rule",
@@ -1702,6 +1800,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "192.0.2.95",
         "source.ip": "192.0.2.95",
         "source.port": 24069,
         "tags": [
@@ -1709,7 +1808,7 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T04:53:02.000-02:00",
+        "@timestamp": "2014-09-12T06:53:02.000-02:00",
         "cisco.ftd.icmp_code": 3,
         "cisco.ftd.icmp_type": 3,
         "cisco.ftd.message_id": "313001",
@@ -1730,16 +1829,18 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "10.2.3.5",
         "source.ip": "10.2.3.5",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2015-01-14T11:16:13.000-02:00",
+        "@timestamp": "2015-01-14T13:16:13.000-02:00",
         "cisco.ftd.icmp_type": 0,
         "cisco.ftd.message_id": "313004",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "172.16.1.10",
         "destination.ip": "172.16.1.10",
         "event.action": "firewall-rule",
         "event.code": 313004,
@@ -1756,13 +1857,14 @@
         "network.iana_number": 1,
         "network.transport": "icmp",
         "service.type": "cisco",
+        "source.address": "172.16.30.2",
         "source.ip": "172.16.30.2",
         "tags": [
             "cisco-ftd"
         ]
     },
     {
-        "@timestamp": "2015-01-14T11:16:14.000-02:00",
+        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "192.88.99.129",
         "cisco.ftd.mapped_destination_port": 80,
@@ -1771,6 +1873,7 @@
         "cisco.ftd.message_id": "338002",
         "cisco.ftd.rule_name": "dynamic",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.88.99.129",
         "destination.domain": "bad.example.com",
         "destination.ip": "192.88.99.129",
         "destination.port": 80,
@@ -1790,6 +1893,7 @@
         "network.transport": "tcp",
         "server.domain": "bad.example.com",
         "service.type": "cisco",
+        "source.address": "10.1.1.45",
         "source.ip": "10.1.1.45",
         "source.nat.ip": "192.88.99.1",
         "source.nat.port": "7890",
@@ -1799,7 +1903,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T11:16:14.000-02:00",
+        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.225",
         "cisco.ftd.mapped_destination_port": 80,
@@ -1810,6 +1914,7 @@
         "cisco.ftd.source_interface": "inside",
         "cisco.ftd.threat_category": "Malware",
         "cisco.ftd.threat_level": "very-high",
+        "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.nat.ip": "192.0.2.225",
         "destination.nat.port": "80",
@@ -1829,6 +1934,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
         "source.nat.port": "33340",
@@ -1838,7 +1944,7 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T11:16:14.000-02:00",
+        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.223",
         "cisco.ftd.mapped_destination_port": 8080,
@@ -1849,6 +1955,7 @@
         "cisco.ftd.source_interface": "inside",
         "cisco.ftd.threat_category": "Malware",
         "cisco.ftd.threat_level": "very-high",
+        "destination.address": "192.0.2.223",
         "destination.ip": "192.0.2.223",
         "destination.nat.ip": "192.0.2.223",
         "destination.nat.port": "8080",
@@ -1868,6 +1975,7 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "service.type": "cisco",
+        "source.address": "10.1.1.1",
         "source.ip": "10.1.1.1",
         "source.nat.ip": "10.2.1.1",
         "source.nat.port": "33340",
@@ -1877,8 +1985,9 @@
         ]
     },
     {
-        "@timestamp": "2009-11-16T12:12:35.000-02:00",
+        "@timestamp": "2009-11-16T14:12:35.000-02:00",
         "cisco.ftd.message_id": "304001",
+        "destination.address": "192.0.2.1",
         "destination.ip": "192.0.2.1",
         "event.action": "firewall-rule",
         "event.code": 304001,
@@ -1893,6 +2002,7 @@
         "log.level": "notification",
         "log.offset": 10843,
         "service.type": "cisco",
+        "source.address": "10.30.30.30",
         "source.ip": "10.30.30.30",
         "tags": [
             "cisco-ftd"
@@ -1900,8 +2010,9 @@
         "url.original": "/app"
     },
     {
-        "@timestamp": "2009-11-16T12:12:36.000-02:00",
+        "@timestamp": "2009-11-16T14:12:36.000-02:00",
         "cisco.ftd.message_id": "304001",
+        "destination.address": "192.0.2.32",
         "destination.ip": "192.0.2.32",
         "event.action": "firewall-rule",
         "event.code": 304001,
@@ -1916,6 +2027,7 @@
         "log.level": "notification",
         "log.offset": 10920,
         "service.type": "cisco",
+        "source.address": "10.5.111.32",
         "source.ip": "10.5.111.32",
         "tags": [
             "cisco-ftd"
@@ -1923,9 +2035,10 @@
         "url.original": "http://example.com"
     },
     {
-        "@timestamp": "2009-11-16T12:12:37.000-02:00",
+        "@timestamp": "2009-11-16T14:12:37.000-02:00",
         "cisco.ftd.message_id": "304002",
         "cisco.ftd.source_interface": "inside",
+        "destination.address": "192.0.0.19",
         "destination.ip": "192.0.0.19",
         "event.action": "firewall-rule",
         "event.code": 304002,
@@ -1940,6 +2053,7 @@
         "log.level": "notification",
         "log.offset": 11012,
         "service.type": "cisco",
+        "source.address": "10.69.6.39",
         "source.ip": "10.69.6.39",
         "tags": [
             "cisco-ftd"

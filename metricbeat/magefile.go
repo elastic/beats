@@ -28,30 +28,31 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
-	build "github.com/elastic/beats/dev-tools/mage/target/build"
+	build "github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/dashboards"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	update "github.com/elastic/beats/dev-tools/mage/target/update"
+	update "github.com/elastic/beats/v7/dev-tools/mage/target/update"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
@@ -78,7 +79,13 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithModulesD())
+	return devtools.TestPackages(
+		devtools.WithModulesD(),
+		devtools.WithModules(),
+
+		// To be increased or removed when more light modules are added
+		devtools.MinModules(1),
+	)
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
@@ -91,6 +98,12 @@ func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
 }
 
+// Imports generates an include/list_{suffix}.go file containing
+// a import statement for each module and dataset.
+func Imports() error {
+	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
+}
+
 func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
 }
@@ -101,14 +114,14 @@ func configYML() error {
 func MockedTests(ctx context.Context) error {
 	params := devtools.DefaultGoTestUnitArgs()
 
-	params.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
+	params.ExtraFlags = []string{"github.com/elastic/beats/v7/metricbeat/mb/testing/data/."}
 
 	if module := os.Getenv("MODULE"); module != "" {
 		params.ExtraFlags = append(params.ExtraFlags, "-module="+module)
 	}
 
 	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")); generate {
-		params.ExtraFlags = append(params.ExtraFlags, "-generate")
+		params.ExtraFlags = append(params.ExtraFlags, "-data")
 	}
 
 	params.Packages = nil
@@ -126,13 +139,6 @@ func Fields() error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
@@ -161,4 +167,11 @@ func FieldsDocs() error {
 // CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoTestIntegrationForModule(ctx)
 }

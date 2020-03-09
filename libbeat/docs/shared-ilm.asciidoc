@@ -3,7 +3,7 @@
 == Configure index lifecycle management
 
 Use the {ref}/getting-started-index-lifecycle-management.html[index lifecycle
-management] feature in {es} to manage your {beatname_uc} indices as they age.
+management] (ILM) feature in {es} to manage your {beatname_uc} indices as they age.
 For example, instead of creating daily indices where index size can vary based
 on the number of Beats and number of events sent, use an index lifecycle policy
 to automate a rollover to a new index when the existing index reaches a
@@ -30,6 +30,8 @@ setup.ilm.pattern: "{now/d}-000001" <1>
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
 date math with the rollover API].
 
+WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored.
+
 [float]
 === Configuration options
 
@@ -51,7 +53,7 @@ required license; otherwise, {beatname_uc} creates daily indices.
 ==== `setup.ilm.rollover_alias`
 
 The index lifecycle write alias name. The default is
-+{beatname_lc}-%{{beat_version_key}}+. Setting this option changes the alias name.
++{beatname_lc}-%{[{beat_version_key}]}+. Setting this option changes the alias name.
 
 NOTE: If you modify this setting after loading the index template, you must
 overwrite the template to apply the changes.
@@ -66,7 +68,7 @@ Date math is supported in this setting. For example:
 
 [source,yaml]
 ----
-setup.ilm.pattern: "{now/M{YYYY.MM}}-000001"
+setup.ilm.pattern: "{now/M{yyyy.MM}}-000001"
 ----
 
 For more information, see
@@ -81,7 +83,7 @@ overwrite the template to apply the changes.
 ==== `setup.ilm.policy_name`
 
 The name to use for the lifecycle policy. The default is
-+{beatname_lc}-%{[{beat_version_key}]}+.
++{beatname_lc}+.
 
 [float]
 [[setup-ilm-policy_file-option]]

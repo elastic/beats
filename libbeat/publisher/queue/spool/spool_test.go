@@ -26,8 +26,8 @@ import (
 
 	humanize "github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/libbeat/publisher/queue"
-	"github.com/elastic/beats/libbeat/publisher/queue/queuetest"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/txfiletest"
 )
@@ -36,13 +36,15 @@ var seed int64
 var debug bool
 
 type testQueue struct {
-	*Spool
+	*diskSpool
 	teardown func()
 }
 
 type testLogger struct {
 	t *testing.T
 }
+
+type silentLogger struct{}
 
 func init() {
 	flag.Int64Var(&seed, "seed", time.Now().UnixNano(), "test random seed")
@@ -95,7 +97,14 @@ func makeTestQueue(
 			}
 		}()
 
-		spool, err := NewSpool(&testLogger{t}, path, Settings{
+		var logger logger
+		if debug {
+			logger = &testLogger{t}
+		} else {
+			logger = new(silentLogger)
+		}
+
+		spool, err := newDiskSpool(logger, path, settings{
 			WriteBuffer:       writeBuffer,
 			WriteFlushTimeout: flushTimeout,
 			Codec:             codecCBORL,
@@ -110,13 +119,13 @@ func makeTestQueue(
 			t.Fatal(err)
 		}
 
-		tq := &testQueue{Spool: spool, teardown: cleanPath}
+		tq := &testQueue{diskSpool: spool, teardown: cleanPath}
 		return tq
 	}
 }
 
 func (t *testQueue) Close() error {
-	err := t.Spool.Close()
+	err := t.diskSpool.Close()
 	t.teardown()
 	return err
 }
@@ -133,15 +142,18 @@ func (l *testLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("Error", 
 func (l *testLogger) report(level string, vs []interface{}) {
 	args := append([]interface{}{level, ":"}, vs...)
 	l.t.Log(args...)
-	if debug {
-		fmt.Println(args...)
-	}
+	fmt.Println(args...)
 }
 
 func (l *testLogger) reportf(level string, str string, vs []interface{}) {
 	str = level + ": " + str
 	l.t.Logf(str, vs...)
-	if debug {
-		fmt.Printf(str, vs...)
-	}
+	fmt.Printf(str, vs...)
 }
+
+func (*silentLogger) Debug(vs ...interface{})              {}
+func (*silentLogger) Debugf(fmt string, vs ...interface{}) {}
+func (*silentLogger) Info(vs ...interface{})               {}
+func (*silentLogger) Infof(fmt string, vs ...interface{})  {}
+func (*silentLogger) Error(vs ...interface{})              {}
+func (*silentLogger) Errorf(fmt string, vs ...interface{}) {}

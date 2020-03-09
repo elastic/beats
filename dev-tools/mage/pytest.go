@@ -32,6 +32,14 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+// WINDOWS USERS:
+// The python installer does not create a python3 alias like it does on other
+// platforms. So do verify the version with python.exe --version.
+//
+// Setting up a python virtual environment on a network drive does not work
+// well. So if this applies to your development environment set PYTHON_ENV
+// to point to somewhere on C:\.
+
 const (
 	libbeatRequirements = "{{ elastic_beats_dir}}/libbeat/tests/system/requirements.txt"
 )
@@ -53,7 +61,20 @@ var (
 		"module/*/test_*.py",
 		"module/*/*/test_*.py",
 	}
+
+	// pythonExe points to the python executable to use. The PYTHON_EXE
+	// environment can be used to modify the executable used.
+	// On Windows this defaults to python and on all other platforms this
+	// defaults to python3.
+	pythonExe = EnvOr("PYTHON_EXE", "python3")
 )
+
+func init() {
+	// The python installer for Windows does not setup a python3 alias.
+	if runtime.GOOS == "windows" {
+		pythonExe = EnvOr("PYTHON_EXE", "python")
+	}
+}
 
 // PythonTestArgs are the arguments used for the "python*Test" targets and they
 // define how "nosetests" is invoked.
@@ -139,7 +160,8 @@ func PythonNoseTest(params PythonTestArgs) error {
 	}
 
 	defer fmt.Println(">> python test:", params.TestName, "Testing Complete")
-	return sh.RunWith(nosetestsEnv, nosetestsPath, append(nosetestsOptions, testFiles...)...)
+	_, err = sh.Exec(nosetestsEnv, os.Stdout, os.Stderr, nosetestsPath, append(nosetestsOptions, testFiles...)...)
+	return err
 
 	// TODO: Aggregate all the individual code coverage reports and generate
 	// and HTML report.
@@ -167,17 +189,9 @@ func PythonVirtualenv() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
-	// If set use PYTHON_EXE env var as the python interpreter.
-	var args []string
-	if pythonExe := os.Getenv("PYTHON_EXE"); pythonExe != "" {
-		args = append(args, "-p", pythonExe)
-	}
-	args = append(args, ve)
-
-	// Execute virtualenv.
+	// Create a virtual environment only if the dir does not exist.
 	if _, err := os.Stat(ve); err != nil {
-		// Run virtualenv if the dir does not exist.
-		if err := sh.Run("virtualenv", args...); err != nil {
+		if err := sh.Run(pythonExe, "-m", "venv", ve); err != nil {
 			return "", err
 		}
 	}
@@ -188,7 +202,7 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
-	args = []string{"install"}
+	args := []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}

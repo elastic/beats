@@ -1,0 +1,28 @@
+[
+    {
+        "@timestamp": "2013-02-26T22:05:32.298Z",
+        "destination.address": "172.16.128.202",
+        "destination.ip": "172.16.128.202",
+        "destination.port": 445,
+        "event.dataset": "zeek.dce_rpc",
+        "event.id": "CsNHVHa1lzFtvJzT8",
+        "event.module": "zeek",
+        "fileset.name": "dce_rpc",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.protocol": "dce_rpc",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "172.16.133.6",
+        "source.ip": "172.16.133.6",
+        "source.port": 1728,
+        "tags": [
+            "zeek.dce_rpc"
+        ],
+        "zeek.dce_rpc.endpoint": "browser",
+        "zeek.dce_rpc.named_pipe": "\\PIPE\\browser",
+        "zeek.dce_rpc.operation": "BrowserrQueryOtherDomains",
+        "zeek.dce_rpc.rtt": 0.09211,
+        "zeek.session_id": "CsNHVHa1lzFtvJzT8"
+    }
+]

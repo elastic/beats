@@ -5,11 +5,11 @@
 
 == Palo Alto Networks module
 
-beta[]
-
 This is a module for Palo Alto Networks PAN-OS firewall monitoring logs received
 over Syslog or read from a file. It currently supports messages of Traffic and
 Threat types.
+
+include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
@@ -20,7 +20,50 @@ versions 7.1 to 9.0 but limited compatibility is expected for earlier versions.
 The {plugins}/ingest-geoip.html[ingest-geoip]
 Elasticsearch plugin is required to run this module.
 
-include::../include/running-modules.asciidoc[]
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001. However
+it can also be configured to read logs from a file. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: panw
+  panos:
+    enabled: true
+    var.paths: ["/var/log/pan-os.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: panos
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `panos` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+  panos:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 514
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9001`
+
+NOTE: Ports below 1024 require {beatname_uc} to run as root.
+
+include::../include/timezone-support.asciidoc[]
 
 [float]
 === ECS field mappings
@@ -104,8 +147,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
-| Source Location | source.geo.country_iso_code |
-| Destination Location | destination.geo.country_iso_code |
+| Source Location | source.geo.name |
+| Destination Location | destination.geo.name |
 | PCAP_id |  | panw.panos.network.pcap_id
 | Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |
@@ -128,51 +171,6 @@ image::./images/filebeat-panw-traffic.png[]
 
 [role="screenshot"]
 image::./images/filebeat-panw-threat.png[]
-
-include::../include/configuring-intro.asciidoc[]
-
-The module is by default configured to run via syslog on port 9001. However
-it can also be configured to read logs from a file. See the following example.
-
-["source","yaml",subs="attributes"]
------
-- module: panw
-  panos:
-    enabled: true
-    var.paths: ["/var/log/pan-os.log"]
-    var.input: "file"
------
-
-:fileset_ex: panos
-
-include::../include/config-option-intro.asciidoc[]
-
-[float]
-==== `panos` fileset settings
-
-Example config:
-
-[source,yaml]
-----
-  panos:
-    var.syslog_host: 0.0.0.0
-    var.syslog_port: 514
-----
-
-include::../include/var-paths.asciidoc[]
-
-*`var.syslog_host`*::
-
-The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
-Set to `0.0.0.0` to bind to all available interfaces.
-
-*`var.syslog_port`*::
-
-The UDP port to listen for syslog traffic. Defaults to `9001`
-
-NOTE: Ports below 1024 require {beatname_uc} to run as root.
-
-include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

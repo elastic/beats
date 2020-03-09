@@ -6,6 +6,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 763,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -51,6 +52,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 844,
           "community_id": "1:XaNCBbXLPvRPq4YmlYj+3C8LbyE=",
           "direction": "unknown",
           "iana_number": 6,
@@ -60,18 +62,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61775
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 6207,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -117,6 +122,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 6288,
           "community_id": "1:ApLoUXZvqTmJTtS6gao5Sqg0kgQ=",
           "direction": "unknown",
           "iana_number": 6,
@@ -126,18 +132,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61776
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 6207,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -183,6 +192,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 6288,
           "community_id": "1:ApLoUXZvqTmJTtS6gao5Sqg0kgQ=",
           "direction": "unknown",
           "iana_number": 6,
@@ -192,18 +202,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61776
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 9075,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -249,6 +262,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 9156,
           "community_id": "1:64faG50xtU56JMAADXSJ0Lro5iE=",
           "direction": "unknown",
           "iana_number": 6,
@@ -258,18 +272,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56635
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 9075,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -315,6 +332,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 9156,
           "community_id": "1:64faG50xtU56JMAADXSJ0Lro5iE=",
           "direction": "unknown",
           "iana_number": 6,
@@ -324,18 +342,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56635
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 5536,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -381,6 +402,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 5617,
           "community_id": "1:8hx//bjfEFu4sYomYN8bh9DeMaQ=",
           "direction": "unknown",
           "iana_number": 6,
@@ -390,18 +412,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61773
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 5536,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -447,6 +472,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 5617,
           "community_id": "1:8hx//bjfEFu4sYomYN8bh9DeMaQ=",
           "direction": "unknown",
           "iana_number": 6,
@@ -456,12 +482,14 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 81,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61773
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -528,13 +556,15 @@
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14179,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -580,6 +610,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14248,
           "community_id": "1:IZ8RrSqt8oeb2F2Rp9296zm54bc=",
           "direction": "unknown",
           "iana_number": 6,
@@ -589,18 +620,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14179,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -646,6 +680,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14248,
           "community_id": "1:IZ8RrSqt8oeb2F2Rp9296zm54bc=",
           "direction": "unknown",
           "iana_number": 6,
@@ -655,12 +690,14 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56649
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -727,13 +764,15 @@
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14178,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -779,6 +818,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14247,
           "community_id": "1:E1vNamQGw5X+X+vT1g7ui6Nc3O0=",
           "direction": "unknown",
           "iana_number": 6,
@@ -788,18 +828,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14178,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -845,6 +888,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14247,
           "community_id": "1:E1vNamQGw5X+X+vT1g7ui6Nc3O0=",
           "direction": "unknown",
           "iana_number": 6,
@@ -854,12 +898,14 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61777
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -926,13 +972,15 @@
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 881,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -978,6 +1026,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 956,
           "community_id": "1:pkwcoe/zjCLerUgj+HGAwwt4wV8=",
           "direction": "unknown",
           "iana_number": 6,
@@ -987,18 +1036,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 75,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 881,
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 80
@@ -1044,6 +1096,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 956,
           "community_id": "1:pkwcoe/zjCLerUgj+HGAwwt4wV8=",
           "direction": "unknown",
           "iana_number": 6,
@@ -1053,12 +1106,14 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 75,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56650
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
@@ -1125,13 +1180,15 @@
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14178,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -1177,6 +1234,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14247,
           "community_id": "1:35/w0D/WO1QvBp8O+Vd95Nb+tt4=",
           "direction": "unknown",
           "iana_number": 6,
@@ -1186,18 +1244,21 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-07-21T13:50:37Z",
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 14178,
           "ip": "192.168.0.18",
           "locality": "private",
           "port": 80
@@ -1243,6 +1304,7 @@
           "type": "netflow_flow"
         },
         "network": {
+          "bytes": 14247,
           "community_id": "1:35/w0D/WO1QvBp8O+Vd95Nb+tt4=",
           "direction": "unknown",
           "iana_number": 6,
@@ -1252,12 +1314,14 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 69,
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56651
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

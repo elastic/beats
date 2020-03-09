@@ -253,6 +253,22 @@ func (typ PackageType) AddFileExtension(file string) string {
 	return file
 }
 
+// PackagingDir returns the path that should be used for building and packaging.
+// The path returned guarantees that packaging operations can run in isolation.
+func (typ PackageType) PackagingDir(home string, target BuildPlatform, spec PackageSpec) (string, error) {
+	root := home
+	if typ == Docker {
+		imageName, err := spec.ImageName()
+		if err != nil {
+			return "", err
+		}
+		root = filepath.Join(root, imageName)
+	}
+
+	targetPath := typ.AddFileExtension(spec.Name + "-" + target.GOOS() + "-" + target.Arch())
+	return filepath.Join(root, targetPath), nil
+}
+
 // Build builds a package based on the provided spec.
 func (typ PackageType) Build(spec PackageSpec) error {
 	switch typ {
@@ -436,6 +452,19 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 	return s
 }
 
+// ImageName computes the image name from the spec. A template for the image
+// name can be configured by adding image_name to extra_vars.
+func (s PackageSpec) ImageName() (string, error) {
+	if name, _ := s.ExtraVars["image_name"]; name != "" {
+		imageName, err := s.Expand(name)
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to expand image_name")
+		}
+		return imageName, nil
+	}
+	return s.Name, nil
+}
+
 func copyInstallScript(spec PackageSpec, script string, local *string) error {
 	if script == "" {
 		return nil
@@ -510,7 +539,8 @@ func PackageZip(spec PackageSpec) error {
 	// Add files to zip.
 	for _, pkgFile := range spec.Files {
 		if err := addFileToZip(w, baseDir, pkgFile); err != nil {
-			return errors.Wrapf(err, "failed adding file=%+v to zip", pkgFile)
+			p, _ := filepath.Abs(pkgFile.Source)
+			return errors.Wrapf(err, "failed adding file=%+v to zip", p)
 		}
 	}
 

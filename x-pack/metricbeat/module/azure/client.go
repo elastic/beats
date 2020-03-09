@@ -14,8 +14,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -26,12 +26,12 @@ type Client struct {
 	Log                 *logp.Logger
 }
 
-// mapMetric function type will map the configuration options to client metrics (depending on the metricset)
-type mapMetric func(client *Client, metric MetricConfig, resource resources.GenericResource) ([]Metric, error)
+// mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
+type mapResourceMetrics func(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config.ClientID, config.ClientSecret, config.TenantID, config.SubscriptionID)
+	azureMonitorService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func NewClient(config Config) (*Client, error) {
 
 // InitResources function will retrieve and validate the resources configured by the users and then map the information configured to client metrics.
 // the mapMetric function sent in this case will handle the mapping part as different metric and aggregation options work for different metricsets
-func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
+func (client *Client) InitResources(fn mapResourceMetrics, report mb.ReporterV2) error {
 	if len(client.Config.Resources) == 0 {
 		return errors.New("no resource options defined")
 	}
@@ -57,43 +57,45 @@ func (client *Client) InitResources(fn mapMetric, report mb.ReporterV2) error {
 	var metrics []Metric
 	for _, resource := range client.Config.Resources {
 		// retrieve azure resources information
-		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.ID, resource.Group, resource.Type, resource.Query)
+		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
 		if err != nil {
 			err = errors.Wrap(err, "failed to retrieve resources")
 			return err
 		}
 		if len(resourceList.Values()) == 0 {
 			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
-				resource.ID, resource.Group, resource.Type, resource.Query)
-			client.LogError(report, err)
+				resource.Id, resource.Group, resource.Type, resource.Query)
+			client.Log.Error(err)
 			continue
 		}
-		for _, res := range resourceList.Values() {
-			for _, metric := range resource.Metrics {
-				met, err := fn(client, metric, res)
-				if err != nil {
-					return err
-				}
-				metrics = append(metrics, met...)
-			}
+		resourceMetrics, err := fn(client, resourceList.Values(), resource)
+		if err != nil {
+			return err
 		}
+		metrics = append(metrics, resourceMetrics...)
 	}
-	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable, we log and create an event if this is the case (see above)
-	// but we return an error when absolutely no resources are found
+	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
+	// we also log a debug message when absolutely no resources are found
 	if len(metrics) == 0 {
-		return errors.New("no resources were found based on all the configurations options entered")
+		client.Log.Debug("no resources were found based on all the configurations options entered")
 	}
 	client.Resources.Metrics = metrics
 	return nil
 }
 
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
-func (client *Client) GetMetricValues(report mb.ReporterV2) error {
+func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []Metric {
+	var resultedMetrics []Metric
 	// loop over the set of metrics
-	for i, metric := range client.Resources.Metrics {
+	for _, metric := range metrics {
 		// select period to collect metrics, will double the interval value in order to retrieve any missing values
+		//if timegrain is larger than intervalx2 then interval will be assigned the timegrain value
+		interval := client.Config.Period
+		if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
+			interval = t
+		}
 		endTime := time.Now().UTC()
-		startTime := endTime.Add(client.Config.Period * (-2))
+		startTime := endTime.Add(interval * (-2))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
@@ -105,36 +107,42 @@ func (client *Client) GetMetricValues(report mb.ReporterV2) error {
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
-		resp, err := client.AzureMonitorService.GetMetricValues(metric.Resource.ID, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
+		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(metric.Resource.SubId, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
 			metric.Aggregations, filter)
 		if err != nil {
-			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.ID, metric.Namespace)
-			client.LogError(report, err)
+			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.Resource.SubId, metric.Namespace)
+			client.Log.Error(err)
+			report.Error(err)
 		} else {
-			current := mapMetricValues(resp, client.Resources.Metrics[i].Values, endTime.Truncate(time.Minute).Add(client.Config.Period*(-1)), endTime.Truncate(time.Minute))
-			client.Resources.Metrics[i].Values = current
+			for i, currentMetric := range client.Resources.Metrics {
+				if matchMetrics(currentMetric, metric) {
+					current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
+					client.Resources.Metrics[i].Values = current
+					if client.Resources.Metrics[i].TimeGrain == "" {
+						client.Resources.Metrics[i].TimeGrain = timegrain
+					}
+					resultedMetrics = append(resultedMetrics, client.Resources.Metrics[i])
+				}
+			}
 		}
 	}
-	return nil
-}
-
-// LogError is used to reduce the number of lines written when logging errors
-func (client *Client) LogError(report mb.ReporterV2, err error) {
-	client.Log.Error(err)
-	report.Error(err)
+	return resultedMetrics
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
-func (client *Client) CreateMetric(resource resources.GenericResource, namespace string, metrics []string, aggregations string, dimensions []Dimension, timegrain string) Metric {
+func (client *Client) CreateMetric(selectedResourceID string, resource resources.GenericResource, resourceSize string, namespace string, metrics []string, aggregations string, dimensions []Dimension, timegrain string) Metric {
 	met := Metric{
 		Resource: Resource{
-			ID:           *resource.ID,
+			SubId:        selectedResourceID,
+			Id:           *resource.ID,
 			Name:         *resource.Name,
 			Location:     *resource.Location,
 			Type:         *resource.Type,
-			Group:        getResourceGroupFromID(*resource.ID),
+			Group:        getResourceGroupFromId(*resource.ID),
 			Tags:         mapTags(resource.Tags),
-			Subscription: client.Config.SubscriptionID},
+			Subscription: client.Config.SubscriptionId,
+			Size:         resourceSize,
+		},
 		Namespace:    namespace,
 		Names:        metrics,
 		Dimensions:   dimensions,
@@ -150,7 +158,7 @@ func (client *Client) CreateMetric(resource resources.GenericResource, namespace
 }
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
-func MapMetricByPrimaryAggregation(client *Client, metrics []insights.MetricDefinition, resource resources.GenericResource, namespace string, dim []Dimension, timegrain string) []Metric {
+func (client *Client) MapMetricByPrimaryAggregation(metrics []insights.MetricDefinition, resource resources.GenericResource, selectedResourceID string, resourceSize string, namespace string, dim []Dimension, timegrain string) []Metric {
 	var clientMetrics []Metric
 	metricGroups := make(map[string][]insights.MetricDefinition)
 
@@ -162,7 +170,10 @@ func MapMetricByPrimaryAggregation(client *Client, metrics []insights.MetricDefi
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		clientMetrics = append(clientMetrics, client.CreateMetric(resource, namespace, metricNames, key, dim, timegrain))
+		if selectedResourceID == "" {
+			selectedResourceID = *resource.ID
+		}
+		clientMetrics = append(clientMetrics, client.CreateMetric(selectedResourceID, resource, resourceSize, namespace, metricNames, key, dim, timegrain))
 	}
 	return clientMetrics
 }

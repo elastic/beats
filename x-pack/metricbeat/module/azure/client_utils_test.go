@@ -60,7 +60,7 @@ func TestMetricExists(t *testing.T) {
 
 func TestMatchMetrics(t *testing.T) {
 	prev := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", ID: "id"},
+		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -69,7 +69,7 @@ func TestMatchMetrics(t *testing.T) {
 		TimeGrain:    "1PM",
 	}
 	current := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", ID: "id"},
+		Resource:     Resource{Name: "vm", Group: "group", Id: "id"},
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -79,7 +79,7 @@ func TestMatchMetrics(t *testing.T) {
 	}
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
-	current.Resource.ID = "id1"
+	current.Resource.Id = "id1"
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
@@ -107,19 +107,19 @@ func TestMetricIsEmpty(t *testing.T) {
 
 func TestGetResourceGroupFromID(t *testing.T) {
 	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	group := getResourceGroupFromID(path)
+	group := getResourceGroupFromId(path)
 	assert.Equal(t, group, "obs-infrastructure")
 }
 
 func TestGetResourceTypeFromID(t *testing.T) {
 	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	rType := getResourceTypeFromID(path)
+	rType := getResourceTypeFromId(path)
 	assert.Equal(t, rType, "Microsoft.Compute/virtualMachines")
 }
 
 func TestGetResourceNameFromID(t *testing.T) {
 	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	name := getResourceNameFromID(path)
+	name := getResourceNameFromId(path)
 	assert.Equal(t, name, "obstestmemleak")
 }
 
@@ -127,4 +127,44 @@ func TestExpired(t *testing.T) {
 	resConfig := ResourceConfiguration{}
 	result := resConfig.Expired()
 	assert.True(t, result)
+}
+
+func TestCompareMetricValues(t *testing.T) {
+	var val1 *float64
+	var val2 *float64
+	result := compareMetricValues(val1, val2)
+	assert.True(t, result)
+	float1 := 1.23
+	val1 = &float1
+	result = compareMetricValues(val1, val2)
+	assert.False(t, result)
+	val2 = &float1
+	result = compareMetricValues(val1, val2)
+	assert.True(t, result)
+}
+
+func TestContainsDimension(t *testing.T) {
+	dimension := "VMName"
+	dim1 := "SlotID"
+	dim2 := "VNU"
+	dim3 := "VMName"
+	dimensionList := []insights.LocalizableString{
+		{
+			Value:          &dim1,
+			LocalizedValue: &dim1,
+		},
+		{
+			Value:          &dim2,
+			LocalizedValue: &dim2,
+		},
+		{
+			Value:          &dim3,
+			LocalizedValue: &dim3,
+		},
+	}
+	result := ContainsDimension(dimension, dimensionList)
+	assert.True(t, result)
+	dimension = "VirtualMachine"
+	result = ContainsDimension(dimension, dimensionList)
+	assert.False(t, result)
 }

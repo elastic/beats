@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2016-10-16T08:17:58.714Z",
+        "event.dataset": "zeek.stats",
+        "event.module": "zeek",
+        "fileset.name": "stats",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.stats"
+        ],
+        "zeek.stats.bytes.received": 39674,
+        "zeek.stats.connections.icmp.active": 0,
+        "zeek.stats.connections.icmp.count": 2,
+        "zeek.stats.connections.tcp.active": 1,
+        "zeek.stats.connections.tcp.count": 6,
+        "zeek.stats.connections.udp.active": 3,
+        "zeek.stats.connections.udp.count": 36,
+        "zeek.stats.dns_requests.active": 0,
+        "zeek.stats.dns_requests.count": 0,
+        "zeek.stats.events.processed": 723,
+        "zeek.stats.events.queued": 728,
+        "zeek.stats.files.active": 0,
+        "zeek.stats.files.count": 0,
+        "zeek.stats.memory": 94,
+        "zeek.stats.packets.processed": 296,
+        "zeek.stats.peer": "bro",
+        "zeek.stats.reassembly_size.file": 0,
+        "zeek.stats.reassembly_size.frag": 0,
+        "zeek.stats.reassembly_size.tcp": 0,
+        "zeek.stats.reassembly_size.unknown": 0,
+        "zeek.stats.timers.active": 38,
+        "zeek.stats.timers.count": 797
+    }
+]

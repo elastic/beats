@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/traceroute.log
+    os.linux:
+      - /var/log/bro/current/traceroute.log
+    os.darwin:
+      - /usr/local/var/logs/current/traceroute.log
+  - name: tags
+    default: [zeek.traceroute]
+
+ingest_pipeline: ingest/pipeline.json
+input: config/traceroute.yml

@@ -5,8 +5,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-couchdb]]
 == couchdb module
 
-beta[]
-
 This is the couchdb module.
 
 The default metricset is `server`.

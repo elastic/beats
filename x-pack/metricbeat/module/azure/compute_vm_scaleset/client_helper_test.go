@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func MockResource() resources.GenericResource {
@@ -21,11 +21,16 @@ func MockResource() resources.GenericResource {
 	name := "resourceName"
 	location := "resourceLocation"
 	rType := "resourceType"
+	skuName := "standard"
+	sku := resources.Sku{
+		Name: &skuName,
+	}
 	return resources.GenericResource{
 		ID:       &id,
 		Name:     &name,
 		Location: &location,
 		Type:     &rType,
+		Sku:      &sku,
 	}
 }
 
@@ -63,12 +68,13 @@ func TestMapMetric(t *testing.T) {
 		Value: &emptyList,
 	}
 	metricConfig := azure.MetricConfig{Name: []string{"*"}, Namespace: "namespace"}
+	var resourceConfig = azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
 	client := azure.NewMockClient()
 	t.Run("return error when the metric metric definition api call returns an error", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
-		metric, err := mapMetric(client, metricConfig, resource)
+		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NotNil(t, err)
 		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace namespace: invalid resource ID")
 		assert.Equal(t, metric, []azure.Metric(nil))
@@ -78,7 +84,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
-		metric, err := mapMetric(client, metricConfig, resource)
+		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NotNil(t, err)
 		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace namespace.")
 		assert.Equal(t, metric, []azure.Metric(nil))
@@ -88,19 +94,20 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
-		metrics, err := mapMetric(client, metricConfig, resource)
+		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
 		assert.Equal(t, len(metrics), 2)
 
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
-		assert.Equal(t, metrics[1].Resource.ID, "123")
+		assert.Equal(t, metrics[1].Resource.Id, "123")
 		assert.Equal(t, metrics[1].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[1].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[1].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[1].Resource.Size, "standard")
 		assert.Equal(t, metrics[1].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))
@@ -114,30 +121,4 @@ func TestMapMetric(t *testing.T) {
 		}
 		m.AssertExpectations(t)
 	})
-}
-
-func TestContainsDimension(t *testing.T) {
-	dimension := "VMName"
-	dim1 := "SlotID"
-	dim2 := "VNU"
-	dim3 := "VMName"
-	dimensionList := []insights.LocalizableString{
-		{
-			Value:          &dim1,
-			LocalizedValue: &dim1,
-		},
-		{
-			Value:          &dim2,
-			LocalizedValue: &dim2,
-		},
-		{
-			Value:          &dim3,
-			LocalizedValue: &dim3,
-		},
-	}
-	result := containsDimension(dimension, dimensionList)
-	assert.True(t, result)
-	dimension = "VirtualMachine"
-	result = containsDimension(dimension, dimensionList)
-	assert.False(t, result)
 }

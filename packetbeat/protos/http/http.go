@@ -22,18 +22,19 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -87,6 +88,7 @@ type httpPlugin struct {
 	splitCookie         bool
 	hideKeywords        []string
 	redactAuthorization bool
+	redactHeaders       []string
 	maxMessageSize      int
 	mustDecodeBody      bool
 
@@ -145,6 +147,11 @@ func (http *httpPlugin) setFromConfig(config *httpConfig) {
 	http.parserConfig.realIPHeader = strings.ToLower(config.RealIPHeader)
 	http.transactionTimeout = config.TransactionTimeout
 	http.mustDecodeBody = config.DecodeBody
+
+	http.redactHeaders = make([]string, len(config.RedactHeaders))
+	for i, header := range config.RedactHeaders {
+		http.redactHeaders[i] = strings.ToLower(header)
+	}
 
 	for _, list := range [][]string{config.IncludeBodyFor, config.IncludeRequestBodyFor} {
 		http.parserConfig.includeRequestBodyFor = append(http.parserConfig.includeRequestBodyFor, list...)
@@ -532,10 +539,15 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 			logp.Warn("Fail to parse HTTP parameters: %v", err)
 		}
 
-		host := string(requ.host)
 		pbf.Source.Bytes = int64(requ.size)
+		host, port := extractHostHeader(string(requ.host))
 		if net.ParseIP(host) == nil {
 			pbf.Destination.Domain = host
+		}
+		if port == 0 {
+			port = int(pbf.Destination.Port)
+		} else if port != int(pbf.Destination.Port) {
+			requ.notes = append(requ.notes, "Host header port number mismatch")
 		}
 		pbf.Event.Start = requ.ts
 		pbf.Network.ForwardedIP = string(requ.realIP)
@@ -554,7 +566,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.RequestHeaders = http.collectHeaders(requ)
 
 		// url
-		u := newURL(host, int64(pbf.Destination.Port), path, params)
+		u := newURL(host, int64(port), path, params)
 		pb.MarshalStruct(evt.Fields, "url", u)
 
 		// user-agent
@@ -701,7 +713,30 @@ func parseCookieValue(raw string) string {
 	return raw
 }
 
+func extractHostHeader(header string) (host string, port int) {
+	if len(header) == 0 || net.ParseIP(header) != nil {
+		return header, port
+	}
+	// Split :port trailer
+	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
+		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
+			header, port = header[:pos], num
+		}
+	}
+	// Remove square bracket boxing of IPv6 address.
+	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
+		header = header[1:last]
+	}
+	return header, port
+}
+
 func (http *httpPlugin) hideHeaders(m *message) {
+	for _, header := range http.redactHeaders {
+		if _, exists := m.headers[header]; exists {
+			m.headers[header] = []byte("REDACTED")
+		}
+	}
+
 	if !m.isRequest || !http.redactAuthorization {
 		return
 	}

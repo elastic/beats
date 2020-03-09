@@ -16,6 +16,13 @@ env:
     - TRAVIS_GO_VERSION=$(cat .go-version)
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
+    - MACOSX_DEPLOYMENT_TARGET=10.15
+
+# Only run CI jobs on specific branches.
+# To keep the number of Travis CI jobs in check, we decided to configure Travis to only kick off CI jobs for the master branch.
+branches:
+  only:
+  - master
 
 jobs:
   include:
@@ -134,44 +141,48 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
+    # Docker Log Driver
+    - os: linux
+      env: TARGETS="-C x-pack/dockerlogbeat testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     # Journalbeat
     - os: linux
       env: TARGETS="-C journalbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
+    # Agent
+    - os: linux
+      env: TARGETS="-C x-pack/agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     # Generators
     - os: linux
-      env: TARGETS="-C generator/metricbeat test"
+      env: TARGETS="-C generator/_templates/metricbeat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C generator/beat test"
+      env: TARGETS="-C generator/_templates/beat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     - os: osx
-      env: TARGETS="-C generator/metricbeat test"
+      env: TARGETS="-C generator/_templates/metricbeat test"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      env: TARGETS="-C generator/beat test"
-      go: $TRAVIS_GO_VERSION
-      stage: test
-
-    # Docs
-    - os: linux
-      env: TARGETS="docs"
+      env: TARGETS="-C generator/_templates/beat test"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Kubernetes
-    - os: linux
-      install: deploy/kubernetes/.travis/setup.sh
-      env:
-        - TARGETS="-C deploy/kubernetes test"
-        - TRAVIS_K8S_VERSION=v1.8.0
-      stage: test
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
       env:
@@ -184,6 +195,25 @@ jobs:
         - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_K8S_VERSION=v1.10.0
       stage: test
+    - os: linux
+      dist: xenial
+      install: deploy/kubernetes/.travis/setup.sh
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+        - TRAVIS_K8S_VERSION=v1.15.3
+        - TRAVIS_MINIKUBE_VERSION=v1.3.1
+      stage: test
+      addons:
+        apt:
+          config:
+            retries: true
+          update: true
+          packages:
+            - libpcap-dev
+            - xsltproc
+            - libxml2-utils
+            - librpm-dev
+
     # TODO include 1.11 once minikube supports it
     #- os: linux
     #  install: deploy/kubernetes/.travis/setup.sh
@@ -194,17 +224,25 @@ jobs:
 
 addons:
   apt:
+    config:
+      retries: true
     update: true
+    sources:
+      - deadsnakes
     packages:
-      - python-virtualenv
       - libpcap-dev
       - xsltproc
       - libxml2-utils
       - libsystemd-journal-dev
       - librpm-dev
+      # From deadsnakes PPA
+      - python3.6
+      - python3.6-venv
 
 before_install:
+  - if [ x$TRAVIS_DIST = xtrusty ]; then sudo ln -sf python3.6 /usr/bin/python3; fi
   - python --version
+  - python3 --version
   - umask 022
   - chmod -R go-w $GOPATH/src/github.com/elastic/beats
   # Docker-compose installation
@@ -212,14 +250,19 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv==16.7.9; fi
 
 
 # Skips installations step
 install: true
 
 script:
+  # Replacement for travis_wait which doesn't print output in real time.
+  # Default Travis timeout is 10min, so this workaround prints timestamps every 9min to reset the counter.
+  # Using seconds (540s = 9min) instead of minutes for shell compatibility reasons.
+  - while sleep 540; do echo "=====[ ${SECONDS} seconds still running ]====="; done &
   - make $TARGETS
+  - kill %1
 
 notifications:
   slack:

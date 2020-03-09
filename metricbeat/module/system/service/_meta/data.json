@@ -1,0 +1,41 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "system.service",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "service",
+        "period": 10000
+    },
+    "process": {
+        "pid": 811
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "service": {
+            "load_state": "loaded",
+            "name": "NetworkManager.service",
+            "resources": {
+                "memory": {
+                    "usage": {
+                        "bytes": 15646720
+                    }
+                },
+                "tasks": {
+                    "count": 4
+                }
+            },
+            "state": "active",
+            "state_since": "2019-10-18T21:24:57.581561-07:00",
+            "sub_state": "running"
+        }
+    },
+    "systemd": {
+        "fragment_path": "/usr/lib/systemd/system/NetworkManager.service",
+        "unit": "NetworkManager.service"
+    }
+}

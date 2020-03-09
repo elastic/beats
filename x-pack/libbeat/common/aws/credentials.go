@@ -12,10 +12,12 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID     string `config:"access_key_id"`
-	SecretAccessKey string `config:"secret_access_key"`
-	SessionToken    string `config:"session_token"`
-	ProfileName     string `config:"credential_profile_name"`
+	AccessKeyID          string `config:"access_key_id"`
+	SecretAccessKey      string `config:"secret_access_key"`
+	SessionToken         string `config:"session_token"`
+	ProfileName          string `config:"credential_profile_name"`
+	SharedCredentialFile string `config:"shared_credential_file"`
+	Endpoint             string `config:"endpoint"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -44,10 +46,35 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
+	// If credential_profile_name is empty, then default profile is used.
+	var options []external.Config
 	if config.ProfileName != "" {
-		return external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(config.ProfileName),
-		)
+		options = append(options, external.WithSharedConfigProfile(config.ProfileName))
 	}
-	return external.LoadDefaultAWSConfig()
+	// If shared_credential_file is empty, then external.LoadDefaultAWSConfig
+	// function will load AWS config from current user's home directory.
+	// Linux/OSX: "$HOME/.aws/credentials"
+	// Windows:   "%USERPROFILE%\.aws\credentials"
+	if config.SharedCredentialFile != "" {
+		options = append(options, external.WithSharedConfigFiles([]string{config.SharedCredentialFile}))
+	}
+
+	awsConfig, err := external.LoadDefaultAWSConfig(options...)
+	if err != nil {
+		return awsConfig, err
+	}
+	return awsConfig, nil
+}
+
+// EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
+// service clients when endpoint is given in config.
+func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
+	if endpoint != "" {
+		if regionName == "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		} else {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+		}
+	}
+	return awsConfig
 }

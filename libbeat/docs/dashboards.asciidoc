@@ -10,10 +10,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 ifdef::has_solutions[]
-TIP: For deeper observability into your infrastructure, use the
-{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
-{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}. For setup details, see
-the {infra-guide}/index.html[Infrastructure Monitoring Guide].
+TIP: For deeper observability into your infrastructure, you can use the
+Metrics app and the Logs app in {kib}.
+For more details, see the {metrics-guide}[Metrics Monitoring Guide]
+and the {logs-guide}[Logs Monitoring Guide].
 endif::has_solutions[]
 
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
@@ -25,7 +25,7 @@ command (as described here) or
 +{beatname_lc}.yml+ config file.
 
 This requires a Kibana endpoint configuration. If you didn't already configure
-a Kibana endpoint, see <<{beatname_lc}-configuration,configure {beatname_uc}>>. 
+a Kibana endpoint, see <<{beatname_lc}-configuration,configure {beatname_uc}>>.
 
 Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
@@ -116,7 +116,13 @@ connect to a secured Elasticsearch cluster, you also need to pass Elasticsearch
 credentials.
 
 TIP: The example shows a hard-coded password, but you should store sensitive
-values in the <<keystore,secrets keystore>>.
+values
+ifndef::serverless[]
+in the <<keystore,secrets keystore>>.
+endif::[]
+ifdef::serverless[]
+in environment variables.
+endif::[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
@@ -142,7 +148,7 @@ ifdef::mac_os[]
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 
+  -E setup.kibana.host=localhost:5601
 ----
 
 *brew:*
@@ -154,7 +160,7 @@ ifdef::mac_os[]
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 
+  -E setup.kibana.host=localhost:5601
 ----
 endif::mac_os[]
 
@@ -168,7 +174,7 @@ ifdef::linux_os[]
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \
   -E output.elasticsearch.password={pwd} \
-  -E setup.kibana.host=localhost:5601 
+  -E setup.kibana.host=localhost:5601
 ----
 endif::linux_os[]
 
@@ -204,7 +210,7 @@ PS > .{backslash}{beatname_lc}.exe setup -e `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username={beat_default_index_prefix}_internal `
   -E output.elasticsearch.password={pwd} `
-  -E setup.kibana.host=localhost:5601 
+  -E setup.kibana.host=localhost:5601
 ----
 endif::win_os[]
 

@@ -30,14 +30,13 @@ import (
 
 	"github.com/elastic/gosigar/cgroup"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/actions"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 const (
@@ -52,7 +51,6 @@ var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	jsprocessor.RegisterPlugin("AddDockerMetadata", New)
 }
 
 type addDockerMetadata struct {
@@ -68,12 +66,14 @@ type addDockerMetadata struct {
 	dockerAvailable bool          // If Docker exists in env, then it is set to true
 }
 
+const selector = "add_docker_metadata"
+
 // New constructs a new add_docker_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
+	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -81,14 +81,13 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 
 	var dockerAvailable bool
 
-	watcher, err := watcherConstructor(config.Host, config.TLS, config.MatchShortID)
+	watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
 	if err != nil {
 		dockerAvailable = false
-		errorMsg := fmt.Sprintf("%v: docker environment not detected: %v", processorName, err)
-		logp.Debug("add_docker_metadata", errorMsg)
+		log.Debugf("%v: docker environment not detected: %+v", processorName, err)
 	} else {
 		dockerAvailable = true
-		logp.Debug("add_docker_metadata", "%v: docker environment detected", processorName)
+		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
 			return nil, errors.Wrap(err, "failed to start watcher")
 		}
@@ -110,7 +109,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	}
 
 	return &addDockerMetadata{
-		log:             logp.NewLogger(processorName),
+		log:             log,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,

@@ -19,7 +19,6 @@ package testing
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -33,21 +32,17 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/asset"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 
-	_ "github.com/elastic/beats/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
 const (
 	expectedExtension = "-expected.json"
-)
-
-var (
-	// Use `go test -generate` to update files.
-	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
 // DataConfig is the configuration for testdata tests
@@ -227,7 +222,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	}
 
 	// Overwrites the golden files if run with -generate
-	if *generateFlag {
+	if *flags.DataFlag {
 		outputIndented, err := json.MarshalIndent(&data, "", "    ")
 		if err != nil {
 			t.Fatal(err)

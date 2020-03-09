@@ -1,7 +1,7 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -16,14 +16,14 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 Install {beatname_uc} on all the servers you want to monitor.
 
-include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -42,7 +42,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -61,7 +61,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -75,14 +75,14 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+include::{libbeat-dir}/shared-brew-install.asciidoc[]
 
 [[linux]]
 *linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -101,7 +101,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -122,7 +122,7 @@ See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -162,7 +162,7 @@ For more information about these options, see
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 To configure {beatname_uc}:
 
@@ -192,25 +192,25 @@ If you accept the default configuration without specifying additional modules,
 +
 See <<configuring-howto-{beatname_lc}>> for more details about configuring modules.
 
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
 
-include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in {es}
 
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the {kib} dashboards
 
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
@@ -246,7 +246,7 @@ in the _Beats Platform Reference_.
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
 
-include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+include::{libbeat-dir}/shared-brew-run.asciidoc[]
 
 *win:*
 
@@ -280,7 +280,7 @@ To make it easier for you to start auditing the activities of users and
 processes on your system, we have created example {beatname_uc} dashboards.
 You loaded the dashboards earlier when you ran the `setup` command.
 
-include::{libbeat-dir}/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

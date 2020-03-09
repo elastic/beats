@@ -22,8 +22,32 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+func TestGetProcessors(t *testing.T) {
+	hints := common.MapStr{
+		"co": common.MapStr{
+			"elastic": common.MapStr{
+				"logs": common.MapStr{
+					"processors": common.MapStr{
+						"add_fields": `{"fields": {"foo": "bar"}}`,
+					},
+				},
+			},
+		},
+	}
+	procs := GetProcessors(hints, "co.elastic.logs")
+	assert.Equal(t, []common.MapStr{
+		common.MapStr{
+			"add_fields": common.MapStr{
+				"fields": map[string]interface{}{
+					"foo": "bar",
+				},
+			},
+		},
+	}, procs)
+}
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
@@ -38,14 +62,49 @@ func TestGenerateHints(t *testing.T) {
 
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// logs/processors.add_fields must be nested common.MapStr under hints.logs
+		// logs/json.keys_under_root must be a nested common.MapStr under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
 			annotations: map[string]string{
+				"co.elastic.logs/multiline.pattern":    "^test",
+				"co.elastic.logs/json.keys_under_root": "true",
+				"co.elastic.metrics/module":            "prometheus",
+				"co.elastic.metrics/period":            "10s",
+				"co.elastic.metrics.foobar/period":     "15s",
+				"co.elastic.metrics.foobar1/period":    "15s",
+				"not.to.include":                       "true",
+			},
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"multiline": common.MapStr{
+						"pattern": "^test",
+					},
+					"json": common.MapStr{
+						"keys_under_root": "true",
+					},
+				},
+				"metrics": common.MapStr{
+					"module": "prometheus",
+					"period": "15s",
+				},
+			},
+		},
+		// Scenarios being tested:
+		// logs/multiline.pattern must be a nested common.MapStr under hints.logs
+		// metrics/module must be found in hints.metrics
+		// not.to.include must not be part of hints
+		// metrics/metrics_path must be found in hints.metrics
+		{
+			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
 				"co.elastic.metrics/module":         "prometheus",
 				"co.elastic.metrics/period":         "10s",
+				"co.elastic.metrics/metrics_path":   "/metrics/prometheus",
+				"co.elastic.metrics/username":       "user",
+				"co.elastic.metrics/password":       "pass",
 				"co.elastic.metrics.foobar/period":  "15s",
 				"co.elastic.metrics.foobar1/period": "15s",
 				"not.to.include":                    "true",
@@ -57,8 +116,11 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 				"metrics": common.MapStr{
-					"module": "prometheus",
-					"period": "15s",
+					"module":       "prometheus",
+					"period":       "15s",
+					"metrics_path": "/metrics/prometheus",
+					"username":     "user",
+					"password":     "pass",
 				},
 			},
 		},
@@ -154,6 +216,6 @@ func TestGenerateHints(t *testing.T) {
 		for k, v := range test.annotations {
 			annMap.Put(k, v)
 		}
-		assert.Equal(t, GenerateHints(annMap, "foobar", "co.elastic"), test.result)
+		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic"))
 	}
 }

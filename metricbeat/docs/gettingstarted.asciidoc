@@ -4,7 +4,7 @@
 {beatname_uc} helps you monitor your servers and the services they host by
 collecting metrics from the operating system and services.
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -25,14 +25,14 @@ traffic or prevent {beatname_uc} from collecting metrics when there are network
 problems. Metrics from multiple {beatname_uc} instances will be combined on the
 Elasticsearch server.
 
-include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -51,7 +51,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -70,7 +70,7 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -84,14 +84,14 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+include::{libbeat-dir}/shared-brew-install.asciidoc[]
 
 [[linux]]
 *linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -120,7 +120,7 @@ See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernet
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
@@ -160,7 +160,7 @@ For more information about these options, see
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 When you configure {beatname_uc}, you need to specify which
 <<{beatname_lc}-modules,modules>> to run. {beatname_uc} uses modules to collect
@@ -214,27 +214,25 @@ settings.
 See <<configuration-{beatname_lc}>> if you want to add the module configs to the
 +{beatname_lc}.yml+ file rather than using the `modules.d` directory.
 
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/step-test-config.asciidoc[]
 
-include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
-
-include::../../libbeat/docs/shared-cm-tip.asciidoc[]
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
 
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/dashboards.asciidoc[]
 
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
@@ -273,7 +271,7 @@ or run {beatname_uc} with `--strict.perms=false` specified. See
 in the _Beats Platform Reference_.
 
 :requires-sudo:
-include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+include::{libbeat-dir}/shared-brew-run.asciidoc[]
 :requires-sudo!:
 
 *win:*
@@ -311,7 +309,7 @@ To make it easier for you to start monitoring your servers in Kibana,
 we have created example {beatname_uc} dashboards. You loaded the dashboards
 earlier when you ran the `setup` command.
 
-include::{libbeat-dir}/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

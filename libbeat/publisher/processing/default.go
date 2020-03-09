@@ -22,14 +22,14 @@ import (
 
 	"github.com/elastic/ecs/code/go/ecs"
 
-	"github.com/elastic/beats/libbeat/asset"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/elastic/beats/libbeat/processors/timeseries"
+	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -266,7 +266,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
-		processors.add(generalizeProcessor)
+		processors.add(newGeneralizeProcessor(cfg.KeepNull))
 	}
 
 	// setup 2: add Meta from client config (C)
@@ -286,7 +286,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	fields := cfg.Fields.Clone()
 	fields.DeepUpdate(b.fields.Clone())
 	if em := cfg.EventMetadata; len(em.Fields) > 0 {
-		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		common.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
 
 	if len(fields) > 0 {
@@ -295,7 +295,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || cfg.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
-		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy))
+		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy, true))
 	}
 
 	if cfg.DynamicFields != nil {
@@ -310,7 +310,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(actions.NewAddFields(meta, needsCopy))
+		processors.add(actions.NewAddFields(meta, needsCopy, false))
 	}
 
 	// setup 8: pipeline processors list

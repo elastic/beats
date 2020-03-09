@@ -1,0 +1,25 @@
+- name: persistentvolumeclaim
+  type: group
+  description: >
+    kubernetes persistent volume clame metrics from kube-state-metrics
+  release: experimental
+  fields:
+    - name: name
+      type: keyword
+      description: PVC name.
+    - name: volume_name
+      type: keyword
+      description: Binded volume name.
+    - name: request_storage.bytes
+      type: long
+      description: Requested capacity.
+    - name: phase
+      type: keyword
+      description: PVC phase.
+    - name: access_mode
+      type: keyword
+      description: Access mode.
+    - name: storage_class
+      type: keyword
+      description: Storage class for the PVC.
+      

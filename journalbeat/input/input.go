@@ -21,14 +21,18 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/reader"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Input manages readers and forwards entries from journals.
@@ -48,7 +52,7 @@ type Input struct {
 // New returns a new Inout
 func New(
 	c *common.Config,
-	pipeline beat.Pipeline,
+	b *beat.Beat,
 	done chan struct{},
 	states map[string]checkpoint.JournalState,
 ) (*Input, error) {
@@ -102,7 +106,7 @@ func New(
 		readers = append(readers, r)
 	}
 
-	processors, err := processors.New(config.Processors)
+	inputProcessors, err := processorsForInput(b.Info, config)
 	if err != nil {
 		return nil, err
 	}
@@ -113,12 +117,12 @@ func New(
 		readers:    readers,
 		done:       done,
 		config:     config,
-		pipeline:   pipeline,
+		pipeline:   b.Publisher,
 		states:     states,
 		id:         id,
 		logger:     logger,
 		eventMeta:  config.EventMetadata,
-		processors: processors,
+		processors: inputProcessors,
 	}, nil
 }
 
@@ -202,4 +206,30 @@ func (i *Input) Stop() {
 // Wait waits until all readers are done.
 func (i *Input) Wait() {
 	i.Stop()
+}
+
+func processorsForInput(beatInfo beat.Info, config Config) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor ordering is important:
+	// 1. Index configuration
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
+
+	// 2. User processors
+	userProcessors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcessors)
+
+	return procs, nil
 }

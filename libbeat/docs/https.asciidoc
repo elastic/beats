@@ -13,7 +13,7 @@
 To secure the communication between {beatname_uc} and Elasticsearch, you can use
 HTTPS and basic authentication. Basic authentication for Elasticsearch is
 available when you enable {security} (see
-{stack-ov}/elasticsearch-security.html[Securing the {stack}] and <<securing-beats>>).
+{ref}/secure-cluster.html[Secure a cluster] and <<securing-beats>>).
 If you aren't using {security}, you can use a web proxy instead.
 
 Here is a sample configuration:
@@ -31,8 +31,13 @@ output.elasticsearch:
 <3> This setting enables the HTTPS protocol.
 <4> The IP and port of the Elasticsearch nodes.
 
-TIP: To obfuscate passwords and other sensitive settings, use the
-<<keystore,secrets keystore>>.
+TIP: To obfuscate passwords and other sensitive settings,
+ifndef::serverless[]
+use the <<keystore,secrets keystore>>.
+endif::[]
+ifdef::serverless[]
+use environment variables.
+endif::[]
 
 {beatname_uc} verifies the validity of the server certificates and only accepts trusted
 certificates. Creating a correct SSL/TLS infrastructure is outside the scope of

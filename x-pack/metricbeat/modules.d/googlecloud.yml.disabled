@@ -1,0 +1,14 @@
+# Module: googlecloud
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-googlecloud.html
+
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+    - loadbalancing
+  zone: "us-central1-a"
+  region: "us-central1"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s

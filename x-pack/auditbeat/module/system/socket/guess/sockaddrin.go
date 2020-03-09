@@ -7,14 +7,15 @@
 package guess
 
 import (
+	"bytes"
 	"encoding/binary"
-	"net"
 
+	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 /*
@@ -29,19 +30,15 @@ import (
 
 func init() {
 	if err := Registry.AddGuess(
-		&guessSockaddrIn{
-			address: net.TCPAddr{
-				IP:   net.IPv4(127, 0x12, 0x34, 0x56).To4(),
-				Port: 0xABCD,
-			},
-		}); err != nil {
+		&guessSockaddrIn{}); err != nil {
 		panic(err)
 	}
 }
 
 type guessSockaddrIn struct {
-	ctx     Context
-	address net.TCPAddr
+	ctx            Context
+	local, remote  unix.SockaddrInet4
+	server, client int
 }
 
 // Name of this guess.
@@ -81,25 +78,48 @@ func (g *guessSockaddrIn) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessSockaddrIn) Prepare(ctx Context) error {
+func (g *guessSockaddrIn) Prepare(ctx Context) (err error) {
 	g.ctx = ctx
+	g.local = unix.SockaddrInet4{
+		Port: 0,
+		Addr: randomLocalIP(),
+	}
+	g.remote = unix.SockaddrInet4{
+		Port: 0,
+		Addr: randomLocalIP(),
+	}
+	for bytes.Equal(g.local.Addr[:], g.remote.Addr[:]) {
+		g.remote.Addr = randomLocalIP()
+	}
+	if g.server, g.local, err = createSocket(g.local); err != nil {
+		return errors.Wrap(err, "error creating server")
+	}
+	if g.client, g.remote, err = createSocket(g.remote); err != nil {
+		return errors.Wrap(err, "error creating client")
+	}
+	if err = unix.Listen(g.server, 1); err != nil {
+		return errors.Wrap(err, "error in listen")
+	}
 	return nil
 }
 
 // Terminate is a no-op.
 func (g *guessSockaddrIn) Terminate() error {
+	unix.Close(g.client)
+	unix.Close(g.server)
 	return nil
 }
 
 // Trigger connects a socket to a random local address (127.x.x.x).
 func (g *guessSockaddrIn) Trigger() error {
-	dialer := net.Dialer{
-		Timeout: g.ctx.Timeout,
+	if err := unix.Connect(g.client, &g.local); err != nil {
+		return err
 	}
-	conn, err := dialer.Dial("tcp", g.address.String())
-	if err == nil {
-		conn.Close()
+	fd, _, err := unix.Accept(g.server)
+	if err != nil {
+		return err
 	}
+	unix.Close(fd)
 	return nil
 }
 
@@ -116,13 +136,13 @@ func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
 		return nil, false
 	}
 
-	binary.BigEndian.PutUint16(needle[:], uint16(g.address.Port))
+	binary.BigEndian.PutUint16(needle[:], uint16(g.local.Port))
 	offsetOfPort := indexAligned(arr, needle[:], offsetOfFamily+2, 2)
 	if offsetOfPort == -1 {
 		return nil, false
 	}
 
-	offsetOfAddr := indexAligned(arr, []byte(g.address.IP), offsetOfPort+2, 4)
+	offsetOfAddr := indexAligned(arr, []byte(g.local.Addr[:]), offsetOfPort+2, 4)
 	if offsetOfAddr == -1 {
 		return nil, false
 	}

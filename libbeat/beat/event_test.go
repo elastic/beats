@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func newEmptyEvent() *Event {
@@ -50,7 +50,7 @@ func TestEventPutGetTimestamp(t *testing.T) {
 
 func TestEventMetadata(t *testing.T) {
 	const id = "123"
-	newMeta := func() common.MapStr { return common.MapStr{"id": id} }
+	newMeta := func() common.MapStr { return common.MapStr{"_id": id} }
 
 	t.Run("put", func(t *testing.T) {
 		evt := newEmptyEvent()
@@ -75,7 +75,7 @@ func TestEventMetadata(t *testing.T) {
 	t.Run("put sub-key", func(t *testing.T) {
 		evt := newEmptyEvent()
 
-		evt.PutValue("@metadata.id", id)
+		evt.PutValue("@metadata._id", id)
 
 		assert.Equal(t, newMeta(), evt.Meta)
 		assert.Empty(t, evt.Fields)
@@ -85,7 +85,7 @@ func TestEventMetadata(t *testing.T) {
 		evt := newEmptyEvent()
 		evt.Meta = newMeta()
 
-		v, err := evt.GetValue("@metadata.id")
+		v, err := evt.GetValue("@metadata._id")
 
 		assert.NoError(t, err)
 		assert.Equal(t, id, v)
@@ -105,7 +105,7 @@ func TestEventMetadata(t *testing.T) {
 		evt := newEmptyEvent()
 		evt.Meta = newMeta()
 
-		err := evt.Delete("@metadata.id")
+		err := evt.Delete("@metadata._id")
 
 		assert.NoError(t, err)
 		assert.Empty(t, evt.Meta)

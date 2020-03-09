@@ -9,13 +9,17 @@
         "s3_daily_storage": {
             "bucket": {
                 "size": {
-                    "bytes": 51665
+                    "bytes": 207372
                 }
             },
-            "number_of_objects": 51
+            "number_of_objects": 128
         }
     },
     "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
         "provider": "aws",
         "region": "ap-southeast-1"
     },

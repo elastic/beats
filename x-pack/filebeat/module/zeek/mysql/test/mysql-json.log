@@ -1,0 +1,1 @@
+{"ts":1216281087.437392,"uid":"C5Hol527kLMUw36hj3","id.orig_h":"192.168.0.254","id.orig_p":56162,"id.resp_h":"192.168.0.254","id.resp_p":3306,"cmd":"query","arg":"select count(*) from foo","success":true,"rows":1}

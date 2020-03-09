@@ -1,9 +1,13 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
 BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_FULL_NAME?=${BEAT_NAME}
 LICENSE?=ASL2
 BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
-BEAT_PATH?=github.com/elastic/beats/${BEAT_NAME}
+BEATS_ROOT?=github.com/elastic/beats
+BEATS_ROOT_IMPORT_PATH?=${BEATS_ROOT}/v7
+BEAT_PATH?=${BEATS_ROOT}/${BEAT_NAME}
+BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_FULL_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
 BEAT_INDEX_PREFIX?=${BEAT_NAME}
 BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
@@ -13,7 +17,7 @@ BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
+GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /scripts/cmd/ )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make release"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
@@ -21,8 +25,12 @@ ELASTIC_LICENSE_FILE?=../licenses/ELASTIC-LICENSE.txt
 SECCOMP_BINARY?=${BEAT_NAME}
 SECCOMP_BLACKLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-blacklist.txt
 SECCOMP_ALLOWLIST?=${ES_BEATS}/libbeat/common/seccomp/seccomp-profiler-allow.txt
+INSTALL_FLAG?=-mod=vendor
+INSTALL_CMD?=install ${INSTALL_FLAG}
+export INSTALL_FLAG
+export INSTALL_CMD
 MAGE_PRESENT := $(shell command -v mage 2> /dev/null)
-MAGE_IMPORT_PATH?=github.com/elastic/beats/vendor/github.com/magefile/mage
+MAGE_IMPORT_PATH?=github.com/magefile/mage
 export MAGE_IMPORT_PATH
 
 space:=$() #
@@ -36,25 +44,41 @@ GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*" 2
 GOFILES_ALL = $(GOFILES) $(shell find $(ES_BEATS) -type f -name '*.go' 2>/dev/null)
 GOPACKAGES_STRESSTESTS=$(shell find . -name '*.go' 2>/dev/null | xargs awk 'FNR>1 {nextfile} /\+build.*stresstest/ {print FILENAME; nextfile}' | xargs dirname | uniq)
 SHELL=bash
-ES_HOST?="elasticsearch"
+ES_HOST?=elasticsearch
+ES_PORT?=9200
+ES_USER?=beats
+ES_PASS?=testing
+ES_HOST_SSL?=elasticsearchssl
+ES_PORT_SSL?=9200
+KIBANA_HOST?=kibana
+KIBANA_PORT?=5601
+# Kibana's Elaticsearch user
+KIBANA_ES_USER?=beats
+KIBANA_ES_PASS?=testing
+# The beat's Kibana user
+BEAT_KIBANA_USER?=${KIBANA_ES_USER}
+BEAT_KIBANA_PASS?=${KIBANA_ES_PASS}
+# Define a superuser, e.g. for initial setup
+ES_SUPERUSER_USER?=admin
+ES_SUPERUSER_PASS?=changeme
 PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
 PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
 COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
-COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
-TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
+COVERAGE_TOOL_REPO?=github.com/pierrre/gotestcover
+TESTIFY_TOOL_REPO?=github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
-GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
+GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
-GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO?=golang.org/x/lint/golint
 REVIEWDOG?=reviewdog -conf ${ES_BEATS}/reviewdog.yml
 REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO?=github.com/haya14busa/reviewdog/cmd/reviewdog
+REVIEWDOG_REPO?=github.com/reviewdog/reviewdog/cmd/reviewdog
 PROCESSES?= 4
 TIMEOUT?= 90
 PYTHON_TEST_FILES?=$(shell find . -type f -name 'test_*.py' -not -path "*/build/*" -not -path "*/vendor/*" 2>/dev/null)
@@ -75,10 +99,12 @@ DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
+PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
+PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 PIP_INSTALL_PARAMS?=
 BUILDID?=$(shell git rev-parse HEAD) ## @Building The build ID
-VIRTUALENV_PARAMS?=
+VENV_PARAMS?=
 INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
@@ -103,19 +129,24 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 
 .DEFAULT_GOAL := ${BEAT_NAME}
 
-${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
+${BEAT_NAME}: $(GOFILES_ALL) update-yacc-vendor ## @build build the beat application
 	go build $(GOBUILD_FLAGS)
 
 # Create test coverage binary
-${BEAT_NAME}.test: $(GOFILES_ALL)
-	@go build -i -o /dev/null
+${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
+	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
+
+# Avoid running yacc to generate a parser for dependency.
+.PHONY: update-yacc-vendor
+update-yacc-vendor:
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
 crosscompile: $(GOFILES)
 ifneq ($(shell [[ $(BEAT_NAME) == journalbeat ]] && echo true ),true)
-	go get github.com/mitchellh/gox
+	go install -mod=vendor github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
 	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="$(strip $(GOX_OS))" -osarch="$(strip $(GOX_OSARCH))" ${GOX_FLAGS}
 endif
@@ -138,13 +169,13 @@ endif
 
 .PHONY: fmt
 fmt: add-headers python-env ## @build Runs `goimports -l -w` and `autopep8`on the project's source code, modifying any files that do not match its style.
-	@go get $(GOIMPORTS_REPO)
+	@go ${INSTALL_CMD} $(GOIMPORTS_REPO)
 	@goimports -local ${GOIMPORTS_LOCAL_PREFIX} -l -w ${GOFILES_NOVENDOR}
 	@${FIND} -name '*.py' -exec ${PYTHON_ENV}/bin/autopep8 --in-place --max-line-length 120  {} \;
 
 .PHONY: lint
 lint:
-	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
+	@go install -mod=vendor $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
 .PHONY: clean
@@ -163,32 +194,30 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 
 # Preparation for tests
 .PHONY: prepare-tests
-prepare-tests:
+prepare-tests: update-yacc-vendor
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
-	go get ${COVERAGE_TOOL_REPO}
+	go ${INSTALL_CMD} ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
-	go get ${TESTIFY_TOOL_REPO}
+	go ${INSTALL_CMD} ${TESTIFY_TOOL_REPO}
+	# Avoid running yacc to generate a parser for dependency.
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	go test -i ${GOPACKAGES}
 	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
-	go test -i ${GOPACKAGES}
 	go test $(RACE) ${GOPACKAGES}
 
 .PHONY: integration-tests
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
-integration-tests: prepare-tests
+integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	go test -i ${GOPACKAGES}
 	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
-#
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 integration-tests-environment: prepare-tests build-image
@@ -197,20 +226,32 @@ integration-tests-environment: prepare-tests build-image
 	#
 	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
 	# by default because it can create noise if the test inside the container fails.
-	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
+	${DOCKER_COMPOSE} run \
+	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
+	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
+	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
+	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  -e GOFLAGS=${INSTALL_FLAG} \
+	  beat make integration-tests
 
 # Runs the system tests
 .PHONY: system-tests
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment:  ## @testing Runs the system tests inside a virtual environment. This can be run on any docker-machine (local, remote)
 system-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run -e INTEGRATION_TESTS=1 -e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} beat make system-tests
+	${DOCKER_COMPOSE} run \
+		-e INTEGRATION_TESTS=1 \
+		-e TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} \
+		-e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
+		-e PYTHON_EXE=${PYTHON_EXE} \
+		-e GOFLAGS=${INSTALL_FLAG} \
+		beat make system-tests
 
 .PHONY: fast-system-tests
 fast-system-tests: ## @testing Runs system tests without coverage reports and in parallel
@@ -239,7 +280,7 @@ load-tests: ## @testing Runs load tests
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -e ${PYTHON_ENV}/bin/activate || virtualenv $(if ${PYTHON_EXE},-p ${PYTHON_EXE}) ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
+	@test -e ${PYTHON_ENV}/bin/activate || ${PYTHON_EXE} -m venv ${VENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
@@ -297,8 +338,8 @@ testsuite: clean update
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
-coverage-report:
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
+coverage-report: python-env
+	${PYTHON_ENV_EXE} ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
 	go tool cover -html=${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 	test ! -s ${COVERAGE_DIR}/integration.cov   || go tool cover -html=${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
 	test ! -s ${COVERAGE_DIR}/system.cov || go tool cover -html=${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
@@ -326,7 +367,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
@@ -335,7 +376,7 @@ endif
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
 	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 endif
 
 .PHONY: docs
@@ -380,10 +421,23 @@ stop-environment:
 write-environment:
 	mkdir -p ${BUILD_DIR}
 	echo "BEAT_STRICT_PERMS=false" > ${BUILD_DIR}/test.env
+	# set ENV variables for beat
 	echo "ES_HOST=${ES_HOST}" >> ${BUILD_DIR}/test.env
-	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
-	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
-	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT=${ES_PORT}" >> ${BUILD_DIR}/test.env
+	echo "ES_HOST_SSL=${ES_HOST_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_PORT_SSL=${ES_PORT_SSL}" >> ${BUILD_DIR}/test.env
+	echo "ES_USER=${ES_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_PASS=${ES_PASS}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_USER=${ES_SUPERUSER_USER}" >> ${BUILD_DIR}/test.env
+	echo "ES_SUPERUSER_PASS=${ES_SUPERUSER_PASS}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_HOST=${KIBANA_HOST}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PORT=${KIBANA_PORT}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_USER=${BEAT_KIBANA_USER}" >> ${BUILD_DIR}/test.env
+	echo "KIBANA_PASS=${BEAT_KIBANA_PASS}" >> ${BUILD_DIR}/test.env
+	# set Kibana ENV variables
+	echo "ELASTICSEARCH_URL=${ES_HOST}:${ES_PORT}" > ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_USERNAME=${KIBANA_ES_USER}" >> ${BUILD_DIR}/kibana.test.env
+	echo "ELASTICSEARCH_PASSWORD=${KIBANA_ES_PASS}" >> ${BUILD_DIR}/kibana.test.env
 
 # Tails the environment logs
 .PHONY: env-logs
@@ -391,8 +445,7 @@ env-logs:
 	${DOCKER_COMPOSE} logs -f
 
 fix-permissions:
-	# Change ownership of all files inside /build folder from root/root to current user/group
-	docker run -v ${PWD}:/beat alpine:3.4 sh -c "find /beat -user 0 -exec chown -h $(shell id -u):$(shell id -g) {} \;"
+	sh ${ES_BEATS}/script/fix_permissions.sh "${PWD}"
 
 set_version: ## @packaging VERSION=x.y.z set the version of the beat to x.y.z
 	${ES_BEATS}/dev-tools/set_version ${VERSION}
@@ -401,16 +454,16 @@ get_version: ## @packaging get the version of the beat.
 	@${ES_BEATS}/dev-tools/get_version
 
 help: ## @help Show this help.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py $(MAKEFILE_LIST)
 
 help_variables: ## @help Show Makefile customizable variables.
-	@python ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_makefile_doc.py --variables $(MAKEFILE_LIST)
 
 # Generates a seccomp whitelist policy for the binary pointed to by
 # SECCOMP_BINARY.
 .PHONY: seccomp
 seccomp:
-	@go get github.com/elastic/beats/vendor/github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
+	@go ${INSTALL_CMD} github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler
 	@test -f ${SECCOMP_BINARY} || (echo "${SECCOMP_BINARY} binary is not built."; false)
 	seccomp-profiler \
 	-b "$(shell grep -v ^# "${SECCOMP_BLACKLIST}")" \
@@ -440,3 +493,7 @@ ifdef NO_COLLECT
 .PHONY: collect
 collect:
 endif
+
+.PHONY: vendor
+vendor:
+	@mage vendor

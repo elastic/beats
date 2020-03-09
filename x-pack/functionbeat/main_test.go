@@ -10,12 +10,14 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/x-pack/functionbeat/manager/cmd"
+	"github.com/elastic/beats/v7/libbeat/tests/system/template"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/cmd"
 )
 
 var systemTest *bool
 
 func init() {
+	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
@@ -24,8 +26,11 @@ func init() {
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
-
 	if *systemTest {
 		main()
 	}
+}
+
+func TestTemplate(t *testing.T) {
+	template.TestTemplate(t, cmd.Name)
 }

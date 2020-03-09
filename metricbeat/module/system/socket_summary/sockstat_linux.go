@@ -26,9 +26,10 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 // SockStat contains data from /proc/net/sockstat
@@ -131,4 +132,10 @@ func parseSockstat(path string) (SockStat, error) {
 	}
 
 	return ss, nil
+}
+
+// connections gets connection information
+// The linux function doesn't query UIDs for performance
+func connections(kind string) ([]net.ConnectionStat, error) {
+	return net.ConnectionsWithoutUids(kind)
 }

@@ -53,12 +53,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 82,
           "ip": "0.0.0.0",
           "locality": "private",
+          "packets": 1,
           "port": 0
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }
