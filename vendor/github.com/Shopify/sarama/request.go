@@ -158,6 +158,8 @@ func allocateBody(key, version int16) protocolBody {
 		return &DescribeConfigsRequest{}
 	case 33:
 		return &AlterConfigsRequest{}
+	case 35:
+		return &DescribeLogDirsRequest{}
 	case 36:
 		return &SaslAuthenticateRequest{}
 	case 37:

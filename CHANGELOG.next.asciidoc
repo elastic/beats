@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update replicaset group to apps/v1 {pull}15854[15802]
 - Fix `metricbeat test output` with an ipv6 ES host in the output.hosts. {pull}15368[15368]
 - Fix `convert` processor conversion of string to integer with leading zeros. {issue}15513[15513] {pull}15557[15557]
+- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
+- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 
 *Auditbeat*
 
@@ -101,6 +103,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - netflow: Fix bytes/packets counters on some devices (NSEL and Netstream). {pull}15449[15449]
 - netflow: Fix compatibility with some Cisco devices by changing the field `class_id` from short to long. {pull}15449[15449]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
+- Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
 - Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
@@ -147,6 +150,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Change sqs metricset to use average as statistic method. {pull}16438[16438]
 - Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
+- Fix diskio issue for windows 32 bit on disk_performance struct alignment. {issue}16680[16680]
+- Fix detection and logging of some error cases with light modules. {pull}14706[14706]
+- Add dashboard for `redisenterprise` module. {pull}16752[16752]
+- Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
 
 *Packetbeat*
 
@@ -226,6 +233,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
+- Allow users to override pipeline ID in fileset input config. {issue}9531[9531] {pull}16561[16561]
+- Improve ECS categorization field mappings in logstash module. {issue}16169[16169] {pull}16668[16668]
 - Improve ECS categorization field mappings in iis module. {issue}16165[16165] {pull}16618[16618]
 - Improve ECS categorization field mapping in kafka module. {issue}16167[16167] {pull}16645[16645]
 
@@ -269,11 +278,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add database_account azure metricset. {issue}15758[15758]
 - Add support for Dropwizard metrics 4.1. {pull}16332[16332]
 - Add support for NATS 2.1. {pull}16317[16317]
+- Add azure container metricset in order to monitor containers. {issue}15751[15751] {pull}16421[16421]
 - Improve the `haproxy` module to support metrics exposed via HTTPS. {issue}14579[14579] {pull}16333[16333]
 - Add filtering option for prometheus collector. {pull}16420[16420]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Add Load Balancing metricset to GCP {pull}15559[15559]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
+- Add OpenMetrics Metricbeat module {pull}16596[16596]
+- Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
+- Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
+- Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
+- Add additional cgroup fields to docker/diskio{pull}16638[16638]
 
 *Packetbeat*
 
