@@ -63,10 +63,10 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds": float64(10),
 					},
-					labels: labels,
+					Labels: labels,
 				},
 			},
 		},
@@ -85,10 +85,10 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds": float64(10),
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 			},
 		},
@@ -114,17 +114,17 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds_count": uint64(10),
 						"http_request_duration_microseconds_sum":   float64(10),
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds": float64(10),
 					},
-					labels: common.MapStr{
+					Labels: common.MapStr{
 						"quantile": "0.99",
 					},
 				},
@@ -152,17 +152,17 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds_count": uint64(10),
 						"http_request_duration_microseconds_sum":   float64(10),
 					},
-					labels: common.MapStr{},
+					Labels: common.MapStr{},
 				},
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds_bucket": uint64(10),
 					},
-					labels: common.MapStr{"le": "0.99"},
+					Labels: common.MapStr{"le": "0.99"},
 				},
 			},
 		},
@@ -187,17 +187,17 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					data: common.MapStr{
+					Data: common.MapStr{
 						"http_request_duration_microseconds": float64(10),
 					},
-					labels: labels,
+					Labels: labels,
 				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		event := getPromEventsFromMetricFamily(test.Family)
+		event := DefaultPromEventsGenerator(test.Family)
 		assert.Equal(t, test.Event, event)
 	}
 }
@@ -320,7 +320,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	metricsToKeep := 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, metricsToKeep, len(testFamilies))
@@ -331,7 +331,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, metricsToKeep, 2)
@@ -342,7 +342,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
@@ -353,7 +353,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
-			metricsToKeep += 1
+			metricsToKeep++
 		}
 	}
 	assert.Equal(t, 1, metricsToKeep)
