@@ -1,0 +1,14 @@
+filebeat:
+  inputs:
+  - type: log
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+output:
+  elasticsearch:
+    enabled: true
+    hosts:
+      - 127.0.0.1:9200
+      - 127.0.0.1:9300
+    username: elastic
+    password: changeme

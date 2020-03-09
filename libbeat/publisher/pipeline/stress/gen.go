@@ -24,10 +24,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type generateConfig struct {
@@ -65,9 +66,10 @@ func generate(
 		WaitClose: config.WaitClose,
 	}
 
+	logger := logp.NewLogger("publisher_pipeline_stress_generate")
 	if config.ACK {
 		settings.ACKCount = func(n int) {
-			logp.Info("Pipeline client (%v) ACKS; %v", id, n)
+			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
 		}
 	}
 
@@ -89,7 +91,7 @@ func generate(
 		panic(err)
 	}
 
-	defer logp.Info("client (%v) closed: %v", id, time.Now())
+	defer logger.Infof("client (%v) closed: %v", id, time.Now())
 
 	done := make(chan struct{})
 	defer close(done)
@@ -136,8 +138,8 @@ func generate(
 		})
 	}
 
-	logp.Info("start (%v) generator: %v", id, time.Now())
-	defer logp.Info("stop (%v) generator: %v", id, time.Now())
+	logger.Infof("start (%v) generator: %v", id, time.Now())
+	defer logger.Infof("stop (%v) generator: %v", id, time.Now())
 
 	for cs.Active() {
 		event := beat.Event{
