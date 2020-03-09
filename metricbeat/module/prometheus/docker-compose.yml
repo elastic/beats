@@ -9,3 +9,4 @@ services:
         PROMETHEUS_VERSION: ${PROMETHEUS_VERSION:-2.6.0}
     ports:
       - 9090
+    network_mode: host

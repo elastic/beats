@@ -32,5 +32,3 @@ jsondiff==1.1.2
 semver==2.8.1
 stomp.py==4.1.22
 deepdiff==4.2.0
-protobuf==3.11.3
-python-snappy==0.5.4
