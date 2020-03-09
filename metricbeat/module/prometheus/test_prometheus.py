@@ -37,6 +37,7 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+
 class TestRemoteWrite(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['prometheus-host-network']
