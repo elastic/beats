@@ -322,11 +322,13 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 			} else {
 				// Pagination control using HTTP Body fields
 				v, err = common.MapStr(mm).GetValue(in.config.Pagination.IDField)
-				if err == common.ErrKeyNotFound {
-					in.log.Info("Pagination finished.")
-					return nil
-				} else {
-					return errors.Wrapf(err, "failed to retrieve id_field for pagination")
+				if err != nil {
+					if err == common.ErrKeyNotFound {
+						in.log.Info("Pagination finished.")
+						return nil
+					} else {
+						return errors.Wrapf(err, "failed to retrieve id_field for pagination")
+					}
 				}
 				if in.config.Pagination.RequestField != "" {
 					ri.ContentMap.Put(in.config.Pagination.RequestField, v)
