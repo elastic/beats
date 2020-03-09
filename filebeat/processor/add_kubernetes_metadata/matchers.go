@@ -86,7 +86,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 		logp.Debug("kubernetes", "Incoming log.file.path value: %s", source)
 
 		if !strings.Contains(source, f.LogsPath) {
-			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+			logp.Err("Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
 			return ""
 		}
 
@@ -105,7 +105,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 					return podUID
 				}
 
-				logp.Debug("kubernetes", "Error extracting pod uid - source value contains matcher's logs_path, however it is too short to contain a Pod UID.")
+				logp.Err("Error extracting pod uid - source value contains matcher's logs_path, however it is too short to contain a Pod UID.")
 			}
 		} else {
 			// In case of the Kubernetes log path "/var/log/containers/",
@@ -125,7 +125,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 				return cid
 			}
 
-			logp.Debug("kubernetes", "Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
+			logp.Err("Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
 		}
 	}
 
