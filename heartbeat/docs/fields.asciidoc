@@ -382,7 +382,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: { "application": "foo-bar", "env": "production" }
+example: {'application': 'foo-bar', 'env': 'production'}
 
 --
 
@@ -837,7 +837,7 @@ type: keyword
 *`client.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -944,6 +944,70 @@ example: us-east-1
 --
 
 [float]
+=== code_signature
+
+These fields contain information about binary code signatures.
+
+
+*`code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+[float]
 === container
 
 Container fields are used for meta information about the specific container that is the source of information.
@@ -971,7 +1035,7 @@ type: keyword
 *`container.image.tag`*::
 +
 --
-Container image tag.
+Container image tags.
 
 type: keyword
 
@@ -1330,7 +1394,7 @@ type: keyword
 *`destination.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -1351,6 +1415,189 @@ example: albert
 +
 --
 type: text
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -1655,7 +1902,7 @@ example: java.lang.NullPointerException
 === event
 
 The event fields are used for context information about the log or metric event itself.
-A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host and device temperature. See the `event.kind` definition in this section for additional details about metric and state events.
 
 
 *`event.action`*::
@@ -1705,7 +1952,7 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
-example: 2016-05-23 08:05:34.857000
+example: 2016-05-23T08:05:34.857Z
 
 --
 
@@ -1774,7 +2021,7 @@ In normal conditions, assuming no tampering, the timestamps should chronological
 
 type: date
 
-example: 2016-05-23 08:05:35.101000
+example: 2016-05-23T08:05:35.101Z
 
 --
 
@@ -1819,7 +2066,10 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 +
 --
 This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
-`event.outcome` simply denotes whether the event represent a success or a failure. Note that not all events will have an associated outcome. For example, this field is generally not populated for metric events or events with `event.type:info`.
+`event.outcome` simply denotes whether the event represents a success or a failure from the perspective of the entity that produced the event.
+Note that when a single transaction is described in multiple events, each event may populate different values of `event.outcome`, according to their perspective.
+Also note that in the case of a compound event (a single event that contains multiple logical events), this field should be populated with the value that best captures the overall success or failure from the perspective of the event producer.
+Further note that not all events will have an associated outcome. For example, this field is generally not populated for metric events, events with `event.type:info`, or any events for which an outcome does not make logical sense.
 
 type: keyword
 
@@ -1836,6 +2086,18 @@ Event transports such as Syslog or the Windows Event Log typically mention the s
 type: keyword
 
 example: kernel
+
+--
+
+*`event.reference`*::
++
+--
+Reference URL linking to additional information about this event.
+This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://system.vendor.com/event/#0001234
 
 --
 
@@ -1862,7 +2124,7 @@ type: float
 +
 --
 Sequence number of the event.
-The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regardless of the timestamp precision.
 
 type: long
 
@@ -1915,6 +2177,18 @@ type: keyword
 
 --
 
+*`event.url`*::
++
+--
+URL linking to an external system to continue investigation of this event.
+This URL links to another system where in-depth investigation of the specific occurence of this event can take place. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://mysystem.mydomain.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
 [float]
 === file
 
@@ -1941,6 +2215,64 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -2078,6 +2410,15 @@ example: 256383
 
 --
 
+*`file.mime_type`*::
++
+--
+MIME type should identify the format of the file or stream of bytes using https://www.iana.org/assignments/media-types/media-types.xhtml[IANA official types], where possible. When more than one type is applicable, the most specific type should be used.
+
+type: keyword
+
+--
+
 *`file.mode`*::
 +
 --
@@ -2135,6 +2476,61 @@ example: /home/alice/example.png
 +
 --
 type: text
+
+--
+
+*`file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -2506,7 +2902,7 @@ type: keyword
 *`host.ip`*::
 +
 --
-Host ip address.
+Host ip addresses.
 
 type: ip
 
@@ -2515,7 +2911,7 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac address.
+Host mac addresses.
 
 type: keyword
 
@@ -2710,7 +3106,7 @@ type: keyword
 *`host.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -2872,6 +3268,45 @@ HTTP version.
 type: keyword
 
 example: 1.1
+
+--
+
+[float]
+=== interface
+
+The interface fields are used to record ingress and egress interface information when reported by an observer (e.g. firewall, router, load balancer) in the context of the observer handling a network connection.  In the case of a single observer interface (e.g. network sensor on a span port) only the observer.ingress information should be populated.
+
+
+*`interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
 
 --
 
@@ -3112,6 +3547,37 @@ example: 6
 
 --
 
+*`network.inner`*::
++
+--
+Network.inner fields are added in addition to network.vlan fields to describe  the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include  vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+
+type: object
+
+--
+
+*`network.inner.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.inner.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
 *`network.name`*::
 +
 --
@@ -3171,12 +3637,109 @@ example: ipv4
 
 --
 
+*`network.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
 [float]
 === observer
 
 An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
 This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, web proxies, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
+
+*`observer.egress`*::
++
+--
+Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.egress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.egress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.zone`*::
++
+--
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: Public_Internet
+
+--
 
 *`observer.geo.city_name`*::
 +
@@ -3277,10 +3840,85 @@ type: keyword
 
 --
 
+*`observer.ingress`*::
++
+--
+Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.ingress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.ingress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.zone`*::
++
+--
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: DMZ
+
+--
+
 *`observer.ip`*::
 +
 --
-IP address of the observer.
+IP addresses of the observer.
 
 type: ip
 
@@ -3289,7 +3927,7 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC address of the observer
+MAC addresses of the observer
 
 type: keyword
 
@@ -3711,6 +4349,67 @@ example: 1.12.9
 --
 
 [float]
+=== pe
+
+These fields contain Windows Portable Executable (PE) metadata.
+
+
+*`pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
 === process
 
 These fields contain information about a process.
@@ -3741,6 +4440,64 @@ example: 4
 
 --
 
+*`process.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
 *`process.command_line`*::
 +
 --
@@ -3757,6 +4514,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -3869,6 +4639,64 @@ example: 4
 
 --
 
+*`process.parent.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.parent.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
 *`process.parent.command_line`*::
 +
 --
@@ -3885,6 +4713,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.parent.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -3915,6 +4756,42 @@ The field should be absent if there is no exit code for the event (e.g. process 
 type: long
 
 example: 137
+
+--
+
+*`process.parent.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
 
 --
 
@@ -4052,6 +4929,61 @@ example: /home/alice
 +
 --
 type: text
+
+--
+
+*`process.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`process.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`process.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`process.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -4263,8 +5195,17 @@ example: Debugger
 
 This field set is meant to facilitate pivoting around a piece of data.
 Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
-A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:192.0.2.15`.
 
+
+*`related.hash`*::
++
+--
+All the hashes seen on your event. Populating this field, then using it to search for hashes can help in situations where you're unsure what the hash algorithm is (and therefore which key name to search).
+
+type: keyword
+
+--
 
 *`related.ip`*::
 +
@@ -4290,6 +5231,17 @@ type: keyword
 Rule fields are used to capture the specifics of any observer or agent rules that generate alerts or other notable events.
 Examples of data sources that would populate the rule fields include: network admission control platforms, network or host IDS/IPS, network firewalls, web application firewalls, url filters, endpoint detection and response (EDR) systems, etc.
 
+
+*`rule.author`*::
++
+--
+Name, organization, or pseudonym of the author or authors who created the rule used to generate this event.
+
+type: keyword
+
+example: ['Star-Lord']
+
+--
 
 *`rule.category`*::
 +
@@ -4321,6 +5273,17 @@ A rule ID that is unique within the scope of an agent, observer, or other entity
 type: keyword
 
 example: 101
+
+--
+
+*`rule.license`*::
++
+--
+Name of the license under which the rule used to generate this event is made available.
+
+type: keyword
+
+example: Apache 2.0
 
 --
 
@@ -4705,7 +5668,7 @@ type: keyword
 *`server.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -5145,7 +6108,7 @@ type: keyword
 *`source.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -5862,7 +6825,7 @@ type: keyword
 *`user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -6021,6 +6984,37 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vlan
+
+The VLAN fields are used to identify 802.1q tag(s) of a packet, as well as ingress and egress VLAN associations of an observer in relation to a specific packet or connection.
+Network.vlan fields are used to record a single VLAN tag, or the outer tag in the case of q-in-q encapsulations, for a packet or connection as observed, typically provided by a network sensor (e.g. Zeek, Wireshark) passively reporting on traffic.
+Network.inner VLAN fields are used to report inner q-in-q 802.1q tags (multiple 802.1q encapsulations) as observed, typically provided by a network sensor  (e.g. Zeek, Wireshark) passively reporting on traffic. Network.inner VLAN fields should only be used in addition to network.vlan fields to indicate q-in-q tagging.
+Observer.ingress and observer.egress VLAN values are used to record observer specific information when observer events contain discrete ingress and egress VLAN information, typically provided by firewalls, routers, or load balancers.
+
+
+*`vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
 
 --
 
