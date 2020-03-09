@@ -7,7 +7,7 @@
 
 beta[]
 
-This is a filebeat module for retrieving system logs from OKTA via API.
+This is a filebeat module for retrieving system logs from Okta (www.okta.com) via API. 
 
 :has-dashboards!:
 
