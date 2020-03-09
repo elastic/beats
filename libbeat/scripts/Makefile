@@ -98,6 +98,7 @@ COMMIT_ID=$(shell git rev-parse HEAD)
 DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION//-}${COMMIT_ID} ## @testing The name of the docker-compose project used by the integration and system tests
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
+DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker-compose build
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
@@ -113,6 +114,10 @@ XPACK_DIR=${ES_BEATS}/x-pack/${BEAT_NAME}
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
+endif
+
+ifeq ($(DOCKER_PULL),1)
+	DOCKER_FORCE_PULL=--pull
 endif
 
 # Conditionally enable the race detector when RACE_DETECTOR=1.
@@ -404,7 +409,7 @@ $(.OVER)import-dashboards: update ${BEAT_NAME}
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} --pull --force-rm
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL} --force-rm
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
