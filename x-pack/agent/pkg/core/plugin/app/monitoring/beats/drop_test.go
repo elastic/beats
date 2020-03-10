@@ -35,10 +35,6 @@ func TestMonitoringDrops(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.Endpoint, func(t *testing.T) {
-			// if runtime.GOOS == "windows" && c.SkipWindows {
-			// 	t.Skip("Skipped under windows")
-			// }
-
 			drop := monitoringDrop(c.Endpoint)
 			if drop != c.Drop {
 				t.Errorf("Case[%s]: Expected '%s', got '%s'", c.Endpoint, c.Drop, drop)
