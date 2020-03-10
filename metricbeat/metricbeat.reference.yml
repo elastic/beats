@@ -137,6 +137,7 @@ metricbeat.modules:
 
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]

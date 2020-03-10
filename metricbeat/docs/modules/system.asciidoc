@@ -235,7 +235,8 @@ metricbeat.modules:
   #service.state_filter: ["active"]
 
   # Filter systemd services based on a name pattern
-  #service.pattern_filter: ["ssh*", "nfs*"]----
+  #service.pattern_filter: ["ssh*", "nfs*"]
+----
 
 [float]
 === Metricsets
