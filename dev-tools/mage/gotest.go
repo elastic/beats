@@ -67,6 +67,7 @@ func makeGoTestArgs(name string) GoTestArgs {
 		Packages:        []string{"./..."},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
+		Tags:            testTagsFromEnv(),
 	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
@@ -83,11 +84,16 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
+		Tags:            testTagsFromEnv(),
 	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
 	}
 	return params
+}
+
+func testTagsFromEnv() []string {
+	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
