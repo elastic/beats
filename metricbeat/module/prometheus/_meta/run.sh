@@ -10,8 +10,6 @@ REMOTE="$HOST_DOMAIN:9201"
 
 sed -i "s/REMOTE/$REMOTE/g" /etc/prometheus/prometheus.yml
 
-cat /etc/prometheus.yml
-
 /bin/prometheus --config.file=/etc/prometheus/prometheus.yml \
  --storage.tsdb.path=/prometheus \
  --web.console.libraries=/usr/share/prometheus/console_libraries \
