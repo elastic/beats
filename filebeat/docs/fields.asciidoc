@@ -1336,16 +1336,6 @@ type: keyword
 
 --
 
-*`aws.ec2.program_name`*::
-+
---
-The program name of the log entry.
-
-
-type: keyword
-
---
-
 [float]
 === elb
 

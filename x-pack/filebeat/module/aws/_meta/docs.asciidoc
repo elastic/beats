@@ -122,7 +122,7 @@ on, it only reads the CloudTrail logs.
 === cloudwatch fileset
 
 Users can use Amazon CloudWatch Logs to monitor, store, and access log files
-from different sources. Export logs from log groups to Amazon S3 bucket which
+from different sources. Export logs from log groups to an Amazon S3 bucket which
 has SQS notification setup already. This fileset will parse these logs into
 `timestamp` and `message` field.
 

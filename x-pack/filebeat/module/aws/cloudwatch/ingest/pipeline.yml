@@ -4,15 +4,16 @@ processors:
   - grok:
       field: message
       patterns:
-        - >-
-          %{TIMESTAMP_ISO8601:_tmp.timestamp} %{GREEDYDATA:message}
+        - "%{TIMESTAMP_ISO8601:_tmp.timestamp} %{SYSLOGTIMESTAMP:_tmp.syslog_timestamp} %{GREEDYDATA:message}"
+        - "%{TIMESTAMP_ISO8601:_tmp.timestamp} %{GREEDYDATA:message}"
 
   - date:
-      field: "_tmp_.timestamp"
+      field: '_tmp.timestamp'
       target_field: "@timestamp"
       ignore_failure: true
       formats:
-        - "dd/MMM/yyyy:H:m:s Z"
+        - 'ISO8601'
+
   - remove:
       field:
         - _tmp
