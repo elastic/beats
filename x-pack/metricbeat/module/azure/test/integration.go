@@ -39,5 +39,5 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 		"client_secret":         clientSecret,
 		"tenant_id":             tenantId,
 		"subscription_id":       subId,
-	}, nil
+	}
 }
