@@ -261,6 +261,16 @@ func TestGetNextLinkFromHeader(t *testing.T) {
 	}
 }
 
+/*
+func TestiCcreateRequestInfoFromBody(t *testing.T) {
+	m := map[string]interface{}{
+                "": "GET",
+                "interval":    0,
+        }
+	m := make(common.MapStr), idField string, requestField string, extraBodyContent common.MapStr, url string, ri *RequestInfo) (*RequestInfo, err)
+}
+*/
+
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{
 		"http_method": "GET",

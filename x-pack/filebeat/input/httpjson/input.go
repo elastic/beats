@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -41,7 +42,7 @@ func init() {
 	}
 }
 
-type httpjsonInput struct {
+type HttpjsonInput struct {
 	config
 	log      *logp.Logger
 	outlet   channel.Outleter // Output of received messages.
@@ -53,7 +54,7 @@ type httpjsonInput struct {
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
 }
 
-type requestInfo struct {
+type RequestInfo struct {
 	URL        string
 	ContentMap common.MapStr
 	Headers    common.MapStr
@@ -95,7 +96,7 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	in := &httpjsonInput{
+	in := &HttpjsonInput{
 		config: conf,
 		log: logp.NewLogger("httpjson").With(
 			"url", conf.URL),
@@ -111,7 +112,7 @@ func NewInput(
 
 // Run starts the input worker then returns. Only the first invocation
 // will ever start the worker.
-func (in *httpjsonInput) Run() {
+func (in *HttpjsonInput) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go func() {
@@ -128,7 +129,7 @@ func (in *httpjsonInput) Run() {
 }
 
 // createHTTPRequest creates an HTTP/HTTPs request for the input
-func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
+func (in *HttpjsonInput) createHTTPRequest(ctx context.Context, ri *RequestInfo) (*http.Request, error) {
 	var body io.Reader
 	if len(ri.ContentMap) == 0 || in.config.NoHTTPBody {
 		body = nil
@@ -165,7 +166,7 @@ func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo)
 }
 
 // processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
-func (in *httpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
+func (in *HttpjsonInput) processEventArray(events []interface{}) (map[string]interface{}, error) {
 	var m map[string]interface{}
 	for _, t := range events {
 		switch v := t.(type) {
@@ -202,7 +203,7 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 }
 
 // applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
-func (in *httpjsonInput) applyRateLimit(ctx context.Context, header http.Header, rateLimit *RateLimit) error {
+func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header, rateLimit *RateLimit) error {
 	if rateLimit != nil {
 		if rateLimit.Remaining != "" {
 			remaining := header.Get(rateLimit.Remaining)
@@ -241,8 +242,38 @@ func (in *httpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 	return nil
 }
 
+// createRequestInfoFromBody creates a new RequestInfo for a new HTTP request in pagination based on HTTP response body
+func createRequestInfoFromBody(m common.MapStr, idField string, requestField string, extraBodyContent common.MapStr, url string, ri *RequestInfo) (*RequestInfo, error) {
+	v, err := m.GetValue(idField)
+	if err != nil {
+		if err == common.ErrKeyNotFound {
+			return nil, nil
+		} else {
+			return nil, errors.Wrapf(err, "failed to retrieve id_field for pagination")
+		}
+	}
+	if requestField != "" {
+		ri.ContentMap.Put(requestField, v)
+		if url != "" {
+			ri.URL = url
+		}
+	} else {
+		switch vt := v.(type) {
+		case string:
+			ri.URL = vt
+		default:
+			return nil, errors.New("pagination ID is not of string type")
+		}
+	}
+	if len(extraBodyContent) > 0 {
+		ri.ContentMap.Update(extraBodyContent)
+	}
+	fmt.Printf("%v", ri)
+	return ri, nil
+}
+
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *requestInfo) error {
+func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, ri *RequestInfo) error {
 	for {
 		req, err := in.createHTTPRequest(ctx, ri)
 		if err != nil {
@@ -321,30 +352,12 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				continue
 			} else {
 				// Pagination control using HTTP Body fields
-				v, err = common.MapStr(mm).GetValue(in.config.Pagination.IDField)
+				ri, err := createRequestInfoFromBody(common.MapStr(mm), in.config.Pagination.IDField, in.config.Pagination.RequestField, common.MapStr(in.config.Pagination.ExtraBodyContent), in.config.Pagination.URL, ri)
 				if err != nil {
-					if err == common.ErrKeyNotFound {
-						in.log.Info("Pagination finished.")
-						return nil
-					} else {
-						return errors.Wrapf(err, "failed to retrieve id_field for pagination")
-					}
+					return err
 				}
-				if in.config.Pagination.RequestField != "" {
-					ri.ContentMap.Put(in.config.Pagination.RequestField, v)
-					if in.config.Pagination.URL != "" {
-						ri.URL = in.config.Pagination.URL
-					}
-				} else {
-					switch vt := v.(type) {
-					case string:
-						ri.URL = vt
-					default:
-						return errors.New("pagination ID is not of string type")
-					}
-				}
-				if in.config.Pagination.ExtraBodyContent != nil {
-					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
+				if ri == nil {
+					return nil
 				}
 				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
 					return err
@@ -357,7 +370,7 @@ func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 	}
 }
 
-func (in *httpjsonInput) run() error {
+func (in *HttpjsonInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
@@ -386,7 +399,7 @@ func (in *httpjsonInput) run() error {
 		Timeout: in.config.HTTPClientTimeout,
 	}
 
-	ri := &requestInfo{
+	ri := &RequestInfo{
 		URL:        in.URL,
 		ContentMap: common.MapStr{},
 		Headers:    in.HTTPHeaders,
@@ -416,13 +429,13 @@ func (in *httpjsonInput) run() error {
 }
 
 // Stop stops the misp input and waits for it to fully stop.
-func (in *httpjsonInput) Stop() {
+func (in *HttpjsonInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
 }
 
 // Wait is an alias for Stop.
-func (in *httpjsonInput) Wait() {
+func (in *HttpjsonInput) Wait() {
 	in.Stop()
 }
 
