@@ -32,9 +32,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
@@ -54,13 +51,9 @@ func TestHTTPServers(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.testName, func(t *testing.T) {
-
-			events := make(chan common.MapStr, 1)
-			handleFunc := getHandleFunc(events)
-
 			host := "127.0.0.1"
 			port := 40050
-			svc, err := getHTTPServer(t, host, port, test.connectionType, handleFunc)
+			svc, err := getHTTPServer(t, host, port, test.connectionType)
 			if err != nil {
 				t.Error(err)
 				t.FailNow()
@@ -79,12 +72,12 @@ func TestHTTPServers(t *testing.T) {
 			assert.True(t, httpCode == test.expectedHTTPCode)
 
 			if test.connectionMethod == "POST" {
-				e := <-events
+				msg := <-svc.GetEvents()
 
-				assert.True(t, e != nil)
-				ok, _ := e.HasKey("data")
+				assert.True(t, msg.GetEvent() != nil)
+				ok, _ := msg.GetEvent().HasKey("data")
 				assert.True(t, ok)
-				bytes, _ := e["data"].([]byte)
+				bytes, _ := msg.GetEvent()["data"].([]byte)
 				httpOutput := string(bytes)
 				assert.True(t, httpOutput == test.expectedOutput)
 			} else {
@@ -92,45 +85,6 @@ func TestHTTPServers(t *testing.T) {
 			}
 
 		})
-	}
-}
-
-func getHandleFunc(events chan common.MapStr) func(writer http.ResponseWriter, req *http.Request) {
-	return func(writer http.ResponseWriter, req *http.Request) {
-		switch req.Method {
-		case "POST":
-			meta := common.MapStr{
-				"path": req.URL.String(),
-			}
-
-			contentType := req.Header.Get("Content-Type")
-			if contentType != "" {
-				meta["Content-Type"] = contentType
-			}
-
-			body, err := ioutil.ReadAll(req.Body)
-			if err != nil {
-				logp.Err("Error reading body: %v", err)
-				http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
-				return
-			}
-
-			payload := common.MapStr{
-				server.EventDataKey: body,
-			}
-
-			events <- payload
-			writer.WriteHeader(http.StatusAccepted)
-
-		case "GET":
-			writer.WriteHeader(http.StatusOK)
-			if req.TLS != nil {
-				writer.Write([]byte("HTTPS Server accepts data via POST"))
-			} else {
-				writer.Write([]byte("HTTP Server accepts data via POST"))
-			}
-
-		}
 	}
 }
 
@@ -166,16 +120,17 @@ func checkServerReady(host string, port int) error {
 
 }
 
-func getHTTPServer(t *testing.T, host string, port int, connectionType string, handleFunc func(writer http.ResponseWriter, req *http.Request)) (server.Server, error) {
+func getHTTPServer(t *testing.T, host string, port int, connectionType string) (server.Server, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	h := &HttpServer{
-		done: make(chan struct{}),
-		ctx:  ctx,
-		stop: cancel,
+		done:       make(chan struct{}),
+		eventQueue: make(chan server.Event, 1),
+		ctx:        ctx,
+		stop:       cancel,
 	}
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(host, strconv.Itoa(int(port))),
-		Handler: http.HandlerFunc(handleFunc),
+		Handler: http.HandlerFunc(h.handleFunc),
 	}
 	if connectionType == "HTTPS" {
 		cfg := prepareTLSConfig(t, host)

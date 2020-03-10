@@ -29,10 +29,13 @@ import (
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("prometheus", "remote_write", New)
+	mb.Registry.MustAddMetricSet("prometheus", "remote_write", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 type MetricSet struct {
@@ -52,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		events:        make(chan mb.Event),
 	}
-	svc, err := httpserver.NewHttpServer(base, m.handleFunc)
+	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 	if err != nil {
 		return nil, err
 	}

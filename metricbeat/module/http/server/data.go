@@ -59,21 +59,21 @@ func (m *metricProcessor) RemovePath(path PathConfig) {
 	m.Unlock()
 }
 
-func (p *metricProcessor) Process(payload common.MapStr, meta common.MapStr) (common.MapStr, error) {
-	urlRaw, ok := meta["path"]
+func (p *metricProcessor) Process(event server.Event) (common.MapStr, error) {
+	urlRaw, ok := event.GetMeta()["path"]
 	if !ok {
 		return nil, errors.New("Malformed HTTP event. Path missing.")
 	}
 	url, _ := urlRaw.(string)
 
-	typeRaw, ok := meta["Content-Type"]
+	typeRaw, ok := event.GetMeta()["Content-Type"]
 	if !ok {
 		return nil, errors.New("Unable to get Content-Type of request")
 	}
 	contentType := typeRaw.(string)
 	pathConf := p.findPath(url)
 
-	bytesRaw, ok := payload[server.EventDataKey]
+	bytesRaw, ok := event.GetEvent()[server.EventDataKey]
 	if !ok {
 		return nil, errors.New("Unable to retrieve response bytes")
 	}
