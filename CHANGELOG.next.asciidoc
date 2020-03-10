@@ -138,6 +138,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 - Add Kerberos support to Kafka input and output. {pull}16781[16781]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
+- Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
 
 *Auditbeat*
 
