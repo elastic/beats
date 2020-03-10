@@ -17,17 +17,12 @@ datasources:
   - namespace: sample
     use_output: default
     inputs:
-      - type: logs
-        processors:
-        streams:
-          - dataset: sample.acccess
-            paths: /var/log/sample/access.log
-          - enabled: false
-            dataset: sample.error
-            paths: /var/log/sample/error.log
       - type: system/metrics
         streams:
           - metricset: cpu
+          - metricset: memory
+          - metricset: network
+          - metricset: filesystem
 
 management:
   # Mode of magement, the agent support two modes of operation:
