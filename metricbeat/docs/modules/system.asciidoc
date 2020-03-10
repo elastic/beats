@@ -274,6 +274,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-uptime,uptime>>
 
+* <<metricbeat-metricset-system-users,users>>
+
 include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
@@ -307,4 +309,6 @@ include::system/socket.asciidoc[]
 include::system/socket_summary.asciidoc[]
 
 include::system/uptime.asciidoc[]
+
+include::system/users.asciidoc[]
 
