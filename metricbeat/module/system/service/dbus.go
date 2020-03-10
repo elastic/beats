@@ -75,8 +75,7 @@ func instrospectForUnitMethods() (unitFetcher, error) {
 	} else if _, ok := unitMap["ListUnits"]; ok {
 		return listUnitsWrapper, nil
 	}
-	return nil, fmt.Errorf("No supported list Units function: %v", unitMap)
-
+	return nil, fmt.Errorf("no supported list Units function: %v", unitMap)
 }
 
 func parseXMLAndReturnMethods(str string) (map[string]bool, error) {
