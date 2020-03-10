@@ -10,16 +10,21 @@
         "dns.question.top_level_domain": "com",
         "dns.question.type": "A",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:27.924120+0000\",\"flow_id\":885455453886936,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":46686,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":51803,\"rrname\":\"google.com\",\"rrtype\":\"A\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:HActqwgIaYeC8fc4sfMGrL8jjaI=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -52,16 +57,21 @@
         "dns.question.top_level_domain": "com",
         "dns.question.type": "AAAA",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:27.924282+0000\",\"flow_id\":1418448010418810,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":36993,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":39523,\"rrname\":\"google.com\",\"rrtype\":\"AAAA\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 280,
         "network.community_id": "1:Z5dwZB2hQ1ZuxC+6Jw04VtuJ1lw=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -110,16 +120,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:27.950946+0000\",\"flow_id\":1418448010418810,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":36993,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":39523,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"google.com\",\"rrtype\":\"AAAA\",\"answers\":[{\"rrname\":\"google.com\",\"rrtype\":\"AAAA\",\"ttl\":272,\"rdata\":\"2607:f8b0:4006:0805:0000:0000:0000:200e\"}],\"grouped\":{\"AAAA\":[\"2607:f8b0:4006:0805:0000:0000:0000:200e\"]}}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 564,
         "network.community_id": "1:Z5dwZB2hQ1ZuxC+6Jw04VtuJ1lw=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -168,16 +183,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:27.957906+0000\",\"flow_id\":885455453886936,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":46686,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":51803,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"google.com\",\"rrtype\":\"A\",\"answers\":[{\"rrname\":\"google.com\",\"rrtype\":\"A\",\"ttl\":299,\"rdata\":\"172.217.11.46\"}],\"grouped\":{\"A\":[\"172.217.11.46\"]}}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 1089,
         "network.community_id": "1:HActqwgIaYeC8fc4sfMGrL8jjaI=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -210,16 +230,21 @@
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:48.839495+0000\",\"flow_id\":40074894954311,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":50720,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":60273,\"rrname\":\"www.elastic.co\",\"rrtype\":\"A\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 1552,
         "network.community_id": "1:vfjW/QLkaS6+iMbv/HRuEOgqA4o=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -252,16 +277,21 @@
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:48.839714+0000\",\"flow_id\":2130691028471842,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":41979,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":4210,\"rrname\":\"www.elastic.co\",\"rrtype\":\"AAAA\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 1835,
         "network.community_id": "1:SDBTqhsjpXwQyrvRX6xpeEaMsAg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -337,16 +367,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:48.901548+0000\",\"flow_id\":40074894954311,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":50720,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":60273,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.elastic.co\",\"rrtype\":\"A\",\"answers\":[{\"rrname\":\"www.elastic.co\",\"rrtype\":\"CNAME\",\"ttl\":270,\"rdata\":\"dualstack.r2.shared.global.fastly.net\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.130.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.194.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.2.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.66.217\"}],\"grouped\":{\"A\":[\"151.101.130.217\",\"151.101.194.217\",\"151.101.2.217\",\"151.101.66.217\"],\"CNAME\":[\"dualstack.r2.shared.global.fastly.net\"]}}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 2122,
         "network.community_id": "1:vfjW/QLkaS6+iMbv/HRuEOgqA4o=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -422,16 +457,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-22T23:48:48.902685+0000\",\"flow_id\":2130691028471842,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":41979,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":4210,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.elastic.co\",\"rrtype\":\"AAAA\",\"answers\":[{\"rrname\":\"www.elastic.co\",\"rrtype\":\"CNAME\",\"ttl\":299,\"rdata\":\"dualstack.r2.shared.global.fastly.net\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0600:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0000:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0200:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0400:0000:0000:0000:0000:0729\"}],\"grouped\":{\"AAAA\":[\"2a04:4e42:0600:0000:0000:0000:0000:0729\",\"2a04:4e42:0000:0000:0000:0000:0000:0729\",\"2a04:4e42:0200:0000:0000:0000:0000:0729\",\"2a04:4e42:0400:0000:0000:0000:0000:0729\"],\"CNAME\":[\"dualstack.r2.shared.global.fastly.net\"]}}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 3116,
         "network.community_id": "1:SDBTqhsjpXwQyrvRX6xpeEaMsAg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -464,16 +504,21 @@
         "dns.question.top_level_domain": "com",
         "dns.question.type": "A",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.812655+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":44773,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":28329,\"rrname\":\"www.yahoo.com\",\"rrtype\":\"A\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4327,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -506,16 +551,21 @@
         "dns.question.top_level_domain": "com",
         "dns.question.type": "AAAA",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.812828+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":55246,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":7050,\"rrname\":\"www.yahoo.com\",\"rrtype\":\"AAAA\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4610,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -553,16 +603,21 @@
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.846575+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":44773,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":28329,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.yahoo.com\",\"rrtype\":\"CNAME\",\"ttl\":1315,\"rdata\":\"atsv2-fp-shed.wg1.b.yahoo.com\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4896,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -602,16 +657,21 @@
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.846575+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":44773,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":28329,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"A\",\"ttl\":15,\"rdata\":\"98.138.219.232\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 5288,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -651,16 +711,21 @@
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.846575+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":44773,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":28329,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"A\",\"ttl\":15,\"rdata\":\"98.138.219.231\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 5675,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -700,16 +765,21 @@
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.846575+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":44773,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":28329,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"A\",\"ttl\":15,\"rdata\":\"72.30.35.10\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 6062,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -749,16 +819,21 @@
         "dns.id": "28329",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.846575+0000\",\"flow_id\":814378410010223,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":44773,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":28329,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"A\",\"ttl\":15,\"rdata\":\"72.30.35.9\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 6446,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -798,16 +873,21 @@
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.847379+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":55246,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":7050,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.yahoo.com\",\"rrtype\":\"CNAME\",\"ttl\":1268,\"rdata\":\"atsv2-fp-shed.wg1.b.yahoo.com\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 6829,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -847,16 +927,21 @@
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.847379+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":55246,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":7050,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"AAAA\",\"ttl\":53,\"rdata\":\"2001:4998:0058:1836:0000:0000:0000:0010\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 7221,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -896,16 +981,21 @@
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.847379+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":55246,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":7050,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"AAAA\",\"ttl\":53,\"rdata\":\"2001:4998:0044:041d:0000:0000:0000:0003\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 7636,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -945,16 +1035,21 @@
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.847379+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":55246,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":7050,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"AAAA\",\"ttl\":53,\"rdata\":\"2001:4998:0058:1836:0000:0000:0000:0011\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 8051,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -994,16 +1089,21 @@
         "dns.id": "7050",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T01:22:31.847379+0000\",\"flow_id\":1887239765714716,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":55246,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":7050,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"atsv2-fp-shed.wg1.b.yahoo.com\",\"rrtype\":\"AAAA\",\"ttl\":53,\"rdata\":\"2001:4998:0044:041d:0000:0000:0000:0004\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 8466,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -1038,16 +1138,21 @@
         "dns.question.top_level_domain": "co",
         "dns.question.type": "A",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T02:03:36.578089+0000\",\"flow_id\":2181951993205289,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":48288,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":9104,\"rrname\":\"www.elastic.co\",\"rrtype\":\"A\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 8881,
         "network.community_id": "1:zh0UVYktuWGDSL+4ROPa1CTtEPE=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -1080,16 +1185,21 @@
         "dns.question.top_level_domain": "co",
         "dns.question.type": "AAAA",
         "dns.type": "query",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T02:03:36.578262+0000\",\"flow_id\":928596784370390,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.15\",\"src_port\":59203,\"dest_ip\":\"10.0.2.3\",\"dest_port\":53,\"proto\":\"UDP\",\"dns\":{\"type\":\"query\",\"id\":12859,\"rrname\":\"www.elastic.co\",\"rrtype\":\"AAAA\",\"tx_id\":0}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 9165,
         "network.community_id": "1:fuLDtU46PU3PHindOSCj0JKYUaA=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.15",
@@ -1165,16 +1275,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T02:03:36.619381+0000\",\"flow_id\":2181951993205289,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":48288,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":9104,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.elastic.co\",\"rrtype\":\"A\",\"answers\":[{\"rrname\":\"www.elastic.co\",\"rrtype\":\"CNAME\",\"ttl\":150,\"rdata\":\"dualstack.r2.shared.global.fastly.net\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.194.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.2.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.66.217\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"A\",\"ttl\":29,\"rdata\":\"151.101.130.217\"}]}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 9452,
         "network.community_id": "1:zh0UVYktuWGDSL+4ROPa1CTtEPE=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",
@@ -1250,16 +1365,21 @@
         ],
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2019-08-23T02:03:36.626559+0000\",\"flow_id\":928596784370390,\"in_iface\":\"enp0s3\",\"event_type\":\"dns\",\"src_ip\":\"10.0.2.3\",\"src_port\":53,\"dest_ip\":\"10.0.2.15\",\"dest_port\":59203,\"proto\":\"UDP\",\"dns\":{\"version\":2,\"type\":\"answer\",\"id\":12859,\"flags\":\"8180\",\"qr\":true,\"rd\":true,\"ra\":true,\"rcode\":\"NOERROR\",\"rrname\":\"www.elastic.co\",\"rrtype\":\"AAAA\",\"answers\":[{\"rrname\":\"www.elastic.co\",\"rrtype\":\"CNAME\",\"ttl\":269,\"rdata\":\"dualstack.r2.shared.global.fastly.net\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0000:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0200:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0400:0000:0000:0000:0000:0729\"},{\"rrname\":\"dualstack.r2.shared.global.fastly.net\",\"rrtype\":\"AAAA\",\"ttl\":29,\"rdata\":\"2a04:4e42:0600:0000:0000:0000:0000:0729\"}]}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 10310,
         "network.community_id": "1:fuLDtU46PU3PHindOSCj0JKYUaA=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "10.0.2.3",

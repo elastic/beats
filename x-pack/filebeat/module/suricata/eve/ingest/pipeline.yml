@@ -30,7 +30,7 @@ processors:
         }
       ignore_failure: true
   - set:
-      if: ctx?.destination?.domain != null
+      if: "ctx?.destination?.domain != null && ctx?.network?.protocol == 'http'"
       field: url.domain
       value: '{{destination.domain}}'
   - grok:
@@ -215,6 +215,17 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
+  - uppercase:
+      field: tls.server.hash.sha1
+      ignore_missing: true
+  - split:
+      field: tls.server.hash.sha1
+      separator: ":"
+      ignore_missing: true
+  - join:
+      field: tls.server.hash.sha1
+      separator: ""
+      ignore_failure: true
   - append:
       field: related.hash
       value: "{{tls.server.hash.sha1}}"

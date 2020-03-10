@@ -4,16 +4,21 @@
         "destination.address": "192.168.253.112",
         "destination.ip": "192.168.253.112",
         "destination.port": 22,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:01:09.820360-0400\",\"flow_id\":298824096901438,\"in_iface\":\"en0\",\"event_type\":\"ssh\",\"src_ip\":\"192.168.86.85\",\"src_port\":55406,\"dest_ip\":\"192.168.253.112\",\"dest_port\":22,\"proto\":\"TCP\",\"ssh\":{\"client\":{\"proto_version\":\"2.0\",\"software_version\":\"OpenSSH_7.6\"},\"server\":{\"proto_version\":\"2.0\",\"software_version\":\"libssh_0.7.0\"}}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:NLm1MbaBR6humQxEQI2Ai7h/XiI=",
+        "network.protocol": "ssh",
         "network.transport": "tcp",
         "related.ip": [
             "192.168.86.85",
@@ -120,6 +125,7 @@
         "input.type": "log",
         "log.offset": 985,
         "network.community_id": "1:gjMiDGtS5SVvdwzjjQdAKGBrDA4=",
+        "network.protocol": "http",
         "network.transport": "tcp",
         "related.ip": [
             "192.168.86.85",
@@ -155,7 +161,9 @@
         "destination.domain": "192.168.86.28",
         "destination.ip": "192.168.86.85",
         "destination.port": 56118,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
@@ -221,16 +229,21 @@
         "dns.id": "12308",
         "dns.response_code": "NOERROR",
         "dns.type": "answer",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:51:20.213418-0400\",\"flow_id\":1684780223079543,\"in_iface\":\"en0\",\"event_type\":\"dns\",\"src_ip\":\"192.168.86.1\",\"src_port\":53,\"dest_ip\":\"192.168.86.85\",\"dest_port\":39464,\"proto\":\"UDP\",\"dns\":{\"type\":\"answer\",\"id\":12308,\"rcode\":\"NOERROR\",\"rrname\":\"clients.l.google.com\",\"rrtype\":\"A\",\"ttl\":299,\"rdata\":\"172.217.13.110\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 2347,
         "network.community_id": "1:pC3b0nBNCU4LxSue53drHp4b4cs=",
+        "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
             "192.168.86.1",
@@ -390,26 +403,31 @@
         "destination.address": "17.142.164.13",
         "destination.as.number": 714,
         "destination.as.organization.name": "Apple Inc.",
-        "destination.domain": "p33-btmmdns.icloud.com.",
+        "destination.domain": "p33-btmmdns.icloud.com",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.142.164.13",
         "destination.port": 443,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
         "event.original": "{\"timestamp\":\"2018-07-05T15:51:50.666597-0400\",\"flow_id\":89751777876473,\"in_iface\":\"en0\",\"event_type\":\"tls\",\"src_ip\":\"192.168.86.85\",\"src_port\":56187,\"dest_ip\":\"17.142.164.13\",\"dest_port\":443,\"proto\":\"TCP\",\"tls\":{\"subject\":\"CN=*.icloud.com\\/OU=management:idms.group.506364\\/O=Apple Inc.\\/ST=California\\/C=US\",\"issuerdn\":\"CN=Apple IST CA 2 - G1\\/OU=Certification Authority\\/O=Apple Inc.\\/C=US\",\"serial\":\"5C:9C:E1:09:78:87:F8:07\",\"fingerprint\":\"6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47\",\"sni\":\"p33-btmmdns.icloud.com.\",\"version\":\"TLS 1.2\",\"notbefore\":\"2017-02-27T17:54:31\",\"notafter\":\"2019-03-29T17:54:31\"}}",
-        "event.type": "protocol",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 4683,
         "network.community_id": "1:u67AuA4ybOaspT7mp9OZ3jWvnKw=",
+        "network.protocol": "tls",
         "network.transport": "tcp",
         "related.hash": [
-            "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47"
+            "6AFFACA65F8A05E7A98C7629B908C769ADDC7247"
         ],
         "related.ip": [
             "192.168.86.85",
@@ -427,21 +445,20 @@
         "suricata.eve.tls.notafter": "2019-03-29T17:54:31",
         "suricata.eve.tls.notbefore": "2017-02-27T17:54:31",
         "suricata.eve.tls.serial": "5C:9C:E1:09:78:87:F8:07",
-        "suricata.eve.tls.sni": "p33-btmmdns.icloud.com.",
+        "suricata.eve.tls.sni": "p33-btmmdns.icloud.com",
         "suricata.eve.tls.subject": "CN=*.icloud.com/OU=management:idms.group.506364/O=Apple Inc./ST=California/C=US",
         "suricata.eve.tls.version": "TLS 1.2",
         "tags": [
             "suricata"
         ],
-        "tls.client.server_name": "p33-btmmdns.icloud.com.",
-        "tls.server.hash.sha1": "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47",
+        "tls.client.server_name": "p33-btmmdns.icloud.com",
+        "tls.server.hash.sha1": "6AFFACA65F8A05E7A98C7629B908C769ADDC7247",
         "tls.server.issuer": "CN=Apple IST CA 2 - G1/OU=Certification Authority/O=Apple Inc./C=US",
         "tls.server.not_after": "2019-03-29T17:54:31",
         "tls.server.not_before": "2017-02-27T17:54:31",
         "tls.server.subject": "CN=*.icloud.com/OU=management:idms.group.506364/O=Apple Inc./ST=California/C=US",
         "tls.version": "1.2",
-        "tls.version_protocol": "tls",
-        "url.domain": "p33-btmmdns.icloud.com."
+        "tls.version_protocol": "tls"
     },
     {
         "@timestamp": "2018-07-05T19:51:54.001Z",
@@ -450,7 +467,9 @@
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0001:0002",
         "destination.packets": 0,
         "destination.port": 547,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "suricata.eve",
         "event.duration": 0,
         "event.end": "2018-07-05T19:51:23.453Z",

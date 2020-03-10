@@ -87,23 +87,26 @@ processors:
           if (event_type == null) {
             return;
           }
+          var catArray = [];
+          var typeArray = [];
           evt.Put("suricata.eve.event_type", event_type.toLowerCase());
           switch (event_type.toLowerCase()) {
             case "alert":
               evt.Put("event.kind", "alert");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.category", "intrusion_detection");
+              catArray.push("network");
+              catArray.push("intrusion_detection");
               break;
-            case "anomally":
+            case "anomaly":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
+              catArray.push("network");
               break;
             case "http":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.category", "web");
-              evt.AppendTo("event.type", "access");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              catArray.push("web");
+              typeArray.push("access");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "http");
               var status = evt.Get("suricata.eve.http.status");
               if (status == null) {
                 break;
@@ -117,67 +120,81 @@ processors:
               break;
             case "dns":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "dns");
               break;
             case "ftp":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "ftp");
               break;
             case "ftp_data":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "ftp");
               break;
             case "tls":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "tls");
               break;
             case "tftp":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "tftp");
               break;
             case "smb":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "smb");
               break;
             case "ssh":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "ssh");
               break;
             case "flow":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "connection");
+              catArray.push("network");
+              typeArray.push("connection");
               var state = evt.Get("suricata.eve.flow.state");
               if (state == null) {
                 break;
               }
               switch (state) {
                 case "new":
-                  evt.AppendTo("event.type", "start");
+                  typeArray.push("start");
                   break;
                 case "closed":
-                  evt.AppendTo("event.type", "end");
+                  typeArray.push("end");
                   break;
               }
               break;
             case "rdp":
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
-              evt.AppendTo("event.type", "protocol");
+              catArray.push("network");
+              typeArray.push("protocol");
+              evt.Put("network.protocol", "rdp");
               break;
             case "stats":
               evt.Put("event.kind", "metric");
               break;
             default:
               evt.Put("event.kind", "event");
-              evt.AppendTo("event.category", "network");
+              catArray.push("network");
+          }
+          if (catArray.length > 0) {
+            evt.Put("event.category", catArray);
+          }
+          if (typeArray.length > 0) {
+            evt.Put("event.type", typeArray);
           }
         }
         function setDnsV1Answers(evt) {
@@ -320,7 +337,7 @@ processors:
           }
         }
         function addTlsVersion(evt) {
-          var tls_version = evt.Get("suricata.eve.tls.version")
+          var tls_version = evt.Get("suricata.eve.tls.version");
           if (tls_version == null) {
             return;
           }
@@ -331,8 +348,17 @@ processors:
           evt.Put("tls.version_protocol", parts[0].toLowerCase());
           evt.Put("tls.version", parts[1]);
         }
+        function cleanupTlsSni(evt) {
+          var sni = evt.Get("suricata.eve.tls.sni");
+          if (sni == null) {
+            return;
+          }
+          if ("." == sni.charAt(sni.length - 1)) {
+            evt.Put("suricata.eve.tls.sni", sni.substring(0, sni.length - 1));
+          }
+        }
         function process(evt) {
-          var event_type = evt.Get("suricata.eve.event_type")
+          var event_type = evt.Get("suricata.eve.event_type");
 
           addEcsCategorization(evt);
           if (event_type == "dns") {
@@ -344,6 +370,7 @@ processors:
           cleanupAppProto(evt);
           addRelatedIps(evt);
           addTlsVersion(evt);
+          cleanupTlsSni(evt);
         }
   - if:
       equals:
