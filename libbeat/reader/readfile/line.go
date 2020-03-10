@@ -67,6 +67,7 @@ func NewLineReader(input io.Reader, config Config) (*LineReader, error) {
 		decodedNl:  terminator,
 		inBuffer:   streambuf.New(nil),
 		outBuffer:  streambuf.New(nil),
+		logger:     logp.NewLogger("readfile_line"),
 	}, nil
 }
 
