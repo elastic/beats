@@ -1,5 +1,5 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance data by using processors
+== Filter and enhance data with processors
 
 ++++
 <titleabbrev>Processors</titleabbrev>

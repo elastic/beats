@@ -1,6 +1,6 @@
 [[filtering-and-enhancing-data]]
 [role="xpack"]
-== Filter and enhance data by using processors
+== Filter and enhance data with processors
 
 ++++
 <titleabbrev>Processors</titleabbrev>

@@ -26,6 +26,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-metricbeat>>
 * <<configuration-general-options>>
 * <<configuration-path>>
+* <<metricbeat-configuration-reloading>>
 * <<configuring-output>>
 * <<configuration-ssl>>
 * <<ilm>>
@@ -47,6 +48,8 @@ include::./metricbeat-options.asciidoc[]
 include::./metricbeat-general-options.asciidoc[]
 
 include::{libbeat-dir}/shared-path-config.asciidoc[]
+
+include::{docdir}/../docs/reload-configuration.asciidoc[]
 
 include::{libbeat-dir}/outputconfig.asciidoc[]
 
