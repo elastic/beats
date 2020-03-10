@@ -142,7 +142,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		event := mb.Event{}
 		idx.Index = name
 
-		err = addClusterStateFields(idx, clusterState)
+		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "failure adding cluster state fields"))
 			continue
@@ -173,7 +173,7 @@ func parseAPIResponse(content []byte, indicesStruct *IndicesStruct) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx index, clusterState common.MapStr) error {
+func addClusterStateFields(idx *index, clusterState common.MapStr) error {
 	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index metadata from cluster state")
