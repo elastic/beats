@@ -26,19 +26,27 @@ import (
 
 type multiplexedFactory []FactoryMatcher
 
-// FactoryMatcher returns a RunnerFactory that should be used to
-// handle the given configuration.
+// FactoryMatcher returns a RunnerFactory that can handle the given
+// configuration if it supports it, otherwise it returns nil.
 type FactoryMatcher func(cfg *common.Config) RunnerFactory
 
 var errConfigDoesNotMatch = errors.New("config does not match accepted configurations")
 
 // MultiplexedRunnerFactory is a RunnerFactory that uses a list of
 // FactoryMatcher to choose which RunnerFactory should handle the configuration.
+// When presented a Config object, MultiplexedRunnerFactory will query the
+// matchers in the order given. The first RunnerFactory returned will be used
+// to create the runner.
+// Creating a runner or checking a configuration will return an error if no
+// matcher was found. Use MatchDefault as last argument to
+// MultiplexedRunnerFactory to configure a default RunnerFactory that shall
+// always be used if no other factory was matched.
 func MultiplexedRunnerFactory(matchers ...FactoryMatcher) RunnerFactory {
 	return multiplexedFactory(matchers)
 }
 
-// MatchHasField returns the configured RunnerFactory if the configation contains the configured field.
+// MatchHasField returns a FactoryMatcher that returns the given RunnerFactory
+// when the input config contains the given field name.
 func MatchHasField(field string, factory RunnerFactory) FactoryMatcher {
 	return func(cfg *common.Config) RunnerFactory {
 		if cfg.HasField(field) {
@@ -48,7 +56,8 @@ func MatchHasField(field string, factory RunnerFactory) FactoryMatcher {
 	}
 }
 
-// MatchDefault always returns the configured runner factory.
+// MatchDefault return a FactoryMatcher that always returns returns the given
+// RunnerFactory.
 func MatchDefault(factory RunnerFactory) FactoryMatcher {
 	return func(cfg *common.Config) RunnerFactory {
 		return factory

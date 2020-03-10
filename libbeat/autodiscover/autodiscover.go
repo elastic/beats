@@ -37,12 +37,16 @@ const (
 	retryPeriod = 10 * time.Second
 )
 
-// TODO autodiscover providers config reload
-
-// EventConfigurer generates a valid list of configs from the given event, the
-// received event will have all keys defined by `StartFilter`.
+// EventConfigurer is used to configure the creation of configuration objects
+// from the autodiscover event bus.
 type EventConfigurer interface {
+	// EventFilter returns the bus filter to retrieve runner start/stop triggering
+	// events. The bus will filter events to the ones, that contain *all* the
+	// the required top-level keys.
 	EventFilter() []string
+
+	// CreateConfig creates a list of configurations from a bus.Event. The
+	// received event will have all keys defined in `EventFilter`.
 	CreateConfig(bus.Event) ([]*common.Config, error)
 }
 

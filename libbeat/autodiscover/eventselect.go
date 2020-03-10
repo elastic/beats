@@ -44,9 +44,10 @@ func QueryConfig() EventConfigurer { return defaultConfigQuery }
 func (q queryConfigFrom) EventFilter() []string { return []string{string(q)} }
 
 func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*common.Config, error) {
-	config, ok := e[string(q)].([]*common.Config)
+	fieldName := string(q)j
+	config, ok := e[fieldName].([]*common.Config)
 	if !ok {
-		return nil, errors.New("Got a wrong value in event `config` key")
+		return nil, fmt.Errorf("Event field '%q' does not contain a valid configuration object", fieldname)
 	}
 	return config, nil
 }

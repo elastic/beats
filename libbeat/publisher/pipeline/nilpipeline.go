@@ -19,7 +19,7 @@ package pipeline
 
 import "github.com/elastic/beats/v7/libbeat/beat"
 
-type NilPipeline struct{}
+type nilPipeline struct{}
 
 type nilClient struct {
 	eventer      beat.ClientEventer
@@ -28,15 +28,19 @@ type nilClient struct {
 	ackLastEvent func(interface{})
 }
 
-var _nilPipeline = (*NilPipeline)(nil)
+var _nilPipeline = (*nilPipeline)(nil)
 
-func NewNilPipeline() *NilPipeline { return _nilPipeline }
+// NewNilPipeline returns a new pipeline that is compatible with
+// beats.PipelineConnector. The pipeline will discard all events that have been
+// published. Client ACK handlers will still be executed, but the callbacks
+// will be executed immediately when the event is published.
+func NewNilPipeline() beat.PipelineConnector { return _nilPipeline }
 
-func (p *NilPipeline) Connect() (beat.Client, error) {
+func (p *nilPipeline) Connect() (beat.Client, error) {
 	return p.ConnectWith(beat.ClientConfig{})
 }
 
-func (p *NilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return &nilClient{
 		eventer:      cfg.Events,
 		ackCount:     cfg.ACKCount,
