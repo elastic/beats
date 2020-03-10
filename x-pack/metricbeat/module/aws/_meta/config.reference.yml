@@ -42,4 +42,9 @@
   period: 60s
   credential_profile_name: test-mb
   metricsets:
+    - elb
+    - natgateway
     - rds
+    - transitgateway
+    - usage
+    - vpn

@@ -27,8 +27,8 @@ image::./images/metricbeat-aws-overview.png[]
 == Metricsets
 
 Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`,
-`lambda`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs` and `usage`
-metricset in `aws` module.
+`lambda`, `natgateway`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs`,
+`transitgateway`, `usage` and `vpn` metricset in `aws` module.
 
 Collecting `tags` for `ec2`, `cloudwatch`, and metricset created based on
 `cloudwatch` using light module is supported.
@@ -117,6 +117,13 @@ The lambda metricset comes with a predefined dashboard:
 image::./images/metricbeat-aws-lambda-overview.png[]
 
 [float]
+=== `natgateway`
+CloudWatch collects information from NAT gateways and creates readable, near real-time metrics.
+This metricset enables users to collect these metrics from CloudWatch to monitor and troubleshoot
+their NAT gateway. NAT gateway metric data is provided at 1-minute intervals and therefore,
+`period` for `natgateway` metricset is recommended to be `1m` or multiples of `1m`.
+
+[float]
 === `rds`
 `period` for `rds` metricset is recommended to be `60s` or multiples of `60s` because Amazon RDS sends metrics and
 dimensions to Amazon CloudWatch every minute.
@@ -155,6 +162,13 @@ The sqs metricset comes with a predefined dashboard:
 image::./images/metricbeat-aws-sqs-overview.png[]
 
 [float]
+=== `transitgateway`
+Amazon VPC reports metrics to CloudWatch only when requests are flowing through
+the transit gateway. If there are requests flowing through the transit gateway,
+Amazon VPC measures and sends its metrics in 60-second intervals. `period` for
+`transitgateway` metricset is recommended to be `1m` or multiples of `1m`.
+
+[float]
 === `usage`
 CloudWatch collects metrics that track the usage of some AWS resources. These
 metrics correspond to AWS service quotas. Tracking these metrics can help
@@ -165,6 +179,12 @@ configuration for usage metricset is set to `1m`.
 The usage metricset comes with a predefined dashboard:
 
 image::./images/metricbeat-aws-usage-overview.png[]
+
+[float]
+=== `vpn`
+CloudWatch collects and processes raw data from the VPN service into readable, near
+real-time metrics for users to better understand the performance of their web
+applications and services.
 
 [float]
 == AWS API requests count per metricset
