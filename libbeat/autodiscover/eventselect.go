@@ -18,7 +18,7 @@
 package autodiscover
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -44,10 +44,10 @@ func QueryConfig() EventConfigurer { return defaultConfigQuery }
 func (q queryConfigFrom) EventFilter() []string { return []string{string(q)} }
 
 func (q queryConfigFrom) CreateConfig(e bus.Event) ([]*common.Config, error) {
-	fieldName := string(q)j
+	fieldName := string(q)
 	config, ok := e[fieldName].([]*common.Config)
 	if !ok {
-		return nil, fmt.Errorf("Event field '%q' does not contain a valid configuration object", fieldname)
+		return nil, fmt.Errorf("Event field '%v' does not contain a valid configuration object", fieldName)
 	}
 	return config, nil
 }
