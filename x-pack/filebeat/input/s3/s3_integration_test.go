@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+// +build aws
+
 package s3
 
 import (
@@ -38,7 +41,9 @@ const (
 var filePath = filepath.Join("ftest", fileName)
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func getConfigForTest() (config, string) {
+func getConfigForTest(t *testing.T) config {
+	t.Helper()
+
 	awsConfig := awscommon.ConfigAWS{}
 	queueURL := os.Getenv("QUEUE_URL")
 	profileName := os.Getenv("AWS_PROFILE_NAME")
@@ -51,25 +56,25 @@ func getConfigForTest() (config, string) {
 	}
 	switch {
 	case queueURL == "":
-		return config, "Skipping: $QUEUE_URL is not set in environment"
+		t.Fatal("$QUEUE_URL is not set in environment")
 	case profileName == "" && accessKeyID == "":
-		return config, "Skipping: $AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty"
+		t.Fatal("$AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty")
 	case profileName != "":
 		awsConfig.ProfileName = profileName
 		config.QueueURL = queueURL
 		config.AwsConfig = awsConfig
-		return config, ""
+		return config
 	case secretAccessKey == "":
-		return config, "Skipping: $AWS_SECRET_ACCESS_KEY not set or set to empty"
-	default:
-		awsConfig.AccessKeyID = accessKeyID
-		awsConfig.SecretAccessKey = secretAccessKey
-		if sessionToken != "" {
-			awsConfig.SessionToken = sessionToken
-		}
-		config.AwsConfig = awsConfig
-		return config, ""
+		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
 	}
+
+	awsConfig.AccessKeyID = accessKeyID
+	awsConfig.SecretAccessKey = secretAccessKey
+	if sessionToken != "" {
+		awsConfig.SessionToken = sessionToken
+	}
+	config.AwsConfig = awsConfig
+	return config
 }
 
 func uploadSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAPI) {
@@ -160,7 +165,7 @@ func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3I
 
 	in, err := NewInput(cfg, connector, inputCtx)
 	if err != nil {
-		t.Skipf("Skipping: %v", err)
+		t.Fatalf("Skipping: %v", err)
 	}
 	s3Input := in.(*s3Input)
 	defer s3Input.Stop()
@@ -224,13 +229,9 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 
 func TestS3Input(t *testing.T) {
 	inputConfig := defaultTestConfig()
+	config := getConfigForTest(t)
 
 	runTest(t, inputConfig, func(t *testing.T, input *s3Input, out *stubOutleter) {
-		config, info := getConfigForTest()
-		if info != "" {
-			t.Skipf("failed to get config for test: %v", info)
-		}
-
 		awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 		if err != nil {
 
