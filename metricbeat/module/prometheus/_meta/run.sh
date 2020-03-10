@@ -1,9 +1,11 @@
 #!/bin/sh
 
-# this works only on Mac envs
-HOST_DOMAIN="host.docker.internal"
-ping -q -c1 $HOST_DOMAIN > /dev/null 2>&1
+sleep 2
+nslookup "host.docker.internal" | grep -q "can't find"
 if [ $? -ne 0 ]; then
+  # this works only on Mac envs
+  HOST_DOMAIN="host.docker.internal"
+else
   # this works only on Linux envs
   HOST_DOMAIN="0.0.0.0"
 fi

@@ -58,7 +58,7 @@ class TestRemoteWrite(metricbeat.BaseTest):
 
         self.wait_until(lambda: self.log_contains("Starting HTTP"))
 
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, 60)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 

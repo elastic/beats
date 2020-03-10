@@ -96,9 +96,10 @@ func NewHttpServerWithHandler(mb mb.BaseMetricSet, handlerFunc http.HandlerFunc)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	h := &HttpServer{
-		done: make(chan struct{}),
-		ctx:  ctx,
-		stop: cancel,
+		done:       make(chan struct{}),
+		eventQueue: make(chan server.Event), // this is needed to avoid `close of nil channel` panics
+		ctx:        ctx,
+		stop:       cancel,
 	}
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
