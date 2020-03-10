@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package vpc
 
@@ -32,10 +33,7 @@ func TestData(t *testing.T) {
 		{"AWS/TransitGateway", "./_meta/data_transit_gateway.json"},
 	}
 
-	config, info := mtest.GetConfigForTest("vpc", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "vpc", "300s")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

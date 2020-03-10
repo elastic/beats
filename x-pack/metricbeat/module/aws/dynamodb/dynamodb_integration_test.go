@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package dynamodb
 
@@ -14,10 +15,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("dynamodb", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "dynamodb", "300s")
 
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
