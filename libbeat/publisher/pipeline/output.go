@@ -45,7 +45,12 @@ type netClientWorker struct {
 
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
-		c := &netClientWorker{observer: observer, qu: qu, client: nc, logger: logp.NewLogger("publisher_pipeline_output")}
+		c := &netClientWorker{
+			observer: observer,
+			qu:       qu,
+			client:   nc,
+			logger:   logp.NewLogger("publisher_pipeline_output"),
+		}
 		go c.run()
 		return c
 	}
