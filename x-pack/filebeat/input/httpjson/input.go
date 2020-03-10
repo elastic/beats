@@ -201,41 +201,53 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 	return "", nil
 }
 
-// applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
-func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header, rateLimit *RateLimit) error {
+// getRateLimit get the rate limit value if specified in the HTTP Header of the response
+func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 	if rateLimit != nil {
 		if rateLimit.Remaining != "" {
 			remaining := header.Get(rateLimit.Remaining)
 			if remaining == "" {
-				return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Remaining)
+				return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Remaining)
 			}
 			m, err := strconv.ParseInt(remaining, 10, 64)
 			if err != nil {
-				return errors.Wrapf(err, "failed to parse rate-limit remaining value")
+				return 0, errors.Wrapf(err, "failed to parse rate-limit remaining value")
 			}
-			in.log.Debugf("Rate Limit: The number of allowed remaining requests is %d.", m)
 			if m == 0 {
 				reset := header.Get(rateLimit.Reset)
 				if reset == "" {
-					return errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Reset)
+					return 0, errors.Errorf("field %s does not exist in the HTTP Header, or is empty", rateLimit.Reset)
 				}
 				epoch, err := strconv.ParseInt(reset, 10, 64)
 				if err != nil {
-					return errors.Wrapf(err, "failed to parse rate-limit reset value")
+					return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
 				}
-				t := time.Unix(epoch, 0)
-				in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
-				ticker := time.NewTicker(time.Until(t))
-				defer ticker.Stop()
-				for {
-					select {
-					case <-ctx.Done():
-						in.log.Info("Context done.")
-					case <-ticker.C:
-						in.log.Debug("Rate Limit: time is up.")
-					}
-				}
+				return epoch, nil
 			}
+		}
+	}
+	return 0, nil
+}
+
+// applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
+func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header, rateLimit *RateLimit) error {
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil {
+		return err
+	}
+	if epoch == 0 {
+		return nil
+	}
+	t := time.Unix(epoch, 0)
+	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
+	ticker := time.NewTicker(time.Until(t))
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			in.log.Info("Context done.")
+		case <-ticker.C:
+			in.log.Debug("Rate Limit: time is up.")
 		}
 	}
 	return nil

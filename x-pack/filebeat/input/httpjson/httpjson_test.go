@@ -275,17 +275,17 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
 	}
 	p, err := ri.ContentMap.GetValue("pagination_id")
-        if err != nil {
-                t.Fatal("Failed to test createRequestInfoFromBody with error", err)
-        }
-        switch pt := p.(type) {
-        case int:
-                if pt != 100 {
+	if err != nil {
+		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
+	}
+	switch pt := p.(type) {
+	case int:
+		if pt != 100 {
 			t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %d should be 100.", pt)
-                }
-        default:
-                t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %T should be int.", pt)
-        }
+		}
+	default:
+		t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %T should be int.", pt)
+	}
 	b, err := ri.ContentMap.GetValue("extra_body")
 	if err != nil {
 		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
@@ -299,6 +299,39 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 		t.Fatalf("Failed to test createRequestInfoFromBody. extra_body type %T should be string.", bt)
 	}
 }
+
+func TestGetRateLimitCase1(t *testing.T) {
+	header := make(http.Header)
+	header.Add("X-Rate-Limit-Limit", "120")
+	header.Add("X-Rate-Limit-Remaining", "118")
+	header.Add("X-Rate-Limit-Reset", "1581658643")
+	rateLimit := &RateLimit {
+		Limit: "X-Rate-Limit-Limit",
+		Reset: "X-Rate-Limit-Reset",
+		Remaining: "X-Rate-Limit-Remaining",
+	}
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil || epoch != 0 {
+		t.Fatal("Failed to test getRateLimit.")
+	}
+}
+
+func TestGetRateLimitCase2(t *testing.T) {
+        header := make(http.Header)
+        header.Add("X-Rate-Limit-Limit", "10")
+        header.Add("X-Rate-Limit-Remaining", "0")
+        header.Add("X-Rate-Limit-Reset", "1581658643")
+        rateLimit := &RateLimit {
+                Limit: "X-Rate-Limit-Limit",
+                Reset: "X-Rate-Limit-Reset",
+                Remaining: "X-Rate-Limit-Remaining",
+        }
+        epoch, err := getRateLimit(header, rateLimit)
+        if err != nil || epoch != 1581658643 {
+                t.Fatal("Failed to test getRateLimit.")
+        }
+}
+
 
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{
