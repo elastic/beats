@@ -246,11 +246,12 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 		select {
 		case <-ctx.Done():
 			in.log.Info("Context done.")
+			return nil
 		case <-ticker.C:
 			in.log.Debug("Rate Limit: time is up.")
+			return nil
 		}
 	}
-	return nil
 }
 
 // createRequestInfoFromBody creates a new RequestInfo for a new HTTP request in pagination based on HTTP response body
