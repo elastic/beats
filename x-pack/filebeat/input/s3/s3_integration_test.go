@@ -16,14 +16,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/stretchr/testify/assert"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -165,7 +165,7 @@ func runTest(t *testing.T, cfg *common.Config, run func(t *testing.T, input *s3I
 
 	in, err := NewInput(cfg, connector, inputCtx)
 	if err != nil {
-		t.Fatalf("Skipping: %v", err)
+		t.Fatal(err)
 	}
 	s3Input := in.(*s3Input)
 	defer s3Input.Stop()
