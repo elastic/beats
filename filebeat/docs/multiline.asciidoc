@@ -123,7 +123,7 @@ To consolidate these lines into a single event in {beatname_uc}, use the followi
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-multiline.pattern: '^[[:space:]]+(at|\.{3})\b|^Caused by:'
+multiline.pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
 multiline.negate: false
 multiline.match: after
 -------------------------------------------------------------------------------------

@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
+- Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
 
 *Auditbeat*
 
@@ -137,6 +138,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 - Add Kerberos support to Kafka input and output. {pull}16781[16781]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
+- Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
 
 *Auditbeat*
 
@@ -225,6 +228,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 
 ==== Deprecated
 
