@@ -39,7 +39,11 @@ type JSONReader struct {
 
 // NewJSONReader creates a new reader that can decode JSON.
 func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
-	return &JSONReader{reader: r, cfg: cfg}
+	return &JSONReader{
+		reader: r,
+		cfg:    cfg,
+		logger: logp.NewLogger("reader_json"),
+	}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
