@@ -2,7 +2,9 @@
     {
         "destination.ip": "192.0.2.83",
         "destination.mac": "90:10:28:5f:62:24",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",

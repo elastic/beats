@@ -3,7 +3,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -14,13 +16,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 15743,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.tos": 0,
@@ -46,7 +52,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 1433,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -62,7 +70,9 @@
         "iptables.length": 40,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 1024,
         "iptables.tos": 0,
@@ -88,7 +98,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -99,13 +111,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 19619,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.tos": 0,
@@ -131,7 +147,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 80,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -142,13 +160,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 4255,
         "iptables.input_device": "eth0",
         "iptables.length": 40,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 14600,
         "iptables.tos": 0,
@@ -174,7 +196,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -185,13 +209,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 27150,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.tos": 0,
@@ -217,7 +245,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -233,7 +263,9 @@
         "iptables.length": 40,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 1024,
         "iptables.tos": 0,
@@ -259,7 +291,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -270,13 +304,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 6101,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.tos": 0,
@@ -302,7 +340,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 445,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -313,13 +353,17 @@
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 6319,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.tos": 0,
@@ -345,7 +389,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 139,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -361,7 +407,9 @@
         "iptables.length": 40,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 1024,
         "iptables.tos": 0,
@@ -387,7 +435,9 @@
         "destination.ip": "172.16.54.114",
         "destination.mac": "90:10:35:5a:1e:3a",
         "destination.port": 8088,
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -403,7 +453,9 @@
         "iptables.length": 40,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "SYN",
+        "iptables.tcp.flags": [
+            "SYN"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 65535,
         "iptables.tos": 0,

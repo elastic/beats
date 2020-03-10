@@ -1,7 +1,9 @@
 [
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -37,7 +39,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -73,7 +77,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -109,7 +115,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -145,7 +153,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -181,7 +191,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -217,7 +229,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -253,7 +267,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -289,7 +305,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -325,7 +343,9 @@
     },
     {
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
@@ -362,7 +382,9 @@
     {
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0000:0016",
         "destination.mac": "90:10:12:34:56:78",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",

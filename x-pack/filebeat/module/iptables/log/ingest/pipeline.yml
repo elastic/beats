@@ -15,7 +15,7 @@ processors:
       IPTABLES_ETHERNET: 'IN=%{DATA:iptables.input_device} OUT=%{DATA:iptables.output_device}?(?:
         MAC=%{NETFILTERMAC})?'
       IPTABLES_PORT_PAIR: SPT=%{UNSIGNED_INT:source.port:int} DPT=%{UNSIGNED_INT:destination.port:int}
-      IPTABLES_TCP_FLAGS: ((?<= )(CWR|ECE|URG|ACK|PSH|RST|SYN|FIN))*
+      IPTABLES_TCP_FLAGS: (CWR |ECE |URG |ACK |PSH |RST |SYN |FIN )*
       IPTABLES_TCP_SEQ: SEQ=%{UNSIGNED_INT:iptables.tcp.seq:int} ACK=%{UNSIGNED_INT:iptables.tcp.ack:int}
       IPTABLES_TCP_DETAILS: (?:%{IPTABLES_TCP_SEQ} )?WINDOW=%{UNSIGNED_INT:iptables.tcp.window:int}
         RES=0x%{BASE16NUM:iptables.tcp_reserved_bits} %{IPTABLES_TCP_FLAGS:iptables.tcp.flags}
@@ -43,7 +43,7 @@ processors:
       IPTABLES: '%{IPTABLES_ETHERNET} (:?%{IPTABLES_IP}|%{IPTABLES_IPV6})'
       UBIQUITI_FIELD: '[^-\]]*'
       UBIQUITI_RULESET_NAME: '[^\]]*'
-      UBIQUITI_LABEL: '%{UBIQUITI_RULESET_NAME:iptables.ubiquiti.rule_set}-%{UBIQUITI_FIELD:iptables.ubiquiti.rule_number}-%{UBIQUITI_FIELD:event.type}'
+      UBIQUITI_LABEL: '%{UBIQUITI_RULESET_NAME:iptables.ubiquiti.rule_set}-%{UBIQUITI_FIELD:iptables.ubiquiti.rule_number}-%{UBIQUITI_FIELD:event.action}'
 - rename:
     field: message
     target_field: log.original
@@ -137,13 +137,22 @@ processors:
           86:dd: ipv6
       - source:
           object: event
-          key: type
+          key: action
+        destination:
+          object: event
+          key: action
+        map:
+          D: drop
+          A: accept
+      - source:
+          object: event
+          key: action
         destination:
           object: event
           key: type
         map:
-          D: denied
-          A: allowed
+          drop: denied
+          accept: allowed
       - source:
           object: network
           key: transport
@@ -201,7 +210,7 @@ processors:
 - set:
     field: event.kind
     value: event
-- set:
+- append:
     field: event.category
     value: network
 - append:
@@ -220,6 +229,30 @@ processors:
     field: iptables.tcp_reserved_bits
     target_field: iptables.tcp.reserved_bits
     ignore_missing: true
+- split:
+    field: iptables.tcp.flags
+    separator: "\\s+"
+    ignore_missing: true
+- split:
+    field: iptables.fragment_flags
+    separator: "\\s+"
+    ignore_missing: true
+- set:
+    field: observer.egress.zone
+    value: "{{iptables.ubiquiti.output_zone}}"
+    if: ctx?.iptables?.ubiquiti?.output_zone != null
+- set:
+    field: observer.ingress.zone
+    value: "{{iptables.ubiquiti.input_zone}}"
+    if: ctx?.iptables?.ubiquiti?.input_zone != null
+- set:
+    field: rule.id
+    value: "{{iptables.ubiquiti.rule_number}}"
+    if: ctx?.iptables?.ubiquiti?.rule_number != null
+- set:
+    field: rule.name
+    value: "{{iptables.ubiquiti.rule_set}}"
+    if: ctx?.iptables?.ubiquiti?.rule_set != null
 on_failure:
 - set:
     field: error.message
