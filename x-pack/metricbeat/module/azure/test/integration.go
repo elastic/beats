@@ -7,25 +7,28 @@ package test
 import (
 	"errors"
 	"os"
+	"testing"
 )
 
 // GetConfig function gets azure credentials for integration tests.
-func GetConfig(metricSetName string) (map[string]interface{}, error) {
+func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
+	t.Helper()
+
 	clientId, ok := os.LookupEnv("AZURE_CLIENT_ID")
 	if !ok {
-		return nil, errors.New("could not find var AZURE_CLIENT_ID")
+		t.Fatal("Could not find var AZURE_CLIENT_ID")
 	}
 	clientSecret, ok := os.LookupEnv("AZURE_CLIENT_SECRET")
 	if !ok {
-		return nil, errors.New("could not find var AZURE_CLIENT_SECRET")
+		t.Fatal("Could not find var AZURE_CLIENT_SECRET")
 	}
 	tenantId, ok := os.LookupEnv("AZURE_TENANT_ID")
 	if !ok {
-		return nil, errors.New("could not find var AZURE_TENANT_ID")
+		t.Fatal("Could not find var AZURE_TENANT_ID")
 	}
 	subId, ok := os.LookupEnv("AZURE_SUBSCRIPTION_ID")
 	if !ok {
-		return nil, errors.New("could not find var AZURE_SUBSCRIPTION_ID")
+		t.Fatal("Could not find var AZURE_SUBSCRIPTION_ID")
 	}
 	return map[string]interface{}{
 		"module":                "azure",
