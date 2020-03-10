@@ -1,0 +1,13 @@
+# Module: iis
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-iis.html
+
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []

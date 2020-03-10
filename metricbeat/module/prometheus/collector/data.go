@@ -21,8 +21,8 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	dto "github.com/prometheus/client_model/go"
 )

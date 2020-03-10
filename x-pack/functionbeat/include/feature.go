@@ -5,10 +5,10 @@
 package include
 
 import (
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/aws"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/gcp"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/local/local"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/aws"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/gcp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/local/local"
 )
 
 // Bundle feature enabled.

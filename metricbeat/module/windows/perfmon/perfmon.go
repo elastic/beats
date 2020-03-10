@@ -22,16 +22,18 @@ package perfmon
 import (
 	"strings"
 
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // CounterConfig for perfmon counters.
 type CounterConfig struct {
-	InstanceLabel    string `config:"instance_label"    validate:"required"`
+	InstanceLabel    string `config:"instance_label"`
 	InstanceName     string `config:"instance_name"`
 	MeasurementLabel string `config:"measurement_label" validate:"required"`
 	Query            string `config:"query"             validate:"required"`
@@ -40,13 +42,16 @@ type CounterConfig struct {
 
 // Config for the windows perfmon metricset.
 type Config struct {
-	IgnoreNECounters  bool            `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements bool            `config:"perfmon.group_measurements_by_instance"`
-	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
+	IgnoreNECounters   bool            `config:"perfmon.ignore_non_existent_counters"`
+	GroupMeasurements  bool            `config:"perfmon.group_measurements_by_instance"`
+	CounterConfig      []CounterConfig `config:"perfmon.counters" validate:"required"`
+	GroupAllCountersTo string          `config:"perfmon.group_all_counter"`
 }
 
+const metricsetName = "perfmon"
+
 func init() {
-	mb.Registry.MustAddMetricSet("windows", "perfmon", New)
+	mb.Registry.MustAddMetricSet("windows", metricsetName, New, mb.WithHostParser(parse.EmptyHostParser))
 }
 
 type MetricSet struct {
@@ -83,14 +88,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
-		log:           logp.NewLogger("perfmon"),
+		log:           logp.NewLogger(metricsetName),
 	}, nil
 }
 
 // Fetch fetches events and reports them upstream
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
-	if len(m.reader.query.counters) == 0 {
+	if len(m.reader.query.Counters) == 0 {
 		return errors.New("no counters to read")
 	}
 
@@ -115,6 +120,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
+
 	return nil
 }
 

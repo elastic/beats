@@ -24,7 +24,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestRemovedSetting(t *testing.T) {

@@ -39,10 +39,10 @@ import (
 	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	mlimporter "github.com/elastic/beats/v7/libbeat/ml-importer"
 )
 
 // Fileset struct is the representation of a fileset.
@@ -370,14 +370,15 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		}
 	}
 
-	// force our pipeline ID
-	rootPipelineID := ""
-	if len(fs.pipelineIDs) > 0 {
-		rootPipelineID = fs.pipelineIDs[0]
-	}
-	err = cfg.SetString("pipeline", -1, rootPipelineID)
-	if err != nil {
-		return nil, fmt.Errorf("Error setting the pipeline ID in the input config: %v", err)
+	const pipelineField = "pipeline"
+	if !cfg.HasField(pipelineField) {
+		rootPipelineID := ""
+		if len(fs.pipelineIDs) > 0 {
+			rootPipelineID = fs.pipelineIDs[0]
+		}
+		if err := cfg.SetString(pipelineField, -1, rootPipelineID); err != nil {
+			return nil, errw.Wrap(err, "error setting the fileset pipeline ID in config")
+		}
 	}
 
 	// force our the module/fileset name

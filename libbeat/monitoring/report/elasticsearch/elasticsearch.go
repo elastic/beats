@@ -27,20 +27,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/outputs"
-	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
-	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 )
 
 type reporter struct {
@@ -171,11 +170,11 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return memqueue.NewBroker(log,
+	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+		return memqueue.NewQueue(log,
 			memqueue.Settings{
-				Eventer: e,
-				Events:  20,
+				ACKListener: ackListener,
+				Events:      20,
 			}), nil
 	}
 
@@ -332,7 +331,7 @@ func makeClient(
 	host string,
 	params map[string]string,
 	proxyURL *url.URL,
-	tlsConfig *transport.TLSConfig,
+	tlsConfig *tlscommon.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)

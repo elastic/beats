@@ -18,7 +18,7 @@
 package outputs
 
 import (
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Managing TLS option with the outputs package is deprecated move your code to use the tlscommon

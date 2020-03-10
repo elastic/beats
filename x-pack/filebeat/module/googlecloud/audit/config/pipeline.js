@@ -38,6 +38,7 @@ function Audit(keep_original_message) {
     var saveMetadata = new processor.Convert({
         fields: [
             {from: "json.logName", to: "log.logger"},
+            {from: "json.insertId", to: "event.id"},
         ],
         ignore_missing: true
     });
@@ -103,6 +104,7 @@ function Audit(keep_original_message) {
             {from: "googlecloud.audit.authentication_info.principal_email", to: "user.email"},
             {from: "googlecloud.audit.service_name", to: "service.name"},
             {from: "googlecloud.audit.request_metadata.caller_supplied_user_agent", to: "user_agent.original"},
+            {from: "googlecloud.audit.method_name", to: "event.action"},
         ],
         fail_on_error: false,
     });
@@ -123,8 +125,8 @@ function Audit(keep_original_message) {
         }
     };
 
-    // Set event.outcome based on authentication_info and status.
-    var setEventOutcome = function(evt) {
+    // Set ECS categorization fields.
+    var setECSCategorization = function(evt) {
         if (evt.Get("googlecloud.audit.status.code") == null) {
             var authorization_info = evt.Get("googlecloud.audit.authorization_info");
             if (authorization_info.length === 1) {
@@ -143,6 +145,7 @@ function Audit(keep_original_message) {
         } else {
             evt.Put("event.outcome", "failure");
         }
+        evt.Put("event.kind", "event");
     };
 
     var pipeline = new processor.Chain()
@@ -157,7 +160,7 @@ function Audit(keep_original_message) {
         .Add(copyFields)
         .Add(dropExtraFields)
         .Add(RenameNestedFields)
-        .Add(setEventOutcome)
+        .Add(setECSCategorization)
         .Build();
 
     return {

@@ -184,6 +184,9 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
 - module: aws
   period: 300s
   credential_profile_name: test-mb
@@ -213,6 +216,9 @@ metricbeat.modules:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
 - module: aws
   period: 60s
   credential_profile_name: test-mb
@@ -265,6 +271,48 @@ metricbeat.modules:
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
 
+- module: azure
+  metricsets:
+  - container_instance
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_service
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_registry
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+
+- module: azure
+  metricsets:
+  - database_account
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
@@ -284,6 +332,20 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+#----------------------------- Cloudfoundry Module -----------------------------
+- module: cloudfoundry
+  metricsets:
+    - container
+    - counter
+    - value
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  doppler_address: '${CLOUDFOUNDRY_DOPPLER_ADDRESS:""}'
+  uaa_address: '${CLOUDFOUNDRY_UAA_ADDRESS:""}'
+  rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
 
 #----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
@@ -446,6 +508,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -486,6 +550,18 @@ metricbeat.modules:
   # This module uses the Prometheus collector metricset, all
   # the options for this metricset are also available here.
   metrics_path: /metrics
+
+#--------------------------------- Iis Module ---------------------------------
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
 
 #-------------------------------- Istio Module --------------------------------
 # Istio mesh. To collect all Mixer-generated metrics
@@ -845,6 +921,19 @@ metricbeat.modules:
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
 
+#----------------------------- Openmetrics Module -----------------------------
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
+
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
   metricsets: ["tablespace", "performance"]
@@ -954,6 +1043,16 @@ metricbeat.modules:
 
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+#--------------------------- Redis Enterprise Module ---------------------------
+- module: redisenterprise
+  metricsets:
+    - node
+    - proxy
+  period: 1m
+
+  # Metrics endpoint
+  hosts: ["https://127.0.0.1:8070/"]
 
 #--------------------------------- Sql Module ---------------------------------
 - module: sql
@@ -1435,6 +1534,12 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
+
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1527,6 +1632,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1713,6 +1824,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -1958,7 +2071,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -2044,6 +2156,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
