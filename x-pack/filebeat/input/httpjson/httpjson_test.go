@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"sync"
 	"testing"
 
@@ -151,6 +152,114 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 }
 
 // --- Test Cases
+
+func TestConfigValidationCase1(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":       "GET",
+		"http_request_body": map[string]interface{}{"test": "abc"},
+		"no_http_body":      true,
+		"url":               "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase2(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":  "GET",
+		"no_http_body": true,
+		"pagination":   map[string]interface{}{"extra_body_content": map[string]interface{}{"test": "abc"}},
+		"url":          "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase3(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":  "GET",
+		"no_http_body": true,
+		"pagination":   map[string]interface{}{"req_field": "abc"},
+		"url":          "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase4(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method": "GET",
+		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "req_field": "abc"},
+		"url":         "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase5(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method": "GET",
+		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "id_field": "abc"},
+		"url":         "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase6(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method": "GET",
+		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "extra_body_content": map[string]interface{}{"test": "abc"}},
+		"url":         "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
+	}
+}
+
+func TestConfigValidationCase7(t *testing.T) {
+	m := map[string]interface{}{
+		"http_method":  "DELETE",
+		"no_http_body": true,
+		"url":          "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil {
+		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
+	}
+}
+
+func TestGetNextLinkFromHeader(t *testing.T) {
+	header := make(http.Header)
+	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs>; rel=\"self\"")
+	header.Add("Link", "<https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1>; rel=\"next\"")
+	re, _ := regexp.Compile("<([^>]+)>; *rel=\"next\"(?:,|$)")
+	url, err := getNextLinkFromHeader(header, "Link", re)
+	if url != "https://dev-168980.okta.com/api/v1/logs?after=1581658181086_1" {
+		t.Fatal("Failed to test getNextLinkFromHeader. URL " + url + " is not expected")
+	}
+	if err != nil {
+		t.Fatal("Failed to test getNextLinkFromHeader with error:", err)
+	}
+}
 
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{

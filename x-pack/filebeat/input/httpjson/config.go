@@ -79,8 +79,8 @@ func (c *config) Validate() error {
 	}
 	if c.Pagination != nil {
 		if c.Pagination.Header != nil {
-			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" {
-				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field cannot be set simultaneously")
+			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" || len(c.Pagination.ExtraBodyContent) > 0 {
+				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")
 			}
 		}
 	}
