@@ -40,7 +40,6 @@ type netClientWorker struct {
 
 	batchSize  int
 	batchSizer func() int
-	logger     *logp.Logger
 }
 
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
@@ -86,24 +85,24 @@ func (w *netClientWorker) run() {
 			batch.Cancelled()
 
 			if w.closed.Load() {
-				w.logger.Infof("Closed connection to %v", w.client)
+				logp.Info("Closed connection to %v", w.client)
 				return
 			}
 
 			if reconnectAttempts > 0 {
-				w.logger.Infof("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
+				logp.Info("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
 			} else {
-				w.logger.Infof("Connecting to %v", w.client)
+				logp.Info("Connecting to %v", w.client)
 			}
 
 			err := w.client.Connect()
 			if err != nil {
-				w.logger.Errorf("Failed to connect to %v: %v", w.client, err)
+				logp.Err("Failed to connect to %v: %v", w.client, err)
 				reconnectAttempts++
 				continue
 			}
 
-			w.logger.Infof("Connection to %v established", w.client)
+			logp.Info("Connection to %v established", w.client)
 			reconnectAttempts = 0
 			break
 		}
@@ -119,7 +118,7 @@ func (w *netClientWorker) run() {
 
 			err := w.client.Publish(batch)
 			if err != nil {
-				w.logger.Errorf("Failed to publish events: %v", err)
+				logp.Err("Failed to publish events: %v", err)
 				// on error return to connect loop
 				break
 			}

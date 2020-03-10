@@ -41,7 +41,6 @@ type LineReader struct {
 	inOffset   int // input buffer read offset
 	byteCount  int // number of bytes decoded from input buffer into output buffer
 	decoder    transform.Transformer
-	logger     *logp.Logger
 }
 
 // New creates a new reader object
@@ -87,15 +86,15 @@ func (r *LineReader) Next() ([]byte, int, error) {
 
 		// This can happen if something goes wrong during decoding
 		if len(buf) == 0 {
-			r.logger.Error("Empty buffer returned by advance")
+			logp.Err("Empty buffer returned by advance")
 			continue
 		}
 
 		if bytes.HasSuffix(buf, r.decodedNl) {
 			break
 		} else {
-			r.logger.Debugf("Line ending char found which wasn't one: %c", buf[len(buf)-1])
-			r.logger.Debugf("In %s", string(buf))
+			logp.Debug("line", "Line ending char found which wasn't one: %c", buf[len(buf)-1])
+			logp.Debug("line", "In %s", string(buf))
 		}
 	}
 
@@ -152,7 +151,7 @@ func (r *LineReader) advance() error {
 	// -> decode input sequence into outBuffer
 	sz, err := r.decode(idx + len(r.nl))
 	if err != nil {
-		r.logger.Errorf("Error decoding line: %s", err)
+		logp.Err("Error decoding line: %s", err)
 		// In case of error increase size by unencoded length
 		sz = idx + len(r.nl)
 	}

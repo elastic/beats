@@ -52,7 +52,6 @@ type Reader struct {
 	err          error // last seen error
 	state        func(*Reader) (reader.Message, error)
 	message      reader.Message
-	logger       *logp.Logger
 }
 
 const (
@@ -144,7 +143,7 @@ func (mlr *Reader) readFirst() (reader.Message, error) {
 				continue
 			}
 
-			mlr.logger.Debug("Multiline event flushed because timeout reached.")
+			logp.Debug("multiline", "Multiline event flushed because timeout reached.")
 
 			// pass error to caller (next layer) for handling
 			return message, err
@@ -173,7 +172,7 @@ func (mlr *Reader) readNext() (reader.Message, error) {
 					continue
 				}
 
-				mlr.logger.Debug("Multiline event flushed because timeout reached.")
+				logp.Debug("multiline", "Multiline event flushed because timeout reached.")
 
 				// return collected multiline event and
 				// empty buffer for new multiline event

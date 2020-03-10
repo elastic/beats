@@ -34,7 +34,6 @@ import (
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
-	logger *logp.Logger
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
@@ -50,7 +49,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
-			r.logger.Errorf("Error decoding JSON: %v", err)
+			logp.Err("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}

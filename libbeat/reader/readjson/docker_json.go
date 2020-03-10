@@ -46,8 +46,6 @@ type DockerJSONReader struct {
 	parseLine func(message *reader.Message, msg *logLine) error
 
 	stripNewLine func(msg *reader.Message)
-
-	logger *logp.Logger
 }
 
 type logLine struct {
@@ -200,7 +198,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
-			p.logger.Errorf("Parse line error: %v", err)
+			logp.Err("Parse line error: %v", err)
 			return message, reader.ErrLineUnparsable
 		}
 
@@ -217,7 +215,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
-				p.logger.Errorf("Parse line error: %v", err)
+				logp.Err("Parse line error: %v", err)
 				return message, reader.ErrLineUnparsable
 			}
 			message.Content = append(message.Content, next.Content...)
