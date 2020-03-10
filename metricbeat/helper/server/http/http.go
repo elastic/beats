@@ -52,7 +52,7 @@ func (h *HttpEvent) GetMeta() server.Meta {
 	return h.meta
 }
 
-func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
+func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 	config := defaultHttpConfig()
 	err := mb.Module().UnpackConfig(&config)
 	if err != nil {
@@ -64,7 +64,7 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.TODO())
 	h := &HttpServer{
 		done:       make(chan struct{}),
 		eventQueue: make(chan server.Event),
@@ -73,42 +73,32 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 	}
 
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
-		Handler: http.HandlerFunc(h.handleFunc),
+		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
 	}
 	h.server = httpServer
+	return h, nil
+}
+
+func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
+	h, err := getDefaultHttpServer(mb)
+	if err != nil {
+		return nil, err
+	}
+	h.server.Handler = http.HandlerFunc(h.handleFunc)
 
 	return h, nil
 }
 
 func NewHttpServerWithHandler(mb mb.BaseMetricSet, handlerFunc http.HandlerFunc) (server.Server, error) {
-	config := defaultHttpConfig()
-	err := mb.Module().UnpackConfig(&config)
+	h, err := getDefaultHttpServer(mb)
 	if err != nil {
 		return nil, err
 	}
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	h := &HttpServer{
-		done:       make(chan struct{}),
-		eventQueue: make(chan server.Event), // this is needed to avoid `close of nil channel` panics
-		ctx:        ctx,
-		stop:       cancel,
-	}
-	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
-		Handler: handlerFunc,
-	}
-	if tlsConfig != nil {
-		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
-	}
-	h.server = httpServer
+	h.server.Handler = handlerFunc
+
 	return h, nil
 }
 
