@@ -9,7 +9,7 @@ outputs:
     password: changeme
 
 datasources:
-  - namespace: sample
+  - namespace: default
     use_output: default
     inputs:
       - type: system/metrics
