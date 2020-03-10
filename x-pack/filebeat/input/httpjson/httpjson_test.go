@@ -36,7 +36,7 @@ func testSetup(t *testing.T) {
 	})
 }
 
-func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input *httpjsonInput, out *stubOutleter, t *testing.T)) {
+func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input *HttpjsonInput, out *stubOutleter, t *testing.T)) {
 	testSetup(t)
 	// Create an http test server according to whether TLS is used
 	var newServer = httptest.NewServer
@@ -91,7 +91,7 @@ func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input 
 	if err != nil {
 		t.Fatal(err)
 	}
-	input := in.(*httpjsonInput)
+	input := in.(*HttpjsonInput)
 	defer input.Stop()
 
 	run(input, eventOutlet, t)
@@ -261,22 +261,51 @@ func TestGetNextLinkFromHeader(t *testing.T) {
 	}
 }
 
-/*
-func TestiCcreateRequestInfoFromBody(t *testing.T) {
+func TestCreateRequestInfoFromBody(t *testing.T) {
 	m := map[string]interface{}{
-                "": "GET",
-                "interval":    0,
+		"id": 100,
+	}
+	extraBodyContent := common.MapStr{"extra_body": "abc"}
+	ri, err := createRequestInfoFromBody(common.MapStr(m), "id", "pagination_id", extraBodyContent, "https://test-123", &RequestInfo{
+		URL:        "",
+		ContentMap: common.MapStr{},
+		Headers:    common.MapStr{},
+	})
+	if ri.URL != "https://test-123" {
+		t.Fatal("Failed to test createRequestInfoFromBody. URL should be https://test-123.")
+	}
+	p, err := ri.ContentMap.GetValue("pagination_id")
+        if err != nil {
+                t.Fatal("Failed to test createRequestInfoFromBody with error", err)
         }
-	m := make(common.MapStr), idField string, requestField string, extraBodyContent common.MapStr, url string, ri *RequestInfo) (*RequestInfo, err)
+        switch pt := p.(type) {
+        case int:
+                if pt != 100 {
+			t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %d should be 100.", pt)
+                }
+        default:
+                t.Fatalf("Failed to test createRequestInfoFromBody. pagination_id value %T should be int.", pt)
+        }
+	b, err := ri.ContentMap.GetValue("extra_body")
+	if err != nil {
+		t.Fatal("Failed to test createRequestInfoFromBody with error", err)
+	}
+	switch bt := b.(type) {
+	case string:
+		if bt != "abc" {
+			t.Fatalf("Failed to test createRequestInfoFromBody. extra_body value %s does not match \"abc\".", bt)
+		}
+	default:
+		t.Fatalf("Failed to test createRequestInfoFromBody. extra_body type %T should be string.", bt)
+	}
 }
-*/
 
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -298,7 +327,7 @@ func TestGetHTTPS(t *testing.T) {
 		"interval":              0,
 		"ssl.verification_mode": "none",
 	}
-	runTest(t, true, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -320,7 +349,7 @@ func TestPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -342,7 +371,7 @@ func TestRepeatedPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          10 ^ 9,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -363,7 +392,7 @@ func TestRunStop(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, m, func(input *httpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		input.Run()
 		input.Stop()
 		input.Run()

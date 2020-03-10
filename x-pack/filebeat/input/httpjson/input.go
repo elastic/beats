@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -268,7 +267,6 @@ func createRequestInfoFromBody(m common.MapStr, idField string, requestField str
 	if len(extraBodyContent) > 0 {
 		ri.ContentMap.Update(extraBodyContent)
 	}
-	fmt.Printf("%v", ri)
 	return ri, nil
 }
 
