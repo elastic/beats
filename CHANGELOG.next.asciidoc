@@ -112,6 +112,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix detection and logging of some error cases with light modules. {pull}14706[14706]
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
+- Dynamically choose a method for the system/service metricset to support older linux distros. {pull}16902[16902]
 
 *Packetbeat*
 
