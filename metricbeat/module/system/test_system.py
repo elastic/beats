@@ -79,6 +79,7 @@ class Test(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         self.assertCountEqual(self.de_dot(SYSTEM_CPU_FIELDS), cpu.keys())
 
+    @unittest.skip("flaky; see https://github.com/elastic/beats/issues/16933")
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
         """
@@ -224,6 +225,7 @@ class Test(metricbeat.BaseTest):
             diskio = evt["system"]["diskio"]
             self.assertCountEqual(self.de_dot(SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
 
+    @unittest.skip("flaky; see https://github.com/elastic/beats/issues/16933")
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
