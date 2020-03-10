@@ -34,202 +34,202 @@ jobs:
 
     # Filebeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C filebeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat filebeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/filebeat testsuite"
       go: $(GO_VERSION)
       stage: test
 
     # Heartbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat heartbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat heartbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C heartbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat heartbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat heartbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Auditbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C auditbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor auditbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Libbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C libbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C libbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: STRESS_TEST_OPTIONS="-timeout=20m -race -v -parallel 1" TARGETS="-C libbeat stress-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/libbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Metricbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C metricbeat unit-tests coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C metricbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Packetbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor packetbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor packetbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C packetbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Winlogbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor winlogbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor winlogbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C winlogbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Functionbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/functionbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/functionbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/functionbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/functionbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Docker Log Driver
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/dockerlogbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/dockerlogbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/dockerlogbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Journalbeat
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor journalbeat || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor journalbeat && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C journalbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Agent
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/agent || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/agent && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C x-pack/agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/agent || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor x-pack/agent && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Generators
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat generator || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat generator && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C generator/_templates/metricbeat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor generator || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor generator && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C generator/_templates/beat test test-package"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat generator || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor metricbeat generator && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C generator/_templates/metricbeat test"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor generator || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat vendor generator && {echo "NOT testing" && travis_terminate 0;}
       env: TARGETS="-C generator/_templates/beat test"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Kubernetes
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes && {echo "NOT testing" && travis_terminate 0;}
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_K8S_VERSION=v1.9.4
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes && {echo "NOT testing" && travis_terminate 0;}
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
         - TRAVIS_K8S_VERSION=v1.10.0
       stage: test
     - os: linux
-      before_install: if bash dev-tools/check_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes || {echo "NOT testing" && travis_terminate 0;}
+      before_install: if bash dev-tools/skip_changes.sh $TRAVIS_COMMIT_RANGE libbeat metricbeat filebeat deploy/kubernetes && {echo "NOT testing" && travis_terminate 0;}
       dist: xenial
       install: deploy/kubernetes/.travis/setup.sh
       env:

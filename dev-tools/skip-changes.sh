@@ -12,8 +12,8 @@ beginswith() { case $2 in "$1"*) true;; *) false;; esac }
 for path in $DIRLIST; do
   for changed in $CHANGED_FILES; do
     if beginswith $path $changed; then
-      exit 0
+      exit 1
     fi
   done
 done
-exit 1
+exit 0
