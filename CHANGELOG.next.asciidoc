@@ -213,6 +213,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add filtering option for prometheus collector. {pull}16420[16420]
 - Add metricsets based on Ceph Manager Daemon to the `ceph` module. {issue}7723[7723] {pull}16254[16254]
 - Release `statsd` module as GA. {pull}16447[16447] {issue}14280[14280]
+- Add collecting tags and tags_filter for rds metricset in aws module. {pull}16605[16605] {issue}16358[16358]
 - Add OpenMetrics Metricbeat module {pull}16596[16596]
 - Add `cloudfoundry` module to send events from Cloud Foundry. {pull}16671[16671]
 - Add `redisenterprise` module. {pull}16482[16482] {issue}15269[15269]
