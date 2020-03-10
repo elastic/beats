@@ -7,7 +7,6 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<{beatname_lc}-geoip>>
-* <<{beatname_lc}-deduplication>>
 * <<using-environ-vars>>
 * <<configuring-ingest-node>>
 * <<yaml-tips>>
@@ -17,9 +16,6 @@ Learn how to perform common {beatname_uc} configuration tasks.
 
 [role="xpack"]
 include::{libbeat-dir}/shared-geoip.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/shared-deduplication.asciidoc[]
 
 :standalone:
 [role="xpack"]
