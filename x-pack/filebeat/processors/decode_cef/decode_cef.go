@@ -89,7 +89,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// If the version < 0 after parsing then none of the data is valid so return here.
 	var ce cef.Event
-	if err = ce.Unpack([]byte(cefData), cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
+	if err = ce.Unpack(cefData, cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
 		if p.IgnoreFailure {
 			return event, nil
 		}
