@@ -47,6 +47,21 @@ const (
 	kafkaDefaultPort = "9092"
 )
 
+var (
+	kafkaHost = fmt.Sprintf("%v:%v",
+		getenv("KAFKA_HOST", kafkaDefaultHost),
+		getenv("KAFKA_PORT", kafkaDefaultPort),
+	)
+	kafkaKerberosHost = fmt.Sprintf("%v:%v",
+		getenv("KAFKA_KERBEROS_HOST", kafkaDefaultHost),
+		getenv("KAFKA_PORT", kafkaDefaultPort),
+	)
+	testTopicOffsets = map[string]*topicOffsetMap{
+		kafkaHost:         &topicOffsetMap{},
+		kafkaKerberosHost: &topicOffsetMap{},
+	}
+)
+
 type eventInfo struct {
 	events []beat.Event
 }
@@ -61,12 +76,14 @@ func TestKafkaPublish(t *testing.T) {
 	tests := []struct {
 		title  string
 		config map[string]interface{}
+		host   string
 		topic  string
 		events []eventInfo
 	}{
 		{
 			"publish single event to test topic",
 			nil,
+			"",
 			testTopic,
 			single(common.MapStr{
 				"host":    "test-host",
@@ -78,6 +95,7 @@ func TestKafkaPublish(t *testing.T) {
 			map[string]interface{}{
 				"topic": "%{[type]}",
 			},
+			"",
 			logType,
 			single(common.MapStr{
 				"host":    "test-host",
@@ -90,6 +108,7 @@ func TestKafkaPublish(t *testing.T) {
 			map[string]interface{}{
 				"codec.format.string": "%{[message]}",
 			},
+			"",
 			testTopic,
 			single(common.MapStr{
 				"host":    "test-host",
@@ -99,6 +118,7 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			"batch publish to test topic",
 			nil,
+			"",
 			testTopic,
 			randMulti(5, 100, common.MapStr{
 				"host": "test-host",
@@ -109,6 +129,7 @@ func TestKafkaPublish(t *testing.T) {
 			map[string]interface{}{
 				"topic": "%{[type]}",
 			},
+			"",
 			logType,
 			randMulti(5, 100, common.MapStr{
 				"host": "test-host",
@@ -122,6 +143,7 @@ func TestKafkaPublish(t *testing.T) {
 					"group_events": 1,
 				},
 			},
+			"",
 			testTopic,
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
@@ -135,6 +157,7 @@ func TestKafkaPublish(t *testing.T) {
 					"group_events": 1,
 				},
 			},
+			"",
 			testTopic,
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
@@ -146,6 +169,7 @@ func TestKafkaPublish(t *testing.T) {
 			map[string]interface{}{
 				"partition.hash": map[string]interface{}{},
 			},
+			"",
 			testTopic,
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
@@ -159,6 +183,7 @@ func TestKafkaPublish(t *testing.T) {
 				"key":            "%{[message]}",
 				"partition.hash": map[string]interface{}{},
 			},
+			"",
 			testTopic,
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
@@ -175,16 +200,56 @@ func TestKafkaPublish(t *testing.T) {
 					"message",
 				},
 			},
+			"",
 			testTopic,
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
 				"type": "log",
 			}),
 		},
+		{
+			"publish single event to test topic behind Kerberos",
+			map[string]interface{}{
+				"hosts": []string{kafkaKerberosHost},
+				"kerberos": map[string]interface{}{
+					"auth_type":    "keytab",
+					"keytab":       "testdata/kafka.keytab",
+					"config_path":  "testdata/krb5.conf",
+					"service_name": "kafka",
+					"realm":        "ELASTIC",
+				},
+			},
+			kafkaKerberosHost,
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			"publish single event to test topic behind Kerberos with username and password",
+			map[string]interface{}{
+				"hosts": []string{kafkaKerberosHost},
+				"kerberos": map[string]interface{}{
+					"auth_type":    "password",
+					"username":     "kafka",
+					"password":     "changeme",
+					"config_path":  "testdata/krb5.conf",
+					"service_name": "kafka",
+					"realm":        "ELASTIC",
+				},
+			},
+			kafkaKerberosHost,
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
-		"hosts":   []string{getTestKafkaHost()},
+		"hosts":   []string{kafkaHost},
 		"topic":   testTopic,
 		"timeout": "1s",
 	}
@@ -230,7 +295,16 @@ func TestKafkaPublish(t *testing.T) {
 
 			// check we can find all event in topic
 			timeout := 20 * time.Second
-			stored := testReadFromKafkaTopic(t, test.topic, len(expected), timeout)
+			kafkaConf, err := readConfig(cfg)
+			conf, err := newSaramaConfig(nil, kafkaConf)
+			if err != nil {
+				t.Fatal(err)
+			}
+			host := test.host
+			if host == "" {
+				host = kafkaHost
+			}
+			stored := testReadFromKafkaTopic(t, test.topic, len(expected), timeout, host, conf)
 
 			// validate messages
 			if len(expected) != len(stored) {
@@ -313,13 +387,6 @@ func getenv(name, defaultValue string) string {
 	return strDefault(os.Getenv(name), defaultValue)
 }
 
-func getTestKafkaHost() string {
-	return fmt.Sprintf("%v:%v",
-		getenv("KAFKA_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
-	)
-}
-
 func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
 	cfg, err := common.NewConfigFrom(in)
 	if err != nil {
@@ -328,9 +395,8 @@ func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
 	return cfg
 }
 
-func newTestConsumer(t *testing.T) sarama.Consumer {
-	hosts := []string{getTestKafkaHost()}
-	consumer, err := sarama.NewConsumer(hosts, nil)
+func newTestConsumer(t *testing.T, hosts []string, c *sarama.Config) sarama.Consumer {
+	consumer, err := sarama.NewConsumer(hosts, c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -379,13 +445,13 @@ func (m *topicOffsetMap) SetOffset(topic string, partition int32, offset int64) 
 	m.m[topic][partition] = offset
 }
 
-var testTopicOffsets = topicOffsetMap{}
-
 func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
 	timeout time.Duration,
+	host string,
+	c *sarama.Config,
 ) []*sarama.ConsumerMessage {
-	consumer := newTestConsumer(t)
+	consumer := newTestConsumer(t, []string{host}, c)
 	defer func() {
 		consumer.Close()
 	}()
@@ -398,7 +464,7 @@ func testReadFromKafkaTopic(
 	done := make(chan struct{})
 	msgs := make(chan *sarama.ConsumerMessage)
 	for _, partition := range partitions {
-		offset := testTopicOffsets.GetOffset(topic, partition)
+		offset := testTopicOffsets[host].GetOffset(topic, partition)
 		partitionConsumer, err := consumer.ConsumePartition(topic, partition, offset)
 		if err != nil {
 			t.Fatal(err)
@@ -414,7 +480,7 @@ func testReadFromKafkaTopic(
 					if !ok {
 						break
 					}
-					testTopicOffsets.SetOffset(topic, p, msg.Offset+1)
+					testTopicOffsets[host].SetOffset(topic, p, msg.Offset+1)
 					msgs <- msg
 				case <-done:
 					break

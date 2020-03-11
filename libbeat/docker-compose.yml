@@ -16,6 +16,7 @@ services:
       - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
+      - KAFKA_KERBEROS_HOST=kafka_kerberos
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
       - ES_MONITORING_HOST=elasticsearch_monitoring
@@ -41,6 +42,8 @@ services:
       elasticsearchssl:         { condition: service_healthy }
       logstash:                 { condition: service_healthy }
       kafka:                    { condition: service_healthy }
+      kafka_kerberos:           { condition: service_healthy }
+      kerberos_kdc:             { condition: service_healthy }
       redis:                    { condition: service_healthy }
       sredis:                   { condition: service_healthy }
       kibana:                   { condition: service_healthy }
@@ -130,3 +133,24 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+
+  kerberos_kdc:
+    build: ${ES_BEATS}/testing/environments/docker/kerberos_kdc
+    volumes:
+     # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
+     - /dev/urandom:/dev/random
+    healthcheck:
+      test: ["CMD", "klist", "-V"]
+
+  kafka_kerberos:
+    build: ${ES_BEATS}/testing/environments/docker/kafka_kerberos
+    expose:
+      - 9092
+      - 2181
+    environment:
+      - ADVERTISED_HOST=kafka_kerberos
+    healthcheck:
+      test: ["CMD", "klist", "-V"]
+    depends_on:
+      - kerberos_kdc
+

@@ -38,8 +38,8 @@ func TestConfigAcceptValid(t *testing.T) {
 		"Kerberos with keytab": common.MapStr{
 			"kerberos": common.MapStr{
 				"auth_type":    "keytab",
-				"keytab":       "/etc/krb5kcd/kafka.keytab",
-				"config_path":  "/etc/path/config",
+				"keytab":       "testdata/kafka.keytab",
+				"config_path":  "testdata/krb5.conf",
 				"service_name": "HTTP/elastic@ELASTIC",
 				"realm":        "ELASTIC",
 			},
@@ -49,7 +49,7 @@ func TestConfigAcceptValid(t *testing.T) {
 				"auth_type":    "password",
 				"username":     "elastic",
 				"password":     "changeme",
-				"config_path":  "/etc/path/config",
+				"config_path":  "testdata/krb5.conf",
 				"service_name": "HTTP/elastic@ELASTIC",
 				"realm":        "ELASTIC",
 			},
