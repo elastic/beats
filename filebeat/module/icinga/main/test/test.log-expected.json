@@ -2,7 +2,9 @@
     {
         "@timestamp": "2017-04-04T09:16:34.000Z",
         "event.dataset": "icinga.main",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "main",
         "icinga.main.facility": "Notification",
         "input.type": "log",
@@ -14,7 +16,9 @@
     {
         "@timestamp": "2017-04-04T09:16:34.000Z",
         "event.dataset": "icinga.main",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "error",
         "fileset.name": "main",
         "icinga.main.facility": "PluginNotificationTask",
         "input.type": "log",
@@ -29,7 +33,9 @@
     {
         "@timestamp": "2017-04-04T09:16:48.000Z",
         "event.dataset": "icinga.main",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "main",
         "icinga.main.facility": "IdoMysqlConnection",
         "input.type": "log",
