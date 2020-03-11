@@ -48,6 +48,7 @@ processors:
       #  certificate_authority: "/etc/pki/root/ca.pem"
       #  certificate:           "/etc/pki/client/cert.pem"
       #  key:                   "/etc/pki/client/cert.key"
+      #cgroup_prefixes:         ["/docker", "/kubepods"]
 -------------------------------------------------------------------------------
 
 It has the following settings:
@@ -82,3 +83,7 @@ forget metadata for a container, 60s by default.
 
 `labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
  labels with `_`.
+
+`cgroup_prefixes`:: (Optional) By default, the `cgroup_prefixes` field is set to
+`/docker` and `/kubepods`. This is the prefix used when naming cgroups in containers.
+ To detect different container runtime configurations overwrite the defaults.

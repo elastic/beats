@@ -22,7 +22,6 @@ package add_docker_metadata
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -64,6 +63,7 @@ type addDockerMetadata struct {
 	hostFS          string        // Directory where /proc is found
 	dedot           bool          // If set to true, replace dots in labels with `_`.
 	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	cgroupPrefixes  []string
 }
 
 const selector = "add_docker_metadata"
@@ -117,6 +117,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 		hostFS:          config.HostFS,
 		dedot:           config.DeDot,
 		dockerAvailable: dockerAvailable,
+		cgroupPrefixes:  config.CgroupPrefixes,
 	}, nil
 }
 
@@ -241,7 +242,7 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) string {
 		break
 	}
 
-	return getContainerIDFromCgroups(cgroups)
+	return d.getContainerIDFromCgroups(cgroups)
 }
 
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
@@ -266,15 +267,30 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (map[string]string, error
 }
 
 // getContainerIDFromCgroups checks all of the processes' paths to see if any
-// of them are associated with Docker. Docker uses /docker/<CID> when
-// naming cgroups and we use this to determine the container ID. If no container
-// ID is found then an empty string is returned.
-func getContainerIDFromCgroups(cgroups map[string]string) string {
+// of them are associated with Docker. Docker uses /docker/<CID> and
+// Kubernetes, with Docker as a container runtime, uses
+// /kubepods/<class>/<podID>/<cID> when naming cgroups.
+// We use this to determine the container ID.
+// If no container ID is found then an empty string is returned.
+func (d *addDockerMetadata) getContainerIDFromCgroups(cgroups map[string]string) string {
 	for _, path := range cgroups {
-		if strings.HasPrefix(path, "/docker") {
-			return filepath.Base(path)
+		for _, prefix := range d.cgroupPrefixes {
+			if strings.HasPrefix(path, prefix) {
+				cid, err := getCID(path)
+				if err != nil {
+					d.log.Debugf("failed to extract container id for cgroup=%v: %v", path, err)
+					continue
+				}
+				return cid
+			}
 		}
 	}
-
 	return ""
+}
+
+func getCID(cgroup string) (string, error) {
+	if i := strings.LastIndex(cgroup, "/"); i >= 0 {
+		return cgroup[i+1:], nil
+	}
+	return "", fmt.Errorf("Can't extract container ID, cgroup: %s", cgroup)
 }
