@@ -407,7 +407,7 @@ github.com/eapache/queue
 # github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
-# github.com/elastic/ecs v1.4.0
+# github.com/elastic/ecs v1.5.0
 github.com/elastic/ecs/code/go/ecs
 # github.com/elastic/go-libaudit v0.4.0
 github.com/elastic/go-libaudit
