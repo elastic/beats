@@ -165,10 +165,10 @@ if __name__ == "__main__":
     es_beats = args.es_beats
 
     # Read fields.yml
-    with open(fields_yml) as f:
+    with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
+    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)
