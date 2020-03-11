@@ -27,6 +27,7 @@ import (
 var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
 
 func main() {
+	// Force CI run
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
