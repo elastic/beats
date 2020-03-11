@@ -1,6 +1,10 @@
 [[load-balancing]]
 == Load balance the output hosts
 
+++++
+<titleabbrev>Load balancing</titleabbrev>
+++++
+
 Filebeat provides configuration options that you can use to fine
 tune load balancing when sending events to multiple hosts.
 

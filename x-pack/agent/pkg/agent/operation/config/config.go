@@ -18,5 +18,5 @@ type Config struct {
 
 	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
 
-	MonitoringConfig *monitoring.Config `yaml:"monitoring" config:"monitoring"`
+	MonitoringConfig *monitoring.Config `yaml:"settings.monitoring" config:"settings.monitoring"`
 }
