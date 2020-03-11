@@ -1,6 +1,6 @@
 
 *Before you begin*: If you haven't installed the {stack}, do that now. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+{stack-gs}/get-started-elastic-stack.html[Get started with the {stack}].
 
 To download and install {beatname_uc}, use the commands that work with your
 system.
