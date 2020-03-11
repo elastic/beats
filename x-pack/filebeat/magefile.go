@@ -9,17 +9,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import generate
-	_ "github.com/elastic/beats/filebeat/scripts/mage/generate"
+	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 )
 
 func init() {
@@ -69,7 +70,12 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseElasticBeatXPackPackaging()
+	if v, found := os.LookupEnv("AGENT_PACKAGING"); found && v != "" {
+		devtools.UseElasticBeatXPackReducedPackaging()
+	} else {
+		devtools.UseElasticBeatXPackPackaging()
+	}
+
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 

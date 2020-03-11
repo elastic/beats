@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": 1320435875000,
+        "@timestamp": "2011-11-04T19:44:35.879Z",
         "event.dataset": "zeek.notice",
         "event.module": "zeek",
         "fileset.name": "notice",
@@ -20,7 +20,7 @@
         "zeek.notice.suppress_for": 3600
     },
     {
-        "@timestamp": 1551393388000,
+        "@timestamp": "2019-02-28T22:36:28.426Z",
         "destination.address": "207.154.238.205",
         "destination.as.number": 14061,
         "destination.as.organization.name": "DigitalOcean, LLC",

@@ -26,12 +26,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 )
 
+func makeTestInfo(version string) beat.Info {
+	return beat.Info{
+		IndexPrefix: "filebeat",
+		Version:     version,
+	}
+}
+
 func TestLoadPipeline(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -69,7 +77,7 @@ func TestLoadPipeline(t *testing.T) {
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
 
-func checkUploadedPipeline(t *testing.T, client *elasticsearch.Client, expectedDescription string) {
+func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expectedDescription string) {
 	status, response, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, status)
@@ -82,7 +90,7 @@ func checkUploadedPipeline(t *testing.T, client *elasticsearch.Client, expectedD
 }
 
 func TestSetupNginx(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -97,7 +105,7 @@ func TestSetupNginx(t *testing.T) {
 		&ModuleConfig{Module: "nginx"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +122,7 @@ func TestSetupNginx(t *testing.T) {
 }
 
 func TestAvailableProcessors(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -139,18 +147,18 @@ func TestAvailableProcessors(t *testing.T) {
 	assert.Contains(t, err.Error(), "ingest-hello")
 }
 
-func hasIngest(client *elasticsearch.Client) bool {
+func hasIngest(client *eslegclient.Connection) bool {
 	v := client.GetVersion()
 	return v.Major >= 5
 }
 
-func hasIngestPipelineProcessor(client *elasticsearch.Client) bool {
+func hasIngestPipelineProcessor(client *eslegclient.Connection) bool {
 	v := client.GetVersion()
 	return v.Major > 6 || (v.Major == 6 && v.Minor >= 5)
 }
 
 func TestLoadMultiplePipelines(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -176,7 +184,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +203,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 }
 
 func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if !hasIngest(client) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
@@ -221,7 +229,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "6.6.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -236,4 +244,25 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	assert.Equal(t, 404, status)
 	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-plain_logs_bad", "", nil, nil)
 	assert.Equal(t, 404, status)
+}
+
+func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:     eslegtest.GetURL(),
+		Timeout: 0,
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
 }

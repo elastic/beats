@@ -13,10 +13,10 @@ import (
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 const (
@@ -43,7 +43,8 @@ type MetricSet struct {
 
 type config struct {
 	Metrics             []string `config:"stackdriver.metrics" validate:"required"`
-	Zone                string   `config:"zone" validate:"required"`
+	Zone                string   `config:"zone"`
+	Region              string   `config:"region"`
 	ProjectID           string   `config:"project_id" validate:"required"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
@@ -78,12 +79,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
 	if err != nil {
-		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s'", m.config.ProjectID, m.config.Zone)
+		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
 
 	responses, err := reqs.Metrics(ctx, m.config.Metrics)
 	if err != nil {
-		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s'", m.config.ProjectID, m.config.Zone)
+		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
 
 	events, err := m.eventMapping(ctx, responses)
@@ -143,5 +144,12 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 		return errors.New("period in Google Cloud config file cannot be set to less than 300 seconds")
 	}
 
+	return nil
+}
+
+func (c *config) Validate() error {
+	if c.Region == "" && c.Zone == "" {
+		return errors.New("region and zone in Google Cloud config file cannot both be empty")
+	}
 	return nil
 }

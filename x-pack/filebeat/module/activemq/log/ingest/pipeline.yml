@@ -24,6 +24,19 @@ processors:
   - remove:
       field:
         - timestamp
+  - set:
+      field: event.kind
+      value: event
+  - script:
+      if: "ctx?.log?.level != null"
+      lang: painless
+      source: >-
+        def err_levels = ["FATAL", "ERROR", "WARN"];
+        if (err_levels.contains(ctx.log.level)) {
+          ctx.event.type = "error";
+        } else {
+          ctx.event.type = "info";
+        }
 on_failure:
   - set:
       field: error.message

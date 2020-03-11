@@ -29,10 +29,11 @@ import (
 )
 
 const (
-	defaultExt     = ".go"
-	defaultPath    = "."
-	defaultLicense = "ASL2"
-	defaultFormat  = "%s: is missing the license header\n"
+	defaultExt      = ".go"
+	defaultPath     = "."
+	defaultLicense  = "ASL2"
+	defaultLicensor = "Elasticsearch B.V."
+	defaultFormat   = "%s: is missing the license header\n"
 )
 
 const (
@@ -59,10 +60,10 @@ Options:
 // Headers is the map of supported licenses
 var Headers = map[string][]string{
 	"ASL2": {
-		`// Licensed to Elasticsearch B.V. under one or more contributor`,
+		`// Licensed to %s under one or more contributor`,
 		`// license agreements. See the NOTICE file distributed with`,
 		`// this work for additional information regarding copyright`,
-		`// ownership. Elasticsearch B.V. licenses this file to you under`,
+		`// ownership. %s licenses this file to you under`,
 		`// the Apache License, Version 2.0 (the "License"); you may`,
 		`// not use this file except in compliance with the License.`,
 		`// You may obtain a copy of the License at`,
@@ -81,6 +82,22 @@ var Headers = map[string][]string{
 		`// or more contributor license agreements. Licensed under the Elastic License;`,
 		`// you may not use this file except in compliance with the Elastic License.`,
 	},
+	"Cloud": {
+		`// ELASTICSEARCH CONFIDENTIAL`,
+		`// __________________`,
+		`//`,
+		`//  Copyright Elasticsearch B.V. All rights reserved.`,
+		`//`,
+		`// NOTICE:  All information contained herein is, and remains`,
+		`// the property of Elasticsearch B.V. and its suppliers, if any.`,
+		`// The intellectual and technical concepts contained herein`,
+		`// are proprietary to Elasticsearch B.V. and its suppliers and`,
+		`// may be covered by U.S. and Foreign Patents, patents in`,
+		`// process, and are protected by trade secret or copyright`,
+		`// law.  Dissemination of this information or reproduction of`,
+		`// this material is strictly forbidden unless prior written`,
+		`// permission is obtained from Elasticsearch B.V.`,
+	},
 }
 
 var (
@@ -89,6 +106,7 @@ var (
 	extension          string
 	args               []string
 	license            string
+	licensor           string
 	exclude            sliceFlag
 	defaultExludedDirs = []string{"vendor", ".git"}
 )
@@ -113,7 +131,8 @@ func init() {
 	flag.BoolVar(&dryRun, "d", false, `skips rewriting files and returns exitcode 1 if any discrepancies are found.`)
 	flag.BoolVar(&showVersion, "version", false, `prints out the binary version.`)
 	flag.StringVar(&extension, "ext", defaultExt, "sets the file extension to scan for.")
-	flag.StringVar(&license, "license", defaultLicense, "sets the license type to check: ASL2, Elastic")
+	flag.StringVar(&license, "license", defaultLicense, "sets the license type to check: ASL2, Elastic, Cloud")
+	flag.StringVar(&licensor, "licensor", defaultLicensor, "sets the name of the licensor")
 	flag.Usage = usageFlag
 	flag.Parse()
 	args = flag.Args()
@@ -125,7 +144,7 @@ func main() {
 		return
 	}
 
-	err := run(args, license, exclude, extension, dryRun, os.Stdout)
+	err := run(args, license, licensor, exclude, extension, dryRun, os.Stdout)
 	if err != nil && err.Error() != "<nil>" {
 		fmt.Fprint(os.Stderr, err)
 	}
@@ -133,14 +152,17 @@ func main() {
 	os.Exit(Code(err))
 }
 
-func run(args []string, license string, exclude []string, ext string, dry bool, out io.Writer) error {
+func run(args []string, license, licensor string, exclude []string, ext string, dry bool, out io.Writer) error {
 	header, ok := Headers[license]
 	if !ok {
 		return &Error{err: fmt.Errorf("unknown license: %s", license), code: errUnknownLicense}
 	}
 
 	var headerBytes []byte
-	for i := range header {
+	for i, line := range header {
+		if strings.Contains(line, "%s") {
+			header[i] = fmt.Sprintf(line, licensor)
+		}
 		headerBytes = append(headerBytes, []byte(header[i])...)
 		headerBytes = append(headerBytes, []byte("\n")...)
 	}

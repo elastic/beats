@@ -21,13 +21,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/module/logstash"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type jvm struct {
@@ -96,7 +96,14 @@ type nodeInfo struct {
 	Status      string   `json:"status"`
 	HTTPAddress string   `json:"http_address"`
 	Pipeline    pipeline `json:"pipeline"`
-	Monitoring  struct {
+}
+
+// inNodeInfo represents the Logstash node info to be parsed from the Logstash API
+// response. It contains nodeInfo (which is also used as-is elsewhere) + monitoring
+// information.
+type inNodeInfo struct {
+	nodeInfo
+	Monitoring struct {
 		ClusterID string `json:"cluster_uuid"`
 	} `json:"monitoring"`
 }
@@ -108,7 +115,7 @@ type reloads struct {
 
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
-	nodeInfo
+	inNodeInfo
 	commonStats
 	Process   process                  `json:"process"`
 	OS        os                       `json:"os"`

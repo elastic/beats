@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -81,9 +81,9 @@ func TestModuleConfig(t *testing.T) {
 		err  string
 	}{
 		{
-			name: "missing required field",
+			name: "string value is not set on required field",
 			in:   map[string]interface{}{},
-			err:  "missing required field accessing 'module'",
+			err:  "string value is not set accessing 'module'",
 		},
 		{
 			name: "valid config",
@@ -97,7 +97,7 @@ func TestModuleConfig(t *testing.T) {
 				Enabled:    true,
 				Period:     time.Second * 10,
 				Timeout:    0,
-				Query:      QueryParams{},
+				Query:      nil,
 			},
 		},
 		{

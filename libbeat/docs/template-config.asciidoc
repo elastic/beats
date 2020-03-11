@@ -11,7 +11,7 @@ connecting to Elasticsearch.
 ifndef::no-output-logstash[]
 
 NOTE: A connection to Elasticsearch is required to load the index template. If
-the output is Logstash, you must <<load-template-manually,load the template
+the configured output is not Elasticsearch (or Elastic Cloud), you must <<load-template-manually,load the template
 manually>>.
 
 endif::[]
@@ -83,16 +83,16 @@ setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
 
-*`setup.template.append_fields`* experimental[]:: A list of fields to be added
+*`setup.template.append_fields`*:: A list of fields to be added
 to the template and {kib} index pattern. This setting adds new fields. It does
-not overwrite or change existing fields. 
+not overwrite or change existing fields.
 +
 This setting is useful when your data contains fields that {beatname_uc} doesn't
-know about in advance. 
+know about in advance.
 ifeval::["{beatname_lc}"=="metricbeat"]
 For example, you might want to append fields to the template when you're using
 a metricset, such as the <<metricbeat-metricset-http-json>>, and the full data
-structure is not known in advance. 
+structure is not known in advance.
 endif::[]
 +
 If `append_fields` is specified along with `overwrite: true`, {beatname_uc}
@@ -117,7 +117,7 @@ setup.template.append_fields:
 
 *`setup.template.json.enabled`*:: Set to `true` to load a
 JSON-based template file. Specify the path to your {es} index template file and
-set the name of the template. 
+set the name of the template.
 +
 ["source","yaml",subs="attributes"]
 ----------------------------------------------------------------------

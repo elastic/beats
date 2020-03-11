@@ -5341,7 +5341,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: { "application": "foo-bar", "env": "production" }
 
 --
 
@@ -20141,6 +20141,7 @@ alias to: message
 
 --
 
+<<<<<<< HEAD
 [[exported-fields-okta]]
 == OKTA fields
 
@@ -20706,6 +20707,303 @@ Geolocation information.
 
 
 type: geo_point
+=======
+[float]
+=== ingress_controller
+
+Contains fields for the Ingress Nginx controller access logs.
+
+
+
+*`nginx.ingress_controller.remote_ip_list`*::
++
+--
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
+
+
+type: array
+
+--
+
+*`nginx.ingress_controller.http.request.length`*::
++
+--
+The request length (including request line, header, and request body)
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nginx.ingress_controller.http.request.time`*::
++
+--
+Time elapsed since the first bytes were read from the client
+
+
+type: double
+
+format: duration
+
+--
+
+*`nginx.ingress_controller.upstream.name`*::
++
+--
+The name of the upstream.
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.alternative_name`*::
++
+--
+The name of the alternative upstream.
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.response.length`*::
++
+--
+The length of the response obtained from the upstream server
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nginx.ingress_controller.upstream.response.time`*::
++
+--
+The time spent on receiving the response from the upstream server as seconds with millisecond resolution
+
+
+type: double
+
+format: duration
+
+--
+
+*`nginx.ingress_controller.upstream.response.status_code`*::
++
+--
+The status code of the response obtained from the upstream server
+
+
+type: long
+
+--
+
+*`nginx.ingress_controller.http.request.id`*::
++
+--
+The randomly generated ID of the request
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.ip`*::
++
+--
+The IP address of the upstream server. If several servers were contacted during request processing, their addresses are separated by commas.
+
+
+type: ip
+
+--
+
+*`nginx.ingress_controller.upstream.port`*::
++
+--
+The port of the upstream server.
+
+
+type: long
+
+--
+
+*`nginx.ingress_controller.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`nginx.ingress_controller.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`nginx.ingress_controller.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`nginx.ingress_controller.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`nginx.ingress_controller.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`nginx.ingress_controller.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`nginx.ingress_controller.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`nginx.ingress_controller.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`nginx.ingress_controller.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device.name
+
+--
+
+*`nginx.ingress_controller.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`nginx.ingress_controller.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`nginx.ingress_controller.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`nginx.ingress_controller.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`nginx.ingress_controller.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`nginx.ingress_controller.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`nginx.ingress_controller.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`nginx.ingress_controller.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`nginx.ingress_controller.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`nginx.ingress_controller.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+>>>>>>> upstream/master
 
 --
 

@@ -9,26 +9,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management"
 )
 
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
-
-func init() {
-	management.Register("x-pack", NewConfigManager, feature.Beta)
-}
 
 // ConfigManager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat
@@ -284,7 +279,7 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 
 		var config *reload.ConfigWithMeta
@@ -293,13 +288,13 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 			config, err = blocks[0].ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return newConfigError(err)
+				return NewConfigError(err)
 			}
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -308,14 +303,14 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 			config, err := block.ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return newConfigError(err)
+				return NewConfigError(err)
 			}
 			configs = append(configs, config)
 		}
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 	}
 
