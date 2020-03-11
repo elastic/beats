@@ -15,3 +15,5 @@
 - Fixed tests on windows {pull}16922[16922]
 
 ==== New features
+
+- Generate index name in a format type-dataset-namespace {pull}16903[16903]

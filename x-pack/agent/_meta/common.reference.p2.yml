@@ -15,9 +15,13 @@ datasources:
       - type: system/metrics
         streams:
           - metricset: cpu
+            dataset: system.cpu
           - metricset: memory
+            dataset: system.memory
           - metricset: network
+            dataset: system.network
           - metricset: filesystem
+            dataset: system.filesystem
 
 management:
   # Mode of management, the agent currently only support the following mode:
