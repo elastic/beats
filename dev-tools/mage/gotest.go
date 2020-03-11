@@ -92,6 +92,8 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 	return params
 }
 
+// testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
+// environment variables, e.g: TEST_TAGS=aws,azure.
 func testTagsFromEnv() []string {
 	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
 }
