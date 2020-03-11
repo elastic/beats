@@ -18,5 +18,5 @@ for path in $DIRLIST; do
   done
 done
 
-echo "NOT testing"
-travis_terminate 0
+echo "NOT testing required. Modified files: $CHANGED_FILES"
+exit 1
