@@ -305,9 +305,9 @@ func TestGetRateLimitCase1(t *testing.T) {
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "118")
 	header.Add("X-Rate-Limit-Reset", "1581658643")
-	rateLimit := &RateLimit {
-		Limit: "X-Rate-Limit-Limit",
-		Reset: "X-Rate-Limit-Reset",
+	rateLimit := &RateLimit{
+		Limit:     "X-Rate-Limit-Limit",
+		Reset:     "X-Rate-Limit-Reset",
 		Remaining: "X-Rate-Limit-Remaining",
 	}
 	epoch, err := getRateLimit(header, rateLimit)
@@ -317,21 +317,20 @@ func TestGetRateLimitCase1(t *testing.T) {
 }
 
 func TestGetRateLimitCase2(t *testing.T) {
-        header := make(http.Header)
-        header.Add("X-Rate-Limit-Limit", "10")
-        header.Add("X-Rate-Limit-Remaining", "0")
-        header.Add("X-Rate-Limit-Reset", "1581658643")
-        rateLimit := &RateLimit {
-                Limit: "X-Rate-Limit-Limit",
-                Reset: "X-Rate-Limit-Reset",
-                Remaining: "X-Rate-Limit-Remaining",
-        }
-        epoch, err := getRateLimit(header, rateLimit)
-        if err != nil || epoch != 1581658643 {
-                t.Fatal("Failed to test getRateLimit.")
-        }
+	header := make(http.Header)
+	header.Add("X-Rate-Limit-Limit", "10")
+	header.Add("X-Rate-Limit-Remaining", "0")
+	header.Add("X-Rate-Limit-Reset", "1581658643")
+	rateLimit := &RateLimit{
+		Limit:     "X-Rate-Limit-Limit",
+		Reset:     "X-Rate-Limit-Reset",
+		Remaining: "X-Rate-Limit-Remaining",
+	}
+	epoch, err := getRateLimit(header, rateLimit)
+	if err != nil || epoch != 1581658643 {
+		t.Fatal("Failed to test getRateLimit.")
+	}
 }
-
 
 func TestGET(t *testing.T) {
 	m := map[string]interface{}{
