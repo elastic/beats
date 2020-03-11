@@ -20,12 +20,14 @@ package elasticsearch
 import (
 	"fmt"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 func TestConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *Client) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
+	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
+	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
 
 	_, err := RegisterConnectCallback(f0)
 	if err != nil {
@@ -48,9 +50,9 @@ func TestConnectCallbacksManagement(t *testing.T) {
 }
 
 func TestGlobalConnectCallbacksManagement(t *testing.T) {
-	f0 := func(client *Client) error { fmt.Println("i am function #0"); return nil }
-	f1 := func(client *Client) error { fmt.Println("i am function #1"); return nil }
-	f2 := func(client *Client) error { fmt.Println("i am function #2"); return nil }
+	f0 := func(client *eslegclient.Connection) error { fmt.Println("i am function #0"); return nil }
+	f1 := func(client *eslegclient.Connection) error { fmt.Println("i am function #1"); return nil }
+	f2 := func(client *eslegclient.Connection) error { fmt.Println("i am function #2"); return nil }
 
 	_, err := RegisterGlobalCallback(f0)
 	if err != nil {

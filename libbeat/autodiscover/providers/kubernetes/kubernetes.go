@@ -25,13 +25,12 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -59,7 +58,6 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -142,7 +140,8 @@ func (p *Provider) publish(event bus.Event) {
 		event["config"] = config
 	} else {
 		// If there isn't a default template then attempt to use builders
-		if config := p.builders.GetConfig(p.eventer.GenerateHints(event)); config != nil {
+		e := p.eventer.GenerateHints(event)
+		if config := p.builders.GetConfig(e); config != nil {
 			event["config"] = config
 		}
 	}

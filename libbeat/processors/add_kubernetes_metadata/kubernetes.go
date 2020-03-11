@@ -27,12 +27,12 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const (
@@ -207,11 +207,14 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
+		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
 
+	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
+		k.log.Debugf("Index key %s did not match any of the cached resources", index)
 		return event, nil
 	}
 
@@ -225,6 +228,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
 	for _, m := range metadata {
+		k.log.Debugf("Created index %s for pod %s/%s", m.Index, pod.GetNamespace(), pod.GetName())
 		k.cache.set(m.Index, m.Data)
 	}
 }

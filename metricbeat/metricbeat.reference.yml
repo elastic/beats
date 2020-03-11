@@ -315,6 +315,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -1206,7 +1208,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1305,7 +1307,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1475,6 +1477,27 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/path/config
+
+  # The service principal name.
+  #kerberos.service_name: HTTP/my-service@realm
+
+  # Name of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
 #------------------------------- Redis output ----------------------------------
 #output.redis:

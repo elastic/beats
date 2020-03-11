@@ -27,7 +27,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // CfgPrefix specifies the env variable prefix used to configure the beat
@@ -40,7 +40,7 @@ func GenNewBeat(config map[string]string) error {
 		return fmt.Errorf("%s is not a valid custom beat type. Valid types are 'beat' and 'metricbeat'", config["type"])
 	}
 
-	genPath := devtools.OSSBeatDir("generator", config["type"], "{beat}")
+	genPath := devtools.OSSBeatDir("generator", "_templates", config["type"], "{beat}")
 	err := filepath.Walk(genPath, func(path string, info os.FileInfo, err error) error {
 		newBase := filepath.Join(build.Default.GOPATH, "src", config["beat_path"])
 		replacePath := strings.Replace(path, genPath, newBase, -1)

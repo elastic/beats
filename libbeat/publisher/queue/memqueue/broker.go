@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // Feature exposes a memory queue.
@@ -42,9 +42,6 @@ type broker struct {
 	logger logger
 
 	bufSize int
-	// buf         brokerBuffer
-	// minEvents   int
-	// idleTimeout time.Duration
 
 	// api channels
 	events    chan pushRequest
@@ -55,7 +52,7 @@ type broker struct {
 	acks          chan int
 	scheduledACKs chan chanList
 
-	eventer queue.Eventer
+	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
 	wg          sync.WaitGroup
@@ -63,7 +60,7 @@ type broker struct {
 }
 
 type Settings struct {
-	Eventer        queue.Eventer
+	ACKListener    queue.ACKListener
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -87,7 +84,9 @@ func init() {
 	queue.RegisterType("mem", create)
 }
 
-func create(eventer queue.Eventer, logger *logp.Logger, cfg *common.Config) (queue.Queue, error) {
+func create(
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -98,7 +97,7 @@ func create(eventer queue.Eventer, logger *logp.Logger, cfg *common.Config) (que
 	}
 
 	return NewQueue(logger, Settings{
-		Eventer:        eventer,
+		ACKListener:    ackListener,
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
 		FlushTimeout:   config.FlushTimeout,
@@ -152,7 +151,7 @@ func NewQueue(
 
 		waitOnClose: settings.WaitOnClose,
 
-		eventer: settings.Eventer,
+		ackListener: settings.ACKListener,
 	}
 
 	var eventLoop interface {

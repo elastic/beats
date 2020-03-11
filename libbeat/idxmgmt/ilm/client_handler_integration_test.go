@@ -30,11 +30,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 const (
@@ -179,14 +178,13 @@ func newESClientHandler(t *testing.T) ilm.ClientHandler {
 }
 
 func newRawESClient(t *testing.T) ilm.ESClient {
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              getURL(),
-		Index:            outil.MakeSelector(),
 		Username:         getUser(),
-		Password:         getUser(),
+		Password:         getPass(),
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}, nil)
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -24,8 +24,8 @@ import (
 
 	metrics "github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 // implement adapter for adding go-metrics based counters
@@ -42,6 +42,7 @@ import (
 type GoMetricsRegistry struct {
 	mutex sync.Mutex
 
+	log     *logp.Logger
 	reg     *monitoring.Registry
 	filters *metricFilters
 
@@ -60,20 +61,19 @@ func GetGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFil
 	if v == nil {
 		return NewGoMetrics(parent, name, filters...)
 	}
-
-	reg := v.(*monitoring.Registry)
-	return &GoMetricsRegistry{
-		reg:     reg,
-		shadow:  metrics.NewRegistry(),
-		filters: makeFilters(filters...),
-	}
+	return newGoMetrics(v.(*monitoring.Registry), filters...)
 }
 
 // NewGoMetrics creates and registers a new GoMetricsRegistry with the parent
 // registry.
 func NewGoMetrics(parent *monitoring.Registry, name string, filters ...MetricFilter) *GoMetricsRegistry {
+	return newGoMetrics(parent.NewRegistry(name, monitoring.IgnorePublishExpvar), filters...)
+}
+
+func newGoMetrics(reg *monitoring.Registry, filters ...MetricFilter) *GoMetricsRegistry {
 	return &GoMetricsRegistry{
-		reg:     parent.NewRegistry(name, monitoring.IgnorePublishExpvar),
+		log:     logp.NewLogger("monitoring"),
+		reg:     reg,
 		shadow:  metrics.NewRegistry(),
 		filters: makeFilters(filters...),
 	}
@@ -193,7 +193,7 @@ func (r *GoMetricsRegistry) UnregisterAll() {
 	r.shadow.UnregisterAll()
 	err := r.reg.Clear()
 	if err != nil {
-		logp.Err("Failed to clear registry: %v", err)
+		r.log.Errorf("Failed to clear registry: %+v", err)
 	}
 }
 

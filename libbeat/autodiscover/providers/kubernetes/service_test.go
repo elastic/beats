@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -29,11 +29,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGenerateHints_Service(t *testing.T) {
@@ -89,6 +89,127 @@ func TestGenerateHints_Service(t *testing.T) {
 					"service": common.MapStr{
 						"name": "foobar",
 					},
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have one set of annotations come from service and the other from namespace defaults
+		// The resultant should have both
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"not.to.include":            "true",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have the same set of annotations come from both namespace and service.
+		// The resultant should have the ones from service alone
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have no annotations on the service and only have namespace level defaults
+		// The resultant should have honored the namespace defaults
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{

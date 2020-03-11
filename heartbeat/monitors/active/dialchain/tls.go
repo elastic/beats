@@ -24,10 +24,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // TLSLayer configures the TLS layer in a DialerChain.
@@ -39,7 +40,7 @@ import (
 //        "rtt": { "handshake": { "us": ... }}
 //    }
 //  }
-func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
+func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
