@@ -55,10 +55,10 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
         mode: 0755
       /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
       /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
 
 
@@ -98,10 +98,10 @@ shared:
         mode: 0600
         config: true
       /etc/{{.BeatName}}/beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
       /etc/{{.BeatName}}/beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
 
   - &agent_binary_files
@@ -132,10 +132,10 @@ shared:
     files:
       <<: *agent_binary_files
       'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
       'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
 
   # Binary package spec (zip for windows) for community beats.
@@ -150,10 +150,10 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
         mode: 0755
       'beats/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        source: '{{ elastic_beats_dir }}/x-pack/filebeat/build/distributions/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
       'beats/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        source: '{{ elastic_beats_dir }}/x-pack/metricbeat/build/distributions/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
 
   - &agent_docker_spec
