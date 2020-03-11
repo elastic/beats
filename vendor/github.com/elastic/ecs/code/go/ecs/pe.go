@@ -19,25 +19,20 @@
 
 package ecs
 
-// Container fields are used for meta information about the specific container
-// that is the source of information.
-// These fields help correlate data based containers from any runtime.
-type Container struct {
-	// Runtime managing this container.
-	Runtime string `ecs:"runtime"`
+// These fields contain Windows Portable Executable (PE) metadata.
+type Pe struct {
+	// Internal name of the file, provided at compile-time.
+	OriginalFileName string `ecs:"original_file_name"`
 
-	// Unique container id.
-	ID string `ecs:"id"`
+	// Internal version of the file, provided at compile-time.
+	FileVersion string `ecs:"file_version"`
 
-	// Name of the image the container was built on.
-	ImageName string `ecs:"image.name"`
+	// Internal description of the file, provided at compile-time.
+	Description string `ecs:"description"`
 
-	// Container image tags.
-	ImageTag string `ecs:"image.tag"`
+	// Internal product name of the file, provided at compile-time.
+	Product string `ecs:"product"`
 
-	// Container name.
-	Name string `ecs:"name"`
-
-	// Image labels.
-	Labels map[string]interface{} `ecs:"labels"`
+	// Internal company name of the file, provided at compile-time.
+	Company string `ecs:"company"`
 }
