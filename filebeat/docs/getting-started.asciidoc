@@ -1,5 +1,9 @@
 [[filebeat-getting-started]]
-== Getting Started With Filebeat
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
