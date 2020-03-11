@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -100,15 +101,17 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 		return nil, extract(resp.Body)
 	}
 
+	rs, _ := ioutil.ReadAll(resp.Body)
+
 	checkinResponse := &CheckinResponse{}
-	decoder := json.NewDecoder(resp.Body)
+	decoder := json.NewDecoder(bytes.NewReader(rs))
 	if err := decoder.Decode(checkinResponse); err != nil {
 		return nil, errors.New(err,
 			"fail to decode checkin response",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
-
+	fmt.Println(string(rs))
 	if err := checkinResponse.Validate(); err != nil {
 		return nil, err
 	}

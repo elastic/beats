@@ -53,33 +53,32 @@ Something went wrong
 		func(t *testing.T) *http.ServeMux {
 			raw := `
 {
-    "actions": [
-        {
-            "type": "POLICY_CHANGE",
-            "id": "id1",
-            "data": {
-                "policy": {
-                    "id": "policy-id",
-                    "outputs": {
-                        "default": {
-                            "hosts": "https://localhost:9200"
-                        }
-                    },
-                    "streams": [
-                        {
-                            "id": "string",
-                            "type": "logs",
-                            "path": "/var/log/hello.log",
-                            "output": {
-                                "use_output": "default"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
-    ],
-    "success": true
+	"actions": [{
+		"type": "CONFIG_CHANGE",
+		"id": "id1",
+		"data": {
+			"config": {
+				"id": "policy-id",
+				"outputs": {
+					"default": {
+						"hosts": "https://localhost:9200"
+					}
+				},
+				"datasources": [{
+					"id": "string",
+					"enabled": true,
+					"use_output": "default",
+					"inputs": [{
+						"type": "logs",
+						"streams": [{
+							"paths": ["/var/log/hello.log"]
+						}]
+					}]
+				}]
+			}
+		}
+	}],
+	"success": true
 }
 `
 			mux := http.NewServeMux()
@@ -103,7 +102,7 @@ Something went wrong
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
 		},
 	))
 
@@ -113,26 +112,27 @@ Something went wrong
 {
     "actions": [
         {
-            "type": "POLICY_CHANGE",
+            "type": "CONFIG_CHANGE",
             "id": "id1",
             "data": {
-                "policy": {
+                "config": {
                     "id": "policy-id",
                     "outputs": {
                         "default": {
                             "hosts": "https://localhost:9200"
                         }
                     },
-                    "streams": [
-                        {
-                            "id": "string",
-                            "type": "logs",
-                            "path": "/var/log/hello.log",
-                            "output": {
-                                "use_output": "default"
-                            }
-                        }
-                    ]
+					"datasources": [{
+						"id": "string",
+						"enabled": true,
+						"use_output": "default",
+						"inputs": [{
+							"type": "logs",
+							"streams": [{
+								"paths": ["/var/log/hello.log"]
+							}]
+						}]
+					}]
                 }
             }
         },
@@ -165,7 +165,7 @@ Something went wrong
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
 
 			// UnknownAction
 			require.Equal(t, "id2", r.Actions[1].ID())
