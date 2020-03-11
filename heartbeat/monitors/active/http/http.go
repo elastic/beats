@@ -26,9 +26,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 func init() {
@@ -47,7 +47,7 @@ func create(
 		return nil, 0, err
 	}
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -118,7 +118,7 @@ func create(
 	return js, len(config.Hosts), nil
 }
 
-func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {
+func newRoundTripper(config *Config, tls *tlscommon.TLSConfig) (*http.Transport, error) {
 	var proxy func(*http.Request) (*url.URL, error)
 	if config.ProxyURL != "" {
 		url, err := url.Parse(config.ProxyURL)

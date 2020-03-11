@@ -38,12 +38,11 @@ type AddResourceMetadataConfig struct {
 	Namespace *common.Config `config:"namespace"`
 }
 
-func defaultConfig() Config {
-	return Config{
-		IncludeCreatorMetadata: true,
-		LabelsDedot:            true,
-		AnnotationsDedot:       true,
-	}
+// InitDefaults initializes the defaults for the config.
+func (c *Config) InitDefaults() {
+	c.IncludeCreatorMetadata = true
+	c.LabelsDedot = true
+	c.AnnotationsDedot = true
 }
 
 // Unmarshal unpacks a Config into the metagen Config

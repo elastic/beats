@@ -27,19 +27,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 type redisOut struct {
 	beat beat.Info
 }
-
-var debugf = logp.MakeDebug("redis")
 
 const (
 	defaultWaitRetry    = 1 * time.Second
@@ -136,7 +133,7 @@ func makeRedis(
 			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
 		}
 
-		transp := &transport.Config{
+		transp := transport.Config{
 			Timeout: config.Timeout,
 			Proxy:   &config.Proxy,
 			TLS:     tls,
@@ -150,7 +147,7 @@ func makeRedis(
 			}
 		case tlsRedisScheme:
 			if transp.TLS == nil {
-				transp.TLS = &transport.TLSConfig{} // enable with system default if TLS was not configured
+				transp.TLS = &tlscommon.TLSConfig{} // enable with system default if TLS was not configured
 			}
 		}
 

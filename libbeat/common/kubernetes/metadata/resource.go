@@ -34,7 +34,7 @@ type Resource struct {
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
 func NewResourceMetadataGenerator(cfg *common.Config) *Resource {
-	config := defaultConfig()
+	var config Config
 	config.Unmarshal(cfg)
 
 	return &Resource{

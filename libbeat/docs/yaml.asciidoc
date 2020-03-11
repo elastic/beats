@@ -15,7 +15,7 @@
 ifdef::standalone[]
 
 [[yaml-tips]]
-== YAML tips and gotchas
+== Avoid YAML formatting problems
 
 endif::[]
 

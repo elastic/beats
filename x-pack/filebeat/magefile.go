@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -69,7 +70,12 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseElasticBeatXPackPackaging()
+	if v, found := os.LookupEnv("AGENT_PACKAGING"); found && v != "" {
+		devtools.UseElasticBeatXPackReducedPackaging()
+	} else {
+		devtools.UseElasticBeatXPackPackaging()
+	}
+
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 

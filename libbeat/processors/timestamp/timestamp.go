@@ -100,8 +100,8 @@ func loadLocation(timezone string) (*time.Location, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("timestamp=[field=%s, target_field=%v, timezone=%v]",
-		p.Field, p.TargetField, p.tz)
+	return fmt.Sprintf("timestamp=[field=%s, target_field=%v, timezone=%v, layouts=%v]",
+		p.Field, p.TargetField, p.tz, p.Layouts)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
