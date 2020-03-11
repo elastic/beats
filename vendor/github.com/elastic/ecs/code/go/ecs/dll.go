@@ -19,25 +19,19 @@
 
 package ecs
 
-// Container fields are used for meta information about the specific container
-// that is the source of information.
-// These fields help correlate data based containers from any runtime.
-type Container struct {
-	// Runtime managing this container.
-	Runtime string `ecs:"runtime"`
-
-	// Unique container id.
-	ID string `ecs:"id"`
-
-	// Name of the image the container was built on.
-	ImageName string `ecs:"image.name"`
-
-	// Container image tags.
-	ImageTag string `ecs:"image.tag"`
-
-	// Container name.
+// These fields contain information about code libraries dynamically loaded
+// into processes.
+//
+// Many operating systems refer to "shared code libraries" with different
+// names, but this field set refers to all of the following:
+// * Dynamic-link library (`.dll`) commonly used on Windows
+// * Shared Object (`.so`) commonly used on Unix-like operating systems
+// * Dynamic library (`.dylib`) commonly used on macOS
+type Dll struct {
+	// Name of the library.
+	// This generally maps to the name of the file on disk.
 	Name string `ecs:"name"`
 
-	// Image labels.
-	Labels map[string]interface{} `ecs:"labels"`
+	// Full file path of the library.
+	Path string `ecs:"path"`
 }
