@@ -122,7 +122,7 @@ func TestPidMatcher(t *testing.T) {
 		},
 	}
 
-	readCgroupFile = func(pid int) ([]byte, error) {
+	readCgroupFile = func(hostPath string, pid int) ([]byte, error) {
 		return nil, fmt.Errorf("file not found")
 	}
 
@@ -130,7 +130,7 @@ func TestPidMatcher(t *testing.T) {
 	out := matcher.MetadataIndex(input)
 	assert.Equal(t, out, "")
 
-	readCgroupFile = func(pid int) ([]byte, error) {
+	readCgroupFile = func(hostPath string, pid int) ([]byte, error) {
 		return []byte("12:fr:/ku/bu/po/c025a1a09bdf3ec56c0f8d8fb33c41ef55a4c7cec82da5c1496eeded7ecece9d"), nil
 	}
 

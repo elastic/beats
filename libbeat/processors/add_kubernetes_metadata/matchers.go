@@ -20,7 +20,9 @@ package add_kubernetes_metadata
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 
@@ -181,6 +183,9 @@ func (f *FieldFormatMatcher) MetadataIndex(event common.MapStr) string {
 // PidMatcher implements matcher that matches container id based on pid from cgroup file
 type PidMatcher struct {
 	matchRegex  string
+	hostPath    string
+	pidField    string
+	ppidField   string
 	pidCidCache *common.Cache
 }
 
@@ -188,6 +193,9 @@ type PidMatcher struct {
 func NewPidMatcher(cfg common.Config) (Matcher, error) {
 	config := struct {
 		RegexField string `config:"matcher_regex"`
+		HostPath   string `config:"host_path"`
+		PidField   string `config:"pid_field"`
+		PpidField  string `config:"ppid_field"`
 	}{}
 
 	err := cfg.Unpack(&config)
@@ -200,45 +208,66 @@ func NewPidMatcher(cfg common.Config) (Matcher, error) {
 		config.RegexField = "^\\d+:\\w+:\\/.+\\/.+\\/.+\\/([0-9a-f]{64})"
 	}
 
+	if len(config.HostPath) == 0 {
+		// no host path from conf, use default one
+		config.HostPath = "/"
+	}
+
+	if len(config.PidField) == 0 {
+		// no pid field from conf, use default one
+		config.PidField = "process.pid"
+	}
+
+	if len(config.PpidField) == 0 {
+		// no ppid field from conf, use default one
+		config.PpidField = "process.ppid"
+	}
+
 	cache := common.NewCache(time.Minute, 1000)
 	cache.StartJanitor(time.Minute)
 
-	return &PidMatcher{matchRegex: config.RegexField, pidCidCache: cache}, nil
+	return &PidMatcher{
+		matchRegex:  config.RegexField,
+		hostPath:    config.HostPath,
+		pidField:    config.PidField,
+		ppidField:   config.PpidField,
+		pidCidCache: cache}, nil
 }
 
 // MetadataIndex returns index for matching metadata indexed based on container id
 func (p *PidMatcher) MetadataIndex(event common.MapStr) string {
-	val, err := event.GetValue("process.pid")
-	if err == nil {
-		pid, ok := val.(int)
+	// As we are post processing here, actual process may be already exited.
+	// So trying to find the container id by the parent process id first, hoping parent process lives a bit longer
+	valPpid, errPpid := event.GetValue(p.ppidField)
+	if errPpid == nil {
+		ppid, ok := valPpid.(int)
 		if ok {
-			// find the container uuid by the pid
+			cid, err := p.getContainerIDFromCgroup(ppid)
+			if err == nil {
+				return cid
+			}
+			logp.Debug("kubernetes", "Unable to extract container id for ppid: %d", ppid)
+		}
+	}
+
+	// No success, try with process id too, just in case
+	valPid, errPid := event.GetValue(p.pidField)
+	if errPid == nil {
+		pid, ok := valPid.(int)
+		if ok {
 			cid, err := p.getContainerIDFromCgroup(pid)
 			if err == nil {
 				return cid
 			}
-			// no cgroup file with that pid, maybe process already exited
-			// trying with parent process instead
-			val, err := event.GetValue("process.ppid")
-			if err == nil {
-				ppid, ok := val.(int)
-				if ok {
-					//find the container uuid from the ppid
-					cid, err := p.getContainerIDFromCgroup(ppid)
-					if err == nil {
-						return cid
-					}
-				}
-
-			}
+			logp.Debug("kubernetes", "Unable to extract container id for pid: %d", pid)
 		}
 	}
 	return ""
 }
 
 // For easy stubbing file read in unit tests
-var readCgroupFile = func(pid int) ([]byte, error) {
-	return ioutil.ReadFile(fmt.Sprintf("/proc/%d/cgroup", pid))
+var readCgroupFile = func(hostPath string, pid int) ([]byte, error) {
+	return ioutil.ReadFile(filepath.Join(hostPath, "proc", strconv.Itoa(pid), "cgroup"))
 }
 
 func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
@@ -249,7 +278,7 @@ func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
 	}
 
 	// not found in cache, try to read form cgroup file
-	data, err := readCgroupFile(pid)
+	data, err := readCgroupFile(p.hostPath, pid)
 	if err != nil {
 		// no cgroup file with given pid
 		return "", err
