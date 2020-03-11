@@ -23,7 +23,6 @@ import (
 	"context"
 	"io/ioutil"
 	"math/rand"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,49 +34,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/internal"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
-
-func TestClientConnect(t *testing.T) {
-	client := getTestingElasticsearch(t)
-	err := client.Connect()
-	assert.NoError(t, err)
-}
-
-func TestClientConnectWithProxy(t *testing.T) {
-	wrongPort, err := net.Listen("tcp", "localhost:0")
-	require.NoError(t, err)
-	go func() {
-		c, err := wrongPort.Accept()
-		if err == nil {
-			// Provoke an early-EOF error on client
-			c.Close()
-		}
-	}()
-	defer wrongPort.Close()
-
-	proxy := startTestProxy(t, internal.GetURL())
-	defer proxy.Close()
-
-	// Use connectTestEs instead of getTestingElasticsearch to make use of makeES
-	_, client := connectTestEs(t, map[string]interface{}{
-		"hosts":   "http://" + wrongPort.Addr().String(),
-		"timeout": 5, // seconds
-	})
-	assert.Error(t, client.Connect(), "it should fail without proxy")
-
-	_, client = connectTestEs(t, map[string]interface{}{
-		"hosts":     "http://" + wrongPort.Addr().String(),
-		"proxy_url": proxy.URL,
-		"timeout":   5, // seconds
-	})
-	assert.NoError(t, client.Connect())
-}
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
@@ -86,7 +48,7 @@ func TestClientPublishEvent(t *testing.T) {
 	})
 
 	// drop old index preparing test
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	batch := outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -101,12 +63,12 @@ func TestClientPublishEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, resp, err := client.CountSearchURI(index, "", nil)
+	_, resp, err := client.conn.CountSearchURI(index, "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,10 +88,10 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
 	// Check version
-	if client.Connection.version.Major < 5 {
+	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
@@ -141,7 +103,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -162,8 +124,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +149,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 			"testfield": 0,
 		}})
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,9 +170,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.Delete(index, "", "", nil)
+	client.conn.Delete(index, "", "", nil)
 
-	if client.Connection.version.Major < 5 {
+	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
@@ -222,7 +184,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	getCount := func(query string) int {
-		_, resp, err := client.CountSearchURI(index, "", map[string]string{
+		_, resp, err := client.conn.CountSearchURI(index, "", map[string]string{
 			"q": query,
 		})
 		if err != nil {
@@ -243,8 +205,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.DeletePipeline(pipeline, nil)
-	_, resp, err := client.CreatePipeline(pipeline, nil, pipelineBody)
+	client.conn.DeletePipeline(pipeline, nil)
+	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -270,7 +232,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 			}},
 	)
 
-	_, _, err = client.Refresh(index)
+	_, _, err = client.conn.Refresh(index)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,9 +243,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"hosts":            internal.GetEsHost(),
-		"username":         internal.GetUser(),
-		"password":         internal.GetPass(),
+		"hosts":            eslegtest.GetEsHost(),
+		"username":         eslegtest.GetUser(),
+		"password":         eslegtest.GetPass(),
 		"template.enabled": false,
 	})
 	if err != nil {
@@ -317,20 +279,6 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	client.Connect()
 
 	return client, client
-}
-
-// getTestingElasticsearch creates a test client.
-func getTestingElasticsearch(t internal.TestLogger) *Client {
-	client, err := NewClient(ClientSettings{
-		URL:              internal.GetURL(),
-		Index:            outil.MakeSelector(),
-		Username:         internal.GetUser(),
-		Password:         internal.GetPass(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	internal.InitClient(t, client, err)
-	return client
 }
 
 func randomClient(grp outputs.Group) outputs.NetworkClient {

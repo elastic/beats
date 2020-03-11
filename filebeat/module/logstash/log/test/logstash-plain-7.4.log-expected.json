@@ -2,8 +2,10 @@
     {
         "@timestamp": "2019-11-20T19:04:48.468-02:00",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
         "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "WARN",
