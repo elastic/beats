@@ -276,6 +276,10 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 						},
 				},*/
 				"namespace": "default",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"nskey": "nsvalue",
+				},
 			},
 		},
 	}

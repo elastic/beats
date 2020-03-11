@@ -51,7 +51,9 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 	if s.namespace != nil {
 		meta := s.namespace.GenerateFromName(svc.GetNamespace(), WithLabels("namespace"))
 		if meta != nil {
-			out.Put("namespace", meta["namespace"])
+			// Use this in 8.0
+			//out.Put("namespace", meta["namespace"])
+			out.DeepUpdate(meta)
 		}
 	}
 
