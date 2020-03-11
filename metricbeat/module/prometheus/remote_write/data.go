@@ -38,7 +38,6 @@ func samplesToEvents(metrics model.Samples) map[string]mb.Event {
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 
-		metric.Metric.Fingerprint()
 		for k, v := range metric.Metric {
 			labels[string(k)] = v
 		}
