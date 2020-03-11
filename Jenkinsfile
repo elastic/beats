@@ -25,6 +25,7 @@ pipeline {
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
+    booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
   }
   stages {
     /**
@@ -38,6 +39,10 @@ pipeline {
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
+        whenTrue(${params.debug}){
+          dumpFilteredEnvironment()
+        }
+      }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
@@ -527,6 +532,10 @@ pipeline {
 }
 
 def makeTarget(context, target, clean = true){
+  whenTrue(${params.debug}){
+    dumpFilteredEnvironment()
+    dumpMage()
+  }
   withGithubNotify(context: "${context}") {
     withBeatsEnv(){
       sh(label: "Make ${target}", script: """
@@ -541,6 +550,12 @@ def makeTarget(context, target, clean = true){
 }
 
 def mageTargetWin(context, target){
+  whenTrue(${params.debug}){
+    dumpFilteredEnvironment()
+    withBeatsEnvWin(){
+      dumpMage()
+    }
+  }
   withGithubNotify(context: "${context}") {
     withBeatsEnvWin(){
       bat(label: "Mage ${target}", script: """
@@ -600,6 +615,62 @@ def withBeatsEnvWin(Closure body){
       }
     }
   }
+}
+
+def dumpMage(){
+  echo "### MAGE DUMP ###"
+  sh(label: "Dump mage variables", script: "mage dumpVariables")
+  echo "### END MAGE DUMP ###"
+}
+
+def dumpFilteredEnvironment(){
+  echo "### ENV DUMP ###"
+  echo "BUILD_DIR: ${env.BUILD_DIR}"
+  echo "COVERAGE_DIR: ${env.COVERAGE_DIR}"
+  echo "BEATS: ${env.BEATS}"
+  echo "PROJECTS: ${env.PROJECTS}"
+  echo "PROJECTS_ENV: ${env.PROJECTS_ENV}"
+  echo "PYTHON_ENV: ${env.PYTHON_ENV}"
+  echo "PYTHON_EXE: ${env.PYTHON_EXE}"
+  echo "PYTHON_ENV_EXE: ${env.PYTHON_ENV_EXE}"
+  echo "VENV_PARAMS: ${env.VENV_PARAMS}"
+  echo "FIND: ${env.FIND}"
+  echo "GOLINT: ${env.GOLINT}"
+  echo "GOLINT_REPO: ${env.GOLINT_REPO}"
+  echo "REVIEWDOG: ${env.REVIEWDOG}"
+  echo "REVIEWDOG_OPTIONS: ${env.REVIEWDOG_OPTIONS}"
+  echo "REVIEWDOG_REPO: ${env.REVIEWDOG_REPO}"
+  echo "XPACK_SUFFIX: ${env.XPACK_SUFFIX}"
+  echo "PKG_BUILD_DIR: ${env.PKG_BUILD_DIR}"
+  echo "PKG_UPLOAD_DIR: ${env.PKG_UPLOAD_DIR}"
+  echo "COVERAGE_TOOL: ${env.COVERAGE_TOOL}"
+  echo "COVERAGE_TOOL_REPO: ${env.COVERAGE_TOOL_REPO}"
+  echo "TESTIFY_TOOL_REPO: ${env.TESTIFY_TOOL_REPO}"
+  echo "NOW: ${env.NOW}"
+  echo "GOBUILD_FLAGS: ${env.GOBUILD_FLAGS}"
+  echo "GOIMPORTS: ${env.GOIMPORTS}"
+  echo "GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}"
+  echo "GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}"
+  echo "PROCESSES: ${env.PROCESSES}"
+  echo "TIMEOUT: ${env.TIMEOUT}"
+  echo "PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}"
+  echo "NOSETESTS_OPTIONS: ${env.NOSETESTS_OPTIONS}"
+  echo "TEST_ENVIRONMENT: ${env.TEST_ENVIRONMENT}"
+  echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
+  echo "STRESS_TESTS: ${env.STRESS_TESTS}"
+  echo "STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}"
+  echo "GOX_OS: ${env.GOX_OS}"
+  echo "GOX_OSARCH: ${env.GOX_OSARCH}"
+  echo "GOX_FLAGS: ${env.GOX_FLAGS}"
+  echo "TESTING_ENVIRONMENT: ${env.TESTING_ENVIRONMENT}"
+  echo "BEAT_VERSION: ${env.BEAT_VERSION}"
+  echo "COMMIT_ID: ${env.COMMIT_ID}"
+  echo "DOCKER_COMPOSE_PROJECT_NAME: ${env.DOCKER_COMPOSE_PROJECT_NAME}"
+  echo "DOCKER_COMPOSE: ${env.DOCKER_COMPOSE}"
+  echo "DOCKER_CACHE: ${env.DOCKER_CACHE}"
+  echo "GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}"
+  echo "PIP_INSTALL_PARAMS: ${env.PIP_INSTALL_PARAMS}"
+  echo "### END ENV DUMP ###"
 }
 
 def k8sTest(versions){
