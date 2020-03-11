@@ -5293,21 +5293,6 @@ type: keyword
 
 --
 
-*`observer.ingress.zone`*::
-+
---
---
-
-*`observer.egress.zone`*::
-+
---
---
-
-*`observer.interface.name`*::
-+
---
---
-
 [[exported-fields-cisco]]
 == Cisco fields
 

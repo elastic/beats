@@ -253,8 +253,3 @@
 
     - name: version
       type: keyword
-
-# TODO: Update to ECS 1.5 and remove.
-- name: observer.ingress.zone
-- name: observer.egress.zone
-- name: observer.interface.name
