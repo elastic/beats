@@ -275,7 +275,7 @@ func TestService_GenerateWithNamespace(t *testing.T) {
 							"nskey": "nsvalue",
 						},
 				},*/
-				"namespace": "default",
+				"namespace":     "default",
 				"namespace_uid": uid,
 				"namespace_labels": common.MapStr{
 					"nskey": "nsvalue",

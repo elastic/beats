@@ -334,7 +334,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					"name": "obj",
 					"uid":  uid,
 				},
-				"namespace": "default",
+				"namespace":     "default",
 				"namespace_uid": uid,
 				"namespace_labels": common.MapStr{
 					"nskey": "nsvalue",
