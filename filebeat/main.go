@@ -32,6 +32,7 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
+	// Test comment to force filebeat CI
 	if err := cmd.RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
