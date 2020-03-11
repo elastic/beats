@@ -5,7 +5,9 @@ set -e
 RANGE=$1
 shift
 DIRLIST=$@
-CHANGED_FILES=$(git diff --name-only $RANGE)
+
+# find modified files in range and filter out docs only changes
+CHANGED_FILES=$(git diff --name-only $RANGE | grep -v '.asciidoc')
 
 beginswith() { case $2 in "$1"*) true;; *) false;; esac }
 
