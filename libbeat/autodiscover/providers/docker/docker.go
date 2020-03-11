@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -61,8 +60,6 @@ type Provider struct {
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
-
-	cfgwarn.Beta("The docker autodiscover is beta")
 
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up docker autodiscover provider")

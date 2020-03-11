@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -34,6 +35,25 @@ func TestConfigAcceptValid(t *testing.T) {
 			"compression": "lz4",
 			"version":     "1.0.0",
 		},
+		"Kerberos with keytab": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "keytab",
+				"keytab":       "/etc/krb5kcd/kafka.keytab",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+		"Kerberos with user and password pair": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "password",
+				"username":     "elastic",
+				"password":     "changeme",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
 	}
 
 	for name, test := range tests {
@@ -45,8 +65,33 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(cfg); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
+			}
+		})
+	}
+}
+
+func TestConfigInvalid(t *testing.T) {
+	tests := map[string]common.MapStr{
+		"Kerberos with invalid auth_type": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "invalid_auth_type",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			_, err := readConfig(c)
+			if err == nil {
+				t.Fatalf("Can create test configuration from invalid input")
 			}
 		})
 	}

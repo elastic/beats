@@ -2,6 +2,10 @@
 [role="xpack"]
 === Add Cloud Foundry metadata
 
+++++
+<titleabbrev>add_cloudfoundry_metadata</titleabbrev>
+++++
+
 experimental[]
 
 The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata

@@ -116,6 +116,8 @@ github.com/akavel/rsrc/coff
 github.com/akavel/rsrc/ico
 # github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 github.com/andrewkroh/sys/windows/svc/eventlog
+# github.com/antlr/antlr4 v0.0.0-20200225173536-225249fdaef5
+github.com/antlr/antlr4/runtime/Go/antlr
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 github.com/armon/go-socks5
 # github.com/aws/aws-lambda-go v1.6.0
@@ -500,6 +502,8 @@ github.com/go-sourcemap/sourcemap/internal/base64vlq
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
+# github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
+github.com/godbus/dbus
 # github.com/godbus/dbus/v5 v5.0.3
 github.com/godbus/dbus/v5
 # github.com/godror/godror v0.10.4
@@ -565,6 +569,10 @@ github.com/googleapis/gnostic/extensions
 github.com/gorhill/cronexpr
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
+# github.com/hashicorp/errwrap v0.0.0-20141028054710-7554cd9344ce
+github.com/hashicorp/errwrap
+# github.com/hashicorp/go-multierror v0.0.0-20161216184304-ed905158d874
+github.com/hashicorp/go-multierror
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
 # github.com/hashicorp/go-version v1.0.0
@@ -656,6 +664,8 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/morikuni/aec v1.0.0
 github.com/morikuni/aec
+# github.com/oklog/ulid v1.3.1
+github.com/oklog/ulid
 # github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483
 github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6
@@ -725,7 +735,7 @@ github.com/sirupsen/logrus
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.3
 github.com/spf13/pflag
-# github.com/stretchr/objx v0.1.2-0.20180702103455-b8b73a35e983
+# github.com/stretchr/objx v0.2.0
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
@@ -738,14 +748,26 @@ github.com/tsg/gopacket
 github.com/tsg/gopacket/afpacket
 github.com/tsg/gopacket/layers
 github.com/tsg/gopacket/pcap
+# github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797
+github.com/urso/diag
+github.com/urso/diag/ctxfmt
+# github.com/urso/diag-ecs v0.0.0-20200210114345-ab085841dcb9
+github.com/urso/diag-ecs/ecs
+# github.com/urso/ecslog v0.0.1
+github.com/urso/ecslog
+github.com/urso/ecslog/backend
+github.com/urso/ecslog/backend/appender
+github.com/urso/ecslog/backend/layout
 # github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e
 github.com/urso/go-bin
-# github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b
+# github.com/urso/magetools v0.0.0-20200125210132-c2e338f92f3a
 github.com/urso/magetools/clitool
 github.com/urso/magetools/ctrl
 github.com/urso/magetools/fs
 github.com/urso/magetools/gotool
 github.com/urso/magetools/mgenv
+# github.com/urso/sderr v0.0.0-20200210124243-c2a16f3d43ec
+github.com/urso/sderr
 # github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 github.com/vmware/govmomi
 github.com/vmware/govmomi/find
@@ -1061,7 +1083,7 @@ gopkg.in/mgo.v2/bson
 gopkg.in/mgo.v2/internal/json
 gopkg.in/mgo.v2/internal/sasl
 gopkg.in/mgo.v2/internal/scram
-# gopkg.in/yaml.v2 v2.2.7
+# gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
 # honnef.co/go/tools v0.0.1-2019.2.3
 honnef.co/go/tools/arg

@@ -25,7 +25,7 @@ func init() {
 	devtools.BeatProjectType = devtools.CommunityProject
 }
 
-// VendorUpdate updates elastic/beats/v7 in the vendor dir
+// VendorUpdate updates the vendor dir
 func VendorUpdate() error {
 	return beatgen.VendorUpdate()
 }

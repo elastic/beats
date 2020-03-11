@@ -1,12 +1,13 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
 BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_FULL_NAME?=${BEAT_NAME}
 LICENSE?=ASL2
 BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEATS_ROOT?=github.com/elastic/beats
 BEATS_ROOT_IMPORT_PATH?=${BEATS_ROOT}/v7
 BEAT_PATH?=${BEATS_ROOT}/${BEAT_NAME}
-BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_NAME}
+BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_FULL_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
 BEAT_INDEX_PREFIX?=${BEAT_NAME}
 BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
@@ -71,7 +72,7 @@ TESTIFY_TOOL_REPO?=github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
-GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO?=golang.org/x/lint/golint
@@ -139,6 +140,7 @@ ${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
 # Avoid running yacc to generate a parser for dependency.
 .PHONY: update-yacc-vendor
 update-yacc-vendor:
+	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.y
 	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go
 
 .PHONY: crosscompile
@@ -199,8 +201,6 @@ prepare-tests: update-yacc-vendor
 	go ${INSTALL_CMD} ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
 	go ${INSTALL_CMD} ${TESTIFY_TOOL_REPO}
-	# Avoid running yacc to generate a parser for dependency.
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.

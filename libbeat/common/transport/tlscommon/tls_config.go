@@ -80,7 +80,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 	insecure := c.Verification != VerifyFull
 	if insecure {
-		logp.Warn("SSL/TLS verifications disabled.")
+		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
 
 	// When we are usign the CAsha256 pin to validate the CA used to validate the chain

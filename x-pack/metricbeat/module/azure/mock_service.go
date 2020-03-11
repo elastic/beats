@@ -18,27 +18,33 @@ type MockService struct {
 	mock.Mock
 }
 
+// GetResourceDefinitionById is a mock function for the azure service
+func (client *MockService) GetResourceDefinitionById(id string) (resources.GenericResource, error) {
+	args := client.Called(id)
+	return args.Get(0).(resources.GenericResource), args.Error(1)
+}
+
 // GetResourceDefinitions is a mock function for the azure service
-func (client *MockService) GetResourceDefinitions(ID []string, group []string, rType string, query string) (resources.ListResultPage, error) {
-	args := client.Called(ID, group, rType, query)
+func (client *MockService) GetResourceDefinitions(id []string, group []string, rType string, query string) (resources.ListResultPage, error) {
+	args := client.Called(id, group, rType, query)
 	return args.Get(0).(resources.ListResultPage), args.Error(1)
 }
 
 // GetMetricDefinitions is a mock function for the azure service
-func (client *MockService) GetMetricDefinitions(resourceID string, namespace string) (insights.MetricDefinitionCollection, error) {
-	args := client.Called(resourceID, namespace)
+func (client *MockService) GetMetricDefinitions(resourceId string, namespace string) (insights.MetricDefinitionCollection, error) {
+	args := client.Called(resourceId, namespace)
 	return args.Get(0).(insights.MetricDefinitionCollection), args.Error(1)
 }
 
 // GetMetricNamespaces is a mock function for the azure service
-func (client *MockService) GetMetricNamespaces(resourceID string) (insights.MetricNamespaceCollection, error) {
-	args := client.Called(resourceID)
+func (client *MockService) GetMetricNamespaces(resourceId string) (insights.MetricNamespaceCollection, error) {
+	args := client.Called(resourceId)
 	return args.Get(0).(insights.MetricNamespaceCollection), args.Error(1)
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client *MockService) GetMetricValues(resourceID string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
-	args := client.Called(resourceID, namespace)
+func (client *MockService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
+	args := client.Called(resourceId, namespace)
 	return args.Get(0).([]insights.Metric), args.String(1), args.Error(2)
 }
 
