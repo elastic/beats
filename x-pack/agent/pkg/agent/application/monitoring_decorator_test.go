@@ -83,16 +83,11 @@ GROUPLOOP:
 }
 
 var inputConfigMap = map[string]interface{}{
-	"monitoring": map[string]interface{}{
-		"enabled": true,
-		"logs":    true,
-		"metrics": true,
-		"elasticsearch": map[string]interface{}{
-			"index_name": "general",
-			"pass":       "xxx",
-			"url":        "xxxxx",
-			"username":   "monitoring-uname",
-		},
+	"settings.monitoring": map[string]interface{}{
+		"enabled":    true,
+		"logs":       true,
+		"metrics":    true,
+		"use_output": "monitoring",
 	},
 	"outputs": map[string]interface{}{
 		"default": map[string]interface{}{
@@ -111,33 +106,39 @@ var inputConfigMap = map[string]interface{}{
 			"url":      "xxxxx",
 			"username": "xxx",
 		},
+		"monitoring": map[string]interface{}{
+			"type":       "elasticsearch",
+			"index_name": "general",
+			"pass":       "xxx",
+			"url":        "xxxxx",
+			"username":   "monitoring-uname",
+		},
 	},
-	"streams": []interface{}{
+	"datasources": []map[string]interface{}{
 		map[string]interface{}{
-			"type": "log",
-			"path": "/xxxx",
-			"processors": []interface{}{
+			"inputs": []map[string]interface{}{
 				map[string]interface{}{
-					"dissect": map[string]interface{}{
-						"tokenizer": "---",
+					"type": "log",
+					"streams": []map[string]interface{}{
+						map[string]interface{}{"paths": "/xxxx"},
 					},
-				},
-			},
-			"output": map[string]interface{}{
-				"override": map[string]interface{}{
-					"index_name":      "my_service_logs",
-					"ingest_pipeline": "process_logs",
+					"processors": []interface{}{
+						map[string]interface{}{
+							"dissect": map[string]interface{}{
+								"tokenizer": "---",
+							},
+						},
+					},
 				},
 			},
 		},
 		map[string]interface{}{
-			"type":     "metric/system",
-			"username": "xxxx",
-			"pass":     "yyy",
-			"output": map[string]interface{}{
-				"index_name": "mysql_metrics",
-				"use_output": "infosec1",
+			"inputs": []map[string]interface{}{
+				map[string]interface{}{
+					"type": "metrics/system",
+				},
 			},
+			"use_output": "infosec1",
 		},
 	},
 }
