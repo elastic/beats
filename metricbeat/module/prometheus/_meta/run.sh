@@ -1,14 +1,20 @@
 #!/bin/sh
 
-sleep 2
-nslookup "host.docker.internal" | grep -q "can't find"
-if [ $? -ne 0 ]; then
-  # this works only on Mac envs
-  HOST_DOMAIN="host.docker.internal"
-else
-  # this works only on Linux envs
-  HOST_DOMAIN="0.0.0.0"
-fi
+
+for i in 1 2 3 4 5;
+do
+  a=`nslookup host.docker.internal | grep "** server can't find " | wc -l`;
+  if [ $a -gt 0 ]; then
+    # this works only on Linux envs
+    HOST_DOMAIN="0.0.0.0"
+  else
+    # this works only on Mac envs
+    HOST_DOMAIN="host.docker.internal"
+    break
+  fi
+done
+
+
 
 REMOTE="$HOST_DOMAIN:9201"
 
