@@ -33,14 +33,14 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 		return &actionStore{log: log, store: store}, nil
 	}
 
-	var action actionPolicyChangeSerializer
+	var action actionConfigChangeSerializer
 
 	dec := yaml.NewDecoder(reader)
 	if err := dec.Decode(&action); err != nil {
 		return nil, err
 	}
 
-	apc := fleetapi.ActionPolicyChange(action)
+	apc := fleetapi.ActionConfigChange(action)
 
 	return &actionStore{
 		log:    log,
@@ -53,7 +53,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 // any other type of action will be silently ignored.
 func (s *actionStore) Add(a action) {
 	switch v := a.(type) {
-	case *fleetapi.ActionPolicyChange:
+	case *fleetapi.ActionConfigChange:
 		// Only persist the action if the action is different.
 		if s.action != nil && s.action.ID() == v.ID() {
 			return
@@ -69,12 +69,12 @@ func (s *actionStore) Save() error {
 		return nil
 	}
 
-	apc, ok := s.action.(*fleetapi.ActionPolicyChange)
+	apc, ok := s.action.(*fleetapi.ActionConfigChange)
 	if !ok {
 		return fmt.Errorf("incompatible type, expected ActionPolicyChange and received %T", s.action)
 	}
 
-	serialize := actionPolicyChangeSerializer(*apc)
+	serialize := actionConfigChangeSerializer(*apc)
 
 	reader, err := yamlToReader(&serialize)
 	if err != nil {
@@ -98,7 +98,7 @@ func (s *actionStore) Actions() []action {
 	return []action{s.action}
 }
 
-// actionPolicyChangeSerializer is a struct that add YAML serialization, I don't think serialization
+// actionConfigChangeSerializer is a struct that add YAML serialization, I don't think serialization
 // is a concern of the fleetapi package. I went this route so I don't have to do much refactoring.
 //
 // There are four ways to achieve the same results:
@@ -108,14 +108,14 @@ func (s *actionStore) Actions() []action {
 // 4. We have two sets of type.
 //
 // This could be done in a refactoring.
-type actionPolicyChangeSerializer struct {
+type actionConfigChangeSerializer struct {
 	ActionID   string                 `yaml:"action_id"`
 	ActionType string                 `yaml:"action_type"`
-	Policy     map[string]interface{} `yaml:"policy"`
+	Config     map[string]interface{} `yaml:"config"`
 }
 
 // Add a guards between the serializer structs and the original struct.
-var _ actionPolicyChangeSerializer = actionPolicyChangeSerializer(fleetapi.ActionPolicyChange{})
+var _ actionConfigChangeSerializer = actionConfigChangeSerializer(fleetapi.ActionConfigChange{})
 
 // actionStoreAcker wraps an existing acker and will send any acked event to the action store,
 // its up to the action store to decide if we need to persist the event for future replay or just

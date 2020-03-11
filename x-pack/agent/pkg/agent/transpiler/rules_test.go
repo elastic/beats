@@ -22,6 +22,71 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
+		"inject index": {
+			givenYAML: `
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+  - name: Specified dataset
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+`,
+			expectedYAML: `
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+          index: mytype-generic-default
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          index: mytype-generic-nsns
+  - name: Specified dataset
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+          index: mytype-dsds-default
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+          index: mytype-dsds-nsns
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectIndex("mytype"),
+				},
+			},
+		},
 
 		"extract items from array": {
 			givenYAML: `
@@ -383,6 +448,61 @@ inputs:
 				},
 			},
 		},
+
+		"remove key": {
+			givenYAML: `
+key1: val1
+key2: val2
+`,
+			expectedYAML: `
+key1: val1
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					RemoveKey("key2"),
+				},
+			},
+		},
+
+		"copy item to list": {
+			givenYAML: `
+namespace: testing
+inputs:
+  - type: metric/log
+  - type: metric/tcp
+`,
+			expectedYAML: `
+namespace: testing
+inputs:
+  - type: metric/log
+    namespace: testing
+  - type: metric/tcp
+    namespace: testing
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					CopyToList("namespace", "inputs"),
+				},
+			},
+		},
+
+		"Make array": {
+			givenYAML: `
+sample:
+  log: "log value"
+`,
+			expectedYAML: `
+sample:
+  log: "log value"
+logs:
+  - "log value"
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					MakeArray("sample.log", "logs"),
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {
@@ -440,6 +560,8 @@ func TestSerialization(t *testing.T) {
 		FilterValues("select-v", "key-v", "v1", "v2"),
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
+		InjectIndex("index-type"),
+		CopyToList("t1", "t2"),
 	)
 
 	y := `- rename:
@@ -484,6 +606,11 @@ func TestSerialization(t *testing.T) {
     path: path.p
     item: item
     to: target
+- inject_index:
+    type: index-type
+- copy_to_list:
+    item: t1
+    to: t2
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

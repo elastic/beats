@@ -206,10 +206,10 @@ func TestFleetGateway(t *testing.T) {
 {
 	"actions": [
 		{
-			"type": "POLICY_CHANGE",
+			"type": "CONFIG_CHANGE",
 			"id": "id1",
 			"data": {
-				"policy": {
+				"config": {
 					"id": "policy-id"
 				}
 			}
