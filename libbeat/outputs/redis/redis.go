@@ -19,29 +19,31 @@ package redis
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 type redisOut struct {
 	beat beat.Info
 }
 
-var debugf = logp.MakeDebug("redis")
-
 const (
 	defaultWaitRetry    = 1 * time.Second
 	defaultMaxWaitRetry = 60 * time.Second
 	defaultPort         = 6379
+	redisScheme         = "redis"
+	tlsRedisScheme      = "rediss"
 )
 
 func init() {
@@ -110,27 +112,63 @@ func makeRedis(
 		return outputs.Fail(err)
 	}
 
-	transp := &transport.Config{
-		Timeout: config.Timeout,
-		Proxy:   &config.Proxy,
-		TLS:     tls,
-		Stats:   observer,
-	}
-
 	clients := make([]outputs.NetworkClient, len(hosts))
-	for i, host := range hosts {
+	for i, h := range hosts {
+		hasScheme := true
+		if parts := strings.SplitN(h, "://", 2); len(parts) != 2 {
+			h = fmt.Sprintf("%s://%s", redisScheme, h)
+			hasScheme = false
+		}
+
+		hostUrl, err := url.Parse(h)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+
+		if hostUrl.Host == "" {
+			return outputs.Fail(fmt.Errorf("invalid redis url host %s", hostUrl.Host))
+		}
+
+		if hostUrl.Scheme != redisScheme && hostUrl.Scheme != tlsRedisScheme {
+			return outputs.Fail(fmt.Errorf("invalid redis url scheme %s", hostUrl.Scheme))
+		}
+
+		transp := transport.Config{
+			Timeout: config.Timeout,
+			Proxy:   &config.Proxy,
+			TLS:     tls,
+			Stats:   observer,
+		}
+
+		switch hostUrl.Scheme {
+		case redisScheme:
+			if hasScheme {
+				transp.TLS = nil // disable TLS if user explicitely set `redis` scheme
+			}
+		case tlsRedisScheme:
+			if transp.TLS == nil {
+				transp.TLS = &tlscommon.TLSConfig{} // enable with system default if TLS was not configured
+			}
+		}
+
+		conn, err := transport.NewClient(transp, "tcp", hostUrl.Host, defaultPort)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+
+		pass := config.Password
+		hostPass, passSet := hostUrl.User.Password()
+		if passSet {
+			pass = hostPass
+		}
+
 		enc, err := codec.CreateEncoder(beat, config.Codec)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
-		if err != nil {
-			return outputs.Fail(err)
-		}
-
 		client := newClient(conn, observer, config.Timeout,
-			config.Password, config.Db, key, dataType, config.Index, enc)
+			pass, config.Db, key, dataType, config.Index, enc)
 		clients[i] = newBackoffClient(client, config.Backoff.Init, config.Backoff.Max)
 	}
 

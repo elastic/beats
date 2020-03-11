@@ -28,7 +28,7 @@ of action, such as selecting the fields that are exported or adding metadata to
 the event.
 * `<condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
-fulfilled. If no condition is passed, then the action is always executed.
+fulfilled. If no condition is set, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
 More complex conditional processing can be accomplished by using the
@@ -267,7 +267,7 @@ For example, the following condition checks if the process name starts with
 [source,yaml]
 -----
 regexp:
-  system.process.name: "foo.*"
+  system.process.name: "^foo.*"
 -----
 
 [float]

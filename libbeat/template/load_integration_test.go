@@ -32,11 +32,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
-	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func init() {
@@ -60,7 +60,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +290,7 @@ func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	require.NoError(t, setup.loadFromFile([]string{"testdata", "fields.yml"}))
 	require.True(t, setup.loader.templateExists(setup.config.Name))
-	esClient := setup.client.(*elasticsearch.Client)
+	esClient := setup.client.(*eslegclient.Connection)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
@@ -349,4 +349,25 @@ func path(t *testing.T, fileElems []string) string {
 	fieldsPath, err := filepath.Abs(filepath.Join(fileElems...))
 	require.NoError(t, err)
 	return fieldsPath
+}
+
+func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:     eslegtest.GetURL(),
+		Timeout: 0,
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
 }

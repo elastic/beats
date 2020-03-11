@@ -2,6 +2,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -22,6 +23,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -55,6 +57,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -75,6 +78,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -95,6 +99,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -115,6 +120,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -135,6 +141,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -155,6 +162,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -175,6 +183,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -195,6 +204,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -215,6 +225,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -235,6 +246,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -255,6 +267,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -275,6 +288,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -295,6 +309,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -315,6 +330,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -335,6 +351,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -355,6 +372,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -375,6 +393,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -395,6 +414,7 @@
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -415,6 +435,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -434,6 +455,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -456,7 +478,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -479,6 +503,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -500,7 +525,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -523,7 +550,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -546,7 +575,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -569,7 +600,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -592,6 +625,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -613,7 +647,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -636,7 +672,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -659,7 +697,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -682,7 +722,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -705,6 +747,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -726,6 +769,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -747,6 +791,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -768,6 +813,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -789,6 +835,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -810,6 +857,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -831,6 +879,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -853,6 +902,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -874,6 +924,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -895,6 +946,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -916,6 +968,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -937,6 +990,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -959,7 +1013,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -982,7 +1038,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1005,7 +1063,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1028,7 +1088,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1051,6 +1113,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1070,6 +1133,7 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1089,7 +1153,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1112,7 +1178,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1135,7 +1203,9 @@
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1158,7 +1228,9 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1181,6 +1253,7 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1206,7 +1279,9 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1229,7 +1304,9 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1252,6 +1329,7 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1274,7 +1352,9 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1297,6 +1377,7 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1319,6 +1400,7 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1339,6 +1421,7 @@
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1359,6 +1442,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1378,6 +1462,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1397,7 +1482,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "uninitialized",
@@ -1420,6 +1507,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1439,6 +1527,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1458,6 +1547,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1478,6 +1568,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1499,6 +1590,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1519,6 +1611,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1540,6 +1633,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1560,6 +1654,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1579,6 +1674,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1598,7 +1694,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1621,6 +1719,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1641,6 +1740,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1661,6 +1761,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1680,7 +1781,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1703,7 +1806,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1726,7 +1831,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1749,7 +1856,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1772,7 +1881,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1795,7 +1906,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1818,7 +1931,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1841,7 +1956,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1864,7 +1981,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1887,7 +2006,9 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kibana.log.meta.prevMsg": "Waiting for Elasticsearch",
@@ -1910,6 +2031,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1930,6 +2052,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1950,6 +2073,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1970,6 +2094,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -1990,6 +2115,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2010,6 +2136,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2030,6 +2157,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2050,6 +2178,7 @@
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2070,6 +2199,7 @@
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2104,6 +2234,7 @@
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",
@@ -2124,6 +2255,7 @@
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
         "event.dataset": "kibana.log",
+        "event.kind": "event",
         "event.module": "kibana",
         "fileset.name": "log",
         "input.type": "log",

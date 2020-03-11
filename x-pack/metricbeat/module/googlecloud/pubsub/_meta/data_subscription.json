@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2020-01-14T11:46:00.000Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "googlecloud": {
+        "labels": {
+            "resource": {
+                "subscription_id": "test-subscription"
+            }
+        },
+        "pubsub": {
+            "subscription": {
+                "num_undelivered_messages": 0,
+                "oldest_unacked_message_age": 0,
+                "backlog_bytes": 0
+            }
+        }
+    },
+    "service": {
+        "type": "googlecloud"
+    },
+    "cloud": {
+        "account": {
+            "id": "elastic-metricbeat"
+        },
+        "provider": "googlecloud"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "type": "metricbeat",
+        "ephemeral_id": "b3b8d9da-0094-4d54-b1dc-4d5e103d38aa",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "event": {
+        "dataset": "googlecloud.pubsub",
+        "module": "googlecloud",
+        "duration": 933264720
+    },
+    "metricset": {
+        "name": "pubsub",
+        "period": 300000
+    }
+}

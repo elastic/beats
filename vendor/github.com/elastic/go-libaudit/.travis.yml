@@ -1,0 +1,32 @@
+---
+sudo: false
+language: go
+go:
+- 1.10.x
+go_import_path: github.com/elastic/go-libaudit
+
+install:
+- go get -u github.com/elastic/go-licenser
+- go get -d -t ./...
+
+script:
+- go-licenser -d
+- >
+  find . -name '*.go' | grep -v vendor | xargs gofmt -s -l | read &&
+  echo "Code differs from gofmt's style. Run 'gofmt -s -w .'" 1>&2 && exit 1 || true
+- go test -v $(go list ./... | grep -v /vendor/)
+- GOARCH=386 go test -v $(go list ./... | grep -v /vendor/)
+- mkdir -p build/bin
+- go build -o build/bin/audit ./cmd/audit/
+- go build -o build/bin/auparse ./cmd/auparse/
+
+deploy:
+  provider: releases
+  api_key:
+    secure: IpZfb/x2tZy21LLsAWDv45A8nHxaSlMHOOLzAr+LJUQf4vh/mGxlUeXzbm6VsRPBXkNFRQEoc/+Lo/1xEPFJ293GsJecZz15PGPkSgJ5fpODR/8U7x/ZXeV3PEFcREebllMkvuE0f4op8YkLG+8UrP4telOkJANYCI5GCE7ASEpisC/1xEyddpOTAwinHpoT0BITMwIC+VzZ2I8ZvKP/4rUBM1D9i278uNrAd0rn+X3pM6ssRrQELgURlCudbjN/Gi4lETg7ibj5cTFCTeLyALPu2elPeAt62Dtu7Dp6XSbkmfQhnGqqzxvAbkPRmfnEJS46zoMkHnSPiovLcYpoJLV8jF80FXiGtT70VvkEDpGHiNufp5VFO8RosqYnTwAHkx5WcrWvYdXu83jRFmZ20BiV91MoafnuAMD4YkPj/B5VmCP0rY06vA+V02w71/s6D8HscPWOuvKTRUMhCVVuQnd0gbBAGrznwwtcqobkhjJGQkzSoDaafmxky1yNKLfWN5ttgpSfPiSDchkBtkxgW9Z0Bp2n9nL8X12xgQKGIXbl446/g1AEkFEeTmEdqFvKrmz3PQAkprrOoRfB57lB+GYgrDd3aEGg9Hb2CPRbORTMdPdSJ7ZFE00H1TCG0F6y8nK9o6cfK3yKbsuy0/U4q7daixu4XRFLyEFyjkeD434=
+  file:
+  - build/bin/audit
+  - build/bin/auparse
+  on:
+    tags: true
+    repo: elastic/go-libaudit

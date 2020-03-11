@@ -9,7 +9,7 @@ import (
 
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 //timeSeriesGrouped groups TimeSeries responses into common Elasticsearch friendly events. This is to avoid sending
@@ -27,7 +27,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 			return nil, err
 		}
 
-		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone)
+		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
 
 		for i := range keyValues {
 			sdCollectorInputData.Timestamp = &keyValues[i].Timestamp

@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // A random container ID that we use for our tests
@@ -85,8 +85,8 @@ func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	cfgLogsPath := "/var/log/other/"
 	sourcePath := "/var/log/other/%s.log"
 	if runtime.GOOS == "windows" {
-		cfgLogsPath = "C:\\var\\log\\other\\"
-		sourcePath = "C:\\var\\log\\other\\%s.log"
+		cfgLogsPath = "C:\\var\\log\\othere\\"
+		sourcePath = "C:\\var\\log\\othere\\%s.log"
 	}
 
 	source := fmt.Sprintf(sourcePath, cid)

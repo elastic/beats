@@ -5,6 +5,9 @@
 ifndef::no_add_cloud_metadata_processor[]
 * <<add-cloud-metadata,`add_cloud_metadata`>>
 endif::[]
+ifndef::no_add_cloudfoundry_metadata_processor[]
+* <<add-cloudfoundry-metadata,`add_cloudfoundry_metadata`>>
+endif::[]
 ifndef::no_add_docker_metadata_processor[]
 * <<add-docker-metadata,`add_docker_metadata`>>
 endif::[]
@@ -95,11 +98,17 @@ endif::[]
 ifndef::no_truncate_fields_processor[]
 * <<truncate-fields, `truncate_fields`>>
 endif::[]
+ifdef::no_translate_sid_processor[]
+* <<processor-translate-sid, `translate_sid`>>
+endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
 ifndef::no_add_cloud_metadata_processor[]
 include::{libbeat-processors-dir}/add_cloud_metadata/docs/add_cloud_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_cloudfoundry_metadata_processor[]
+include::{x-libbeat-processors-dir}/add_cloudfoundry_metadata/docs/add_cloudfoundry_metadata.asciidoc[]
 endif::[]
 ifndef::no_add_docker_metadata_processor[]
 include::{libbeat-processors-dir}/add_docker_metadata/docs/add_docker_metadata.asciidoc[]
@@ -191,7 +200,8 @@ endif::[]
 ifndef::no_truncate_fields_processor[]
 include::{libbeat-processors-dir}/actions/docs/truncate_fields.asciidoc[]
 endif::[]
+ifdef::no_translate_sid_processor[]
+include::{libbeat-processors-dir}/translate_sid/docs/translate_sid.asciidoc[]
+endif::[]
 
 //# end::processors-include[]
-
-

@@ -24,11 +24,11 @@ import (
 	"4d63.com/tz"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.timestamp"
@@ -100,8 +100,8 @@ func loadLocation(timezone string) (*time.Location, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("timestamp=[field=%s, target_field=%v, timezone=%v]",
-		p.Field, p.TargetField, p.tz)
+	return fmt.Sprintf("timestamp=[field=%s, target_field=%v, timezone=%v, layouts=%v]",
+		p.Field, p.TargetField, p.tz, p.Layouts)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {

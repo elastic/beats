@@ -7,8 +7,8 @@ package stackdriver
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud/stackdriver/compute"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver/compute"
 )
 
 // NewMetadataServiceForConfig returns a service to fetch metadata from a config struct. It must return the Compute
@@ -16,7 +16,7 @@ import (
 func NewMetadataServiceForConfig(c config) (googlecloud.MetadataService, error) {
 	switch c.ServiceName {
 	case googlecloud.ServiceCompute:
-		return compute.NewMetadataService(c.ProjectID, c.Zone, c.opt...)
+		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.opt...)
 	case googlecloud.ServicePubsub, googlecloud.ServiceLoadBalancing:
 		return nil, nil
 	default:

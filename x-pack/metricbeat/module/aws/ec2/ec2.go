@@ -11,15 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
@@ -45,7 +45,6 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	TagsFilter []aws.Tag `config:"tags_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -54,15 +53,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
-	}
-
-	config := struct {
-		Tags []aws.Tag `config:"tags_filter"`
-	}{}
-
-	err = base.Module().UnpackConfig(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
@@ -76,8 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:  metricSet,
-		TagsFilter: config.Tags,
+		MetricSet: metricSet,
 	}, nil
 }
 
@@ -91,7 +80,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcEC2 := ec2.New(awsConfig)
+
+		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "ec2", regionName, awsConfig))
+
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -100,7 +92,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
 		namespace := "AWS/EC2"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
@@ -131,7 +125,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// Create Cloudwatch Events for EC2
 			events, err := m.createCloudWatchEvents(metricDataOutput, instancesOutputs, regionName)
-
 			if err != nil {
 				m.Logger().Error(err.Error())
 				report.Error(err)
@@ -197,6 +190,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					// If tag filter doesn't exist in tagKeys/tagValues,
 					// then do not report this event/instance.
 					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+						// if tag filter doesn't exist, remove this event initial
+						// entry to avoid report an empty event.
+						delete(events, instanceID)
 						continue
 					}
 				}
