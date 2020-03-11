@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat
+BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/agent
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -81,12 +81,6 @@ clean: mage
 	@$(MAKE) -C generator clean
 	@-mage -clean
 
-# Cleans up the vendor directory from unnecessary files
-# This should always be run after updating the dependencies
-.PHONY: clean-vendor
-clean-vendor:
-	@sh script/clean_vendor.sh
-
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
@@ -95,6 +89,7 @@ check: python-env
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
+	go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --

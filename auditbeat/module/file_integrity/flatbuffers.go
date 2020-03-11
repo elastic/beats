@@ -25,7 +25,7 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/module/file_integrity/schema"
+	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/schema"
 )
 
 // Requires the Google flatbuffer compiler.

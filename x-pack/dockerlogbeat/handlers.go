@@ -12,7 +12,7 @@ import (
 
 	"github.com/docker/docker/daemon/logger"
 
-	"github.com/elastic/beats/x-pack/dockerlogbeat/pipelinemanager"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 
 	"github.com/pkg/errors"
 )

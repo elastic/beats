@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 // MultiLine reader combining multiple line events into one multi-line event.
@@ -52,6 +52,7 @@ type Reader struct {
 	err          error // last seen error
 	state        func(*Reader) (reader.Message, error)
 	message      reader.Message
+	logger       *logp.Logger
 }
 
 const (
@@ -125,6 +126,7 @@ func New(
 		maxLines:     maxLines,
 		separator:    []byte(separator),
 		message:      reader.Message{},
+		logger:       logp.NewLogger("reader_multiline"),
 	}
 	return mlr, nil
 }
@@ -143,7 +145,7 @@ func (mlr *Reader) readFirst() (reader.Message, error) {
 				continue
 			}
 
-			logp.Debug("multiline", "Multiline event flushed because timeout reached.")
+			mlr.logger.Debug("Multiline event flushed because timeout reached.")
 
 			// pass error to caller (next layer) for handling
 			return message, err
@@ -172,7 +174,7 @@ func (mlr *Reader) readNext() (reader.Message, error) {
 					continue
 				}
 
-				logp.Debug("multiline", "Multiline event flushed because timeout reached.")
+				mlr.logger.Debug("Multiline event flushed because timeout reached.")
 
 				// return collected multiline event and
 				// empty buffer for new multiline event

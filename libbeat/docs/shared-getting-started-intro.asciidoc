@@ -16,7 +16,7 @@ for more information about installing these products.
 You can skip having to install {es} and {kib} by using our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
 {ecloud}. The {ess} is available on AWS, GCP, and Azure.
-https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {ess}
+{ess-trial}[Try out the {ess}
 for free].
 ==============
 

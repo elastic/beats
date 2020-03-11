@@ -2,6 +2,7 @@
     {
         "event.dataset": "haproxy.log",
         "event.duration": 1000000,
+        "event.kind": "event",
         "event.module": "haproxy",
         "event.timezone": "-02:00",
         "fileset.name": "log",
@@ -24,6 +25,9 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 25457,
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "haproxy",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

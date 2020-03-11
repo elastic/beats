@@ -23,9 +23,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 const sep = '\xff'

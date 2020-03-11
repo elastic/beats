@@ -56,6 +56,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-google-pubsub>>
 * <<{beatname_lc}-input-azure-eventhub>>
+* <<{beatname_lc}-input-cloudfoundry>>
 
 
 include::inputs/input-log.asciidoc[]
@@ -85,3 +86,5 @@ include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]

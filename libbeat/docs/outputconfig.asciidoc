@@ -10,7 +10,6 @@
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-// tag::shared-outputconfig[]
 
 [[configuring-output]]
 == Configure the output
@@ -22,8 +21,6 @@ output may be defined.
 The following topics describe how to configure each supported output. If you've
 secured the {stack}, also read <<securing-{beatname_lc}>> for more about
 security-related configuration options.
-
-// end::shared-outputconfig[]
 
 include::outputs-list.asciidoc[tag=outputs-list]
 

@@ -29,8 +29,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/dashboards"
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/dashboards"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 var (

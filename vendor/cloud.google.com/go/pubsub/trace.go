@@ -33,18 +33,31 @@ func openCensusOptions() []option.ClientOption {
 	}
 }
 
-var subscriptionKey tag.Key
+// The following keys are used to tag requests with a specific topic/subscription ID.
+var (
+	keyTopic        = tag.MustNewKey("topic")
+	keySubscription = tag.MustNewKey("subscription")
+)
 
-func init() {
-	var err error
-	if subscriptionKey, err = tag.NewKey("subscription"); err != nil {
-		log.Fatal("cannot create 'subscription' key")
-	}
-}
+// In the following, errors are used if status is not "OK".
+var (
+	keyStatus = tag.MustNewKey("status")
+	keyError  = tag.MustNewKey("error")
+)
 
 const statsPrefix = "cloud.google.com/go/pubsub/"
 
+// The following are measures recorded in publish/subscribe flows.
 var (
+	// PublishedMessages is a measure of the number of messages published, which may include errors.
+	// It is EXPERIMENTAL and subject to change or removal without notice.
+	PublishedMessages = stats.Int64(statsPrefix+"published_messages", "Number of PubSub message published", stats.UnitDimensionless)
+
+	// PublishLatency is a measure of the number of milliseconds it took to publish a bundle,
+	// which may consist of one or more messages.
+	// It is EXPERIMENTAL and subject to change or removal without notice.
+	PublishLatency = stats.Float64(statsPrefix+"publish_roundtrip_latency", "The latency in milliseconds per publish batch", stats.UnitMilliseconds)
+
 	// PullCount is a measure of the number of messages pulled.
 	// It is EXPERIMENTAL and subject to change or removal without notice.
 	PullCount = stats.Int64(statsPrefix+"pull_count", "Number of PubSub messages pulled", stats.UnitDimensionless)
@@ -80,6 +93,16 @@ var (
 	// StreamResponseCount is a measure of the number of responses received on a streaming-pull stream.
 	// It is EXPERIMENTAL and subject to change or removal without notice.
 	StreamResponseCount = stats.Int64(statsPrefix+"stream_response_count", "Number of gRPC StreamingPull response messages received", stats.UnitDimensionless)
+)
+
+var (
+	// PublishedMessagesView is a cumulative sum of PublishedMessages.
+	// It is EXPERIMENTAL and subject to change or removal without notice.
+	PublishedMessagesView *view.View
+
+	// PublishLatencyView is a distribution of PublishLatency.
+	// It is EXPERIMENTAL and subject to change or removal without notice.
+	PublishLatencyView *view.View
 
 	// PullCountView is a cumulative sum of PullCount.
 	// It is EXPERIMENTAL and subject to change or removal without notice.
@@ -119,34 +142,71 @@ var (
 )
 
 func init() {
-	PullCountView = countView(PullCount)
-	AckCountView = countView(AckCount)
-	NackCountView = countView(NackCount)
-	ModAckCountView = countView(ModAckCount)
-	ModAckTimeoutCountView = countView(ModAckTimeoutCount)
-	StreamOpenCountView = countView(StreamOpenCount)
-	StreamRetryCountView = countView(StreamRetryCount)
-	StreamRequestCountView = countView(StreamRequestCount)
-	StreamResponseCountView = countView(StreamResponseCount)
+	PublishedMessagesView = createCountView(stats.Measure(PublishedMessages), keyTopic, keyStatus, keyError)
+	PublishLatencyView = createDistView(PublishLatency, keyTopic, keyStatus, keyError)
+	PullCountView = createCountView(PullCount, keySubscription)
+	AckCountView = createCountView(AckCount, keySubscription)
+	NackCountView = createCountView(NackCount, keySubscription)
+	ModAckCountView = createCountView(ModAckCount, keySubscription)
+	ModAckTimeoutCountView = createCountView(ModAckTimeoutCount, keySubscription)
+	StreamOpenCountView = createCountView(StreamOpenCount, keySubscription)
+	StreamRetryCountView = createCountView(StreamRetryCount, keySubscription)
+	StreamRequestCountView = createCountView(StreamRequestCount, keySubscription)
+	StreamResponseCountView = createCountView(StreamResponseCount, keySubscription)
+
+	DefaultPublishViews = []*view.View{
+		PublishedMessagesView,
+		PublishLatencyView,
+	}
+
+	DefaultSubscribeViews = []*view.View{
+		PullCountView,
+		AckCountView,
+		NackCountView,
+		ModAckCountView,
+		ModAckTimeoutCountView,
+		StreamOpenCountView,
+		StreamRetryCountView,
+		StreamRequestCountView,
+		StreamResponseCountView,
+	}
 }
 
-func countView(m *stats.Int64Measure) *view.View {
+// The following arrays are the default views related to publish/subscribe operations provided by this package.
+// It is EXPERIMENTAL and subject to change or removal without notice.
+var (
+	DefaultPublishViews   []*view.View
+	DefaultSubscribeViews []*view.View
+)
+
+func createCountView(m stats.Measure, keys ...tag.Key) *view.View {
 	return &view.View{
 		Name:        m.Name(),
 		Description: m.Description(),
-		TagKeys:     []tag.Key{subscriptionKey},
+		TagKeys:     keys,
 		Measure:     m,
 		Aggregation: view.Sum(),
 	}
 }
 
+func createDistView(m stats.Measure, keys ...tag.Key) *view.View {
+	return &view.View{
+		Name:        m.Name(),
+		Description: m.Description(),
+		TagKeys:     keys,
+		Measure:     m,
+		Aggregation: view.Distribution(0, 25, 50, 75, 100, 200, 400, 600, 800, 1000, 2000, 4000, 6000),
+	}
+}
+
 var logOnce sync.Once
 
+// withSubscriptionKey returns a new context modified with the subscriptionKey tag map.
 func withSubscriptionKey(ctx context.Context, subName string) context.Context {
-	ctx, err := tag.New(ctx, tag.Upsert(subscriptionKey, subName))
+	ctx, err := tag.New(ctx, tag.Upsert(keySubscription, subName))
 	if err != nil {
 		logOnce.Do(func() {
-			log.Printf("pubsub: error creating tag map: %v", err)
+			log.Printf("pubsub: error creating tag map for 'subscribe' key: %v", err)
 		})
 	}
 	return ctx

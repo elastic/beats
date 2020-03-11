@@ -13,6 +13,8 @@ service of common Unix/Linux based distributions.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
@@ -20,16 +22,6 @@ This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
 macOS Sierra.
 
 This module is not available for Windows.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboards
-
-This module comes with sample dashboards. For example:
-
-[role="screenshot"]
-image::./images/kibana-system.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -75,6 +67,14 @@ include::../include/var-paths.asciidoc[]
 include::../include/var-paths.asciidoc[]
 
 include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-system.png[]
 
 :has-dashboards!:
 

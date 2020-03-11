@@ -9,9 +9,9 @@ list_header = 8 + 4  # next pointer + page entry count
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--pagesize', dest='pagesize', type=int, default=4096)
-    parser.add_argument('-s', '--maxsize', dest='maxsize', type=int, default=1 << 30)
-    parser.add_argument('-w', '--wal', dest='wal', type=int, default=1000)
+    parser.add_argument('-p', '--pagesize', dest='pagesize', type=long, default=4096)
+    parser.add_argument('-s', '--maxsize', dest='maxsize', type=long, default=1 << 30)
+    parser.add_argument('-w', '--wal', dest='wal', type=long, default=1000)
     args = parser.parse_args()
 
     stats = compute_stats(args.pagesize, args.maxsize, args.wal)

@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/atomic"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type mockEventHandler struct {

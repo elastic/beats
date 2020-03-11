@@ -1,0 +1,7 @@
+- name: container_service.*.*
+  release: beta
+  type: object
+  object_type: float
+  object_type_mapping_type: "*"
+  description: >
+    container service

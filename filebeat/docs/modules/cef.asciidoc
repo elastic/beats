@@ -18,7 +18,7 @@ encoded data. The decoded data is written into a `cef` object field. Lastly any
 Elastic Common Schema (ECS) fields that can be populated with the CEF data are
 populated.
 
-include::../include/running-modules.asciidoc[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 

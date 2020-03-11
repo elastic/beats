@@ -80,7 +80,7 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 	var instanceName string
 	// Extract the instance name from the counterPath.
 	if instance == "" || wildcard {
-		instanceName, err = matchInstanceName(counterPath)
+		instanceName, err = MatchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
@@ -178,6 +178,18 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 	return rtn, nil
 }
 
+// GetCountersAndInstances returns a list of counters and instances for a given object
+func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
+	counters, instances, err := PdhEnumObjectItems(objectName)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "Unable to retrieve counter and instance list for %s", objectName)
+	}
+	if len(counters) == 0 && len(instances) == 0 {
+		return nil, nil, errors.Errorf("Unable to retrieve counter and instance list for %s", objectName)
+	}
+	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
+}
+
 // ExpandWildCardPath  examines local computer and returns those counter paths that match the given counter path which contains wildcard characters.
 func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	if wildCardPath == "" {
@@ -209,8 +221,8 @@ func (q *Query) Close() error {
 	return PdhCloseQuery(q.Handle)
 }
 
-// matchInstanceName will check first for instance and then for any objects names.
-func matchInstanceName(counterPath string) (string, error) {
+// MatchInstanceName will check first for instance and then for any objects names.
+func MatchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) != 2 {
 		matches = objectNameRegexp.FindStringSubmatch(counterPath)

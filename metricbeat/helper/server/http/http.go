@@ -24,11 +24,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper/server"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type HttpServer struct {

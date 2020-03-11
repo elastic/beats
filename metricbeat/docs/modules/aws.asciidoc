@@ -38,7 +38,7 @@ Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`,
 `lambda`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs` and `usage`
 metricset in `aws` module.
 
-Collecting `tags` for `ec2`, `cloudwatch`, and metricset created based on
+Collecting `tags` for `ec2`, `rds`, `cloudwatch`, and metricset created based on
 `cloudwatch` using light module is supported.
 
 * *tags.*: Tag key value pairs from aws resources. A tag is a label that user assigns to an AWS resource.
@@ -263,6 +263,9 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
 - module: aws
   period: 300s
   credential_profile_name: test-mb
@@ -292,9 +295,15 @@ metricbeat.modules:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
 - module: aws
   period: 60s
   credential_profile_name: test-mb
+  tags_filter:
+    - key: "dept"
+      value: "eng"
   metricsets:
     - rds
 ----
@@ -330,6 +339,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-usage,usage>>
 
+* <<metricbeat-metricset-aws-vpc,vpc>>
+
 include::aws/billing.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
@@ -355,4 +366,6 @@ include::aws/sns.asciidoc[]
 include::aws/sqs.asciidoc[]
 
 include::aws/usage.asciidoc[]
+
+include::aws/vpc.asciidoc[]
 

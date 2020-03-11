@@ -1,7 +1,11 @@
 [[add-process-metadata]]
 === Add process metadata
 
-The Add process metadata processor enriches events with information from running
+++++
+<titleabbrev>add_process_metadata</titleabbrev>
+++++
+
+The `add_process_metadata` processor enriches events with information from running
 processes, identified by their process ID (PID).
 
 [source,yaml]

@@ -2,7 +2,9 @@
     {
         "@timestamp": "2019-01-07T21:25:21.871Z",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
@@ -28,7 +30,9 @@
     {
         "@timestamp": "2019-01-07T21:25:22.538Z",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
@@ -43,7 +47,9 @@
     {
         "@timestamp": "2019-01-07T21:25:22.594Z",
         "event.dataset": "logstash.log",
+        "event.kind": "event",
         "event.module": "logstash",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",

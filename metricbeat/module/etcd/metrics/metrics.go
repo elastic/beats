@@ -18,8 +18,8 @@
 package metrics
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {

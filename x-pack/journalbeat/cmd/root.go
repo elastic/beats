@@ -5,8 +5,8 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/journalbeat/cmd"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+	"github.com/elastic/beats/v7/journalbeat/cmd"
+	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 )
 
 // RootCmd to handle beats cli

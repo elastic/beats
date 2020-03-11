@@ -1,0 +1,19 @@
+This is the database_account metricset of the module azure.
+
+This metricset allows users to retrieve all metrics from specified database accounts.
+
+include::../../_meta/shared-azure.asciidoc[]
+
+[float]
+==== Config options to identify resources
+
+`resource_id`:: (_[]string_) The fully qualified ID's of the resource, including the resource name and resource type. Has the format /subscriptions/{guid}/resourceGroups/{resource-group-name}/providers/{resource-provider-namespace}/{resource-type}/{resource-name}.
+  Should return a list of resources.
+
+`resource_group`:: (_[]string_) This option should return a list of databases we want to apply our metric configuration options on.
+
+If none of the options are entered then we will select all databases from the entire subscription
+For each metric the primary aggregation assigned will be retrieved.
+A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
+
+

@@ -33,8 +33,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 // These constants are inserted into client http request headers and confirmed
@@ -184,10 +185,12 @@ func doClientPing(t *testing.T) {
 	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
 	clientSettings := ClientSettings{
-		URL:          serverURL,
-		Index:        outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers:      map[string]string{headerTestField: headerTestValue},
-		ProxyDisable: proxyDisable != "",
+		ConnectionSettings: eslegclient.ConnectionSettings{
+			URL:          serverURL,
+			Headers:      map[string]string{headerTestField: headerTestValue},
+			ProxyDisable: proxyDisable != "",
+		},
+		Index: outil.MakeSelector(outil.ConstSelectorExpr("test")),
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
@@ -200,7 +203,7 @@ func doClientPing(t *testing.T) {
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
 	// the client is pointed at the right server or proxy.
-	client.Ping()
+	client.Connect()
 }
 
 // serverState contains the state of the http listeners for proxy tests,

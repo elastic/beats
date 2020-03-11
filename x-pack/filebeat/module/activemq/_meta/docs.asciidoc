@@ -11,12 +11,12 @@ This module parses Apache ActiveMQ logs. It supports application and audit logs.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The module has been tested with ActiveMQ 5.13.0 and 5.15.9. Other versions are expected to work.
-
-include::../include/running-modules.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 

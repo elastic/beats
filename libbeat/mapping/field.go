@@ -134,7 +134,7 @@ func (f *Field) validateType() error {
 		return geoPointType.validate(f.Format)
 	case "date_range":
 		return dateRangeType.validate(f.Format)
-	case "boolean", "binary", "ip", "alias", "array":
+	case "boolean", "binary", "ip", "alias", "array", "histogram":
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
 		}

@@ -1,6 +1,10 @@
 [[include-fields]]
 === Keep fields from events
 
+++++
+<titleabbrev>include_fields</titleabbrev>
+++++
+
 The `include_fields` processor specifies which fields to export if a certain
 condition is fulfilled. The condition is optional. If it's missing, the
 specified fields are always exported. The `@timestamp` and `type` fields are
