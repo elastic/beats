@@ -2,36 +2,54 @@
 
 set -eo pipefail
 
+# Environment variables used
+# FLEET_ADMIN_PASSWORD - used for new fleet user [elastic]
+# FLEET_ADMIN_USERNAME - used for new fleet user [changeme]
+# FLEET_CONFIG_ID - config related to new token [defaul]
+# FLEET_ENROLLMENT_TOKEN - existing enrollment token to be used for enroll
+# FLEET_ENROLL - if set to 1 enroll will be performed
+# FLEET_SETUP - if  set to 1 fleet setup will be performed
+# FLEET_TOKEN_NAME - token name for a token to be created
+# KIBANA_HOST - actual kibana host [http://localhost:5601]
+# KIBANA_PASSWORD - password for accessing kibana API [changeme]
+# KIBANA_USERNAME - username for accessing kibana API [elastic]
+
 function setup(){
   curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/setup -H 'kbn-xsrf: true' -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
   curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/setup \
     -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true' \
-    -d '{"admin_username":"elastic","admin_password":"changeme"}' \
+    -d '{"admin_username":"'"${FLEET_ADMIN_USERNAME:-elastic}"'","admin_password":"'"${FLEET_ADMIN_PASSWORD:-changeme}"'"}' \
     -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme}
 }
 
 function enroll(){
-    # enroll agent to kibana
     local enrollResp
-    enrollResp=$(curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
-      -H 'Content-Type: application/json' \
-      -H 'kbn-xsrf: true' \
-      -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} \
-      -d '{"name":"demotoken","config_id":"default"}')
+    local apiKey
 
-    local exitCode=$?
-    if [ $exitCode -ne 0 ]; then
-      exit $exitCode
+    if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]] && [[ ${FLEET_ENROLLMENT_TOKEN} == 1 ]]; then
+      apikey = "${FLEET_ENROLLMENT_TOKEN}"
+    else
+      enrollResp=$(curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+        -H 'Content-Type: application/json' \
+        -H 'kbn-xsrf: true' \
+        -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} \
+        -d '{"name":"'"${FLEET_TOKEN_NAME:-demotoken}"'","config_id":"'"${FLEET_CONFIG_ID:-default}"'"}')
+
+      local exitCode=$?
+      if [ $exitCode -ne 0 ]; then
+        exit $exitCode
+      fi
+
+      apikey=$(echo $enrollResp | jq -r '.item.api_key')
     fi
 
-    apikey=$(echo $enrollResp | jq -r '.item.api_key')
     ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
 }
 yum install -y epel-release
 yum install -y jq
 
-setup
-enroll
+if [[ -n "${FLEET_SETUP}" ]] && [[ ${FLEET_SETUP} == 1 ]]; then setup; fi
+if [[ -n "${FLEET_ENROLL}" ]] && [[ ${FLEET_ENROLL} == 1 ]]; then enroll; fi
 
 exec {{ .BeatName }} run "$@"
