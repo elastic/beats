@@ -147,6 +147,8 @@ func TestPidMatcher(t *testing.T) {
 	assert.Equal(t, out, "")
 
 	testCfg["matcher_regex"] = "(.*)"
+	testCfg["pid_field"] = "p.p"
+	testCfg["ppid_field"] = "p.pp"
 	cfg, err = common.NewConfigFrom(testCfg)
 	assert.Nil(t, err)
 
@@ -154,7 +156,14 @@ func TestPidMatcher(t *testing.T) {
 	assert.NotNil(t, matcher)
 	assert.Nil(t, err)
 
-	// test matching with regex from config
+	input = common.MapStr{
+		"p": common.MapStr{
+			"p":  123,
+			"pp": 321,
+		},
+	}
+
+	// test matching with regex and pid/ppid fields from config
 	out = matcher.MetadataIndex(input)
 	assert.Equal(t, out, "12:fr:/ku/bu/po/c025a1a09bdf3ec56c0f8d8fb33c41ef55a4c7cec82da5c1496eeded7ecece9d")
 }

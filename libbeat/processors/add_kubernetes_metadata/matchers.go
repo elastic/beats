@@ -246,7 +246,6 @@ func (p *PidMatcher) MetadataIndex(event common.MapStr) string {
 			if err == nil {
 				return cid
 			}
-			logp.Debug("kubernetes", "Unable to extract container id for ppid: %d", ppid)
 		}
 	}
 
@@ -259,7 +258,6 @@ func (p *PidMatcher) MetadataIndex(event common.MapStr) string {
 			if err == nil {
 				return cid
 			}
-			logp.Debug("kubernetes", "Unable to extract container id for pid: %d", pid)
 		}
 	}
 	return ""
@@ -271,7 +269,7 @@ var readCgroupFile = func(hostPath string, pid int) ([]byte, error) {
 }
 
 func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
-	// check from from cache
+	// check from cache
 	cid := p.pidCidCache.Get(pid)
 	if cid != nil {
 		return cid.(string), nil
@@ -280,7 +278,8 @@ func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
 	// not found in cache, try to read form cgroup file
 	data, err := readCgroupFile(p.hostPath, pid)
 	if err != nil {
-		// no cgroup file with given pid
+		// no cgroup file for such pid
+		logp.Debug("kubernetes", "Unable to read cgroup file: %s", err)
 		return "", err
 	}
 
@@ -295,5 +294,7 @@ func (p *PidMatcher) getContainerIDFromCgroup(pid int) (string, error) {
 	}
 
 	// no regex match, probably not a container process
+	logp.Debug("kubernetes", "Unable to extract container id from cgroup file for pid: %d. Probably not a container process.", pid)
+
 	return "", nil
 }
