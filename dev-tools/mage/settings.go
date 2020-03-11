@@ -616,7 +616,7 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 		return nil, errors.Errorf("failed to find root dir of module file: %v", errs)
 	}
 
-	rootImportPath, err := gotool.GetModuleName()
+	rootImportPath, err := gotool.GetModuleNameNoVersion()
 	if err != nil {
 		return nil, err
 	}
@@ -675,7 +675,7 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 		return nil, errors.Wrap(err, "failed to get relative path to repo root")
 	}
 
-	rootImportPath, err := gotool.GetModuleName()
+	rootImportPath, err := gotool.GetModuleNameNoVersion()
 	if err != nil {
 		return nil, err
 	}

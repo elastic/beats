@@ -20,8 +20,10 @@ package gotool
 import (
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
+	"github.com/Masterminds/semver"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -66,6 +68,25 @@ func GetModuleName() (string, error) {
 		return "", fmt.Errorf("unexpected number of lines")
 	}
 	return lines[0], nil
+}
+
+// GetModuleNameNoVersion returns name of the modules without version suffix.
+func GetModuleNameNoVersion() (string, error) {
+	name, err := GetModuleName()
+	if err != nil {
+		return name, nil
+	}
+
+	return moduleTrimVersion(name), nil
+}
+
+func moduleTrimVersion(module string) string {
+	base := path.Base(module)
+	if _, err := semver.NewVersion(base); strings.HasPrefix(base, "v") && err == nil {
+		return path.Dir(module)
+	}
+
+	return module
 }
 
 // ListProjectPackages lists all packages in the current project
