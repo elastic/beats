@@ -242,15 +242,13 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
 	ticker := time.NewTicker(time.Until(t))
 	defer ticker.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			in.log.Info("Context done.")
-			return nil
-		case <-ticker.C:
-			in.log.Debug("Rate Limit: time is up.")
-			return nil
-		}
+	select {
+	case <-ctx.Done():
+		in.log.Info("Context done.")
+		return nil
+	case <-ticker.C:
+		in.log.Debug("Rate Limit: time is up.")
+		return nil
 	}
 }
 
