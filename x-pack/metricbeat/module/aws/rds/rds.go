@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
@@ -49,6 +50,7 @@ type DBDetails struct {
 	dbAvailabilityZone string
 	dbIdentifier       string
 	dbStatus           string
+	tags               []aws.Tag
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -87,7 +89,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.Endpoint, "rds", regionName, awsConfig))
 
 		// Get DBInstance IDs per region
-		dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
+		dbInstanceIDs, dbDetailsMap, err := m.getDBInstancesPerRegion(svc)
 		if err != nil {
 			err = errors.Wrap(err, "getDBInstancesPerRegion failed, skipping region "+regionName)
 			m.Logger().Errorf(err.Error())
@@ -129,7 +131,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Create Cloudwatch Events for RDS
-		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap, m.AccountName, m.AccountID)
+		events, err := m.createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap)
 		if err != nil {
 			m.Logger().Error(err.Error())
 			report.Error(err)
@@ -149,7 +151,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDetails, error) {
+func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDetails, error) {
 	describeInstanceInput := &rds.DescribeDBInstancesInput{}
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
 	output, err := req.Send(context.TODO())
@@ -160,18 +162,58 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDet
 	var dbInstanceIDs []string
 	dbDetailsMap := map[string]DBDetails{}
 	for _, dbInstance := range output.DBInstances {
-		dbInstanceIDs = append(dbInstanceIDs, *dbInstance.DBInstanceIdentifier)
-		dbDetails := DBDetails{
-			dbArn:        *dbInstance.DBInstanceArn,
-			dbClass:      *dbInstance.DBInstanceClass,
-			dbIdentifier: *dbInstance.DBInstanceIdentifier,
-			dbStatus:     *dbInstance.DBInstanceStatus,
+		dbDetails := DBDetails{}
+		if dbInstance.DBInstanceIdentifier != nil {
+			dbDetails.dbIdentifier = *dbInstance.DBInstanceIdentifier
+			dbInstanceIDs = append(dbInstanceIDs, *dbInstance.DBInstanceIdentifier)
+		}
+
+		if dbInstance.DBInstanceArn != nil {
+			dbDetails.dbArn = *dbInstance.DBInstanceArn
+		}
+
+		if dbInstance.DBInstanceClass != nil {
+			dbDetails.dbClass = *dbInstance.DBInstanceClass
+		}
+
+		if dbInstance.DBInstanceClass != nil {
+			dbDetails.dbStatus = *dbInstance.DBInstanceStatus
 		}
 
 		if dbInstance.AvailabilityZone != nil {
 			dbDetails.dbAvailabilityZone = *dbInstance.AvailabilityZone
 		}
 
+		// Get tags for each RDS instance
+		listTagsInput := rds.ListTagsForResourceInput{
+			ResourceName: dbInstance.DBInstanceArn,
+		}
+		reqListTags := svc.ListTagsForResourceRequest(&listTagsInput)
+		outputListTags, err := reqListTags.Send(context.TODO())
+		if err != nil {
+			m.Logger().Warn("ListTagsForResourceRequest failed, rds:ListTagsForResource permission is required for getting tags.")
+			dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
+			return dbInstanceIDs, dbDetailsMap, nil
+		}
+
+		if m.TagsFilter != nil {
+			// Check with each tag filter
+			// If tag filter doesn't exist in tagKeys/tagValues,
+			// then remove this dbInstance entry from dbDetailsMap.
+			if exists := aws.CheckTagFiltersExist(m.TagsFilter, outputListTags.TagList); !exists {
+				delete(dbDetailsMap, *dbInstance.DBInstanceIdentifier)
+				continue
+			}
+		}
+
+		for _, tag := range outputListTags.TagList {
+			// By default, replace dot "." using under bar "_" for tag keys and values
+			dbDetails.tags = append(dbDetails.tags,
+				aws.Tag{
+					Key:   common.DeDot(*tag.Key),
+					Value: common.DeDot(*tag.Value),
+				})
+		}
 		dbDetailsMap[*dbInstance.DBInstanceIdentifier] = dbDetails
 	}
 	return dbInstanceIDs, dbDetailsMap, nil
@@ -223,7 +265,7 @@ func constructLabel(metricDimensions []cloudwatch.Dimension, metricName string) 
 	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails, accountName string, accountID string) (map[string]mb.Event, error) {
+func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails) (map[string]mb.Event, error) {
 	// Initialize events and metricSetFieldResults per dbInstance
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
@@ -245,7 +287,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 				}
 
 				if _, ok := events[dimValues]; !ok {
-					events[dimValues] = aws.InitEvent(regionName, accountName, accountID)
+					events[dimValues] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 				}
 
 				if _, ok := metricSetFieldResults[dimValues]; !ok {
@@ -262,15 +304,38 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 					for i := 1; i < len(labels); i += 2 {
 						if labels[i] == "DBInstanceIdentifier" {
 							dbIdentifier := labels[i+1]
-							if _, found := events[dbIdentifier]; !found {
+							if _, found := events[dbIdentifier]; found {
+								if _, found := dbInstanceMap[dbIdentifier]; !found {
+									delete(metricSetFieldResults, dimValues)
+									continue
+								}
 								events[dbIdentifier].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbIdentifier].dbAvailabilityZone)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbIdentifier].dbArn)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
 								events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
+
+								for _, tag := range dbInstanceMap[dbIdentifier].tags {
+									events[dbIdentifier].ModuleFields.Put("tags."+tag.Key, tag.Value)
+								}
 							}
 						}
 						metricSetFieldResults[dimValues][labels[i]] = fmt.Sprint(labels[(i + 1)])
+					}
+
+					// if tags_filter is given, then only return metrics with DBInstanceIdentifier as dimension
+					if m.TagsFilter != nil {
+						if len(labels) == 1 {
+							delete(events, dimValues)
+							delete(metricSetFieldResults, dimValues)
+						}
+
+						for i := 1; i < len(labels); i += 2 {
+							if labels[i] != "DBInstanceIdentifier" && i == len(labels)-2 {
+								delete(events, dimValues)
+								delete(metricSetFieldResults, dimValues)
+							}
+						}
 					}
 				}
 			}
