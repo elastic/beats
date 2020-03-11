@@ -115,7 +115,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 	const (
 		outputsKey = "outputs"
 		outputKey  = "output"
-		streamsKey = "streams"
+		streamsKey = "datasources"
 		typeKey    = "type"
 	)
 
@@ -227,23 +227,15 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 func findOutputName(m map[string]interface{}) string {
 	const (
 		defaultOutputName = "default"
-		outputKey         = "output"
 		useOutputKey      = "use_output"
 	)
 
-	output, ok := m[outputKey]
+	output, ok := m[useOutputKey]
 	if !ok {
 		return defaultOutputName
 	}
 
-	o := output.(map[string]interface{})
-
-	name, ok := o[useOutputKey]
-	if !ok {
-		return defaultOutputName
-	}
-
-	return name.(string)
+	return output.(string)
 }
 
 func cloneMap(m map[string]interface{}) map[string]interface{} {

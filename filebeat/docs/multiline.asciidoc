@@ -1,5 +1,9 @@
 [[multiline-examples]]
-== Manage multiline messages
+=== Manage multiline messages
+
+++++
+<titleabbrev>Multiline messages</titleabbrev>
+++++
 
 The files harvested by {beatname_uc} may contain messages that span multiple
 lines of text. For example, multiline messages are common in files that contain
@@ -15,7 +19,7 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 
 [float]
 [[multiline]]
-=== Configuration options
+==== Configuration options
 
 You can specify the following options in the +{beatname_lc}.inputs+ section of
 the +{beatname_lc}.yml+ config file to control how {beatname_uc} deals with messages
@@ -73,7 +77,7 @@ lines are discarded. The default is 500.
 *`multiline.timeout`*:: After the specified timeout, {beatname_uc} sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
 
-=== Examples of multiline configuration
+==== Examples of multiline configuration
 
 The examples in this section cover the following use cases:
 
@@ -82,7 +86,7 @@ The examples in this section cover the following use cases:
 * Combining multiple lines from time-stamped events
 
 [float]
-==== Java stack traces
+===== Java stack traces
 
 Java stack traces consist of multiple lines, with each line after the initial line beginning with whitespace, as in
 this example:
@@ -134,7 +138,7 @@ In this example, the pattern matches the following lines:
 * a line that begins with the words `Caused by:`
 
 [float]
-==== Line continuations
+===== Line continuations
 
 Several programming languages use the backslash (`\`) character at the end of a line to denote that the line continues,
 as in this example:
@@ -157,7 +161,7 @@ multiline.match: before
 This configuration merges any line that ends with the `\` character with the line that follows.
 
 [float]
-==== Timestamps
+===== Timestamps
 
 Activity logs from services such as Elasticsearch typically begin with a timestamp, followed by information on the
 specific activity, as in this example:
@@ -181,7 +185,7 @@ This configuration uses the `negate: true` and `match: after` settings to specif
 specified pattern belongs to the previous line.
 
 [float]
-==== Application events
+===== Application events
 
 Sometimes your application logs contain events, that begin and end with custom markers, such as the following example:
 
@@ -204,7 +208,7 @@ multiline.flush_pattern: 'End event'
 
 The `flush_pattern` option, specifies a regex at which the current multiline will be flushed. If you think of the `pattern` option specifying the beginning of an event, the `flush_pattern` option will specify the end or last line of the event.
 
-=== Test your regexp pattern for multiline
+==== Test your regexp pattern for multiline
 
 To make it easier for you to test the regexp patterns in your multiline config, we've created a
 https://play.golang.org/p/uAd5XHxscu[Go Playground]. You can simply plug in the regexp pattern along with
