@@ -5,7 +5,6 @@
 package test
 
 import (
-	"errors"
 	"os"
 	"testing"
 )
