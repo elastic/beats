@@ -1,0 +1,17 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+
+[[release-notes-8.0.0]]
+=== Agent version 8.0.0
+
+
+==== Breaking changes
+
+==== Bugfixes
+
+- Fixed tests on windows {pull}16922[16922]
+
+==== New features
