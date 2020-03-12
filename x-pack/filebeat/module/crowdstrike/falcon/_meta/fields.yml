@@ -102,6 +102,11 @@
       description: >
         Executable path with comand line arguments.
 
+    - name: SHA256String
+      type: text
+      description: >
+        SHA256 sum of the executable associated with the detection.
+ 
     - name: MD5String
       type: text
       description: >
@@ -163,7 +168,7 @@
         Unique ID associated with action taken.
 
     - name: PatternDispositionFlags
-      type: keyword
+      type: object
       description: >
         Flags indicating actions taken.
 
@@ -198,7 +203,7 @@
         Timestamp associated with this event in UTC UNIX format.
 
     - name: AuditKeyValues
-      type: keyword
+      type: nested
       description: >
         Fields that were changed in this event.
 
@@ -212,13 +217,32 @@
       description: >
         Host name of the machine for the remote session.
 
-    - name: UserName
-      type: text
-      description: >
-        User name assoicated with the remote session.
-
     - name: StartTimestamp
       type: date
       description: >
         Start time for the remote session in UTC UNIX format.
-      
+
+    - name: EndTimestamp
+      type: date
+      description: >
+        End time for the remote session in UTC UNIX format.
+
+    - name: State
+      type: text
+      description: >
+        Whether the incident summary is open and ongoing or closed.
+
+    - name: IncidentStartTime
+      type: date
+      description: >
+        Start time for the incident in UTC UNIX format.
+
+    - name: IncidentEndTime
+      type: date
+      description: >
+        End time for the incident in UTC UNIX format.
+
+    - name: FineScore
+      type: float
+      description: >
+        Score for incident.

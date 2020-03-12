@@ -19,6 +19,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cef"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cisco"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/coredns"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/crowdstrike"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/googlecloud"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/ibmmq"

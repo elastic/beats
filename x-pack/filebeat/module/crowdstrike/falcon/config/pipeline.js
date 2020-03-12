@@ -99,6 +99,16 @@ var crowdstrikeFalcon = (function() {
 
                 break;
 
+            case "IncidentSummaryEvent":
+                evt.Put("rule.reference", evt.Get("crowdstrike.event.FalconHostLink"))
+                evt.Put("event.kind", "alert")
+                evt.Put("event.type", "info")
+                evt.Put("event.category", "malware")
+                evt.Put("event.action", "incident")
+                evt.Put("message", "Incident score " + evt.Get("crowdstrike.event.FineScore"))
+
+                break;
+
             default:
                 break;
         }
