@@ -23,13 +23,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ToEventTestCase struct {

@@ -1,6 +1,10 @@
 [[copy-fields]]
 === Copy fields
 
+++++
+<titleabbrev>copy_fields</titleabbrev>
+++++
+
 The `copy_fields` processor copies a field to another one.
 
 `fields`:: List of `from` and `to` pairs to copy from and to.

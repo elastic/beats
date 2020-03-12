@@ -18,7 +18,9 @@
 package ucfg
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/elastic/go-ucfg/parse"
 )
@@ -38,6 +40,7 @@ type options struct {
 	noParse      bool
 
 	configValueHandling configHandling
+	fieldHandlingTree   *fieldHandlingTree
 
 	// temporary cache of parsed splice values for lifetime of call to
 	// Unpack/Pack/Get/...
@@ -47,6 +50,9 @@ type options struct {
 }
 
 type valueCache map[string]spliceValue
+
+// specific API on top of Config to handle adjusting merging behavior per fields
+type fieldHandlingTree Config
 
 // id used to store intermediate parse results in current execution context.
 // As parsing results might differ between multiple calls due to:
@@ -162,6 +168,57 @@ func makeOptValueHandling(h configHandling) Option {
 	}
 }
 
+var (
+	// FieldMergeValues option configures all merging and unpacking operations to use
+	// the default merging behavior for the specified field. This overrides the any struct
+	// tags during unpack for the field. Nested field names can be defined using dot
+	// notation.
+	FieldMergeValues = makeFieldOptValueHandling(cfgMergeValues)
+
+	// FieldReplaceValues option configures all merging and unpacking operations to
+	// replace old dictionaries and arrays while merging for the specified field. This
+	// overrides the any struct tags during unpack for the field. Nested field names
+	// can be defined using dot notation.
+	FieldReplaceValues = makeFieldOptValueHandling(cfgReplaceValue)
+
+	// FieldAppendValues option configures all merging and unpacking operations to
+	// merge dictionaries and append arrays to existing arrays while merging for the
+	// specified field. This overrides the any struct tags during unpack for the field.
+	// Nested field names can be defined using dot notation.
+	FieldAppendValues = makeFieldOptValueHandling(cfgArrAppend)
+
+	// FieldPrependValues option configures all merging and unpacking operations to
+	// merge dictionaries and prepend arrays to existing arrays while merging for the
+	// specified field. This overrides the any struct tags during unpack for the field.
+	// Nested field names can be defined using dot notation.
+	FieldPrependValues = makeFieldOptValueHandling(cfgArrPrepend)
+)
+
+func makeFieldOptValueHandling(h configHandling) func(...string) Option {
+	return func(fieldName ...string) Option {
+		if len(fieldName) == 0 {
+			return func(_ *options) {}
+		}
+
+		table := make(map[string]configHandling)
+		for _, name := range fieldName {
+			// field value config options are rendered into a Config; the '*' represents the handling method
+			// for everything nested under this field.
+			if !strings.HasSuffix(name, ".*") {
+				name = fmt.Sprintf("%s.*", name)
+			}
+			table[name] = h
+		}
+
+		return func(o *options) {
+			if o.fieldHandlingTree == nil {
+				o.fieldHandlingTree = newFieldHandlingTree()
+			}
+			o.fieldHandlingTree.merge(table, PathSep(o.pathSep))
+		}
+	}
+}
+
 // VarExp option enables support for variable expansion. Resolve and Env options will only be effective if  VarExp is set.
 var VarExp Option = doVarExp
 
@@ -199,4 +256,60 @@ func (cache valueCache) cachedValue(
 		cache[string(id)] = spliceValue{err, v}
 	}
 	return v, err
+}
+
+func newFieldHandlingTree() *fieldHandlingTree {
+	return (*fieldHandlingTree)(New())
+}
+
+func (t *fieldHandlingTree) merge(other interface{}, opts ...Option) error {
+	cfg := (*Config)(t)
+	return cfg.Merge(other, opts...)
+}
+
+func (t *fieldHandlingTree) child(fieldName string, idx int) (*fieldHandlingTree, error) {
+	cfg := (*Config)(t)
+	child, err := cfg.Child(fieldName, idx)
+	if err != nil {
+		return nil, err
+	}
+	return (*fieldHandlingTree)(child), nil
+}
+
+func (t *fieldHandlingTree) configHandling(fieldName string, idx int) (configHandling, error) {
+	cfg := (*Config)(t)
+	handling, err := cfg.Uint(fieldName, idx)
+	if err != nil {
+		return cfgDefaultHandling, err
+	}
+	return configHandling(handling), nil
+}
+
+func (t *fieldHandlingTree) wildcard() (*fieldHandlingTree, error) {
+	return t.child("**", -1)
+}
+
+func (t *fieldHandlingTree) setWildcard(wildcard *fieldHandlingTree) error {
+	cfg := (*Config)(t)
+	return cfg.SetChild("**", -1, (*Config)(wildcard))
+}
+
+func (t *fieldHandlingTree) fieldHandling(fieldName string, idx int) (configHandling, *fieldHandlingTree, bool) {
+	child, err := t.child(fieldName, idx)
+	if err == nil {
+		cfgHandling, err := child.configHandling("*", -1)
+		if err == nil {
+			return cfgHandling, child, true
+		}
+	}
+	// try wildcard match
+	wildcard, err := t.wildcard()
+	if err != nil {
+		return cfgDefaultHandling, child, false
+	}
+	cfgHandling, cfg, ok := wildcard.fieldHandling(fieldName, idx)
+	if ok {
+		return cfgHandling, cfg, ok
+	}
+	return cfgDefaultHandling, child, ok
 }

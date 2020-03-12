@@ -1,6 +1,10 @@
 [[add-kubernetes-metadata]]
 === Add Kubernetes metadata
 
+++++
+<titleabbrev>add_kubernetes_metadata</titleabbrev>
+++++
+
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from.
 At startup it detects an `in_cluster` environment and caches the

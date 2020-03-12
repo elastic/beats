@@ -42,7 +42,7 @@ class Test(BaseTest):
         data = json.loads(r.content)
 
         # Test one data point
-        assert data["libbeat"]["config"]["reloads"] == 0
+        assert data["libbeat"]["config"]["scans"] == 0
 
         proc.check_kill_and_wait()
 

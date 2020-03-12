@@ -1,0 +1,59 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "iis.webserver",
+        "duration": 115000,
+        "module": "iis"
+    },
+    "iis": {
+        "webserver": {
+            "asp_net": {
+                "application_restarts": 0,
+                "request_wait_time": 0
+            },
+            "asp_net_application": {
+                "pipeline_instance_count": 3,
+                "requests_executing": 0,
+                "requests_in_application_queue": 0
+            },
+            "cache": {
+                "current_file_cache_memory_usage": 696,
+                "current_files_cached": 2,
+                "current_uris_cached": 0,
+                "file_cache_hits": 1,
+                "file_cache_misses": 7,
+                "maximum_file_cache_memory_usage": 696,
+                "output_cache_current_items": 0,
+                "output_cache_current_memory_usage": 0,
+                "output_cache_total_hits": 0,
+                "output_cache_total_misses": 8,
+                "total_files_cached": 2,
+                "total_uris_cached": 1,
+                "uri_cache_hits": 0,
+                "uri_cache_misses": 8
+            },
+            "network": {
+                "current_anonymous_users": 0,
+                "current_connections": 0,
+                "current_nonanonymous_users": 0,
+                "maximum_connections": 3,
+                "service_uptime": 343447,
+                "total_anonymous_users": 6,
+                "total_bytes_received": 2715,
+                "total_bytes_sent": 89432,
+                "total_connection_attempts": 4,
+                "total_delete_requests": 0,
+                "total_get_requests": 6,
+                "total_nonanonymous_users": 0,
+                "total_post_requests": 0
+            }
+        }
+    },
+    "metricset": {
+        "name": "webserver",
+        "period": 10000
+    },
+    "service": {
+        "type": "iis"
+    }
+}

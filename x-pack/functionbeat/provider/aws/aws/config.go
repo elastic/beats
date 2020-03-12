@@ -14,7 +14,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 // Config expose the configuration option the AWS provider.

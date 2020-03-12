@@ -22,9 +22,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 type handlerFunc func(http.ResponseWriter, *http.Request)

@@ -81,6 +81,13 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	// Wait for health
 	err = compose.Wait(upOptions.Timeout, service)
 	if err != nil {
+		inspected, inspectErr := compose.Inspect(service)
+		if inspectErr != nil {
+			t.Logf("inspection error: %v", err)
+		} else {
+			t.Logf("Container state (service: '%s'): %s", service, inspected)
+		}
+
 		t.Fatal(err)
 	}
 

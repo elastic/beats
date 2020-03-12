@@ -9,8 +9,8 @@ import (
 
 	"github.com/godror/godror"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 )

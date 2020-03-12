@@ -1,6 +1,10 @@
 [[add-id]]
 === Generate an ID for an event
 
+++++
+<titleabbrev>add_id</titleabbrev>
+++++
+
 The `add_id` processor generates a unique ID for an event.
 
 [source,yaml]

@@ -21,8 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/heartbeat/scheduler/schedule/cron"
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule/cron"
 )
 
 type Schedule struct {

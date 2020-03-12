@@ -9,38 +9,44 @@
 package afpacket
 
 import (
-	"errors"
-	"syscall"
 	"unsafe"
 
 	"golang.org/x/sys/unix"
 )
 
-const maxOptSize = 8192
-
-var errSockoptTooBig = errors.New("socket option too big")
-
 // setsockopt provides access to the setsockopt syscall.
 func setsockopt(fd, level, name int, val unsafe.Pointer, vallen uintptr) error {
-	if vallen > maxOptSize {
-		return errSockoptTooBig
+	_, _, errno := unix.Syscall6(
+		unix.SYS_SETSOCKOPT,
+		uintptr(fd),
+		uintptr(level),
+		uintptr(name),
+		uintptr(val),
+		vallen,
+		0,
+	)
+	if errno != 0 {
+		return error(errno)
 	}
-	slice := (*[maxOptSize]byte)(val)[:]
-	return syscall.SetsockoptString(fd, level, name, string(slice[:vallen]))
+
+	return nil
 }
 
 // getsockopt provides access to the getsockopt syscall.
-func getsockopt(fd, level, name int, val unsafe.Pointer, vallen *uintptr) error {
-	s, err := unix.GetsockoptString(fd, level, name)
-	if err != nil {
-		return err
+func getsockopt(fd, level, name int, val unsafe.Pointer, vallen uintptr) error {
+	_, _, errno := unix.Syscall6(
+		unix.SYS_GETSOCKOPT,
+		uintptr(fd),
+		uintptr(level),
+		uintptr(name),
+		uintptr(val),
+		vallen,
+		0,
+	)
+	if errno != 0 {
+		return error(errno)
 	}
-	rcvLen := uintptr(len(s))
-	if rcvLen > *vallen {
-		return errSockoptTooBig
-	}
-	copy((*[maxOptSize]byte)(val)[:rcvLen], s)
-	*vallen = rcvLen
+
 	return nil
 }
 

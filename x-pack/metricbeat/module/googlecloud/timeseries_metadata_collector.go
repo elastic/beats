@@ -12,15 +12,16 @@ import (
 	"github.com/pkg/errors"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors
-func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string) *MetadataCollectorInputData {
+func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string, region string) *MetadataCollectorInputData {
 	return &MetadataCollectorInputData{
 		TimeSeries: ts,
 		ProjectID:  projectID,
 		Zone:       zone,
+		Region:     region,
 	}
 }
 

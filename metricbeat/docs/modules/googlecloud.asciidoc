@@ -17,6 +17,7 @@ Note: extra GCP charges on Stackdriver Monitoring API requests will be generated
 This is a list of the possible module parameters you can tune:
 
 * *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
+* *region*: A single string with the region you want to monitor like "us-central1". This will enable monitoring for all zones under this region.
 * *project_id*: A single string with your GCP Project ID
 * *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
 * *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
@@ -43,7 +44,7 @@ Authentication and authorization in Google Cloud Platform can be achieved in man
 }
 ----
 
-Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role:
+Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role (applies to all metricsets):
 
 * `Compute Viewer` (1 permission in use of 138):
 - `monitoring.metricDescriptors.list`
@@ -82,7 +83,10 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+    - pubsub
+    - loadbalancing
   zone: "us-central1-a"
+  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
@@ -98,7 +102,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>>
 
+* <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
+
 include::googlecloud/compute.asciidoc[]
 
 include::googlecloud/loadbalancing.asciidoc[]
+
+include::googlecloud/pubsub.asciidoc[]
 

@@ -1,0 +1,56 @@
+[[add-cloudfoundry-metadata]]
+[role="xpack"]
+=== Add Cloud Foundry metadata
+
+++++
+<titleabbrev>add_cloudfoundry_metadata</titleabbrev>
+++++
+
+experimental[]
+
+The `add_cloudfoundry_metadata` processor annotates each event with relevant metadata
+from Cloud Foundry applications. The events are annotated with Cloud Foundry metadata,
+only if the event contains a reference to a Cloud Foundry application (using field
+`cloudfoundry.app.id`) and the configured Cloud Foundry client is able to retrieve
+information for the application.
+
+Each event is annotated with:
+
+* Application Name
+* Space ID
+* Space Name
+* Organization ID
+* Organization Name
+
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_cloudfoundry_metadata:
+    api_address: https://api.dev.cfdev.sh
+    client_id: uaa-filebeat
+    client_secret: verysecret
+    ssl:
+      verification_mode: none
+    # To connect to Cloud Foundry over verified TLS you can specify a client and CA certificate.
+    #ssl:
+    #  certificate_authorities: ["/etc/pki/cf/ca.pem"]
+    #  certificate:              "/etc/pki/cf/cert.pem"
+    #  key:                      "/etc/pki/cf/cert.key"
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`api_address`:: (Optional) The URL of the Cloud Foundry API. It uses `http://api.bosh-lite.com` by default.
+
+`doppler_address`:: (Optional) The URL of the Cloud Foundry Doppler Websocket. It uses value from ${api_address}/v2/info by default.
+
+`uaa_address`:: (Optional) The URL of the Cloud Foundry UAA API. It uses value from ${api_address}/v2/info by default.
+
+`rlp_address`:: (Optional) The URL of the Cloud Foundry RLP Gateway. It uses value from ${api_address}/v2/info by default.
+
+`client_id`:: Client ID to authenticate with Cloud Foundry.
+
+`client_secret`:: Client Secret to authenticate with Cloud Foundry.
+
+`ssl`:: (Optional) SSL configuration to use when connecting to Cloud Foundry.

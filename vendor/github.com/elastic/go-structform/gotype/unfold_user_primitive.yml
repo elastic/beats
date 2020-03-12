@@ -1,0 +1,82 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import:
+  - unfold_templates.yml
+
+main: |
+  package gotype
+
+  {{/* define pointer based user unfolder types */}}
+  {{ template "makeType" "bool" }}
+  {{ template "makeType" "string" }}
+  {{ range .numTypes }} 
+    {{ template "makeType" . }}
+  {{ end }}
+
+  {{/* create value visitor callbacks */}}
+  {{ invoke "onBoolFns" "name" "userUnfolderBool" "fn" "process" }}
+  {{ invoke "onStringFns" "name" "userUnfolderString" "fn" "process" }}
+  {{ range .numTypes }}
+    {{ $type := . }}
+    {{ $name := capitalize . | printf "userUnfolder%v" }}
+    {{ invoke "onNumberFns" "name" $name "type" $type "fn" "process" }}
+  {{ end }}
+
+# makeTypeWithName(name, type, [base])
+templates.makeTypeWithName: |
+  {{ $type := .type }}
+  {{ $name := capitalize .name | printf "userUnfolder%v" }}
+  {{ invoke "makeUserUnfoldType" "type" $type "name" $name "base" .base }}
+
+  func (u *{{ $name }} ) initState(ctx *unfoldCtx, ptr unsafe.Pointer) {
+    ctx.unfolder.push(u)
+    ctx.ptr.push(ptr)
+  }
+
+  func (u *{{ $name }} ) cleanup(ctx *unfoldCtx) {
+    ctx.unfolder.pop()
+    ctx.ptr.pop()
+  }
+
+  func (u *{{ $name }}) process(ctx *unfoldCtx, v {{ $type }}) error {
+    err := u.fn(ctx.ptr.current, v)
+    u.cleanup(ctx)
+    return err
+  }
+
+templates.makeUserUnfoldType: |
+  {{ $type := .type }}
+  {{ $name := .name }}
+  {{ $cbname := .name | printf "%vCB" }}
+  {{ $base := default "unfolderErrUnknown" .base }}
+
+  type (
+    {{ $name }} struct {
+      {{ $base }}
+      fn {{ $cbname }}
+    }
+
+    {{ $cbname }} func(unsafe.Pointer, {{ $type }}) error
+  )
+
+  func new{{ $name | capitalize }}(fn reflect.Value) ptrUnfolder {
+    return &{{ $name }}{
+      fn: *((*{{ $cbname }})(stunsafe.UnsafeFnPtr(fn))),
+    }
+  }
+

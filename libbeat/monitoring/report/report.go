@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Format encodes the type of format to report monitoring data in. This

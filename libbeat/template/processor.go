@@ -21,8 +21,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 // Processor struct to process fields to template
@@ -80,6 +80,8 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.array(&field)
 		case "alias":
 			indexMapping = p.alias(&field)
+		case "histogram":
+			indexMapping = p.histogram(&field)
 		case "group":
 			indexMapping = common.MapStr{}
 			if field.Dynamic.Value != nil {
@@ -287,6 +289,18 @@ func (p *Processor) alias(f *mapping.Field) common.MapStr {
 	return properties
 }
 
+func (p *Processor) histogram(f *mapping.Field) common.MapStr {
+	// Histograms were introduced in Elasticsearch 7.6, ignore if unsupported
+	if p.EsVersion.LessThan(common.MustNewVersion("7.6.0")) {
+		return nil
+	}
+
+	properties := getDefaultProperties(f)
+	properties["type"] = "histogram"
+
+	return properties
+}
+
 func (p *Processor) object(f *mapping.Field) common.MapStr {
 	matchType := func(onlyType string, mt string) string {
 		if mt != "" {
@@ -324,6 +338,9 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 		case "byte", "double", "float", "long", "short", "boolean":
 			dynProperties["type"] = otp.ObjectType
 			addDynamicTemplate(f, dynProperties, matchType(otp.ObjectType, otp.ObjectTypeMappingType))
+		case "histogram":
+			dynProperties["type"] = otp.ObjectType
+			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
 		}
 	}
 

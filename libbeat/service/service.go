@@ -32,8 +32,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.

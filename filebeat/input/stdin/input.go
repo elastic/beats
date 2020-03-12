@@ -20,14 +20,14 @@ package stdin
 import (
 	"fmt"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/input/log"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/input/log"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {

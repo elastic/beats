@@ -6,14 +6,13 @@ package gcp
 
 import (
 	"fmt"
-	"time"
 )
 
 // FunctionConfig stores the configuration of a Google Cloud Function
 type FunctionConfig struct {
 	Description         string            `config:"description"`
 	MemorySize          string            `config:"memory_size"`
-	Timeout             time.Duration     `config:"timeout" validate:"nonzero,positive"`
+	Timeout             string            `config:"timeout"`
 	ServiceAccountEmail string            `config:"service_account_email"`
 	Labels              map[string]string `config:"labels"`
 	VPCConnector        string            `config:"vpc_connector"`

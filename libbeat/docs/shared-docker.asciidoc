@@ -1,5 +1,5 @@
 [[running-on-docker]]
-=== Running {beatname_uc} on Docker
+=== Run {beatname_uc} on Docker
 
 Docker images for {beatname_uc} are available from the Elastic Docker
 registry. The base image is https://hub.docker.com/_/centos/[centos:7].
@@ -14,7 +14,7 @@ paid commercial features. See the
 https://www.elastic.co/subscriptions[Subscriptions] page for information about 
 Elastic license levels.
 
-==== Pulling the image
+==== Pull the image
 
 Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ command
 against the Elastic Docker registry.
