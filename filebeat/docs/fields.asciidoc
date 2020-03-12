@@ -1314,6 +1314,29 @@ type: keyword
 --
 
 [float]
+=== cloudwatch
+
+Fields for AWS CloudWatch logs.
+
+
+[float]
+=== ec2
+
+Fields for AWS EC2 logs in CloudWatch.
+
+
+
+*`aws.ec2.ip_address`*::
++
+--
+The internet address of the requester.
+
+
+type: keyword
+
+--
+
+[float]
 === elb
 
 Fields for AWS ELB logs.
