@@ -130,22 +130,25 @@ func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.
 
 		pair := strings.SplitN(host, ":", 2)
 		ports := config.Ports
-		if len(pair) == 2 {
-			port, err := strconv.ParseUint(pair[1], 10, 16)
-			if err != nil {
-				return nil, fmt.Errorf("'%v' is no valid port number in '%v'", pair[1], h)
+		for _, port := range ports {
+			if len(pair) == 2 {
+				port64, err := strconv.ParseUint(pair[1], 10, 16)
+				port = uint16(port64)
+				if err != nil {
+					return nil, fmt.Errorf("'%v' is no valid port number in '%v'", pair[1], h)
+				}
+
+				host = pair[0]
+			} else if len(config.Ports) == 0 {
+				return nil, fmt.Errorf("host '%v' missing port number", h)
 			}
 
-			ports = []uint16{uint16(port)}
-			host = pair[0]
-		} else if len(config.Ports) == 0 {
-			return nil, fmt.Errorf("host '%v' missing port number", h)
+			endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
+				Host: host,
+				Port: port,
+			})
 		}
 
-		endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
-			Host:  host,
-			Ports: ports,
-		})
 	}
 	return endpoints, nil
 }

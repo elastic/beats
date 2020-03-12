@@ -53,8 +53,8 @@ type BuilderSettings struct {
 // Endpoint configures a host with all port numbers to be monitored by a dialer
 // based job.
 type Endpoint struct {
-	Host  string
-	Ports []uint16
+	Host string
+	Port uint16
 }
 
 // NewBuilder creates a new Builder for constructing dialers.
@@ -139,18 +139,15 @@ func MakeDialerJobs(
 ) ([]jobs.Job, error) {
 	var jobs []jobs.Job
 	for _, endpoint := range endpoints {
-		for _, port := range endpoint.Ports {
-			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
-			if err != nil {
-				return nil, err
-			}
-			endpointJob, err := makeEndpointJob(b, endpointURL, mode, fn)
-			if err != nil {
-				return nil, err
-			}
-			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
+		endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, endpoint.Port))
+		if err != nil {
+			return nil, err
 		}
-
+		endpointJob, err := makeEndpointJob(b, endpointURL, mode, fn)
+		if err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
 	}
 
 	return jobs, nil
