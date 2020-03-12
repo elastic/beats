@@ -5,7 +5,6 @@ SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 BEATS_DOCKER_INTEGRATION_TEST_ENV?=true
 ES_BEATS?=..
-DOCKER_PULL=0
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO.
 GOX_OS=netbsd linux windows
