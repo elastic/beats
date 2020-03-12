@@ -49,7 +49,7 @@ func main() {
 		line = line[begin:]
 
 		var e cef.Event
-		if err := e.Unpack(line, opts...); err != nil {
+		if err := e.Unpack(string(line), opts...); err != nil {
 			log.Println("ERROR:", err, "in:", string(line))
 		}
 
