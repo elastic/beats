@@ -100,20 +100,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 	//Load default indexer configs
 	if config.DefaultIndexers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
-			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
-		}
-		Indexing.RUnlock()
+		config.Indexers = Indexing.GetDefaultIndexerConfigs()
 	}
 
 	//Load default matcher configs
 	if config.DefaultMatchers.Enabled == true {
-		Indexing.RLock()
-		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
-			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
-		}
-		Indexing.RUnlock()
+		config.Matchers = Indexing.GetDefaultMatcherConfigs()
 	}
 
 	processor := &kubernetesAnnotator{
