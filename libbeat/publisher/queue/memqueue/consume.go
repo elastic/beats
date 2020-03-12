@@ -58,8 +58,6 @@ func newConsumer(b *broker) *consumer {
 }
 
 func (c *consumer) Get(sz int) (queue.Batch, error) {
-	// log := c.broker.logger
-
 	if c.closed.Load() {
 		return nil, io.EOF
 	}

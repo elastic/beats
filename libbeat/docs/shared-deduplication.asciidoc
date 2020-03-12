@@ -1,5 +1,5 @@
 [id="{beatname_lc}-deduplication"]
-== Data deduplication
+== Deduplicate data
 
 The {beats} framework guarantees at-least-once delivery to ensure that no data
 is lost when events are sent to outputs that support acknowledgement, such as
