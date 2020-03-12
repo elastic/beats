@@ -106,7 +106,7 @@ func (r *Register) GetDefaultIndexerConfigs() PluginConfig {
 	r.RLock()
 	defer r.RUnlock()
 
-	configs := make(PluginConfig, 0, len(r.indexers))
+	configs := make(PluginConfig, 0, len(r.defaultIndexerConfigs))
 	for key, cfg := range r.defaultIndexerConfigs {
 		configs = append(configs, map[string]common.Config{key: cfg})
 	}
@@ -120,7 +120,7 @@ func (r *Register) GetDefaultMatcherConfigs() PluginConfig {
 	r.RLock()
 	defer r.RUnlock()
 
-	configs := make(PluginConfig, 0, len(r.indexers))
+	configs := make(PluginConfig, 0, len(r.defaultMatcherConfigs))
 	for key, cfg := range r.defaultMatcherConfigs {
 		configs = append(configs, map[string]common.Config{key: cfg})
 	}
