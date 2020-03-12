@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# XXX: Revert this
+exit 0
+
 set -exuo pipefail
 
 # commit range to check for. For example master...<PR branch>
