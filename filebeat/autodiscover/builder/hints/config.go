@@ -59,7 +59,12 @@ func (c *config) Unpack(from *common.Config) error {
 			}
 		} else {
 			// full config provided, discard default
-			c.DefaultConfig = config
+			//
+			// must be a clone of the default config or the config will be
+			// updated across different hints and causes bad unexpected behaviour;
+			// (https://github.com/elastic/beats/issues/16540) provides more context
+			// on why this is required here
+			c.DefaultConfig = common.MustNewConfigFrom(config)
 		}
 	}
 
