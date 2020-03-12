@@ -34,80 +34,80 @@ jobs:
 
     # Filebeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat || travis_terminate 0
       env: TARGETS="-C filebeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh filebeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/filebeat filebeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/filebeat testsuite"
       go: $(GO_VERSION)
       stage: test
 
     # Heartbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat || travis_terminate 0
       env: TARGETS="-C heartbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh heartbeat libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Auditbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat || travis_terminate 0
       env: TARGETS="-C auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat || travis_terminate 0
       env: TARGETS="-C auditbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh auditbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/auditbeat auditbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/auditbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Libbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh libbeat || travis_terminate 0
       env: TARGETS="-C libbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh libbeat || travis_terminate 0
       env: TARGETS="-C libbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh libbeat || travis_terminate 0
       env: STRESS_TEST_OPTIONS="-timeout=20m -race -v -parallel 1" TARGETS="-C libbeat stress-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/libbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/libbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Metricbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
       env: TARGETS="-C metricbeat unit-tests coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
@@ -123,69 +123,69 @@ jobs:
       stage: test
 
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
       env: TARGETS="-C metricbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Packetbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh packetbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh packetbeat libbeat || travis_terminate 0
       env: TARGETS="-C packetbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Winlogbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh winlogbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh winlogbeat libbeat || travis_terminate 0
       env: TARGETS="-C winlogbeat crosscompile"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Functionbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Docker Log Driver
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/dockerlogbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/dockerlogbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/dockerlogbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Journalbeat
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh journalbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh journalbeat libbeat || travis_terminate 0
       env: TARGETS="-C journalbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Agent
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat || travis_terminate 0
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
@@ -193,30 +193,30 @@ jobs:
     # Generators
     # https://github.com/elastic/beats/issues/16951
     #- os: linux
-    #  before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat vendor || travis_terminate 0
+    #  before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat || travis_terminate 0
     #  env: TARGETS="-C generator/_templates/metricbeat test test-package"
     #  go: $TRAVIS_GO_VERSION
     #  stage: test
     #- os: linux
-    #  before_install: .ci/scripts/travis_has_changes.sh generator libbeat vendor || travis_terminate 0
+    #  before_install: .ci/scripts/travis_has_changes.sh generator libbeat || travis_terminate 0
     #  env: TARGETS="-C generator/_templates/beat test test-package"
     #  go: $TRAVIS_GO_VERSION
     #  stage: test
 
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat || travis_terminate 0
       env: TARGETS="-C generator/_templates/metricbeat test"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh generator libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh generator libbeat || travis_terminate 0
       env: TARGETS="-C generator/_templates/beat test"
       go: $TRAVIS_GO_VERSION
       stage: test
 
     # Kubernetes
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh deploy/kubernetes metricbeat filebeat libbeat vendor || travis_terminate 0
+      before_install: .ci/scripts/travis_has_changes.sh deploy/kubernetes metricbeat filebeat libbeat || travis_terminate 0
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
