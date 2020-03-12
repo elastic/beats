@@ -100,6 +100,7 @@ function OktaSystem(keep_original_message) {
             { from: "okta.security_context.domain", to: "client.domain" },
             { from: "okta.security_context.domain", to: "source.domain" },
             { from: "okta.uuid", to: "event.id" },
+            { from: "okta.uuid", to: "_id" },
         ],
         fail_on_error: false,
     });
