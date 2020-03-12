@@ -6,7 +6,7 @@ COMMON_DIRLIST="vendor dev-tools .travis.yml"
 
 # Commit range to check for. For example master...<PR branch>
 RANGE=$TRAVIS_COMMIT_RANGE
-DIRLIST="$@ $COMMON_DIR_LIST"
+DIRLIST="$@ $COMMON_DIRLIST"
 
 # Find modified files in range and filter out docs only changes.
 CHANGED_FILES=$(git diff --name-only $RANGE | grep -v '.asciidoc')
