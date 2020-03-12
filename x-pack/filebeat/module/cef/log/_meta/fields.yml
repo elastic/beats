@@ -1,0 +1,10 @@
+- name: forcepoint
+  type: group
+  default_field: false
+  description: >
+    Fields for Forcepoint Custom String mappings
+  fields:
+    - name: virus_id
+      type: keyword
+      description: >
+        Virus ID
