@@ -18,6 +18,8 @@
 package metadata
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
@@ -38,5 +40,13 @@ type FieldOptions func(common.MapStr)
 func WithFields(key string, value interface{}) FieldOptions {
 	return func(meta common.MapStr) {
 		safemapstr.Put(meta, key, value)
+	}
+}
+
+// WithLabels FieldOption allows adding labels under sub-resource(kind)
+// example if kind=namespace namespace.labels key will be added
+func WithLabels(kind string) FieldOptions {
+	return func(meta common.MapStr) {
+		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 	}
 }
