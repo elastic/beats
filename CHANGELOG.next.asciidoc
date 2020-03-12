@@ -66,7 +66,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
-- Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
+- Improve some logging messages for add_kubernetes_metadata processor {pull}16866[16866]
+- Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
 
 *Auditbeat*
 
@@ -140,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Kafka input and output. {pull}16781[16781]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
 - Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
+- Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
 
 *Auditbeat*
 
@@ -162,6 +164,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
 - Improve ECS field mappings in haproxy module. {issue}16162[16162] {pull}16529[16529]
+- Add cloudwatch fileset and ec2 fileset in aws module. {issue}13716[13716] {pull}16579[16579]
 - Improve ECS categorization field mappings in kibana module. {issue}16168[16168] {pull}16652[16652]
 - Improve the decode_cef processor by reducing the number of memory allocations. {pull}16587[16587]
 - Add `cloudfoundry` input to send events from Cloud Foundry. {pull}16586[16586]
@@ -224,6 +227,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
+- Add Prometheus remote write endpoint {pull}16609[16609]
 
 *Packetbeat*
 
