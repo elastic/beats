@@ -39,10 +39,9 @@ pipeline {
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
-        whenTrue(${params.debug}){
+        whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-      }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
@@ -532,7 +531,7 @@ pipeline {
 }
 
 def makeTarget(context, target, clean = true){
-  whenTrue(${params.debug}){
+  whenTrue(params.debug){
     dumpFilteredEnvironment()
     dumpMage()
   }
@@ -550,7 +549,7 @@ def makeTarget(context, target, clean = true){
 }
 
 def mageTargetWin(context, target){
-  whenTrue(${params.debug}){
+  whenTrue(params.debug){
     dumpFilteredEnvironment()
     withBeatsEnvWin(){
       dumpMage()
