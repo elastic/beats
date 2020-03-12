@@ -75,7 +75,7 @@ func Vendor() error {
 
 	// copy packages which require the whole tree
 	for _, p := range copyAll {
-		path, err := gotool.ListModulePath(p.name)
+		path, err := gotool.ListModuleVendorDir(p.name)
 		if err != nil {
 			return err
 		}

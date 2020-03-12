@@ -49,6 +49,8 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Expand expands the given Go text/template string.
@@ -768,4 +770,14 @@ func binaryExtension(goos string) string {
 		return ".exe"
 	}
 	return ""
+}
+
+// listModuleDir calls gotool.ListModuleVendorDir or
+// gotool.ListModuleCacheDir, depending on the value of
+// UseVendor.
+func listModuleDir(modpath string) (string, error) {
+	if UseVendor {
+		return gotool.ListModuleVendorDir(modpath)
+	}
+	return gotool.ListModuleCacheDir(modpath)
 }

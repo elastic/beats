@@ -5,7 +5,7 @@
 package cef
 
 import (
-	"bytes"
+	"strings"
 
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -59,7 +59,7 @@ type Event struct {
 	Extensions map[string]*Field `json:"extensions,omitempty"`
 }
 
-func (e *Event) init() {
+func (e *Event) init(data string) {
 	e.Version = -1
 	e.DeviceVendor = ""
 	e.DeviceProduct = ""
@@ -68,13 +68,25 @@ func (e *Event) init() {
 	e.Name = ""
 	e.Severity = ""
 	e.Extensions = nil
+
+	// Estimate length of the extensions. But limit the allocation because
+	// it's based on user input. This doesn't account for escaped equals.
+	if n := strings.Count(data, "="); n > 0 {
+		const maxLen = 50
+		if n <= maxLen {
+			e.Extensions = make(map[string]*Field, n)
+		} else {
+			e.Extensions = make(map[string]*Field, maxLen)
+		}
+	}
 }
 
-func (e *Event) pushExtension(key []byte, value []byte) {
+func (e *Event) pushExtension(key, value string) {
 	if e.Extensions == nil {
 		e.Extensions = map[string]*Field{}
 	}
-	e.Extensions[string(key)] = &Field{String: string(value)}
+	field := &Field{String: value}
+	e.Extensions[key] = field
 }
 
 // Unpack unpacks a common event format (CEF) message. The data is expected to
@@ -99,7 +111,7 @@ func (e *Event) pushExtension(key []byte, value []byte) {
 // and may contain alphanumeric, underscore (_), period (.), comma (,), and
 // brackets ([) (]). This is less strict than the CEF specification, but aligns
 // the key names used in practice.
-func (e *Event) Unpack(data []byte, opts ...Option) error {
+func (e *Event) Unpack(data string, opts ...Option) error {
 	var settings Settings
 	for _, opt := range opts {
 		opt.Apply(&settings)
@@ -137,29 +149,32 @@ func (e *Event) Unpack(data []byte, opts ...Option) error {
 	return multierr.Combine(errs...)
 }
 
-var (
-	backslash        = []byte(`\`)
-	escapedBackslash = []byte(`\\`)
+const (
+	backslash        = `\`
+	escapedBackslash = `\\`
 
-	pipe        = []byte(`|`)
-	escapedPipe = []byte(`\|`)
+	pipe        = `|`
+	escapedPipe = `\|`
 
-	equalsSign        = []byte(`=`)
-	escapedEqualsSign = []byte(`\=`)
+	equalsSign        = `=`
+	escapedEqualsSign = `\=`
 )
 
-func replaceHeaderEscapes(b []byte) []byte {
-	if bytes.IndexByte(b, '\\') != -1 {
-		b = bytes.ReplaceAll(b, escapedBackslash, backslash)
-		b = bytes.ReplaceAll(b, escapedPipe, pipe)
+var (
+	headerEscapes    = strings.NewReplacer(escapedBackslash, backslash, escapedPipe, pipe)
+	extensionEscapes = strings.NewReplacer(escapedBackslash, backslash, escapedEqualsSign, equalsSign)
+)
+
+func replaceHeaderEscapes(b string) string {
+	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedPipe) != -1 {
+		return headerEscapes.Replace(b)
 	}
 	return b
 }
 
-func replaceExtensionEscapes(b []byte) []byte {
-	if bytes.IndexByte(b, '\\') != -1 {
-		b = bytes.ReplaceAll(b, escapedBackslash, backslash)
-		b = bytes.ReplaceAll(b, escapedEqualsSign, equalsSign)
+func replaceExtensionEscapes(b string) string {
+	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedEqualsSign) != -1 {
+		return extensionEscapes.Replace(b)
 	}
 	return b
 }
