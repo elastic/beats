@@ -121,12 +121,11 @@ func (r *Renderer) Render(handle EvtHandle) (*sys.Event, error) {
 	// Load cached event metadata or try to bootstrap it from the event's XML.
 	eventMeta := md.getEventMetadata(uint16(event.EventIdentifier.ID), fingerprint, handle)
 
-	if err = r.addEventData(eventMeta, eventData, event); err != nil {
-		errs = append(errs, err)
-	}
+	// Associate key names with the event data values.
+	r.addEventData(eventMeta, eventData, event)
 
 	if event.Message, err = r.formatMessage(md, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
-		errs = append(errs, err)
+		errs = append(errs, errors.Wrap(err, "failed to get the event message string"))
 	}
 
 	if len(errs) > 0 {
@@ -164,6 +163,8 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*publisherMetadataSto
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).
 			md = newEmptyPublisherMetadataStore(publisher, r.log)
+			err = errors.Wrapf(err, "failed to load publisher metadata for %v "+
+				"(returning an empty metadata store)", publisher)
 		}
 		r.metadataCache[publisher] = md
 	} else {
@@ -305,9 +306,9 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*byteBuffer
 }
 
 // addEventData adds the event/user data values to the event.
-func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, event *sys.Event) error {
+func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, event *sys.Event) {
 	if len(values) == 0 {
-		return nil
+		return
 	}
 
 	if evtMeta == nil {
@@ -355,7 +356,7 @@ func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, ev
 		})
 	}
 
-	return nil
+	return
 }
 
 // formatMessage adds the message to the event.

@@ -69,7 +69,8 @@ func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
 		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
 			return l.open(l.lastRead)
 		}),
-		win.WithBatchSize(l.maxRead))
+		win.WithBatchSize(l.maxRead),
+		win.WithLogger(l.log))
 
 	return err
 }

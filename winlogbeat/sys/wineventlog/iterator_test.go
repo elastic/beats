@@ -26,9 +26,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestEventIterator(t *testing.T) {
+	logp.TestingSetup()
+
 	writer, tearDown := createLog(t)
 	defer tearDown()
 
@@ -224,7 +228,7 @@ func TestEventIterator(t *testing.T) {
 				return log, err
 			}
 
-			itr, err := NewEventIterator(WithSubscriptionFactory(factory), WithBatchSize(7))
+			itr, err := NewEventIterator(WithSubscriptionFactory(factory), WithBatchSize(10))
 			if err != nil {
 				t.Fatal(err)
 			}

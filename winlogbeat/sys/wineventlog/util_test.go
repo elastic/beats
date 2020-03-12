@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	winlogbeatTestLogName = "WinlogbeatTestGo"
+	winlogbeatTestLogName = "WinEventLogTestGo"
 
 	security4752File      = "../../../x-pack/winlogbeat/module/security/test/testdata/4752.evtx"
 	sysmon9File           = "../../../x-pack/winlogbeat/module/sysmon/test/testdata/sysmon-9.01.evtx"
@@ -43,7 +43,7 @@ const (
 // to the log.
 func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	const name = winlogbeatTestLogName
-	const source = "wineventlog_pkg"
+	const source = "wineventlog_test"
 
 	existed, err := eventlog.InstallAsEventCreate(name, source, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
@@ -60,6 +60,8 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 		eventlog.RemoveProvider(name)
 		t.Fatal(err)
 	}
+
+	setLogSize(t, winlogbeatTestLogName, 1024*1024*1024) // 1 GiB
 
 	tearDown = func() {
 		log.Close()

@@ -50,7 +50,7 @@ func TestRenderer(t *testing.T) {
 		}
 		defer r.Close()
 
-		events := renderAllEvents(t, log, r)
+		events := renderAllEvents(t, log, r, true)
 		assert.NotEmpty(t, events)
 
 		if t.Failed() {
@@ -68,7 +68,7 @@ func TestRenderer(t *testing.T) {
 		}
 		defer r.Close()
 
-		events := renderAllEvents(t, log, r)
+		events := renderAllEvents(t, log, r, false)
 		if !assert.Len(t, events, 1) {
 			return
 		}
@@ -113,7 +113,7 @@ func TestRenderer(t *testing.T) {
 		}
 		defer r.Close()
 
-		events := renderAllEvents(t, log, r)
+		events := renderAllEvents(t, log, r, false)
 		if !assert.Len(t, events, 1) {
 			return
 		}
@@ -164,7 +164,7 @@ func TestTemplateFunc(t *testing.T) {
 }
 
 // renderAllEvents reads all events and renders them.
-func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer) []*sys.Event {
+func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMissingMetadataError bool) []*sys.Event {
 	t.Helper()
 
 	var events []*sys.Event
@@ -179,7 +179,10 @@ func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer) []*sys.Eve
 
 			evt, err := renderer.Render(h)
 			if err != nil {
-				t.Fatalf("Render failed: %+v", err)
+				md := renderer.metadataCache[evt.Provider.Name]
+				if !ignoreMissingMetadataError || md.Metadata != nil {
+					t.Fatalf("Render failed: %+v", err)
+				}
 			}
 
 			events = append(events, evt)
@@ -200,8 +203,6 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 func BenchmarkRenderer(b *testing.B) {
 	writer, teardown := createLog(b)
 	defer teardown()
-
-	setLogSize(b, winlogbeatTestLogName, 1024*1024*1024) // 1 GiB
 
 	const totalEvents = 1000000
 	msg := strings.Repeat("Hello world! ", 21)

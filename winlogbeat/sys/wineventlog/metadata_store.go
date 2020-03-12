@@ -232,7 +232,6 @@ func (s *publisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	if err != nil {
 		s.log.Debugw("Failed to make event metadata from event handle. Will "+
 			"use default event metadata from the publisher.",
-			"provider", s.Metadata.Name,
 			"event_id", eventID,
 			"fingerprint", eventDataFingerprint,
 			"error", err)
@@ -259,7 +258,6 @@ func (s *publisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 
 	s.log.Debugw("Obtained unique event metadata from event handle. "+
 		"It differed from what was listed in the publisher's metadata.",
-		"provider", s.Metadata.Name,
 		"event_id", eventID,
 		"fingerprint", eventDataFingerprint,
 		"default_event_metadata", defaultEM,
