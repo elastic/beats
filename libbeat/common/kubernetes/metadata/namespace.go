@@ -67,9 +67,8 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 		}
 
 		return n.Generate(no, opts...)
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func flattenMetadata(in common.MapStr) common.MapStr {
@@ -83,7 +82,6 @@ func flattenMetadata(in common.MapStr) common.MapStr {
 	if !ok {
 		return nil
 	}
-
 	for k, v := range fields {
 		if k == "name" {
 			out[resource] = v
@@ -91,6 +89,16 @@ func flattenMetadata(in common.MapStr) common.MapStr {
 			out[resource+"_"+k] = v
 		}
 	}
+
+	rawLabels, err := in.GetValue("labels")
+	if err != nil {
+		return out
+	}
+	labels, ok := rawLabels.(common.MapStr)
+	if !ok {
+		return out
+	}
+	out[resource+"_labels"] = labels
 
 	return out
 }
