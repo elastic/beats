@@ -1,0 +1,93 @@
+[role="xpack"]
+
+:type: cloudfoundry
+
+[id="{beatname_lc}-input-{type}"]
+=== Cloud Foundry input
+
+++++
+<titleabbrev>Cloud Foundry</titleabbrev>
+++++
+
+experimental[]
+
+Use the `cloudfoundry` input to get http access logs, container logs and error logs from Cloud Foundry. Connects to
+the Cloud Foundry loggregator to receive events.
+
+Example configurations:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: cloudfoundry
+  api_address: https://api.dev.cfdev.sh
+  client_id: uaa-filebeat
+  client_secret: verysecret
+  ssl:
+      verification_mode: none
+----
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: cloudfoundry
+  api_address: https://api.dev.cfdev.sh
+  client_id: uaa-filebeat
+  client_secret: verysecret
+  ssl.certificate_authorities: ["/etc/pki/cf/ca.pem"]
+  ssl.certificate: "/etc/pki/cf/cert.pem"
+  ssl.key: "/etc/pki/cf/cert.key"
+
+----
+
+
+==== Configuration options
+
+The `cloudfoundry` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `api_address`
+
+The URL of the Cloud Foundry API. Optional. Default: "http://api.bosh-lite.com".
+
+[float]
+==== `doppler_address`
+
+The URL of the Cloud Foundry Doppler Websocket. Optional. Default: "(value from ${api_address}/v2/info)".
+
+[float]
+==== `uaa_address`
+
+The URL of the Cloud Foundry UAA API. Optional. Default: "(value from ${api_address}/v2/info)".
+
+[float]
+==== `rlp_address`
+
+The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(value from ${api_address}/v2/info)".
+
+[float]
+==== `client_id`
+
+Client ID to authenticate with Cloud Foundry. Default: "".
+
+[float]
+==== `client_secret`
+
+Client Secret to authenticate with Cloud Foundry. Default: "".
+
+[float]
+==== `shard_id`
+
+Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
+from the RLP Gateway. Default: "(generated UUID)".
+
+[float]
+==== `ssl`
+
+This specifies SSL/TLS common config. Default: not used.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

@@ -51,7 +51,7 @@ class Test(metricbeat.BaseTest):
             return
 
         self.render_config_template(modules=[self.get_ceph_mgr_module_config(metricset)])
-        proc = self.start_beat(home=self.beat_path)
+        proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(replace=['SSL/TLS verifications disabled.'])

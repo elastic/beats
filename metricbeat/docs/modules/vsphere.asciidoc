@@ -11,6 +11,14 @@ The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library t
 
 By default it enables the metricsets `datastore`, `host` and `virtualmachine`.
 
+[float]
+=== Dashboard
+
+The vsphere module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_vsphere_dashboard.png[]
+image::./images/metricbeat_vsphere_vm_dashboard.png[]
+
 
 [float]
 === Example configuration

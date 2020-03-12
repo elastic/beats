@@ -16,7 +16,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *elasticsearch.Client) {

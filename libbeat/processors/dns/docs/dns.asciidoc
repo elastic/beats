@@ -1,7 +1,11 @@
 [[processor-dns]]
 === DNS Reverse Lookup
 
-The DNS processor performs reverse DNS lookups of IP addresses. It caches the
+++++
+<titleabbrev>dns</titleabbrev>
+++++
+
+The `dns` processor performs reverse DNS lookups of IP addresses. It caches the
 responses that it receives in accordance to the time-to-live (TTL) value
 contained in the response. It also caches failures that occur during lookups.
 Each instance of this processor maintains its own independent cache.

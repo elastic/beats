@@ -19,5 +19,5 @@ package autodiscover
 
 import (
 	// include all heartbeat specific builders
-	_ "github.com/elastic/beats/heartbeat/autodiscover/builder/hints"
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 )

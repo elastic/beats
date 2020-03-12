@@ -25,12 +25,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/metricbeat/module/jolokia"
-	_ "github.com/elastic/beats/metricbeat/module/jolokia/jmx"
+	_ "github.com/elastic/beats/v7/metricbeat/module/jolokia"
+	_ "github.com/elastic/beats/v7/metricbeat/module/jolokia/jmx"
 )
 
 func TestData(t *testing.T) {

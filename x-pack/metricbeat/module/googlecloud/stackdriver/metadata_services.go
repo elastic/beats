@@ -7,8 +7,8 @@ package stackdriver
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud/stackdriver/compute"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver/compute"
 )
 
 // NewMetadataServiceForConfig returns a service to fetch metadata from a config struct. It must return the Compute

@@ -105,9 +105,14 @@ func NewClusterAdmin(addrs []string, conf *Config) (ClusterAdmin, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewClusterAdminFromClient(client)
+}
 
+// NewClusterAdminFromClient creates a new ClusterAdmin using the given client.
+// Note that underlying client will also be closed on admin's Close() call.
+func NewClusterAdminFromClient(client Client) (ClusterAdmin, error) {
 	//make sure we can retrieve the controller
-	_, err = client.Controller()
+	_, err := client.Controller()
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +212,10 @@ func (ca *clusterAdmin) DescribeCluster() (brokers []*Broker, controllerID int32
 
 	request := &MetadataRequest{
 		Topics: []string{},
+	}
+
+	if ca.conf.Version.IsAtLeast(V0_11_0_0) {
+		request.Version = 1
 	}
 
 	response, err := controller.GetMetadata(request)
@@ -495,6 +504,10 @@ func (ca *clusterAdmin) CreateACL(resource Resource, acl Acl) error {
 	acls = append(acls, &AclCreation{resource, acl})
 	request := &CreateAclsRequest{AclCreations: acls}
 
+	if ca.conf.Version.IsAtLeast(V2_0_0_0) {
+		request.Version = 1
+	}
+
 	b, err := ca.Controller()
 	if err != nil {
 		return err
@@ -507,6 +520,10 @@ func (ca *clusterAdmin) CreateACL(resource Resource, acl Acl) error {
 func (ca *clusterAdmin) ListAcls(filter AclFilter) ([]ResourceAcls, error) {
 
 	request := &DescribeAclsRequest{AclFilter: filter}
+
+	if ca.conf.Version.IsAtLeast(V2_0_0_0) {
+		request.Version = 1
+	}
 
 	b, err := ca.Controller()
 	if err != nil {
@@ -529,6 +546,10 @@ func (ca *clusterAdmin) DeleteACL(filter AclFilter, validateOnly bool) ([]Matchi
 	var filters []*AclFilter
 	filters = append(filters, &filter)
 	request := &DeleteAclsRequest{Filters: filters}
+
+	if ca.conf.Version.IsAtLeast(V2_0_0_0) {
+		request.Version = 1
+	}
 
 	b, err := ca.Controller()
 	if err != nil {

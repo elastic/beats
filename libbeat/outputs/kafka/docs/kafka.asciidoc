@@ -139,7 +139,11 @@ This configuration results in topics named +critical-{version}+,
 
 ===== `key`
 
-Optional Kafka event key. If configured, the event key must be unique and can be extracted from the event using a format string.
+Optional formatted string specifying the Kafka event key. If configured, the
+event key can be extracted from the event using a format string.
+
+See the Kafka documentation for the implications of a particular choice of key;
+by default, the key is chosen by the Kafka cluster.
 
 ===== `partition`
 

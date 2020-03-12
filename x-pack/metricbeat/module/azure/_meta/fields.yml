@@ -8,15 +8,15 @@
       type: group
       description: >
       fields:
+        - name: timegrain
+          type: keyword
+          description: >
+            The Azure metric timegrain
         - name: resource
           type: group
           description: >
             The resource specified
           fields:
-            - name: name
-              type: keyword
-              description: >
-                The name of the resource
             - name: type
               type: keyword
               description: >

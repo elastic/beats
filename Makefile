@@ -23,7 +23,7 @@ PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
 # remove this and treat all sub-projects the same.
-PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG)
+PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
 
 #
 # Includes
@@ -81,12 +81,6 @@ clean: mage
 	@$(MAKE) -C generator clean
 	@-mage -clean
 
-# Cleans up the vendor directory from unnecessary files
-# This should always be run after updating the dependencies
-.PHONY: clean-vendor
-clean-vendor:
-	@sh script/clean_vendor.sh
-
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
@@ -95,6 +89,7 @@ check: python-env
 	@# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
+	go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --

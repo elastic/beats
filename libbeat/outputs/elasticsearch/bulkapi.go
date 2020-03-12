@@ -25,7 +25,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // MetaBuilder creates meta data for bulk requests

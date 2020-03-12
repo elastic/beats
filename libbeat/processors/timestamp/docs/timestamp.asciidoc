@@ -1,6 +1,10 @@
 [[processor-timestamp]]
 === Timestamp
 
+++++
+<titleabbrev>timestamp</titleabbrev>
+++++
+
 beta[]
 
 The `timestamp` processor parses a timestamp from a field. By default the

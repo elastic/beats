@@ -9,11 +9,11 @@ package sqs
 import (
 	"testing"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {

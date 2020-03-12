@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": 1547687130000,
+        "@timestamp": "2019-01-17T01:05:30.172Z",
         "destination.address": "17.253.5.203",
         "destination.as.number": 6185,
         "destination.as.organization.name": "Apple Inc.",

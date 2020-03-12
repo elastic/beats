@@ -1,6 +1,10 @@
 [[add-labels]]
 === Add labels
 
+++++
+<titleabbrev>add_labels</titleabbrev>
+++++
+
 The `add_labels` processors adds a set of key-value pairs to an event.
 The processor will flatten nested configuration objects like arrays or
 dictionaries into a fully qualified name by merging nested names with a `.`.

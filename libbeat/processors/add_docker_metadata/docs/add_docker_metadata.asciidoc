@@ -1,6 +1,10 @@
 [[add-docker-metadata]]
 === Add Docker metadata
 
+++++
+<titleabbrev>add_docker_metadata</titleabbrev>
+++++
+
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers. At startup it detects a docker environment and caches the metadata.
 The events are annotated with Docker metadata, only if a valid configuration

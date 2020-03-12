@@ -33,6 +33,7 @@ type Config struct {
 	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
 	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
 	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
+	CASha256         pins                    `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
@@ -88,6 +89,7 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 		CipherSuites:     cipherSuites,
 		CurvePreferences: curves,
 		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
+		CASha256:         config.CASha256,
 	}, nil
 }
 

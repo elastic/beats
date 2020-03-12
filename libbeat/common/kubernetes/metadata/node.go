@@ -20,8 +20,8 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 type node struct {

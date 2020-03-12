@@ -13,13 +13,13 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {

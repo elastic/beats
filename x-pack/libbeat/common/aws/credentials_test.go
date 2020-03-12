@@ -5,9 +5,10 @@
 package aws
 
 import (
+	"testing"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestGetAWSCredentials(t *testing.T) {

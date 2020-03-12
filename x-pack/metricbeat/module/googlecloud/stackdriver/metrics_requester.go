@@ -17,8 +17,8 @@ import (
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 func newStackdriverMetricsRequester(ctx context.Context, c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
@@ -109,11 +109,6 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) 
 	}
 
 	wg.Wait()
-
-	if len(results) == 0 {
-		return nil, errors.New("service returned 0 metrics")
-	}
-
 	return results, nil
 }
 

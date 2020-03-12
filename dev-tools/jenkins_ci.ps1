@@ -32,7 +32,7 @@ $env:TEST_COVERAGE = "true"
 $env:RACE_DETECTOR = "true"
 
 # Install mage from vendor.
-exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage } "mage install FAILURE"
+exec { go install -mod=vendor github.com/magefile/mage } "mage install FAILURE"
 
 if (Test-Path "$env:beat\magefile.go") {
     cd "$env:beat"

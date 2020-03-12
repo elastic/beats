@@ -1,6 +1,10 @@
 [[truncate-fields]]
 === Truncate fields
 
+++++
+<titleabbrev>truncate_fields</titleabbrev>
+++++
+
 The `truncate_fields` processor truncates a field to a given size. If the size of the field is smaller than
 the limit, the field is left as is.
 
