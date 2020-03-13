@@ -297,10 +297,35 @@ processors:
 
   # checkpoint.file_hash can be either MD5 or SHA1.
   - set:
-      field: 'file.hash.md5'
+      field: file.hash.md5
       value: '{{checkpoint.file_hash}}'
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==32'
   - set:
-      field: 'file.hash.sha1'
+      field: file.hash.sha1
       value: '{{checkpoint.file_hash}}'
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==40'
+
+  # Event kind is 'event' by default. 'alert' when a risk score and rule info
+  # is present.
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: event.kind
+      value: alert
+      if: 'ctx.cef?.extensions?.cp_app_risk != null && ctx.rule != null'
+
+  # Set event.category to network/malware/intrusion_detection depending on which
+  # fields have been populated.
+  - set:
+      field: event.category
+      value: network
+      if: 'ctx.source?.ip != null && ctx.destination?.ip != null'
+  - set:
+      field: event.category
+      value: malware
+      if: 'ctx.checkpoint?.protection_id != null || ctx.checkpoint?.malware_name != null || ctx.checkpoint?.malware_family != null || ctx.checkpoint?.spyware_status != null'
+  - set:
+      field: event.category
+      value: intrusion_detection
+      if: 'ctx.event?.category != "malware" && (ctx.checkpoint?.protection_type != null || ctx.cef.extensions?.flexString2Label == "Attack Information")'
