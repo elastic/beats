@@ -19,8 +19,8 @@
 
 package wineventlog
 
-// winMeta contains the static values are a common across Windows. These valuesi
-// are from winmeta.xml inside the Windows SDK.
+// winMeta contains the static values that are a common across Windows. These
+// values are from winmeta.xml inside the Windows SDK.
 var winMeta = &publisherMetadataStore{
 	Keywords: map[int64]string{
 		0:                "AnyKeyword",
