@@ -69,7 +69,7 @@ _JAVA_OPTIONS="${_JAVA_OPTIONS} -Djava.security.auth.login.config=/etc/kafka/ser
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override delete.topic.enable=true --override advertised.host.name=${KAFKA_ADVERTISED_HOST} \
     --override listeners=PLAINTEXT://kafka_kerberos:9092,SASL_SSL://kafka_kerberos:9093 \
-    --override advertised.listeners=PLAINTEXT://kafka_kerberos:9092,SASL_SSL://kafka_kerberos:9093 \
+    --override advertised.listeners=PLAINTEXT://${ADVERTISED_HOST}:9092,SASL_SSL://${ADVERTISED_HOST}:9093 \
     --override logs.dir=${KAFKA_LOGS_DIR} --override log.flush.interval.ms=200 \
     --override num.partitions=3 \
     --override sasl.enabled.mechanisms=GSSAPI \
