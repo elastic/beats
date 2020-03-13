@@ -34,8 +34,9 @@ import (
 )
 
 const (
-	processorName   = "add_process_metadata"
-	cacheExpiration = time.Second * 30
+	processorName      = "add_process_metadata"
+	cacheExpiration    = time.Second * 30
+	containerIDMapping = "container.id"
 )
 
 var (
@@ -130,6 +131,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	return &p, nil
 }
 
+// check if the value exist in mapping
 func containsValue(m common.MapStr, v string) bool {
 	for _, x := range m {
 		if x == v {
@@ -238,9 +240,9 @@ func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) erro
 
 // String returns the processor representation formatted as a string
 func (p *addProcessMetadata) String() string {
-	return fmt.Sprintf("%v=[match_pids=%v, mappings=%v, ignore_missing=%v, overwrite_fields=%v, restricted_fields=%v]",
+	return fmt.Sprintf("%v=[match_pids=%v, mappings=%v, ignore_missing=%v, overwrite_fields=%v, restricted_fields=%v, host_path=%v, cgroup_prefixes=%v]",
 		processorName, p.config.MatchPIDs, p.mappings, p.config.IgnoreMissing,
-		p.config.OverwriteKeys, p.config.RestrictedFields)
+		p.config.OverwriteKeys, p.config.RestrictedFields, p.config.HostPath, p.config.CgroupPrefixes)
 }
 
 func (p *processMetadata) toMap() common.MapStr {

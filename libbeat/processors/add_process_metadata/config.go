@@ -84,6 +84,7 @@ func defaultConfig() config {
 		IgnoreMissing:    true,
 		OverwriteKeys:    false,
 		RestrictedFields: false,
+		MatchPIDs:        []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
 		HostPath:         "/",
 		CgroupPrefixes:   []string{"/kubepods", "/docker"},
 	}
