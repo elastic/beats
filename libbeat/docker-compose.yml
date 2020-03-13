@@ -139,8 +139,6 @@ services:
     volumes:
      # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
      - /dev/urandom:/dev/random
-    healthcheck:
-      test: ["CMD", "klist", "-V"]
 
   kafka_kerberos:
     build: ${ES_BEATS}/testing/environments/docker/kafka_kerberos
