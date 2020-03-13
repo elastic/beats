@@ -24,7 +24,6 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -181,7 +180,6 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 
 	if config.Kerberos != nil {
-		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
 		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
 			AuthType:           int(config.Kerberos.AuthType),
 			KeyTabPath:         config.Kerberos.KeyTabPath,
