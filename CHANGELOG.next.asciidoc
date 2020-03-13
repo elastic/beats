@@ -301,7 +301,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
 
-
 *Packetbeat*
 
 
