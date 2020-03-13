@@ -85,9 +85,9 @@ func (b *byteBuffer) Len() int {
 	return b.offset
 }
 
-// SetLength resets the buffer to a specific length. It may allocate a new
-// underlying buffer discarding any existing contents.
-func (b *byteBuffer) SetLength(n int) {
+// Reserve reserves n bytes by increasing the buffer's length. It may allocate
+// a new underlying buffer discarding any existing contents.
+func (b *byteBuffer) Reserve(n int) {
 	b.offset = n
 
 	if n > cap(b.buf) {

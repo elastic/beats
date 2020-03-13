@@ -84,7 +84,7 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	// Get a buffer from the pool and adjust its length.
 	bb := newByteBuffer()
 	defer bb.free()
-	bb.SetLength(int(bufferUsed * 2))
+	bb.Reserve(int(bufferUsed * 2))
 
 	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(len(bb.buf)/2), &bb.buf[0], &bufferUsed)
 	if err != nil {

@@ -294,7 +294,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*byteBuffer
 	}
 
 	bb := newByteBuffer()
-	bb.SetLength(int(bufferUsed))
+	bb.Reserve(int(bufferUsed))
 
 	err = _EvtRender(context, eventHandle, EvtRenderEventValues, uint32(len(bb.buf)), &bb.buf[0], &bufferUsed, &propertyCount)
 	if err != nil {

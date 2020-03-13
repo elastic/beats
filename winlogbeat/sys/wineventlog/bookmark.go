@@ -44,7 +44,7 @@ func (b Bookmark) XML() (string, error) {
 	}
 
 	bb := newByteBuffer()
-	bb.SetLength(int(bufferUsed * 2))
+	bb.Reserve(int(bufferUsed * 2))
 	defer bb.free()
 
 	err = _EvtRender(NilHandle, EvtHandle(b), EvtRenderBookmark, uint32(len(bb.buf)), &bb.buf[0], &bufferUsed, nil)
