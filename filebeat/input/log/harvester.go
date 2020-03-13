@@ -237,7 +237,7 @@ func (h *Harvester) Run() error {
 		defer h.onTerminate()
 	}
 
-	outlet := channel.CloseOnSignal(h.outletFactory(), h.done)
+	outlet := h.outletFactory()
 	forwarder := harvester.NewForwarder(outlet)
 
 	// This is to make sure a harvester is not started anymore if stop was already
@@ -268,6 +268,9 @@ func (h *Harvester) Run() error {
 
 		// Marks harvester stopping completed
 		h.stopWg.Done()
+
+		// outlet.Close must be after harvester complete
+		outlet.Close()
 	}()
 
 	harvesterStarted.Add(1)
