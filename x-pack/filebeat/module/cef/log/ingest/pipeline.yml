@@ -45,7 +45,9 @@ processors:
         field: destination.as.organization_name
         target_field: destination.as.organization.name
         ignore_missing: true
-
+  - pipeline:
+        name: '{< IngestPipeline "fp-pipeline" >}'
+        if: "ctx.cef?.device?.vendor == 'FORCEPOINT'"
 on_failure:
   - set:
         field: error.message
