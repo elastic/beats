@@ -232,7 +232,7 @@ processors:
             to: rule.uuid
 
           - name: ifname
-            to: observer.interface.name
+            to: observer.ingress.interface.name
 
           - name: inzone
             to: observer.ingress.zone

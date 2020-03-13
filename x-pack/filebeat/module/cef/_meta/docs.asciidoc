@@ -125,7 +125,7 @@ Check Point CEF extensions are mapped as follows:
 .2+| flexString2             | malware action              | event.action             | -                              |
                              | attack information          | event.action             | -                              |
 | rule_uid                   | -                           | rule.uuid                | -                              |
-| ifname                     | -                           | observer.interface.name  | -                              |
+| ifname                     | -                           | observer.ingress.interface.name | -                              |
 | inzone                     | -                           | observer.ingress.zone    | -                              |
 | outzone                    | -                           | observer.egress.zone     | -                              |
 | product                    | -                           | observer.product         | -                              |
