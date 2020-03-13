@@ -147,11 +147,24 @@ class TestCase(unittest.TestCase, ComposeMixin):
         self.build_path = build_dir + "/system-tests/"
 
         # Start the containers needed to run these tests
-        self.compose_up()
+        self.compose_up_with_retries()
 
     @classmethod
     def tearDownClass(self):
         self.compose_down()
+
+    @classmethod
+    def compose_up_with_retries(self):
+        retries = 3
+        for i in range(retries):
+            try:
+                self.compose_up()
+                return
+            except e:
+                if i + 1 >= retries:
+                    raise e
+                print("Compose up failed, retrying: " + e)
+                self.compose_down()
 
     def run_beat(self,
                  cmd=None,
