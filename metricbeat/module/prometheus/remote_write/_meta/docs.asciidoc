@@ -41,5 +41,6 @@ remote_write:
     tls_config:
         cert_file: "/etc/prometheus/my_key.pem"
         key_file: "/etc/prometheus/my_key.key"
-        insecure_skip_verify: true
+        # Disable validation of the server certificate.
+        #insecure_skip_verify: true
 ------------------------------------------------------------------------------
