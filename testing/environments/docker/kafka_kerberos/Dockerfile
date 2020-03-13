@@ -2,15 +2,15 @@ FROM debian:stretch
 MAINTAINER Simão Martins "simao.martins@tecnico.ulisboa.pt"
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -qq update
-RUN apt-get -qq install \
-    apt-transport-https \
-    curl \
-    krb5-user \
-    locales \
-    netcat \
-    openjdk-8-jre-headless
-RUN apt-get -qq clean
+RUN apt-get -qq update \
+  && apt-get -qq install \
+      apt-transport-https \
+      curl \
+      krb5-user \
+      locales \
+      netcat \
+      openjdk-8-jre-headless \
+  && apt-get -qq clean
 
 RUN locale-gen "en_US.UTF-8"
 RUN echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
