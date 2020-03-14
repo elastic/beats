@@ -246,6 +246,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mapping in icinga module. {issue}16164[16164] {pull}16533[16533]
 - Improve ECS categorization field mappings in ibmmq module. {issue}16163[16163] {pull}16532[16532]
 - Add custom string mapping to CEF module to support Forcepoint NGFW {issue}14663[14663] {pull}15910[15910]
+- Add ECS related fields to CEF module {issue}16157[16157] {pull}16338[16338]
 
 *Heartbeat*
 
