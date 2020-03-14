@@ -6,6 +6,8 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<configuration-filebeat-options>>
+* <<{beatname_lc}-template>>
+* <<change-index-name>>
 * <<{beatname_lc}-geoip>>
 * <<{beatname_lc}-deduplication>>
 * <<using-environ-vars>>
@@ -16,6 +18,10 @@ Learn how to perform common {beatname_uc} configuration tasks.
 --
 
 include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
+
+include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
+
+include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 

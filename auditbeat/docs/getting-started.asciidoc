@@ -9,7 +9,7 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
-* <<{beatname_lc}-template>>
+* <<load-{beatname_lc}-template>>
 * <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
 * <<view-kibana-dashboards>>
@@ -206,7 +206,7 @@ include::{libbeat-dir}/step-test-config.asciidoc[]
 
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
-[id="{beatname_lc}-template"]
+[id="load-{beatname_lc}-template"]
 === Step 3: Load the index template in {es}
 
 include::{libbeat-dir}/shared-template-load.asciidoc[]

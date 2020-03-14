@@ -9,7 +9,7 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<filebeat-installation>>
 * <<filebeat-configuration>>
-* <<filebeat-template>>
+* <<step-filebeat-template>>
 * <<load-kibana-dashboards>>
 * <<filebeat-starting>>
 * <<view-kibana-dashboards>>
@@ -204,7 +204,7 @@ include::{libbeat-dir}/step-test-config.asciidoc[]
 
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
-[[filebeat-template]]
+[[step-filebeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
 include::{libbeat-dir}/shared-template-load.asciidoc[]

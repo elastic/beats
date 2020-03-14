@@ -18,6 +18,7 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 * <<view-kibana-dashboards>>
 * <<setup-repositories>>
 
+[float]
 [id="{beatname_lc}-installation"]
 === Step 1: Install {beatname_uc}
 
@@ -166,6 +167,7 @@ configuration file, for example +C:{backslash}Program Files{backslash}{beatname_
 For more information about these options, see
 <<configuring-howto-{beatname_lc}>>.
 
+[float]
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
@@ -233,7 +235,7 @@ include::{libbeat-dir}/step-test-config.asciidoc[]
 
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
-[id="{beatname_lc}-template"]
+[id="step-template"]
 === Step 3: Load the index template in Elasticsearch
 
 include::{libbeat-dir}/shared-template-load.asciidoc[]
