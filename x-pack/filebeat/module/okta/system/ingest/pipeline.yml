@@ -1,4 +1,4 @@
-description: Pipeline for OKTA system logs.
+description: Pipeline for Okta system logs.
 
 processors:
   - user_agent:
