@@ -129,19 +129,13 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 
 .DEFAULT_GOAL := ${BEAT_NAME}
 
-${BEAT_NAME}: $(GOFILES_ALL) update-yacc-vendor ## @build build the beat application
+${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 	go build $(GOBUILD_FLAGS)
 
 # Create test coverage binary
-${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
+${BEAT_NAME}.test: $(GOFILES_ALL)
 	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
-
-# Avoid running yacc to generate a parser for dependency.
-.PHONY: update-yacc-vendor
-update-yacc-vendor:
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.y
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
