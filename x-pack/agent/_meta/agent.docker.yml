@@ -4,9 +4,9 @@
 outputs:
   default:
     type: elasticsearch
-    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
-    username: elastic
-    password: changeme
+    hosts: '${ELASTICSEARCH_HOSTS:http://elasticsearch:9200}'
+    username: '${ELASTICSEARCH_USERNAME:elastic}'
+    password: '${ELASTICSEARCH_PASSWORD:changeme}'
 
 datasources:
   - namespace: default
