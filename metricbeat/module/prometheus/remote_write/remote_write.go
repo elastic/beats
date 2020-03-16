@@ -40,9 +40,10 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	server serverhelper.Server
-	events chan mb.Event
-	stopCh chan struct{}
+	server           serverhelper.Server
+	events           chan mb.Event
+	stopCh           chan struct{}
+	clientsSemaphore chan struct{}
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -51,11 +52,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	maxClients := 100
 	m := &MetricSet{
-		BaseMetricSet: base,
-		events:        make(chan mb.Event),
-		stopCh:        make(chan struct{}),
+		BaseMetricSet:    base,
+		events:           make(chan mb.Event),
+		stopCh:           make(chan struct{}),
+		clientsSemaphore: make(chan struct{}, maxClients),
 	}
 	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 	if err != nil {
@@ -82,6 +84,9 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 }
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
+	m.clientsSemaphore <- struct{}{}
+	defer func() { <-m.clientsSemaphore }()
+
 	compressed, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		m.Logger().Errorf("Read error %v", err)
