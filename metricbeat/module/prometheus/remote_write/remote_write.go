@@ -42,6 +42,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server serverhelper.Server
 	events chan mb.Event
+	stopCh chan struct{}
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -54,6 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m := &MetricSet{
 		BaseMetricSet: base,
 		events:        make(chan mb.Event),
+		stopCh:        make(chan struct{}),
 	}
 	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 	if err != nil {
@@ -71,7 +73,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		select {
 		case <-reporter.Done():
 			m.server.Stop()
-			close(m.events)
+			close(m.stopCh)
 			return
 		case e := <-m.events:
 			reporter.Event(e)
@@ -86,6 +88,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer req.Body.Close()
 
 	reqBuf, err := snappy.Decode(nil, compressed)
 	if err != nil {
@@ -100,12 +103,16 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// refactor, optimize
+
 	samples := protoToSamples(&protoReq)
 	events := samplesToEvents(samples)
 
 	for _, e := range events {
-		m.events <- e
+		select {
+		case <- m.stopCh:
+			return
+		case m.events <- e:
+		}
 	}
 	writer.WriteHeader(http.StatusAccepted)
 }

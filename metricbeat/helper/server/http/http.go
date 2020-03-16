@@ -23,6 +23,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -74,6 +75,9 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 
 	httpServer := &http.Server{
 		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
@@ -152,6 +156,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
 			return
 		}
+		defer req.Body.Close()
 
 		payload := common.MapStr{
 			server.EventDataKey: body,
