@@ -1,0 +1,6 @@
+- name: remote_write
+  type: group
+  description: >
+    remote write metrics from Prometheus server
+  release: beta
+  fields:
