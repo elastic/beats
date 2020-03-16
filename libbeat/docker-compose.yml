@@ -17,6 +17,7 @@ services:
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
       - KAFKA_KERBEROS_HOST=kafka_kerberos
+      - KAFKA_KERBEROS_PORT=9093
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
       - ES_MONITORING_HOST=elasticsearch_monitoring

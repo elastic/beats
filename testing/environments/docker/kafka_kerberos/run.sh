@@ -74,7 +74,7 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override num.partitions=3 \
     --override sasl.enabled.mechanisms=GSSAPI \
     --override sasl.mechanism.inter.broker.protocol=GSSAPI \
-    --override sasl.kerberos.service.name="kafka" &
+    --override sasl.kerberos.service.name=${KAFKA_KERBEROS_HOST} &
 
 wait_for_port 9092
 

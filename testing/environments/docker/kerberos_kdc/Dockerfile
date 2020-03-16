@@ -13,7 +13,7 @@ RUN locale-gen "en_US.UTF-8"
 RUN echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
 
 ENV REALM ELASTIC
-ENV KADMIN_PRINCIPAL kafka
+ENV KADMIN_PRINCIPAL kafka/kafka_kerberos
 ENV KADMIN_PASSWORD changeme
 
 COPY init-script.sh /tmp/

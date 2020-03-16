@@ -43,8 +43,9 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	kafkaDefaultHost       = "localhost"
+	kafkaDefaultPort       = "9092"
+	kafkaSecureDefaultPort = "9093"
 )
 
 var (
@@ -54,7 +55,7 @@ var (
 	)
 	kafkaKerberosHost = fmt.Sprintf("%v:%v",
 		getenv("KAFKA_KERBEROS_HOST", kafkaDefaultHost),
-		getenv("KAFKA_PORT", kafkaDefaultPort),
+		getenv("KAFKA_KERBEROS_PORT", kafkaSecureDefaultPort),
 	)
 	testTopicOffsets = map[string]*topicOffsetMap{
 		kafkaHost:         &topicOffsetMap{},
@@ -215,7 +216,7 @@ func TestKafkaPublish(t *testing.T) {
 					"auth_type":    "keytab",
 					"keytab":       "testdata/kafka.keytab",
 					"config_path":  "testdata/krb5.conf",
-					"service_name": "kafka",
+					"service_name": "kafka_kerberos",
 					"realm":        "ELASTIC",
 				},
 			},
@@ -232,10 +233,10 @@ func TestKafkaPublish(t *testing.T) {
 				"hosts": []string{kafkaKerberosHost},
 				"kerberos": map[string]interface{}{
 					"auth_type":    "password",
-					"username":     "kafka",
+					"username":     "kafka/kerberos_kafka",
 					"password":     "changeme",
 					"config_path":  "testdata/krb5.conf",
-					"service_name": "kafka",
+					"service_name": "kafka_kerberos",
 					"realm":        "ELASTIC",
 				},
 			},

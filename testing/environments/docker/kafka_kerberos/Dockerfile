@@ -17,12 +17,13 @@ RUN echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
 
 # Kerberos variables
 ENV REALM ELASTIC
-ENV KADMIN_PRINCIPAL kafka
+ENV KADMIN_PRINCIPAL kafka/kafka_kerberos
 ENV KADMIN_PASSWORD changeme
 
 ENV KAFKA_HOME /kafka
 # The advertised host is kafka. This means it will not work if container is started locally and connected from localhost to it
-ENV KAFKA_ADVERTISED_HOST kafka
+ENV KAFKA_ADVERTISED_HOST kafka_kerberos
+ENV KAFKA_KERBEROS_HOST kafka_kerberos
 ENV KAFKA_LOGS_DIR="/kafka-logs"
 ENV KAFKA_VERSION 2.1.1
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true -Djava.security.krb5.conf=/etc/kafka/krb5.conf"
