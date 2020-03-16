@@ -109,7 +109,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 
 	for _, e := range events {
 		select {
-		case <- m.stopCh:
+		case <-m.stopCh:
 			return
 		case m.events <- e:
 		}

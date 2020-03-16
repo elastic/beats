@@ -74,7 +74,7 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 	}
 
 	httpServer := &http.Server{
-		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
+		Addr:         net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
