@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 :modulename: okta
 :has-dashboards: false
 
-== OKTA module
+== Okta module
 
 beta[]
 

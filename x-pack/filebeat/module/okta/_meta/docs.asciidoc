@@ -3,7 +3,7 @@
 :modulename: okta
 :has-dashboards: false
 
-== OKTA module
+== Okta module
 
 beta[]
 
