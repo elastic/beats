@@ -4,6 +4,9 @@
 
 FROM {{ .from }}
 
+RUN yum -y --setopt=tsflags=nodocs update && \
+    yum clean all
+
 LABEL \
   org.label-schema.build-date="{{ date }}" \
   org.label-schema.schema-version="1.0" \
