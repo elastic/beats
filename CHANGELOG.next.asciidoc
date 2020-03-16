@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 - Add queue_url definition in manifest file for aws module. {pull}16640{16640}
+- Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
 
 *Heartbeat*
 
@@ -113,6 +114,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix detection and logging of some error cases with light modules. {pull}14706[14706]
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
+- Dynamically choose a method for the system/service metricset to support older linux distros. {pull}16902[16902]
 
 *Packetbeat*
 
@@ -176,6 +178,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
 - Improve ECS categorization field mapping in icinga module. {issue}16164[16164] {pull}16533[16533]
 - Improve ECS categorization field mappings in ibmmq module. {issue}16163[16163] {pull}16532[16532]
+- Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
+- Add ECS related fields to CEF module {issue}16157[16157] {pull}16338[16338]
+- Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
 
 *Heartbeat*
 
@@ -228,6 +233,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
 - Add Prometheus remote write endpoint {pull}16609[16609]
+- Release STAN module as GA. {pull}16980[16980]
 
 *Packetbeat*
 
