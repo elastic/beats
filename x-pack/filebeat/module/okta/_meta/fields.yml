@@ -5,6 +5,7 @@
   fields:
     - name: okta
       type: group
+      default_field: false
       description: >
         Fields from Okta.
       fields:
