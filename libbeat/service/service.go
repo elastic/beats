@@ -23,6 +23,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -97,24 +98,31 @@ func BeforeRun() {
 
 	if *httpprof != "" {
 		logp.Info("start pprof endpoint")
+		mux := http.NewServeMux()
+
+		// Register pprof handler
+		mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+			http.DefaultServeMux.ServeHTTP(w, r)
+		})
+
+		// Register metrics handler
+		mux.HandleFunc("/debug/vars", metricsHandler)
+
+		// Ensure we are listening before returning
+		listener, err := net.Listen("tcp", *httpprof)
+		if err != nil {
+			log.Fatalf("Failed to start stats listener: %v", err)
+		}
+
 		go func() {
-			mux := http.NewServeMux()
-
-			// register pprof handler
-			mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-				http.DefaultServeMux.ServeHTTP(w, r)
-			})
-
-			// register metrics handler
-			mux.HandleFunc("/debug/vars", metricsHandler)
-
-			endpoint := http.ListenAndServe(*httpprof, mux)
-			logp.Info("finished pprof endpoint: %v", endpoint)
+			// Serve returns always a non-nil error
+			err := http.Serve(listener, mux)
+			logp.Info("Finished pprof endpoint: %v", err)
 		}()
 	}
 }
 
-// report expvar and all libbeat/monitoring metrics
+// metricsHandler reports expvar and all libbeat/monitoring metrics
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
