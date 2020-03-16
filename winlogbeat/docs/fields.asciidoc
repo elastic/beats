@@ -6967,6 +6967,20 @@ type: keyword
 
 --
 
+*`winlog.event_data.MemberName`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.MemberSid`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.MinimumPerformancePercent`*::
 +
 --
