@@ -22,7 +22,6 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
@@ -91,35 +90,39 @@ func BeforeRun() {
 	if withCPUProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
-			log.Fatal(err)
+			logp.Err("Failed to create CPU profile: %v", err)
+			os.Exit(1)
 		}
 		pprof.StartCPUProfile(cpuOut)
 	}
 
-	if *httpprof != "" {
-		logp.Info("start pprof endpoint")
-		mux := http.NewServeMux()
-
-		// Register pprof handler
-		mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-			http.DefaultServeMux.ServeHTTP(w, r)
-		})
-
-		// Register metrics handler
-		mux.HandleFunc("/debug/vars", metricsHandler)
-
-		// Ensure we are listening before returning
-		listener, err := net.Listen("tcp", *httpprof)
-		if err != nil {
-			log.Fatalf("Failed to start stats listener: %v", err)
-		}
-
-		go func() {
-			// Serve returns always a non-nil error
-			err := http.Serve(listener, mux)
-			logp.Info("Finished pprof endpoint: %v", err)
-		}()
+	if *httpprof == "" {
+		return
 	}
+
+	logp.Info("Start pprof endpoint")
+	mux := http.NewServeMux()
+
+	// Register pprof handler
+	mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+		http.DefaultServeMux.ServeHTTP(w, r)
+	})
+
+	// Register metrics handler
+	mux.HandleFunc("/debug/vars", metricsHandler)
+
+	// Ensure we are listening before returning
+	listener, err := net.Listen("tcp", *httpprof)
+	if err != nil {
+		logp.Err("Failed to start stats listener: %v", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		// Serve returns always a non-nil error
+		err := http.Serve(listener, mux)
+		logp.Info("Finished pprof endpoint: %v", err)
+	}()
 }
 
 // metricsHandler reports expvar and all libbeat/monitoring metrics
