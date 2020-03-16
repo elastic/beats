@@ -312,12 +312,14 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 		switch obj := m.(type) {
 		// Top level Array
 		case []interface{}:
+			in.log.Info("Processed:", len(obj))
 			mm, err = in.processEventArray(obj)
 			if err != nil {
 				return err
 			}
 		case map[string]interface{}:
 			if in.config.JSONObjects == "" {
+				in.log.Info("Processed:", len(obj))
 				mm, err = in.processEventArray([]interface{}{obj})
 				if err != nil {
 					return err
@@ -329,6 +331,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 				}
 				switch ts := v.(type) {
 				case []interface{}:
+					in.log.Info("Processed:", len(ts))
 					mm, err = in.processEventArray(ts)
 					if err != nil {
 						return err

@@ -87,6 +87,7 @@ function OktaSystem(keep_original_message) {
         ],
         mode: "rename",
         ignore_missing: true,
+        fail_on_error: false,
     });
 
     var copyFields = new processor.Convert({
@@ -122,8 +123,10 @@ function OktaSystem(keep_original_message) {
     // Set user info if actor type is User
     var setUserInfo = function(evt) {
         if (evt.Get("okta.actor.type") === "User") {
-	    evt.Put("user.full_name", evt.Get("okta.actor.display_name"));
-	    evt.Put("user.id", evt.Get("okta.actor.id"));
+	    evt.Put("client.user.full_name", evt.Get("okta.actor.display_name"));
+	    evt.Put("source.user.full_name", evt.Get("okta.actor.display_name"));
+	    evt.Put("client.user.id", evt.Get("okta.actor.id"));
+	    evt.Put("source.user.id", evt.Get("okta.actor.id"));
         }
     };
 

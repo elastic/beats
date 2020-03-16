@@ -20,11 +20,11 @@ var:
   - name: no_http_body
     default: true
   - name: interval
-    default: 0
+    default: 60
   - name: json_objects_array
     default: ""
   - name: keep_original_message
-    default: false
+    default: true
   - name: pagination
     default: |-
       {
