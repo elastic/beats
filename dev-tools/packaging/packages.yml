@@ -160,7 +160,7 @@ shared:
     <<: *agent_binary_spec
     extra_vars:
       from: 'centos:7'
-      user: '{{ .BeatName }}'
+      user: 'root'
       linux_capabilities: ''
     files:
       'agent.yml':
