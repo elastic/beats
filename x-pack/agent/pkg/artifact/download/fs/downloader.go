@@ -17,7 +17,10 @@ import (
 
 const (
 	packagePermissions = 0660
-	defaultDropSubdir  = "downloads"
+)
+
+var (
+	defaultDropSubdir = filepath.Join("data", "downloads")
 )
 
 // Downloader is a downloader able to fetch artifacts from elastic.co web page.
