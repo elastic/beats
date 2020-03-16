@@ -326,9 +326,13 @@ func dockerComposeBuildImages() error {
 		return err
 	}
 
-	args := []string{"-p", dockerComposeProjectName(), "build", "--pull", "--force-rm"}
+	args := []string{"-p", dockerComposeProjectName(), "build", "--force-rm"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
+	}
+
+	if _, forcePull := os.LookupEnv("DOCKER_PULL"); forcePull {
+		args = append(args, "--pull")
 	}
 
 	out := ioutil.Discard
