@@ -79,25 +79,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		http:          http,
 		fetcher:       nil,
 	}
-
-	m.info, err = m.getInfoFromCouchdbHost(m.Host())
-	if err != nil {
-		return nil, errors.Wrap(err, "cannot start couchdb metricbeat module")
+	if err = m.retrieveFetcher(); err != nil {
+		m.Logger().Warnf("error trying to get CouchDB version: '%s'. Retrying on next fetch...", err.Error())
 	}
-
-	v, err := common.NewVersion(m.info.Version)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not capture couchdb version")
-	}
-
-	switch v.Major {
-	case 1:
-		m.fetcher = &V1{}
-	case 2:
-		m.fetcher = &V2{}
-	}
-
-	m.Logger().Debugf("found couchdb version %d", v.Major)
 
 	return m, nil
 }
@@ -111,6 +95,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in http fetch")
 	}
 
+	if m.fetcher == nil {
+		if err = m.retrieveFetcher(); err != nil {
+			return errors.Wrapf(err, "error trying to get CouchDB version. Retrying on next fetch...")
+		}
+	}
 	event, err := m.fetcher.MapEvent(m.info, content)
 	if err != nil {
 		return errors.Wrap(err, "error trying to get couchdb data")
@@ -118,6 +107,31 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	reporter.Event(event)
 
 	return nil
+}
+
+func (m *MetricSet) retrieveFetcher() (err error) {
+	m.info, err = m.getInfoFromCouchdbHost(m.Host())
+	if err != nil {
+		return errors.Wrap(err, "cannot start CouchDB metricbeat module")
+	}
+
+	version, err := common.NewVersion(m.info.Version)
+	if err != nil {
+		return errors.Wrap(err, "could not capture couchdb version")
+	}
+
+	m.Logger().Debugf("found couchdb version %d", version.Major)
+
+	switch version.Major {
+	case 1:
+		m.fetcher = &V1{}
+	case 2:
+		m.fetcher = &V2{}
+	default:
+		m.fetcher = nil
+	}
+
+	return
 }
 
 // CommonInfo defines the data you receive when you make a GET request to the root path of a Couchdb server
