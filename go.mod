@@ -21,6 +21,7 @@ require (
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
+	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
@@ -93,6 +94,7 @@ require (
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
+	github.com/josephspurrier/goversioninfo v0.0.0-20200309025242-14b0ab84c6ca
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/klauspost/compress v1.9.3-0.20191122130757-c099ac9f21dd // indirect
