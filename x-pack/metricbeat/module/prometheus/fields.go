@@ -19,5 +19,5 @@ func init() {
 // AssetPrometheus returns asset data.
 // This is the base64 encoded gzipped contents of module/prometheus.
 func AssetPrometheus() string {
-	return "eJxSgAJdhaLUnNTE4lQrhfRELkAAAAD//zROBVs="
+	return "eJzE0ktqMzEMB/C9T/HHy/AlB/DiO0Ohy1KCMlY8bv3C0hRy+5LMkA590CwK8c6SbP1kvMUrnxxar5l15EkMoFETO9iHa9AawLMMPTaNtTj8NwDwqKQCGTo19jj2mkH4OAUuvtVYdGeAzolJ2CGQAYRVYwni8GRFkv0HO6o2+2yAY+TkxV06bFEo89q32+zeKE18SQN6auxQDy886BKaN/s54+t0SPw1s8/UWixhKbMbu9R8M+Z5raYKNAVGZu1x+Bk51Kko9/sxF8Cv0E56x8c8d/c3W8coWkOnfCP4c/3fmK+3rr2zef3L3wMAAP//PRYNew=="
 }

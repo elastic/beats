@@ -987,6 +987,12 @@ metricbeat.modules:
 
 #------------------------------ Prometheus Module ------------------------------
 - module: prometheus
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+  # TODO
+#------------------------------ Prometheus Module ------------------------------
+- module: prometheus
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics

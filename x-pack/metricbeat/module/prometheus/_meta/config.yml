@@ -1,0 +1,5 @@
+- module: prometheus
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+  # TODO
