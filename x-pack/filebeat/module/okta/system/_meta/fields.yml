@@ -1,8 +1,8 @@
 - name: uuid
   title: UUID
-  short: The unique identifier of the OKTA LogEvent.
+  short: The unique identifier of the Okta LogEvent.
   description: >
-    The unique identifier of the OKTA LogEvent.
+    The unique identifier of the Okta LogEvent.
   type: keyword
 
 - name: event_type

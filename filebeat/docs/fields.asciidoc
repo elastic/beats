@@ -20440,23 +20440,23 @@ alias to: source.geo.region_iso_code
 --
 
 [[exported-fields-okta]]
-== OKTA fields
+== Okta fields
 
-Module for handling system logs from OKTA.
+Module for handling system logs from Okta.
 
 
 
 [float]
 === okta
 
-Fields from OKTA.
+Fields from Okta.
 
 
 
 *`okta.uuid`*::
 +
 --
-The unique identifier of the OKTA LogEvent.
+The unique identifier of the Okta LogEvent.
 
 
 type: keyword

@@ -1,8 +1,8 @@
 - module: okta
   system:
     enabled: true
-    # API key to access OKTA
+    # API key to access Okta
     #var.api_key
 
-    # URL of the OKTA REST API
+    # URL of the Okta REST API
     #var.url
