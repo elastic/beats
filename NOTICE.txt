@@ -286,6 +286,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/akavel/rsrc
+Version: v0.8.0
 License type (autodetected): MIT
 ./vendor/github.com/akavel/rsrc/LICENSE.txt:
 --------------------------------------------------------------------
@@ -4480,6 +4481,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/josephspurrier/goversioninfo
+Revision: 14b0ab84c6ca
 License type (autodetected): MIT
 ./vendor/github.com/josephspurrier/goversioninfo/LICENSE:
 --------------------------------------------------------------------
