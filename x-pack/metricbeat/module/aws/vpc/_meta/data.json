@@ -1,0 +1,74 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/NATGateway"
+        },
+        "dimensions": {
+            "NatGatewayId": "nat-0a5cb7b9807908cc0"
+        },
+        "natgateway": {
+            "metrics": {
+                "ActiveConnectionCount": {
+                    "max": 0
+                },
+                "BytesInFromDestination": {
+                    "sum": 0
+                },
+                "BytesInFromSource": {
+                    "sum": 0
+                },
+                "BytesOutToDestination": {
+                    "sum": 0
+                },
+                "BytesOutToSource": {
+                    "sum": 0
+                },
+                "ConnectionAttemptCount": {
+                    "sum": 0
+                },
+                "ConnectionEstablishedCount": {
+                    "sum": 0
+                },
+                "ErrorPortAllocation": {
+                    "sum": 0
+                },
+                "PacketsDropCount": {
+                    "sum": 0
+                },
+                "PacketsInFromDestination": {
+                    "sum": 0
+                },
+                "PacketsInFromSource": {
+                    "sum": 0
+                },
+                "PacketsOutToDestination": {
+                    "sum": 0
+                },
+                "PacketsOutToSource": {
+                    "sum": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-west-2"
+    },
+    "event": {
+        "dataset": "aws.vpc",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "vpc",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

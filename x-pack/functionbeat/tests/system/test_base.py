@@ -105,7 +105,7 @@ class Test(BaseTest):
         for fb in bins_to_gen:
             if os.path.exists(fb):
                 continue
-            with open(fb, "wb") as f:
+            with open(fb, "w") as f:
                 f.write("my dummy functionbeat binary\n")
 
     def _get_generated_function_template(self):

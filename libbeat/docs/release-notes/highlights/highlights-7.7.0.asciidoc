@@ -1,0 +1,26 @@
+[[release-highlights-7.7.0]]
+=== 7.7 release highlights
+++++
+<titleabbrev>7.7</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 7.7.
+
+For a complete list of related highlights, see the 
+https://www.elastic.co/blog/elastic-observability-7-6-0-released[Observability 7.7 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-7.7, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+
+//[float]
+//==== highlight
+
+//Description
+
+// end::notable-highlights[]

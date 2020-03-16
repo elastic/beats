@@ -26,7 +26,7 @@ class KeystoreBase(BaseTest):
 
         proc = Proc(args, os.path.join(self.working_dir, "mockbeat.log"))
 
-        os.write(proc.stdin_write, value)
+        os.write(proc.stdin_write, value.encode("utf8"))
         os.close(proc.stdin_write)
 
         return proc.start().wait()

@@ -1,0 +1,9 @@
+*.iml
+*.swp
+*.o
+.idea
+.vagrant
+_obj
+
+cmd/sandbox/sandbox
+cmd/seccomp-profiler/seccomp-profiler

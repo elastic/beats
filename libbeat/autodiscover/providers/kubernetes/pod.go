@@ -23,14 +23,15 @@ import (
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type pod struct {
@@ -42,6 +43,7 @@ type pod struct {
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
+	namespaceStore   cache.Store
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
@@ -159,15 +161,27 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var annotations common.MapStr
 	var kubeMeta, container common.MapStr
+
+	annotations := make(common.MapStr, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
 		kubeMeta = rawMeta.(common.MapStr)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
+			anns, _ := rawAnn.(common.MapStr)
+			if len(anns) != 0 {
+				annotations = anns.Clone()
+			}
+		}
+
+		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+			nsAnn, _ := rawNsAnn.(common.MapStr)
+			if len(nsAnn) != 0 {
+				annotations.DeepUpdateNoOverwrite(nsAnn)
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -186,12 +200,14 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	}
 
 	cname := builder.GetContainerName(container)
+
+	// Generate hints based on the cumulative of both namespace and pod annotations.
 	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
 	p.logger.Debugf("Generated hints %+v", hints)
+
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
-
 	p.logger.Debugf("Generated builder event %+v", e)
 
 	return e
@@ -296,6 +312,18 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
+		if p.namespaceWatcher != nil {
+			if rawNs, ok, err := p.namespaceWatcher.Store().GetByKey(pod.Namespace); ok && err == nil {
+				if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
+					nsAnn := common.MapStr{}
+
+					for k, v := range namespace.GetAnnotations() {
+						safemapstr.Put(nsAnn, k, v)
+					}
+					kubemeta["namespace_annotations"] = nsAnn
+				}
+			}
+		}
 
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {

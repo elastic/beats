@@ -1,11 +1,12 @@
 import json
-import metricbeat
 import os
 import semver
 import sys
 import time
 import unittest
-import urllib2
+import urllib.error
+import urllib.parse
+import urllib.request
 from nose.plugins.skip import SkipTest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
@@ -59,7 +60,7 @@ class Test(metricbeat.BaseTest):
 
     def get_version(self):
         host = self.get_hosts()[0]
-        res = urllib2.urlopen("http://" + host + "/").read()
+        res = urllib.request.urlopen("http://" + host + "/").read()
 
         body = json.loads(res)
         version = body["version"]

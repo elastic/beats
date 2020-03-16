@@ -38,6 +38,10 @@ func (u UUID) Value() (driver.Value, error) {
 // a longer byte slice or a string will be handled by UnmarshalText.
 func (u *UUID) Scan(src interface{}) error {
 	switch src := src.(type) {
+	case UUID: // support gorm convert from UUID to NullUUID
+		*u = src
+		return nil
+
 	case []byte:
 		if len(src) == Size {
 			return u.UnmarshalBinary(src)

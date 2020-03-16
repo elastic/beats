@@ -23,16 +23,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	v2 "github.com/elastic/go-lumber/client/v2"
 )
 
 type asyncClient struct {
+	log *logp.Logger
 	*transport.Client
 	observer outputs.Observer
 	client   *v2.AsyncClient
@@ -59,7 +60,10 @@ func newAsyncClient(
 	observer outputs.Observer,
 	config *Config,
 ) (*asyncClient, error) {
+
+	log := logp.NewLogger("logstash")
 	c := &asyncClient{
+		log:      log,
 		Client:   conn,
 		observer: observer,
 	}
@@ -69,10 +73,10 @@ func newAsyncClient(
 	}
 
 	if config.TTL != 0 {
-		logp.Warn(`The async Logstash client does not support the "ttl" option`)
+		log.Warn(`The async Logstash client does not support the "ttl" option`)
 	}
 
-	enc := makeLogstashEventEncoder(beat, config.EscapeHTML, config.Index)
+	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
 
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
@@ -112,7 +116,7 @@ func makeClientFactory(
 }
 
 func (c *asyncClient) Connect() error {
-	logp.Debug("logstash", "connect")
+	c.log.Debug("connect")
 	return c.connect()
 }
 
@@ -120,7 +124,7 @@ func (c *asyncClient) Close() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	logp.Debug("logstash", "close connection")
+	c.log.Debug("close connection")
 
 	if c.client != nil {
 		err := c.client.Close()
@@ -164,7 +168,7 @@ func (c *asyncClient) Publish(batch publisher.Batch) error {
 			n, err = c.publishWindowed(ref, events)
 		}
 
-		debugf("%v events out of %v events sent to logstash host %s. Continue sending",
+		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
 		events = events[n:]
@@ -188,7 +192,7 @@ func (c *asyncClient) publishWindowed(
 	batchSize := len(events)
 	windowSize := c.win.get()
 
-	debugf("Try to publish %v events to logstash host %s with window size %v",
+	c.log.Debugf("Try to publish %v events to logstash host %s with window size %v",
 		batchSize, c.Host(), windowSize)
 
 	// prepare message payload
@@ -272,5 +276,5 @@ func (r *msgRef) dec() {
 	}
 
 	r.batch.RetryEvents(r.slice)
-	logp.Err("Failed to publish events caused by: %v", err)
+	r.client.log.Errorf("Failed to publish events caused by: %+v", err)
 }

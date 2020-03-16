@@ -7,3 +7,4 @@ metricsets:
   - sns
   - lambda
   - dynamodb
+  - vpc

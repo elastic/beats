@@ -1,6 +1,10 @@
 [[add-locale]]
 === Add the local time zone
 
+++++
+<titleabbrev>add_locale</titleabbrev>
+++++
+
 The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
 option named `format` that controls whether an offset or time zone abbreviation

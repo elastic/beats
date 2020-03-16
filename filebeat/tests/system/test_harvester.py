@@ -49,9 +49,8 @@ class Test(BaseTest):
 
         os.rename(testfile1, testfile2)
 
-        file = open(testfile1, 'w', 0)
-        file.write("Hello World\n")
-        file.close()
+        with open(testfile1, 'w') as f:
+            f.write("Hello World\n")
 
         # Wait until error shows up
         self.wait_until(
@@ -792,14 +791,14 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with io.open(logfile, 'w', encoding="utf-16le") as file:
-            file.write(u'hello world1')
-            file.write(u"\n")
+            file.write(str(u'hello world1'))
+            file.write(str(u"\n"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write(u"\U00012345=Ra")
+            file.write(str(u"\U00012345=Ra"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write(u"\n")
-            file.write(u"hello world2")
-            file.write(u"\n")
+            file.write(str(u"\n"))
+            file.write(str(u"hello world2"))
+            file.write(str(u"\n"))
 
         filebeat = self.start_beat()
 
@@ -834,19 +833,23 @@ class Test(BaseTest):
 
         logfile = self.working_dir + "/log/test.log"
 
-        file = open(logfile, 'w', 0)
-        file.write("hello world1")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("\n")
-        file.write("hello world2")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("Hello World\n")
-        # Write some more data to hit the 16k min buffer size.
-        # Make it web safe.
-        file.write(base64.b64encode(os.urandom(16 * 1024)))
-        file.close()
+        lines = [
+            b"hello world1",
+            b"\n",
+            b"\x00\x00\x00\x00",
+            b"\n",
+            b"hello world2",
+            b"\n",
+            b"\x00\x00\x00\x00",
+            b"Hello World\n",
+        ]
+        with open(logfile, 'wb') as f:
+            for line in lines:
+                f.write(line)
+
+            # Write some more data to hit the 16k min buffer size.
+            # Make it web safe.
+            f.write(base64.b64encode(os.urandom(16 * 1024)))
 
         filebeat = self.start_beat()
 

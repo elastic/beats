@@ -10,12 +10,12 @@ import (
 
 	"cloud.google.com/go/functions/metadata"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 const (
@@ -98,8 +98,8 @@ func (s *Storage) getEventDataFromContext(ctx context.Context) (StorageEventWith
 }
 
 // StorageDetails returns the details of the feature.
-func StorageDetails() *feature.Details {
-	return feature.NewDetails("Google Cloud Storage trigger", "receive events from Google Cloud Storage.", feature.Stable)
+func StorageDetails() feature.Details {
+	return feature.MakeDetails("Google Cloud Storage trigger", "receive events from Google Cloud Storage.", feature.Stable)
 }
 
 // Name returns the name of the function.

@@ -1,0 +1,174 @@
+{
+    "@timestamp": "2020-01-14T21:14:00.000Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "mcastro",
+        "architecture": "x86_64",
+        "os": {
+            "version": "",
+            "family": "",
+            "name": "Antergos Linux",
+            "kernel": "5.4.3-arch1-1",
+            "platform": "antergos"
+        },
+        "id": "54f70115bae545cbac2b150f254472a0",
+        "containerized": false,
+        "hostname": "mcastro"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "ephemeral_id": "ddb5f424-578e-4c51-ac74-08447827a4b1",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+        "version": "8.0.0"
+    },
+    "service": {
+        "type": "googlecloud"
+    },
+    "cloud": {
+        "account": {
+            "id": "elastic-metricbeat"
+        },
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.loadbalancing",
+        "module": "googlecloud",
+        "duration": 908872754
+    },
+    "metricset": {
+        "name": "loadbalancing",
+        "period": 900000
+    },
+    "googlecloud": {
+        "labels": {
+            "metrics": {
+                "response_code": "502",
+                "cache_result": "DISABLED",
+                "proxy_continent": "Europe",
+                "client_country": "France",
+                "response_code_class": "500",
+                "protocol": "HTTP/1.1"
+            },
+            "resource": {
+                "matched_url_path_rule": "UNMATCHED",
+                "backend_target_name": "my-backed",
+                "backend_type": "INVALID_BACKEND",
+                "backend_scope_type": "INVALID_BACKEND",
+                "url_map_name": "test-lb",
+                "forwarding_rule_name": "test-lb-forwarding-rule",
+                "region": "global",
+                "backend_scope": "INVALID_BACKEND",
+                "target_proxy_name": "test-lb-target-proxy",
+                "backend_target_type": "BACKEND_SERVICE",
+                "backend_name": "INVALID_BACKEND"
+            }
+        },
+        "loadbalancing": {
+            "https": {
+                "frontend_tcp_rtt": {
+                    "count": 3,
+                    "mean": 27,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "growth_factor": 1.4,
+                                "scale": 1,
+                                "num_finite_buckets": 66
+                            }
+                        }
+                    },
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        3
+                    ]
+                },
+                "request_bytes_count": 1281,
+                "request_count": 3,
+                "response_bytes_count": 1464,
+                "backend_latencies": {
+                    "mean": 112.094,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "growth_factor": 1.4,
+                                "scale": 1,
+                                "num_finite_buckets": 66
+                            }
+                        }
+                    },
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        3
+                    ],
+                    "count": 3
+                },
+                "total_latencies": {
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        3
+                    ],
+                    "count": 3,
+                    "mean": 195,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "growth_factor": 1.4,
+                                "scale": 1,
+                                "num_finite_buckets": 66
+                            }
+                        }
+                    }
+                },
+                "backend_request_count": 3,
+                "backend_response_bytes_count": 1464,
+                "backend_request_bytes_count": 1281
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.4.0"
+    }
+}

@@ -40,6 +40,8 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    environment:
+      script.cache.max_size: "500"
 
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka

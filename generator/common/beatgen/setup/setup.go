@@ -18,111 +18,116 @@
 package setup
 
 import (
-	"fmt"
+	"bufio"
 	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
-// RunSetup runs any remaining setup commands after the vendor directory has been setup
-func RunSetup() error {
-	vendorPath := "./vendor/github.com/"
+var (
+	makefileDeps = []string{
+		"dev-tools",
+		"libbeat",
+		"licenses",
+		"metricbeat",
+		"script",
+	}
+)
 
-	//Copy mage stuff
-	toMkdir := filepath.Join(vendorPath, "magefile")
-	err := os.MkdirAll(toMkdir, 0755)
+func InitModule() error {
+	err := gotool.Mod.Init()
 	if err != nil {
-		return errors.Wrapf(err, "error making mage directory at %s", toMkdir)
+		return errors.Wrap(err, "error initializing a module for the Beat")
 	}
 
-	err = sh.Run("cp", "-R", filepath.Join(vendorPath, "elastic/beats/vendor/github.com/magefile/mage"), filepath.Join(vendorPath, "magefile"))
-	if err != nil {
-		return errors.Wrapf(err, "error copying vendored magefile to %s", filepath.Join(vendorPath, "magefile"))
-	}
-
-	//Copy the pkg helper
-	err = sh.Run("cp", "-R", filepath.Join(vendorPath, "elastic/beats/vendor/github.com/pkg"), vendorPath)
-	if err != nil {
-		return errors.Wrapf(err, "error copying pkg to %s", vendorPath)
-	}
-	return nil
+	return copyReplacedModules()
 }
 
-// CopyVendor copies a new version of beats into the vendor directory of PWD
-// By default this uses git archive, meaning any uncommitted changes will not be copied.
-// Set the NEWBEAT_DEV env variable to use a slow `cp` copy that will catch uncommited changes
+func copyReplacedModules() error {
+	const goModPath = "go.mod"
+
+	beatPath, err := devtools.ElasticBeatsDir()
+	if err != nil {
+		return errors.Wrap(err, "error determining path to github.com/elastic/beats")
+	}
+
+	inMod, err := os.Open(filepath.Join(beatPath, goModPath))
+	if err != nil {
+		return errors.Wrap(err, "error opening go.mod file of github.com/elastic/beats")
+	}
+	defer inMod.Close()
+
+	s := bufio.NewScanner(inMod)
+	inReplaceSection := false
+	replacedLines := []string{
+		"",
+		"replace (",
+	}
+	for s.Scan() {
+		if err := s.Err(); err != nil {
+			return errors.Wrap(err, "error reading go.mod file")
+		}
+
+		line := s.Text()
+		if inReplaceSection {
+			replacedLines = append(replacedLines, line)
+
+			if line == ")" {
+				break
+			}
+			continue
+		}
+
+		if line == "replace (" {
+			inReplaceSection = true
+		}
+	}
+
+	outMod, err := os.OpenFile(goModPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
+	if err != nil {
+		return errors.Wrap(err, "error opening the go.mod file of the generated Beat")
+	}
+	defer outMod.Close()
+
+	w := bufio.NewWriter(outMod)
+	for _, rep := range replacedLines {
+		_, err = w.WriteString(rep + "\n")
+		if err != nil {
+			return errors.Wrap(err, "error writing replace lines to go.mod file")
+		}
+	}
+
+	return w.Flush()
+}
+
+// CopyVendor copies a new version of the dependencies to the vendor folder
 func CopyVendor() error {
-	vendorPath := "./vendor/github.com/elastic/"
-	beatPath, err := devtools.ElasticBeatsDir()
+	err := gotool.Mod.Vendor()
 	if err != nil {
-		return errors.Wrap(err, "Could not find ElasticBeatsDir")
+		return err
 	}
-	err = os.MkdirAll(vendorPath, 0755)
+
+	path, err := gotool.ListModuleCacheDir("github.com/elastic/beats/v7")
 	if err != nil {
-		return errors.Wrap(err, "error creating vendor dir")
+		return err
 	}
 
-	isClean, err := checkBeatsDirClean()
-	if err != nil {
-		return errors.Wrap(err, "error in checkIfBeatsDirClean")
-	}
-
-	if !isClean {
-		//Dev mode. Use CP.
-		fmt.Printf("You have uncommited changes in elastic/beats. Running CopyVendor running in dev mode, elastic/beats will be copied into the vendor directory with cp\n")
-		vendorPath = filepath.Join(vendorPath, "beats")
-
-		err = sh.Run("cp", "-R", beatPath, vendorPath)
+	vendorPath := "./vendor/github.com/elastic/beats/v7"
+	for _, d := range makefileDeps {
+		from := filepath.Join(path, d)
+		to := filepath.Join(vendorPath, d)
+		copyTask := &devtools.CopyTask{Source: from, Dest: to, Mode: 0640, DirMode: os.ModeDir | 0750}
+		err = copyTask.Execute()
 		if err != nil {
-			return errors.Wrap(err, "error copying vendor dir")
-		}
-		err = sh.Rm(filepath.Join(vendorPath, ".git"))
-		if err != nil {
-			return errors.Wrap(err, "error removing vendor git directory")
-		}
-		err = sh.Rm(filepath.Join(vendorPath, "x-pack"))
-		if err != nil {
-			return errors.Wrap(err, "error removing x-pack directory")
-		}
-	} else {
-		//not dev mode. Use git archive
-		vendorPath = filepath.Join(vendorPath, "beats")
-		err = os.MkdirAll(vendorPath, 0755)
-		if err != nil {
-			return errors.Wrap(err, "error creating vendor dir")
-		}
-		err = sh.Run("sh",
-			"-c",
-			"git archive --remote "+beatPath+" HEAD |  tar -x --exclude=x-pack -C "+vendorPath)
-		if err != nil {
-			return errors.Wrap(err, "error running git archive")
+			return err
 		}
 	}
-
 	return nil
-
-}
-
-// checkIfBeatsDirClean checks to see if the working elastic/beats dir is modified.
-// If it is, we'll use a different method to copy beats to vendor/
-func checkBeatsDirClean() (bool, error) {
-	beatPath, err := devtools.ElasticBeatsDir()
-	if err != nil {
-		return false, errors.Wrap(err, "Could not find ElasticBeatsDir")
-	}
-	out, err := sh.Output("git", "-C", beatPath, "status", "--porcelain")
-	if err != nil {
-		return false, errors.Wrap(err, "Error checking status of elastic/beats repo")
-	}
-
-	if len(out) == 0 {
-		return true, nil
-	}
-	return false, nil
 }
 
 // GitInit initializes a new git repo in the current directory

@@ -32,13 +32,13 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/asset"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/testing/flags"
+	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 
-	_ "github.com/elastic/beats/metricbeat/include/fields"
+	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
 const (
@@ -278,7 +278,11 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		for _, e := range expectedMap {
 			t.Error(e)
 		}
-		t.Fatal()
+	}
+
+	// If there was some error, fail before trying to write anything.
+	if t.Failed() {
+		t.FailNow()
 	}
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {

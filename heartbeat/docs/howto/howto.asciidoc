@@ -1,0 +1,32 @@
+[[howto-guides]]
+= How to
+
+[partintro]
+--
+Learn how to perform common {beatname_uc} configuration tasks.
+
+* <<configuration-observer-options>>
+* <<{beatname_lc}-geoip>>
+* <<using-environ-vars>>
+* <<configuring-ingest-node>>
+* <<yaml-tips>>
+
+
+--
+
+include::{docdir}/heartbeat-observer-options.asciidoc[]
+
+include::{libbeat-dir}/shared-geoip.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
+
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
+
+:standalone:
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
+
+
+

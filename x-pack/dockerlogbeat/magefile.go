@@ -18,17 +18,17 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/pkg/errors"
 
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -62,11 +62,6 @@ func getPluginName() (string, error) {
 
 // createContainer builds the plugin and creates the container that will later become the rootfs used by the plugin
 func createContainer(ctx context.Context, cli *client.Client) error {
-	goVersion, err := mage.GoVersion()
-	if err != nil {
-		return errors.Wrap(err, "error determining go version")
-	}
-
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "error getting work dir")
@@ -96,7 +91,6 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	defer buildContext.Close()
 
 	buildOpts := types.ImageBuildOptions{
-		BuildArgs:  map[string]*string{"versionString": &goVersion},
 		Tags:       []string{rootImageName},
 		Dockerfile: "Dockerfile",
 	}
@@ -209,11 +203,6 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 
 // Uninstall removes working objects and containers
 func Uninstall(ctx context.Context) error {
-	name, err := getPluginName()
-	if err != nil {
-		return err
-	}
-
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return errors.Wrap(err, "Error creating docker client")
@@ -224,21 +213,25 @@ func Uninstall(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting list of plugins")
 	}
-	oursExists := false
+
+	toRemoveName := ""
 	for _, plugin := range plugins {
 		if strings.Contains(plugin.Name, logDriverName) {
-			oursExists = true
+			toRemoveName = plugin.Name
+			break
 		}
 	}
-	if oursExists {
-		err = cli.PluginDisable(ctx, name, types.PluginDisableOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error disabling plugin")
-		}
-		err = cli.PluginRemove(ctx, name, types.PluginRemoveOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error removing plugin")
-		}
+	if toRemoveName == "" {
+		return nil
+	}
+
+	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error disabling plugin")
+	}
+	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error removing plugin")
 	}
 
 	return nil
