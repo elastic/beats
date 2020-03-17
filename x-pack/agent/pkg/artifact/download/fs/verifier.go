@@ -79,7 +79,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 
 func (v *Verifier) getPublicAsc(filename string) ([]byte, error) {
 	ascFile := fmt.Sprintf("%s%s", filename, ascSuffix)
-	fullPath := filepath.Join(beatsSubfolder, ascFile)
+	fullPath := filepath.Join(defaultDropSubdir, ascFile)
 
 	b, err := ioutil.ReadFile(fullPath)
 	if err != nil {
