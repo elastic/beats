@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == activemq module
 
-beta[]
-
 This module periodically fetches JMX metrics from Apache ActiveMQ.
 
 [float]
