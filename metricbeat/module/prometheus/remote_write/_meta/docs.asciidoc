@@ -7,9 +7,20 @@ remote_write:
   - url: "http://localhost:9201/write"
 ------------------------------------------------------------------------------
 
-
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
-Also consider using secure settings for the server using TLS/SSL as shown
+A basic configuration would look like:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+------------------------------------------------------------------------------
+
+
+
+Also consider using secure settings for the server, configuring the module with TLS/SSL as shown:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -19,4 +30,17 @@ Also consider using secure settings for the server using TLS/SSL as shown
   ssl.certificate: "/etc/pki/server/cert.pem"
   ssl.key: "/etc/pki/server/cert.key"
   port: "9201"
+------------------------------------------------------------------------------
+
+and on Prometheus side:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+remote_write:
+  - url: "https://localhost:9201/write"
+    tls_config:
+        cert_file: "/etc/prometheus/my_key.pem"
+        key_file: "/etc/prometheus/my_key.key"
+        # Disable validation of the server certificate.
+        #insecure_skip_verify: true
 ------------------------------------------------------------------------------
