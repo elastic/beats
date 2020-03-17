@@ -189,7 +189,7 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 
 # Preparation for tests
 .PHONY: prepare-tests
-prepare-tests: update-yacc-vendor
+prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
 	go ${INSTALL_CMD} ${COVERAGE_TOOL_REPO}
