@@ -155,11 +155,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		r.Event(event)
 	}
 
-	if errs != nil {
-		return errs.Err()
-	}
-
-	return nil
+	return errs.Err()
 }
 
 func parseAPIResponse(content []byte, indicesStats *stats) error {
