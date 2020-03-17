@@ -31,10 +31,10 @@ func BenchmarkParseAPIResponse(b *testing.B) {
 	content, err := ioutil.ReadFile("_meta/test/stats.800.bench.json")
 	require.NoError(b, err)
 
-	var indicesStruct IndicesStruct
+	var indicesStats stats
 
 	for i := 0; i < b.N; i++ {
-		err = parseAPIResponse(content, &indicesStruct)
+		err = parseAPIResponse(content, &indicesStats)
 		require.NoError(b, err)
 	}
 
