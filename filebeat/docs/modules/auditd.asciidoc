@@ -11,6 +11,8 @@ This file is generated! See scripts/docs_collector.py
 The +{modulename}+ module collects and parses logs from the audit daemon
 (`auditd`).
 
+NOTE: While Filebeat is able to parse logs using the `auditd` module, more advanced features are available in {auditbeat-ref}/auditbeat-module-auditd.html[Auditbeat].
+
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
