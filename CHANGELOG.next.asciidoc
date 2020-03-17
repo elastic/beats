@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 
 *Winlogbeat*
 
@@ -68,6 +69,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866[16866]
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
+- Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 
 *Auditbeat*
@@ -91,6 +93,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
 - Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 - Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
+- Fix Elasticsearch `_id` field set by S3 and Google Pub/Sub inputs. {pull}17026[17026]
+- Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
+- Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
 
 *Heartbeat*
 
@@ -116,6 +121,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix imports after PR was merged before rebase. {pull}16756[16756]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 - Dynamically choose a method for the system/service metricset to support older linux distros. {pull}16902[16902]
+- Use max in k8s apiserver dashboard aggregations. {pull}17018[17018]
+- Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
+- Check if CCR feature is available on Elasticsearch cluster before attempting to call CCR APIs from `elasticsearch/ccr` metricset. {issue}16511[16511] {pull}17073[17073]
+- Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 
 *Packetbeat*
 
@@ -145,6 +154,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
 - Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
 - Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
+- Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 
 *Auditbeat*
 
@@ -183,6 +193,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS related fields to CEF module {issue}16157[16157] {pull}16338[16338]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
+- Add Filebeat Okta module. {pull}16362[16362]
+- Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
+- Add pattern for Cisco ASA / FTD Message 734001 {issue}16212[16212] {pull}16612[16612]
+- Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 
 *Heartbeat*
 
@@ -234,10 +249,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
+- Add overview dashboard for googlecloud compute metricset. {issue}16534[16534] {pull}16819[16819]
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
+- Add query metricset for prometheus module. {pull}17104[17104]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
+- Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
+- Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
+- Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
 
 *Packetbeat*
 
