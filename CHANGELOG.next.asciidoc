@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866[16866]
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
+- Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 
 *Auditbeat*
 
@@ -181,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
 - Add ECS related fields to CEF module {issue}16157[16157] {pull}16338[16338]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
+- Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 
 *Heartbeat*
@@ -235,6 +237,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
+- Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 
 *Packetbeat*
 
@@ -244,6 +248,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
+- Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
 
 ==== Deprecated
 
