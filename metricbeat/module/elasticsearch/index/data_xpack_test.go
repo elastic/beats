@@ -33,7 +33,6 @@ func BenchmarkParseAPIResponse(b *testing.B) {
 
 	var indicesStruct IndicesStruct
 
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		err = parseAPIResponse(content, &indicesStruct)
 		require.NoError(b, err)
