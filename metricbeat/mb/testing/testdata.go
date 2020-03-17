@@ -278,7 +278,11 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		for _, e := range expectedMap {
 			t.Error(e)
 		}
-		t.Fatal()
+	}
+
+	// If there was some error, fail before trying to write anything.
+	if t.Failed() {
+		t.FailNow()
 	}
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
