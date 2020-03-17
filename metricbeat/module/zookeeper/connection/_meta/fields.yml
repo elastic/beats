@@ -1,6 +1,6 @@
 - name: connection
   type: group
-  release: beta
+  release: ga
   description: >
     connections
   fields:

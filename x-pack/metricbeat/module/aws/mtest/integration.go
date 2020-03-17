@@ -15,7 +15,9 @@ import (
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(metricSetName string, period string) (map[string]interface{}, string) {
+func GetConfigForTest(t *testing.T, metricSetName string, period string) (map[string]interface{}, string) {
+	t.Helper()
+
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
@@ -27,9 +29,9 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 	info := ""
 	config := map[string]interface{}{}
 	if !okAccessKeyID || accessKeyID == "" {
-		info = "Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty"
+		t.Fatal("$AWS_ACCESS_KEY_ID not set or set to empty")
 	} else if !okSecretAccessKey || secretAccessKey == "" {
-		info = "Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty"
+		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
 	} else {
 		config = map[string]interface{}{
 			"module":            "aws",
@@ -51,6 +53,8 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 
 // CheckEventField function checks a given field type and compares it with the expected type for integration tests.
 func CheckEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
+	t.Helper()
+
 	ok1, err1 := event.MetricSetFields.HasKey(metricName)
 	ok2, err2 := event.RootFields.HasKey(metricName)
 	if ok1 || ok2 {
