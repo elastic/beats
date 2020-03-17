@@ -96,7 +96,6 @@ function OktaSystem(keep_original_message) {
             { from: "okta.client.ip", to: "client.ip" },
             { from: "okta.client.ip", to: "source.ip" },
             { from: "okta.event_type", to: "event.action" },
-            { from: "okta.outcome.result", to: "event.outcome" },
             { from: "okta.security_context.as.number", to: "client.as.number" },
             { from: "okta.security_context.as.organization.name", to: "client.as.organization.name" },
             { from: "okta.security_context.domain", to: "client.domain" },
@@ -107,6 +106,20 @@ function OktaSystem(keep_original_message) {
         ignore_missing: true,
         fail_on_error: false,
     });
+
+    var setEventOutcome = function(evt) {
+        var outcome = evt.Get("okta.outcome.result")
+        if (outcome != null) {
+            var o = outcome.toLowerCase();
+            if (o == "success" || o == "allow") {
+                evt.Put("event.outcome", "success");
+            } else if (o == "failure" || o == "deny") {
+                evt.Put("event.outcome", "failure");
+            } else {
+                evt.Put("event.outcome", "unknown");
+            }
+        }
+    }
  
     // Update nested fields 
     var renameNestedFields = function(evt) {
@@ -156,6 +169,7 @@ function OktaSystem(keep_original_message) {
         .Add(categorizeEvent)
         .Add(convertFields)
         .Add(copyFields)
+        .Add(setEventOutcome)
         .Add(renameNestedFields)
         .Add(setUserInfo)
         .Add(setRelatedIP)
