@@ -107,7 +107,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat Okta] Overview",
+        "title": "Overview [Filebeat Okta]",
         "version": 1
       },
       "id": "749203a0-67b1-11ea-a76f-bf44814e437d",
@@ -182,7 +182,7 @@
         "description": "",
         "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"6908e81b-1695-4445-aee4-8bc8c9f65600\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"4b8bd321-4b90-4d97-83e0-2b12bf091f66\",\"geoField\":\"client.geo.location\",\"filterByMapBounds\":false,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"useTopHits\":false,\"topHitsSize\":1,\"applyGlobalQuery\":false,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"airfield\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"dc52e707-92d7-4de7-becf-a3a8bfaa2c2d\",\"label\":\"Okta \",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"query\":{\"query\":\"event.dataset : \\\"okta.system\\\" \",\"language\":\"kuery\"}}]",
         "mapStateJSON": "{\"zoom\":2.75,\"center\":{\"lon\":-44.69098,\"lat\":26.54701},\"timeFilters\":{\"from\":\"now-15w\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"okta.system\"},\"type\":\"phrase\"},\"query\":{\"match_phrase\":{\"event.dataset\":\"okta.system\"}}}]}",
-        "title": "[Filebeat Okta] Geolocation",
+        "title": "Geolocation [Filebeat Okta]",
         "uiStateJSON": {
           "isLayerTOCOpen": true,
           "openTOCDetails": []
@@ -238,7 +238,7 @@
             }
           }
         },
-        "title": "[Filebeat Okta] Event Outcome ",
+        "title": "Event Outcome [Filebeat Okta]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -280,7 +280,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "[Filebeat Okta] Event Outcome ",
+          "title": "Event Outcome [Filebeat Okta]",
           "type": "pie"
         }
       },
@@ -339,7 +339,7 @@
             }
           }
         },
-        "title": "[Filebeat Okta] Transaction Types",
+        "title": "Transaction Types [Filebeat Okta]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -381,7 +381,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "[Filebeat Okta] Transaction Types",
+          "title": "Transaction Types [Filebeat Okta]",
           "type": "pie"
         }
       },
@@ -411,7 +411,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "[Filebeat Okta] Time Series",
+        "title": "Time Series [Filebeat Okta]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -461,7 +461,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "[Filebeat Okta] Time Series",
+          "title": "Time Series [Filebeat Okta]",
           "type": "metrics"
         }
       },
@@ -509,7 +509,7 @@
             }
           }
         },
-        "title": "[Filebeat Okta] Actor Types",
+        "title": "Actor Types [Filebeat Okta]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -551,7 +551,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "[Filebeat Okta] Actor Types",
+          "title": "Actor Types [Filebeat Okta]",
           "type": "pie"
         }
       },
