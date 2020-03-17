@@ -17,7 +17,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
 	findKey := func(key string) func(common.MapStr) bool {
