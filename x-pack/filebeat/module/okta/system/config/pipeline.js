@@ -35,9 +35,9 @@ function OktaSystem(keep_original_message) {
     var categorizeEvent = new processor.AddFields({
         target: "event",
         fields: {
-            category: "authentication",
+            category: ["authentication"],
             kind: "event",
-            type: "access",
+            type: ["access"],
 
         },
     });
@@ -97,12 +97,14 @@ function OktaSystem(keep_original_message) {
             { from: "okta.client.ip", to: "source.ip" },
             { from: "okta.event_type", to: "event.action" },
             { from: "okta.outcome.result", to: "event.outcome" },
-            { from: "okta.security_context.as", to: "client.as" },
+            { from: "okta.security_context.as.number", to: "client.as.number" },
+            { from: "okta.security_context.as.organization.name", to: "client.as.organization.name" },
             { from: "okta.security_context.domain", to: "client.domain" },
             { from: "okta.security_context.domain", to: "source.domain" },
             { from: "okta.uuid", to: "event.id" },
             { from: "okta.uuid", to: "_id" },
         ],
+        ignore_missing: true,
         fail_on_error: false,
     });
  
@@ -125,11 +127,21 @@ function OktaSystem(keep_original_message) {
         if (evt.Get("okta.actor.type") === "User") {
 	    evt.Put("client.user.full_name", evt.Get("okta.actor.display_name"));
 	    evt.Put("source.user.full_name", evt.Get("okta.actor.display_name"));
+	    evt.Put("related.user", evt.Get("okta.actor.display_name"));
 	    evt.Put("client.user.id", evt.Get("okta.actor.id"));
 	    evt.Put("source.user.id", evt.Get("okta.actor.id"));
         }
     };
 
+    // Set related.ip field
+    var setRelatedIP = function(event) {
+        if (event.Get("source.ip") != null) {
+            event.AppendTo("related.ip", event.Get("source.ip"));
+        }
+        if (event.Get("destination.ip") != null) {
+            event.AppendTo("related.ip", event.Get("destination.ip"));
+        }
+    };
 
     // Drop extra fields
     var dropExtraFields = function(evt) {
@@ -146,6 +158,7 @@ function OktaSystem(keep_original_message) {
         .Add(copyFields)
         .Add(renameNestedFields)
         .Add(setUserInfo)
+        .Add(setRelatedIP)
         .Add(dropExtraFields)
         .Build();
 
