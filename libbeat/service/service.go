@@ -41,7 +41,7 @@ import (
 // the service shut downs gracefully.
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
-	var logger = logp.NewLogger("service")
+	logger := logp.NewLogger("service")
 
 	// On termination signals, gracefully stop the Beat
 	sigc := make(chan os.Signal, 1)
@@ -88,7 +88,7 @@ func withCPUProfile() bool { return *cpuprofile != "" }
 // BeforeRun takes care of necessary actions such as creating files
 // before the beat should run.
 func BeforeRun() {
-	var logger = logp.NewLogger("service")
+	logger := logp.NewLogger("service")
 	if withCPUProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -155,7 +155,7 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 // Cleanup handles cleaning up the runtime and OS environments. This includes
 // tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
-	var logger = logp.NewLogger("service")
+	logger := logp.NewLogger("service")
 	if withCPUProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
@@ -181,7 +181,7 @@ func debugMemStats(logger *logp.Logger) {
 }
 
 func writeHeapProfile(filename string) {
-	var logger = logp.NewLogger("service")
+	logger := logp.NewLogger("service")
 	f, err := os.Create(filename)
 	if err != nil {
 		logger.Errorf("Failed creating file %s: %s", filename, err)
