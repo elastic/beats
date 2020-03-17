@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Filebeat Okta module Kibana dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
