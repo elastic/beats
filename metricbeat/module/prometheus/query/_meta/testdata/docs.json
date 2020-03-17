@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "matrix",
+    "result": [
+      {
+        "metric": {
+          "job": "kubelet",
+            "namespace": "kube-system",
+            "node": "master01",
+            "service": "prometheus-prometheus-oper-kubelet",
+            "__name__": "up",
+            "endpoint": "https-metrics",
+            "instance": "192.168.48.204:10250"
+        },
+        "value": [
+          [1576884600, "1"]
+        ]
+      }
+    ]
+  }
+}
