@@ -161,6 +161,18 @@ function OktaSystem(keep_original_message) {
         evt.Delete("json");
     };
 
+    // Remove null fields
+    var dropNullFields = function(evt) {
+        function dropNull(obj) {
+            Object.keys(obj).forEach(function(key) {
+                (obj[key] && typeof obj[key] === 'object') && dropNull(obj[key]) ||
+                (obj[key] === null) && delete obj[key]
+            });
+            return obj;
+        };
+        dropNull(evt);
+    };
+
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
@@ -174,6 +186,7 @@ function OktaSystem(keep_original_message) {
         .Add(setUserInfo)
         .Add(setRelatedIP)
         .Add(dropExtraFields)
+        .Add(dropNullFields)
         .Build();
 
     return {
