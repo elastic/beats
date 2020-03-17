@@ -40,10 +40,9 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	server           serverhelper.Server
-	events           chan mb.Event
-	stopCh           chan struct{}
-	clientsSemaphore chan struct{}
+	server serverhelper.Server
+	events chan prompb.WriteRequest
+	stopCh chan struct{}
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -52,12 +51,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	maxClients := 100
 	m := &MetricSet{
-		BaseMetricSet:    base,
-		events:           make(chan mb.Event),
-		stopCh:           make(chan struct{}),
-		clientsSemaphore: make(chan struct{}, maxClients),
+		BaseMetricSet: base,
+		events:        make(chan prompb.WriteRequest),
+		stopCh:        make(chan struct{}),
 	}
 	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 	if err != nil {
@@ -77,23 +74,23 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			m.server.Stop()
 			close(m.stopCh)
 			return
-		case e := <-m.events:
-			reporter.Event(e)
+		case protoReq := <-m.events:
+			samples := protoToSamples(&protoReq)
+			events := samplesToEvents(samples)
+			for _, e := range events {
+				reporter.Event(e)
+			}
 		}
 	}
 }
 
 func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
-	m.clientsSemaphore <- struct{}{}
-	defer func() { <-m.clientsSemaphore }()
-
 	compressed, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		m.Logger().Errorf("Read error %v", err)
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer req.Body.Close()
 
 	reqBuf, err := snappy.Decode(nil, compressed)
 	if err != nil {
@@ -109,16 +106,13 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	samples := protoToSamples(&protoReq)
-	events := samplesToEvents(samples)
-
-	for _, e := range events {
-		select {
-		case <-m.stopCh:
-			return
-		case m.events <- e:
-		}
+	select {
+	case <-req.Context().Done():
+		writer.WriteHeader(http.StatusAccepted)
+		return
+	case m.events <- protoReq:
 	}
+
 	writer.WriteHeader(http.StatusAccepted)
 }
 
