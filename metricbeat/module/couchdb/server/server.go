@@ -95,10 +95,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in http fetch")
 	}
 
-	if m.fetcher == nil {
-		if err = m.retrieveFetcher(); err != nil {
-			return errors.Wrapf(err, "error trying to get CouchDB version. Retrying on next fetch...")
-		}
+	if err = m.retrieveFetcher(); err != nil {
+		return errors.Wrapf(err, "error trying to get CouchDB version. Retrying on next fetch...")
 	}
 	event, err := m.fetcher.MapEvent(m.info, content)
 	if err != nil {
@@ -110,6 +108,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 }
 
 func (m *MetricSet) retrieveFetcher() (err error) {
+	if m.fetcher != nil {
+		return nil
+	}
+
 	m.info, err = m.getInfoFromCouchdbHost(m.Host())
 	if err != nil {
 		return errors.Wrap(err, "cannot start CouchDB metricbeat module")
