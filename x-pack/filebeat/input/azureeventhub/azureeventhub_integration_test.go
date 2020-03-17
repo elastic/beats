@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build azure
 
 package azureeventhub
 
@@ -23,26 +24,20 @@ import (
 )
 
 var (
-
-	// setup the input config
 	azureConfig = common.MustNewConfigFrom(common.MapStr{
-		"storage_account_key":       os.Getenv("STORAGE_ACCOUNT_NAME"),
-		"storage_account":           os.Getenv("STORAGE_ACCOUNT_KEY"),
+		"storage_account_key":       lookupEnv("STORAGE_ACCOUNT_NAME"),
+		"storage_account":           lookupEnv("STORAGE_ACCOUNT_KEY"),
 		"storage_account_container": ephContainerName,
-		"connection_string":         os.Getenv("EVENTHUB_CONNECTION_STRING"),
-		"consumer_group":            os.Getenv("EVENTHUB_CONSUMERGROUP"),
-		"eventhub":                  os.Getenv("EVENTHUB_NAME"),
+		"connection_string":         lookupEnv("EVENTHUB_CONNECTION_STRING"),
+		"consumer_group":            lookupEnv("EVENTHUB_CONSUMERGROUP"),
+		"eventhub":                  lookupEnv("EVENTHUB_NAME"),
 	})
 
 	message = "{\"records\":[{\"some_field\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
 )
 
 func TestInput(t *testing.T) {
-	if os.Getenv("EVENTHUB_NAME") == "" || os.Getenv("EVENTHUB_CONNECTION_STRING") == "" {
-		t.Skip("EVENTHUB_NAME or/and EVENTHUB_CONSUMERGROUP  are not set in environment.")
-	}
-	err := addEventToHub(os.Getenv("EVENTHUB_CONNECTION_STRING"))
-
+	err := addEventToHub(lookupEnv("EVENTHUB_CONNECTION_STRING"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,6 +92,14 @@ func TestInput(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+}
+
+func lookupEnv(t *testing.T, varName string) string {
+	value, ok := os.LookupEnv(varName)
+	if !ok {
+		t.Fatalf("Environment variable %s is not set", varName)
+	}
+	return value
 }
 
 func addEventToHub(connStr string) error {
