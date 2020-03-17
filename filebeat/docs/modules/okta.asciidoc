@@ -16,6 +16,11 @@ This is a filebeat module for retrieving system logs from Okta (www.okta.com) vi
 
 :has-dashboards!:
 
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/filebeat-okta-dashboard.png[]
+
 :modulename!:
 
 

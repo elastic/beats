@@ -8,7 +8,7 @@
 
 
 ```
-./filebeat setup --modules=okta -e
+./filebeat setup --modules=okta -e --dashboards
 ```
 
 Enable the Okta module
