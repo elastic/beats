@@ -108,7 +108,6 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 
 	select {
 	case <-req.Context().Done():
-		writer.WriteHeader(http.StatusAccepted)
 		return
 	case m.events <- protoReq:
 	}
