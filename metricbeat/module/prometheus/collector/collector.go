@@ -164,6 +164,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 }
 
 func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
+	// TODO add this as family so it follows common code paths
 	metricName := "up"
 	if m.skipFamilyName(metricName) {
 		return

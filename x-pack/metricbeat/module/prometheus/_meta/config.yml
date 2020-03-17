@@ -2,4 +2,10 @@
   metricsets: ['collector']
   period: 10s
   hosts: ['localhost:9090']
-  # TODO
+
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  #use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  #rate_counters: true

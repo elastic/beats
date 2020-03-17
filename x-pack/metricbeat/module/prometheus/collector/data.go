@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 
@@ -22,19 +23,37 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 	}
 
 	if config.UseTypes {
-		if config.RateCounters {
+		cfgwarn.Beta("Prometheus 'use_types' settings is beta")
 
+		// use a counter cache with a timeout of 5x the period, as a safe value
+		// to make sure that all counters are available between fetches
+		counters := NewCounterCache(base.Module().Config().Period * 5)
+		counters.Start()
+
+		if config.RateCounters {
+			cfgwarn.Beta("Prometheus 'rate_counters' settings is experimental")
 		}
 
-		return promEventsGenerator, nil
+		g := typedGenerator{
+			counterCache: counters,
+			rateCounters: config.RateCounters,
+		}
+
+		// TODO cache cleanup on module stop, probably make this an interface
+		return g.promEventsGenerator, nil
 	}
 
 	return collector.DefaultPromEventsGenerator, nil
 }
 
+type typedGenerator struct {
+	counterCache CounterCache
+	rateCounters bool
+}
+
 // promEventsGenerator stores all Prometheus metrics using
 // only double field type in Elasticsearch.
-func promEventsGenerator(mf *dto.MetricFamily) []collector.PromEvent {
+func (g *typedGenerator) promEventsGenerator(mf *dto.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
 	name := *mf.Name
@@ -114,6 +133,14 @@ func promEventsGenerator(mf *dto.MetricFamily) []collector.PromEvent {
 
 		histogram := metric.GetHistogram()
 		if histogram != nil {
+			events = append(events, collector.PromEvent{
+				Data: common.MapStr{
+					name: common.MapStr{
+						"histogram": promHistogramToES(g.counterCache, name, labels, histogram),
+					},
+				},
+				Labels: labels,
+			})
 			/*
 				TODO convert histogram to ES type
 				if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
@@ -123,22 +150,6 @@ func promEventsGenerator(mf *dto.MetricFamily) []collector.PromEvent {
 							name + "_count.counter": histogram.GetSampleCount(),
 						},
 						Labels: labels,
-					})
-				}
-
-				for _, bucket := range histogram.GetBucket() {
-					if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
-						continue
-					}
-
-					bucketLabels := labels.Clone()
-					bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
-
-					events = append(events, collector.PromEvent{
-						Data: common.MapStr{
-							name + "_bucket": bucket.GetCumulativeCount(),
-						},
-						Labels: bucketLabels,
 					})
 				}
 			*/
