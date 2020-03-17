@@ -46,6 +46,9 @@ var (
 			},
 		},
 	}
+	filesToRemove = []string{
+		filepath.Join("vendor", "github.com", "yuin", "gopher-lua", "parse", "Makefile"),
+	}
 )
 
 // Vendor cleans up go.mod and copies the files not carried over from modules cache.
@@ -75,7 +78,7 @@ func Vendor() error {
 
 	// copy packages which require the whole tree
 	for _, p := range copyAll {
-		path, err := gotool.ListModuleVendorDir(p.name)
+		path, err := gotool.ListModuleCacheDir(p.name)
 		if err != nil {
 			return err
 		}
@@ -88,6 +91,14 @@ func Vendor() error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	for _, p := range filesToRemove {
+		p = filepath.Join(repo.RootDir, p)
+		err = os.RemoveAll(p)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
