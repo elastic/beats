@@ -96,8 +96,7 @@ var (
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var indicesStruct IndicesStruct
-	err := json.Unmarshal(content, &indicesStruct)
-	if err != nil {
+	if err := parseAPIResponse(content, &indicesStruct); err != nil {
 		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
@@ -136,6 +135,10 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	return errs.Err()
+}
+
+func parseAPIResponse(content []byte, indicesStruct *IndicesStruct) error {
+	return json.Unmarshal(content, indicesStruct)
 }
 
 // Fields added here are based on same fields being added by internal collection in
