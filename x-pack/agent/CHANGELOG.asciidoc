@@ -17,3 +17,4 @@
 ==== New features
 
 - Generate index name in a format type-dataset-namespace {pull}16903[16903]
+- OS agnostic default configuration {pull}17016[17016]
