@@ -41,6 +41,7 @@ ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
 
 EXPOSE 9092
+EXPOSE 9093
 EXPOSE 2181
 
 # Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available

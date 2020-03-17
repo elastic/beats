@@ -147,6 +147,7 @@ services:
     build: ${ES_BEATS}/testing/environments/docker/kafka_kerberos
     expose:
       - 9092
+      - 9093
       - 2181
     environment:
       - ADVERTISED_HOST=kafka_kerberos
