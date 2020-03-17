@@ -23,9 +23,9 @@
               "title": "Filters"
             },
             "gridData": {
-              "h": 11,
+              "h": 17,
               "i": "28706ab2-1142-401d-9143-f4176a034c10",
-              "w": 10,
+              "w": 7,
               "x": 0,
               "y": 0
             },
@@ -36,34 +36,34 @@
           },
           {
             "embeddableConfig": {
-              "title": "CPU Utilization"
+              "title": "Instance Uptime"
             },
             "gridData": {
-              "h": 22,
-              "i": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
-              "w": 38,
-              "x": 10,
+              "h": 17,
+              "i": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+              "w": 10,
+              "x": 7,
               "y": 0
             },
-            "panelIndex": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+            "panelIndex": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
             "panelRefName": "panel_1",
-            "title": "CPU Utilization",
+            "title": "Instance Uptime",
             "version": "7.6.1"
           },
           {
             "embeddableConfig": {
-              "title": "Instance Uptime"
+              "title": "CPU Utilization"
             },
             "gridData": {
-              "h": 11,
-              "i": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
-              "w": 10,
-              "x": 0,
-              "y": 11
+              "h": 17,
+              "i": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
+              "w": 31,
+              "x": 17,
+              "y": 0
             },
-            "panelIndex": "2034fcc8-5cd7-4ee8-8c8f-99054f025b05",
+            "panelIndex": "5f6f2ecd-dcaf-4455-967c-ede6b38f431f",
             "panelRefName": "panel_2",
-            "title": "Instance Uptime",
+            "title": "CPU Utilization",
             "version": "7.6.1"
           },
           {
@@ -75,7 +75,7 @@
               "i": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
               "w": 24,
               "x": 0,
-              "y": 22
+              "y": 17
             },
             "panelIndex": "9c6f36f5-c2b2-40f5-8ee3-af6131168842",
             "panelRefName": "panel_3",
@@ -91,7 +91,7 @@
               "i": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
               "w": 24,
               "x": 24,
-              "y": 22
+              "y": 17
             },
             "panelIndex": "93906f63-42c9-4f30-9b2c-05041a9e1efe",
             "panelRefName": "panel_4",
@@ -107,7 +107,7 @@
               "i": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
               "w": 24,
               "x": 0,
-              "y": 37
+              "y": 32
             },
             "panelIndex": "e1a4e862-dd00-409f-8746-8a8e4bc82807",
             "panelRefName": "panel_5",
@@ -123,7 +123,7 @@
               "i": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
               "w": 24,
               "x": 24,
-              "y": 37
+              "y": 32
             },
             "panelIndex": "6f47ff85-3ec1-4f6f-a63b-1a56f0cfc9ce",
             "panelRefName": "panel_6",
@@ -139,7 +139,7 @@
               "i": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
               "w": 24,
               "x": 0,
-              "y": 52
+              "y": 47
             },
             "panelIndex": "00689e12-4cb3-49ad-ac33-dbe4279f446e",
             "panelRefName": "panel_7",
@@ -155,7 +155,7 @@
               "i": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
               "w": 24,
               "x": 24,
-              "y": 52
+              "y": 47
             },
             "panelIndex": "901e7bf5-35f5-4c1a-9627-27f6c20d2514",
             "panelRefName": "panel_8",
@@ -178,12 +178,12 @@
           "type": "visualization"
         },
         {
-          "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
+          "id": "da5bc460-63e1-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "da5bc460-63e1-11ea-b0ac-95d4ecb1fecd",
+          "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
           "name": "panel_2",
           "type": "visualization"
         },
@@ -219,8 +219,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-03-11T21:55:27.497Z",
-      "version": "Wzc5MiwyXQ=="
+      "updated_at": "2020-03-17T15:46:32.321Z",
+      "version": "WzgwNiwyXQ=="
     },
     {
       "attributes": {
@@ -319,73 +319,6 @@
       "type": "visualization",
       "updated_at": "2020-03-11T21:52:40.506Z",
       "version": "Wzc4NywyXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
-        },
-        "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
-            "drop_last_bucket": 0,
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "5m",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "#68BC00",
-                "fill": "0",
-                "formatter": "percent",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "",
-                "line_width": "2",
-                "metrics": [
-                  {
-                    "field": "googlecloud.compute.instance.cpu.utilization",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
-                  }
-                ],
-                "point_size": "3",
-                "separate_axis": 0,
-                "split_color_mode": "rainbow",
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "cloud.instance.name",
-                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
-                "type": "timeseries"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
-          "type": "metrics"
-        }
-      },
-      "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-03-09T17:22:26.247Z",
-      "version": "WzcwNCwxXQ=="
     },
     {
       "attributes": {
@@ -498,6 +431,73 @@
       "type": "visualization",
       "updated_at": "2020-03-11T22:29:03.883Z",
       "version": "WzgwMiwyXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "drop_last_bucket": 0,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "googlecloud.compute.instance.cpu.utilization",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "3",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "cloud.instance.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Compute CPU Utilization [Metricbeat Googlecloud]",
+          "type": "metrics"
+        }
+      },
+      "id": "3f472ea0-5e47-11ea-a4f6-717338406083",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-03-09T17:22:26.247Z",
+      "version": "WzcwNCwxXQ=="
     },
     {
       "attributes": {
