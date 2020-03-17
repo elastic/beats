@@ -5,10 +5,10 @@ This file is generated! See scripts/mage/docs_collector.go
 [options="header"]
 |===
 |Modules   |Dashboards   |Metricsets   
-|<<metricbeat-module-activemq,activemq>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>> beta[]  
-|<<metricbeat-metricset-activemq-queue,queue>> beta[]  
-|<<metricbeat-metricset-activemq-topic,topic>> beta[]  
+|<<metricbeat-module-activemq,activemq>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>>   
+|<<metricbeat-metricset-activemq-queue,queue>>   
+|<<metricbeat-metricset-activemq-topic,topic>>   
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
