@@ -16,12 +16,12 @@ import (
 }%%
 
 // unpack unpacks a CEF message.
-func (e *Event) unpack(data []byte) error {
+func (e *Event) unpack(data string) error {
     cs, p, pe, eof := 0, 0, len(data), len(data)
     mark := 0
 
     // Extension key.
-    var extKey []byte
+    var extKey string
 
     // Extension value start and end indices.
     extValueStart, extValueEnd := 0, 0
@@ -30,7 +30,7 @@ func (e *Event) unpack(data []byte) error {
     // recover from (though the parsing might not be "correct").
     var recoveredErrs []error
 
-    e.init()
+    e.init(data)
 
     %%{
         # Actions to execute while executing state machine.
@@ -38,31 +38,31 @@ func (e *Event) unpack(data []byte) error {
             mark = p
         }
         action version {
-            e.Version, _ = strconv.Atoi(string(data[mark:p]))
+            e.Version, _ = strconv.Atoi(data[mark:p])
         }
         action device_vendor {
-            e.DeviceVendor = string(replaceHeaderEscapes(data[mark:p]))
+            e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
         }
         action device_product {
-            e.DeviceProduct = string(replaceHeaderEscapes(data[mark:p]))
+            e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
         }
         action device_version {
-            e.DeviceVersion = string(replaceHeaderEscapes(data[mark:p]))
+            e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
         }
         action device_event_class_id {
-            e.DeviceEventClassID = string(replaceHeaderEscapes(data[mark:p]))
+            e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
         }
         action name {
-            e.Name = string(replaceHeaderEscapes(data[mark:p]))
+            e.Name = replaceHeaderEscapes(data[mark:p])
         }
         action severity {
-            e.Severity = string(data[mark:p])
+            e.Severity = data[mark:p]
         }
         action extension_key {
             // A new extension key marks the end of the last extension value.
             if len(extKey) > 0 && extValueStart <= mark - 1 {
                 e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:mark-1]))
-                extKey, extValueStart, extValueEnd = nil, 0, 0
+                extKey, extValueStart, extValueEnd = "", 0, 0
             }
             extKey = data[mark:p]
         }
@@ -77,7 +77,7 @@ func (e *Event) unpack(data []byte) error {
             // Reaching the EOF marks the end of the final extension value.
             if len(extKey) > 0 && extValueStart <= extValueEnd {
                 e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-                extKey, extValueStart, extValueEnd = nil, 0, 0
+                extKey, extValueStart, extValueEnd = "", 0, 0
             }
         }
         action extension_err {
@@ -85,7 +85,7 @@ func (e *Event) unpack(data []byte) error {
             fhold; fgoto gobble_extension;
         }
         action recover_next_extension {
-            extKey, extValueStart, extValueEnd = nil, 0, 0
+            extKey, extValueStart, extValueEnd = "", 0, 0
             // Resume processing at p, the start of the next extension key.
             p = mark;
             fgoto extensions;
