@@ -121,11 +121,6 @@ type shardStats struct {
 }
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
-	var indicesStruct IndicesStruct
-	if err := parseAPIResponse(content, &indicesStruct); err != nil {
-		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
-	}
-
 	clusterStateMetrics := []string{"metadata", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
@@ -133,7 +128,7 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	var indicesStats stats
-	if err := json.Unmarshal(content, &indicesStats); err != nil {
+	if err := parseAPIResponse(content, &indicesStats); err != nil {
 		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
 	}
 
@@ -167,8 +162,8 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	return nil
 }
 
-func parseAPIResponse(content []byte, indicesStruct *IndicesStruct) error {
-	return json.Unmarshal(content, indicesStruct)
+func parseAPIResponse(content []byte, indicesStats *stats) error {
+	return json.Unmarshal(content, indicesStats)
 }
 
 // Fields added here are based on same fields being added by internal collection in
