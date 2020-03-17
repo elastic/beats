@@ -57,14 +57,14 @@ func (a *ActionUnknown) OriginalType() string {
 	return a.originalType
 }
 
-// ActionPolicyChange is a request to apply a new
-type ActionPolicyChange struct {
+// ActionConfigChange is a request to apply a new
+type ActionConfigChange struct {
 	ActionID   string
 	ActionType string
-	Policy     map[string]interface{} `json:"policy"`
+	Config     map[string]interface{} `json:"config"`
 }
 
-func (a *ActionPolicyChange) String() string {
+func (a *ActionConfigChange) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
 	s.WriteString(a.ActionID)
@@ -74,12 +74,12 @@ func (a *ActionPolicyChange) String() string {
 }
 
 // Type returns the type of the Action.
-func (a *ActionPolicyChange) Type() string {
+func (a *ActionConfigChange) Type() string {
 	return a.ActionType
 }
 
 // ID returns the ID of the Action.
-func (a *ActionPolicyChange) ID() string {
+func (a *ActionConfigChange) ID() string {
 	return a.ActionID
 }
 
@@ -107,14 +107,14 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 
 	for _, response := range responses {
 		switch response.ActionType {
-		case "POLICY_CHANGE":
-			action = &ActionPolicyChange{
+		case "CONFIG_CHANGE":
+			action = &ActionConfigChange{
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 			}
 			if err := json.Unmarshal(response.Data, action); err != nil {
 				return errors.New(err,
-					"fail to decode POLICY_CHANGE action",
+					"fail to decode CONFIG_CHANGE action",
 					errors.TypeConfig)
 			}
 		default:

@@ -5,10 +5,10 @@ This file is generated! See scripts/mage/docs_collector.go
 [options="header"]
 |===
 |Modules   |Dashboards   |Metricsets   
-|<<metricbeat-module-activemq,activemq>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>> beta[]  
-|<<metricbeat-metricset-activemq-queue,queue>> beta[]  
-|<<metricbeat-metricset-activemq-topic,topic>> beta[]  
+|<<metricbeat-module-activemq,activemq>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>>   
+|<<metricbeat-metricset-activemq-queue,queue>>   
+|<<metricbeat-metricset-activemq-topic,topic>>   
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -207,7 +207,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>>   
 |<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
+.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
+|<<metricbeat-metricset-prometheus-remote_write,remote_write>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
 |<<metricbeat-metricset-rabbitmq-exchange,exchange>>   
@@ -222,10 +223,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-redisenterprise-proxy,proxy>> beta[]  
 |<<metricbeat-module-sql,sql>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-sql-query,query>> beta[]  
-|<<metricbeat-module-stan,Stan>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>> beta[]  
-|<<metricbeat-metricset-stan-stats,stats>> beta[]  
-|<<metricbeat-metricset-stan-subscriptions,subscriptions>> beta[]  
+|<<metricbeat-module-stan,Stan>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>>   
+|<<metricbeat-metricset-stan-stats,stats>>   
+|<<metricbeat-metricset-stan-subscriptions,subscriptions>>   
 |<<metricbeat-module-statsd,Statsd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-statsd-server,server>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -264,7 +265,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>> beta[]  
+.3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
 |<<metricbeat-metricset-zookeeper-server,server>>   
 |===
