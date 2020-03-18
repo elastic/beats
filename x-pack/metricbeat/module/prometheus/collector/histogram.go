@@ -18,18 +18,10 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 	var values []float64
 	var counts []uint64
 
-	// sort buckets
-	buckets := histogram.GetBucket()
-	/*
-		sort.SliceStable(buckets, func(i, j int) bool {
-			return buckets[i].GetUpperBound() < buckets[j].GetUpperBound()
-		})
-	*/
-
 	// calculate centroids and rated counts
 	var lastUpper float64
 	var sumCount uint64
-	for _, bucket := range buckets {
+	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
 		if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
 			continue
