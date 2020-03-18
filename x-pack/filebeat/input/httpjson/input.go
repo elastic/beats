@@ -312,7 +312,6 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 		switch obj := m.(type) {
 		// Top level Array
 		case []interface{}:
-			in.log.Info("Processed:", len(obj))
 			mm, err = in.processEventArray(obj)
 			if err != nil {
 				return err
