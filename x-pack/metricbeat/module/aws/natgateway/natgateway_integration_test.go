@@ -14,11 +14,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("natgateway", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
-
+	config := mtest.GetConfigForTest("natgateway", "300s")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }
