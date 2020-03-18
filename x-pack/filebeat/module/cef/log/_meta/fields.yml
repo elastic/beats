@@ -8,3 +8,248 @@
       type: keyword
       description: >
         Virus ID
+
+
+- name: checkpoint
+  type: group
+  default_field: false
+  description: >
+    Fields for Check Point custom string mappings.
+  fields:
+    - name: app_risk
+      type: keyword
+      description: Application risk.
+
+    - name: app_severity
+      type: keyword
+      description: Application threat severity.
+
+    - name: app_sig_id
+      type: keyword
+      description: The signature ID which the application was detected by.
+
+    - name: auth_method
+      type: keyword
+      description: Password authentication protocol used.
+
+    - name: category
+      type: keyword
+      description: Category.
+
+    - name: confidence_level
+      type: keyword
+      description: Confidence level determined.
+
+    - name: connectivity_state
+      type: keyword
+      description: Connectivity state.
+
+    - name: cookie
+      type: keyword
+      description: IKE cookie.
+
+    - name: dst_phone_number
+      type: keyword
+      description: Destination IP-Phone.
+
+    - name: email_control
+      type: keyword
+      description: Engine name.
+
+    - name: email_id
+      type: keyword
+      description: Internal email ID.
+
+    - name: email_recipients_num
+      type: long
+      description: Number of recipients.
+
+    - name: email_session_id
+      type: keyword
+      description: Internal email session ID.
+
+    - name: email_spool_id
+      type: keyword
+      description: Internal email spool ID.
+
+    - name: email_subject
+      type: keyword
+      description: Email subject.
+
+    - name: event_count
+      type: long
+      description: Number of events associated with the log.
+
+    - name: file_hash
+      type: keyword
+      description: File hash (SHA1 or MD5).
+
+    - name: frequency
+      type: keyword
+      description: Scan frequency.
+
+    - name: icmp_type
+      type: long
+      description: ICMP type.
+
+    - name: icmp_code
+      type: long
+      description: ICMP code.
+
+    - name: identity_type
+      type: keyword
+      description: Identity type.
+
+    - name: incident_extension
+      type: keyword
+      description: Format of original data.
+
+    - name: integrity_av_invoke_type
+      type: keyword
+      description: Scan invoke type.
+
+    - name: peer_gateway
+      type: ip
+      description: Main IP of the peer Security Gateway.
+
+    - name: performance_impact
+      type: keyword
+      description: Protection performance impact.
+
+    - name: protection_id
+      type: keyword
+      description: Protection malware ID.
+
+    - name: protection_name
+      type: keyword
+      description: Specific signature name of the attack.
+
+    - name: protection_type
+      type: keyword
+      description: Type of protection used to detect the attack.
+
+    - name: scan_result
+      type: keyword
+      description: Scan result.
+
+    - name: sensor_mode
+      type: keyword
+      description: Sensor mode.
+
+    - name: severity
+      type: keyword
+      description: Threat severity.
+
+    - name: malware_status
+      type: keyword
+      description: Malware status.
+
+    - name: subscription_expiration
+      type: date
+      description: The expiration date of the subscription.
+
+    - name: tcp_flags
+      type: keyword
+      description: TCP packet flags.
+
+    - name: termination_reason
+      type: keyword
+      description: Termination reason.
+
+    - name: update_status
+      type: keyword
+      description: Update status.
+
+    - name: user_status
+      type: keyword
+      description: User response.
+
+    - name: uuid
+      type: keyword
+      description: External ID.
+
+    - name: virus_name
+      type: keyword
+      description: Virus name.
+
+    - name: malware_name
+      type: keyword
+      description: Malware name.
+
+    - name: malware_family
+      type: keyword
+      description: Malware family.
+
+    - name: voip_log_type
+      type: keyword
+      description: VoIP log types.
+
+- name: cef.extensions
+  type: group
+  default_field: false
+  description: >
+    Extra vendor-specific extensions.
+  fields:
+
+    - name: cp_app_risk
+      type: keyword
+
+    - name: cp_severity
+      type: keyword
+
+    - name: ifname
+      type: keyword
+
+    - name: inzone
+      type: keyword
+
+    - name: layer_uuid
+      type: keyword
+
+    - name: layer_name
+      type: keyword
+
+    - name: logid
+      type: keyword
+
+    - name: loguid
+      type: keyword
+
+    - name: match_id
+      type: keyword
+
+    - name: nat_addtnl_rulenum
+      type: keyword
+
+    - name: nat_rulenum
+      type: keyword
+
+    - name: origin
+      type: keyword
+
+    - name: originsicname
+      type: keyword
+
+    - name: outzone
+      type: keyword
+
+    - name: parent_rule
+      type: keyword
+
+    - name: product
+      type: keyword
+
+    - name: rule_action
+      type: keyword
+
+    - name: rule_uid
+      type: keyword
+
+    - name: sequencenum
+      type: keyword
+
+    - name: service_id
+      type: keyword
+
+    - name: version
+      type: keyword
