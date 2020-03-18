@@ -1,11 +1,41 @@
-This is the `query` metricset to query from https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries.
+This is the `query` metricset to query from querring API[https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries] of Promtheus.
 
 
 [float]
 === Configuration
 
-This module can query using HTTP API provided by Prometheus.
-https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries
+[float]
+==== Instant queries
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  paths:
+  - name: "sum_rate_http_requests_total"
+    path: "/api/v1/query"
+    fields:
+      query: "sum(rate(prometheus_http_requests_total[1m]))"
+-------------------------------------------------------------------------------------
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  paths:
+  - name: 'up'
+    path: '/api/v1/query'
+    fields:
+      query: "up"
+-------------------------------------------------------------------------------------
+
+
+[float]
+==== Range queries
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -14,11 +44,11 @@ https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries
   metricsets: ["query"]
   hosts: ["node:9100"]
   paths:
-  - name: 'http_request'
-    path: '/api/v1/query_range'
+  - name: "up_master"
+    path: "/api/v1/query_range"
     fields:
-      'query': 'up{node="master01"}'
-      'start': '2019-12-20T23:30:00.000Z'
-      'end': '2019-12-21T00:00:00.000Z'
-      'step': 1h
+      query: "up{node="master01"}"
+      start: "2019-12-20T23:30:00.000Z"
+      end: "2019-12-21T00:00:00.000Z"
+      step: 1h
 -------------------------------------------------------------------------------------

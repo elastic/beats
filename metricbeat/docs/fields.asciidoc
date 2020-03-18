@@ -31595,6 +31595,16 @@ type: object
 
 --
 
+*`prometheus.query.*`*::
++
+--
+Prometheus value resulted from PromQL
+
+
+type: object
+
+--
+
 [float]
 === query
 
