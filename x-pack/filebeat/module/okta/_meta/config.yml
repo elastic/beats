@@ -6,3 +6,9 @@
 
     # URL of the Okta REST API
     #var.url
+
+    # Disable SSL verification 
+    #var.ssl: |-
+    #  {
+    #    "verification_mode": "none"
+    #  }
