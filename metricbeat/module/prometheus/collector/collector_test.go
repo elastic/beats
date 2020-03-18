@@ -196,8 +196,9 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 		},
 	}
 
+	p := promEventGenerator{}
 	for _, test := range tests {
-		event := DefaultPromEventsGenerator(test.Family)
+		event := p.GeneratePromEvents(test.Family)
 		assert.Equal(t, test.Event, event)
 	}
 }

@@ -19,7 +19,7 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 	var counts []uint64
 
 	// calculate centroids and rated counts
-	var lastUpper float64
+	var lastUpper, prevUpper float64
 	var sumCount uint64
 	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
@@ -27,9 +27,10 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 			continue
 		}
 
+		prevUpper = lastUpper
 		if bucket.GetUpperBound() == math.Inf(0) {
-			// Report +Inf bucket as a point
-			values = append(values, lastUpper)
+			// Report +Inf bucket as a point, interpolating its value
+			values = append(values, lastUpper+(lastUpper-prevUpper))
 		} else {
 			// calculate bucket centroid
 			values = append(values, lastUpper+(bucket.GetUpperBound()-lastUpper)/2.0)

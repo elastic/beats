@@ -28,7 +28,6 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
 		counters := NewCounterCache(base.Module().Config().Period * 5)
-		counters.Start()
 
 		if config.RateCounters {
 			cfgwarn.Beta("Prometheus 'rate_counters' settings is experimental")
@@ -39,11 +38,10 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 			rateCounters: config.RateCounters,
 		}
 
-		// TODO cache cleanup on module stop, probably make this an interface
-		return g.promEventsGenerator, nil
+		return &g, nil
 	}
 
-	return collector.DefaultPromEventsGenerator, nil
+	return collector.DefaultPromEventsGeneratorFactory(base)
 }
 
 type typedGenerator struct {
@@ -51,9 +49,17 @@ type typedGenerator struct {
 	rateCounters bool
 }
 
-// promEventsGenerator stores all Prometheus metrics using
+func (g *typedGenerator) Start() {
+	g.counterCache.Start()
+}
+
+func (g *typedGenerator) Stop() {
+	g.counterCache.Stop()
+}
+
+// GeneratePromEvents stores all Prometheus metrics using
 // only double field type in Elasticsearch.
-func (g *typedGenerator) promEventsGenerator(mf *dto.MetricFamily) []collector.PromEvent {
+func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
 	name := *mf.Name

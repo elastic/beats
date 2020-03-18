@@ -41,12 +41,17 @@ func (p *PromEvent) LabelsHash() string {
 
 // DefaultPromEventsGeneratorFactory returns the default prometheus events generator
 func DefaultPromEventsGeneratorFactory(ms mb.BaseMetricSet) (PromEventsGenerator, error) {
-	return DefaultPromEventsGenerator, nil
+	return &promEventGenerator{}, nil
 }
+
+type promEventGenerator struct{}
+
+func (p *promEventGenerator) Start() {}
+func (p *promEventGenerator) Stop()  {}
 
 // DefaultPromEventsGenerator stores all Prometheus metrics using
 // only double field type in Elasticsearch.
-func DefaultPromEventsGenerator(mf *dto.MetricFamily) []PromEvent {
+func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEvent {
 	var events []PromEvent
 
 	name := *mf.Name

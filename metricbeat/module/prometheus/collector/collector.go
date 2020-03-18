@@ -19,6 +19,7 @@ package collector
 
 import (
 	"regexp"
+	"sync"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -52,7 +53,16 @@ func init() {
 }
 
 // PromEventsGenerator converts a Prometheus metric family into a PromEvent list
-type PromEventsGenerator func(mf *dto.MetricFamily) []PromEvent
+type PromEventsGenerator interface {
+	// Start must be called before using the generator
+	Start()
+
+	// converts a Prometheus metric family into a list of PromEvents
+	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
+
+	// Stop must be called when the generator won't be used anymore
+	Stop()
+}
 
 // PromEventsGeneratorFactory creates a PromEventsGenerator when instanciating a metricset
 type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, error)
@@ -64,7 +74,8 @@ type MetricSet struct {
 	includeMetrics []*regexp.Regexp
 	excludeMetrics []*regexp.Regexp
 	namespace      string
-	genPromEvents  PromEventsGenerator
+	promEventsGen  PromEventsGenerator
+	once           sync.Once
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -80,7 +91,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			return nil, err
 		}
 
-		genPromEvents, err := genFactory(base)
+		promEventsGen, err := genFactory(base)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +100,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			BaseMetricSet: base,
 			prometheus:    prometheus,
 			namespace:     namespace,
-			genPromEvents: genPromEvents,
+			promEventsGen: promEventsGen,
 		}
 		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
@@ -106,6 +117,8 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	m.once.Do(m.promEventsGen.Start)
+
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
 	if err != nil {
@@ -122,7 +135,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if m.skipFamily(family) {
 			continue
 		}
-		promEvents := m.genPromEvents(family)
+		promEvents := m.promEventsGen.GeneratePromEvents(family)
 
 		for _, promEvent := range promEvents {
 			labelsHash := promEvent.LabelsHash()
@@ -160,6 +173,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
+	return nil
+}
+
+// Close stops the metricset
+func (m *MetricSet) Close() error {
+	m.promEventsGen.Stop()
 	return nil
 }
 
