@@ -186,6 +186,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 - Add Filebeat Okta module. {pull}16362[16362]
+- Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}NNNN[NNNN]
+- Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
 
 *Heartbeat*
 
