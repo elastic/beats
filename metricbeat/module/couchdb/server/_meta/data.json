@@ -8,26 +8,26 @@
                 "database_reads": 0,
                 "database_writes": 0,
                 "open_databases": 0,
-                "open_os_files": 1,
-                "request_time": 0
+                "open_os_files": 0,
+                "request_time": 12.667
             },
             "httpd": {
                 "bulk_requests": 0,
                 "clients_requesting_changes": 0,
-                "requests": 80,
+                "requests": 4,
                 "temporary_view_reads": 0,
                 "view_reads": 0
             },
             "httpd_request_methods": {
                 "COPY": 0,
                 "DELETE": 0,
-                "GET": 80,
+                "GET": 4,
                 "HEAD": 0,
                 "POST": 0,
                 "PUT": 0
             },
             "httpd_status_codes": {
-                "200": 80,
+                "200": 4,
                 "201": 0,
                 "202": 0,
                 "301": 0,
@@ -43,12 +43,6 @@
             }
         }
     },
-    "ecs": {
-        "service": {
-            "id": "0ae996d03cd96d22851f3df77d553a25",
-            "version": "2.3.1"
-        }
-    },
     "event": {
         "dataset": "couchdb.server",
         "duration": 115000,
@@ -59,7 +53,9 @@
         "period": 10000
     },
     "service": {
-        "address": "172.17.0.2:5986",
-        "type": "couchdb"
+        "address": "172.19.0.2:5984",
+        "id": "7021f7f554d9dd612adf13a6987d1358",
+        "type": "couchdb",
+        "version": "1.7.2"
     }
 }
