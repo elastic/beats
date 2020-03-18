@@ -31596,6 +31596,12 @@ type: object
 --
 
 [float]
+=== query
+
+query metricset
+
+
+[float]
 === remote_write
 
 remote write metrics from Prometheus server

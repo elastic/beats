@@ -20,7 +20,7 @@ package query
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Config for "query" metricset

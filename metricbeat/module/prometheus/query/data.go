@@ -19,11 +19,12 @@ package query
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/pkg/errors"
 )
 
@@ -52,7 +53,7 @@ type mapResult struct {
 	Vectors [][]interface{}   `json:"values"`
 }
 
-func (m *MetricSet) parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
+func parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
 	var events []mb.Event
 	converted, resultType, err := convertJSONToStruct(body)
 	if err != nil {
@@ -105,7 +106,11 @@ func convertJSONToStruct(body []byte) (interface{}, string, error) {
 	if err := json.Unmarshal(body, &arrayBody); err != nil {
 		return nil, "", errors.Wrap(err, "Failed to parse api response")
 	}
-
+	if arrayBody.Status == "error" {
+		return nil, "", errors.Errorf("Failed to query")
+	}
+	fmt.Println("here it is:")
+	fmt.Println(arrayBody)
 	if arrayBody.Data.ResultType == "vector" || arrayBody.Data.ResultType == "matrix" {
 		mapBody := MapResponse{}
 		if err := json.Unmarshal(body, &mapBody); err != nil {

@@ -18,16 +18,29 @@
 package query
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"io/ioutil"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
+	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/pkg/errors"
 )
 
+const (
+	defaultScheme = "http"
+)
+
+var (
+	hostParser = parse.URLHostParserBuilder{
+		DefaultScheme: defaultScheme,
+	}.Build()
+)
+
 func init() {
-	mb.Registry.MustAddMetricSet("prometheus", "query", New)
+	mb.Registry.MustAddMetricSet("prometheus", "query", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet for Prometheus Query
@@ -64,10 +77,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, pathConfig := range m.paths {
 		url := m.getURL(pathConfig.Path, pathConfig.Fields)
+		fmt.Println(url)
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "unable to fetch data from prometheus endpoint")
 		}
 		defer func() {
 			if err := response.Body.Close(); err != nil {
@@ -80,9 +94,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return err
 		}
 
-		events, parseErr := m.parseResponse(body, pathConfig)
+		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
-			return err
+			m.Logger().Debug("error parsing response for ", pathConfig.Name, ": ", parseErr)
+			reporter.Error(errors.Wrap(err, "error mapping channel to its schema"))
+			continue
 		}
 		for _, e := range events {
 			if reported := reporter.Event(e); !reported {
@@ -95,5 +111,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 func (m *MetricSet) getURL(path string, queryMap common.MapStr) string {
 	queryStr := mb.QueryParams(queryMap).String()
-	return "http://" + m.BaseMetricSet.Host() + path + "?" + queryStr
+	return m.http.GetURI() + path + "?" + queryStr
 }
