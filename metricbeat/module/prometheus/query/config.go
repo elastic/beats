@@ -25,30 +25,30 @@ import (
 
 // Config for "query" metricset
 type Config struct {
-	Paths       []PathConfig `config:"paths"`
-	DefaultPath PathConfig   `config:"default_path"`
+	Queries      []QueryConfig `config:"queries"`
+	DefaultQuery QueryConfig   `config:"default_path"`
 }
 
 // PathConfig is used to make a API request.
-type PathConfig struct {
-	Path   string        `config:"path"`
-	Fields common.MapStr `config:"fields"`
-	Name   string        `config:"name"`
+type QueryConfig struct {
+	Path        string        `config:"path"`
+	QueryParams common.MapStr `config:"query_params"`
+	QueryName   string        `config:"query_name"`
 }
 
 func defaultConfig() Config {
 	return Config{
-		DefaultPath: PathConfig{
-			Path: "/api/v1/query",
-			Name: "default",
+		DefaultQuery: QueryConfig{
+			Path:      "/api/v1/query",
+			QueryName: "default",
 		},
 	}
 }
 
 // Validate for Prometheus "query" metricset config
-func (p PathConfig) Validate() error {
-	if p.Name == "" {
-		return errors.New("`namespace` can not be empty in path configuration")
+func (p QueryConfig) Validate() error {
+	if p.QueryName == "" {
+		return errors.New("`query_name` can not be empty in path configuration")
 	}
 
 	if p.Path == "" {

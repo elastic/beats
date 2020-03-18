@@ -23,9 +23,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/pkg/errors"
 )
 
 // ArrayResponse is for "scalar", "string" type.
@@ -53,7 +54,7 @@ type mapResult struct {
 	Vectors [][]interface{}   `json:"values"`
 }
 
-func parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
+func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 	var events []mb.Event
 	converted, resultType, err := convertJSONToStruct(body)
 	if err != nil {
@@ -65,8 +66,8 @@ func parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
 		events = append(events, mb.Event{
 			Timestamp: getTimestamp(res.Data.Results[0].(float64)),
 			MetricSetFields: common.MapStr{
-				"dataType":      resultType,
-				pathConfig.Name: convertToNumeric(res.Data.Results[1].(string)),
+				"dataType":           resultType,
+				pathConfig.QueryName: convertToNumeric(res.Data.Results[1].(string)),
 			},
 		})
 	case "vector":
@@ -75,9 +76,9 @@ func parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
 			events = append(events, mb.Event{
 				Timestamp: getTimestamp(result.Vector[0].(float64)),
 				MetricSetFields: common.MapStr{
-					"labels":        result.Metric,
-					"dataType":      resultType,
-					pathConfig.Name: convertToNumeric(result.Vector[1].(string)),
+					"labels":             result.Metric,
+					"dataType":           resultType,
+					pathConfig.QueryName: convertToNumeric(result.Vector[1].(string)),
 				},
 			})
 		}
@@ -88,9 +89,9 @@ func parseResponse(body []byte, pathConfig PathConfig) ([]mb.Event, error) {
 				events = append(events, mb.Event{
 					Timestamp: getTimestamp(vector[0].(float64)),
 					MetricSetFields: common.MapStr{
-						"labels":        result.Metric,
-						"dataType":      resultType,
-						pathConfig.Name: convertToNumeric(vector[1].(string)),
+						"labels":             result.Metric,
+						"dataType":           resultType,
+						pathConfig.QueryName: convertToNumeric(vector[1].(string)),
 					},
 				})
 			}

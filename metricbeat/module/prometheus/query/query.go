@@ -18,13 +18,15 @@
 package query
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 const (
@@ -46,8 +48,8 @@ func init() {
 // MetricSet type defines all fields of the MetricSet for Prometheus Query
 type MetricSet struct {
 	mb.BaseMetricSet
-	http  *helper.HTTP
-	paths []PathConfig
+	http    *helper.HTTP
+	queries []QueryConfig
 }
 
 // New create a new instance of the MetricSet
@@ -67,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		paths:         config.Paths,
+		queries:       config.Queries,
 	}, nil
 }
 
@@ -75,13 +77,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	for _, pathConfig := range m.paths {
-		url := m.getURL(pathConfig.Path, pathConfig.Fields)
+	for _, pathConfig := range m.queries {
+		url := m.getURL(pathConfig.Path, pathConfig.QueryParams)
 		fmt.Println(url)
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
-			return errors.Wrap(err, "unable to fetch data from prometheus endpoint")
+			msg := fmt.Sprintf("unable to fetch data from prometheus endpoint: %v", pathConfig.Path)
+			m.Logger().Debug(msg, err)
+			reporter.Error(errors.Wrap(err, msg))
+			continue
 		}
 		defer func() {
 			if err := response.Body.Close(); err != nil {
@@ -96,14 +101,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
-			m.Logger().Debug("error parsing response for ", pathConfig.Name, ": ", parseErr)
-			reporter.Error(errors.Wrap(err, "error mapping channel to its schema"))
+			msg := fmt.Sprintf("error parsing response for: %v", pathConfig.QueryName)
+			m.Logger().Debug(msg, err)
+			reporter.Error(errors.Wrap(err, msg))
 			continue
 		}
 		for _, e := range events {
-			if reported := reporter.Event(e); !reported {
-				m.Logger().Debug(errors.Errorf("error reporting event: %#v", e))
-			}
+			reporter.Event(e)
 		}
 	}
 	return nil
