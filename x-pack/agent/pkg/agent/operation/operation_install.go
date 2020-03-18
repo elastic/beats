@@ -67,5 +67,6 @@ func (o *operationInstall) Run(ctx context.Context, application Application) (er
 		}
 	}()
 
-	return o.installer.Install(o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	_, err = o.installer.Install(o.program.BinaryName(), o.program.Version(), o.program.Directory())
+	return err
 }

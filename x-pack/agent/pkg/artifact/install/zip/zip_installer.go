@@ -34,18 +34,18 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, installDir string) error {
+func (i *Installer) Install(programName, version, installDir string) (string, error) {
 	if err := i.unzip(programName, version, installDir); err != nil {
-		return err
+		return "", err
 	}
 
 	oldPath := filepath.Join(installDir, fmt.Sprintf("%s-%s-windows", programName, version))
 	newPath := filepath.Join(installDir, strings.Title(programName))
 	if err := os.Rename(oldPath, newPath); err != nil {
-		return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, newPath))
+		return oldPath, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, newPath))
 	}
 
-	return i.runInstall(programName, installDir)
+	return newPath, i.runInstall(programName, installDir)
 }
 
 func (i *Installer) unzip(programName, version, installPath string) error {

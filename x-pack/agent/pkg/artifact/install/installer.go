@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/snapshot"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/tar"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/zip"
 )
@@ -23,7 +24,7 @@ type Installer interface {
 	// Install installs an artifact and returns
 	// location of the installed program
 	// error if something went wrong
-	Install(programName, version, installDir string) error
+	Install(programName, version, installDir string) (string, error)
 }
 
 // NewInstaller returns a correct installer associated with a
@@ -36,8 +37,25 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 		return nil, ErrConfigNotProvided
 	}
 
+	var i Installer
+	var err error
+
 	if runtime.GOOS == "windows" {
-		return zip.NewInstaller(config)
+		i, err = zip.NewInstaller(config)
+	} else {
+		i, err = tar.NewInstaller(config)
 	}
-	return tar.NewInstaller(config)
+	if err != nil {
+		return nil, err
+	}
+
+	if IsSnapshot() {
+		return snapshot.NewInstaller(i)
+	}
+
+	return i, nil
+}
+
+func IsSnapshot() bool {
+	return true
 }
