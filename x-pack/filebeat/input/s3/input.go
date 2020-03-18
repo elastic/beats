@@ -587,33 +587,34 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
-	f := common.MapStr{
-		"message": log,
-		"log": common.MapStr{
-			"offset":    int64(offset),
-			"file.path": constructObjectURL(info),
-		},
-		"aws": common.MapStr{
-			"s3": common.MapStr{
-				"bucket": common.MapStr{
-					"name": info.name,
-					"arn":  info.arn},
-				"object.key": info.key,
+	s3Ctx.Inc()
+
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": log,
+			"log": common.MapStr{
+				"offset":    int64(offset),
+				"file.path": constructObjectURL(info),
+			},
+			"aws": common.MapStr{
+				"s3": common.MapStr{
+					"bucket": common.MapStr{
+						"name": info.name,
+						"arn":  info.arn},
+					"object.key": info.key,
+				},
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   info.region,
 			},
 		},
-		"cloud": common.MapStr{
-			"provider": "aws",
-			"region":   info.region,
-		},
+		Private: s3Ctx,
 	}
+	event.SetID(objectHash + "-" + fmt.Sprintf("%012d", offset))
 
-	s3Ctx.Inc()
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields:    f,
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Ctx,
-	}
+	return event
 }
 
 func constructObjectURL(info s3Info) string {
