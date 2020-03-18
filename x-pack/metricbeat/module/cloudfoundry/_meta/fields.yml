@@ -8,6 +8,10 @@
       type: group
       description: >
       fields:
+        - name: type
+          type: keyword
+          description: >
+            The type of event from Cloud Foundry.
         - name: app
           type: group
           description: >
