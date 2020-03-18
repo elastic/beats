@@ -1,12 +1,12 @@
 import os
 import re
 import sys
-import unittest
 import yaml
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
 
 from beat.beat import TestCase
+from beat.tags import tag
 from parameterized import parameterized_class
 
 COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
@@ -140,26 +140,3 @@ def parameterized_with_supported_versions(base_class):
     variants = supported_versions(versions_path)
     decorator = parameterized_class(['COMPOSE_ENV'], variants)
     decorator(base_class)
-
-
-def tag(tag):
-    """
-    Decorates a test function with a tag following go build tags semantics,
-    if the tag is not included in TEST_TAGS environment variable, the test is
-    skipped.
-    TEST_TAGS can be a comma-separated list of tags, e.g: TEST_TAGS=oracle,mssql.
-    """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            set_tags = [
-                tag.strip() for tag in os.environ.get("TEST_TAGS", "").split(",")
-                if tag.strip() != ""
-            ]
-            if not tag in set_tags:
-                raise unittest.SkipTest("tag '{}' is not included in TEST_TAGS".format(tag))
-            return func(*args, **kwargs)
-        wrapper.__name__ = func.__name__
-        wrapper.__doc__ = func.__doc__
-        return wrapper
-
-    return decorator
