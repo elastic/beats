@@ -36,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -171,11 +170,11 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
+	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
 		return memqueue.NewQueue(log,
 			memqueue.Settings{
-				Eventer: e,
-				Events:  20,
+				ACKListener: ackListener,
+				Events:      20,
 			}), nil
 	}
 
@@ -332,7 +331,7 @@ func makeClient(
 	host string,
 	params map[string]string,
 	proxyURL *url.URL,
-	tlsConfig *transport.TLSConfig,
+	tlsConfig *tlscommon.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)

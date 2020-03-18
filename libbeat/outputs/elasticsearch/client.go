@@ -31,10 +31,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -42,7 +43,7 @@ import (
 // Client is an elasticsearch client.
 type Client struct {
 	Connection
-	tlsConfig *transport.TLSConfig
+	tlsConfig *tlscommon.TLSConfig
 
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
@@ -67,7 +68,7 @@ type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
 	ProxyDisable       bool
-	TLS                *transport.TLSConfig
+	TLS                *tlscommon.TLSConfig
 	Username, Password string
 	APIKey             string
 	EscapeHTML         bool

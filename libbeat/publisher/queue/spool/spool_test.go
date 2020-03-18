@@ -36,7 +36,7 @@ var seed int64
 var debug bool
 
 type testQueue struct {
-	*Spool
+	*diskSpool
 	teardown func()
 }
 
@@ -104,7 +104,7 @@ func makeTestQueue(
 			logger = new(silentLogger)
 		}
 
-		spool, err := NewSpool(logger, path, Settings{
+		spool, err := newDiskSpool(logger, path, settings{
 			WriteBuffer:       writeBuffer,
 			WriteFlushTimeout: flushTimeout,
 			Codec:             codecCBORL,
@@ -119,13 +119,13 @@ func makeTestQueue(
 			t.Fatal(err)
 		}
 
-		tq := &testQueue{Spool: spool, teardown: cleanPath}
+		tq := &testQueue{diskSpool: spool, teardown: cleanPath}
 		return tq
 	}
 }
 
 func (t *testQueue) Close() error {
-	err := t.Spool.Close()
+	err := t.diskSpool.Close()
 	t.teardown()
 	return err
 }

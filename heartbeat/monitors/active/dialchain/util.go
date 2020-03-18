@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 )
 
 type timer struct {

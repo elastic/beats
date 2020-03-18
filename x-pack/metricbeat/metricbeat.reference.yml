@@ -133,7 +133,10 @@ metricbeat.modules:
   #diskio.include_devices: []
 
   # Filter systemd services by status or sub-status
-  #service.state_filter: []
+  #service.state_filter: ["active"]
+
+  # Filter systemd services based on a name pattern
+  #service.pattern_filter: ["ssh*", "nfs*"]
 
 #------------------------------- Activemq Module -------------------------------
 - module: activemq
@@ -222,6 +225,9 @@ metricbeat.modules:
 - module: aws
   period: 60s
   credential_profile_name: test-mb
+  tags_filter:
+    - key: "dept"
+      value: "eng"
   metricsets:
     - rds
 
@@ -508,6 +514,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -919,6 +927,19 @@ metricbeat.modules:
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
 
+#----------------------------- Openmetrics Module -----------------------------
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
+
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
   metricsets: ["tablespace", "performance"]
@@ -968,8 +989,10 @@ metricbeat.modules:
   #password: pass
 
 #------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
 - module: prometheus
   period: 10s
+  metricsets: ["collector"]
   hosts: ["localhost:9090"]
   metrics_path: /metrics
   #metrics_filters:
@@ -982,6 +1005,16 @@ metricbeat.modules:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+# Metrics sent by a Prometheus server using remote_write option
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq

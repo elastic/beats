@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -46,6 +45,9 @@ var (
 				"src",
 			},
 		},
+	}
+	filesToRemove = []string{
+		filepath.Join("vendor", "github.com", "yuin", "gopher-lua", "parse", "Makefile"),
 	}
 )
 
@@ -76,11 +78,10 @@ func Vendor() error {
 
 	// copy packages which require the whole tree
 	for _, p := range copyAll {
-		path, err := gotool.ListModulePath(p.name)
+		path, err := gotool.ListModuleCacheDir(p.name)
 		if err != nil {
 			return err
 		}
-		fmt.Println(path)
 
 		for _, f := range p.filesToCopy {
 			from := filepath.Join(path, f)
@@ -90,6 +91,14 @@ func Vendor() error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	for _, p := range filesToRemove {
+		p = filepath.Join(repo.RootDir, p)
+		err = os.RemoveAll(p)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

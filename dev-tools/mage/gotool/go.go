@@ -93,19 +93,36 @@ func ListTestFiles(pkg string) ([]string, error) {
 	return getLines(callGo(nil, "list", "-f", tmpl, pkg))
 }
 
-// ListModulePath returns the path to the module in the cache.
-func ListModulePath(pkg string) (string, error) {
-	const tmpl = `{{.Dir}}`
+// ListModuleCacheDir returns the module cache directory containing
+// the specified module. If the module does not exist in the cache,
+// an error will be returned.
+func ListModuleCacheDir(pkg string) (string, error) {
+	return listModuleDir(pkg, false)
+}
+
+// ListModuleVendorDir returns the vendor directory containing the
+// specified module. If the module has not been vendored, an error
+// will be returned.
+func ListModuleVendorDir(pkg string) (string, error) {
+	return listModuleDir(pkg, true)
+}
+
+func listModuleDir(pkg string, vendor bool) (string, error) {
 	env := map[string]string{
-		// make sure to look in the module cache
+		// Make sure GOFLAGS does not influence behaviour.
 		"GOFLAGS": "",
 	}
-	lines, err := getLines(callGo(env, "list", "-m", "-f", tmpl, pkg))
+	args := []string{"-m", "-f", "{{.Dir}}"}
+	if vendor {
+		args = append(args, "-mod=vendor")
+	}
+	args = append(args, pkg)
+	lines, err := getLines(callGo(env, "list", args...))
 	if err != nil {
 		return "", err
 	}
 	if n := len(lines); n != 1 {
-		return "", fmt.Errorf("expected 1 line, got %d", n)
+		return "", fmt.Errorf("expected 1 line, got %d while looking for %s", n, pkg)
 	}
 	return lines[0], nil
 }

@@ -425,6 +425,26 @@ func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
 	require.Len(t, procs.List, 1)
 }
 
+func TestProcessorsForMetricSet_ListModules(t *testing.T) {
+	source := NewLightModulesSource("testdata/lightmodules")
+	modules, err := source.Modules()
+	require.NoError(t, err)
+
+	// Check that regular file in directory is not listed as module
+	require.FileExists(t, "testdata/lightmodules/regular_file")
+	assert.NotContains(t, modules, "regular_file")
+
+	expectedModules := []string{
+		"broken",
+		"httpextended",
+		"mixed",
+		"mixedbroken",
+		"service",
+		"unpack",
+	}
+	assert.ElementsMatch(t, expectedModules, modules, "Modules found: %v", modules)
+}
+
 type metricSetWithOption struct {
 	BaseMetricSet
 	Option string

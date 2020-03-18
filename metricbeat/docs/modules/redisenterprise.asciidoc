@@ -15,7 +15,7 @@ The defaut metricsets are `node` and `proxy`.
 [float]
 === Module-specific configuration notes
 
-The Redis module has these additional config options:
+The `redisenterprise` module has these additional config options:
 
 *`hosts`*:: URLs that are used to connect to Redis.
 URL format:
@@ -26,6 +26,14 @@ https://HOST[:PORT]
 
 The metricsets `node` and `proxy` are compatible with Redis Enterprise Software (RES). There were tested with RES
 5.4.10-22 and are expected to work with all versions >= 5.0.2.
+
+[float]
+=== Dashboard
+
+The `redisenterprise` module includes a predefined dashboard with overview information
+of the monitored servers.
+
+image::./images/metricbeat-redisenterprise-overview.png[]
 
 
 [float]
