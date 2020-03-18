@@ -363,6 +363,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+type XPack struct {
+	Features struct {
+		CCR struct {
+			Available bool `json:"available"`
+		} `json:"CCR"`
+	} `json:"features"`
+}
+
+// GetXPack returns information about xpack features.
+func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
+	content, err := fetchPath(http, resetURI, "_xpack", "")
+
+	if err != nil {
+		return XPack{}, err
+	}
+
+	var xpack XPack
+	err = json.Unmarshal(content, &xpack)
+	return xpack, err
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")

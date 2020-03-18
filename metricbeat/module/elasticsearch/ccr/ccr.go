@@ -121,9 +121,12 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 		return
 	}
 
-	// TODO: Check feature availability in ES: GET _xpack, check .features.ccr.available
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", errors.Wrap(err, "error determining xpack features")
+	}
 
-	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.CCRStatsAPIAvailableVersion)
+	isAvailable := xpack.Features.CCR.Available && elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.CCRStatsAPIAvailableVersion)
 
 	if !isAvailable {
 		metricsetName := m.FullyQualifiedName()
