@@ -35,20 +35,20 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
 func (i *Installer) Install(programName, version, installDir string) (string, error) {
-	if err := i.unzip(programName, version, installDir); err != nil {
+	if err := i.unzip(programName, version); err != nil {
 		return "", err
 	}
 
-	oldPath := filepath.Join(installDir, fmt.Sprintf("%s-%s-windows", programName, version))
-	newPath := filepath.Join(installDir, strings.Title(programName))
+	oldPath := filepath.Join(i.config.InstallPath, fmt.Sprintf("%s-%s-windows", programName, version))
+	newPath := filepath.Join(i.config.InstallPath, strings.Title(programName))
 	if err := os.Rename(oldPath, newPath); err != nil {
 		return oldPath, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, newPath))
 	}
 
-	return newPath, i.runInstall(programName, installDir)
+	return newPath, i.runInstall(programName, version, installDir)
 }
 
-func (i *Installer) unzip(programName, version, installPath string) error {
+func (i *Installer) unzip(programName, version string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
@@ -58,14 +58,25 @@ func (i *Installer) unzip(programName, version, installPath string) error {
 		return errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
 	}
 
-	powershellArg := fmt.Sprintf("Expand-Archive -Path \"%s\" -DestinationPath \"%s\"", artifactPath, installPath)
+	powershellArg := fmt.Sprintf("Expand-Archive -LiteralPath \"%s\" -DestinationPath \"%s\"", artifactPath, i.config.InstallPath)
 	installCmd := exec.Command("powershell", "-command", powershellArg)
 	return installCmd.Run()
 }
 
-func (i *Installer) runInstall(programName, installPath string) error {
-	powershellCmd := fmt.Sprintf(powershellCmdTemplate, installPath, programName)
+func (i *Installer) runInstall(programName, version, installPath string) error {
+	alignedPath := alignInstallPath(installPath, version)
+	powershellCmd := fmt.Sprintf(powershellCmdTemplate, alignedPath, programName)
 
 	installCmd := exec.Command("powershell", "-command", powershellCmd)
 	return installCmd.Run()
+}
+
+func alignInstallPath(installPath, version string) string {
+	snapshotPath := strings.Replace(installPath, version, fmt.Sprintf("%s-SNAPSHOT", version), 1)
+
+	if _, err := os.Stat(snapshotPath); err == nil {
+		return snapshotPath
+	}
+
+	return installPath
 }
