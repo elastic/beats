@@ -141,37 +141,37 @@
       },
       "references": [
         {
-          "id": "metricbeat-*",
+          "id": "fcfc8d80-693e-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "142ad600-693b-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "58f5a3c0-6943-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "2ee7f420-6943-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "ea9e3d40-693a-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_4",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "26b73e50-6943-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
+          "id": "f58f99b0-693a-11ea-b0ac-95d4ecb1fecd",
           "name": "panel_6",
           "type": "visualization"
         }
@@ -274,22 +274,22 @@
       },
       "references": [
         {
-          "id": "3aae0740-6254-11ea-b498-73b2257e8bae",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "3aae0740-6254-11ea-b498-73b2257e8bae",
+          "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "3aae0740-6254-11ea-b498-73b2257e8bae",
+          "id": "metricbeat-*",
           "name": "control_2_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "3aae0740-6254-11ea-b498-73b2257e8bae",
+          "id": "metricbeat-*",
           "name": "control_3_index_pattern",
           "type": "index-pattern"
         }
