@@ -492,7 +492,7 @@ func envelopMap(evt Event) common.MapStr {
 func baseMap(evt Event) common.MapStr {
 	return common.MapStr{
 		"cloudfoundry": common.MapStr{
-			"type": evt.String,
+			"type": evt.String(),
 			evt.String(): common.MapStr{
 				"timestamp": evt.Timestamp(),
 			},
