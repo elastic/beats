@@ -50,6 +50,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	http    *helper.HTTP
 	queries []QueryConfig
+	baseURL string
 }
 
 // New create a new instance of the MetricSet
@@ -69,6 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		http:          http,
 		queries:       config.Queries,
+		baseURL:       http.GetURI(),
 	}, nil
 }
 
@@ -82,7 +84,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		response, err := m.http.FetchResponse()
 		if err != nil {
 			msg := fmt.Sprintf("unable to fetch data from prometheus endpoint: %v", pathConfig.Path)
-			m.Logger().Debug(msg, err)
+			m.Logger().Debugf("%v: %v", msg, err)
 			reporter.Error(errors.Wrap(err, msg))
 			continue
 		}
@@ -100,7 +102,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
 			msg := fmt.Sprintf("error parsing response for: %v", pathConfig.QueryName)
-			m.Logger().Debug(msg, err)
+			m.Logger().Debugf("%v: %v", msg, err)
 			reporter.Error(errors.Wrap(err, msg))
 			continue
 		}
@@ -113,5 +115,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 func (m *MetricSet) getURL(path string, queryMap common.MapStr) string {
 	queryStr := mb.QueryParams(queryMap).String()
-	return m.http.GetURI() + path + "?" + queryStr
+	return m.baseURL + path + "?" + queryStr
 }

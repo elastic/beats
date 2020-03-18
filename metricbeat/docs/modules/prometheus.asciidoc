@@ -56,6 +56,7 @@ metricbeat.modules:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
 
+
 - module: prometheus
   period: 10s
   hosts: ["localhost:9090"]

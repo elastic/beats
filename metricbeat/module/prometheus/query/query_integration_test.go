@@ -38,10 +38,10 @@ func TestData(t *testing.T) {
 		"hosts":      []string{service.Host()},
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
+				"query_name": "go_threads",
 				"path":       "/api/v1/query",
 				"query_params": common.MapStr{
-					"query": "up",
+					"query": "go_threads",
 				},
 			},
 		},
@@ -63,10 +63,10 @@ func TestQueryFetch(t *testing.T) {
 		"hosts":      []string{service.Host()},
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
+				"query_name": "go_threads",
 				"path":       "/api/v1/query",
 				"query_params": common.MapStr{
-					"query": "up",
+					"query": "go_threads",
 				},
 			},
 		},

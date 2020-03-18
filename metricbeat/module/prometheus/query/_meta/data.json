@@ -10,14 +10,14 @@
         "period": 10000
     },
     "prometheus": {
+        "labels": {
+            "__name__": "go_threads",
+            "instance": "localhost:9090",
+            "job": "prometheus"
+        },
         "query": {
             "dataType": "vector",
-            "labels": {
-                "__name__": "up",
-                "instance": "localhost:9090",
-                "job": "prometheus"
-            },
-            "up": 1
+            "go_threads": 24
         }
     },
     "service": {

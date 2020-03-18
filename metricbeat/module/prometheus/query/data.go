@@ -73,9 +73,9 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		res := converted.(MapResponse)
 		for _, result := range res.Data.Results {
 			events = append(events, mb.Event{
-				Timestamp: getTimestamp(result.Vector[0].(float64)),
+				Timestamp:    getTimestamp(result.Vector[0].(float64)),
+				ModuleFields: common.MapStr{"labels": result.Metric},
 				MetricSetFields: common.MapStr{
-					"labels":             result.Metric,
 					"dataType":           resultType,
 					pathConfig.QueryName: convertToNumeric(result.Vector[1].(string)),
 				},
@@ -86,9 +86,9 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		for _, result := range res.Data.Results {
 			for _, vector := range result.Vectors {
 				events = append(events, mb.Event{
-					Timestamp: getTimestamp(vector[0].(float64)),
+					Timestamp:    getTimestamp(vector[0].(float64)),
+					ModuleFields: common.MapStr{"labels": result.Metric},
 					MetricSetFields: common.MapStr{
-						"labels":             result.Metric,
 						"dataType":           resultType,
 						pathConfig.QueryName: convertToNumeric(vector[1].(string)),
 					},
