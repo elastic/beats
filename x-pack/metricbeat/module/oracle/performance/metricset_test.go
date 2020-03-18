@@ -13,6 +13,7 @@ import (
 	_ "github.com/godror/godror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 )
@@ -20,7 +21,7 @@ import (
 func TestData(t *testing.T) {
 	r := compose.EnsureUp(t, "oracle")
 
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))
 
 	findKey := func(key string) func(common.MapStr) bool {
 		return func(in common.MapStr) bool {

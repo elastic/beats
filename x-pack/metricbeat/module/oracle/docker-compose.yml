@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   oracle:
-    image: docker.elastic.co/integrations-ci/beats-oracle:${ORACLE_VERSION:-12.2.0.1}-1
+    image: docker.elastic.co/observability-ci/database-enterprise:${ORACLE_VERSION:-12.2.0.1}-1
     build:
       context: ./_meta
       args:
