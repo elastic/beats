@@ -695,6 +695,22 @@ filebeat.modules:
   #  # Filebeat will choose the paths depending on your OS.
   #  #var.paths:
 
+#--------------------------------- Okta Module ---------------------------------
+- module: okta
+  system:
+    enabled: true
+    # API key to access Okta
+    #var.api_key
+
+    # URL of the Okta REST API
+    #var.url
+
+    # Disable SSL verification 
+    #var.ssl: |-
+    #  {
+    #    "verification_mode": "none"
+    #  }
+
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:

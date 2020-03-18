@@ -5812,7 +5812,7 @@ type: long
 --
 
 [[exported-fields-couchdb]]
-== couchdb fields
+== CouchDB fields
 
 couchdb module
 
@@ -5821,7 +5821,7 @@ couchdb module
 [float]
 === couchdb
 
-
+Couchdb metrics
 
 
 [float]
