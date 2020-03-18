@@ -150,7 +150,10 @@ func (b *Monitor) monitoringDrop() string {
 func monitoringDrop(path string) (drop string) {
 	defer func() {
 		if drop != "" {
-			drop = filepath.Dir(drop)
+			// Dir call changes separator to the one used in OS
+			// '/var/lib' -> '\var\lib\' on windows
+			baseLen := len(filepath.Dir(drop))
+			drop = drop[:baseLen]
 		}
 	}()
 

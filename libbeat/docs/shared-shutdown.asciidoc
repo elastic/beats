@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[shutdown]]
-=== Stopping {beatname_uc}
+=== Stop {beatname_uc}
 
 An orderly shutdown of {beatname_uc} ensures that it has a chance to clean up 
 and close outstanding resources. You can help ensure an orderly shutdown by 

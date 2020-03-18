@@ -10,7 +10,11 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[http-endpoint]]
-== HTTP Endpoint
+== Configure an HTTP endpoint for metrics
+
+++++
+<titleabbrev>HTTP endpoint</titleabbrev>
+++++
 
 experimental[]
 
