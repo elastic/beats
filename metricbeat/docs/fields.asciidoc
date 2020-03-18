@@ -4633,6 +4633,16 @@ Cloud Foundry module
 
 
 
+*`cloudfoundry.type`*::
++
+--
+The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
+
+
+type: keyword
+
+--
+
 [float]
 === app
 
