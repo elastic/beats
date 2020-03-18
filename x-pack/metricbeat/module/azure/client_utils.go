@@ -87,15 +87,15 @@ func metricIsEmpty(metric insights.MetricValue) bool {
 
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.Resource.ID == met.Resource.ID &&
+	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.Resource.Id == met.Resource.Id &&
 		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
 		return true
 	}
 	return false
 }
 
-// getResourceGroupFormID maps resource group from resource ID
-func getResourceGroupFromID(path string) string {
+// getResourceGroupFromId maps resource group from resource ID
+func getResourceGroupFromId(path string) string {
 	params := strings.Split(path, "/")
 	for i, param := range params {
 		if param == "resourceGroups" {
@@ -105,8 +105,8 @@ func getResourceGroupFromID(path string) string {
 	return ""
 }
 
-// getResourceNameFormID maps resource group from resource ID
-func getResourceTypeFromID(path string) string {
+// getResourceTypeFromId maps resource group from resource ID
+func getResourceTypeFromId(path string) string {
 	params := strings.Split(path, "/")
 	for i, param := range params {
 		if param == "providers" {
@@ -116,8 +116,8 @@ func getResourceTypeFromID(path string) string {
 	return ""
 }
 
-// getResourceNameFormID maps resource group from resource ID
-func getResourceNameFromID(path string) string {
+// getResourceNameFormId maps resource group from resource ID
+func getResourceNameFromId(path string) string {
 	params := strings.Split(path, "/")
 	if strings.HasSuffix(path, "/") {
 		return params[len(params)-2]
@@ -181,10 +181,10 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	grouped := make(map[string][]Metric)
 	for _, metric := range metrics {
-		if _, ok := grouped[metric.Resource.ID]; !ok {
-			grouped[metric.Resource.ID] = make([]Metric, 0)
+		if _, ok := grouped[metric.Resource.Id]; !ok {
+			grouped[metric.Resource.Id] = make([]Metric, 0)
 		}
-		grouped[metric.Resource.ID] = append(grouped[metric.Resource.ID], metric)
+		grouped[metric.Resource.Id] = append(grouped[metric.Resource.Id], metric)
 	}
 	return grouped
 }

@@ -33,9 +33,11 @@ import (
 )
 
 const (
-	errorSuccess            syscall.Errno = 0
-	ioctlDiskPerformance                  = 0x70020
-	ioctlDiskPerformanceOff               = 0x70060
+	errorSuccess syscall.Errno = 0
+	// ioctlDiskPerformance is used to enable performance counters that provide disk performance information.
+	ioctlDiskPerformance = 0x70020
+	// ioctlDiskPerformanceOff used to disable performance counters that provide disk performance information.
+	ioctlDiskPerformanceOff = 0x70060
 )
 
 var (
@@ -47,24 +49,6 @@ var (
 type logicalDrive struct {
 	Name    string
 	UNCPath string
-}
-
-type diskPerformance struct {
-	BytesRead    int64
-	BytesWritten int64
-	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	ReadTime int64
-	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	WriteTime int64
-	//Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	IdleTime            int64
-	ReadCount           uint32
-	WriteCount          uint32
-	QueueDepth          uint32
-	SplitCount          uint32
-	QueryTime           int64
-	StorageDeviceNumber uint32
-	StorageManagerName  [8]uint16
 }
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.

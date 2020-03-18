@@ -3,7 +3,7 @@
 == Configure index lifecycle management
 
 Use the {ref}/getting-started-index-lifecycle-management.html[index lifecycle
-management] feature in {es} to manage your {beatname_uc} indices as they age.
+management] (ILM) feature in {es} to manage your {beatname_uc} indices as they age.
 For example, instead of creating daily indices where index size can vary based
 on the number of Beats and number of events sent, use an index lifecycle policy
 to automate a rollover to a new index when the existing index reaches a
@@ -29,6 +29,8 @@ setup.ilm.pattern: "{now/d}-000001" <1>
 <1> Date math is supported here. For more information, see
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
 date math with the rollover API].
+
+WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored.
 
 [float]
 === Configuration options

@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
 )
 
 // Server represent a TCP server
@@ -41,7 +40,7 @@ type Server struct {
 	done         chan struct{}
 	factory      HandlerFactory
 	log          *logp.Logger
-	tlsConfig    *transport.TLSConfig
+	tlsConfig    *tlscommon.TLSConfig
 	closer       *Closer
 	clientsCount atomic.Int
 }

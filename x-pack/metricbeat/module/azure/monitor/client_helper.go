@@ -54,7 +54,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, resource, metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				metrics = append(metrics, client.CreateMetric(*resource.ID, resource, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
 			}
 		}
 	}
@@ -62,7 +62,7 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 }
 
 // filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
-func filterMetricNames(resourceID string, metricConfig azure.MetricConfig, metricDefinitions []insights.MetricDefinition) ([]string, error) {
+func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []insights.MetricDefinition) ([]string, error) {
 	var supportedMetricNames []string
 	var unsupportedMetricNames []string
 	// check if all metric names are selected (*)
@@ -75,11 +75,11 @@ func filterMetricNames(resourceID string, metricConfig azure.MetricConfig, metri
 		supportedMetricNames, unsupportedMetricNames = filterSConfiguredMetrics(metricConfig.Name, metricDefinitions)
 		if len(unsupportedMetricNames) > 0 {
 			return nil, errors.Errorf("the metric names configured  %s are not supported for the resource %s and namespace %s",
-				strings.Join(unsupportedMetricNames, ","), resourceID, metricConfig.Namespace)
+				strings.Join(unsupportedMetricNames, ","), resourceId, metricConfig.Namespace)
 		}
 	}
 	if len(supportedMetricNames) == 0 {
-		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metricConfig.Name, ","), resourceID, metricConfig.Namespace)
+		return nil, errors.Errorf("the metric names configured : %s are not supported for the resource %s and namespace %s ", strings.Join(metricConfig.Name, ","), resourceId, metricConfig.Namespace)
 	}
 	return supportedMetricNames, nil
 }
