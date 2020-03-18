@@ -18,6 +18,8 @@ import (
 )
 
 func TestData(t *testing.T) {
+	r := compose.EnsureUp(t, "oracle")
+
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
 	findKey := func(key string) func(common.MapStr) bool {
