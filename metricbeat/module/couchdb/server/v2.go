@@ -78,8 +78,8 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 	}
 
 	ecs := common.MapStr{}
-	ecs.Put("ecs.service.id", info.UUID)
-	ecs.Put("ecs.service.version", info.Version)
+	ecs.Put("service.id", info.UUID)
+	ecs.Put("service.version", info.Version)
 
 	return mb.Event{
 		RootFields:      ecs,
