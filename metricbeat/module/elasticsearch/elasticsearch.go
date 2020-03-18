@@ -458,8 +458,13 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently.
-var licenseCache = &_licenseCache{}
+var (
+	// Global cache for license information. Assumption is that license information changes infrequently.
+	licenseCache = &_licenseCache{}
+
+	// LicenseEnableCaching controls whether license caching is enabled or not. Intended for test use.
+	LicenseEnableCaching = true
+)
 
 type _licenseCache struct {
 	sync.RWMutex
@@ -481,6 +486,10 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
+	if !LicenseEnableCaching {
+		return
+	}
+
 	c.Lock()
 	defer c.Unlock()
 
