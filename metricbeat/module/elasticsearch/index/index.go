@@ -35,7 +35,7 @@ func init() {
 
 const (
 	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics
+	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices"
 )
 
 // MetricSet type defines all fields of the MetricSet

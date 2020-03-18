@@ -21,75 +21,18 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
+	"github.com/pkg/errors"
 )
 
-// Server type defines all fields of the Server Metricset
-type Server struct {
-	Httpd               Httpd               `json:"httpd"`
-	HttpdRequestMethods HttpdRequestMethods `json:"httpd_request_methods"`
-	HttpdStatusCodes    HttpdStatusCodes    `json:"httpd_status_codes"`
-	Couchdb             Couchdb             `json:"couchdb"`
-}
+type V1 struct{}
 
-// Httpd type defines httpd fields of the Server Metricset
-type Httpd struct {
-	ViewReads                General `json:"view_reads"`
-	BulkRequests             General `json:"bulk_requests"`
-	ClientsRequestingChanges General `json:"clients_requesting_changes"`
-	TemporaryViewReads       General `json:"temporary_view_reads"`
-	Requests                 General `json:"requests"`
-}
-
-// HttpdRequestMethods type defines httpd requests methods fields of the Server Metricset
-type HttpdRequestMethods struct {
-	Copy   General `json:"COPY"`
-	Head   General `json:"HEAD"`
-	Post   General `json:"POST"`
-	Delete General `json:"DELETE"`
-	Get    General `json:"GET"`
-	Put    General `json:"PUT"`
-}
-
-// HttpdStatusCodes type defines httpd status codes fields of the Server Metricset
-type HttpdStatusCodes struct {
-	Num200 General `json:"200"`
-	Num201 General `json:"201"`
-	Num202 General `json:"202"`
-	Num301 General `json:"301"`
-	Num304 General `json:"304"`
-	Num400 General `json:"400"`
-	Num401 General `json:"401"`
-	Num403 General `json:"403"`
-	Num404 General `json:"404"`
-	Num405 General `json:"405"`
-	Num409 General `json:"409"`
-	Num412 General `json:"412"`
-	Num500 General `json:"500"`
-}
-
-// Couchdb type defines couchdb fields of the Server Metricset
-type Couchdb struct {
-	OpenOsFiles     General `json:"open_os_files"`
-	OpenDatabases   General `json:"open_databases"`
-	AuthCacheHits   General `json:"auth_cache_hits"`
-	RequestTime     General `json:"request_time"`
-	DatabaseReads   General `json:"database_reads"`
-	DatabaseWrites  General `json:"database_writes"`
-	AuthCacheMisses General `json:"auth_cache_misses"`
-}
-
-// General type defines common fields of the Server Metricset
-type General struct {
-	Current float64 `json:"current"`
-}
-
-func eventMapping(content []byte) (common.MapStr, error) {
-	var data Server
-	err := json.Unmarshal(content, &data)
+func (v *V1) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
+	var data ServerV1
+	err := json.Unmarshal(in, &data)
 	if err != nil {
-		logp.Err("Error: %+v", err)
-		return nil, err
+		return mb.Event{}, errors.Wrap(err, "error parsing v1 server JSON")
 	}
 
 	event := common.MapStr{
@@ -133,5 +76,73 @@ func eventMapping(content []byte) (common.MapStr, error) {
 			"open_os_files":     data.Couchdb.OpenOsFiles.Current,
 		},
 	}
-	return event, nil
+
+	ecs := common.MapStr{}
+	ecs.Put("service.id", info.UUID)
+	ecs.Put("service.version", info.Version)
+
+	return mb.Event{
+		RootFields:      ecs,
+		MetricSetFields: event,
+	}, nil
+}
+
+// Server type defines all fields of the Server Metricset
+type ServerV1 struct {
+	Httpd               HttpdV1               `json:"httpd"`
+	HttpdRequestMethods HttpdRequestMethodsV1 `json:"httpd_request_methods"`
+	HttpdStatusCodes    HttpdStatusCodesV1    `json:"httpd_status_codes"`
+	Couchdb             CouchdbV1             `json:"couchdb"`
+}
+
+// HttpdV1 type defines httpd fields of the Server Metricset
+type HttpdV1 struct {
+	ViewReads                General `json:"view_reads"`
+	BulkRequests             General `json:"bulk_requests"`
+	ClientsRequestingChanges General `json:"clients_requesting_changes"`
+	TemporaryViewReads       General `json:"temporary_view_reads"`
+	Requests                 General `json:"requests"`
+}
+
+// HttpdRequestMethodsV1 type defines httpd requests methods fields of the Server Metricset
+type HttpdRequestMethodsV1 struct {
+	Copy   General `json:"COPY"`
+	Head   General `json:"HEAD"`
+	Post   General `json:"POST"`
+	Delete General `json:"DELETE"`
+	Get    General `json:"GET"`
+	Put    General `json:"PUT"`
+}
+
+// HttpdStatusCodesV1 type defines httpd status codes fields of the Server Metricset
+type HttpdStatusCodesV1 struct {
+	Num200 General `json:"200"`
+	Num201 General `json:"201"`
+	Num202 General `json:"202"`
+	Num301 General `json:"301"`
+	Num304 General `json:"304"`
+	Num400 General `json:"400"`
+	Num401 General `json:"401"`
+	Num403 General `json:"403"`
+	Num404 General `json:"404"`
+	Num405 General `json:"405"`
+	Num409 General `json:"409"`
+	Num412 General `json:"412"`
+	Num500 General `json:"500"`
+}
+
+// CouchdbV1 type defines couchdb fields of the Server Metricset
+type CouchdbV1 struct {
+	OpenOsFiles     General `json:"open_os_files"`
+	OpenDatabases   General `json:"open_databases"`
+	AuthCacheHits   General `json:"auth_cache_hits"`
+	RequestTime     General `json:"request_time"`
+	DatabaseReads   General `json:"database_reads"`
+	DatabaseWrites  General `json:"database_writes"`
+	AuthCacheMisses General `json:"auth_cache_misses"`
+}
+
+// General type defines common fields of the Server Metricset
+type General struct {
+	Current float64 `json:"current"`
 }
