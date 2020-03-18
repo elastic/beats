@@ -1,3 +1,8 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-o365]]
 [role="xpack"]
 
 :modulename: o365
@@ -211,3 +216,11 @@ image::./images/filebeat-o365-audit.png[]
 :fileset_ex!:
 
 :modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-o365,exported fields>> section.
+
