@@ -366,7 +366,7 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 type XPack struct {
 	Features struct {
 		CCR struct {
-			Available bool `json:"available"`
+			Enabled bool `json:"enabled"`
 		} `json:"CCR"`
 	} `json:"features"`
 }
