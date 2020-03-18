@@ -49,6 +49,13 @@ type config struct {
 
 	// CgroupPrefix is the prefix where the container id is inside cgroup
 	CgroupPrefixes []string `config:"cgroup_prefixes"`
+
+	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
+	// set to 0 to disable the cgroup cache
+	CgroupCacheExpireTime int `config:"cgroup_cache_expire_time"`
+
+	// CgroupCacheCleanTime is the length of time cache clean up expired elements in seconds
+	CgroupCacheCleanTime int `config:"cgroup_cache_clean_time"`
 }
 
 // available fields by default
@@ -81,12 +88,14 @@ func init() {
 
 func defaultConfig() config {
 	return config{
-		IgnoreMissing:    true,
-		OverwriteKeys:    false,
-		RestrictedFields: false,
-		MatchPIDs:        []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
-		HostPath:         "/",
-		CgroupPrefixes:   []string{"/kubepods", "/docker"},
+		IgnoreMissing:         true,
+		OverwriteKeys:         false,
+		RestrictedFields:      false,
+		MatchPIDs:             []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
+		HostPath:              "/",
+		CgroupPrefixes:        []string{"/kubepods", "/docker"},
+		CgroupCacheExpireTime: 300,
+		CgroupCacheCleanTime:  5,
 	}
 }
 

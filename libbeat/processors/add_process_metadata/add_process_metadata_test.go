@@ -485,6 +485,31 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "without cgroup cache",
+			config: common.MapStr{
+				"match_pids":               []string{"system.process.ppid"},
+				"include_fields":           []string{"container.id"},
+				"cgroup_cache_expire_time": 0,
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := common.NewConfigFrom(test.config)
@@ -520,6 +545,92 @@ func TestAddProcessMetadata(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUsingCache(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors(processorName))
+
+	selfPID := os.Getpid()
+
+	// mock of the cgroup processCgroupPaths
+	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
+		testMap := map[int]map[string]string{
+			selfPID: map[string]string{
+				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+			},
+		}
+		return testMap[pid], nil
+	}
+
+	config, err := common.NewConfigFrom(common.MapStr{
+		"match_pids":     []string{"system.process.ppid"},
+		"include_fields": []string{"container.id"},
+		"target":         "meta",
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	proc, err := New(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ev := beat.Event{
+		Fields: common.MapStr{
+			"system": common.MapStr{
+				"process": common.MapStr{
+					"ppid": selfPID,
+				},
+			},
+		},
+	}
+
+	// first run
+	result, err := proc.Run(&ev)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(result.Fields)
+	containerID, err := result.Fields.GetValue("meta.container.id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
+
+	ev = beat.Event{
+		Fields: common.MapStr{
+			"system": common.MapStr{
+				"process": common.MapStr{
+					"ppid": selfPID,
+				},
+			},
+		},
+	}
+
+	// cached result
+	result, err = proc.Run(&ev)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(result.Fields)
+	containerID, err = result.Fields.GetValue("meta.container.id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
 }
 
 func TestSelf(t *testing.T) {

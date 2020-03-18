@@ -18,29 +18,35 @@
 package add_process_metadata
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/pkg/errors"
+)
+
+const (
+	providerName           = "gosigar_cid_provider"
+	cgroupsCacheExpiration = 5 * time.Minute
 )
 
 type gosigarCidProvider struct {
+	log                *logp.Logger
 	hostPath           string
 	cgroupPrefixes     []string
 	processCgroupPaths func(string, int) (map[string]string, error)
+	cgroupsCache       *common.Cache
 }
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
-	cgroups, err := p.processCgroupPaths(p.hostPath, pid)
-	switch err.(type) {
-	case nil:
-		// do no thing
-	case *os.PathError:
-		// os.PathError happens when the process don't exist, or not running in linux system
-		return "", nil
-	default:
-		// should never happen
-		return "", fmt.Errorf("failed to read cgroups for pid=%v", pid)
+
+	cgroups, err := p.getProcessCgroups(pid)
+
+	if err != nil {
+		p.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 	}
 
 	cid := p.getCid(cgroups)
@@ -48,12 +54,45 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error)) gosigarCidProvider {
+func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error), cgroupsCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
+		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		processCgroupPaths: processCgroupPaths,
+		cgroupsCache:       cgroupsCache,
 	}
+}
+
+// getProcessCgroups returns a mapping of cgroup subsystem name to path. It
+// returns an error if it failed to retrieve the cgroup info.
+func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error) {
+
+	var cgroup map[string]string
+	var ok bool
+
+	if p.cgroupsCache != nil {
+		if cgroup, ok = p.cgroupsCache.Get(pid).(map[string]string); ok {
+			p.log.Debugf("Using cached cgroups for pid=%v", pid)
+			return cgroup, nil
+		}
+	}
+
+	cgroup, err := p.processCgroupPaths(p.hostPath, pid)
+	switch err.(type) {
+	case nil, *os.PathError:
+		// do no thing when err is nil or when os.PathError happens because the process don't exist,
+		// or not running in linux system
+	default:
+		// should never happen
+		return cgroup, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+	}
+
+	if p.cgroupsCache != nil {
+		p.cgroupsCache.Put(pid, cgroup)
+	}
+
+	return cgroup, nil
 }
 
 // getCid checks all of the processes' paths to see if any

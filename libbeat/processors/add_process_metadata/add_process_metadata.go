@@ -110,22 +110,27 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 
 	var p addProcessMetadata
 
+	p = addProcessMetadata{
+		config:   config,
+		provider: provider,
+		log:      log,
+		mappings: mappings,
+	}
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
-		p = addProcessMetadata{
-			config:      config,
-			provider:    provider,
-			cidProvider: newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths),
-			log:         log,
-			mappings:    mappings,
+		if config.CgroupCacheExpireTime != 0 {
+			p.log.Debug("Initializing cgroup cache")
+			evictionListener := func(k common.Key, v common.Value) {
+				p.log.Debugf("Evicted cached cgroups for PID=%v", k)
+			}
+
+			cgroupsCache := common.NewCacheWithRemovalListener(time.Duration(config.CgroupCacheExpireTime)*time.Second, 100, evictionListener)
+			cgroupsCache.StartJanitor(time.Duration(config.CgroupCacheCleanTime) * time.Second)
+			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, cgroupsCache)
+		} else {
+			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, nil)
 		}
-	} else {
-		p = addProcessMetadata{
-			config:   config,
-			provider: provider,
-			log:      log,
-			mappings: mappings,
-		}
+
 	}
 
 	return &p, nil
