@@ -15,34 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration
+
 package query
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestQueryFetchEventContent(t *testing.T) {
-	absPath, _ := filepath.Abs("./_meta/test/")
-
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
-	defer server.Close()
+func TestData(t *testing.T) {
+	service := compose.EnsureUp(t, "prometheus")
 
 	config := map[string]interface{}{
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
-		"hosts":      []string{server.URL},
+		"hosts":      []string{service.Host()},
 		"queries": []common.MapStr{
 			common.MapStr{
 				"query_name": "up",
@@ -53,11 +46,37 @@ func TestQueryFetchEventContent(t *testing.T) {
 			},
 		},
 	}
-	reporter := &mbtest.CapturingReporterV2{}
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
+	if err == nil {
+		return
+	}
+	t.Fatal("write", err)
+}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+func TestQueryFetch(t *testing.T) {
+	service := compose.EnsureUp(t, "prometheus")
 
-	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
-	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{service.Host()},
+		"queries": []common.MapStr{
+			common.MapStr{
+				"query_name": "up",
+				"path":       "/api/v1/query",
+				"query_params": common.MapStr{
+					"query": "up",
+				},
+			},
+		},
+	}
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }

@@ -60,21 +60,21 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:9090"]
   metricsets: ["query"]
-  paths:
-  - name: 'instant_vector'
-    path: '/api/v1/query'
-    fields:
+  queries:
+  - query_name: "instant_vector"
+    path: "/api/v1/query"
+    query_params:
       query: "sum(rate(prometheus_http_requests_total[1m]))"
-  - name: "range_vector"
+  - query_name: "range_vector"
     path: "/api/v1/query_range"
-    fields:
+    query_params:
       query: "up"
       start: "2019-12-20T00:00:00.000Z"
       end:  "2019-12-21T00:00:00.000Z"
       step: 1h
-  - name: "scalar"
+  - query_name: "scalar"
     path: "/api/v1/query"
-    fields:
+    query_params:
       query: "100"
 ----
 

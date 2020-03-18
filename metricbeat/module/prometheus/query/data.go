@@ -19,7 +19,6 @@ package query
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -110,8 +109,7 @@ func convertJSONToStruct(body []byte) (interface{}, string, error) {
 	if arrayBody.Status == "error" {
 		return nil, "", errors.Errorf("Failed to query")
 	}
-	fmt.Println("here it is:")
-	fmt.Println(arrayBody)
+
 	if arrayBody.Data.ResultType == "vector" || arrayBody.Data.ResultType == "matrix" {
 		mapBody := MapResponse{}
 		if err := json.Unmarshal(body, &mapBody); err != nil {

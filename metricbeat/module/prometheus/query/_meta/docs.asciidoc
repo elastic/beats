@@ -13,10 +13,10 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
   period: 10s
   hosts: ["localhost:9090"]
   metricsets: ["query"]
-  paths:
-  - name: "sum_rate_http_requests_total"
+  queries:
+  - query_name: "sum_rate_http_requests_total"
     path: "/api/v1/query"
-    fields:
+    query_params:
       query: "sum(rate(prometheus_http_requests_total[1m]))"
 -------------------------------------------------------------------------------------
 
@@ -26,10 +26,10 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
   period: 10s
   hosts: ["localhost:9090"]
   metricsets: ["query"]
-  paths:
-  - name: 'up'
+  queries:
+  - query_name: 'up'
     path: '/api/v1/query'
-    fields:
+    query_params:
       query: "up"
 -------------------------------------------------------------------------------------
 
@@ -43,10 +43,10 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
   period: 10s
   metricsets: ["query"]
   hosts: ["node:9100"]
-  paths:
-  - name: "up_master"
+  queries:
+  - query_name: "up_master"
     path: "/api/v1/query_range"
-    fields:
+    query_params:
       query: "up{node="master01"}"
       start: "2019-12-20T23:30:00.000Z"
       end: "2019-12-21T00:00:00.000Z"

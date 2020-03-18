@@ -65,7 +65,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
@@ -79,7 +78,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, pathConfig := range m.queries {
 		url := m.getURL(pathConfig.Path, pathConfig.QueryParams)
-		fmt.Println(url)
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
