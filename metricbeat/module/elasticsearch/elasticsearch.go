@@ -462,8 +462,8 @@ var (
 	// Global cache for license information. Assumption is that license information changes infrequently.
 	licenseCache = &_licenseCache{}
 
-	// LicenseEnableCaching controls whether license caching is enabled or not. Intended for test use.
-	LicenseEnableCaching = true
+	// LicenseCacheEnabled controls whether license caching is enabled or not. Intended for test use.
+	LicenseCacheEnabled = true
 )
 
 type _licenseCache struct {
@@ -486,7 +486,7 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
-	if !LicenseEnableCaching {
+	if !LicenseCacheEnabled {
 		return
 	}
 

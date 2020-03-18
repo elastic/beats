@@ -90,8 +90,8 @@ func TestCCRNotAvailable(t *testing.T) {
 	}
 
 	// Disable license caching for these tests
-	elasticsearch.LicenseEnableCaching = false
-	defer func() { elasticsearch.LicenseEnableCaching = true }()
+	elasticsearch.LicenseCacheEnabled = false
+	defer func() { elasticsearch.LicenseCacheEnabled = true }()
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
