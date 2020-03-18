@@ -76,6 +76,12 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.vendor": "Check Point",
         "observer.version": "Check Point",
+        "related.ip": [
+            "52.173.84.157",
+            "0.0.0.0",
+            "192.168.101.100",
+            "192.168.103.254"
+        ],
         "rule.category": "Business / Economy",
         "rule.uuid": "9e5e6e74-aa9a-4693-b9fe-53712dd27bea",
         "service.type": "cef",
@@ -128,6 +134,9 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.vendor": "Check Point",
         "observer.version": "Check Point",
+        "related.hash": [
+            "55f4a511e6f630a6b1319505414f114e7bcaf13d"
+        ],
         "service.type": "cef",
         "source.port": 4001,
         "tags": [
@@ -178,6 +187,9 @@
         "observer.type": "Mobile",
         "observer.vendor": "Check Point",
         "observer.version": "Check Point",
+        "related.hash": [
+            "580a783c1cb2b20613323f715d231a69"
+        ],
         "service.type": "cef",
         "source.ip": "fd00::555",
         "tags": [
