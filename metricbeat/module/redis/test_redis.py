@@ -29,7 +29,6 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['redis']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @metricbeat.tag('redis')
     @attr('integration')
     def test_info(self):
         """
