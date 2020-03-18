@@ -16,6 +16,7 @@ require (
 	github.com/Azure/go-amqp v0.12.7 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Azure/go-autorest/autorest v0.10.0
+	github.com/Azure/go-autorest/autorest/adal v0.8.2
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5

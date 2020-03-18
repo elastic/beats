@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/Azure/azure-event-hubs-go/v3"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
@@ -81,7 +81,7 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	input := &azureInput{
+	in := &azureInput{
 		config:       config,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
 		context:      inputContext,
@@ -96,9 +96,9 @@ func NewInput(
 	if err != nil {
 		return nil, err
 	}
-	input.outlet = out
-	input.log.Infof("Initialized %s input.", inputName)
-	return input, nil
+	in.outlet = out
+	in.log.Infof("Initialized %s input.", inputName)
+	return in, nil
 }
 
 // Run starts the input worker then returns. Only the first invocation
