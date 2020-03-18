@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
@@ -39,13 +38,14 @@ func (i *Installer) Install(programName, version, installDir string) (string, er
 		return "", err
 	}
 
-	oldPath := filepath.Join(i.config.InstallPath, fmt.Sprintf("%s-%s-windows", programName, version))
-	newPath := filepath.Join(i.config.InstallPath, strings.Title(programName))
-	if err := os.Rename(oldPath, newPath); err != nil {
-		return oldPath, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, newPath))
+	windowsPath := strings.Replace(installDir, version, fmt.Sprintf("%s-windows", version), 1)
+	if _, err := os.Stat(windowsPath); err == nil {
+		if err := os.Rename(windowsPath, installDir); err != nil {
+			return windowsPath, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
+		}
 	}
 
-	return newPath, i.runInstall(programName, version, installDir)
+	return installDir, i.runInstall(programName, version, installDir)
 }
 
 func (i *Installer) unzip(programName, version string) error {
