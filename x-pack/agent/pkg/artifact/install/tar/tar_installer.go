@@ -71,6 +71,11 @@ func unpack(r io.Reader, dir string) (string, error) {
 		rel := filepath.FromSlash(f.Name)
 		abs := filepath.Join(dir, rel)
 
+		// find the root dir
+		if currentDir := filepath.Dir(abs); rootDir == "" || len(filepath.Dir(rootDir)) > len(currentDir) {
+			rootDir = currentDir
+		}
+
 		fi := f.FileInfo()
 		mode := fi.Mode()
 		switch {
@@ -93,10 +98,6 @@ func unpack(r io.Reader, dir string) (string, error) {
 				return rootDir, fmt.Errorf("TarInstaller: error writing to %s: %v", abs, err)
 			}
 		case mode.IsDir():
-			if rootDir == "" {
-				rootDir = abs
-			}
-
 			if err := os.MkdirAll(abs, 0755); err != nil {
 				return rootDir, errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
 			}

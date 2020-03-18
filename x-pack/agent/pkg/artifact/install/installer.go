@@ -49,13 +49,5 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 		return nil, err
 	}
 
-	if IsSnapshot() {
-		return snapshot.NewInstaller(i)
-	}
-
-	return i, nil
-}
-
-func IsSnapshot() bool {
-	return true
+	return snapshot.NewInstaller(i)
 }
