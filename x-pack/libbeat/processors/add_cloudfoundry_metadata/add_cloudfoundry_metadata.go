@@ -72,7 +72,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	app, err := d.client.GetAppByGuid(val)
 	if err != nil {
-		d.log.Warnf("failed to get application info for GUID(%s): %v", val, err)
+		d.log.Debugf("failed to get application info for GUID(%s): %v", val, err)
 		return event, nil
 	}
 	event.Fields.DeepUpdate(common.MapStr{
