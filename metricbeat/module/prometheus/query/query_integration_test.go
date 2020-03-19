@@ -69,10 +69,10 @@ func TestQueryFetch(t *testing.T) {
 		"hosts":      []string{service.Host()},
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "go_threads",
+				"query_name": "go_info",
 				"path":       "/api/v1/query",
 				"query_params": common.MapStr{
-					"query": "go_threads",
+					"query": "go_info",
 				},
 			},
 		},
@@ -86,7 +86,7 @@ func TestQueryFetch(t *testing.T) {
 		if len(events) > 0 {
 			break
 		}
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(10 * time.Second)
 	}
 	if len(errors) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errors), errors)

@@ -50,8 +50,8 @@ class Test(metricbeat.BaseTest):
             "extras": {
                 "queries": [{
                     "path": "/api/v1/query",
-                    'query_name': 'instant_vector',
-                    'query_params': {'query': 'go_threads'}
+                    'query_name': 'go_info',
+                    'query_params': {'query': 'go_info'}
                 }]
             }
         }])
