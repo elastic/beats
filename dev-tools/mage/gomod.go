@@ -24,30 +24,30 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
-// copyModule contains a module name and the list of files or directories
+// CopyModule contains a module name and the list of files or directories
 // to copy recursively.
-type copyModule struct {
-	name        string
-	filesToCopy []string
+type CopyModule struct {
+	Name        string
+	FilesToCopy []string
 }
 
 var (
-	copyAll = []copyModule{
-		copyModule{
-			name: "github.com/godror/godror",
-			filesToCopy: []string{
-				"odpi",
+	copyAll = []CopyModule{
+		CopyModule{
+			Name: "github.com/tsg/go-daemon",
+			FilesToCopy: []string{
+				"src",
 			},
 		},
-		copyModule{
-			name: "github.com/tsg/go-daemon",
-			filesToCopy: []string{
-				"src",
+		CopyModule{
+			Name: "github.com/godror/godror",
+			FilesToCopy: []string{
+				"odpi",
 			},
 		},
 	}
 	filesToRemove = []string{
-		filepath.Join("vendor", "github.com", "yuin", "gopher-lua", "parse", "Makefile"),
+		filepath.Join("github.com", "yuin", "gopher-lua", "parse", "Makefile"),
 	}
 )
 
@@ -74,31 +74,39 @@ func Vendor() error {
 	if err != nil {
 		return err
 	}
-	vendorFolder := filepath.Join(repo.RootDir, "vendor")
 
-	// copy packages which require the whole tree
-	for _, p := range copyAll {
-		path, err := gotool.ListModuleCacheDir(p.name)
+	vendorFolder := filepath.Join(repo.RootDir, "vendor")
+	err = CopyFilesToVendor(vendorFolder, copyAll)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range filesToRemove {
+		p = filepath.Join(vendorFolder, p)
+		err = os.RemoveAll(p)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// CopyFilesToVendor copies packages which require the whole tree
+func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
+	for _, p := range modulesToCopy {
+		path, err := gotool.ListModuleCacheDir(p.Name)
 		if err != nil {
 			return err
 		}
 
-		for _, f := range p.filesToCopy {
+		for _, f := range p.FilesToCopy {
 			from := filepath.Join(path, f)
-			to := filepath.Join(vendorFolder, p.name, f)
+			to := filepath.Join(vendorFolder, p.Name, f)
 			copyTask := &CopyTask{Source: from, Dest: to, DirMode: os.ModeDir | 0750}
 			err = copyTask.Execute()
 			if err != nil {
 				return err
 			}
-		}
-	}
-
-	for _, p := range filesToRemove {
-		p = filepath.Join(repo.RootDir, p)
-		err = os.RemoveAll(p)
-		if err != nil {
-			return err
 		}
 	}
 	return nil
