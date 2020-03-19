@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - TLS: Fields have been changed to adapt to ECS. {pull}15497[15497]
 - TLS: The behavior of send_certificates and include_raw_certificates options has changed. {pull}15497[15497]
+- Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 
 *Winlogbeat*
 
@@ -88,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
+- Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 
 *Auditbeat*
@@ -123,6 +125,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 - Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
 - Fix Elasticsearch `_id` field set by S3 and Google Pub/Sub inputs. {pull}17026[17026]
+- Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 
 *Heartbeat*
 
@@ -312,6 +315,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system/users metricset as beta {pull}16569[16569]
 - Align fields to ECS and add more tests for the azure module. {issue}16024[16024] {pull}16754[16754]
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
+- Add overview dashboard for googlecloud compute metricset. {issue}16534[16534] {pull}16819[16819]
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
