@@ -102,7 +102,7 @@ func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
 		for _, f := range p.FilesToCopy {
 			from := filepath.Join(path, f)
 			to := filepath.Join(vendorFolder, p.Name, f)
-			copyTask := &CopyTask{Source: from, Dest: to, DirMode: os.ModeDir | 0750}
+			copyTask := &CopyTask{Source: from, Dest: to, Mode: 0640, DirMode: os.ModeDir | 0750}
 			err = copyTask.Execute()
 			if err != nil {
 				return err
