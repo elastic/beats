@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
 - Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
+- Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 
 *Auditbeat*
 
@@ -160,6 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 - Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
 - Dynamically choose a method for the system/service metricset to support older linux distros. {pull}16902[16902]
+- Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
 
 *Packetbeat*
 
@@ -255,6 +257,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 
 *Heartbeat*
 
@@ -312,6 +315,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
 
 *Packetbeat*
 
@@ -324,6 +328,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
+- Add Audit and Log Management, Computer Object Management, and Distribution Group related events to the Security module. {pull}15217[15217]
 
 ==== Deprecated
 
