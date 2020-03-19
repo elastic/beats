@@ -99,7 +99,7 @@ func copyReplacedModules() error {
 func CopyVendor() error {
 	err := gotool.Mod.Vendor()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error while running go mod vendor")
 	}
 
 	err = devtools.CopyFilesToVendor(
@@ -125,7 +125,7 @@ func CopyVendor() error {
 		},
 	)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error while copying required files to vendor")
 	}
 
 	return nil
