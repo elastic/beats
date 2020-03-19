@@ -85,8 +85,8 @@ func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	cfgLogsPath := "/var/log/other/"
 	sourcePath := "/var/log/other/%s.log"
 	if runtime.GOOS == "windows" {
-		cfgLogsPath = "C:\\var\\log\\other\\"
-		sourcePath = "C:\\var\\log\\other\\%s.log"
+		cfgLogsPath = "C:\\var\\log\\othere\\"
+		sourcePath = "C:\\var\\log\\othere\\%s.log"
 	}
 
 	source := fmt.Sprintf(sourcePath, cid)

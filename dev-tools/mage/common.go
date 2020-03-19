@@ -781,3 +781,25 @@ func listModuleDir(modpath string) (string, error) {
 	}
 	return gotool.ListModuleCacheDir(modpath)
 }
+
+var parseVersionRegex = regexp.MustCompile(`(?m)^[^\d]*(?P<major>\d)+\.(?P<minor>\d)+(?:\.(?P<patch>\d)+.*)?$`)
+
+// ParseVersion extracts the major, minor, and optional patch number from a
+// version string.
+func ParseVersion(version string) (major, minor, patch int, err error) {
+	names := parseVersionRegex.SubexpNames()
+	matches := parseVersionRegex.FindStringSubmatch(version)
+	if len(matches) == 0 {
+		err = errors.Errorf("failed to parse version '%v'", version)
+		return
+	}
+
+	data := map[string]string{}
+	for i, match := range matches {
+		data[names[i]] = match
+	}
+	major, _ = strconv.Atoi(data["major"])
+	minor, _ = strconv.Atoi(data["minor"])
+	patch, _ = strconv.Atoi(data["patch"])
+	return
+}

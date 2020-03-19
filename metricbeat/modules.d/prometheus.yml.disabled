@@ -1,8 +1,10 @@
 # Module: prometheus
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-prometheus.html
 
+# Metrics collected from a Prometheus endpoint
 - module: prometheus
   period: 10s
+  metricsets: ["collector"]
   hosts: ["localhost:9090"]
   metrics_path: /metrics
   #metrics_filters:
@@ -15,3 +17,13 @@
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+# Metrics sent by a Prometheus server using remote_write option
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
