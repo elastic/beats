@@ -33,6 +33,7 @@ processors:
         _temp_.message_type: 3
         _temp_.message_subtype: 4
         _temp_.generated_time: 6
+        _temp_.ietf_header: 0
 
   - extract_array:
       when:

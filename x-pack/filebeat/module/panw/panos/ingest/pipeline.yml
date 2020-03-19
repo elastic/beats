@@ -6,6 +6,13 @@ processors:
      field: message
      target_field: log.original
 
+# Get the correct timezone from the IETF header
+ - grok:
+     field: _temp_.ietf_header
+     patterns:
+       - '%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE:event.timezone}?'
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
 # Set @timestamp to the time when the entry was generated at the data plane.
  - date:
      if: "ctx.event.timezone == null"
