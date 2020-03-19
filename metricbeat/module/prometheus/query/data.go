@@ -38,6 +38,7 @@ type Response struct {
 }
 
 // ArrayResponse is for "scalar", "string" type.
+// example: {"status":"success","data":{"resultType":"string","result":[1584628642.569,"100"]}}
 type ArrayResponse struct {
 	Status string    `json:"status"`
 	Data   arrayData `json:"data"`
@@ -47,18 +48,47 @@ type arrayData struct {
 	Results    []interface{} `json:"result"`
 }
 
-// MapResponse is for "vector", "matrix" type from Prometheus Query API Request
-type MapResponse struct {
-	Status string  `json:"status"`
-	Data   mapData `json:"data"`
+// InstantVectorResponse is for "vector" type from Prometheus Query API Request
+// Format:
+// [
+//  {
+//    "metric": { "<label_name>": "<label_value>", ... },
+//    "value": [ <unix_time>, "<sample_value>" ]
+//  },
+//  ...
+//]
+type InstantVectorResponse struct {
+	Status string            `json:"status"`
+	Data   instantVectorData `json:"data"`
 }
-type mapData struct {
-	ResultType string      `json:"resultType"`
-	Results    []mapResult `json:"result"`
+type instantVectorData struct {
+	ResultType string                `json:"resultType"`
+	Results    []instantVectorResult `json:"result"`
 }
-type mapResult struct {
+type instantVectorResult struct {
+	Metric map[string]string `json:"metric"`
+	Vector []interface{}     `json:"value"`
+}
+
+// InstantVectorResponse is for "vector" type from Prometheus Query API Request
+// Format:
+// [
+//  {
+//    "metric": { "<label_name>": "<label_value>", ... },
+//    "values": [ [ <unix_time>, "<sample_value>" ], ... ]
+//  },
+//  ...
+//]
+type RangeVectorResponse struct {
+	Status string          `json:"status"`
+	Data   rangeVectorData `json:"data"`
+}
+type rangeVectorData struct {
+	ResultType string              `json:"resultType"`
+	Results    []rangeVectorResult `json:"result"`
+}
+type rangeVectorResult struct {
 	Metric  map[string]string `json:"metric"`
-	Vector  []interface{}     `json:"value"`
 	Vectors [][]interface{}   `json:"values"`
 }
 
@@ -98,7 +128,7 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 
 func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	convertedMap, err := convertJSONToMapResponse(body)
+	convertedMap, err := convertJSONToRangeVectorResponse(body)
 	if err != nil {
 		return events, err
 	}
@@ -130,7 +160,7 @@ func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb
 
 func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	convertedMap, err := convertJSONToMapResponse(body)
+	convertedMap, err := convertJSONToInstantVectorResponse(body)
 	if err != nil {
 		return events, err
 	}
@@ -193,17 +223,6 @@ func getResultType(body []byte) (string, error) {
 	return response.Data.ResultType, nil
 }
 
-func convertJSONToMapResponse(body []byte) (MapResponse, error) {
-	mapBody := MapResponse{}
-	if err := json.Unmarshal(body, &mapBody); err != nil {
-		return MapResponse{}, errors.Wrap(err, "Failed to parse api response")
-	}
-	if mapBody.Status == "error" {
-		return mapBody, errors.Errorf("Failed to query")
-	}
-	return mapBody, nil
-}
-
 func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 	arrayBody := ArrayResponse{}
 	if err := json.Unmarshal(body, &arrayBody); err != nil {
@@ -213,6 +232,28 @@ func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 		return arrayBody, errors.Errorf("Failed to query")
 	}
 	return arrayBody, nil
+}
+
+func convertJSONToRangeVectorResponse(body []byte) (RangeVectorResponse, error) {
+	mapBody := RangeVectorResponse{}
+	if err := json.Unmarshal(body, &mapBody); err != nil {
+		return RangeVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+	}
+	if mapBody.Status == "error" {
+		return mapBody, errors.Errorf("Failed to query")
+	}
+	return mapBody, nil
+}
+
+func convertJSONToInstantVectorResponse(body []byte) (InstantVectorResponse, error) {
+	mapBody := InstantVectorResponse{}
+	if err := json.Unmarshal(body, &mapBody); err != nil {
+		return InstantVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+	}
+	if mapBody.Status == "error" {
+		return mapBody, errors.Errorf("Failed to query")
+	}
+	return mapBody, nil
 }
 
 func getTimestamp(num float64) time.Time {
