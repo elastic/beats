@@ -453,9 +453,9 @@ function yammerSchema(debug) {
         // User uploads a file.
         FileCreated: [ "file", "creation"],
         // User creates a group.
-        GroupCreation: [ "iam", "group"],
+        GroupCreation: [ "iam", ["group", "creation"] ],
         // A group is deleted from Yammer.
-        GroupDeletion: [ "iam", "group"],
+        GroupDeletion: [ "iam", ["group", "deletion"] ],
         // User downloads a file.
         FileDownloaded: [ "file", "access"],
         // User shares a file with another user.

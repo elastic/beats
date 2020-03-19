@@ -13,7 +13,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "Yammer",
-        "event.type": "group",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "audit",
         "group.name": "Sales",
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
@@ -68,7 +71,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "Yammer",
-        "event.type": "group",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "audit",
         "group.name": "Company group",
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
