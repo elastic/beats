@@ -36,6 +36,7 @@ var (
 		"licenses",
 		"metricbeat",
 		"script",
+		".go-version",
 	}
 )
 
