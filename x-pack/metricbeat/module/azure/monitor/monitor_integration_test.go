@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build azure
 
 package monitor
 
@@ -17,10 +18,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config, err := test.GetConfig("monitor")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "monitor")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
@@ -30,10 +28,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, err := test.GetConfig("monitor")
-	if err != nil {
-		t.Skip("Skipping TestFetch: " + err.Error())
-	}
+	config := test.GetConfig(t, "monitor")
 	config["resources"] = []map[string]interface{}{{
 		"resource_query": "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'",
 		"metrics": []map[string]interface{}{{"namespace": "Microsoft.DocumentDb/databaseAccounts",

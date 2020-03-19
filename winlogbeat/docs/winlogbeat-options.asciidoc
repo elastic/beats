@@ -410,3 +410,29 @@ stopped. *{vista_and_newer}*
 Setting `no_more_events` to `stop` is useful when reading from archived event
 log files where you want to read the whole file then exit. There's a complete
 example of how to read from an `.evtx` file in the <<reading-from-evtx,FAQ>>.
+
+[float]
+==== `event_logs.api`
+
+experimental[]
+
+This selects the event log reader implementation that is used to read events
+from the Windows APIs. You should only set this option when testing experimental
+features. When the value is set to `wineventlog-experimental` Winlogbeat will
+replace the default event log reader with the experimental implementation.
+We are evaluating this implementation to see if it can provide increased
+performance and reduce CPU usage. *{vista_and_newer}*
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: ForwardedEvents
+    api: wineventlog-experimental
+--------------------------------------------------------------------------------
+
+There are a few notable differences in the events:
+
+* Events that contained data under `winlog.user_data` will now have it under
+  `winlog.event_data`.
+* Setting `include_xml: true` has no effect.
+

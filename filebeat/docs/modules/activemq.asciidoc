@@ -10,7 +10,7 @@ This file is generated! See scripts/docs_collector.py
 
 == ActiveMQ module
 
-beta[]
+ga[]
 
 This module parses Apache ActiveMQ logs. It supports application and audit logs.
 

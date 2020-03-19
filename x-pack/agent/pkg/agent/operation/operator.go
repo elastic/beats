@@ -224,6 +224,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			continue
 		}
 
+		o.logger.Debugf("running operation '%s' for %s.%s", op.Name(), p.BinaryName(), p.Version())
 		if err := op.Run(o.bgContext, app); err != nil {
 			return err
 		}
