@@ -19,6 +19,7 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -52,10 +53,7 @@ type config struct {
 
 	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
 	// set to 0 to disable the cgroup cache
-	CgroupCacheExpireTime int `config:"cgroup_cache_expire_time"`
-
-	// CgroupCacheCleanTime is the length of time cache clean up expired elements in seconds
-	CgroupCacheCleanTime int `config:"cgroup_cache_clean_time"`
+	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`
 }
 
 // available fields by default
@@ -94,8 +92,7 @@ func defaultConfig() config {
 		MatchPIDs:             []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
 		HostPath:              "/",
 		CgroupPrefixes:        []string{"/kubepods", "/docker"},
-		CgroupCacheExpireTime: 300,
-		CgroupCacheCleanTime:  5,
+		CgroupCacheExpireTime: cacheExpiration,
 	}
 }
 

@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -30,8 +29,7 @@ import (
 )
 
 const (
-	providerName           = "gosigar_cid_provider"
-	cgroupsCacheExpiration = 5 * time.Minute
+	providerName = "gosigar_cid_provider"
 )
 
 type gosigarCidProvider struct {

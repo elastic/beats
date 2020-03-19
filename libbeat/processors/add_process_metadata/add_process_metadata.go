@@ -124,8 +124,8 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 				p.log.Debugf("Evicted cached cgroups for PID=%v", k)
 			}
 
-			cgroupsCache := common.NewCacheWithRemovalListener(time.Duration(config.CgroupCacheExpireTime)*time.Second, 100, evictionListener)
-			cgroupsCache.StartJanitor(time.Duration(config.CgroupCacheCleanTime) * time.Second)
+			cgroupsCache := common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
+			cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
 			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, cgroupsCache)
 		} else {
 			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, nil)

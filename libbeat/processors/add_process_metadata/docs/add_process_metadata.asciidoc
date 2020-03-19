@@ -80,14 +80,10 @@ to `/kubepods` and `/docker`. This is the prefix where the container ID is
 inside cgroup. For different runtime configurations of Kubernetes or Docker,
 the `cgroup_prefixes` can be set to overwrite the defaults.
 
-`CgroupCacheExpireTime`:: (Optional) By default, the `CgroupCacheExpireTime`
-is set to 5 minuses. This is the length of time before cgroup cache elements
-expire in seconds. It can be set to 0 to disable the cgroup cache. In some
-container runtimes technology like runc, the container's process is also
-process in the host kernel, and will be affected by PID rollover/reuse. The
-expire time needs to set smaller than the PIDs wrap around time to avoid wrong
-container id.
-
-`CgroupCacheExpireTime`:: (Optional) By default, the `CgroupCacheExpireTime`
-is set to 5 seconds. this is the length of time cache clean up expired elements
-in seconds.
+`cgroup_cache_expire_time`:: (Optional) By default, the 
+`cgroup_cache_expire_time` is set to 30 seconds. This is the length of time
+before cgroup cache elements expire in seconds. It can be set to 0 to disable
+the cgroup cache. In some container runtimes technology like runc, the 
+container's process is also process in the host kernel, and will be affected by
+PID rollover/reuse. The expire time needs to set smaller than the PIDs wrap 
+around time to avoid wrong container id.

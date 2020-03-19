@@ -510,6 +510,31 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "custom cache expire time",
+			config: common.MapStr{
+				"match_pids":               []string{"system.process.ppid"},
+				"include_fields":           []string{"container.id"},
+				"cgroup_cache_expire_time": 10 * time.Second,
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := common.NewConfigFrom(test.config)
