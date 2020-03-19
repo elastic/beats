@@ -123,3 +123,87 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 	}
 }
+
+func TestQueryFetchEventContentScalar(t *testing.T) {
+	absPath, _ := filepath.Abs("./_meta/test/")
+
+	// test with response format like:
+	//[ <unix_time>, "<scalar_value>" ]
+	response, _ := ioutil.ReadFile(absPath + "/querymetrics_scalar.json")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json;")
+		w.Write([]byte(response))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		"queries": []common.MapStr{
+			common.MapStr{
+				"query_name": "up",
+				"path":       "/api/v1/query",
+				"query_params": common.MapStr{
+					"query": "up",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	metricSet.Fetch(reporter)
+
+	events := reporter.GetEvents()
+	if len(events) != 1 {
+		t.Fatalf("Expected 1 events, had %d. %v\n", len(events), events)
+	}
+	for _, event := range events {
+		e := mbtest.StandardizeEvent(metricSet, event)
+		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
+}
+
+func TestQueryFetchEventContentString(t *testing.T) {
+	absPath, _ := filepath.Abs("./_meta/test/")
+
+	// test with response format like:
+	//[ <unix_time>, "<scalar_value>" ]
+	response, _ := ioutil.ReadFile(absPath + "/querymetrics_string.json")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json;")
+		w.Write([]byte(response))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		"queries": []common.MapStr{
+			common.MapStr{
+				"query_name": "up",
+				"path":       "/api/v1/query",
+				"query_params": common.MapStr{
+					"query": "up",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	metricSet.Fetch(reporter)
+
+	events := reporter.GetEvents()
+	if len(events) != 1 {
+		t.Fatalf("Expected 1 events, had %d. %v\n", len(events), events)
+	}
+	for _, event := range events {
+		e := mbtest.StandardizeEvent(metricSet, event)
+		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
+}
