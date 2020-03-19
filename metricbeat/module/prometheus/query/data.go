@@ -50,7 +50,7 @@ type arrayData struct {
 }
 
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
-// Format:
+// instantVectorResult format:
 // [
 //  {
 //    "metric": { "<label_name>": "<label_value>", ... },
@@ -72,7 +72,7 @@ type instantVectorResult struct {
 }
 
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
-// Format:
+// rangeVectorResult format:
 // [
 //  {
 //    "metric": { "<label_name>": "<label_value>", ... },

@@ -55,7 +55,7 @@ func TestData(t *testing.T) {
 		if err == nil {
 			return
 		}
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 	t.Fatal("write", err)
 }
@@ -86,7 +86,7 @@ func TestQueryFetch(t *testing.T) {
 		if len(events) > 0 {
 			break
 		}
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 	if len(errors) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errors), errors)

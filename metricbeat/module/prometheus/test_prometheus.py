@@ -56,7 +56,7 @@ class Test(metricbeat.BaseTest):
             }
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, 60)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 

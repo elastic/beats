@@ -51,6 +51,7 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
 				"query_name": "up",
@@ -99,6 +100,7 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
 				"query_name": "up",
@@ -141,6 +143,7 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
 				"query_name": "up",
@@ -183,6 +186,7 @@ func TestQueryFetchEventContentString(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
+		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
 				"query_name": "up",
