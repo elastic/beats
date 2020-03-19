@@ -169,6 +169,7 @@ type List struct {
 	value []Node
 }
 
+// NewList creates a new list with provided nodes.
 func NewList(nodes []Node) *List {
 	return &List{nodes}
 }

@@ -34,6 +34,7 @@ const (
 	osVersionKey    = "os.version"
 )
 
+// ConstraintFilter filters ast based on included constraints.
 func ConstraintFilter(ast *transpiler.AST) error {
 	// get datasources
 	dsNode, found := transpiler.Lookup(ast, datasourcesKey)
