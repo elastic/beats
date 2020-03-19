@@ -28,6 +28,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/misp"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/mssql"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/netflow"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/o365"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/panw"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/rabbitmq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/suricata"

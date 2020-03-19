@@ -1,0 +1,5 @@
+- key: o365
+  title: Office 365
+  description: >
+    Module for handling logs from Office 365.
+  fields:
