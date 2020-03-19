@@ -129,7 +129,7 @@ func newInput(
 				poll.WithLogger(log.With("tenantID", tenantID, "contentType", contentType)),
 				poll.WithContext(ctx),
 				poll.WithRequestDecorator(
-					autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+inputName)),
+					autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+inputName, true)),
 					autorest.WithQueryParameters(common.MapStr{
 						"publisherIdentifier": tenantID,
 					}),
