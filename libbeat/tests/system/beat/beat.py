@@ -160,10 +160,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
             try:
                 self.compose_up()
                 return
-            except e:
+            except Exception as e:
                 if i + 1 >= retries:
                     raise e
-                print("Compose up failed, retrying: " + e)
+                print("Compose up failed, retrying: {}".format(e))
                 self.compose_down()
 
     def run_beat(self,
