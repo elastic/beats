@@ -74,7 +74,7 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
-		return errors.Wrap(err, "Error locating temp dir")
+		return errors.Wrap(err, "error locating temp dir")
 	}
 	defer sh.Rm(tmpDir)
 
@@ -119,16 +119,16 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 // * send this to the plugin create API endpoint
 func BuildContainer(ctx context.Context) error {
 	// setup
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	mage.CreateDir(packageStagingDir)
 	mage.CreateDir(packageEndDir)
 	err = os.MkdirAll(filepath.Join(buildDir, "rootfs"), 0755)
 	if err != nil {
-		return errors.Wrap(err, "Error creating build dir")
+		return errors.Wrap(err, "error creating build dir")
 	}
 
 	err = createContainer(ctx, cli)
@@ -167,7 +167,7 @@ func BuildContainer(ctx context.Context) error {
 
 	_, err = io.Copy(file, exportReader)
 	if err != nil {
-		return errors.Wrap(err, "Error writing exported container")
+		return errors.Wrap(err, "error writing exported container")
 	}
 
 	//misc prepare operations
@@ -203,9 +203,9 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 
 // Uninstall removes working objects and containers
 func Uninstall(ctx context.Context) error {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	//check to see if we have a plugin we need to remove
@@ -249,9 +249,9 @@ func Install(ctx context.Context) error {
 		return err
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	archiveOpts := &archive.TarOptions{
@@ -345,4 +345,13 @@ func IntegTest() {
 // Update is currently a dummy test for the `testsuite` target
 func Update() {
 	fmt.Printf("There is no Update for The Elastic Log Plugin\n")
+}
+
+func newDockerClient(ctx context.Context) (*client.Client, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	cli.NegotiateAPIVersion(ctx)
+	return cli, nil
 }

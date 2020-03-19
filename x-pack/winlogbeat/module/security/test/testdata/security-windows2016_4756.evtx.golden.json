@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-10-22T11:34:58.4130288Z",
     "event": {
-      "action": "added-group-account-to",
+      "action": "added-member-to-group",
       "code": 4756,
       "kind": "event",
       "module": "security",
@@ -18,8 +18,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

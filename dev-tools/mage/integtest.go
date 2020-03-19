@@ -147,6 +147,7 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 	env := []string{
 		"TEST_COVERAGE",
 		"RACE_DETECTOR",
+		"TEST_TAGS",
 		"PYTHON_EXE",
 	}
 	env = append(env, passThroughEnvVars...)

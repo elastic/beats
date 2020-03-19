@@ -35,6 +35,8 @@ import (
 
 const logName = "processor.convert"
 
+var ignoredFailure = struct{}{}
+
 func init() {
 	processors.RegisterPlugin("convert", New)
 	jsprocessor.RegisterPlugin("Convert", New)
@@ -43,8 +45,6 @@ func init() {
 type processor struct {
 	config
 	log *logp.Logger
-
-	converted []interface{} // Temporary storage for converted values.
 }
 
 // New constructs a new convert processor.
@@ -63,7 +63,7 @@ func newConvert(c config) (*processor, error) {
 		log = log.With("instance_id", c.Tag)
 	}
 
-	return &processor{config: c, log: log, converted: make([]interface{}, len(c.Fields))}, nil
+	return &processor{config: c, log: log}, nil
 }
 
 func (p *processor) String() string {
@@ -71,19 +71,11 @@ func (p *processor) String() string {
 	return "convert=" + string(json)
 }
 
-var ignoredFailure = struct{}{}
-
-func resetValues(s []interface{}) {
-	for i := range s {
-		s[i] = nil
-	}
-}
-
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	defer resetValues(p.converted)
+	converted := make([]interface{}, len(p.Fields))
 
 	// Convert the fields and write the results to temporary storage.
-	if err := p.convertFields(event); err != nil {
+	if err := p.convertFields(event, converted); err != nil {
 		return event, err
 	}
 
@@ -99,14 +91,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	// Update the event with the converted values.
-	if err := p.writeToEvent(event); err != nil {
+	if err := p.writeToEvent(event, converted); err != nil {
 		return &saved, err
 	}
 
 	return event, nil
 }
 
-func (p *processor) convertFields(event *beat.Event) error {
+func (p *processor) convertFields(event *beat.Event, converted []interface{}) error {
 	// Write conversion results to temporary storage.
 	for i, conv := range p.Fields {
 		v, err := p.convertField(event, conv)
@@ -116,7 +108,7 @@ func (p *processor) convertFields(event *beat.Event) error {
 			}
 			v = ignoredFailure
 		}
-		p.converted[i] = v
+		converted[i] = v
 	}
 
 	return nil
@@ -142,9 +134,9 @@ func (p *processor) convertField(event *beat.Event, conversion field) (interface
 	return v, nil
 }
 
-func (p *processor) writeToEvent(event *beat.Event) error {
+func (p *processor) writeToEvent(event *beat.Event, converted []interface{}) error {
 	for i, conversion := range p.Fields {
-		v := p.converted[i]
+		v := converted[i]
 		if v == ignoredFailure {
 			continue
 		}
