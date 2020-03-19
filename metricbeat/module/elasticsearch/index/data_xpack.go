@@ -68,7 +68,7 @@ type indexStats struct {
 	Merges struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
-	QueryCache   cacheStats `json:"query_stats"`
+	QueryCache   cacheStats `json:"query_cache"`
 	RequestCache cacheStats `json:"request_cache"`
 	Search       struct {
 		QueryTotal        int `json:"query_total"`
@@ -117,7 +117,7 @@ type shardStats struct {
 	UnassignedReplicas  int `json:"unassigned_replicas"`
 
 	Initializing int `json:"initializing"`
-	Relocating   int `json:"relocationg"`
+	Relocating   int `json:"relocating"`
 }
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
