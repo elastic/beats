@@ -50,7 +50,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	m := &MetricSet{
 		BaseMetricSet: base,
 		events:        make(chan mb.Event),
@@ -71,7 +70,6 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		select {
 		case <-reporter.Done():
 			m.server.Stop()
-			close(m.events)
 			return
 		case e := <-m.events:
 			reporter.Event(e)
@@ -100,12 +98,16 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// refactor, optimize
+
 	samples := protoToSamples(&protoReq)
 	events := samplesToEvents(samples)
 
 	for _, e := range events {
-		m.events <- e
+		select {
+		case <-req.Context().Done():
+			return
+		case m.events <- e:
+		}
 	}
 	writer.WriteHeader(http.StatusAccepted)
 }
