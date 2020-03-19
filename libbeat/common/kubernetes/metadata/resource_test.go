@@ -109,7 +109,7 @@ func TestResource_Generate(t *testing.T) {
 		},
 	}
 
-	cfg := defaultConfig()
+	cfg := DefaultConfig()
 	metagen := &Resource{
 		config: &cfg,
 	}

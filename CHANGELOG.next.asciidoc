@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
+- Fix metadata enrichers to use default config for kubernetes module. {pull}17020[17020]
 
 *Auditbeat*
 
@@ -54,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
 - Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Add queue_url definition in manifest file for aws module. {pull}16640{16640}
+- Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
 - Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 
 *Heartbeat*
