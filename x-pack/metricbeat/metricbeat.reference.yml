@@ -385,7 +385,7 @@ metricbeat.modules:
   hosts: ["localhost:8091"]
   enabled: true
 
-#------------------------------- Couchdb Module -------------------------------
+#------------------------------- CouchDB Module -------------------------------
 - module: couchdb
   metricsets: ["server"]
   period: 10s
