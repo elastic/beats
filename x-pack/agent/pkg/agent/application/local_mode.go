@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
@@ -85,7 +86,7 @@ func newLocal(
 	}
 
 	discover := discoverer(pathConfigFile, c.Management.Path)
-	emit := emitter(log, router, injectMonitoring)
+	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}})
 
 	var cfgSource source
 	if !c.Management.Reload.Enabled {

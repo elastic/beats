@@ -169,6 +169,10 @@ type List struct {
 	value []Node
 }
 
+func NewList(nodes []Node) *List {
+	return &List{nodes}
+}
+
 func (l *List) String() string {
 	var sb strings.Builder
 	for i := 0; i < len(l.value); i++ {
