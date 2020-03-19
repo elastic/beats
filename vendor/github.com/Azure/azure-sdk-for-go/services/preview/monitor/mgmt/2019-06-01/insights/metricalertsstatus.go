@@ -35,9 +35,7 @@ func NewMetricAlertsStatusClient(subscriptionID string) MetricAlertsStatusClient
 	return NewMetricAlertsStatusClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
-// NewMetricAlertsStatusClientWithBaseURI creates an instance of the MetricAlertsStatusClient client using a custom
-// endpoint.  Use this when interacting with an Azure cloud that uses a non-standard base URI (sovereign clouds, Azure
-// stack).
+// NewMetricAlertsStatusClientWithBaseURI creates an instance of the MetricAlertsStatusClient client.
 func NewMetricAlertsStatusClientWithBaseURI(baseURI string, subscriptionID string) MetricAlertsStatusClient {
 	return MetricAlertsStatusClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
@@ -102,7 +100,8 @@ func (client MetricAlertsStatusClient) ListPreparer(ctx context.Context, resourc
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client MetricAlertsStatusClient) ListSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -180,7 +179,8 @@ func (client MetricAlertsStatusClient) ListByNamePreparer(ctx context.Context, r
 // ListByNameSender sends the ListByName request. The method will close the
 // http.Response Body if it receives an error.
 func (client MetricAlertsStatusClient) ListByNameSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListByNameResponder handles the response to the ListByName request. The method always

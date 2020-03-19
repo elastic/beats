@@ -36,9 +36,7 @@ func NewDisasterRecoveryConfigsClient(subscriptionID string) DisasterRecoveryCon
 	return NewDisasterRecoveryConfigsClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
-// NewDisasterRecoveryConfigsClientWithBaseURI creates an instance of the DisasterRecoveryConfigsClient client using a
-// custom endpoint.  Use this when interacting with an Azure cloud that uses a non-standard base URI (sovereign clouds,
-// Azure stack).
+// NewDisasterRecoveryConfigsClientWithBaseURI creates an instance of the DisasterRecoveryConfigsClient client.
 func NewDisasterRecoveryConfigsClientWithBaseURI(baseURI string, subscriptionID string) DisasterRecoveryConfigsClient {
 	return DisasterRecoveryConfigsClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
@@ -119,7 +117,8 @@ func (client DisasterRecoveryConfigsClient) BreakPairingPreparer(ctx context.Con
 // BreakPairingSender sends the BreakPairing request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) BreakPairingSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // BreakPairingResponder handles the response to the BreakPairing request. The method always
@@ -209,7 +208,8 @@ func (client DisasterRecoveryConfigsClient) CheckNameAvailabilityPreparer(ctx co
 // CheckNameAvailabilitySender sends the CheckNameAvailability request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) CheckNameAvailabilitySender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CheckNameAvailabilityResponder handles the response to the CheckNameAvailability request. The method always
@@ -303,7 +303,8 @@ func (client DisasterRecoveryConfigsClient) CreateOrUpdatePreparer(ctx context.C
 // CreateOrUpdateSender sends the CreateOrUpdate request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) CreateOrUpdateSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
@@ -394,7 +395,8 @@ func (client DisasterRecoveryConfigsClient) DeletePreparer(ctx context.Context, 
 // DeleteSender sends the Delete request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) DeleteSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // DeleteResponder handles the response to the Delete request. The method always
@@ -484,7 +486,8 @@ func (client DisasterRecoveryConfigsClient) FailOverPreparer(ctx context.Context
 // FailOverSender sends the FailOver request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) FailOverSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // FailOverResponder handles the response to the FailOver request. The method always
@@ -574,7 +577,8 @@ func (client DisasterRecoveryConfigsClient) GetPreparer(ctx context.Context, res
 // GetSender sends the Get request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) GetSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetResponder handles the response to the Get request. The method always
@@ -669,7 +673,8 @@ func (client DisasterRecoveryConfigsClient) GetAuthorizationRulePreparer(ctx con
 // GetAuthorizationRuleSender sends the GetAuthorizationRule request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) GetAuthorizationRuleSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // GetAuthorizationRuleResponder handles the response to the GetAuthorizationRule request. The method always
@@ -756,7 +761,8 @@ func (client DisasterRecoveryConfigsClient) ListPreparer(ctx context.Context, re
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
@@ -885,7 +891,8 @@ func (client DisasterRecoveryConfigsClient) ListAuthorizationRulesPreparer(ctx c
 // ListAuthorizationRulesSender sends the ListAuthorizationRules request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) ListAuthorizationRulesSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListAuthorizationRulesResponder handles the response to the ListAuthorizationRules request. The method always
@@ -1017,7 +1024,8 @@ func (client DisasterRecoveryConfigsClient) ListKeysPreparer(ctx context.Context
 // ListKeysSender sends the ListKeys request. The method will close the
 // http.Response Body if it receives an error.
 func (client DisasterRecoveryConfigsClient) ListKeysSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListKeysResponder handles the response to the ListKeys request. The method always

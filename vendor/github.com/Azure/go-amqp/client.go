@@ -1810,20 +1810,6 @@ func LinkTargetExpiryPolicy(p ExpiryPolicy) LinkOption {
 	}
 }
 
-// LinkTargetTimeout sets the duration that an expiring target will be retained.
-//
-// Default: 0.
-func LinkTargetTimeout(timeout uint32) LinkOption {
-	return func(l *link) error {
-		if l.target == nil {
-			l.target = new(target)
-		}
-		l.target.Timeout = timeout
-
-		return nil
-	}
-}
-
 // LinkSourceDurability sets the source durability policy.
 //
 // Default: DurabilityNone.
@@ -1856,20 +1842,6 @@ func LinkSourceExpiryPolicy(p ExpiryPolicy) LinkOption {
 			l.source = new(source)
 		}
 		l.source.ExpiryPolicy = p
-
-		return nil
-	}
-}
-
-// LinkSourceTimeout sets the duration that an expiring source will be retained.
-//
-// Default: 0.
-func LinkSourceTimeout(timeout uint32) LinkOption {
-	return func(l *link) error {
-		if l.source == nil {
-			l.source = new(source)
-		}
-		l.source.Timeout = timeout
 
 		return nil
 	}

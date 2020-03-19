@@ -104,9 +104,6 @@ func (sk *SharedKeyAuthorizer) WithAuthorization() PrepareDecorator {
 			}
 
 			sk, err := buildSharedKey(sk.accountName, sk.accountKey, r, sk.keyType)
-			if err != nil {
-				return r, err
-			}
 			return Prepare(r, WithHeader(headerAuthorization, sk))
 		})
 	}

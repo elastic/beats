@@ -35,8 +35,7 @@ func NewActivityLogsClient(subscriptionID string) ActivityLogsClient {
 	return NewActivityLogsClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
-// NewActivityLogsClientWithBaseURI creates an instance of the ActivityLogsClient client using a custom endpoint.  Use
-// this when interacting with an Azure cloud that uses a non-standard base URI (sovereign clouds, Azure stack).
+// NewActivityLogsClientWithBaseURI creates an instance of the ActivityLogsClient client.
 func NewActivityLogsClientWithBaseURI(baseURI string, subscriptionID string) ActivityLogsClient {
 	return ActivityLogsClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
@@ -119,7 +118,8 @@ func (client ActivityLogsClient) ListPreparer(ctx context.Context, filter string
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client ActivityLogsClient) ListSender(req *http.Request) (*http.Response, error) {
-	return client.Send(req, azure.DoRetryWithRegistration(client.Client))
+	sd := autorest.GetSendDecorators(req.Context(), azure.DoRetryWithRegistration(client.Client))
+	return autorest.SendWithSender(client, req, sd...)
 }
 
 // ListResponder handles the response to the List request. The method always
