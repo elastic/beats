@@ -3403,8 +3403,8 @@ type Metric struct {
 type MetricAlertAction struct {
 	// ActionGroupID - the id of the action group to use.
 	ActionGroupID *string `json:"actionGroupId,omitempty"`
-	// WebhookProperties - The properties of a webhook object.
-	WebhookProperties map[string]*string `json:"webhookProperties"`
+	// WebHookProperties - The properties of a webhook object.
+	WebHookProperties map[string]*string `json:"webHookProperties"`
 }
 
 // MarshalJSON is the custom marshaler for MetricAlertAction.
@@ -3413,8 +3413,8 @@ func (maa MetricAlertAction) MarshalJSON() ([]byte, error) {
 	if maa.ActionGroupID != nil {
 		objectMap["actionGroupId"] = maa.ActionGroupID
 	}
-	if maa.WebhookProperties != nil {
-		objectMap["webhookProperties"] = maa.WebhookProperties
+	if maa.WebHookProperties != nil {
+		objectMap["webHookProperties"] = maa.WebHookProperties
 	}
 	return json.Marshal(objectMap)
 }

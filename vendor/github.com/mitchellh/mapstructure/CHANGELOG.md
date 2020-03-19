@@ -1,3 +1,11 @@
+## 1.2.0
+
+* Added support to capture unused values in a field using the `",remain"` value
+  in the mapstructure tag. There is an example to showcase usage.
+* Added `DecoderConfig` option to always squash embedded structs
+* `json.Number` can decode into `uint` types
+* Empty slices are preserved and not replaced with nil slices
+
 ## 1.1.2
 
 * Fix error when decode hook decodes interface implementation into interface

@@ -10,8 +10,8 @@ require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
-	github.com/Azure/azure-event-hubs-go/v3 v3.2.0
-	github.com/Azure/azure-sdk-for-go v40.0.0+incompatible
+	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
+	github.com/Azure/azure-sdk-for-go v40.4.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-amqp v0.12.7 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
@@ -114,7 +114,7 @@ require (
 	github.com/miekg/dns v1.1.15
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
-	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/mapstructure v1.2.0
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
@@ -145,7 +145,7 @@ require (
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
 	go.uber.org/zap v1.7.1
-	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
+	golang.org/x/crypto v0.0.0-20200317142112-1b76d66859c6
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
