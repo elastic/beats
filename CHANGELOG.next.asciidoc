@@ -255,6 +255,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 
 *Heartbeat*
 
