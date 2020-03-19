@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
+- Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
 
 *Auditbeat*
@@ -158,6 +159,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 - Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
 - Dynamically choose a method for the system/service metricset to support older linux distros. {pull}16902[16902]
+- Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
 
 *Packetbeat*
 
@@ -252,6 +254,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS related fields to CEF module {issue}16157[16157] {pull}16338[16338]
 - Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
+- Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 
 *Heartbeat*
@@ -309,6 +312,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional cgroup fields to docker/diskio{pull}16638[16638]
 - Add Prometheus remote write endpoint {pull}16609[16609]
 - Release STAN module as GA. {pull}16980[16980]
+- Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
+- Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
 
 *Packetbeat*
 
@@ -321,6 +326,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
+- Add Audit and Log Management, Computer Object Management, and Distribution Group related events to the Security module. {pull}15217[15217]
 
 ==== Deprecated
 
