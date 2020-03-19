@@ -14,7 +14,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	config := mtest.GetConfigForTest("vpn", "300s")
+	config := mtest.GetConfigForTest(t, "vpn", "300s")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }
