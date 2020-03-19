@@ -24,6 +24,8 @@ const (
 func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	for _, resource := range resources {
+		// return resource size
+		resourceSize := mapResourceSize(resource)
 		for _, metric := range resourceConfig.Metrics {
 			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
 			if err != nil {
@@ -75,9 +77,17 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				if key != azure.NoDimension {
 					dimensions = []azure.Dimension{{Name: key, Value: "*"}}
 				}
-				metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, metricGroup, resource, "", metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(metricGroup, resource, "", resourceSize, metric.Namespace, dimensions, azure.DefaultTimeGrain)...)
 			}
 		}
 	}
 	return metrics, nil
+}
+
+// mapResourceSize func will try to map if existing the resource size, for the vmss it seems that SKU is populated and resource size is mapped in the name
+func mapResourceSize(resource resources.GenericResource) string {
+	if resource.Sku != nil && resource.Sku.Name != nil {
+		return *resource.Sku.Name
+	}
+	return ""
 }

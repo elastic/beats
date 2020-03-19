@@ -28,6 +28,7 @@ import (
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
@@ -46,7 +47,8 @@ type ModuleRegistry struct {
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
-	beatVersion string) (*ModuleRegistry, error) {
+	beatInfo beat.Info,
+) (*ModuleRegistry, error) {
 
 	var reg ModuleRegistry
 	reg.registry = map[string]map[string]*Fileset{}
@@ -87,7 +89,7 @@ func newModuleRegistry(modulesPath string,
 			if err != nil {
 				return nil, err
 			}
-			err = fileset.Read(beatVersion)
+			err = fileset.Read(beatInfo)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
@@ -106,7 +108,7 @@ func newModuleRegistry(modulesPath string,
 				}
 			}
 			if !found {
-				return nil, fmt.Errorf("Fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
+				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
 		}
 	}
@@ -115,7 +117,7 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init bool) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -151,7 +153,7 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init 
 		return nil, err
 	}
 
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatVersion)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
 }
 
 func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {

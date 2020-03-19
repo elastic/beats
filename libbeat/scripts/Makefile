@@ -1,12 +1,13 @@
 ### VARIABLE SETUP ###
 ### Application using libbeat may override the following variables in their Makefile
 BEAT_NAME?=libbeat## @packaging Name of the binary
+BEAT_FULL_NAME?=${BEAT_NAME}
 LICENSE?=ASL2
 BEAT_TITLE?=${BEAT_NAME}## @packaging Title of the application
 BEATS_ROOT?=github.com/elastic/beats
 BEATS_ROOT_IMPORT_PATH?=${BEATS_ROOT}/v7
 BEAT_PATH?=${BEATS_ROOT}/${BEAT_NAME}
-BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_NAME}
+BEAT_IMPORT_PATH?=${BEATS_ROOT_IMPORT_PATH}/${BEAT_FULL_NAME}
 BEAT_PACKAGE_NAME?=${BEAT_NAME}
 BEAT_INDEX_PREFIX?=${BEAT_NAME}
 BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link to the homepage of the application
@@ -71,7 +72,7 @@ TESTIFY_TOOL_REPO?=github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
-GOIMPORTS_REPO?=github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports
+GOIMPORTS_REPO?=golang.org/x/tools/cmd/goimports
 GOIMPORTS_LOCAL_PREFIX?=github.com/elastic
 GOLINT=golint
 GOLINT_REPO?=golang.org/x/lint/golint
@@ -97,6 +98,7 @@ COMMIT_ID=$(shell git rev-parse HEAD)
 DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION//-}${COMMIT_ID} ## @testing The name of the docker-compose project used by the integration and system tests
 DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
+DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker-compose build
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_EXE?=python3
 PYTHON_ENV?=${BUILD_DIR}/python-env
@@ -114,6 +116,10 @@ ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
 endif
 
+ifeq ($(DOCKER_PULL),1)
+	DOCKER_FORCE_PULL=--pull
+endif
+
 # Conditionally enable the race detector when RACE_DETECTOR=1.
 ifeq ($(RACE_DETECTOR),1)
 	RACE=-race
@@ -128,18 +134,13 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 
 .DEFAULT_GOAL := ${BEAT_NAME}
 
-${BEAT_NAME}: $(GOFILES_ALL) update-yacc-vendor ## @build build the beat application
+${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 	go build $(GOBUILD_FLAGS)
 
 # Create test coverage binary
-${BEAT_NAME}.test: $(GOFILES_ALL) update-yacc-vendor
+${BEAT_NAME}.test: $(GOFILES_ALL)
 	@go build -o /dev/null
 	@go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
-
-# Avoid running yacc to generate a parser for dependency.
-.PHONY: update-yacc-vendor
-update-yacc-vendor:
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go
 
 .PHONY: crosscompile
 crosscompile: ## @build Cross-compile beat for the OS'es specified in GOX_OS variable. The binaries are placed in the build/bin directory.
@@ -193,14 +194,12 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 
 # Preparation for tests
 .PHONY: prepare-tests
-prepare-tests: update-yacc-vendor
+prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
 	# gotestcover is needed to fetch coverage for multiple packages
 	go ${INSTALL_CMD} ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
 	go ${INSTALL_CMD} ${TESTIFY_TOOL_REPO}
-	# Avoid running yacc to generate a parser for dependency.
-	touch -c ../vendor/github.com/yuin/gopher-lua/parse/parser.go.c
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
@@ -403,7 +402,7 @@ $(.OVER)import-dashboards: update ${BEAT_NAME}
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} --pull --force-rm
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE} ${DOCKER_FORCE_PULL} --force-rm
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.

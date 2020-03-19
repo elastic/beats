@@ -1,37 +1,46 @@
 {
-    "@timestamp" : "2020-02-28T14:47:00.000Z",
-    "ecs" : {
-        "version" : "1.4.0"
-    },
-    "cloud" : {
-        "region" : "westeurope",
-        "provider" : "azure"
-    },
-    "event" : {
-        "dataset" : "azure.container_registry",
-        "module" : "azure",
-        "duration" : 2730896000
-    },
-    "metricset" : {
-        "name" : "container_registry",
-        "period" : 300000
-    },
-    "azure" : {
-        "subscription_id" : "123456-qwer-1234-5678-12345678",
-        "namespace" : "Microsoft.ContainerRegistry/registries",
-        "container_registry" : {
-            "successful_push_count" : {
-                "avg" : 1
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "container_registry": {
+            "successful_pull_count": {
+                "avg": 1
+            },
+            "successful_push_count": {
+                "avg": 1
+            },
+            "total_pull_count": {
+                "avg": 1
+            },
+            "total_push_count": {
+                "avg": 1
             }
         },
-        "timegrain" : "PT5M",
-        "resource" : {
-            "type" : "Microsoft.ContainerRegistry/registries",
-            "group" : "obs-infrastructure",
-            "name" : "obstest"
-        }
+        "namespace": "Microsoft.ContainerRegistry/registries",
+        "resource": {
+            "group": "obs-infrastructure",
+            "type": "Microsoft.ContainerRegistry/registries"
+        },
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "timegrain": "PT5M"
     },
-    "service" : {
-        "type" : "azure"
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerRegistry/registries/obstest",
+            "name": "obstest"
+        },
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.container_registry",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "container_registry",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
     }
 }

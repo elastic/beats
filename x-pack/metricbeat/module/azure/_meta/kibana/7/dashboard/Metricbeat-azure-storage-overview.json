@@ -474,7 +474,7 @@
             "index_pattern": "metricbeat-*",
             "interval": "60m",
             "isModelInvalid": false,
-            "pivot_id": "azure.resource.name",
+            "pivot_id": "cloud.instance.name",
             "pivot_label": "Resource Name",
             "pivot_rows": "30",
             "pivot_type": "string",
@@ -504,7 +504,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -607,7 +607,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -710,7 +710,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                 "type": "timeseries",
                 "value_template": "{{value}}"
@@ -861,7 +861,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "azure.resource.name",
+                "fieldName": "cloud.instance.name",
                 "id": "1578578146383",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "Resource Name",
@@ -1116,7 +1116,7 @@
             "index_pattern": "metricbeat-*",
             "interval": "60m",
             "isModelInvalid": false,
-            "pivot_id": "azure.resource.name",
+            "pivot_id": "cloud.instance.name",
             "pivot_label": "Resource Name",
             "pivot_rows": "30",
             "pivot_type": "string",
@@ -1146,7 +1146,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "azure.resource.name",
+                "terms_field": "cloud.instance.name",
                 "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                 "type": "timeseries",
                 "value_template": "{{value}}"

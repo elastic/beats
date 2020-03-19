@@ -1,9 +1,12 @@
 [role="xpack"]
 [[monitoring]]
-= Monitoring {beatname_uc}
+= Monitor {beatname_uc}
 
 [partintro]
 --
+++++
+<titleabbrev>Monitor</titleabbrev>
+++++
 
 You can use the {stack} {monitor-features} to gain insight into the health of
 ifndef::apm-server[]

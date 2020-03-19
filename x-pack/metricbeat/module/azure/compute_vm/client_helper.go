@@ -19,6 +19,8 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 		return nil, nil
 	}
 	for _, resource := range resources {
+		// return resource size
+		resourceSize := mapResourceSize(resource, client)
 		// return all namespaces supported for this resource
 		namespaces, err := client.AzureMonitorService.GetMetricNamespaces(*resource.ID)
 		if err != nil {
@@ -38,8 +40,32 @@ func mapMetrics(client *azure.Client, resources []resources.GenericResource, res
 				filteredMetricDefinitions = append(filteredMetricDefinitions, metricDefinition)
 			}
 			// map azure metric definitions to client metrics
-			metrics = append(metrics, azure.MapMetricByPrimaryAggregation(client, filteredMetricDefinitions, resource, "", *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
+			metrics = append(metrics, client.MapMetricByPrimaryAggregation(filteredMetricDefinitions, resource, "", resourceSize, *namespace.Properties.MetricNamespaceName, nil, azure.DefaultTimeGrain)...)
 		}
 	}
 	return metrics, nil
+}
+
+// mapResourceSize func will try to map if existing the resource size
+func mapResourceSize(resource resources.GenericResource, client *azure.Client) string {
+	if resource.Sku != nil && resource.Sku.Name != nil {
+		return *resource.Sku.Name
+	}
+	if resource.Sku == nil && resource.Properties == nil {
+		expandedResource, err := client.AzureMonitorService.GetResourceDefinitionById(*resource.ID)
+		if err != nil {
+			client.Log.Error(err, "could not retrieve the resource details by resource ID %s", *resource.ID)
+			return ""
+		}
+		if expandedResource.Properties != nil {
+			if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
+				if hardware, ok := properties["hardwareProfile"]; ok {
+					if vmSize, ok := hardware.(map[string]interface{})["vmSize"]; ok {
+						return vmSize.(string)
+					}
+				}
+			}
+		}
+	}
+	return ""
 }

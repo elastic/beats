@@ -109,11 +109,6 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) 
 	}
 
 	wg.Wait()
-
-	if len(results) == 0 {
-		return nil, errors.New("service returned 0 metrics")
-	}
-
 	return results, nil
 }
 
