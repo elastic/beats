@@ -1,6 +1,6 @@
 [[howto-guides]]
 [role="xpack"]
-= How to
+= How to guides
 
 [partintro]
 --
