@@ -28,10 +28,18 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestQueryFetchEventContent(t *testing.T) {
+func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	absPath, _ := filepath.Abs("./_meta/test/")
 
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics.json")
+	// test with response format like:
+	//[
+	//  {
+	//    "metric": { "<label_name>": "<label_value>", ... },
+	//    "value": [ <unix_time>, "<sample_value>" ]
+	//  },
+	//  ...
+	//]
+	response, _ := ioutil.ReadFile(absPath + "/querymetrics_instant_vector.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -58,6 +66,60 @@ func TestQueryFetchEventContent(t *testing.T) {
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	metricSet.Fetch(reporter)
 
-	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
-	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	events := reporter.GetEvents()
+	if len(events) != 2 {
+		t.Fatalf("Expected 2 events, had %d. %v\n", len(events), events)
+	}
+	for _, event := range events {
+		e := mbtest.StandardizeEvent(metricSet, event)
+		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
+}
+
+func TestQueryFetchEventContentRangeVector(t *testing.T) {
+	absPath, _ := filepath.Abs("./_meta/test/")
+
+	// test with response format like:
+	//[
+	//  {
+	//    "metric": { "<label_name>": "<label_value>", ... },
+	//    "values": [ [ <unix_time>, "<sample_value>" ], ... ]
+	//  },
+	//  ...
+	//]
+	response, _ := ioutil.ReadFile(absPath + "/querymetrics_range_vector.json")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json;")
+		w.Write([]byte(response))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"module":     "prometheus",
+		"metricsets": []string{"query"},
+		"hosts":      []string{server.URL},
+		"queries": []common.MapStr{
+			common.MapStr{
+				"query_name": "up",
+				"path":       "/api/v1/query",
+				"query_params": common.MapStr{
+					"query": "up",
+				},
+			},
+		},
+	}
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+	metricSet.Fetch(reporter)
+
+	events := reporter.GetEvents()
+	if len(events) != 6 {
+		t.Fatalf("Expected 6 events, had %d. %v\n", len(events), events)
+	}
+	for _, event := range events {
+		e := mbtest.StandardizeEvent(metricSet, event)
+		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+	}
 }

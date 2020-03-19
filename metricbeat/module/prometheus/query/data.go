@@ -19,6 +19,7 @@ package query
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -27,6 +28,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+// Response stores the very basic response information to only keep the Status and the ResultType.
+type Response struct {
+	Status string `json:"status"`
+	Data   struct {
+		ResultType string `json:"resultType"`
+	} `json:"data"`
+}
 
 // ArrayResponse is for "scalar", "string" type.
 type ArrayResponse struct {
@@ -55,80 +64,142 @@ type mapResult struct {
 
 func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 	var events []mb.Event
-	var resultType string
-	var convertedMap MapResponse
 
-	// try to convert to array response
-	convertedArray, err := convertJSONToArrayResponse(body)
+	resultType, err := getResultType(body)
 	if err != nil {
 		return events, err
-	}
-	resultType = convertedArray.Data.ResultType
-
-	// check if it is a vector or matrix and unmarshal more
-	if resultType == "vector" || resultType == "matrix" {
-		convertedMap, err = convertJSONToMapResponse(body)
-		if err != nil {
-			return events, err
-		}
-		resultType = convertedMap.Data.ResultType
 	}
 
 	switch resultType {
 	case "scalar", "string":
-		if convertedArray.Data.Results != nil {
-			events = append(events, mb.Event{
-				Timestamp: getTimestamp(convertedArray.Data.Results[0].(float64)),
-				MetricSetFields: common.MapStr{
-					"dataType":           resultType,
-					pathConfig.QueryName: attemptConvertToNumeric(convertedArray.Data.Results[1].(string)),
-				},
-			})
-		} else {
-			return events, errors.New("Could not retrieve results")
+		event, err := getEventFromScalarOrString(body, resultType, pathConfig.QueryName)
+		if err != nil {
+			return events, err
 		}
+		events = append(events, event)
 	case "vector":
-		for _, result := range convertedMap.Data.Results {
-			if result.Vector != nil {
+		evnts, err := getEventsFromVector(body, resultType, pathConfig.QueryName)
+		if err != nil {
+			return events, err
+		}
+		events = append(events, evnts...)
+	case "matrix":
+		evnts, err := getEventsFromMatrix(body, resultType, pathConfig.QueryName)
+		if err != nil {
+			return events, err
+		}
+		events = append(events, evnts...)
+	default:
+		msg := fmt.Sprintf("Unknown resultType '%v'", resultType)
+		return events, errors.New(msg)
+	}
+	return events, nil
+}
+
+func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb.Event, error) {
+	events := []mb.Event{}
+	convertedMap, err := convertJSONToMapResponse(body)
+	if err != nil {
+		return events, err
+	}
+	results := convertedMap.Data.Results
+	for _, result := range results {
+		for _, vector := range result.Vectors {
+			if vector != nil {
+				if len(vector) != 2 {
+					return []mb.Event{}, errors.New("Could not parse results")
+				}
+				timestamp, ok := vector[0].(float64)
+				if !ok {
+					return []mb.Event{}, errors.New("Could not parse timestamp of result")
+				}
 				events = append(events, mb.Event{
-					Timestamp:    getTimestamp(result.Vector[0].(float64)),
-					ModuleFields: common.MapStr{"labels": result.Metric},
+					Timestamp: getTimestamp(timestamp),
 					MetricSetFields: common.MapStr{
-						"dataType":           resultType,
-						pathConfig.QueryName: attemptConvertToNumeric(result.Vector[1].(string)),
+						"dataType": resultType,
+						queryName:  attemptConvertToNumeric(vector[1].(string)),
 					},
 				})
 			} else {
-				return events, errors.New("Could not retrieve results")
+				return []mb.Event{}, errors.New("Could not parse results")
 			}
 		}
-	case "matrix":
-		for _, result := range convertedMap.Data.Results {
-			for _, vector := range result.Vectors {
-				if vector != nil {
-					events = append(events, mb.Event{
-						Timestamp:    getTimestamp(vector[0].(float64)),
-						ModuleFields: common.MapStr{"labels": result.Metric},
-						MetricSetFields: common.MapStr{
-							"dataType":           resultType,
-							pathConfig.QueryName: attemptConvertToNumeric(vector[1].(string)),
-						},
-					})
-				} else {
-					return events, errors.New("Could not retrieve results")
-				}
-			}
-		}
-	default:
-		return events, errors.New("Unknown resultType " + resultType)
 	}
 	return events, nil
+}
+
+func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb.Event, error) {
+	events := []mb.Event{}
+	convertedMap, err := convertJSONToMapResponse(body)
+	if err != nil {
+		return events, err
+	}
+	results := convertedMap.Data.Results
+	for _, result := range results {
+		if result.Vector != nil {
+			if len(result.Vector) != 2 {
+				return []mb.Event{}, errors.New("Could not parse results")
+			}
+			timestamp, ok := result.Vector[0].(float64)
+			if !ok {
+				return []mb.Event{}, errors.New("Could not parse timestamp of result")
+			}
+			events = append(events, mb.Event{
+				Timestamp: getTimestamp(timestamp),
+				MetricSetFields: common.MapStr{
+					"dataType": resultType,
+					queryName:  attemptConvertToNumeric(result.Vector[1].(string)),
+				},
+			})
+		} else {
+			return []mb.Event{}, errors.New("Could not parse results")
+		}
+	}
+	return events, nil
+}
+
+func getEventFromScalarOrString(body []byte, resultType string, queryName string) (mb.Event, error) {
+	convertedArray, err := convertJSONToArrayResponse(body)
+	if err != nil {
+		return mb.Event{}, err
+	}
+	if convertedArray.Data.Results != nil {
+		if len(convertedArray.Data.Results) != 2 {
+			return mb.Event{}, errors.New("Could not parse results")
+		}
+		timestamp, ok := convertedArray.Data.Results[0].(float64)
+		if !ok {
+			return mb.Event{}, errors.New("Could not parse timestamp of result")
+		}
+		return mb.Event{
+			Timestamp: getTimestamp(timestamp),
+			MetricSetFields: common.MapStr{
+				"dataType": resultType,
+				queryName:  attemptConvertToNumeric(convertedArray.Data.Results[1].(string)),
+			},
+		}, nil
+	}
+	return mb.Event{}, errors.New("Could not parse results")
+}
+
+func getResultType(body []byte) (string, error) {
+	response := Response{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		return "", errors.Wrap(err, "Failed to parse api response")
+	}
+	if response.Status == "error" {
+		return "", errors.Errorf("Failed to query")
+	}
+	return response.Data.ResultType, nil
 }
 
 func convertJSONToMapResponse(body []byte) (MapResponse, error) {
 	mapBody := MapResponse{}
 	if err := json.Unmarshal(body, &mapBody); err != nil {
 		return MapResponse{}, errors.Wrap(err, "Failed to parse api response")
+	}
+	if mapBody.Status == "error" {
+		return mapBody, errors.Errorf("Failed to query")
 	}
 	return mapBody, nil
 }
