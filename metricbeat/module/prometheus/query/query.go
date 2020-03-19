@@ -18,7 +18,6 @@
 package query
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"github.com/pkg/errors"
@@ -83,9 +82,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
-			msg := fmt.Sprintf("unable to fetch data from prometheus endpoint: %v", pathConfig.Path)
-			m.Logger().Debugf("%v: %v", msg, err)
-			reporter.Error(errors.Wrap(err, msg))
+			err = errors.Wrapf(err, "unable to fetch data from prometheus endpoint: %v", pathConfig.Path)
+			m.Logger().Debug(err)
+			reporter.Error(err)
 			continue
 		}
 		defer func() {
@@ -101,9 +100,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
-			msg := fmt.Sprintf("error parsing response for: %v", pathConfig.QueryName)
-			m.Logger().Debugf("%v: %v", msg, err)
-			reporter.Error(errors.Wrap(err, msg))
+			parseErr = errors.Wrapf(parseErr, "error parsing response for: %v", pathConfig.QueryName)
+			m.Logger().Debug(parseErr)
+			reporter.Error(parseErr)
 			continue
 		}
 		for _, e := range events {

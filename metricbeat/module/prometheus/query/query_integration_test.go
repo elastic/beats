@@ -21,12 +21,14 @@ package query
 
 import (
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestData(t *testing.T) {
@@ -47,9 +49,13 @@ func TestData(t *testing.T) {
 		},
 	}
 	ms := mbtest.NewReportingMetricSetV2Error(t, config)
-	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
-	if err == nil {
-		return
+	var err error
+	for retries := 0; retries < 3; retries++ {
+		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
+		if err == nil {
+			return
+		}
+		time.Sleep(300 * time.Millisecond)
 	}
 	t.Fatal("write", err)
 }
@@ -72,9 +78,18 @@ func TestQueryFetch(t *testing.T) {
 		},
 	}
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
+
+	var events []mb.Event
+	var errors []error
+	for retries := 0; retries < 3; retries++ {
+		events, errors = mbtest.ReportingFetchV2Error(f)
+		if len(events) > 0 {
+			break
+		}
+		time.Sleep(300 * time.Millisecond)
+	}
+	if len(errors) > 0 {
+		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errors), errors)
 	}
 	assert.NotEmpty(t, events)
 	event := events[0].MetricSetFields

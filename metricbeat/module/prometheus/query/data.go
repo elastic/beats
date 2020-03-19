@@ -55,44 +55,68 @@ type mapResult struct {
 
 func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 	var events []mb.Event
-	converted, resultType, err := convertJSONToStruct(body)
+	var resultType string
+	var convertedMap MapResponse
+
+	// try to convert to array response
+	convertedArray, err := convertJSONToArrayResponse(body)
 	if err != nil {
 		return events, err
 	}
+	resultType = convertedArray.Data.ResultType
+
+	// check if it is a vector or matrix and unmarshal more
+	if resultType == "vector" || resultType == "matrix" {
+		convertedMap, err = convertJSONToMapResponse(body)
+		if err != nil {
+			return events, err
+		}
+		resultType = convertedMap.Data.ResultType
+	}
+
 	switch resultType {
 	case "scalar", "string":
-		res := converted.(ArrayResponse)
-		events = append(events, mb.Event{
-			Timestamp: getTimestamp(res.Data.Results[0].(float64)),
-			MetricSetFields: common.MapStr{
-				"dataType":           resultType,
-				pathConfig.QueryName: convertToNumeric(res.Data.Results[1].(string)),
-			},
-		})
-	case "vector":
-		res := converted.(MapResponse)
-		for _, result := range res.Data.Results {
+		if convertedArray.Data.Results != nil {
 			events = append(events, mb.Event{
-				Timestamp:    getTimestamp(result.Vector[0].(float64)),
-				ModuleFields: common.MapStr{"labels": result.Metric},
+				Timestamp: getTimestamp(convertedArray.Data.Results[0].(float64)),
 				MetricSetFields: common.MapStr{
 					"dataType":           resultType,
-					pathConfig.QueryName: convertToNumeric(result.Vector[1].(string)),
+					pathConfig.QueryName: attemptConvertToNumeric(convertedArray.Data.Results[1].(string)),
 				},
 			})
+		} else {
+			return events, errors.New("Could not retrieve results")
 		}
-	case "matrix":
-		res := converted.(MapResponse)
-		for _, result := range res.Data.Results {
-			for _, vector := range result.Vectors {
+	case "vector":
+		for _, result := range convertedMap.Data.Results {
+			if result.Vector != nil {
 				events = append(events, mb.Event{
-					Timestamp:    getTimestamp(vector[0].(float64)),
+					Timestamp:    getTimestamp(result.Vector[0].(float64)),
 					ModuleFields: common.MapStr{"labels": result.Metric},
 					MetricSetFields: common.MapStr{
 						"dataType":           resultType,
-						pathConfig.QueryName: convertToNumeric(vector[1].(string)),
+						pathConfig.QueryName: attemptConvertToNumeric(result.Vector[1].(string)),
 					},
 				})
+			} else {
+				return events, errors.New("Could not retrieve results")
+			}
+		}
+	case "matrix":
+		for _, result := range convertedMap.Data.Results {
+			for _, vector := range result.Vectors {
+				if vector != nil {
+					events = append(events, mb.Event{
+						Timestamp:    getTimestamp(vector[0].(float64)),
+						ModuleFields: common.MapStr{"labels": result.Metric},
+						MetricSetFields: common.MapStr{
+							"dataType":           resultType,
+							pathConfig.QueryName: attemptConvertToNumeric(vector[1].(string)),
+						},
+					})
+				} else {
+					return events, errors.New("Could not retrieve results")
+				}
 			}
 		}
 	default:
@@ -101,23 +125,23 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 	return events, nil
 }
 
-func convertJSONToStruct(body []byte) (interface{}, string, error) {
+func convertJSONToMapResponse(body []byte) (MapResponse, error) {
+	mapBody := MapResponse{}
+	if err := json.Unmarshal(body, &mapBody); err != nil {
+		return MapResponse{}, errors.Wrap(err, "Failed to parse api response")
+	}
+	return mapBody, nil
+}
+
+func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 	arrayBody := ArrayResponse{}
 	if err := json.Unmarshal(body, &arrayBody); err != nil {
-		return nil, "", errors.Wrap(err, "Failed to parse api response")
+		return arrayBody, errors.Wrap(err, "Failed to parse api response")
 	}
 	if arrayBody.Status == "error" {
-		return nil, "", errors.Errorf("Failed to query")
+		return arrayBody, errors.Errorf("Failed to query")
 	}
-
-	if arrayBody.Data.ResultType == "vector" || arrayBody.Data.ResultType == "matrix" {
-		mapBody := MapResponse{}
-		if err := json.Unmarshal(body, &mapBody); err != nil {
-			return nil, arrayBody.Data.ResultType, errors.Wrap(err, "Failed to parse api response")
-		}
-		return mapBody, mapBody.Data.ResultType, nil
-	}
-	return arrayBody, arrayBody.Data.ResultType, nil
+	return arrayBody, nil
 }
 
 func getTimestamp(num float64) time.Time {
@@ -126,7 +150,7 @@ func getTimestamp(num float64) time.Time {
 	return time.Unix(sec, ns)
 }
 
-func convertToNumeric(str string) interface{} {
+func attemptConvertToNumeric(str string) interface{} {
 	if res, err := strconv.Atoi(str); err == nil {
 		return res
 	} else if res, err := strconv.ParseFloat(str, 64); err == nil {
