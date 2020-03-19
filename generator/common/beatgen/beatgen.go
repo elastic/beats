@@ -101,6 +101,12 @@ func Generate() error {
 		return err
 	}
 
+	// Make sure the ElasticBeatsDir value is cached
+	// before changing directory below.
+	if _, err := devtools.ElasticBeatsDir(); err != nil {
+		return err
+	}
+
 	err = setup.GenNewBeat(cfg)
 	if err != nil {
 		return errors.Wrap(err, "error generating new beat")

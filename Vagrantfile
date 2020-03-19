@@ -164,6 +164,11 @@ Vagrant.configure(2) do |config|
   config.vm.define "win2019", primary: true do |c|
     c.vm.box = "StefanScherer/windows_2019"
     c.vm.provision "shell", inline: $winPsProvision, privileged: false
+
+    c.vm.provider :virtualbox do |vbox|
+      vbox.memory = 4096
+      vbox.cpus = 4
+    end
   end
 
   # Solaris 11.2

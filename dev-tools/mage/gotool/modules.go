@@ -19,10 +19,11 @@ package gotool
 
 // Mod is the command go mod.
 var Mod = goMod{
-	Init:   modCommand{"init"}.run,
-	Tidy:   modCommand{"tidy"}.run,
-	Verify: modCommand{"verify"}.run,
-	Vendor: modCommand{"vendor"}.run,
+	Download: modCommand{"download"}.run,
+	Init:     modCommand{"init"}.run,
+	Tidy:     modCommand{"tidy"}.run,
+	Verify:   modCommand{"verify"}.run,
+	Vendor:   modCommand{"vendor"}.run,
 }
 
 type modCommand struct {
@@ -40,11 +41,15 @@ func (cmd modCommand) run(opts ...ArgOpt) error {
 }
 
 type goMod struct {
-	Init   modInit
-	Tidy   modTidy
-	Verify modVerify
-	Vendor modVendor
+	Download modDownload
+	Init     modInit
+	Tidy     modTidy
+	Verify   modVerify
+	Vendor   modVendor
 }
+
+// modDownload cleans the go.mod file
+type modDownload func(opts ...ArgOpt) error
 
 // modInit initializes a new go module in folder.
 type modInit func(opts ...ArgOpt) error

@@ -96,7 +96,33 @@ filebeat.modules:
 
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
-  s3access:
+  cloudtrail:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+  cloudwatch:
     enabled: false
 
     # AWS SQS queue url
@@ -148,7 +174,7 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-  vpcflow:
+  s3access:
     enabled: false
 
     # AWS SQS queue url
@@ -174,7 +200,7 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-  cloudtrail:
+  vpcflow:
     enabled: false
 
     # AWS SQS queue url
@@ -668,6 +694,22 @@ filebeat.modules:
   #  # Set custom paths for the log files. If left empty,
   #  # Filebeat will choose the paths depending on your OS.
   #  #var.paths:
+
+#--------------------------------- Okta Module ---------------------------------
+- module: okta
+  system:
+    enabled: true
+    # API key to access Okta
+    #var.api_key
+
+    # URL of the Okta REST API
+    #var.url
+
+    # Disable SSL verification 
+    #var.ssl: |-
+    #  {
+    #    "verification_mode": "none"
+    #  }
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -2035,6 +2077,27 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/path/config
+
+  # The service principal name.
+  #kerberos.service_name: HTTP/my-service@realm
+
+  # Name of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
 #------------------------------- Redis output ----------------------------------
 #output.redis:
