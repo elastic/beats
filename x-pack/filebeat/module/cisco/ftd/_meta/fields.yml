@@ -93,10 +93,12 @@
   
   - name: connection_type
     type: keyword
+    default_field: false
     description: >
       The VPN connection type
 
   - name: dap_records
     type: keyword
+    default_field: false
     description: >
       The assigned DAP records
