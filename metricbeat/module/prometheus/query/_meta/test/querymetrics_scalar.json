@@ -1,10 +1,10 @@
 {
     "status":"success",
     "data":{
-        "resultType":"string",
+        "resultType":"scalar",
         "result":[
             1584628364.185,
-            "100"
+            "100.4"
         ]
     }
 }

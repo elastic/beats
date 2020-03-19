@@ -9,7 +9,7 @@
                     "job" : "prometheus",
                     "instance" : "localhost:9090"
                 },
-                "value": [ 1435781451.781, "1" ]
+                "value": [ 1435781451.781, "1.0" ]
             },
             {
                 "metric" : {
@@ -17,7 +17,7 @@
                     "job" : "node",
                     "instance" : "localhost:9100"
                 },
-                "value" : [ 1435781451.781, "0" ]
+                "value" : [ 1435781451.781, "1.19" ]
             }
         ]
     }

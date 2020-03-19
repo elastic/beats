@@ -20,6 +20,7 @@ package query
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 
@@ -144,11 +145,24 @@ func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb
 					msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
 					return []mb.Event{}, errors.New(msg)
 				}
+				value, ok := vector[1].(string)
+				if !ok {
+					msg := fmt.Sprintf("Could not parse value of result: %v", vector)
+					return []mb.Event{}, errors.New(msg)
+				}
+				val, err := strconv.ParseFloat(value, 64)
+				if err != nil {
+					msg := fmt.Sprintf("Could not parse 'range vector' value of result: %v", vector)
+					return []mb.Event{}, errors.New(msg)
+				}
+				if math.IsNaN(val) || math.IsInf(val, 0) {
+					continue
+				}
 				events = append(events, mb.Event{
 					Timestamp: getTimestamp(timestamp),
 					MetricSetFields: common.MapStr{
 						"dataType": resultType,
-						queryName:  attemptConvertToNumeric(vector[1].(string)),
+						queryName:  val,
 					},
 				})
 			} else {
@@ -176,11 +190,24 @@ func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb
 				msg := fmt.Sprintf("Could not parse timestamp of result: %v", result.Vector)
 				return []mb.Event{}, errors.New(msg)
 			}
+			value, ok := result.Vector[1].(string)
+			if !ok {
+				msg := fmt.Sprintf("Could not parse value of result: %v", result.Vector)
+				return []mb.Event{}, errors.New(msg)
+			}
+			val, err := strconv.ParseFloat(value, 64)
+			if err != nil {
+				msg := fmt.Sprintf("Could not parse 'instant vector' value of result: %v", result.Vector)
+				return []mb.Event{}, errors.New(msg)
+			}
+			if math.IsNaN(val) || math.IsInf(val, 0) {
+				continue
+			}
 			events = append(events, mb.Event{
 				Timestamp: getTimestamp(timestamp),
 				MetricSetFields: common.MapStr{
 					"dataType": resultType,
-					queryName:  attemptConvertToNumeric(result.Vector[1].(string)),
+					queryName:  val,
 				},
 			})
 		} else {
@@ -215,13 +242,23 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				msg := fmt.Sprintf("Could not parse 'scalar' value of result: %v", convertedArray.Data.Results)
 				return mb.Event{}, errors.New(msg)
 			}
-			return mb.Event{
-				Timestamp: getTimestamp(timestamp),
-				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  val,
-				},
-			}, nil
+			if math.IsNaN(val) || math.IsInf(val, 0) {
+				return mb.Event{
+					Timestamp: getTimestamp(timestamp),
+					MetricSetFields: common.MapStr{
+						"dataType": resultType,
+						queryName:  value,
+					},
+				}, nil
+			} else {
+				return mb.Event{
+					Timestamp: getTimestamp(timestamp),
+					MetricSetFields: common.MapStr{
+						"dataType": resultType,
+						queryName:  val,
+					},
+				}, nil
+			}
 		} else if resultType == "string" {
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
@@ -284,14 +321,4 @@ func getTimestamp(num float64) time.Time {
 	sec := int64(num)
 	ns := int64((num - float64(sec)) * 1000)
 	return time.Unix(sec, ns)
-}
-
-func attemptConvertToNumeric(str string) interface{} {
-	if res, err := strconv.Atoi(str); err == nil {
-		return res
-	} else if res, err := strconv.ParseFloat(str, 64); err == nil {
-		return res
-	} else {
-		return str
-	}
 }
