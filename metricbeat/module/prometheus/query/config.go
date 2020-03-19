@@ -23,13 +23,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// Config for "query" metricset
+// Config defines the "query" metricset's configuration
 type Config struct {
 	Queries      []QueryConfig `config:"queries"`
 	DefaultQuery QueryConfig   `config:"default_path"`
 }
 
-// PathConfig is used to make a API request.
+// QueryConfig is used to make an API request.
 type QueryConfig struct {
 	Path        string        `config:"path"`
 	QueryParams common.MapStr `config:"query_params"`
@@ -46,7 +46,7 @@ func defaultConfig() Config {
 }
 
 // Validate for Prometheus "query" metricset config
-func (p QueryConfig) Validate() error {
+func (p *QueryConfig) Validate() error {
 	if p.QueryName == "" {
 		return errors.New("`query_name` can not be empty in path configuration")
 	}

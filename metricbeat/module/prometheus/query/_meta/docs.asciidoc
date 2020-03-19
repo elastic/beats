@@ -1,4 +1,4 @@
-This is the `query` metricset to query from querring API[https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries] of Promtheus.
+This is the `query` metricset to query from https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries[querying API of Promtheus].
 
 
 [float]
@@ -7,19 +7,7 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
 [float]
 ==== Instant queries
 
-[source,yaml]
--------------------------------------------------------------------------------------
-- module: prometheus
-  period: 10s
-  hosts: ["localhost:9090"]
-  metricsets: ["query"]
-  queries:
-  - query_name: "sum_rate_http_requests_total"
-    path: "/api/v1/query"
-    query_params:
-      query: "sum(rate(prometheus_http_requests_total[1m]))"
--------------------------------------------------------------------------------------
-
+The following configuration performs an instant query for `up` metric at a single point in time:
 [source,yaml]
 -------------------------------------------------------------------------------------
 - module: prometheus
@@ -34,9 +22,29 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
 -------------------------------------------------------------------------------------
 
 
+More complex PromQL expressions can also be used like the following one which calculates the per-second rate of HTTP
+requests as measured over the last 5 minutes.
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  queries:
+  - query_name: "rate_http_requests_total"
+    path: "/api/v1/query"
+    query_params:
+      query: "rate(prometheus_http_requests_total[5m])"
+-------------------------------------------------------------------------------------
+
+
+
+
 [float]
 ==== Range queries
 
+
+The following example evaluates the expression `up` over a 30-second range with a query resolution of 15 seconds:
 [source,yaml]
 -------------------------------------------------------------------------------------
 - module: prometheus
@@ -48,7 +56,7 @@ This is the `query` metricset to query from querring API[https://prometheus.io/d
     path: "/api/v1/query_range"
     query_params:
       query: "up{node="master01"}"
-      start: "2019-12-20T23:30:00.000Z"
-      end: "2019-12-21T00:00:00.000Z"
-      step: 1h
+      start: "2019-12-20T23:30:30.000Z"
+      end: "2019-12-21T23:31:00.000Z"
+      step: 15s
 -------------------------------------------------------------------------------------
