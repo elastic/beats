@@ -3,6 +3,47 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.6.2]]
+=== Beats version 7.6.2
+https://github.com/elastic/beats/compare/v7.6.1...v7.6.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
+- Fix metadata enrichers to use default config for kubernetes module. {pull}17020[17020]
+
+*Metricbeat*
+
+- Make use of secure port when accessing Kubelet API {pull}16063[16063]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
+
+*Filebeat*
+
+- Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
+- Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
+
+*Metricbeat*
+
+- Convert increments of 100 nanoseconds/ticks to milliseconds for WriteTime and ReadTime in diskio metricset (Windows) for consistency. {issue}14233[14233]
+- Fix diskio issue for windows 32 bit on disk_performance struct alignment. {issue}16680[16680]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
+
+*Winlogbeat*
+
+- Add more DNS error codes to the Sysmon module. {issue}15685[15685]
+
 [[release-notes-7.6.1]]
 === Beats version 7.6.1
 https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
