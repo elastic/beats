@@ -141,7 +141,8 @@ func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb
 				}
 				timestamp, ok := vector[0].(float64)
 				if !ok {
-					return []mb.Event{}, errors.New("Could not parse timestamp of result")
+					msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
+					return []mb.Event{}, errors.New(msg)
 				}
 				events = append(events, mb.Event{
 					Timestamp: getTimestamp(timestamp),
@@ -172,7 +173,8 @@ func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb
 			}
 			timestamp, ok := result.Vector[0].(float64)
 			if !ok {
-				return []mb.Event{}, errors.New("Could not parse timestamp of result")
+				msg := fmt.Sprintf("Could not parse timestamp of result: %v", result.Vector)
+				return []mb.Event{}, errors.New(msg)
 			}
 			events = append(events, mb.Event{
 				Timestamp: getTimestamp(timestamp),
@@ -199,15 +201,37 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 		}
 		timestamp, ok := convertedArray.Data.Results[0].(float64)
 		if !ok {
-			return mb.Event{}, errors.New("Could not parse timestamp of result")
+			msg := fmt.Sprintf("Could not parse timestamp of result: %v", convertedArray.Data.Results)
+			return mb.Event{}, errors.New(msg)
 		}
-		return mb.Event{
-			Timestamp: getTimestamp(timestamp),
-			MetricSetFields: common.MapStr{
-				"dataType": resultType,
-				queryName:  attemptConvertToNumeric(convertedArray.Data.Results[1].(string)),
-			},
-		}, nil
+		value, ok := convertedArray.Data.Results[1].(string)
+		if !ok {
+			msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
+			return mb.Event{}, errors.New(msg)
+		}
+		if resultType == "scalar" {
+			val, err := strconv.ParseFloat(value, 64)
+			if err != nil {
+				msg := fmt.Sprintf("Could not parse 'scalar' value of result: %v", convertedArray.Data.Results)
+				return mb.Event{}, errors.New(msg)
+			}
+			return mb.Event{
+				Timestamp: getTimestamp(timestamp),
+				MetricSetFields: common.MapStr{
+					"dataType": resultType,
+					queryName:  val,
+				},
+			}, nil
+		} else if resultType == "string" {
+			return mb.Event{
+				Timestamp: getTimestamp(timestamp),
+				MetricSetFields: common.MapStr{
+					"dataType": resultType,
+					queryName:  value,
+				},
+			}, nil
+		}
+
 	}
 	return mb.Event{}, errors.New("Could not parse results")
 }
