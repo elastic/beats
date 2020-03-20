@@ -3,7 +3,7 @@ When `add_kubernetes_metadata` is used with {beatname_uc}, it uses the
 contains a reference to a container ID are enriched with metadata of the pod of
 this container.
 
-This behaviour can be disabled disabling default indexers and matchers in the
+This behaviour can be disabled by disabling default indexers and matchers in the
 configuration:
 [source,yaml]
 -------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ indexer and the `fields` matcher with the `metricset.host` field. So events that
 contain a `metricset.host` field are enriched with metadata of the pods that
 exposes the same port in the same IP.
 
-This behaviour can be disabled disabling default indexers and matchers in the
+This behaviour can be disabled by disabling default indexers and matchers in the
 configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
