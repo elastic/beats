@@ -229,7 +229,12 @@ metricbeat.modules:
     - key: "dept"
       value: "eng"
   metricsets:
+    - elb
+    - natgateway
     - rds
+    - transitgateway
+    - usage
+    - vpn
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
