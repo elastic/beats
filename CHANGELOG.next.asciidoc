@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873] 
 
 *Winlogbeat*
 
