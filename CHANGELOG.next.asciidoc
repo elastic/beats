@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 
 *Packetbeat*
 
