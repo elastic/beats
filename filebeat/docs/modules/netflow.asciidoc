@@ -18,7 +18,7 @@ This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
 flow records with geolocation information about the IP endpoints by using
 Elasticsearch Ingest Node.
 
-include::../include/running-modules.asciidoc[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -67,6 +67,10 @@ bursts of traffic.
 These allow to update the NetFlow/IPFIX fields with vendor extensions and to
 override existing fields. See <<filebeat-input-netflow,netflow input>> for
 details.
+
+`var.detect_sequence_reset`:: Flag controlling whether {beatname_uc} should
+monitor sequence numbers in the Netflow packets to detect an Exporting Process
+reset. See <<filebeat-input-netflow,netflow input>> for details.
 
 :has-dashboards!:
 

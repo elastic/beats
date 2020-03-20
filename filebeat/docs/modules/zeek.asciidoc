@@ -13,6 +13,8 @@ This file is generated! See scripts/docs_collector.py
 This is a module for Zeek, which used to be called Bro. It parses logs that are in the
 https://www.zeek.org/manual/release/logs/index.html[Zeek JSON format].
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 

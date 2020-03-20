@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -52,9 +53,7 @@ func TestAddModuleNilFactory(t *testing.T) {
 func TestAddModuleDuplicateName(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddModule(moduleName, fakeModuleFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	err = registry.AddModule(moduleName, fakeModuleFactory)
 	if assert.Error(t, err) {
@@ -65,9 +64,7 @@ func TestAddModuleDuplicateName(t *testing.T) {
 func TestAddModule(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddModule(moduleName, fakeModuleFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	factory, found := registry.modules[moduleName]
 	assert.True(t, found, "module not found")
 	assert.NotNil(t, factory, "factory fuction is nil")
@@ -100,9 +97,7 @@ func TestAddMetricSetNilFactory(t *testing.T) {
 func TestAddMetricSetDuplicateName(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	err = registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 	if assert.Error(t, err) {
@@ -113,9 +108,7 @@ func TestAddMetricSetDuplicateName(t *testing.T) {
 func TestAddMetricSet(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	f, found := registry.metricSets[moduleName][metricSetName]
 	assert.True(t, found, "metricset not found")
 	assert.NotNil(t, f, "factory function is nil")
@@ -139,14 +132,10 @@ func TestMetricSetFactory(t *testing.T) {
 	t.Run("without HostParser", func(t *testing.T) {
 		registry := NewRegister()
 		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		assert.Equal(t, metricSetName, reg.Name)
 		assert.NotNil(t, reg.Factory)
 		assert.Nil(t, reg.HostParser)
@@ -158,14 +147,10 @@ func TestMetricSetFactory(t *testing.T) {
 		registry := NewRegister()
 		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
 		err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory, hostParser)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		assert.NotNil(t, reg.HostParser) // Can't compare functions in Go so just check for non-nil.
 	})
 
@@ -173,14 +158,10 @@ func TestMetricSetFactory(t *testing.T) {
 		registry := NewRegister()
 		hostParser := func(Module, string) (HostData, error) { return HostData{}, nil }
 		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithHostParser(hostParser))
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		assert.NotNil(t, reg.HostParser) // Can't compare functions in Go so just check for non-nil.
 	})
 
@@ -189,14 +170,10 @@ func TestMetricSetFactory(t *testing.T) {
 
 		registry := NewRegister()
 		err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, WithNamespace(ns))
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		reg, err := registry.metricSetRegistration(moduleName, metricSetName)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		assert.Equal(t, metricSetName, reg.Name)
 		assert.NotNil(t, reg.Factory)
 		assert.Nil(t, reg.HostParser)
@@ -208,23 +185,17 @@ func TestMetricSetFactory(t *testing.T) {
 func TestDefaultMetricSet(t *testing.T) {
 	registry := NewRegister()
 	err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, DefaultMetricSet())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	names, err := registry.DefaultMetricSets(moduleName)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	assert.Contains(t, names, metricSetName)
 }
 
 func TestMetricSetQuery(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	metricsets := registry.MetricSets(moduleName)
 	assert.Equal(t, len(metricsets), 1)
@@ -241,4 +212,29 @@ func TestModuleQuery(t *testing.T) {
 	modules := registry.Modules()
 	assert.Equal(t, len(modules), 1)
 	assert.Equal(t, modules[0], moduleName)
+}
+
+func TestProcessorsForMetricSet_StandardMetricSet(t *testing.T) {
+	registry := NewRegister()
+	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
+	procs, err := registry.ProcessorsForMetricSet(moduleName, metricSetName)
+	require.NotNil(t, procs)
+	require.Empty(t, procs.List)
+	require.NoError(t, err)
+}
+
+func TestProcessorsForMetricSet_UndefinedSecondarySource(t *testing.T) {
+	registry := NewRegister()
+	procs, err := registry.ProcessorsForMetricSet(moduleName, metricSetName)
+	require.Nil(t, procs)
+	require.Error(t, err)
+}
+
+func TestProcessorsForMetricSet_FromSource(t *testing.T) {
+	registry := NewRegister()
+	registry.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
+	procs, err := registry.ProcessorsForMetricSet("unpack", "withprocessors")
+	require.NoError(t, err)
+	require.NotNil(t, procs)
+	require.Len(t, procs.List, 1)
 }

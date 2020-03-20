@@ -53,7 +53,7 @@ processors:
           to: "destination.packets"
 
         - from: "zeek.connection.conn_state"
-          to: "zeek.connection.state.code"
+          to: "zeek.connection.state"
 
         - from: "zeek.connection.orig_l2_addr"
           to: "source.mac"

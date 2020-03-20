@@ -5,19 +5,16 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common/cli"
-	"github.com/elastic/beats/x-pack/functionbeat/config"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 )
-
-var output string
 
 func initProviders() ([]provider.Provider, error) {
 	b, err := instance.NewInitializedBeat(instance.Settings{
@@ -116,7 +113,12 @@ func genRemoveCmd() *cobra.Command {
 	return genCLICmd("remove", "Remove a function", (*cliHandler).Remove)
 }
 
+func genExportFunctionCmd() *cobra.Command {
+	return genCLICmd("function", "Export function template", (*cliHandler).Export)
+}
+
 func genPackageCmd() *cobra.Command {
+	var outputPattern string
 	cmd := &cobra.Command{
 		Use:   "package",
 		Short: "Package the configuration and the executable in a zip",
@@ -125,8 +127,7 @@ func genPackageCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			return h.BuildPackage(output)
+			return h.Package(outputPattern)
 		}),
 	}
 
@@ -136,34 +137,6 @@ func genPackageCmd() *cobra.Command {
 	}
 
 	defaultOutput := filepath.Join(dir, "package-{{.Provider}}.zip")
-	cmd.Flags().StringVarP(&output, "output", "o", defaultOutput, "full path pattern to the package")
+	cmd.Flags().StringVarP(&outputPattern, "output", "o", defaultOutput, "full path pattern to the package")
 	return cmd
-}
-
-func genExportFunctionCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "function",
-		Short: "Export function template",
-		Run: cli.RunWith(func(_ *cobra.Command, args []string) error {
-			providers, err := initProviders()
-			if err != nil {
-				return err
-			}
-
-			for _, p := range providers {
-				builder, err := p.TemplateBuilder()
-				if err != nil {
-					return err
-				}
-				for _, name := range args {
-					template, err := builder.RawTemplate(name)
-					if err != nil {
-						return fmt.Errorf("error generating raw template for %s: %+v", name, err)
-					}
-					fmt.Println(template)
-				}
-			}
-			return nil
-		}),
-	}
 }

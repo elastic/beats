@@ -14,7 +14,7 @@ var:
   - name: read_buffer
   - name: timeout
   - name: custom_definitions
-
+  - name: detect_sequence_reset
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 

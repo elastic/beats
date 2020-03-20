@@ -12,9 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common/cli"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
 const (
@@ -22,16 +21,15 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *elasticsearch.Client {
+func getTestClient() *eslegclient.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
-		Index:            outil.MakeSelector(),
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
-	}, nil)
+		Timeout:          60 * time.Second,
+	})
 
 	if err != nil {
 		panic(err)
@@ -47,17 +45,9 @@ func TestElasticsearch(t *testing.T) {
 		return
 	}
 
-	assert.NotNil(t, license.Get())
-	assert.NotNil(t, license.Type)
+	assert.Equal(t, Trial, license.Get())
+	assert.Equal(t, Trial, license.Type)
 	assert.Equal(t, Active, license.Status)
 
 	assert.NotEmpty(t, license.UUID)
-
-	assert.NotNil(t, license.Features.Graph)
-	assert.NotNil(t, license.Features.Logstash)
-	assert.NotNil(t, license.Features.ML)
-	assert.NotNil(t, license.Features.Monitoring)
-	assert.NotNil(t, license.Features.Rollup)
-	assert.NotNil(t, license.Features.Security)
-	assert.NotNil(t, license.Features.Watcher)
 }

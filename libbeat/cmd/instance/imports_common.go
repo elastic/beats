@@ -18,20 +18,23 @@
 package instance
 
 import (
-	_ "github.com/elastic/beats/libbeat/autodiscover/appenders/config" // Register autodiscover appenders
-	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
-	_ "github.com/elastic/beats/libbeat/monitoring/report/elasticsearch" // Register default monitoring reporting
-	_ "github.com/elastic/beats/libbeat/processors/actions"              // Register default processors.
-	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_host_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_locale"
-	_ "github.com/elastic/beats/libbeat/processors/add_observer_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
-	_ "github.com/elastic/beats/libbeat/processors/communityid"
-	_ "github.com/elastic/beats/libbeat/processors/convert"
-	_ "github.com/elastic/beats/libbeat/processors/dissect"
-	_ "github.com/elastic/beats/libbeat/processors/dns"
-	_ "github.com/elastic/beats/libbeat/processors/extract_array"
-	_ "github.com/elastic/beats/libbeat/processors/registered_domain"
-	_ "github.com/elastic/beats/libbeat/publisher/includes" // Register publisher pipeline modules
+	_ "github.com/elastic/beats/v7/libbeat/autodiscover/appenders/config" // Register autodiscover appenders
+	_ "github.com/elastic/beats/v7/libbeat/autodiscover/providers/jolokia"
+	_ "github.com/elastic/beats/v7/libbeat/monitoring/report/elasticsearch" // Register default monitoring reporting
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"              // Register default processors.
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_locale"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_observer_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/communityid"
+	_ "github.com/elastic/beats/v7/libbeat/processors/convert"
+	_ "github.com/elastic/beats/v7/libbeat/processors/dissect"
+	_ "github.com/elastic/beats/v7/libbeat/processors/dns"
+	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
+	_ "github.com/elastic/beats/v7/libbeat/processors/fingerprint"
+	_ "github.com/elastic/beats/v7/libbeat/processors/registered_domain"
+	_ "github.com/elastic/beats/v7/libbeat/processors/translate_sid"
+	_ "github.com/elastic/beats/v7/libbeat/publisher/includes" // Register publisher pipeline modules
 )

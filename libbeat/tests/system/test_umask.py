@@ -13,12 +13,12 @@ class TestUmask(BaseTest):
     Test default umask
     """
 
-    DEFAULT_UMASK = 0027
+    DEFAULT_UMASK = 0o027
 
     def setUp(self):
         super(BaseTest, self).setUp()
 
-        self.output_file_permissions = 0666
+        self.output_file_permissions = 0o666
 
         self.render_config_template(output_file_permissions=self.output_file_permissions)
         proc = self.start_beat()

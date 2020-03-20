@@ -1,0 +1,23 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "istio.mixer",
+        "duration": 115000,
+        "module": "istio"
+    },
+    "istio": {
+        "mixer": {
+            "handler": {
+                "daemons": 1
+            }
+        }
+    },
+    "metricset": {
+        "name": "mixer",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "istio"
+    }
+}

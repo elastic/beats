@@ -1,0 +1,5 @@
+dashboards:
+- id: ffe86390-145f-11ea-8fd8-030a13064883
+  file: Filebeat-activemq-audit-events.json
+- id: 26434790-1464-11ea-8fd8-030a13064883
+  file: Filebeat-activemq-application-events.json

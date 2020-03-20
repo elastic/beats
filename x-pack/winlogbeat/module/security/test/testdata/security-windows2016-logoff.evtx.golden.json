@@ -14,7 +14,9 @@
     "log": {
       "level": "information"
     },
-    "message": "An account was logged off.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1000\n\tAccount Name:\t\taudittest\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x767A77\n\nLogon Type:\t\t\t3\n\nThis event is generated when a logon session is destroyed. It may be positively correlated with a logon event using the Logon ID value. Logon IDs are only unique between reboots on the same computer.",
+    "related": {
+      "user": "audittest"
+    },
     "user": {
       "domain": "WIN-41OB2LO92CR",
       "id": "S-1-5-21-101361758-2486510592-3018839910-1000",
@@ -67,7 +69,9 @@
     "log": {
       "level": "information"
     },
-    "message": "An account was logged off.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x104A4A6\n\nLogon Type:\t\t\t3\n\nThis event is generated when a logon session is destroyed. It may be positively correlated with a logon event using the Logon ID value. Logon IDs are only unique between reboots on the same computer.",
+    "related": {
+      "user": "Administrator"
+    },
     "user": {
       "domain": "WIN-41OB2LO92CR",
       "id": "S-1-5-21-101361758-2486510592-3018839910-500",

@@ -24,6 +24,7 @@ beat.db
 mage_output_file.go
 x-pack/functionbeat/*/fields.yml
 x-pack/functionbeat/provider/*/functionbeat-*
+x-pack/dockerlogbeat/temproot.tar
 
 # Editor swap files
 *.swp

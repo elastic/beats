@@ -37,7 +37,7 @@ class Test(BaseTest):
             m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
                 " 'su root' failed for lonvick on /dev/pts/8 {}\n"
             m = m.format(n)
-            sock.send(m)
+            sock.send(m.encode("utf-8"))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 
@@ -47,6 +47,46 @@ class Test(BaseTest):
 
         assert len(output) == 2
         self.assert_syslog(output[0])
+        sock.close()
+
+    def test_syslog_with_tcp_invalid_message(self):
+        """
+        Test syslog input with invalid events from TCP.
+        """
+        host = "127.0.0.1"
+        port = 8080
+        input_raw = """
+- type: syslog
+  protocol:
+    tcp:
+        host: "{}:{}"
+"""
+
+        input_raw = input_raw.format(host, port)
+        self.render_config_template(
+            input_raw=input_raw,
+            inputs=False,
+        )
+
+        filebeat = self.start_beat()
+
+        self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
+        sock.connect((host, port))
+
+        for n in range(0, 2):
+            sock.send("invalid\n".encode("utf-8"))
+
+        self.wait_until(lambda: self.output_count(lambda x: x >= 2))
+
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+
+        assert len(output) == 2
+        assert output[0]["message"] == "invalid"
+        assert len(output[0]["log.source.address"]) > 0
         sock.close()
 
     def test_syslog_with_udp(self):
@@ -78,7 +118,7 @@ class Test(BaseTest):
             m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
                 " 'su root' failed for lonvick on /dev/pts/8 {}\n"
             m = m.format(n)
-            sock.sendto(m, (host, port))
+            sock.sendto(m.encode("utf-8"), (host, port))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 

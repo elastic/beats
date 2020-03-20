@@ -88,7 +88,7 @@ class Test(BaseTest):
         )
 
         self.wait_until(
-            lambda: self.log_contains("error generating raw template for {}: invalid name".format(function_name))
+            lambda: self.log_contains("error while finding enabled functions: invalid name: '{}'".format(function_name))
         )
 
         exit_code = functionbeat_proc.kill_and_wait()
@@ -105,7 +105,7 @@ class Test(BaseTest):
         for fb in bins_to_gen:
             if os.path.exists(fb):
                 continue
-            with open(fb, "wb") as f:
+            with open(fb, "w") as f:
                 f.write("my dummy functionbeat binary\n")
 
     def _get_generated_function_template(self):

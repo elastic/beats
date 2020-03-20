@@ -34,16 +34,23 @@ import (
 type dockerBuilder struct {
 	PackageSpec
 
-	buildDir string
-	beatDir  string
+	imageName string
+	buildDir  string
+	beatDir   string
 }
 
 func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
+	imageName, err := spec.ImageName()
+	if err != nil {
+		return nil, err
+	}
+
 	buildDir := filepath.Join(spec.packageDir, "docker-build")
 	beatDir := filepath.Join(buildDir, "beat")
 
 	return &dockerBuilder{
 		PackageSpec: spec,
+		imageName:   imageName,
 		buildDir:    buildDir,
 		beatDir:     beatDir,
 	}, nil
@@ -113,8 +120,8 @@ func (b *dockerBuilder) prepareBuild() error {
 		"ModulesDirs": b.modulesDirs(),
 	}
 
-	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
-		if !info.IsDir() {
+	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
+		if !info.IsDir() && !isDockerFile(path) {
 			target := strings.TrimSuffix(
 				filepath.Join(b.buildDir, filepath.Base(path)),
 				".tmpl",
@@ -127,14 +134,59 @@ func (b *dockerBuilder) prepareBuild() error {
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return b.expandDockerfile(templatesDir, data)
+}
+
+func isDockerFile(path string) bool {
+	path = filepath.Base(path)
+	return strings.HasPrefix(path, "Dockerfile") || strings.HasPrefix(path, "docker-entrypoint")
+}
+
+func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
+	// has specific dockerfile
+	dockerfile := fmt.Sprintf("Dockerfile.%s.tmpl", b.imageName)
+	_, err := os.Stat(filepath.Join(templatesDir, dockerfile))
+	if err != nil {
+		// specific missing fallback to generic
+		dockerfile = "Dockerfile.tmpl"
+	}
+
+	entrypoint := fmt.Sprintf("docker-entrypoint.%s.tmpl", b.imageName)
+	_, err = os.Stat(filepath.Join(templatesDir, entrypoint))
+	if err != nil {
+		// specific missing fallback to generic
+		entrypoint = "docker-entrypoint.tmpl"
+	}
+
+	type fileExpansion struct {
+		source string
+		target string
+	}
+	for _, file := range []fileExpansion{{dockerfile, "Dockerfile.tmpl"}, {entrypoint, "docker-entrypoint.tmpl"}} {
+		target := strings.TrimSuffix(
+			filepath.Join(b.buildDir, file.target),
+			".tmpl",
+		)
+		path := filepath.Join(templatesDir, file.source)
+		err = b.ExpandFile(path, target, data)
+		if err != nil {
+			return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
+		}
+	}
+
+	return nil
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {
-	tag := fmt.Sprintf("%s:%s", b.Name, b.Version)
+	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
-
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
@@ -145,7 +197,9 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
-		outputTar, err := b.Expand(defaultBinaryName + ".docker.tar.gz")
+		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]interface{}{
+			"Name": b.imageName,
+		})
 		if err != nil {
 			return err
 		}

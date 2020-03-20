@@ -34,11 +34,25 @@
               type: keyword
               description: >
                 Schema
+        - name: claims.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Claims
         - name: authorization
           type: group
           description: >
             Authorization
           fields:
+            - name: scope
+              type: keyword
+              description: >
+                Scope
+            - name: action
+              type: keyword
+              description: >
+                Action
             - name: evidence
               type: group
               description: >
@@ -68,14 +82,6 @@
                   type: keyword
                   description: >
                     Principal type
-        - name: scope
-          type: keyword
-          description: >
-            Scope
-        - name: action
-          type: keyword
-          description: >
-            Action
     - name: operation_name
       type: keyword
       description: >
@@ -84,6 +90,10 @@
       type: keyword
       description: >
         Result signature
+    - name: category
+      type: keyword
+      description: >
+        Category
     - name: properties
       type: group
       description: >

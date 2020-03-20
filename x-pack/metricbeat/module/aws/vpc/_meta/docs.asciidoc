@@ -1,0 +1,103 @@
+The vpc metricset of aws module allows users to monitor VPC related services: NAT
+gateway, transit gateway and VPN tunnels.
+NAT gateway metric data can be used to monitor and troubleshoot NAT gateways and
+the data is provided at 1-minute intervals to CloudWatch.
+Transit gateway metrics are sent to CloudWatch by VPC only when requests are
+flowing through the gateway. If there are requests flowing through the transit
+gateway, Amazon VPC measures and sends its metrics in 1-minute intervals.
+VPN metric data is automatically sent to CloudWatch as it becomes available. Users
+can use these metrics to gain a better perspective on how the web application or
+service is performing.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect usage metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 1m
+  metricsets:
+    - vpc
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics and Dimensions for NAT gateway
+Metrics:
+|===
+|Metric Name|Statistic Method | Description
+|ActiveConnectionCount | Max | The total number of concurrent active TCP connections through the NAT gateway.
+|BytesInFromDestination | Sum | The number of bytes received by the NAT gateway from the destination.
+|BytesInFromSource | Sum | The number of bytes received by the NAT gateway from clients in your VPC.
+|BytesOutToDestination | Sum | The number of bytes sent out through the NAT gateway to the destination.
+|BytesOutToSource | Sum | The number of bytes sent through the NAT gateway to the clients in your VPC.
+|ConnectionAttemptCount | Sum | The number of connection attempts made through the NAT gateway.
+|ConnectionEstablishedCount | Sum | The number of connections established through the NAT gateway.
+|ErrorPortAllocation | Sum | The number of times the NAT gateway could not allocate a source port.
+|IdleTimeoutCount | Sum | The number of connections that transitioned from the active state to the idle state.
+|PacketsDropCount | Sum | The number of packets dropped by the NAT gateway.
+|PacketsInFromDestination | Sum | The number of packets received by the NAT gateway from the destination.
+|PacketsInFromSource | Sum | The number of packets received by the NAT gateway from clients in your VPC.
+|PacketsOutToDestination | Sum | The number of packets sent out through the NAT gateway to the destination.
+|PacketsOutToSource | Sum | The number of packets sent through the NAT gateway to the clients in your VPC.
+|===
+
+Dimensions:
+|===
+|Dimension Name| Description
+|NatGatewayId | Filter the metric data by the NAT gateway ID.
+|===
+
+Please see https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway-cloudwatch.html[NAT Gateway CloudWatch Metrics] for more details.
+
+[float]
+=== Metrics and Dimensions for Transit gateway
+Metrics:
+|===
+|Metric Name|Statistic Method | Description
+|BytesIn | Sum | The number of bytes received by the transit gateway.
+|BytesOut | Sum | The number of bytes sent from the transit gateway.
+|PacketsIn | Sum | The number of packets received by the transit gateway.
+|PacketsOut | Sum | The number of packets sent by the transit gateway.
+|PacketDropCountBlackhole | Sum | The number of packets dropped because they matched a blackhole route.
+|PacketDropCountNoRoute | Sum | The number of packets dropped because they did not match a route.
+|===
+
+Dimensions:
+|===
+|Dimension Name| Description
+|TransitGateway | Filters the metric data by transit gateway.
+|===
+
+Please see https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-cloudwatch-metrics.html[Transit Gateway Metrics] for more details.
+
+[float]
+=== Metrics and Dimensions for VPN
+Metrics:
+|===
+|Metric Name|Statistic Method | Description
+|TunnelState | Max | The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.
+|TunnelDataIn| Sum | The bytes received through the VPN tunnel.
+|TunnelDataOut| Sum | The bytes sent through the VPN tunnel.
+|===
+
+Dimensions:
+|===
+|Dimension Name| Description
+|VpnId | Filters the metric data by the Site-to-Site VPN connection ID.
+|TunnelIpAddress | Filters the metric data by the IP address of the tunnel for the virtual private gateway.
+|===
+
+Please see https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-cloudwatch-vpn.html[VPN Tunnel CloudWatch Metrics] for more details.

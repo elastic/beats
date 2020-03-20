@@ -2,34 +2,35 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
-            "dimensions": {
-                "LoadBalancerName": "tf-lb-20171218185946539900000004"
-            },
             "namespace": "AWS/ELB"
         },
-        "metrics": {
-            "EstimatedALBActiveConnectionCount": {
-                "avg": 2.6
-            },
-            "EstimatedALBConsumedLCUs": {
-                "avg": 0.000015000000000000002
-            },
-            "EstimatedALBNewConnectionCount": {
-                "avg": 0
-            },
-            "EstimatedProcessedBytes": {
-                "avg": 237.6
-            }
+        "dimensions": {
+            "Namespace": "AWS"
         },
-        "tags": {
-            "Name": "logstash",
-            "owner": "logstash"
+        "elb": {
+            "metrics": {
+                "HealthyHostCount": {
+                    "max": 2
+                },
+                "Latency": {
+                    "avg": 0.000005960464477539062
+                },
+                "RequestCount": {
+                    "sum": 1
+                },
+                "SurgeQueueLength": {
+                    "max": 1
+                },
+                "UnHealthyHostCount": {
+                    "max": 0
+                }
+            }
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
         "provider": "aws",
         "region": "us-east-1"

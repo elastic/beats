@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build darwin dragonfly freebsd linux netbsd openbsd solaris windows
+// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris windows
 
 package icmp
 
@@ -50,6 +50,9 @@ func ListenPacket(network, address string) (*PacketConn, error) {
 		family, proto = syscall.AF_INET6, iana.ProtocolIPv6ICMP
 	default:
 		i := last(network, ':')
+		if i < 0 {
+			i = len(network)
+		}
 		switch network[:i] {
 		case "ip4":
 			proto = iana.ProtocolICMP

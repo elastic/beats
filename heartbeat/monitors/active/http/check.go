@@ -27,11 +27,11 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/jsontransform"
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
 // multiValidator combines multiple validations of each type into a single easy to use object.
@@ -77,7 +77,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	var respValidators []respValidator
 	var bodyValidators []bodyValidator
 
-	if config.Status > 0 {
+	if len(config.Status) > 0 {
 		respValidators = append(respValidators, checkStatus(config.Status))
 	} else {
 		respValidators = append(respValidators, checkStatusOK)
@@ -102,10 +102,12 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	return multiValidator{respValidators, bodyValidators}, nil
 }
 
-func checkStatus(status uint16) respValidator {
+func checkStatus(status []uint16) respValidator {
 	return func(r *http.Response) error {
-		if r.StatusCode == int(status) {
-			return nil
+		for _, v := range status {
+			if r.StatusCode == int(v) {
+				return nil
+			}
 		}
 		return fmt.Errorf("received status code %v expecting %v", r.StatusCode, status)
 	}

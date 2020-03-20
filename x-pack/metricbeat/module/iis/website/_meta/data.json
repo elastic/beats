@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "iis.website",
+        "duration": 115000,
+        "module": "iis"
+    },
+    "iis": {
+        "website": {
+            "current_connections": 0,
+            "maximum_connections": 1,
+            "name": "test2.local",
+            "service_uptime": 346586,
+            "total_bytes_received": 1666,
+            "total_bytes_sent": 84224,
+            "total_connection_attempts": 2,
+            "total_delete_requests": 0,
+            "total_get_requests": 4,
+            "total_post_requests": 0,
+            "total_put_requests": 0
+        }
+    },
+    "metricset": {
+        "name": "website",
+        "period": 10000
+    },
+    "service": {
+        "type": "iis"
+    }
+}

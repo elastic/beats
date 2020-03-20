@@ -20,21 +20,7 @@ When you run the module, it performs a few tasks under the hood:
 
 * Deploys dashboards for visualizing the log data.
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with sample dashboards showing geolocation and network
-protocols used. One for all iptables logs:
-
-[role="screenshot"]
-image::./images/kibana-iptables.png[]
-
-and one specific for Ubiquiti Firewall logs:
-
-[role="screenshot"]
-image::./images/kibana-iptables-ubiquiti.png[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -71,6 +57,20 @@ The UDP port to listen for syslog traffic. Defaults to `9001`
 NOTE: Ports below 1024 require Filebeat to run as root.
 
 include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards showing geolocation and network
+protocols used. One for all iptables logs:
+
+[role="screenshot"]
+image::./images/kibana-iptables.png[]
+
+and one specific for Ubiquiti Firewall logs:
+
+[role="screenshot"]
+image::./images/kibana-iptables-ubiquiti.png[]
 
 :has-dashboards!:
 

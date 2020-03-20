@@ -1,0 +1,181 @@
+[
+    {
+        "@timestamp": "2019-12-19T00:49:36.086Z",
+        "cloud.project.id": "elastic-beats",
+        "event.action": "GetResourceBillingInfo",
+        "event.dataset": "googlecloud.audit",
+        "event.id": "-uihnmjctwo",
+        "event.kind": "event",
+        "event.module": "googlecloud",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "googlecloud.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "resourcemanager.projects.get",
+                "resource": "projects/elastic-beats",
+                "resource_attributes": {}
+            }
+        ],
+        "googlecloud.audit.method_name": "GetResourceBillingInfo",
+        "googlecloud.audit.request.proto_name": "type.googleapis.com/google.internal.cloudbilling.billingaccount.v1.GetResourceBillingInfoRequest",
+        "googlecloud.audit.request.resource_name": "projects/189716325846",
+        "googlecloud.audit.request_metadata.caller_ip": "192.168.1.1",
+        "googlecloud.audit.resource_name": "projects/elastic-beats",
+        "googlecloud.audit.service_name": "cloudbilling.googleapis.com",
+        "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 0,
+        "service.name": "cloudbilling.googleapis.com",
+        "service.type": "googlecloud",
+        "source.ip": "192.168.1.1",
+        "user.email": "xxx@xxx.xxx"
+    },
+    {
+        "@timestamp": "2019-12-19T00:45:51.228Z",
+        "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.machineTypes.aggregatedList",
+        "event.dataset": "googlecloud.audit",
+        "event.id": "-h6onuze1h7dg",
+        "event.kind": "event",
+        "event.module": "googlecloud",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "googlecloud.audit.authorization_info": [
+            {
+                "granted": false,
+                "permission": "compute.machineTypes.list",
+                "resource_attributes": {
+                    "name": "projects/elastic-beats",
+                    "service": "resourcemanager",
+                    "type": "resourcemanager.projects"
+                }
+            }
+        ],
+        "googlecloud.audit.method_name": "beta.compute.machineTypes.aggregatedList",
+        "googlecloud.audit.num_response_items": 71,
+        "googlecloud.audit.request.proto_name": "type.googleapis.com/compute.machineTypes.aggregatedList",
+        "googlecloud.audit.request_metadata.caller_ip": "192.168.1.1",
+        "googlecloud.audit.request_metadata.caller_supplied_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "googlecloud.audit.resource_location.current_locations": [
+            "global"
+        ],
+        "googlecloud.audit.resource_name": "projects/elastic-beats/global/machineTypes",
+        "googlecloud.audit.service_name": "compute.googleapis.com",
+        "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 945,
+        "service.name": "compute.googleapis.com",
+        "service.type": "googlecloud",
+        "source.ip": "192.168.1.1",
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "user_agent.os.full": "Mac OS X 10.15",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15",
+        "user_agent.version": "71.0."
+    },
+    {
+        "@timestamp": "2019-12-19T00:44:25.051Z",
+        "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.instances.aggregatedList",
+        "event.dataset": "googlecloud.audit",
+        "event.id": "yonau2dg2zi",
+        "event.kind": "event",
+        "event.module": "googlecloud",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "googlecloud.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "compute.instances.list",
+                "resource_attributes": {
+                    "name": "projects/elastic-beats",
+                    "service": "resourcemanager",
+                    "type": "resourcemanager.projects"
+                }
+            }
+        ],
+        "googlecloud.audit.method_name": "beta.compute.instances.aggregatedList",
+        "googlecloud.audit.num_response_items": 61,
+        "googlecloud.audit.request.proto_name": "type.googleapis.com/compute.instances.aggregatedList",
+        "googlecloud.audit.request_metadata.caller_ip": "192.168.1.1",
+        "googlecloud.audit.request_metadata.caller_supplied_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "googlecloud.audit.resource_location.current_locations": [
+            "global"
+        ],
+        "googlecloud.audit.resource_name": "projects/elastic-beats/global/instances",
+        "googlecloud.audit.service_name": "compute.googleapis.com",
+        "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 2252,
+        "service.name": "compute.googleapis.com",
+        "service.type": "googlecloud",
+        "source.ip": "192.168.1.1",
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "user_agent.os.full": "Mac OS X 10.15",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15",
+        "user_agent.version": "71.0."
+    },
+    {
+        "@timestamp": "2019-12-19T00:44:25.051Z",
+        "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.instances.aggregatedList",
+        "event.dataset": "googlecloud.audit",
+        "event.id": "yonau3dc2zi",
+        "event.kind": "event",
+        "event.module": "googlecloud",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "googlecloud.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "googlecloud.audit.authorization_info": [
+            {
+                "permission": "compute.instances.list",
+                "resource_attributes": {
+                    "name": "projects/elastic-beats",
+                    "service": "resourcemanager",
+                    "type": "resourcemanager.projects"
+                }
+            }
+        ],
+        "googlecloud.audit.method_name": "beta.compute.instances.aggregatedList",
+        "googlecloud.audit.num_response_items": 61,
+        "googlecloud.audit.request.proto_name": "type.googleapis.com/compute.instances.aggregatedList",
+        "googlecloud.audit.request_metadata.caller_ip": "192.168.1.1",
+        "googlecloud.audit.request_metadata.caller_supplied_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "googlecloud.audit.resource_location.current_locations": [
+            "global"
+        ],
+        "googlecloud.audit.resource_name": "projects/elastic-beats/global/instances",
+        "googlecloud.audit.service_name": "compute.googleapis.com",
+        "googlecloud.audit.status.code": 7,
+        "googlecloud.audit.status.message": "PERMISSION_DENIED",
+        "googlecloud.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-beats/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 3541,
+        "service.name": "compute.googleapis.com",
+        "service.type": "googlecloud",
+        "source.ip": "192.168.1.1",
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:71.0) Gecko/20100101 Firefox/71.0,gzip(gfe),gzip(gfe)",
+        "user_agent.os.full": "Mac OS X 10.15",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15",
+        "user_agent.version": "71.0."
+    }
+]

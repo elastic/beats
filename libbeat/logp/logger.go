@@ -18,6 +18,8 @@
 package logp
 
 import (
+	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -201,6 +203,14 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // Field such as logp.Stringer.
 func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 	l.sugar.DPanicw(msg, keysAndValues...)
+}
+
+// Recover stops a panicking goroutine and logs an Error.
+func (l *Logger) Recover(msg string) {
+	if r := recover(); r != nil {
+		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
+		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
+	}
 }
 
 // L returns an unnamed global logger.

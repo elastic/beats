@@ -23,11 +23,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
@@ -87,9 +88,10 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			}))
 			defer testESServer.Close()
 
-			testESClient, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-				URL: testESServer.URL,
-			}, nil)
+			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+				URL:     testESServer.URL,
+				Timeout: 90 * time.Second,
+			})
 			assert.NoError(t, err)
 
 			err = testESClient.Connect()

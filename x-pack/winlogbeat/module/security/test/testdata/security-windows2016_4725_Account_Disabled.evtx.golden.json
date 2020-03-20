@@ -14,13 +14,16 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was disabled.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1000\n\tAccount Name:\t\taudittest\n\tAccount Domain:\t\tWIN-41OB2LO92CR",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": [
+        "Administrator",
+        "audittest"
+      ]
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
-      "name": "audittest"
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",
@@ -71,13 +74,16 @@
     "log": {
       "level": "information"
     },
-    "message": "A user account was disabled.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWIN-41OB2LO92CR\n\tLogon ID:\t\t0x264B2\n\nTarget Account:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1006\n\tAccount Name:\t\taudittest0609\n\tAccount Domain:\t\tWIN-41OB2LO92CR",
-    "process": {
-      "name": "null"
+    "related": {
+      "user": [
+        "Administrator",
+        "audittest0609"
+      ]
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
-      "name": "audittest0609"
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
     },
     "winlog": {
       "activity_id": "{1200ce16-64b6-0000-0ed0-0012b664d501}",

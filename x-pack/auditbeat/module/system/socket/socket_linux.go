@@ -18,21 +18,21 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/guess"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/providers/linux"
 
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	// Register dns capture implementations
-	_ "github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns/afpacket"
+	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns/afpacket"
 )
 
 const (
@@ -103,7 +103,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),
 		detailLog:       logp.NewLogger(detailSelector),
-		isDetailed:      logp.IsDebug(detailSelector),
+		isDetailed:      logp.HasSelector(detailSelector),
 		sniffer:         sniffer,
 	}
 
@@ -199,8 +199,11 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			if m.isDetailed {
 				m.detailLog.Debug(v.String())
 			}
-			if err := v.Update(st); err != nil {
-				m.log.Infof("error processing event '%s': %v", v.String(), err)
+			if err := v.Update(st); err != nil && m.isDetailed {
+				// These errors are seldom interesting, as the flow state engine
+				// doesn't have many error conditions and all benign enough to
+				// not be worth logging them by default.
+				m.detailLog.Warnf("Issue while processing event '%s': %v", v.String(), err)
 			}
 			atomic.AddUint64(&eventCount, 1)
 
@@ -356,7 +359,7 @@ func (m *MetricSet) Setup() (err error) {
 		return errors.Wrap(err, "unable to guess one or more required parameters")
 	}
 
-	if m.isDetailed {
+	if m.isDebug {
 		names := make([]string, 0, len(m.templateVars))
 		for name := range m.templateVars {
 			names = append(names, name)
@@ -364,7 +367,7 @@ func (m *MetricSet) Setup() (err error) {
 		sort.Strings(names)
 		m.log.Debugf("%d template variables in use:", len(m.templateVars))
 		for _, key := range names {
-			m.detailLog.Debugf("  %s = %v", key, m.templateVars[key])
+			m.log.Debugf("  %s = %v", key, m.templateVars[key])
 		}
 	}
 

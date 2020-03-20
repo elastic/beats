@@ -1,0 +1,12 @@
+# Module: cloudfoundry
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-cloudfoundry.html
+
+- module: cloudfoundry
+  metricsets:
+    - container
+    - counter
+    - value
+  enabled: true
+  api_address: '${CLOUDFOUNDRY_API_ADDRESS:""}'
+  client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
+  client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'

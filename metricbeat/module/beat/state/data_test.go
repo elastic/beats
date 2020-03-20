@@ -24,17 +24,17 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/module/beat"
+	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/beat"
 
-	"github.com/stretchr/testify/assert"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestEventMapping(t *testing.T) {
 
 	files, err := filepath.Glob("./_meta/test/state.*.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	info := beat.Info{
 		UUID: "1234",
@@ -43,13 +43,13 @@ func TestEventMapping(t *testing.T) {
 
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
 		err = eventMapping(reporter, info, input)
 
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
+		require.NoError(t, err, f)
+		require.True(t, len(reporter.GetEvents()) >= 1, f)
+		require.Equal(t, 0, len(reporter.GetErrors()), f)
 	}
 }

@@ -127,7 +127,7 @@ class Test(BaseTest):
             if expected_status == "down":
                 nose.tools.eq_(self.last_output_line()["http.response.body.content"], body)
             else:
-                assert not self.last_output_line().has_key("http.response.body.content")
+                assert "http.response.body.content" not in self.last_output_line()
         finally:
             server.shutdown()
 

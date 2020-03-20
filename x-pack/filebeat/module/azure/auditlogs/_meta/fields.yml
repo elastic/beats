@@ -11,6 +11,10 @@
       type: keyword
       description: >
         The operation version
+    - name: identity
+      type: keyword
+      description: >
+        Identity
     - name: tenant_id
       type: keyword
       description: >
@@ -52,16 +56,17 @@
           type: keyword
           description: >
             ID
-        - name: activityDateTime
-          type: keyword
+        - name: activity_datetime
+          type: date
           description: >
             Activity timestamp
         - name: category
           type: keyword
           description: >
             category
-        - name: target_resources
+        - name: target_resources.*
           type: group
+          object_type_mapping_type: "*"
           description: >
             Target resources
           fields:
@@ -85,20 +90,22 @@
               type: keyword
               description: >
                 User principal name
-            - name: modified_properties
+            - name: modified_properties.*
               type: group
+              object_type: keyword
+              object_type_mapping_type: "*"
               description: >
                 Modified properties
               fields:
-                - name: newValue
+                - name: new_value
                   type: keyword
                   description: >
                     New value
-                - name: displayName
+                - name: display_name
                   type: keyword
                   description: >
                     Display value
-                - name: oldValue
+                - name: old_value
                   type: keyword
                   description: >
                     Old value

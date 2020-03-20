@@ -24,10 +24,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -84,7 +84,7 @@ func TestProcessorsForConfig(t *testing.T) {
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
 						"fields": common.MapStr{"testField": "clientConfig"},
-					}, false)),
+					}, false, true)),
 				},
 			},
 			expectedFields: map[string]string{
@@ -97,7 +97,7 @@ func TestProcessorsForConfig(t *testing.T) {
 				Processing: beat.ProcessingConfig{
 					Processor: makeProcessors(actions.NewAddFields(common.MapStr{
 						"fields": common.MapStr{"testField": "clientConfig"},
-					}, false)),
+					}, false, true)),
 				},
 			},
 			expectedFields: map[string]string{

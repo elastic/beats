@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.
@@ -74,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Namespace:   config.Namespace,
 	}
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, watchOptions)
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, watchOptions, nil)
 	if err != nil {
 		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
 	}

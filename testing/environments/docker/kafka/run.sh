@@ -21,7 +21,8 @@ mkdir -p ${KAFKA_LOGS_DIR}
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override delete.topic.enable=true --override advertised.host.name=${KAFKA_ADVERTISED_HOST} \
     --override listeners=PLAINTEXT://0.0.0.0:9092 \
-    --override logs.dir=${KAFKA_LOGS_DIR} --override log.flush.interval.ms=200 &
+    --override logs.dir=${KAFKA_LOGS_DIR} --override log.flush.interval.ms=200 \
+    --override num.partitions=3 &
 
 wait_for_port 9092
 

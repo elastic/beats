@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   apache:
-    image: docker.elastic.co/observability-ci/beats-integration-apache:${APACHE_VERSION:-2.4.20}-1
+    image: docker.elastic.co/integrations-ci/beats-apache:${APACHE_VERSION:-2.4.20}-1
     build:
       context: ./_meta
       args:

@@ -13,18 +13,10 @@ https://traefik.io/[Træfik].
 
 include::../include/what-happens.asciidoc[]
 
-[float]
-=== Compatibility
+include::../include/gs-link.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboards
-
-This module comes with sample dashboards. For example:
-
-[role="screenshot"]
-image::./images/kibana-traefik.png[]
+//[float]
+//=== Compatibility
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -57,6 +49,14 @@ include::../include/config-option-intro.asciidoc[]
 ==== `access` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-traefik.png[]
 
 :has-dashboards!:
 

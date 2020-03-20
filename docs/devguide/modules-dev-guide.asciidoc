@@ -102,7 +102,8 @@ $ ./export_dashboards -yml '../../../filebeat/module/{module}/module.yml'
 ----
 
 New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards
-that are compatible with 5.x, run the following command inside the developer virtualenv:
+that are compatible with 5.x, run the following command inside the developer
+virtual environment:
 
 [source,shell]
 ----
@@ -456,7 +457,7 @@ make create-fields MODULE={module} FILESET={fileset}
 ----
 
 Please, always check the generated file and make sure the fields are correct.
-Documentation of fields must be added manually.
+You must add field documentation manually.
 
 If the fields are correct, it is time to generate documentation, configuration
 and Kibana index patterns.
@@ -479,3 +480,12 @@ In addition, assuming you have a `test.log` file, you can add a
 documents as they are found via an Elasticsearch search. In this case, the
 integration tests will automatically check that the result is the same on each
 run.
+
+In order to test the filesets with the sample logs and/or generate the expected output one should run the tests
+locally for a specific module, using the following procedure under Filebeat directory:
+
+. Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
+. Create python env: `make python-env`
+. Source python env: `./build/python-env/bin/activate`
+. Create the testing binary: `make filebeat.test`
+. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx nosetests tests/system/test_modules.py`

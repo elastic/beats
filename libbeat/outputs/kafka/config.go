@@ -25,20 +25,22 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
 
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
 	TLS                *tlscommon.Config         `config:"ssl"`
+	Kerberos           *kerberos.Config          `config:"kerberos"`
 	Timeout            time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata           metaConfig                `config:"metadata"`
 	Key                *fmtstr.EventFormatString `config:"key"`
@@ -58,6 +60,13 @@ type kafkaConfig struct {
 	Username           string                    `config:"username"`
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
+	Sasl               saslConfig                `config:"sasl"`
+}
+
+type saslConfig struct {
+	SaslMechanism string `config:"mechanism"`
+	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
+	//SaslPassword  string `config:"password"`
 }
 
 type metaConfig struct {
@@ -83,10 +92,17 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"snappy": sarama.CompressionSnappy,
 }
 
+const (
+	saslTypePlaintext   = sarama.SASLTypePlaintext
+	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
+	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
+)
+
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
 		Hosts:              nil,
 		TLS:                nil,
+		Kerberos:           nil,
 		Timeout:            30 * time.Second,
 		BulkMaxSize:        2048,
 		BulkFlushFrequency: 0,
@@ -111,6 +127,32 @@ func defaultConfig() kafkaConfig {
 		Username:         "",
 		Password:         "",
 	}
+}
+
+func (c *saslConfig) configureSarama(config *sarama.Config) error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "":
+		// SASL is not enabled
+		return nil
+	case saslTypePlaintext:
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
+	case saslTypeSCRAMSHA256:
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
+		}
+	case saslTypeSCRAMSHA512:
+		config.Net.SASL.Handshake = true
+		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
+		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
+		}
+	default:
+		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+	}
+
+	return nil
 }
 
 func readConfig(cfg *common.Config) (*kafkaConfig, error) {
@@ -144,12 +186,11 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
-
 	return nil
 }
 
-func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
-	partitioner, err := makePartitioner(config.Partition)
+func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
+	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
 	}
@@ -165,19 +206,38 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
+
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Kerberos != nil {
+		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
+			AuthType:           int(config.Kerberos.AuthType),
+			KeyTabPath:         config.Kerberos.KeyTabPath,
+			KerberosConfigPath: config.Kerberos.ConfigPath,
+			ServiceName:        config.Kerberos.ServiceName,
+			Username:           config.Kerberos.Username,
+			Password:           config.Kerberos.Password,
+			Realm:              config.Kerberos.Realm,
+		}
 	}
 
 	if config.Username != "" {
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
+		err = config.Sasl.configureSarama(k)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// configure metadata update properties
@@ -239,7 +299,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
+		log.Errorf("Invalid kafka configuration: %+v", err)
 		return nil, err
 	}
 	return k, nil

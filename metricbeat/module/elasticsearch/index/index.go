@@ -20,8 +20,8 @@ package index
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 // init registers the MetricSet with the central registry.
@@ -35,7 +35,7 @@ func init() {
 
 const (
 	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
-	statsPath    = "/_stats/" + statsMetrics
+	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices"
 )
 
 // MetricSet type defines all fields of the MetricSet

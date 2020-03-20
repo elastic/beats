@@ -20,6 +20,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -31,8 +32,12 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/go-txfile/dev-tools/lib/mage/gotool"
-	"github.com/elastic/go-txfile/dev-tools/lib/mage/mgenv"
+	"github.com/urso/magetools/clitool"
+	"github.com/urso/magetools/ctrl"
+	"github.com/urso/magetools/fs"
+	"github.com/urso/magetools/gotool"
+	"github.com/urso/magetools/mgenv"
+
 	"github.com/elastic/go-txfile/dev-tools/lib/mage/xbuild"
 )
 
@@ -62,6 +67,13 @@ var (
 var xProviders = xbuild.NewRegistry(map[xbuild.OSArch]xbuild.Provider{
 	xbuild.OSArch{"linux", "arm"}: &xbuild.DockerImage{
 		Image:   "balenalib/revpi-core-3-alpine-golang:latest-edge-build",
+		Workdir: "/go/src/github.com/elastic/go-txfile",
+		Volumes: map[string]string{
+			filepath.Join(os.Getenv("GOPATH"), "src"): "/go/src",
+		},
+	},
+	xbuild.OSArch{"linux", runtime.GOARCH}: &xbuild.DockerImage{
+		Image:   golangVersionImage(),
 		Workdir: "/go/src/github.com/elastic/go-txfile",
 		Volumes: map[string]string{
 			filepath.Join(os.Getenv("GOPATH"), "src"): "/go/src",
@@ -100,7 +112,7 @@ func (Info) Vars() {
 func (Prepare) All() { mg.Deps(Prepare.Dirs) }
 
 // Dirs creates requires build directories for storing artifacts
-func (Prepare) Dirs() error { return mkdir("build") }
+func (Prepare) Dirs() error { return fs.MakeDirs("build") }
 
 // Lint runs golint
 func (Check) Lint() error {
@@ -112,163 +124,86 @@ func Clean() error {
 	return sh.Rm(buildHome)
 }
 
-// Mage builds the magefile binary for reuse
-func (Build) Mage() error {
-	mg.Deps(Prepare.Dirs)
-
-	goos := envBuildOS
-	goarch := envBuildArch
-	out := filepath.Join(buildHome, fmt.Sprintf("mage-%v-%v", goos, goarch))
-	return sh.Run("mage", "-f", "-goos="+goos, "-goarch="+goarch, "-compile", out)
-}
-
 // Test builds the per package unit test executables.
 func (Build) Test() error {
 	mg.Deps(Prepare.Dirs)
 
-	return withList(gotool.ListProjectPackages, failFastEach, func(pkg string) error {
-		tst := gotool.Test
+	goRun := gotool.New(clitool.NewCLIExecutor(true), mg.GoCmd())
+	return ctrl.ForEachFrom(goRun.List.ProjectPackages, failFastEach, func(pkg string) error {
+		fmt.Println("Compile test binary for package", pkg)
+
+		tst := goRun.Test
 		return tst(
+			context.Background(),
 			tst.OS(envBuildOS),
 			tst.ARCH(envBuildArch),
-			tst.Create(),
-			tst.WithCoverage(""),
+			tst.Create(true),
 			tst.Out(path.Join(buildHome, pkg, path.Base(pkg))),
+			tst.WithCoverage(""),
 			tst.Package(pkg),
 		)
 	})
+}
+
+// Shell tries to start an interactive shell if a crossbuild environment is configured.
+func (Build) Shell() error {
+	if !crossBuild() {
+		return errors.New("No cross build environment configured")
+	}
+	return withXProvider((xbuild.Provider).Shell)
 }
 
 // Test runs the unit tests.
 func Test() error {
 	mg.Deps(Prepare.Dirs)
+	return withExecEnv(func(local, runner clitool.Executor) error {
+		testUseBin := envTestUseBin
+		if crossBuild() {
+			mg.Deps(Build.Test)
+			testUseBin = true
+		}
 
-	if crossBuild() {
-		return withXProvider(func(p xbuild.Provider) error {
-			mg.Deps(Build.Mage, Build.Test)
+		goLocal := gotool.New(local, mg.GoCmd())
+		goRun := gotool.New(runner, mg.GoCmd())
 
-			env := mgenv.MakeEnv()
-			env["TEST_USE_BIN"] = "true"
-			return p.Run(env, "./build/mage-linux-arm", useIf("-v", mg.Verbose()), "test")
+		return ctrl.ForEachFrom(goLocal.List.ProjectPackages, failFastEach, func(pkg string) error {
+			fmt.Println("Test:", pkg)
+			if b, err := goLocal.List.HasTests(pkg); !b {
+				fmt.Printf("Skipping %v: No tests found\n", pkg)
+				return err
+			}
+
+			home := path.Join(buildHome, pkg)
+			if err := fs.MakeDirs(home); err != nil {
+				return err
+			}
+
+			tst := goRun.Test
+			bin := path.Join(home, path.Base(pkg))
+			useBinary := fs.ExistsFile(bin) && testUseBin
+			fmt.Printf("Run test for package '%v' (binary: %v)\n", pkg, useBinary)
+
+			return tst(
+				context.Background(),
+				tst.UseBinaryIf(bin, useBinary),
+				tst.WithCoverage(path.Join(home, "cover.out")),
+				tst.Short(envTestShort),
+				tst.Out(bin),
+				tst.Package(pkg),
+				tst.Verbose(true),
+			)
 		})
-	}
-
-	return withList(gotool.ListProjectPackages, failFastEach, func(pkg string) error {
-		fmt.Println("Test:", pkg)
-		if b, err := gotool.HasTests(pkg); !b {
-			fmt.Printf("Skipping %v: No tests found\n", pkg)
-			return err
-		}
-
-		home := path.Join(buildHome, pkg)
-		if err := mkdir(home); err != nil {
-			return err
-		}
-
-		tst := gotool.Test
-		bin := path.Join(home, path.Base(pkg))
-		return tst(
-			tst.Use(useIf(bin, existsFile(bin) && envTestUseBin)),
-			tst.WithCoverage(path.Join(home, "cover.out")),
-			tst.Short(envTestShort),
-			tst.Out(bin),
-			tst.Package(pkg),
-			tst.Verbose(),
-		)
 	})
 }
 
 // helpers
 
-func withList(
-	gen func() ([]string, error),
-	mode func(...func() error) error,
-	fn func(string) error,
-) error {
-	list, err := gen()
-	if err != nil {
-		return err
-	}
-
-	ops := make([]func() error, len(list))
-	for i, v := range list {
-		v := v
-		ops[i] = func() error { return fn(v) }
-	}
-
-	return mode(ops...)
-}
-
-func useIf(s string, b bool) string {
-	if b {
-		return s
-	}
-	return ""
-}
-
-func existsFile(path string) bool {
-	fi, err := os.Stat(path)
-	return err == nil && fi.Mode().IsRegular()
-}
-
-func mkdirs(paths ...string) error {
-	for _, p := range paths {
-		if err := mkdir(p); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func mkdir(path string) error {
-	return os.MkdirAll(path, os.ModeDir|0700)
-}
-
-func failFastEach(ops ...func() error) error {
-	mode := each
+func failFastEach(ops ...ctrl.Operation) error {
+	mode := ctrl.Each
 	if envFailFast {
-		mode = and
+		mode = ctrl.Sequential
 	}
 	return mode(ops...)
-}
-
-func each(ops ...func() error) error {
-	var errs []error
-	for _, op := range ops {
-		if err := op(); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return makeErrs(errs)
-}
-
-func and(ops ...func() error) error {
-	for _, op := range ops {
-		if err := op(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type multiErr []error
-
-func makeErrs(errs []error) error {
-	if len(errs) == 0 {
-		return nil
-	}
-	return multiErr(errs)
-}
-
-func (m multiErr) Error() string {
-	var bld strings.Builder
-	for _, err := range m {
-		if bld.Len() > 0 {
-			bld.WriteByte('\n')
-			bld.WriteString(err.Error())
-		}
-	}
-	return bld.String()
 }
 
 func printTitle(s string) {
@@ -283,6 +218,33 @@ func crossBuild() bool {
 	return envBuildArch != runtime.GOARCH || envBuildOS != runtime.GOOS
 }
 
-func withXProvider(fn func(p xbuild.Provider) error) error {
+func withXProvider(fn func(xbuild.Provider) error) error {
 	return xProviders.With(envBuildOS, envBuildArch, fn)
+}
+
+func withExecEnv(fn func(local, remote clitool.Executor) error) error {
+	local := clitool.NewCLIExecutor(mg.Verbose())
+
+	if crossBuild() {
+		return withXProvider(func(p xbuild.Provider) error {
+			e, err := p.Executor(mg.Verbose())
+			if err != nil {
+				return err
+			}
+
+			return fn(local, e)
+		})
+	}
+
+	return fn(local, local)
+}
+
+func golangVersionImage() string {
+	version := runtime.Version()
+	if strings.HasPrefix(version, "go") {
+		version = version[2:]
+	} else {
+		version = "latest"
+	}
+	return fmt.Sprintf("golang:%v", version)
 }

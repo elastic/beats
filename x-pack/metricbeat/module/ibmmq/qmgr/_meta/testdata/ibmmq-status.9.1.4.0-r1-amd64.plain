@@ -1,0 +1,180 @@
+# HELP ibmmq_qmgr_commit_total Commit count
+# TYPE ibmmq_qmgr_commit_total counter
+ibmmq_qmgr_commit_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_destructive_get_bytes_total Interval total destructive get - byte count
+# TYPE ibmmq_qmgr_destructive_get_bytes_total counter
+ibmmq_qmgr_destructive_get_bytes_total{qmgr="QM1"} 7812
+# HELP ibmmq_qmgr_destructive_get_total Interval total destructive get- count
+# TYPE ibmmq_qmgr_destructive_get_total counter
+ibmmq_qmgr_destructive_get_total{qmgr="QM1"} 23
+# HELP ibmmq_qmgr_durable_subscription_alter_total Alter durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_alter_total counter
+ibmmq_qmgr_durable_subscription_alter_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_create_total Create durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_create_total counter
+ibmmq_qmgr_durable_subscription_create_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_delete_total Delete durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_delete_total counter
+ibmmq_qmgr_durable_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_durable_subscription_resume_total Resume durable subscription count
+# TYPE ibmmq_qmgr_durable_subscription_resume_total counter
+ibmmq_qmgr_durable_subscription_resume_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_expired_message_total Expired message count
+# TYPE ibmmq_qmgr_expired_message_total counter
+ibmmq_qmgr_expired_message_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_browse_total Failed browse count
+# TYPE ibmmq_qmgr_failed_browse_total counter
+ibmmq_qmgr_failed_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqcb_total Failed MQCB count
+# TYPE ibmmq_qmgr_failed_mqcb_total counter
+ibmmq_qmgr_failed_mqcb_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqclose_total Failed MQCLOSE count
+# TYPE ibmmq_qmgr_failed_mqclose_total counter
+ibmmq_qmgr_failed_mqclose_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqconn_mqconnx_total Failed MQCONN/MQCONNX count
+# TYPE ibmmq_qmgr_failed_mqconn_mqconnx_total counter
+ibmmq_qmgr_failed_mqconn_mqconnx_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqget_total Failed MQGET - count
+# TYPE ibmmq_qmgr_failed_mqget_total counter
+ibmmq_qmgr_failed_mqget_total{qmgr="QM1"} 16
+# HELP ibmmq_qmgr_failed_mqinq_total Failed MQINQ count
+# TYPE ibmmq_qmgr_failed_mqinq_total counter
+ibmmq_qmgr_failed_mqinq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqopen_total Failed MQOPEN count
+# TYPE ibmmq_qmgr_failed_mqopen_total counter
+ibmmq_qmgr_failed_mqopen_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqput1_total Failed MQPUT1 count
+# TYPE ibmmq_qmgr_failed_mqput1_total counter
+ibmmq_qmgr_failed_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqput_total Failed MQPUT count
+# TYPE ibmmq_qmgr_failed_mqput_total counter
+ibmmq_qmgr_failed_mqput_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqset_total Failed MQSET count
+# TYPE ibmmq_qmgr_failed_mqset_total counter
+ibmmq_qmgr_failed_mqset_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_mqsubrq_total Failed MQSUBRQ count
+# TYPE ibmmq_qmgr_failed_mqsubrq_total counter
+ibmmq_qmgr_failed_mqsubrq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_subscription_create_alter_resume_total Failed create/alter/resume subscription count
+# TYPE ibmmq_qmgr_failed_subscription_create_alter_resume_total counter
+ibmmq_qmgr_failed_subscription_create_alter_resume_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_subscription_delete_total Subscription delete failure count
+# TYPE ibmmq_qmgr_failed_subscription_delete_total counter
+ibmmq_qmgr_failed_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_failed_topic_mqput_mqput1_total Failed topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_failed_topic_mqput_mqput1_total counter
+ibmmq_qmgr_failed_topic_mqput_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_log_logical_written_bytes_total Log - logical bytes written
+# TYPE ibmmq_qmgr_log_logical_written_bytes_total counter
+ibmmq_qmgr_log_logical_written_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_log_physical_written_bytes_total Log - physical bytes written
+# TYPE ibmmq_qmgr_log_physical_written_bytes_total counter
+ibmmq_qmgr_log_physical_written_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqcb_total MQCB count
+# TYPE ibmmq_qmgr_mqcb_total counter
+ibmmq_qmgr_mqcb_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqclose_total MQCLOSE count
+# TYPE ibmmq_qmgr_mqclose_total counter
+ibmmq_qmgr_mqclose_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqconn_mqconnx_total MQCONN/MQCONNX count
+# TYPE ibmmq_qmgr_mqconn_mqconnx_total counter
+ibmmq_qmgr_mqconn_mqconnx_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqctl_total MQCTL count
+# TYPE ibmmq_qmgr_mqctl_total counter
+ibmmq_qmgr_mqctl_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqdisc_total MQDISC count
+# TYPE ibmmq_qmgr_mqdisc_total counter
+ibmmq_qmgr_mqdisc_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqinq_total MQINQ count
+# TYPE ibmmq_qmgr_mqinq_total counter
+ibmmq_qmgr_mqinq_total{qmgr="QM1"} 4
+# HELP ibmmq_qmgr_mqopen_total MQOPEN count
+# TYPE ibmmq_qmgr_mqopen_total counter
+ibmmq_qmgr_mqopen_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqput_mqput1_bytes_total Interval total MQPUT/MQPUT1 byte count
+# TYPE ibmmq_qmgr_mqput_mqput1_bytes_total counter
+ibmmq_qmgr_mqput_mqput1_bytes_total{qmgr="QM1"} 1860
+# HELP ibmmq_qmgr_mqput_mqput1_total Interval total MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_mqput_mqput1_total counter
+ibmmq_qmgr_mqput_mqput1_total{qmgr="QM1"} 6
+# HELP ibmmq_qmgr_mqset_total MQSET count
+# TYPE ibmmq_qmgr_mqset_total counter
+ibmmq_qmgr_mqset_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqstat_total MQSTAT count
+# TYPE ibmmq_qmgr_mqstat_total counter
+ibmmq_qmgr_mqstat_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_mqsubrq_total MQSUBRQ count
+# TYPE ibmmq_qmgr_mqsubrq_total counter
+ibmmq_qmgr_mqsubrq_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_durable_subscription_create_total Create non-durable subscription count
+# TYPE ibmmq_qmgr_non_durable_subscription_create_total counter
+ibmmq_qmgr_non_durable_subscription_create_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_durable_subscription_delete_total Delete non-durable subscription count
+# TYPE ibmmq_qmgr_non_durable_subscription_delete_total counter
+ibmmq_qmgr_non_durable_subscription_delete_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_browse_bytes_total Non-persistent message browse - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_browse_bytes_total counter
+ibmmq_qmgr_non_persistent_message_browse_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_browse_total Non-persistent message browse - count
+# TYPE ibmmq_qmgr_non_persistent_message_browse_total counter
+ibmmq_qmgr_non_persistent_message_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_destructive_get_total Non-persistent message destructive get - count
+# TYPE ibmmq_qmgr_non_persistent_message_destructive_get_total counter
+ibmmq_qmgr_non_persistent_message_destructive_get_total{qmgr="QM1"} 23
+# HELP ibmmq_qmgr_non_persistent_message_get_bytes_total Got non-persistent messages - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_get_bytes_total counter
+ibmmq_qmgr_non_persistent_message_get_bytes_total{qmgr="QM1"} 7812
+# HELP ibmmq_qmgr_non_persistent_message_mqput1_total Non-persistent message MQPUT1 count
+# TYPE ibmmq_qmgr_non_persistent_message_mqput1_total counter
+ibmmq_qmgr_non_persistent_message_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_non_persistent_message_mqput_total Non-persistent message MQPUT count
+# TYPE ibmmq_qmgr_non_persistent_message_mqput_total counter
+ibmmq_qmgr_non_persistent_message_mqput_total{qmgr="QM1"} 6
+# HELP ibmmq_qmgr_non_persistent_message_put_bytes_total Put non-persistent messages - byte count
+# TYPE ibmmq_qmgr_non_persistent_message_put_bytes_total counter
+ibmmq_qmgr_non_persistent_message_put_bytes_total{qmgr="QM1"} 1860
+# HELP ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total Non-persistent - topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total counter
+ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total{qmgr="QM1"} 6
+# HELP ibmmq_qmgr_persistent_message_browse_bytes_total Persistent message browse - byte count
+# TYPE ibmmq_qmgr_persistent_message_browse_bytes_total counter
+ibmmq_qmgr_persistent_message_browse_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_browse_total Persistent message browse - count
+# TYPE ibmmq_qmgr_persistent_message_browse_total counter
+ibmmq_qmgr_persistent_message_browse_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_destructive_get_total Persistent message destructive get - count
+# TYPE ibmmq_qmgr_persistent_message_destructive_get_total counter
+ibmmq_qmgr_persistent_message_destructive_get_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_get_bytes_total Got persistent messages - byte count
+# TYPE ibmmq_qmgr_persistent_message_get_bytes_total counter
+ibmmq_qmgr_persistent_message_get_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_mqput1_total Persistent message MQPUT1 count
+# TYPE ibmmq_qmgr_persistent_message_mqput1_total counter
+ibmmq_qmgr_persistent_message_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_mqput_total Persistent message MQPUT count
+# TYPE ibmmq_qmgr_persistent_message_mqput_total counter
+ibmmq_qmgr_persistent_message_mqput_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_message_put_bytes_total Put persistent messages - byte count
+# TYPE ibmmq_qmgr_persistent_message_put_bytes_total counter
+ibmmq_qmgr_persistent_message_put_bytes_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_persistent_topic_mqput_mqput1_total Persistent - topic MQPUT/MQPUT1 count
+# TYPE ibmmq_qmgr_persistent_topic_mqput_mqput1_total counter
+ibmmq_qmgr_persistent_topic_mqput_mqput1_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_published_to_subscribers_bytes_total Published to subscribers - byte count
+# TYPE ibmmq_qmgr_published_to_subscribers_bytes_total counter
+ibmmq_qmgr_published_to_subscribers_bytes_total{qmgr="QM1"} 1224
+# HELP ibmmq_qmgr_published_to_subscribers_message_total Published to subscribers - message count
+# TYPE ibmmq_qmgr_published_to_subscribers_message_total counter
+ibmmq_qmgr_published_to_subscribers_message_total{qmgr="QM1"} 6
+# HELP ibmmq_qmgr_purged_queue_total Purged queue count
+# TYPE ibmmq_qmgr_purged_queue_total counter
+ibmmq_qmgr_purged_queue_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_rollback_total Rollback count
+# TYPE ibmmq_qmgr_rollback_total counter
+ibmmq_qmgr_rollback_total{qmgr="QM1"} 0
+# HELP ibmmq_qmgr_topic_mqput_mqput1_total Topic MQPUT/MQPUT1 interval total
+# TYPE ibmmq_qmgr_topic_mqput_mqput1_total counter
+ibmmq_qmgr_topic_mqput_mqput1_total{qmgr="QM1"} 6
+# HELP ibmmq_qmgr_topic_put_bytes_total Interval total topic bytes put
+# TYPE ibmmq_qmgr_topic_put_bytes_total counter
+ibmmq_qmgr_topic_put_bytes_total{qmgr="QM1"} 1224

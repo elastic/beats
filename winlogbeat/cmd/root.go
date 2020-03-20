@@ -18,21 +18,21 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/winlogbeat/beater"
 
 	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
+	_ "github.com/elastic/beats/v7/winlogbeat/include"
 
 	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 // Name of this beat
 var Name = "winlogbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: true})

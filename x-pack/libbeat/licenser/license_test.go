@@ -28,7 +28,7 @@ func TestLicenseGet(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			l := License{Mode: test.t}
+			l := License{Type: test.t}
 			assert.Equal(t, test.t, l.Get())
 		})
 	}
@@ -69,7 +69,7 @@ func TestLicenseIs(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			l := License{Mode: test.t}
+			l := License{Type: test.t}
 			assert.Equal(t, test.expected, l.Cover(test.query))
 		})
 	}
@@ -110,7 +110,7 @@ func TestLicenseIsStrict(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			l := License{Mode: test.t}
+			l := License{Type: test.t}
 			assert.Equal(t, test.expected, l.Is(test.query))
 		})
 	}
@@ -149,12 +149,12 @@ func TestIsTrial(t *testing.T) {
 	}{
 		{
 			name:     "is a trial license",
-			l:        License{Mode: Trial},
+			l:        License{Type: Trial},
 			expected: true,
 		},
 		{
 			name:     "is not a trial license",
-			l:        License{Mode: Basic},
+			l:        License{Type: Basic},
 			expected: false,
 		},
 	}
@@ -174,17 +174,17 @@ func TestIsTrialExpired(t *testing.T) {
 	}{
 		{
 			name:     "trial is expired",
-			l:        License{Mode: Trial, TrialExpiry: expiryTime(time.Now().Add(-2 * time.Hour))},
+			l:        License{Type: Trial, TrialExpiry: expiryTime(time.Now().Add(-2 * time.Hour))},
 			expected: true,
 		},
 		{
 			name:     "trial is not expired",
-			l:        License{Mode: Trial, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
+			l:        License{Type: Trial, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
 			expected: false,
 		},
 		{
 			name:     "license is not on trial",
-			l:        License{Mode: Basic, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
+			l:        License{Type: Basic, TrialExpiry: expiryTime(time.Now().Add(2 * time.Minute))},
 			expected: false,
 		},
 	}

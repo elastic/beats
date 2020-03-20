@@ -21,10 +21,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestEmit(t *testing.T) {
-	bus := New("name")
+	bus := New(logp.L(), "name")
 	listener := bus.Subscribe()
 
 	bus.Publish(Event{
@@ -36,7 +38,7 @@ func TestEmit(t *testing.T) {
 }
 
 func TestEmitOrder(t *testing.T) {
-	bus := New("name")
+	bus := New(logp.L(), "name")
 	listener := bus.Subscribe()
 	bus.Publish(Event{"first": "event"})
 	bus.Publish(Event{"second": "event"})
@@ -48,7 +50,7 @@ func TestEmitOrder(t *testing.T) {
 }
 
 func TestSubscribeFilter(t *testing.T) {
-	bus := New("name")
+	bus := New(logp.L(), "name")
 	listener := bus.Subscribe("second")
 
 	bus.Publish(Event{"first": "event"})
@@ -59,7 +61,7 @@ func TestSubscribeFilter(t *testing.T) {
 }
 
 func TestMultipleListeners(t *testing.T) {
-	bus := New("name")
+	bus := New(logp.L(), "name")
 	listener1 := bus.Subscribe("a")
 	listener2 := bus.Subscribe("a", "b")
 
@@ -82,7 +84,7 @@ func TestMultipleListeners(t *testing.T) {
 }
 
 func TestListenerClose(t *testing.T) {
-	bus := New("name")
+	bus := New(logp.L(), "name")
 	listener := bus.Subscribe()
 
 	bus.Publish(Event{"first": "event"})
@@ -103,7 +105,7 @@ func TestListenerClose(t *testing.T) {
 }
 
 func TestUnsubscribedBus(t *testing.T) {
-	bus := NewBusWithStore("name", 2)
+	bus := NewBusWithStore(logp.L(), "name", 2)
 	bus.Publish(Event{"first": "event"})
 
 	listener := bus.Subscribe()

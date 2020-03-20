@@ -1,6 +1,10 @@
 [[add-cloud-metadata]]
 === Add cloud metadata
 
+++++
+<titleabbrev>add_cloud_metadata</titleabbrev>
+++++
+
 The `add_cloud_metadata` processor enriches each event with instance metadata
 from the machine's hosting provider. At startup it will query a list of hosting
 providers and cache the instance metadata.

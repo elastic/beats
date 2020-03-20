@@ -1,0 +1,14 @@
+This is the STAN module. The STAN module uses https://github.com/nats-io/nats-streaming-server/blob/master/server/monitor.go[STAN monitoring server APIs] to collect metrics.
+
+The default metricsets are `channels`, `stats` and `subscriptions`.
+
+[float]
+=== Compatibility
+
+The STAN module is tested with STAN 0.15.1.
+
+[float]
+== Dashboard
+Dashboards for topic message count and queue depth are included:
+
+image::./images/metricbeat-stan-overview.png[]

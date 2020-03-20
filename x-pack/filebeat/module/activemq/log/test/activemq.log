@@ -1,0 +1,30 @@
+2019-11-27 15:09:34,491 | INFO  | KahaDB is version 6 | org.apache.activemq.store.kahadb.MessageDatabase | main
+2019-11-27 15:09:34,531 | INFO  | PListStore:[/opt/activemq/data/localhost/tmp_storage] started | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
+2019-11-27 15:09:34,538 | INFO  | Page File: /opt/activemq/data/kahadb/db.data. Recovered pageFile free list of size: 0 | org.apache.activemq.store.kahadb.disk.page.PageFile | KahaDB Index Free Page Recovery
+2019-11-27 15:09:34,690 | INFO  | Apache ActiveMQ 5.15.9 (localhost, ID:5338986a6080-37033-1574867374550-0:1) is starting | org.apache.activemq.broker.BrokerService | main
+2019-11-27 15:09:34,712 | ERROR | Failed to start Apache ActiveMQ (localhost, ID:5338986a6080-37033-1574867374550-0:1) | org.apache.activemq.broker.BrokerService | main
+	at org.apache.activemq.util.IOExceptionSupport.create(IOExceptionSupport.java:28)[activemq-client-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.registerConnectorMBean(BrokerService.java:2264)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.startTransportConnector(BrokerService.java:2744)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.startAllConnectors(BrokerService.java:2640)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.doStartBroker(BrokerService.java:771)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.startBroker(BrokerService.java:733)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.broker.BrokerService.start(BrokerService.java:636)[activemq-broker-5.15.9.jar:5.15.9]
+	at org.apache.activemq.xbean.XBeanBrokerService.afterPropertiesSet(XBeanBrokerService.java:73)[activemq-spring-5.15.9.jar:5.15.9]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)[:1.8.0_212]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)[:1.8.0_212]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)[:1.8.0_212]
+	at java.lang.reflect.Method.invoke(Method.java:498)[:1.8.0_212]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeCustomInitMethod(AbstractAutowireCapableBeanFactory.java:1763)[spring-beans-4.3.18.RELEASE.jar:4.3.18.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1700)[spring-beans-4.3.18.RELEASE.jar:4.3.18.RELEASE]
+2019-11-27 15:09:34,716 | INFO  | Apache ActiveMQ 5.15.9 (localhost, ID:5338986a6080-37033-1574867374550-0:1) is shutting down | org.apache.activemq.broker.BrokerService | main
+2019-11-27 15:09:34,718 | INFO  | Connector openwire stopped | org.apache.activemq.broker.TransportConnector | main
+2019-11-27 15:09:34,719 | INFO  | Connector amqp stopped | org.apache.activemq.broker.TransportConnector | main
+2019-11-27 15:09:34,721 | INFO  | Connector stomp stopped | org.apache.activemq.broker.TransportConnector | main
+2019-11-27 15:09:34,722 | INFO  | Connector mqtt stopped | org.apache.activemq.broker.TransportConnector | main
+2019-11-27 15:09:34,723 | INFO  | Connector ws stopped | org.apache.activemq.broker.TransportConnector | main
+2019-11-27 15:09:34,727 | INFO  | PListStore:[/opt/activemq/data/localhost/tmp_storage] stopped | org.apache.activemq.store.kahadb.plist.PListStoreImpl | main
+2019-11-27 15:09:34,728 | INFO  | Stopping async queue tasks | org.apache.activemq.store.kahadb.KahaDBStore | main
+2019-11-27 15:09:34,730 | INFO  | Stopping async topic tasks | org.apache.activemq.store.kahadb.KahaDBStore | main
+2019-11-29 10:59:49,515 | INFO  | No Spring WebApplicationInitializer types detected on classpath | /admin | main
+2019-11-29 10:59:49,779 | INFO  | Initializing Spring FrameworkServlet 'dispatcher' | /admin | main

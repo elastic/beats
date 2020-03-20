@@ -51,11 +51,13 @@ Metrics with dimensions are exported as flattened single dimensional metrics, ag
 `value`:: Dimension value. (Users can select * to return metric values for each dimension)
 
 Users can select the options to retrieve all metrics from a specific namespace using the following:
-```
+
+["source","yaml"]
+----
  metrics:
  - name: ["*"]
    namespace: "Microsoft.Storage/storageAccounts"
-```
+----
 
 If no aggregations are entered under a metric level the metricset will retrieve the primary aggregation assigned for this metric.
 

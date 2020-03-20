@@ -1,5 +1,9 @@
 [[winlogbeat-getting-started]]
-== Getting Started With Winlogbeat
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
@@ -15,7 +19,7 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 === Step 1: Install Winlogbeat
 
 *Before you begin*: If you haven't installed the {stack}, do that now. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+{stack-gs}/get-started-elastic-stack.html[Get started with the {stack}].
 
 . Download the Winlogbeat zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
@@ -111,7 +115,7 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 [[config-winlogbeat-logstash]]
 === Step 3: Configure Winlogbeat to use Logstash
 
-include::{libbeat-dir}/outputs/output-logstash.asciidoc[tag=shared-logstash-config]
+include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
 
 [[winlogbeat-template]]
 === Step 4: Load the index template in Elasticsearch

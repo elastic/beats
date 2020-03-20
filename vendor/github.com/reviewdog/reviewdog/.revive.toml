@@ -1,0 +1,15 @@
+ignoreGeneratedHeader = true
+severity = "warning"
+confidence = 0.1
+errorCode = 0
+warningCode = 0
+
+# rules which are not supported by golint
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.confusing-naming]
+[rule.get-return]
+[rule.modifies-parameter]
+[rule.confusing-results]
+[rule.deep-exit]
+[rule.unused-parameter]

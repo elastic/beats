@@ -1,8 +1,13 @@
 [
     {
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "haproxy.log",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "haproxy",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
@@ -30,15 +35,23 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 19312,
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "haproxy",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 35982
     },
     {
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "haproxy.log",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "haproxy",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
@@ -66,15 +79,23 @@
         "log.offset": 186,
         "process.name": "haproxy",
         "process.pid": 29785,
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "haproxy",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 43738
     },
     {
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "haproxy.log",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "haproxy",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "http-webservices",
@@ -106,6 +127,9 @@
         "log.offset": 394,
         "process.name": "haproxy",
         "process.pid": 7873,
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "haproxy",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

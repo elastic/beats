@@ -20,9 +20,9 @@ package cpu
 import (
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 type CPUStats struct {
@@ -100,7 +100,20 @@ type cpuUsage struct {
 // be updated/initialized with the corresponding value retrieved from Docker API.
 func (u *cpuUsage) CPUs() uint32 {
 	if u.cpus == 0 {
-		u.cpus = u.Stats.CPUStats.OnlineCPUs
+		if u.Stats.CPUStats.OnlineCPUs != 0 {
+			u.cpus = u.Stats.CPUStats.OnlineCPUs
+		} else {
+			//Certain versions of docker don't have `online_cpus`
+			//In addition to this, certain kernel versions will report spurious zeros from the cgroups usage_percpu
+			var realCPUCount uint32
+			for _, rCPUUsage := range u.Stats.CPUStats.CPUUsage.PercpuUsage {
+				if rCPUUsage != 0 {
+					realCPUCount++
+				}
+			}
+			u.cpus = realCPUCount
+		}
+
 	}
 	return u.cpus
 }

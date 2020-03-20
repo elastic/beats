@@ -20,14 +20,16 @@ package util
 import (
 	"testing"
 
+	"k8s.io/client-go/tools/cache"
+
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 func TestBuildMetadataEnricher(t *testing.T) {
@@ -147,6 +149,11 @@ func (m *mockWatcher) Start() error {
 func (m *mockWatcher) Stop() {
 
 }
+
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
+}
+
+func (m *mockWatcher) Store() cache.Store {
+	return nil
 }

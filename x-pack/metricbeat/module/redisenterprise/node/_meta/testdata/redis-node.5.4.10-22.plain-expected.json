@@ -1,0 +1,75 @@
+[
+    {
+        "event": {
+            "dataset": "redisenterprise.node",
+            "duration": 115000,
+            "module": "redisenterprise"
+        },
+        "metricset": {
+            "name": "node",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "cluster": "cluster.local",
+                "instance": "127.0.0.1:55467",
+                "job": "redisenterprise",
+                "node": "1"
+            },
+            "metrics": {
+                "node_available_memory": 6270261475.556,
+                "node_available_memory_no_overbooking": 6270062136.889,
+                "node_conns": 0,
+                "node_cpu_idle": 0.914,
+                "node_cpu_idle_max": 0.914,
+                "node_cpu_idle_median": 0.914,
+                "node_cpu_idle_min": 0.914,
+                "node_cpu_iowait": 0,
+                "node_cpu_iowait_max": 0,
+                "node_cpu_iowait_median": 0,
+                "node_cpu_iowait_min": 0,
+                "node_cpu_irqs": 0.001,
+                "node_cpu_irqs_max": 0.001,
+                "node_cpu_irqs_median": 0.001,
+                "node_cpu_irqs_min": 0.001,
+                "node_cpu_nice": 0,
+                "node_cpu_nice_max": 0,
+                "node_cpu_nice_median": 0,
+                "node_cpu_nice_min": 0,
+                "node_cpu_steal": 0,
+                "node_cpu_steal_max": 0,
+                "node_cpu_steal_median": 0,
+                "node_cpu_steal_min": 0,
+                "node_cpu_system": 0.022,
+                "node_cpu_system_max": 0.022,
+                "node_cpu_system_median": 0.022,
+                "node_cpu_system_min": 0.022,
+                "node_cpu_user": 0.033,
+                "node_cpu_user_max": 0.033,
+                "node_cpu_user_median": 0.033,
+                "node_cpu_user_min": 0.033,
+                "node_cur_aof_rewrites": 0,
+                "node_egress_bytes": 14291.444,
+                "node_egress_bytes_max": 14291.444,
+                "node_egress_bytes_median": 14291.444,
+                "node_egress_bytes_min": 14291.444,
+                "node_ephemeral_storage_avail": 52714645731.556,
+                "node_ephemeral_storage_free": 55931361507.556,
+                "node_free_memory": 6268220757.333,
+                "node_ingress_bytes": 1006.111,
+                "node_ingress_bytes_max": 1006.111,
+                "node_ingress_bytes_median": 1006.111,
+                "node_ingress_bytes_min": 1006.111,
+                "node_persistent_storage_avail": 52714645731.556,
+                "node_persistent_storage_free": 55931361507.556,
+                "node_provisional_memory": 5099835456.556,
+                "node_provisional_memory_no_overbooking": 5099636117.889,
+                "node_total_req": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "redisenterprise"
+        }
+    }
+]

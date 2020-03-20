@@ -29,15 +29,7 @@ Check the <<dynamic-script-compilations>> section for more information.
 
 include::../include/what-happens.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard for ASA:
-
-[role="screenshot"]
-image::./images/kibana-cisco-asa.png[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -288,16 +280,24 @@ include::../include/timezone-support.asciidoc[]
 [[dynamic-script-compilations]]
 === Dynamic Script Compilations
 
-The `asa` and `ftd` filesets are based on ingest pipelines and make extensive
-use of script processors and painless conditions. This can cause the pipelines
-to fail loading the first time the module is used, due to exceeding the maximum
-script compilation limits. It is recommended to tune the following parameters
-on your cluster:
+The `asa` and `ftd` filesets are based on Elasticsearch ingest pipelines and 
+make extensive use of script processors and painless conditions. This can cause 
+the pipelines to fail loading the first time the module is used, due to exceeding
+the maximum script compilation limits. It is recommended to tune the following 
+parameters on your Elasticsearch cluster:
 
 - {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
   Increase to at least `100/5m`.
 
 - {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
   Increase to at least `200` if using both filesets or other script-heavy modules.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for ASA:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
 
 :modulename!:

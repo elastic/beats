@@ -20,10 +20,9 @@ package spool
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // forgetfulProducer forwards event to the inBroker. The forgetfulProducer
@@ -35,17 +34,16 @@ type forgetfulProducer struct {
 // ackProducer forwards events to the inBroker. The ackBroker provides
 // functionality for ACK/Drop callbacks.
 type ackProducer struct {
-	cancel    bool
-	seq       uint32
-	state     produceState
-	openState openState
-	pubCancel chan producerCancelRequest
+	dropOnCancel bool
+	seq          uint32
+	state        produceState
+	openState    openState
+	pubCancel    chan producerCancelRequest
 }
 
 // openState tracks the producer->inBroker connection state.
 type openState struct {
 	ctx    *spoolCtx
-	isOpen atomic.Bool
 	done   chan struct{}
 	events chan pushRequest
 }
@@ -83,7 +81,6 @@ func newProducer(
 ) queue.Producer {
 	openState := openState{
 		ctx:    ctx,
-		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
 		events: events,
 	}
@@ -93,10 +90,10 @@ func newProducer(
 	}
 
 	p := &ackProducer{
-		seq:       1,
-		cancel:    dropOnCancel,
-		openState: openState,
-		pubCancel: pubCancel,
+		seq:          1,
+		dropOnCancel: dropOnCancel,
+		openState:    openState,
+		pubCancel:    pubCancel,
 	}
 	p.state.ackCB = ackCB
 	p.state.dropCB = dropCB
@@ -131,7 +128,7 @@ func (p *ackProducer) TryPublish(event publisher.Event) bool {
 func (p *ackProducer) Cancel() int {
 	p.openState.Close()
 
-	if p.cancel {
+	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
 		p.pubCancel <- producerCancelRequest{
 			state: &p.state,
@@ -157,7 +154,6 @@ func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
 }
 
 func (st *openState) Close() {
-	st.isOpen.Store(false)
 	close(st.done)
 }
 

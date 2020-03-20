@@ -1,0 +1,214 @@
+---
+description: Pipeline for AWS CloudTrail Logs
+processors:
+  - rename:
+      field: "message"
+      target_field: "event.original"
+  - json:
+      field: "event.original"
+      target_field: "json"
+  - date:
+      field: "json.eventTime"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.eventVersion"
+      target_field: "aws.cloudtrail.event_version"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.type"
+      target_field: "aws.cloudtrail.user_identity.type"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.userName"
+      target_field: "user.name"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.principalId"
+      target_field: "user.id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.arn"
+      target_field: "aws.cloudtrail.user_identity.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.accountId"
+      target_field: "cloud.account.id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.accessKeyId"
+      target_field: "aws.cloudtrail.user_identity.access_key_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionContext.attributes.mfaAuthenticated"
+      target_field: "aws.cloudtrail.user_identity.session_context.mfa_authenticated"
+      ignore_failure: true
+  - date:
+      field: "json.userIdentity.sessionContext.attributes.creationDate"
+      target_field: "aws.cloudtrail.user_identity.session_context.creation_date"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.userIdentity.invokedBy"
+      target_field: "aws.cloudtrail.user_identity.invoked_by"
+      ignore_failure: true
+  - rename:
+      field: "json.eventSource"
+      target_field: "event.provider"
+      ignore_failure: true
+  - set:
+      field: "event.action"
+      value: "{{json.eventName}}"
+      ignore_failure: true
+  - rename:
+      field: "json.awsRegion"
+      target_field: "cloud.region"
+      ignore_failure: true
+  - geoip:
+      field: "json.sourceIPAddress"
+      target_field: "source.geo"
+      ignore_failure: true
+  - rename:
+      field: "json.sourceIPAddress"
+      target_field: "source.address"
+      ignore_failure: true
+  - user_agent:
+      field: "json.userAgent"
+      target_field: "user_agent"
+      on_failure:
+        - rename:
+            field: "json.userAgent"
+            target_field: "user_agent.original"
+            ignore_failure: true
+  - rename:
+      field: "json.errorCode"
+      target_field: "aws.cloudtrail.error_code"
+      ignore_failure: true
+  - rename:
+      field: "json.errorMessage"
+      target_field: "aws.cloudtrail.error_message"
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: |
+        if (ctx.json.requestParameters != null) {
+          ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
+        }
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: |
+        if (ctx.json.responseElements != null) {
+          ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
+        }
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: |
+        if (ctx.json.additionalEventData != null) {
+          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
+        }
+      ignore_failure: true
+  - rename:
+      field: "json.requestId"
+      target_field: "aws.cloudtrail.request_id"
+      ignore_failure: true
+  - rename:
+      field: "json.eventID"
+      target_field: event.id
+      ignore_failure: true
+  - rename:
+      field: "json.eventType"
+      target_field: "aws.cloudtrail.event_type"
+      ignore_failure: true
+  - rename:
+      field: "json.apiVersion"
+      target_field: "aws.cloudtrail.api_version"
+      ignore_failure: true
+  - rename:
+      field: "json.managementEvent"
+      target_field: "aws.cloudtrail.management_event"
+      ignore_failure: true
+  - rename:
+      field: "json.readOnly"
+      target_field: "aws.cloudtrail.read_only"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.ARN"
+      target_field: "aws.cloudtrail.resources.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.accountId"
+      target_field: "aws.cloudtrail.resources.account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.type"
+      target_field: "aws.cloudtrail.resources.type"
+      ignore_failure: true
+  - rename:
+      field: "json.recipientAccountId"
+      target_field: "aws.cloudtrail.recipient_account_id"
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: |
+        if (ctx.json.serviceEventDetails != null) {
+          ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
+        }
+      ignore_failure: true
+  - rename:
+      field: "json.sharedEventId"
+      target_field: "aws.cloudtrail.shared_event_id"
+      ignore_failure: true
+  - rename:
+      field: "json.vpcEndpointId"
+      target_field: "aws.cloudtrail.vpc_endpoint_id"
+      ignore_failure: true
+  - script:
+      lang: painless
+      ignore_failure: true
+      source: >-
+        void addRelatedUser(def ctx, String userName) {
+          if (ctx.related == null) {
+            Map map = new HashMap();
+            ctx.put("related", map);
+          }
+          if (ctx.related.user == null) {
+            ArrayList al = new ArrayList();
+            ctx.related.put("user", al);
+          }
+          ctx.related.user.add(userName);
+        }
+
+        ctx.event.type = 'info';
+        ctx.event.kind = 'event';
+        if (ctx.aws.cloudtrail.error_code != null || ctx.aws.cloudtrail.error_message != null) {
+            ctx.event.outcome = 'failure'
+        } else {
+            ctx.event.outcome = 'success'
+        }
+
+        if (ctx.json?.eventName == 'ConsoleLogin') {
+          ctx.event.category = 'authentication';
+          if (ctx.json?.responseElements.ConsoleLogin != null) {
+            ctx.event.outcome = Processors.lowercase(ctx.json.responseElements.ConsoleLogin);
+          }
+        }
+
+        if (ctx.json?.requestParameters.userName != null) {
+          addRelatedUser(ctx, ctx.json.requestParameters.userName);
+        }
+        if (ctx.json?.requestParameters.newUserName != null) {
+          addRelatedUser(ctx, ctx.json.requestParameters.newUserName);
+        }
+  - remove:
+      field:
+        - "json"
+      ignore_missing: true
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

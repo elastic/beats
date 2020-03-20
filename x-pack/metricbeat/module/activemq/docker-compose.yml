@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  activemq:
+    image: docker.elastic.co/integrations-ci/beats-activemq:${ACTIVEMQ_VERSION:-5.15.9}-1
+    build:
+      context: ./_meta
+      args:
+        ACTIVEMQ_VERSION: ${ACTIVEMQ_VERSION:-5.15.9}
+    ports:
+      - 8161
+      - 61613

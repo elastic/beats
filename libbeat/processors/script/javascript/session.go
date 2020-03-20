@@ -26,9 +26,9 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -96,8 +96,7 @@ func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
 	}
 
 	// Register modules.
-	for name, registerModule := range sessionHooks {
-		s.log.Debugf("Registering module %v with the Javascript runtime.", name)
+	for _, registerModule := range sessionHooks {
 		registerModule(s)
 	}
 
