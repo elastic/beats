@@ -363,6 +363,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+type XPack struct {
+	Features struct {
+		CCR struct {
+			Enabled bool `json:"enabled"`
+		} `json:"CCR"`
+	} `json:"features"`
+}
+
+// GetXPack returns information about xpack features.
+func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
+	content, err := fetchPath(http, resetURI, "_xpack", "")
+
+	if err != nil {
+		return XPack{}, err
+	}
+
+	var xpack XPack
+	err = json.Unmarshal(content, &xpack)
+	return xpack, err
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
@@ -437,8 +458,13 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently.
-var licenseCache = &_licenseCache{}
+var (
+	// Global cache for license information. Assumption is that license information changes infrequently.
+	licenseCache = &_licenseCache{}
+
+	// LicenseCacheEnabled controls whether license caching is enabled or not. Intended for test use.
+	LicenseCacheEnabled = true
+)
 
 type _licenseCache struct {
 	sync.RWMutex
@@ -460,6 +486,10 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
+	if !LicenseCacheEnabled {
+		return
+	}
+
 	c.Lock()
 	defer c.Unlock()
 

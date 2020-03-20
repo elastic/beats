@@ -60,12 +60,12 @@
         "region": "us-west-2"
     },
     "event": {
-        "dataset": "aws.vpc",
+        "dataset": "aws.natgateway",
         "duration": 115000,
         "module": "aws"
     },
     "metricset": {
-        "name": "vpc",
+        "name": "natgateway",
         "period": 10000
     },
     "service": {
