@@ -150,7 +150,8 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 					continue
 				}
 				events = append(events, mb.Event{
-					Timestamp: getTimestamp(timestamp),
+					Timestamp:    getTimestamp(timestamp),
+					ModuleFields: common.MapStr{"labels": result.Metric},
 					MetricSetFields: common.MapStr{
 						"dataType": resultType,
 						queryName:  val,
@@ -186,7 +187,8 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 				continue
 			}
 			events = append(events, mb.Event{
-				Timestamp: getTimestamp(timestamp),
+				Timestamp:    getTimestamp(timestamp),
+				ModuleFields: common.MapStr{"labels": result.Metric},
 				MetricSetFields: common.MapStr{
 					"dataType": resultType,
 					queryName:  val,
@@ -231,10 +233,11 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				return mb.Event{}, errors.New(msg)
 			}
 			return mb.Event{
-				Timestamp: getTimestamp(timestamp),
+				Timestamp:    getTimestamp(timestamp),
+				ModuleFields: common.MapStr{"labels": common.MapStr{queryName: value}},
 				MetricSetFields: common.MapStr{
 					"dataType": resultType,
-					queryName:  value,
+					queryName:  1,
 				},
 			}, nil
 		}

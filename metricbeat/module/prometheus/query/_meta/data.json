@@ -17,7 +17,7 @@
         },
         "query": {
             "dataType": "vector",
-            "go_threads": 24
+            "go_threads": 26
         }
     },
     "service": {

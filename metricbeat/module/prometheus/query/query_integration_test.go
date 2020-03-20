@@ -55,7 +55,7 @@ func TestData(t *testing.T) {
 		if err == nil {
 			return
 		}
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(10 * time.Second)
 	}
 	t.Fatal("write", err)
 }
