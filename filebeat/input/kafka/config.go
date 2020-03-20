@@ -24,7 +24,9 @@ import (
 
 	"github.com/Shopify/sarama"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -47,6 +49,7 @@ type kafkaInputConfig struct {
 	Fetch                    kafkaFetch        `config:"fetch"`
 	Rebalance                kafkaRebalance    `config:"rebalance"`
 	TLS                      *tlscommon.Config `config:"ssl"`
+	Kerberos                 *kerberos.Config  `config:"kerberos"`
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
@@ -175,6 +178,19 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Kerberos != nil {
+		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
+			AuthType:           int(config.Kerberos.AuthType),
+			KeyTabPath:         config.Kerberos.KeyTabPath,
+			KerberosConfigPath: config.Kerberos.ConfigPath,
+			ServiceName:        config.Kerberos.ServiceName,
+			Username:           config.Kerberos.Username,
+			Password:           config.Kerberos.Password,
+			Realm:              config.Kerberos.Realm,
+		}
 	}
 
 	if config.Username != "" {
