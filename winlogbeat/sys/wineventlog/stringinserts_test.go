@@ -15,12 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package wineventlog provides access to the Windows Event Log API used in
-// all versions of Windows since Vista (i.e. Windows 7+  and Windows Server 2008+).
-// This is distinct from the Event Logging API that was used in Windows XP,
-// Windows Server 2003, and Windows 2000.
+// +build windows
+
 package wineventlog
 
-// Add -trace to enable debug prints around syscalls.
-//go:generate go get golang.org/x/sys/windows/mkwinsyscall
-//go:generate $GOPATH/bin/mkwinsyscall.exe -systemdll -output zsyscall_windows.go syscall_windows.go
+import (
+	"testing"
+	"unsafe"
+
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
+)
+
+func TestStringInserts(t *testing.T) {
+	assert.NotNil(t, templateInserts)
+
+	si := newTemplateStringInserts()
+	defer si.clear()
+
+	// "The value of n can be a number between 1 and 99."
+	// https://docs.microsoft.com/en-us/windows/win32/eventlog/message-text-files
+	assert.Contains(t, windows.UTF16ToString(si.insertStrings[0]), " 1}")
+	assert.Contains(t, windows.UTF16ToString(si.insertStrings[maxInsertStrings-1]), " 99}")
+
+	for i, evtVariant := range si.evtVariants {
+		assert.EqualValues(t, uintptr(unsafe.Pointer(&si.insertStrings[i][0])), evtVariant.Value)
+		assert.Len(t, si.insertStrings[i], int(evtVariant.Count))
+		assert.Equal(t, evtVariant.Type, EvtVarTypeString)
+	}
+}
