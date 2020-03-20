@@ -23,15 +23,9 @@ func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGene
 	}
 
 	if config.UseTypes {
-		cfgwarn.Beta("Prometheus 'use_types' settings is beta")
-
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
 		counters := NewCounterCache(base.Module().Config().Period * 5)
-
-		if config.RateCounters {
-			cfgwarn.Beta("Prometheus 'rate_counters' settings is experimental")
-		}
 
 		g := typedGenerator{
 			counterCache: counters,
@@ -50,6 +44,12 @@ type typedGenerator struct {
 }
 
 func (g *typedGenerator) Start() {
+	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
+
+	if g.rateCounters {
+		cfgwarn.Beta("Prometheus 'rate_counters' setting is experimental")
+	}
+
 	g.counterCache.Start()
 }
 
