@@ -4,24 +4,6 @@ input:
   metricset: cloudwatch
   defaults:
     metrics:
-      - namespace: AWS/VPN
-        statistic: ["Average"]
-        name:
-          - TunnelState
-      - namespace: AWS/VPN
-        statistic: ["Sum"]
-        name:
-          - TunnelDataIn
-          - TunnelDataOut
-      - namespace: AWS/TransitGateway
-        statistic: ["Sum"]
-        name:
-          - BytesIn
-          - BytesOut
-          - PacketsIn
-          - PacketsOut
-          - PacketDropCountBlackhole
-          - PacketDropCountNoRoute
       - namespace: AWS/NATGateway
         statistic: ["Sum"]
         name:
