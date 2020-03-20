@@ -82,7 +82,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
-			reporter.Error(errors.Wrapf(err, "unable to fetch data from prometheus endpoint: %v", pathConfig.Path))
+			reporter.Error(errors.Wrapf(err, "unable to fetch data from prometheus endpoint: %v", url))
 			continue
 		}
 		defer func() {
@@ -98,7 +98,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
-			reporter.Error(errors.Wrapf(parseErr, "error parsing response for: %v", pathConfig.QueryName))
+			reporter.Error(errors.Wrapf(parseErr, "error parsing response from: %v", url))
 			continue
 		}
 		for _, e := range events {

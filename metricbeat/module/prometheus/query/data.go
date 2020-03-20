@@ -109,13 +109,13 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		}
 		events = append(events, event)
 	case "vector":
-		evnts, err := getEventsFromVector(body, resultType, pathConfig.QueryName)
+		evnts, err := getEventsFromVector(body, pathConfig.QueryName)
 		if err != nil {
 			return events, err
 		}
 		events = append(events, evnts...)
 	case "matrix":
-		evnts, err := getEventsFromMatrix(body, resultType, pathConfig.QueryName)
+		evnts, err := getEventsFromMatrix(body, pathConfig.QueryName)
 		if err != nil {
 			return events, err
 		}
@@ -127,8 +127,9 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 	return events, nil
 }
 
-func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb.Event, error) {
+func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
+	resultType := "matrix"
 	convertedMap, err := convertJSONToRangeVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -137,23 +138,13 @@ func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb
 	for _, result := range results {
 		for _, vector := range result.Vectors {
 			if vector != nil {
-				if len(vector) != 2 {
-					return []mb.Event{}, errors.New("Could not parse results")
-				}
-				timestamp, ok := vector[0].(float64)
-				if !ok {
-					msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
-					return []mb.Event{}, errors.New(msg)
-				}
-				value, ok := vector[1].(string)
-				if !ok {
-					msg := fmt.Sprintf("Could not parse value of result: %v", vector)
-					return []mb.Event{}, errors.New(msg)
-				}
-				val, err := strconv.ParseFloat(value, 64)
+				timestamp, err := getTimestampFromVector(vector)
 				if err != nil {
-					msg := fmt.Sprintf("Could not parse 'range vector' value of result: %v", vector)
-					return []mb.Event{}, errors.New(msg)
+					return []mb.Event{}, err
+				}
+				val, err := getValueFromVector(vector)
+				if err != nil {
+					return []mb.Event{}, err
 				}
 				if math.IsNaN(val) || math.IsInf(val, 0) {
 					continue
@@ -173,8 +164,9 @@ func getEventsFromMatrix(body []byte, resultType string, queryName string) ([]mb
 	return events, nil
 }
 
-func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb.Event, error) {
+func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
+	resultType := "vector"
 	convertedMap, err := convertJSONToInstantVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -182,23 +174,13 @@ func getEventsFromVector(body []byte, resultType string, queryName string) ([]mb
 	results := convertedMap.Data.Results
 	for _, result := range results {
 		if result.Vector != nil {
-			if len(result.Vector) != 2 {
-				return []mb.Event{}, errors.New("Could not parse results")
-			}
-			timestamp, ok := result.Vector[0].(float64)
-			if !ok {
-				msg := fmt.Sprintf("Could not parse timestamp of result: %v", result.Vector)
-				return []mb.Event{}, errors.New(msg)
-			}
-			value, ok := result.Vector[1].(string)
-			if !ok {
-				msg := fmt.Sprintf("Could not parse value of result: %v", result.Vector)
-				return []mb.Event{}, errors.New(msg)
-			}
-			val, err := strconv.ParseFloat(value, 64)
+			timestamp, err := getTimestampFromVector(result.Vector)
 			if err != nil {
-				msg := fmt.Sprintf("Could not parse 'instant vector' value of result: %v", result.Vector)
-				return []mb.Event{}, errors.New(msg)
+				return []mb.Event{}, err
+			}
+			val, err := getValueFromVector(result.Vector)
+			if err != nil {
+				return []mb.Event{}, err
 			}
 			if math.IsNaN(val) || math.IsInf(val, 0) {
 				continue
@@ -223,43 +205,31 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 		return mb.Event{}, err
 	}
 	if convertedArray.Data.Results != nil {
-		if len(convertedArray.Data.Results) != 2 {
-			return mb.Event{}, errors.New("Could not parse results")
-		}
-		timestamp, ok := convertedArray.Data.Results[0].(float64)
-		if !ok {
-			msg := fmt.Sprintf("Could not parse timestamp of result: %v", convertedArray.Data.Results)
-			return mb.Event{}, errors.New(msg)
-		}
-		value, ok := convertedArray.Data.Results[1].(string)
-		if !ok {
-			msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
-			return mb.Event{}, errors.New(msg)
+		timestamp, err := getTimestampFromVector(convertedArray.Data.Results)
+		if err != nil {
+			return mb.Event{}, err
 		}
 		if resultType == "scalar" {
-			val, err := strconv.ParseFloat(value, 64)
+			val, err := getValueFromVector(convertedArray.Data.Results)
 			if err != nil {
-				msg := fmt.Sprintf("Could not parse 'scalar' value of result: %v", convertedArray.Data.Results)
-				return mb.Event{}, errors.New(msg)
+				return mb.Event{}, err
 			}
 			if math.IsNaN(val) || math.IsInf(val, 0) {
-				return mb.Event{
-					Timestamp: getTimestamp(timestamp),
-					MetricSetFields: common.MapStr{
-						"dataType": resultType,
-						queryName:  value,
-					},
-				}, nil
-			} else {
-				return mb.Event{
-					Timestamp: getTimestamp(timestamp),
-					MetricSetFields: common.MapStr{
-						"dataType": resultType,
-						queryName:  val,
-					},
-				}, nil
+				return mb.Event{}, nil
 			}
+			return mb.Event{
+				Timestamp: getTimestamp(timestamp),
+				MetricSetFields: common.MapStr{
+					"dataType": resultType,
+					queryName:  val,
+				},
+			}, nil
 		} else if resultType == "string" {
+			value, ok := convertedArray.Data.Results[1].(string)
+			if !ok {
+				msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
+				return mb.Event{}, errors.New(msg)
+			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
 				MetricSetFields: common.MapStr{
@@ -268,9 +238,39 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				},
 			}, nil
 		}
-
 	}
 	return mb.Event{}, errors.New("Could not parse results")
+}
+
+func getTimestampFromVector(vector []interface{}) (float64, error) {
+	// Example input: [ <unix_time>, "<sample_value>" ]
+	if len(vector) != 2 {
+		return 0, errors.New("Could not parse results")
+	}
+	timestamp, ok := vector[0].(float64)
+	if !ok {
+		msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
+		return 0, errors.New(msg)
+	}
+	return timestamp, nil
+}
+
+func getValueFromVector(vector []interface{}) (float64, error) {
+	// Example input: [ <unix_time>, "<sample_value>" ]
+	if len(vector) != 2 {
+		return 0, errors.New("Could not parse results")
+	}
+	value, ok := vector[1].(string)
+	if !ok {
+		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
+		return 0, errors.New(msg)
+	}
+	val, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
+		return 0, errors.New(msg)
+	}
+	return val, nil
 }
 
 func getResultType(body []byte) (string, error) {
