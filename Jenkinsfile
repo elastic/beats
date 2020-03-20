@@ -575,6 +575,7 @@ def withBeatsEnv(Closure body){
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
     "TEST_TAGS=oracle",
+    "DOCKER_PULL=0",
   ]){
     deleteDir()
     unstash 'source'
