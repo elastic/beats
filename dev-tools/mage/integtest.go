@@ -149,6 +149,7 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 		"RACE_DETECTOR",
 		"TEST_TAGS",
 		"PYTHON_EXE",
+		"MODULE",
 	}
 	env = append(env, passThroughEnvVars...)
 	return runInIntegTestEnv(mageTarget, test, env...)
