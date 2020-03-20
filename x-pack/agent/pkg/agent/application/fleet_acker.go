@@ -41,16 +41,17 @@ func newActionAcker(
 
 func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
+	agentID := f.agentInfo.AgentID()
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
 		Events: []fleetapi.AckEvent{
-			constructEvent(action, f.agentInfo.AgentID()),
+			constructEvent(action, agentID),
 		},
 	}
 
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("acknowledge action '%s' failed", action.ID()), errors.TypeNetwork)
+		return errors.New(err, fmt.Sprintf("acknowledge action '%s' for agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
 	}
 
 	return nil
@@ -71,7 +72,7 @@ func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) e
 
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' failed", len(actions), actions), errors.TypeNetwork)
+		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' for agent '%s' failed", len(actions), actions, agentID), errors.TypeNetwork)
 	}
 
 	return nil
