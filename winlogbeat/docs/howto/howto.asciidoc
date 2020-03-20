@@ -1,5 +1,5 @@
 [[howto-guides]]
-= How to
+= How to guides
 
 [partintro]
 --

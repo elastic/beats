@@ -4633,6 +4633,16 @@ Cloud Foundry module
 
 
 
+*`cloudfoundry.type`*::
++
+--
+The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
+
+
+type: keyword
+
+--
+
 [float]
 === app
 
@@ -5800,7 +5810,7 @@ type: long
 --
 
 [[exported-fields-couchdb]]
-== couchdb fields
+== CouchDB fields
 
 couchdb module
 
@@ -5809,7 +5819,7 @@ couchdb module
 [float]
 === couchdb
 
-
+Couchdb metrics
 
 
 [float]

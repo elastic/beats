@@ -134,7 +134,7 @@ func (a *actionStoreAcker) Ack(ctx context.Context, action fleetapi.Action) erro
 }
 
 func (a *actionStoreAcker) Commit(ctx context.Context) error {
-	return nil
+	return a.acker.Commit(ctx)
 }
 
 func newActionStoreAcker(acker fleetAcker, store *actionStore) *actionStoreAcker {
