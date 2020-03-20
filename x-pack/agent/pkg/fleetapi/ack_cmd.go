@@ -16,6 +16,7 @@ import (
 
 const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
 
+// AckEvent is an event sent in an ACK request.
 type AckEvent struct {
 	EventType string `json:"type"`              //  'STATE' | 'ERROR' | 'ACTION_RESULT' | 'ACTION'
 	SubType   string `json:"subtype"`           // 'RUNNING','STARTING','IN_PROGRESS','CONFIG','FAILED','STOPPING','STOPPED','DATA_DUMP','ACKNOWLEDGED','UNKNOWN';
