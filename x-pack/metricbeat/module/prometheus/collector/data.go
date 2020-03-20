@@ -80,9 +80,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, collector.PromEvent{
 					Data: common.MapStr{
-						name: common.MapStr{
-							"counter": counter.GetValue(),
-						},
+						name: g.rateCounterFloat64(name, labels, counter.GetValue()),
 					},
 					Labels: labels,
 				})
@@ -108,12 +106,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, collector.PromEvent{
 					Data: common.MapStr{
-						name + "_sum": common.MapStr{
-							"counter": summary.GetSampleSum(),
-						},
-						name + "_count": common.MapStr{
-							"counter": summary.GetSampleCount(),
-						},
+						name + "_sum":   g.rateCounterFloat64(name, labels, summary.GetSampleSum()),
+						name + "_count": g.rateCounterUint64(name, labels, summary.GetSampleCount()),
 					},
 					Labels: labels,
 				})
@@ -149,15 +143,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			})
 			/*
 				TODO convert histogram to ES type
-				if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
-					events = append(events, collector.PromEvent{
-						Data: common.MapStr{
-							name + "_sum.counter":   histogram.GetSampleSum(),
-							name + "_count.counter": histogram.GetSampleCount(),
-						},
-						Labels: labels,
-					})
-				}
+				Send sum & count? not sure it's worth it
 			*/
 		}
 
@@ -176,4 +162,30 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 		}
 	}
 	return events
+}
+
+// rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
+func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, value uint64) common.MapStr {
+	d := common.MapStr{
+		"counter": value,
+	}
+
+	if g.rateCounters {
+		d["rate"] = g.counterCache.RateUint64(name+labels.String(), value)
+	}
+
+	return d
+}
+
+// rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
+func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, value float64) common.MapStr {
+	d := common.MapStr{
+		"counter": value,
+	}
+
+	if g.rateCounters {
+		d["rate"] = g.counterCache.RateFloat64(name+labels.String(), value)
+	}
+
+	return d
 }
