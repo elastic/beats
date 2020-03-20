@@ -13,6 +13,10 @@ VSPHERE_FIELDS = metricbeat.COMMON_FIELDS + ["vsphere"]
 class TestVsphere(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['vsphere']
 
+    @classmethod
+    def get_hosts(cls):
+        return ['http://{}/sdk'.format(cls.compose_host())]
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_datastore(self):
         """
@@ -23,6 +27,11 @@ class TestVsphere(metricbeat.BaseTest):
             "metricsets": ["datastore"],
             "hosts": self.get_hosts(),
             "period": "5s",
+            "username": "user",
+            "password": "pass",
+            "extras": {
+                "insecure": True,
+            },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -47,6 +56,11 @@ class TestVsphere(metricbeat.BaseTest):
             "metricsets": ["host"],
             "hosts": self.get_hosts(),
             "period": "5s",
+            "username": "user",
+            "password": "pass",
+            "extras": {
+                "insecure": True,
+            },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -71,6 +85,11 @@ class TestVsphere(metricbeat.BaseTest):
             "metricsets": ["virtualmachine"],
             "hosts": self.get_hosts(),
             "period": "5s",
+            "username": "user",
+            "password": "pass",
+            "extras": {
+                "insecure": True,
+            },
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
