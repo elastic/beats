@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.8]]
+=== Beats version 6.8.8
+https://github.com/elastic/beats/compare/v6.8.7...v6.8.8[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
+
 [[release-notes-6.8.7]]
 === Beats version 6.8.7
 https://github.com/elastic/beats/compare/v6.8.6...v6.8.7[View commits]
