@@ -18,8 +18,8 @@
 package redis
 
 import (
-	"time"
 	"bytes"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
