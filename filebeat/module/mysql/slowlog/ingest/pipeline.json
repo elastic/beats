@@ -9,7 +9,7 @@
       "pattern_definitions" : {
         "GREEDYMULTILINE": "(.|\n)*",
         "METRICSPACE": "([ #\n]*)",
-        "EXPLAIN": "(# explain:.*\n|#\\s*\n)*"
+        "EXPLAIN": "(# explain:.*\n|#\\s*\n)"
       },
       "ignore_missing": true
     }
