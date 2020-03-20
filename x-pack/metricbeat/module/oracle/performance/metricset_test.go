@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build oracle
-
 package performance
 
 import (
@@ -57,11 +54,11 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "oracle",
 		"metricsets": []string{"performance"},
-		"hosts":      []string{oracle.GetOracleConnectionDetails("localhost")},
+		"hosts":      []string{oracle.GetOracleConnectionDetails(host)},
 		"username":   "sys",
 		"password":   "Oradoc_db1",
 	}
