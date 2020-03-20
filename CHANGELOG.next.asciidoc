@@ -267,6 +267,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 - Add pattern for Cisco ASA / FTD Message 734001 {issue}16212[16212] {pull}16612[16612]
 - Add `o365audit` input type for consuming events from Office 365 Management Activity API. {issue}16196[16196] {pull}16244[16244]
+- Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
 
 *Heartbeat*
 
