@@ -26,24 +26,28 @@
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
 
-
+# Metrics that will be collected using a PromQL
 - module: prometheus
   period: 10s
   hosts: ["localhost:9090"]
   metricsets: ["query"]
   queries:
-  - query_name: "instant_vector"
-    path: "/api/v1/query"
-    query_params:
-      query: "sum(rate(prometheus_http_requests_total[1m]))"
-  - query_name: "range_vector"
-    path: "/api/v1/query_range"
-    query_params:
-      query: "up"
-      start: "2019-12-20T00:00:00.000Z"
-      end:  "2019-12-21T00:00:00.000Z"
-      step: 1h
-  - query_name: "scalar"
-    path: "/api/v1/query"
-    query_params:
-      query: "100"
+  #- query_name: "instant_vector"
+  #  path: "/api/v1/query"
+  #  query_params:
+  #    query: "sum(rate(prometheus_http_requests_total[1m]))"
+  #- query_name: "range_vector"
+  #  path: "/api/v1/query_range"
+  #  query_params:
+  #    query: "up"
+  #    start: "2019-12-20T00:00:00.000Z"
+  #    end:  "2019-12-21T00:00:00.000Z"
+  #    step: 1h
+  #- query_name: "scalar"
+  #  path: "/api/v1/query"
+  #  query_params:
+  #    query: "100"
+  #- query_name: "string"
+  #  path: "/api/v1/query"
+  #  query_params:
+  #    query: "some_value"
