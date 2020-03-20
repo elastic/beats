@@ -15,7 +15,7 @@ class TestVsphere(metricbeat.BaseTest):
 
     @classmethod
     def get_hosts(cls):
-        return ['http://{}/sdk'.format(cls.compose_host())]
+        return ['https://{}/sdk'.format(cls.compose_host())]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_datastore(self):
@@ -68,7 +68,7 @@ class TestVsphere(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 4)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(VSPHERE_FIELDS), evt.keys(), evt)
@@ -97,7 +97,7 @@ class TestVsphere(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 4)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(VSPHERE_FIELDS), evt.keys(), evt)
