@@ -32,7 +32,7 @@ type Container struct {
 	// Name of the image the container was built on.
 	ImageName string `ecs:"image.name"`
 
-	// Container image tag.
+	// Container image tags.
 	ImageTag string `ecs:"image.tag"`
 
 	// Container name.

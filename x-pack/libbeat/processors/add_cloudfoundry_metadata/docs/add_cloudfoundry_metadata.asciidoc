@@ -53,4 +53,6 @@ It has the following settings:
 
 `client_secret`:: Client Secret to authenticate with Cloud Foundry.
 
+`cache_duration`:: (Optional) Maximum amount of time to cache an application's metadata.
+
 `ssl`:: (Optional) SSL configuration to use when connecting to Cloud Foundry.

@@ -13,7 +13,7 @@
 [[monitoring-internal-collection-legacy]]
 == Use legacy internal collection to send monitoring data
 ++++
-<titleabbrev>Legacy internal collection (deprecated)</titleabbrev>
+<titleabbrev>Use legacy internal collection (deprecated)</titleabbrev>
 ++++
 
 deprecated[7.2.0]
