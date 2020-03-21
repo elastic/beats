@@ -66,7 +66,7 @@ grouped in the following categories:
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-prometheus>>
-* <<exported-fields-prometheus>>
+* <<exported-fields-prometheus-xpack>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
@@ -31624,8 +31624,8 @@ type: object
 remote write metrics from Prometheus server
 
 
-[[exported-fields-prometheus]]
-== Prometheus fields
+[[exported-fields-prometheus-xpack]]
+== Prometheus typed metrics fields
 
 Stats scraped from a Prometheus endpoint.
 

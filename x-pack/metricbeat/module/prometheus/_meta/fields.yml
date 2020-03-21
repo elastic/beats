@@ -1,5 +1,5 @@
-- key: prometheus
-  title: "Prometheus"
+- key: prometheus-xpack
+  title: "Prometheus typed metrics"
   description: >
     Stats scraped from a Prometheus endpoint.
   release: ga
