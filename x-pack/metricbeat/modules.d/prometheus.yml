@@ -1,8 +1,0 @@
-# Module: prometheus
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-prometheus.html
-
-- module: prometheus
-  metricsets: ['collector']
-  period: 10s
-  hosts: ['localhost:9100']
-  use_types: true

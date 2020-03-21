@@ -47,7 +47,7 @@ func (g *typedGenerator) Start() {
 	cfgwarn.Beta("Prometheus 'use_types' setting is beta")
 
 	if g.rateCounters {
-		cfgwarn.Beta("Prometheus 'rate_counters' setting is experimental")
+		cfgwarn.Experimental("Prometheus 'rate_counters' setting is experimental")
 	}
 
 	g.counterCache.Start()

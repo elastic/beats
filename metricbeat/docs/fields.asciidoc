@@ -66,6 +66,7 @@ grouped in the following categories:
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-prometheus>>
+* <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
@@ -30595,6 +30596,53 @@ type: object
 +
 --
 Prometheus metric
+
+
+type: object
+
+--
+
+[[exported-fields-prometheus]]
+== Prometheus fields
+
+Stats scraped from a Prometheus endpoint.
+
+
+
+*`prometheus.*.value`*::
++
+--
+Prometheus gauge metric
+
+
+type: object
+
+--
+
+*`prometheus.*.counter`*::
++
+--
+Prometheus counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.rate`*::
++
+--
+Prometheus rated counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.histogram`*::
++
+--
+Prometheus histogram metric - release: ga
 
 
 type: object
