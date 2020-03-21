@@ -13,7 +13,7 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
-// promHistogramToES takes a Prometheus histogram and converts it to
+// promHistogramToES takes a Prometheus histogram and converts it to an ES histogram
 func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histogram *dto.Histogram) common.MapStr {
 	var values []float64
 	var counts []uint64
