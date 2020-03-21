@@ -42,6 +42,12 @@ var (
 		DefaultPath:   defaultPath,
 		PathConfigKey: "metrics_path",
 	}.Build()
+
+	upMetricName          = "up"
+	upMetricType          = dto.MetricType_GAUGE
+	upMetricInstanceLabel = "instance"
+	upMetricJobLabel      = "job"
+	upMetricJobValue      = "prometheus"
 )
 
 func init() {
@@ -76,6 +82,7 @@ type MetricSet struct {
 	namespace      string
 	promEventsGen  PromEventsGenerator
 	once           sync.Once
+	host           string
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -102,6 +109,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			namespace:     namespace,
 			promEventsGen: promEventsGen,
 		}
+		ms.host = ms.Host()
 		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
@@ -122,13 +130,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.prometheus.GetFamilies()
 	eventList := map[string]common.MapStr{}
 	if err != nil {
-		m.addUpEvent(eventList, 0)
-		for _, evt := range eventList {
-			reporter.Event(mb.Event{
-				RootFields: common.MapStr{m.namespace: evt},
-			})
-		}
-		return errors.Wrap(err, "unable to decode response from prometheus endpoint")
+		// send up event only
+		families = append(families, m.upMetricFamily(0.0))
+
+		// set the error to report it after sending the up event
+		err = errors.Wrap(err, "unable to decode response from prometheus endpoint")
+	} else {
+		// add up event to the list
+		families = append(families, m.upMetricFamily(1.0))
 	}
 
 	for _, family := range families {
@@ -161,8 +170,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
-	m.addUpEvent(eventList, 1)
-
 	// Report events
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
@@ -173,7 +180,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
-	return nil
+	return err
 }
 
 // Close stops the metricset
@@ -182,25 +189,27 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) addUpEvent(eventList map[string]common.MapStr, up int) {
-	// TODO add this as family so it follows common code paths
-	metricName := "up"
-	if m.skipFamilyName(metricName) {
-		return
+func (m *MetricSet) upMetricFamily(value float64) *dto.MetricFamily {
+	gauge := dto.Gauge{
+		Value: &value,
 	}
-	upPromEvent := PromEvent{
-		Labels: common.MapStr{
-			"instance": m.Host(),
-			"job":      "prometheus",
-		},
+	label1 := dto.LabelPair{
+		Name:  &upMetricInstanceLabel,
+		Value: &m.host,
 	}
-	eventList[upPromEvent.LabelsHash()] = common.MapStr{
-		"metrics": common.MapStr{
-			"up": up,
-		},
-		"labels": upPromEvent.Labels,
+	label2 := dto.LabelPair{
+		Name:  &upMetricJobLabel,
+		Value: &upMetricJobValue,
 	}
-
+	metric := dto.Metric{
+		Gauge: &gauge,
+		Label: []*dto.LabelPair{&label1, &label2},
+	}
+	return &dto.MetricFamily{
+		Name:   &upMetricName,
+		Type:   &upMetricType,
+		Metric: []*dto.Metric{&metric},
+	}
 }
 
 func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
