@@ -1155,6 +1155,48 @@ type: keyword
 
 --
 
+[float]
+=== session_issuer
+
+If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
+
+*`aws.cloudtrail.user_identity.session_issuer.type`*::
++
+--
+The source of the temporary security credentials, such as Root, IAMUser, or Role.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
++
+--
+The internal ID of the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.arn`*::
++
+--
+The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
++
+--
+The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
 *`aws.cloudtrail.error_code`*::
 +
 --
@@ -1311,6 +1353,46 @@ type: keyword
 Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
 
 type: keyword
+
+--
+
+[float]
+=== console_login
+
+Fields specific to ConsoleLogin events
+
+
+[float]
+=== additional_eventdata
+
+Additional Event Data for ConsoleLogin events
+
+
+
+*`aws.cloudtrail.console_login.additional_eventdata.mobile_version`*::
++
+--
+Identifies whether ConsoleLogin was from mobile version
+
+type: boolean
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.login_to`*::
++
+--
+URL for ConsoleLogin
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.mfa_used`*::
++
+--
+Identifies whether multi factor authentication was used during ConsoleLogin
+
+type: boolean
 
 --
 
