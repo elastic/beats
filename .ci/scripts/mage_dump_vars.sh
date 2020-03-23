@@ -8,4 +8,3 @@ else
   echo "WARN: cannot dump mage variables because mage is not installed"
 fi
 
-
