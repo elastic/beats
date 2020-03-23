@@ -618,7 +618,7 @@ def withBeatsEnvWin(Closure body){
 
 def dumpMage(){
   echo "### MAGE DUMP ###"
-  sh(label: "Dump mage variables", script: "mage dumpVariables")
+  sh(label: "Dump mage variables", script: ".ci/scripts/mage_dump_vars.sh")
   echo "### END MAGE DUMP ###"
 }
 
