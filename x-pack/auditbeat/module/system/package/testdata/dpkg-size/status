@@ -169,7 +169,7 @@ Package: python2.7-minimal
 Status: install ok installed
 Priority: optional
 Section: python
-Installed-Size: 3685
+Installed-Size: Who knows
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Architecture: amd64
 Multi-Arch: allowed

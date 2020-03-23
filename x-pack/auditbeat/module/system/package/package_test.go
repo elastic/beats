@@ -88,7 +88,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"libsepol1-dev":     1739 * 1024,
 		"libisl19":          17 * 1024 * 1024,
 		"netbase":           0,
-		"python2.7-minimal": 3685,
+		"python2.7-minimal": 0,
 	}
 
 	logp.TestingSetup()
