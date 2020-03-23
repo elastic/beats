@@ -17,6 +17,9 @@ env:
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
     - MACOSX_DEPLOYMENT_TARGET=10.15
+    # Enable verbose output since Travis users cannot access test output that is written to files.
+    # The constant output from tests also prevents time-outs.
+    - MAGEFILE_VERBOSE=true
 
 # Only run CI jobs on specific branches.
 # To keep the number of Travis CI jobs in check, we decided to configure Travis to only kick off CI jobs for the master branch.
