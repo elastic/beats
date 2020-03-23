@@ -13,7 +13,20 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
-// promHistogramToES takes a Prometheus histogram and converts it to an ES histogram
+// promHistogramToES takes a Prometheus histogram and converts it to an ES histogram:
+//
+// ES histograms look like this:
+//
+//   "histogram_field" : {
+//      "values" : [0.1, 0.2, 0.3, 0.4, 0.5],
+//      "counts" : [3, 7, 23, 12, 6]
+//   }
+//
+// This code takes a Prometheus histogram and tries to accomodate it into an ES histogram by:
+//  - calculating centroids for each bucket (values)
+//  - undoing counters accumulation for each bucket (counts)
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
 func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histogram *dto.Histogram) common.MapStr {
 	var values []float64
 	var counts []uint64

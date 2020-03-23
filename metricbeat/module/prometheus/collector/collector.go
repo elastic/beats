@@ -109,6 +109,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			namespace:     namespace,
 			promEventsGen: promEventsGen,
 		}
+		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {

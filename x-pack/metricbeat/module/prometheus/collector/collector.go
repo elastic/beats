@@ -14,6 +14,9 @@ func init() {
 		collector.MetricSetBuilder("prometheus", promEventsGeneratorFactory),
 		mb.WithHostParser(collector.HostParser),
 		mb.DefaultMetricSet(),
+
+		// must replace ensures that we are replacing the oss implementation with this one
+		// so we can make use of ES histograms (basic only) when use_types is enabled
 		mb.MustReplace(),
 	)
 }
