@@ -10,7 +10,7 @@ GVM_CMD="${HOME}/bin/gvm"
 
 mkdir -p "${HOME}/bin"
 
-curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-${ARCH}-amd64"
+curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-${ARCH}-amd64"
 chmod +x "${GVM_CMD}"
 
 gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
