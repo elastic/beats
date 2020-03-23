@@ -31,15 +31,15 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, _ string) (string, error) {
+func (i *Installer) Install(programName, version, _ string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	f, err := os.Open(artifactPath)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
+		return errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
 	}
 	defer f.Close()
 
@@ -47,10 +47,10 @@ func (i *Installer) Install(programName, version, _ string) (string, error) {
 
 }
 
-func unpack(r io.Reader, dir string) (string, error) {
+func unpack(r io.Reader, dir string) error {
 	zr, err := gzip.NewReader(r)
 	if err != nil {
-		return "", errors.New("requires gzip-compressed body", err, errors.TypeFilesystem)
+		return errors.New("requires gzip-compressed body", err, errors.TypeFilesystem)
 	}
 
 	tr := tar.NewReader(zr)
@@ -62,11 +62,11 @@ func unpack(r io.Reader, dir string) (string, error) {
 			break
 		}
 		if err != nil {
-			return "", err
+			return err
 		}
 
 		if !validFileName(f.Name) {
-			return "", errors.New("tar contained invalid filename: %q", f.Name, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
+			return errors.New("tar contained invalid filename: %q", f.Name, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
 		}
 		rel := filepath.FromSlash(f.Name)
 		abs := filepath.Join(dir, rel)
@@ -82,12 +82,12 @@ func unpack(r io.Reader, dir string) (string, error) {
 		case mode.IsRegular():
 			// just to be sure, it should already be created by Dir type
 			if err := os.MkdirAll(filepath.Dir(abs), 0755); err != nil {
-				return rootDir, errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
+				return errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
 			}
 
 			wf, err := os.OpenFile(abs, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode.Perm())
 			if err != nil {
-				return rootDir, errors.New(err, "TarInstaller: creating file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
+				return errors.New(err, "TarInstaller: creating file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
 			}
 
 			_, err = io.Copy(wf, tr)
@@ -95,18 +95,18 @@ func unpack(r io.Reader, dir string) (string, error) {
 				err = closeErr
 			}
 			if err != nil {
-				return rootDir, fmt.Errorf("TarInstaller: error writing to %s: %v", abs, err)
+				return fmt.Errorf("TarInstaller: error writing to %s: %v", abs, err)
 			}
 		case mode.IsDir():
 			if err := os.MkdirAll(abs, 0755); err != nil {
-				return rootDir, errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
+				return errors.New(err, "TarInstaller: creating directory for file "+abs, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, abs))
 			}
 		default:
-			return rootDir, errors.New(fmt.Sprintf("tar file entry %s contained unsupported file type %v", f.Name, mode), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
+			return errors.New(fmt.Sprintf("tar file entry %s contained unsupported file type %v", f.Name, mode), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, f.Name))
 		}
 	}
 
-	return rootDir, nil
+	return nil
 }
 
 func validFileName(p string) bool {

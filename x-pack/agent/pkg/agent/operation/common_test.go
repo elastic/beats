@@ -96,8 +96,8 @@ var _ download.Downloader = &DummyDownloader{}
 type DummyInstaller struct {
 }
 
-func (*DummyInstaller) Install(p, v, _ string) (string, error) {
-	return "", nil
+func (*DummyInstaller) Install(p, v, _ string) error {
+	return nil
 }
 
 var _ install.Installer = &DummyInstaller{}

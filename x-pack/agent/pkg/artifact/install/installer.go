@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/snapshot"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/tar"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/zip"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 var (
@@ -24,7 +25,7 @@ type Installer interface {
 	// Install installs an artifact and returns
 	// location of the installed program
 	// error if something went wrong
-	Install(programName, version, installDir string) (string, error)
+	Install(programName, version, installDir string) error
 }
 
 // NewInstaller returns a correct installer associated with a
@@ -49,5 +50,9 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 		return nil, err
 	}
 
-	return snapshot.NewInstaller(i)
+	if release.Snapshot() {
+		return snapshot.NewInstaller(i)
+	}
+
+	return i, nil
 }

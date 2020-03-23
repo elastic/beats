@@ -19,6 +19,11 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 		Use:   "version",
 		Short: "Display the version of the agent.",
 		Run: func(_ *cobra.Command, _ []string) {
+			version := release.Version()
+			if release.Snapshot() {
+				version = version + "-SNAPSHOT"
+			}
+
 			fmt.Fprintf(
 				streams.Out,
 				"Agent version is %s (build: %s at %s)\n",

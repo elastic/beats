@@ -34,30 +34,30 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(programName, version, installDir string) (string, error) {
+func (i *Installer) Install(programName, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if err := i.unzip(artifactPath, programName, version); err != nil {
-		return "", err
+		return err
 	}
 
 	rootDir, err := i.getRootDir(artifactPath)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// if root directory is not the same as desired directory rename
 	// e.g contains `-windows-` or  `-SNAPSHOT-`
 	if rootDir != installDir {
 		if err := os.Rename(rootDir, installDir); err != nil {
-			return rootDir, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
+			return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
 		}
 	}
 
-	return installDir, i.runInstall(programName, version, installDir)
+	return i.runInstall(programName, version, installDir)
 }
 
 func (i *Installer) unzip(artifactPath, programName, version string) error {
