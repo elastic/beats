@@ -741,6 +741,7 @@ filebeat.modules:
     #   max_retention: 7d
     #   max_requests_per_minute: 2000
     #   poll_interval: 3m
+
 #--------------------------------- Okta Module ---------------------------------
 - module: okta
   system:
@@ -756,6 +757,7 @@ filebeat.modules:
     #  {
     #    "verification_mode": "none"
     #  }
+
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:
