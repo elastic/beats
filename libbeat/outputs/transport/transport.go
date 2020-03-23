@@ -18,32 +18,19 @@
 package transport
 
 import (
-	"errors"
 	"net"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 )
 
-type Dialer interface {
-	Dial(network, address string) (net.Conn, error)
-}
+type Dialer = transport.Dialer
 
-type DialerFunc func(network, address string) (net.Conn, error)
+type DialerFunc = transport.DialerFunc
 
 var (
-	ErrNotConnected = errors.New("client is not connected")
-
-	debugf = logp.MakeDebug("transport")
+	ErrNotConnected = transport.ErrNotConnected
 )
 
-func (d DialerFunc) Dial(network, address string) (net.Conn, error) {
-	return d(network, address)
-}
-
 func Dial(c *Config, network, address string) (net.Conn, error) {
-	d, err := MakeDialer(c)
-	if err != nil {
-		return nil, err
-	}
-	return d.Dial(network, address)
+	return transport.Dial(*c, network, address)
 }

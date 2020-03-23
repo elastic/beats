@@ -21,20 +21,20 @@
 /x-pack/packetbeat/ @elastic/siem
 
 # Filebeat
-/filebeat/module/ @elastic/integrations
-/filebeat/module/elasticsearch/ @elastic/stack-monitoring
-/filebeat/module/kibana/ @elastic/stack-monitoring
-/filebeat/module/logstash/ @elastic/stack-monitoring
-/x-pack/filebeat/module/ @elastic/integrations
-/x-pack/filebeat/module/suricata/ @elastic/secops
+# /filebeat/module/ @elastic/integrations
+# /filebeat/module/elasticsearch/ @elastic/stack-monitoring
+# /filebeat/module/kibana/ @elastic/stack-monitoring
+# /filebeat/module/logstash/ @elastic/stack-monitoring
+# /x-pack/filebeat/module/ @elastic/integrations
+# /x-pack/filebeat/module/suricata/ @elastic/secops
 
 # Metricbeat
-/metricbeat/module/ @elastic/integrations
-/metricbeat/module/elasticsearch/ @elastic/stack-monitoring
-/metricbeat/module/kibana/ @elastic/stack-monitoring
-/metricbeat/module/logstash/ @elastic/stack-monitoring
-/metricbeat/module/beat/ @elastic/stack-monitoring
-/x-pack/metricbeat/module/ @elastic/integrations
+# /metricbeat/module/ @elastic/integrations
+# /metricbeat/module/elasticsearch/ @elastic/stack-monitoring
+# /metricbeat/module/kibana/ @elastic/stack-monitoring
+# /metricbeat/module/logstash/ @elastic/stack-monitoring
+# /metricbeat/module/beat/ @elastic/stack-monitoring
+# /x-pack/metricbeat/module/ @elastic/integrations
 
 # Heartbeat
 /heartbeat/ @elastic/uptime

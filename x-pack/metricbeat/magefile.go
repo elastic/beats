@@ -132,6 +132,7 @@ func UnitTest() {
 // GoUnitTest executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
 func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
@@ -152,6 +153,7 @@ func IntegTest() {
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
 func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }

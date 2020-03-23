@@ -110,6 +110,10 @@ github.com/aerospike/aerospike-client-go/types/atomic
 github.com/aerospike/aerospike-client-go/types/particle_type
 github.com/aerospike/aerospike-client-go/types/rand
 github.com/aerospike/aerospike-client-go/utils/buffer
+# github.com/akavel/rsrc v0.8.0
+github.com/akavel/rsrc/binutil
+github.com/akavel/rsrc/coff
+github.com/akavel/rsrc/ico
 # github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 github.com/andrewkroh/sys/windows/svc/eventlog
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
@@ -401,7 +405,7 @@ github.com/eapache/queue
 # github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
-# github.com/elastic/ecs v1.4.0
+# github.com/elastic/ecs v1.5.0
 github.com/elastic/ecs/code/go/ecs
 # github.com/elastic/go-libaudit v0.4.0
 github.com/elastic/go-libaudit
@@ -496,6 +500,8 @@ github.com/go-sourcemap/sourcemap/internal/base64vlq
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
+# github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
+github.com/godbus/dbus
 # github.com/godbus/dbus/v5 v5.0.3
 github.com/godbus/dbus/v5
 # github.com/godror/godror v0.10.4
@@ -509,9 +515,11 @@ github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
+github.com/gogo/protobuf/types
 # github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7
 github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.3.2
+github.com/golang/protobuf/descriptor
 github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go
@@ -561,6 +569,10 @@ github.com/googleapis/gnostic/extensions
 github.com/gorhill/cronexpr
 # github.com/gorilla/websocket v1.4.1
 github.com/gorilla/websocket
+# github.com/grpc-ecosystem/grpc-gateway v1.13.0
+github.com/grpc-ecosystem/grpc-gateway/internal
+github.com/grpc-ecosystem/grpc-gateway/runtime
+github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
 # github.com/hashicorp/go-version v1.0.0
@@ -587,6 +599,8 @@ github.com/jmoiron/sqlx
 github.com/jmoiron/sqlx/reflectx
 # github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 github.com/joeshaw/multierror
+# github.com/josephspurrier/goversioninfo v0.0.0-20200309025242-14b0ab84c6ca
+github.com/josephspurrier/goversioninfo
 # github.com/jpillora/backoff v1.0.0
 github.com/jpillora/backoff
 # github.com/json-iterator/go v1.1.7
@@ -681,6 +695,8 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
+# github.com/prometheus/prometheus v2.5.0+incompatible
+github.com/prometheus/prometheus/prompb
 # github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 github.com/rcrowley/go-metrics
 # github.com/reviewdog/errorformat v0.0.0-20200109134752-8983be9bc7dd
@@ -944,6 +960,7 @@ google.golang.org/appengine/urlfetch
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/distribution
+google.golang.org/genproto/googleapis/api/httpbody
 google.golang.org/genproto/googleapis/api/label
 google.golang.org/genproto/googleapis/api/metric
 google.golang.org/genproto/googleapis/api/monitoredres

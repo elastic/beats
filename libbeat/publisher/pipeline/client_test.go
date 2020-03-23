@@ -33,7 +33,7 @@ func TestClient(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			func(_ queue.Eventer) (queue.Queue, error) {
+			func(_ queue.ACKListener) (queue.Queue, error) {
 				return qu, nil
 			},
 			outputs.Group{},

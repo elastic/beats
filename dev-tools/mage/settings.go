@@ -60,6 +60,10 @@ var (
 	TestCoverage = false
 	UseVendor    = true
 
+	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only.
+	CrossBuildMountModcache = false
+
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
 	BeatServiceName = EnvOr("BEAT_SERVICE_NAME", BeatName)
 	BeatIndexPrefix = EnvOr("BEAT_INDEX_PREFIX", BeatName)
@@ -280,8 +284,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-
-	return gotool.ListModulePath("github.com/elastic/beats/v7")
+	return listModuleDir("github.com/elastic/beats/v7")
 }
 
 var (
@@ -599,13 +602,13 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 
 		if isRoot {
 			rootDir = possibleRoot
+			subDir, err = filepath.Rel(rootDir, cwd)
+			if err != nil {
+				errs = append(errs, err.Error())
+			}
 			break
 		}
 
-		subDir, err = filepath.Rel(possibleRoot, cwd)
-		if err != nil {
-			errs = append(errs, err.Error())
-		}
 		possibleRoot = filepath.Dir(possibleRoot)
 	}
 

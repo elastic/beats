@@ -38,21 +38,6 @@ var (
 	shortTemplate     = filepath.Join("build", BeatName+".yml.tmpl")
 	referenceTemplate = filepath.Join("build", BeatName+".reference.yml.tmpl")
 	dockerTemplate    = filepath.Join("build", BeatName+".docker.yml.tmpl")
-
-	defaultConfigFileParams = ConfigFileParams{
-		ShortParts: []string{
-			OSSBeatDir("_meta/beat.yml"),
-			LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceParts: []string{
-			OSSBeatDir("_meta/beat.reference.yml"),
-			LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		DockerParts: []string{
-			OSSBeatDir("_meta/beat.docker.yml"),
-			LibbeatDir("_meta/config.docker.yml"),
-		},
-	}
 )
 
 // ConfigFileType is a bitset that indicates what types of config files to
@@ -97,7 +82,20 @@ func (c ConfigFileParams) Empty() bool {
 // host for the generated configs. Defaults to linux/amd64.
 func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error {
 	if args.Empty() {
-		args = defaultConfigFileParams
+		args = ConfigFileParams{
+			ShortParts: []string{
+				OSSBeatDir("_meta/beat.yml"),
+				LibbeatDir("_meta/config.yml.tmpl"),
+			},
+			ReferenceParts: []string{
+				OSSBeatDir("_meta/beat.reference.yml"),
+				LibbeatDir("_meta/config.reference.yml.tmpl"),
+			},
+			DockerParts: []string{
+				OSSBeatDir("_meta/beat.docker.yml"),
+				LibbeatDir("_meta/config.docker.yml"),
+			},
+		}
 	}
 
 	if err := makeConfigTemplates(types, args); err != nil {

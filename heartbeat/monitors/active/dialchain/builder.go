@@ -27,7 +27,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Builder maintains a DialerChain for building dialers and dialer based
@@ -46,7 +47,7 @@ type Builder struct {
 type BuilderSettings struct {
 	Timeout time.Duration
 	Socks5  transport.ProxyConfig
-	TLS     *transport.TLSConfig
+	TLS     *tlscommon.TLSConfig
 }
 
 // Endpoint configures a host with all port numbers to be monitored by a dialer
