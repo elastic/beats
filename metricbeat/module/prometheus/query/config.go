@@ -31,24 +31,24 @@ type Config struct {
 
 // QueryConfig is used to make an API request.
 type QueryConfig struct {
-	Path        string        `config:"path"`
-	QueryParams common.MapStr `config:"query_params"`
-	QueryName   string        `config:"query_name"`
+	Path   string        `config:"path"`
+	Params common.MapStr `config:"params"`
+	Name   string        `config:"name"`
 }
 
 func defaultConfig() Config {
 	return Config{
 		DefaultQuery: QueryConfig{
-			Path:      "/api/v1/query",
-			QueryName: "default",
+			Path: "/api/v1/query",
+			Name: "default",
 		},
 	}
 }
 
 // Validate for Prometheus "query" metricset config
 func (p *QueryConfig) Validate() error {
-	if p.QueryName == "" {
-		return errors.New("`query_name` can not be empty in path configuration")
+	if p.Name == "" {
+		return errors.New("`name` can not be empty in path configuration")
 	}
 
 	if p.Path == "" {

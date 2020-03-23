@@ -1026,24 +1026,24 @@ metricbeat.modules:
   hosts: ["localhost:9090"]
   metricsets: ["query"]
   queries:
-  #- query_name: "instant_vector"
+  #- name: "instant_vector"
   #  path: "/api/v1/query"
-  #  query_params:
+  #  params:
   #    query: "sum(rate(prometheus_http_requests_total[1m]))"
-  #- query_name: "range_vector"
+  #- name: "range_vector"
   #  path: "/api/v1/query_range"
-  #  query_params:
+  #  params:
   #    query: "up"
   #    start: "2019-12-20T00:00:00.000Z"
   #    end:  "2019-12-21T00:00:00.000Z"
   #    step: 1h
-  #- query_name: "scalar"
+  #- name: "scalar"
   #  path: "/api/v1/query"
-  #  query_params:
+  #  params:
   #    query: "100"
-  #- query_name: "string"
+  #- name: "string"
   #  path: "/api/v1/query"
-  #  query_params:
+  #  params:
   #    query: "some_value"
 
 #------------------------------- RabbitMQ Module -------------------------------

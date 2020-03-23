@@ -103,19 +103,19 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 
 	switch resultType {
 	case "scalar", "string":
-		event, err := getEventFromScalarOrString(body, resultType, pathConfig.QueryName)
+		event, err := getEventFromScalarOrString(body, resultType, pathConfig.Name)
 		if err != nil {
 			return events, err
 		}
 		events = append(events, event)
 	case "vector":
-		evnts, err := getEventsFromVector(body, pathConfig.QueryName)
+		evnts, err := getEventsFromVector(body, pathConfig.Name)
 		if err != nil {
 			return events, err
 		}
 		events = append(events, evnts...)
 	case "matrix":
-		evnts, err := getEventsFromMatrix(body, pathConfig.QueryName)
+		evnts, err := getEventsFromMatrix(body, pathConfig.Name)
 		if err != nil {
 			return events, err
 		}
@@ -149,6 +149,7 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 				if math.IsNaN(val) || math.IsInf(val, 0) {
 					continue
 				}
+				delete(result.Metric, "__name__")
 				events = append(events, mb.Event{
 					Timestamp:    getTimestamp(timestamp),
 					ModuleFields: common.MapStr{"labels": result.Metric},
@@ -186,6 +187,7 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 			if math.IsNaN(val) || math.IsInf(val, 0) {
 				continue
 			}
+			delete(result.Metric, "__name__")
 			events = append(events, mb.Event{
 				Timestamp:    getTimestamp(timestamp),
 				ModuleFields: common.MapStr{"labels": result.Metric},

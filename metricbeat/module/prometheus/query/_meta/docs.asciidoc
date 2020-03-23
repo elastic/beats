@@ -15,9 +15,9 @@ The following configuration performs an instant query for `up` metric at a singl
   hosts: ["localhost:9090"]
   metricsets: ["query"]
   queries:
-  - query_name: 'up'
+  - name: 'up'
     path: '/api/v1/query'
-    query_params:
+    params:
       query: "up"
 -------------------------------------------------------------------------------------
 
@@ -31,9 +31,9 @@ requests as measured over the last 5 minutes.
   hosts: ["localhost:9090"]
   metricsets: ["query"]
   queries:
-  - query_name: "rate_http_requests_total"
+  - name: "rate_http_requests_total"
     path: "/api/v1/query"
-    query_params:
+    params:
       query: "rate(prometheus_http_requests_total[5m])"
 -------------------------------------------------------------------------------------
 
@@ -52,10 +52,10 @@ The following example evaluates the expression `up` over a 30-second range with 
   metricsets: ["query"]
   hosts: ["node:9100"]
   queries:
-  - query_name: "up_master"
+  - name: "up_master"
     path: "/api/v1/query_range"
-    query_params:
-      query: "up{node="master01"}"
+    params:
+      query: "up{node='master01'}"
       start: "2019-12-20T23:30:30.000Z"
       end: "2019-12-21T23:31:00.000Z"
       step: 15s

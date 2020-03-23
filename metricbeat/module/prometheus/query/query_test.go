@@ -54,9 +54,9 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
-				"path":       "/api/v1/query",
-				"query_params": common.MapStr{
+				"name": "up",
+				"path": "/api/v1/query",
+				"params": common.MapStr{
 					"query": "up",
 				},
 			},
@@ -103,10 +103,13 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
-				"path":       "/api/v1/query",
-				"query_params": common.MapStr{
+				"name": "up_range",
+				"path": "/api/v1/query",
+				"params": common.MapStr{
 					"query": "up",
+					"start": "2019-12-20T23:30:30.000Z",
+					"end":   "2019-12-21T23:31:00.000Z",
+					"step":  "15s",
 				},
 			},
 		},
@@ -146,10 +149,10 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
-				"path":       "/api/v1/query",
-				"query_params": common.MapStr{
-					"query": "up",
+				"name": "scalar",
+				"path": "/api/v1/query",
+				"params": common.MapStr{
+					"query": "100",
 				},
 			},
 		},
@@ -189,10 +192,10 @@ func TestQueryFetchEventContentString(t *testing.T) {
 		// queries do not have an actual role here since all http responses are mocked
 		"queries": []common.MapStr{
 			common.MapStr{
-				"query_name": "up",
-				"path":       "/api/v1/query",
-				"query_params": common.MapStr{
-					"query": "up",
+				"name": "string",
+				"path": "/api/v1/query",
+				"params": common.MapStr{
+					"query": "some",
 				},
 			},
 		},

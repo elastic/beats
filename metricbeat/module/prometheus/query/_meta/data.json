@@ -11,7 +11,6 @@
     },
     "prometheus": {
         "labels": {
-            "__name__": "go_threads",
             "instance": "localhost:9090",
             "job": "prometheus"
         },

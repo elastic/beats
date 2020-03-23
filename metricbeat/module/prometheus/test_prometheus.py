@@ -50,8 +50,8 @@ class Test(metricbeat.BaseTest):
             "extras": {
                 "queries": [{
                     "path": "/api/v1/query",
-                    'query_name': 'go_info',
-                    'query_params': {'query': 'go_info'}
+                    'name': 'go_info',
+                    'params': {'query': 'go_info'}
                 }]
             }
         }])
