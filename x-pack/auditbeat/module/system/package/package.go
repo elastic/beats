@@ -600,15 +600,13 @@ func parseDpkgInstalledSize(value string) (size uint64, err error) {
 			break
 		}
 	}
-	var multiplier uint64
+	multiplier := uint64(1)
 	if end < len(value) {
 		switch value[end] {
 		case 'm', 'M':
 			multiplier = 1024
 		case 'g', 'G':
 			multiplier = 1024 * 1024
-		default:
-			multiplier = 1
 		}
 	}
 
