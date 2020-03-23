@@ -611,10 +611,7 @@ func parseDpkgInstalledSize(value string) (size uint64, err error) {
 			multiplier = 1
 		}
 	}
-	if size, err = strconv.ParseUint(value[:end], 10, 64); err == nil {
-		return size * multiplier, nil
-	}
 
-	// Otherwise just return size=0 and an error.
-	return size, err
+	size, err = strconv.ParseUint(value[:end], 10, 64)
+	return size * multiplier, err
 }
