@@ -591,7 +591,7 @@ func parseDpkgInstalledSize(value string) (size uint64, err error) {
 	}
 
 	// Some rare third-party packages contain a unit at the end. This is ignored
-	// by dpkg tools. Try to parse to return as value as accurate as possible
+	// by dpkg tools. Try to parse to return a value as close as possible
 	// to what the package maintainer meant.
 	end := len(value)
 	for idx, chr := range value {
