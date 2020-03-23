@@ -15,7 +15,7 @@ import (
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(t *testing.T, metricSetName string, period string) (map[string]interface{}, string) {
+func GetConfigForTest(t *testing.T, metricSetName string, period string) map[string]interface{} {
 	t.Helper()
 
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
@@ -26,7 +26,6 @@ func GetConfigForTest(t *testing.T, metricSetName string, period string) (map[st
 		defaultRegion = "us-west-1"
 	}
 
-	info := ""
 	config := map[string]interface{}{}
 	if !okAccessKeyID || accessKeyID == "" {
 		t.Fatal("$AWS_ACCESS_KEY_ID not set or set to empty")
@@ -48,7 +47,7 @@ func GetConfigForTest(t *testing.T, metricSetName string, period string) (map[st
 			config["session_token"] = sessionToken
 		}
 	}
-	return config, info
+	return config
 }
 
 // CheckEventField function checks a given field type and compares it with the expected type for integration tests.

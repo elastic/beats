@@ -21,33 +21,35 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
-// copyModule contains a module name and the list of files or directories
+// CopyModule contains a module name and the list of files or directories
 // to copy recursively.
-type copyModule struct {
-	name        string
-	filesToCopy []string
+type CopyModule struct {
+	Name        string
+	FilesToCopy []string
 }
 
 var (
-	copyAll = []copyModule{
-		copyModule{
-			name: "github.com/godror/godror",
-			filesToCopy: []string{
-				"odpi",
+	copyAll = []CopyModule{
+		CopyModule{
+			Name: "github.com/tsg/go-daemon",
+			FilesToCopy: []string{
+				"src",
 			},
 		},
-		copyModule{
-			name: "github.com/tsg/go-daemon",
-			filesToCopy: []string{
-				"src",
+		CopyModule{
+			Name: "github.com/godror/godror",
+			FilesToCopy: []string{
+				"odpi",
 			},
 		},
 	}
 	filesToRemove = []string{
-		filepath.Join("vendor", "github.com", "yuin", "gopher-lua", "parse", "Makefile"),
+		filepath.Join("github.com", "yuin", "gopher-lua", "parse", "Makefile"),
 	}
 )
 
@@ -57,48 +59,56 @@ func Vendor() error {
 
 	err := mod.Tidy()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while running go mod tidy")
 	}
 
 	err = mod.Vendor()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while running go mod vendor")
 	}
 
 	err = mod.Verify()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while running go mod verify")
 	}
 
 	repo, err := GetProjectRepoInfo()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error while getting repository information")
 	}
+
 	vendorFolder := filepath.Join(repo.RootDir, "vendor")
-
-	// copy packages which require the whole tree
-	for _, p := range copyAll {
-		path, err := gotool.ListModuleCacheDir(p.name)
-		if err != nil {
-			return err
-		}
-
-		for _, f := range p.filesToCopy {
-			from := filepath.Join(path, f)
-			to := filepath.Join(vendorFolder, p.name, f)
-			copyTask := &CopyTask{Source: from, Dest: to, DirMode: os.ModeDir | 0750}
-			err = copyTask.Execute()
-			if err != nil {
-				return err
-			}
-		}
+	err = CopyFilesToVendor(vendorFolder, copyAll)
+	if err != nil {
+		return errors.Wrap(err, "error copying required files")
 	}
 
 	for _, p := range filesToRemove {
-		p = filepath.Join(repo.RootDir, p)
+		p = filepath.Join(vendorFolder, p)
 		err = os.RemoveAll(p)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error while removing file: %s", p)
+		}
+	}
+	return nil
+}
+
+// CopyFilesToVendor copies packages which require the whole tree
+func CopyFilesToVendor(vendorFolder string, modulesToCopy []CopyModule) error {
+	for _, p := range modulesToCopy {
+		path, err := gotool.ListModuleCacheDir(p.Name)
+		if err != nil {
+			return errors.Wrapf(err, "error while looking up cached dir of module: %s", p.Name)
+		}
+
+		for _, f := range p.FilesToCopy {
+			from := filepath.Join(path, f)
+			to := filepath.Join(vendorFolder, p.Name, f)
+			copyTask := &CopyTask{Source: from, Dest: to, Mode: 0600, DirMode: os.ModeDir | 0750}
+			err = copyTask.Execute()
+			if err != nil {
+				return errors.Wrapf(err, "error while copying file from %s to %s", from, to)
+			}
 		}
 	}
 	return nil

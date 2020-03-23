@@ -57,6 +57,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-google-pubsub>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
+* <<{beatname_lc}-input-o365audit>>
 
 
 include::multiline.asciidoc[]
@@ -90,3 +91,5 @@ include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
