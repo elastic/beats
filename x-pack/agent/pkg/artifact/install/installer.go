@@ -9,10 +9,8 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/snapshot"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/tar"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/install/zip"
-	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 var (
@@ -38,21 +36,9 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 		return nil, ErrConfigNotProvided
 	}
 
-	var i Installer
-	var err error
-
 	if runtime.GOOS == "windows" {
-		i, err = zip.NewInstaller(config)
-	} else {
-		i, err = tar.NewInstaller(config)
-	}
-	if err != nil {
-		return nil, err
+		return zip.NewInstaller(config)
 	}
 
-	if release.Snapshot() {
-		return snapshot.NewInstaller(i)
-	}
-
-	return i, nil
+	return tar.NewInstaller(config)
 }

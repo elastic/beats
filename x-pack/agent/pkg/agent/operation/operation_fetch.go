@@ -6,7 +6,6 @@ package operation
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
@@ -14,7 +13,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 // operationFetch fetches artifact from preconfigured source
@@ -54,12 +52,7 @@ func (o *operationFetch) Name() string {
 // - Fetch does not need to run if package is already present
 func (o *operationFetch) Check() (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
-	version := release.Version()
-	if release.Snapshot() {
-		version = fmt.Sprintf("%s-SNAPSHOT", version)
-	}
-
-	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), version, downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
 		return false, err
 	}
@@ -69,7 +62,7 @@ func (o *operationFetch) Check() (bool, error) {
 		return true, nil
 	}
 
-	o.logger.Infof("%s.%s already exists in %s. Skipping operation %s", o.program.BinaryName(), version, fullPath, o.Name())
+	o.logger.Infof("%s.%s already exists in %s. Skipping operation %s", o.program.BinaryName(), o.program.Version(), fullPath, o.Name())
 	return false, err
 }
 
