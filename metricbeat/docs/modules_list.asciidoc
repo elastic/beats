@@ -206,7 +206,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>>   
 |<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
+.3+| .3+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
+|<<metricbeat-metricset-prometheus-query,query>> beta[]  
 |<<metricbeat-metricset-prometheus-remote_write,remote_write>> beta[]  
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   

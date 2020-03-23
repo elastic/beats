@@ -15,6 +15,7 @@
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+
 # Metrics sent by a Prometheus server using remote_write option
 - module: prometheus
   metricsets: ["remote_write"]
@@ -24,3 +25,29 @@
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  queries:
+  #- name: "instant_vector"
+  #  path: "/api/v1/query"
+  #  params:
+  #    query: "sum(rate(prometheus_http_requests_total[1m]))"
+  #- name: "range_vector"
+  #  path: "/api/v1/query_range"
+  #  params:
+  #    query: "up"
+  #    start: "2019-12-20T00:00:00.000Z"
+  #    end:  "2019-12-21T00:00:00.000Z"
+  #    step: 1h
+  #- name: "scalar"
+  #  path: "/api/v1/query"
+  #  params:
+  #    query: "100"
+  #- name: "string"
+  #  path: "/api/v1/query"
+  #  params:
+  #    query: "some_value"
