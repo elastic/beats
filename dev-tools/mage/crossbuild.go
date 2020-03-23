@@ -268,6 +268,7 @@ func (b GolangCrossBuilder) Build() error {
 		"--rm",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
+		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
