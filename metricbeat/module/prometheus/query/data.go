@@ -149,7 +149,6 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 				if math.IsNaN(val) || math.IsInf(val, 0) {
 					continue
 				}
-				delete(result.Metric, "__name__")
 				events = append(events, mb.Event{
 					Timestamp:    getTimestamp(timestamp),
 					ModuleFields: common.MapStr{"labels": result.Metric},
@@ -187,7 +186,6 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 			if math.IsNaN(val) || math.IsInf(val, 0) {
 				continue
 			}
-			delete(result.Metric, "__name__")
 			events = append(events, mb.Event{
 				Timestamp:    getTimestamp(timestamp),
 				ModuleFields: common.MapStr{"labels": result.Metric},
