@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package elb
 
@@ -32,10 +33,7 @@ func TestData(t *testing.T) {
 		{"AWS/NetworkELB", "./_meta/data_nlb.json"},
 	}
 
-	config, info := mtest.GetConfigForTest("elb", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "elb", "300s")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

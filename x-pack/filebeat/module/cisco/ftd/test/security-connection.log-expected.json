@@ -421,8 +421,8 @@
         "log.level": "alert",
         "log.offset": 3037,
         "network.application": [
-            "Advanced Packaging Tool",
-            "Ubuntu"
+            "advanced packaging tool",
+            "ubuntu"
         ],
         "network.iana_number": 6,
         "network.protocol": "http",

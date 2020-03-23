@@ -124,7 +124,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	}
 
 	for key, field := range e.Extensions {
-		mapping, found := extensionMapping[key]
+		mapping, found := extensionMappingLowerCase[strings.ToLower(key)]
 		if !found {
 			continue
 		}

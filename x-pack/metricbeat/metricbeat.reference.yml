@@ -229,7 +229,12 @@ metricbeat.modules:
     - key: "dept"
       value: "eng"
   metricsets:
+    - elb
+    - natgateway
     - rds
+    - transitgateway
+    - usage
+    - vpn
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -385,7 +390,7 @@ metricbeat.modules:
   hosts: ["localhost:8091"]
   enabled: true
 
-#------------------------------- Couchdb Module -------------------------------
+#------------------------------- CouchDB Module -------------------------------
 - module: couchdb
   metricsets: ["server"]
   period: 10s
