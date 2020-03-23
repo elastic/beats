@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use max in k8s apiserver dashboard aggregations. {pull}17018[17018]
 - Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
 - Check if CCR feature is available on Elasticsearch cluster before attempting to call CCR APIs from `elasticsearch/ccr` metricset. {issue}16511[16511] {pull}17073[17073]
+- Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 
 *Packetbeat*
 
