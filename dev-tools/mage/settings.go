@@ -602,13 +602,13 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 
 		if isRoot {
 			rootDir = possibleRoot
+			subDir, err = filepath.Rel(rootDir, cwd)
+			if err != nil {
+				errs = append(errs, err.Error())
+			}
 			break
 		}
 
-		subDir, err = filepath.Rel(possibleRoot, cwd)
-		if err != nil {
-			errs = append(errs, err.Error())
-		}
 		possibleRoot = filepath.Dir(possibleRoot)
 	}
 
