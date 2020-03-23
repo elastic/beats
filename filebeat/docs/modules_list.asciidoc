@@ -30,6 +30,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-netflow>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-o365>>
+  * <<filebeat-module-okta>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
   * <<filebeat-module-postgresql>>
@@ -72,6 +73,7 @@ include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/o365.asciidoc[]
+include::modules/okta.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]
