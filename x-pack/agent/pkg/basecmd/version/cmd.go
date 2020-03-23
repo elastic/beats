@@ -27,7 +27,7 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 			fmt.Fprintf(
 				streams.Out,
 				"Agent version is %s (build: %s at %s)\n",
-				release.Version(),
+				version,
 				release.Commit(),
 				release.BuildTime(),
 			)
