@@ -59,6 +59,7 @@ processors:
       field: "json.userIdentity.sessionIssuer.type"
       target_field: "aws.cloudtrail.user_identity.session_issuer.type"
       ignore_failure: true
+# userIdentity.sessionIssuer.userName is only set with assumed roles.
   - rename:
       field: "json.userIdentity.sessionIssuer.userName"
       target_field: "user.name"
