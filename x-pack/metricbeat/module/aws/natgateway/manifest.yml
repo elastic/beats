@@ -1,0 +1,26 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/NATGateway
+        statistic: ["Sum"]
+        name:
+          - BytesInFromDestination
+          - BytesInFromSource
+          - BytesOutToDestination
+          - BytesOutToSource
+          - ConnectionAttemptCount
+          - ConnectionEstablishedCount
+          - ErrorPortAllocation
+          - IdleTimeoutCount
+          - PacketsDropCount
+          - PacketsInFromDestination
+          - PacketsInFromSource
+          - PacketsOutToDestination
+          - PacketsOutToSource
+      - namespace: AWS/NATGateway
+        statistic: ["Maximum"]
+        name:
+          - ActiveConnectionCount

@@ -48,6 +48,7 @@ grouped in the following categories:
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-o365>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -1308,6 +1309,29 @@ type: keyword
 +
 --
 Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
+
+type: keyword
+
+--
+
+[float]
+=== cloudwatch
+
+Fields for AWS CloudWatch logs.
+
+
+[float]
+=== ec2
+
+Fields for AWS EC2 logs in CloudWatch.
+
+
+
+*`aws.ec2.ip_address`*::
++
+--
+The internet address of the requester.
+
 
 type: keyword
 
@@ -3632,7 +3656,52 @@ type: double
 
 --
 
+*`cef.extensions.deviceCustomIPv6Address1`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
 *`cef.extensions.deviceCustomIPv6Address1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3Label`*::
 +
 --
 All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
@@ -3659,33 +3728,6 @@ type: keyword
 
 --
 
-*`cef.extensions.deviceCustomIPv6Address1`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3Label`*::
-+
---
-All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
-
-type: keyword
-
---
-
 *`cef.extensions.deviceCustomNumber1`*::
 +
 --
@@ -3704,7 +3746,7 @@ type: keyword
 
 --
 
-*`cef.extensions.DeviceCustomNumber2`*::
+*`cef.extensions.deviceCustomNumber2`*::
 +
 --
 One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
@@ -3888,6 +3930,42 @@ type: keyword
 +
 --
 The facility generating this event. For example, Syslog has an explicit facility associated with every event.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber1`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber2`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
 type: keyword
 
@@ -4676,6 +4754,545 @@ type: keyword
 
 --
 
+[float]
+=== checkpoint
+
+Fields for Check Point custom string mappings.
+
+
+
+*`checkpoint.app_risk`*::
++
+--
+Application risk.
+
+type: keyword
+
+--
+
+*`checkpoint.app_severity`*::
++
+--
+Application threat severity.
+
+type: keyword
+
+--
+
+*`checkpoint.app_sig_id`*::
++
+--
+The signature ID which the application was detected by.
+
+type: keyword
+
+--
+
+*`checkpoint.auth_method`*::
++
+--
+Password authentication protocol used.
+
+type: keyword
+
+--
+
+*`checkpoint.category`*::
++
+--
+Category.
+
+type: keyword
+
+--
+
+*`checkpoint.confidence_level`*::
++
+--
+Confidence level determined.
+
+type: keyword
+
+--
+
+*`checkpoint.connectivity_state`*::
++
+--
+Connectivity state.
+
+type: keyword
+
+--
+
+*`checkpoint.cookie`*::
++
+--
+IKE cookie.
+
+type: keyword
+
+--
+
+*`checkpoint.dst_phone_number`*::
++
+--
+Destination IP-Phone.
+
+type: keyword
+
+--
+
+*`checkpoint.email_control`*::
++
+--
+Engine name.
+
+type: keyword
+
+--
+
+*`checkpoint.email_id`*::
++
+--
+Internal email ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_recipients_num`*::
++
+--
+Number of recipients.
+
+type: long
+
+--
+
+*`checkpoint.email_session_id`*::
++
+--
+Internal email session ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_spool_id`*::
++
+--
+Internal email spool ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_subject`*::
++
+--
+Email subject.
+
+type: keyword
+
+--
+
+*`checkpoint.event_count`*::
++
+--
+Number of events associated with the log.
+
+type: long
+
+--
+
+*`checkpoint.file_hash`*::
++
+--
+File hash (SHA1 or MD5).
+
+type: keyword
+
+--
+
+*`checkpoint.frequency`*::
++
+--
+Scan frequency.
+
+type: keyword
+
+--
+
+*`checkpoint.icmp_type`*::
++
+--
+ICMP type.
+
+type: long
+
+--
+
+*`checkpoint.icmp_code`*::
++
+--
+ICMP code.
+
+type: long
+
+--
+
+*`checkpoint.identity_type`*::
++
+--
+Identity type.
+
+type: keyword
+
+--
+
+*`checkpoint.incident_extension`*::
++
+--
+Format of original data.
+
+type: keyword
+
+--
+
+*`checkpoint.integrity_av_invoke_type`*::
++
+--
+Scan invoke type.
+
+type: keyword
+
+--
+
+*`checkpoint.peer_gateway`*::
++
+--
+Main IP of the peer Security Gateway.
+
+type: ip
+
+--
+
+*`checkpoint.performance_impact`*::
++
+--
+Protection performance impact.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_id`*::
++
+--
+Protection malware ID.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_name`*::
++
+--
+Specific signature name of the attack.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_type`*::
++
+--
+Type of protection used to detect the attack.
+
+type: keyword
+
+--
+
+*`checkpoint.scan_result`*::
++
+--
+Scan result.
+
+type: keyword
+
+--
+
+*`checkpoint.sensor_mode`*::
++
+--
+Sensor mode.
+
+type: keyword
+
+--
+
+*`checkpoint.severity`*::
++
+--
+Threat severity.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_status`*::
++
+--
+Malware status.
+
+type: keyword
+
+--
+
+*`checkpoint.subscription_expiration`*::
++
+--
+The expiration date of the subscription.
+
+type: date
+
+--
+
+*`checkpoint.tcp_flags`*::
++
+--
+TCP packet flags.
+
+type: keyword
+
+--
+
+*`checkpoint.termination_reason`*::
++
+--
+Termination reason.
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Update status.
+
+type: keyword
+
+--
+
+*`checkpoint.user_status`*::
++
+--
+User response.
+
+type: keyword
+
+--
+
+*`checkpoint.uuid`*::
++
+--
+External ID.
+
+type: keyword
+
+--
+
+*`checkpoint.virus_name`*::
++
+--
+Virus name.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_name`*::
++
+--
+Malware name.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_family`*::
++
+--
+Malware family.
+
+type: keyword
+
+--
+
+*`checkpoint.voip_log_type`*::
++
+--
+VoIP log types.
+
+type: keyword
+
+--
+
+[float]
+=== cef.extensions
+
+Extra vendor-specific extensions.
+
+
+
+*`cef.extensions.cp_app_risk`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.cp_severity`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.ifname`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.inzone`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.layer_uuid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.layer_name`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.logid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.loguid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.match_id`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.nat_addtnl_rulenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.nat_rulenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.origin`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.originsicname`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.outzone`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.parent_rule`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.product`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.rule_action`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.rule_uid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.sequencenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.service_id`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.version`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-cisco]]
 == Cisco fields
 
@@ -4859,6 +5476,26 @@ type: short
 
 --
 
+*`cisco.asa.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.asa.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
+
+--
+
 [float]
 === ftd
 
@@ -5034,6 +5671,26 @@ type: short
 Raw fields for Security Events.
 
 type: object
+
+--
+
+*`cisco.ftd.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
 
 --
 
@@ -21429,6 +22086,664 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-o365]]
+== Office 365 fields
+
+Module for handling logs from Office 365.
+
+
+
+[float]
+=== o365.audit
+
+Fields from Office 365 Management API audit logs.
+
+
+
+*`o365.audit.Actor`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.ActorContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorIpAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorYammerUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertEntityId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertLinks`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.AlertType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationDisplayName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AzureActiveDirectoryEventType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExchangeMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Category`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientAppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientInfoString`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIP`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIPAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Comments`*::
++
+--
+type: text
+
+--
+
+*`o365.audit.CorrelationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CreationTime`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CustomUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Data`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.DataType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventData`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventSource`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExceptionInfo.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExtendedProperties.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExternalAccess`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.GroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Id`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ImplicitShare`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IncidentId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InternalLogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InterSystemsId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IntraSystemId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Item.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Item.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ItemName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ItemType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListItemUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonError`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonUserSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerMasterAccountSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerUPN`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Members`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.Members.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ModifiedProperties.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Name`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ObjectId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Operation`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OriginatingServer`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Parameters.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.PolicyDetails`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.PolicyId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.RecordType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ResultStatus`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SensitiveInfoDetectionIsIncluded`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SharePointMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.SessionId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Severity`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Site`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SiteUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Source`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileExtension`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceRelativeUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Status`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SupportTicketId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Target`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.TargetContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UniqueSharingId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserAgent`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserKey`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Version`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.WebId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Workload`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.YammerNetworkId`*::
++
+--
+type: keyword
 
 --
 

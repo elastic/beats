@@ -73,6 +73,7 @@ func (g *guessDeref) Provides() []string {
 func (g *guessDeref) Requires() []string {
 	return []string{
 		"SYS_UNAME",
+		"SYS_P1",
 	}
 }
 
@@ -85,7 +86,7 @@ func (g *guessDeref) Probes() ([]helper.ProbeDef, error) {
 				Type:      tracing.TypeKProbe,
 				Name:      "guess_null_ptr_deref",
 				Address:   "{{.SYS_UNAME}}",
-				Fetchargs: helper.MakeMemoryDump("{{.P1}}", 0, credDumpBytes),
+				Fetchargs: helper.MakeMemoryDump("{{.SYS_P1}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},

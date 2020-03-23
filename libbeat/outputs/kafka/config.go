@@ -26,8 +26,10 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -38,6 +40,7 @@ import (
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
 	TLS                *tlscommon.Config         `config:"ssl"`
+	Kerberos           *kerberos.Config          `config:"kerberos"`
 	Timeout            time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata           metaConfig                `config:"metadata"`
 	Key                *fmtstr.EventFormatString `config:"key"`
@@ -83,6 +86,7 @@ func defaultConfig() kafkaConfig {
 	return kafkaConfig{
 		Hosts:              nil,
 		TLS:                nil,
+		Kerberos:           nil,
 		Timeout:            30 * time.Second,
 		BulkMaxSize:        2048,
 		BulkFlushFrequency: 0,
@@ -168,6 +172,19 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Kerberos != nil {
+		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
+			AuthType:           int(config.Kerberos.AuthType),
+			KeyTabPath:         config.Kerberos.KeyTabPath,
+			KerberosConfigPath: config.Kerberos.ConfigPath,
+			ServiceName:        config.Kerberos.ServiceName,
+			Username:           config.Kerberos.Username,
+			Password:           config.Kerberos.Password,
+			Realm:              config.Kerberos.Realm,
+		}
 	}
 
 	if config.Username != "" {

@@ -29,16 +29,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
-var (
-	makefileDeps = []string{
-		"dev-tools",
-		"libbeat",
-		"licenses",
-		"metricbeat",
-		"script",
-	}
-)
-
 func InitModule() error {
 	err := gotool.Mod.Init()
 	if err != nil {
@@ -109,24 +99,35 @@ func copyReplacedModules() error {
 func CopyVendor() error {
 	err := gotool.Mod.Vendor()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error while running go mod vendor")
 	}
 
-	path, err := gotool.ListModuleCacheDir("github.com/elastic/beats/v7")
+	err = devtools.CopyFilesToVendor(
+		"./vendor",
+		[]devtools.CopyModule{
+			devtools.CopyModule{
+				Name: "github.com/elastic/beats/v7",
+				FilesToCopy: []string{
+					"dev-tools",
+					"libbeat",
+					"licenses",
+					"metricbeat",
+					"script",
+					".go-version",
+				},
+			},
+			devtools.CopyModule{
+				Name: "github.com/tsg/go-daemon",
+				FilesToCopy: []string{
+					"src",
+				},
+			},
+		},
+	)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "error while copying required files to vendor")
 	}
 
-	vendorPath := "./vendor/github.com/elastic/beats/v7"
-	for _, d := range makefileDeps {
-		from := filepath.Join(path, d)
-		to := filepath.Join(vendorPath, d)
-		copyTask := &devtools.CopyTask{Source: from, Dest: to, Mode: 0640, DirMode: os.ModeDir | 0750}
-		err = copyTask.Execute()
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
