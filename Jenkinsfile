@@ -432,6 +432,9 @@ pipeline {
             stage('Functionbeat x-pack'){
               steps {
                 mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
+                withEnv(["GO_VERSION=1.13.1"]){
+                  makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
+                }
               }
             }
             stage('Functionbeat Mac OS X x-pack'){
