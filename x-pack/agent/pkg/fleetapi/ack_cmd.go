@@ -16,6 +16,17 @@ import (
 
 const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
 
+// AckEvent is an event sent in an ACK request.
+type AckEvent struct {
+	EventType string `json:"type"`              //  'STATE' | 'ERROR' | 'ACTION_RESULT' | 'ACTION'
+	SubType   string `json:"subtype"`           // 'RUNNING','STARTING','IN_PROGRESS','CONFIG','FAILED','STOPPING','STOPPED','DATA_DUMP','ACKNOWLEDGED','UNKNOWN';
+	Timestamp string `json:"timestamp"`         // : '2019-01-05T14:32:03.36764-05:00',
+	ActionID  string `json:"action_id"`         // : '48cebde1-c906-4893-b89f-595d943b72a2',
+	AgentID   string `json:"agent_id"`          // : 'agent1',
+	Message   string `json:"message,omitempty"` // : 'hello2',
+	Payload   string `json:"payload,omitempty"` // : 'payload2',
+}
+
 // AckRequest consists of multiple actions acked to fleet ui.
 // POST /agents/{agentId}/acks
 // Authorization: ApiKey {AgentAccessApiKey}
@@ -23,7 +34,7 @@ const ackPath = "/api/ingest_manager/fleet/agents/%s/acks"
 //   "action_ids": ["id1"]
 // }
 type AckRequest struct {
-	Actions []string `json:"action_ids"`
+	Events []AckEvent `json:"events"`
 }
 
 // Validate validates the enrollment request before sending it to the API.
