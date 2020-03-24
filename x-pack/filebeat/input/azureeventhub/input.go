@@ -42,6 +42,7 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
+	ackChannel   chan int
 }
 
 const (
@@ -66,14 +67,6 @@ func NewInput(
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "reading %s input config", inputName)
 	}
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
@@ -88,17 +81,24 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	input := &azureInput{
+	in := &azureInput{
 		config:       config,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
-		outlet:       out,
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 	}
-
-	input.log.Infof("Initialized %s input.", inputName)
-	return input, nil
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	in.outlet = out
+	in.log.Infof("Initialized %s input.", inputName)
+	return in, nil
 }
 
 // Run starts the input worker then returns. Only the first invocation
@@ -176,7 +176,7 @@ func (a *azureInput) Wait() {
 	a.Stop()
 }
 
-func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) error {
+func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
 	timestamp := time.Now()
 	azure := common.MapStr{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
@@ -195,12 +195,13 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) er
 				"message": msg,
 				"azure":   azure,
 			},
+			Private: event.Data,
 		})
 		if !ok {
-			return errors.New("event has not been sent")
+			return ok
 		}
 	}
-	return nil
+	return true
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
@@ -209,7 +210,6 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	err := json.Unmarshal(bMessage, &obj)
 	if err != nil {
 		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-		return []string{string(bMessage)}
 	}
 	var messages []string
 	if len(obj[expandEventListFromField]) > 0 {

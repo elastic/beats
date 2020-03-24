@@ -48,6 +48,7 @@ grouped in the following categories:
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-o365>>
 * <<exported-fields-okta>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
@@ -1155,6 +1156,48 @@ type: keyword
 
 --
 
+[float]
+=== session_issuer
+
+If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
+
+*`aws.cloudtrail.user_identity.session_issuer.type`*::
++
+--
+The source of the temporary security credentials, such as Root, IAMUser, or Role.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
++
+--
+The internal ID of the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.arn`*::
++
+--
+The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
++
+--
+The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
 *`aws.cloudtrail.error_code`*::
 +
 --
@@ -1311,6 +1354,46 @@ type: keyword
 Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
 
 type: keyword
+
+--
+
+[float]
+=== console_login
+
+Fields specific to ConsoleLogin events
+
+
+[float]
+=== additional_eventdata
+
+Additional Event Data for ConsoleLogin events
+
+
+
+*`aws.cloudtrail.console_login.additional_eventdata.mobile_version`*::
++
+--
+Identifies whether ConsoleLogin was from mobile version
+
+type: boolean
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.login_to`*::
++
+--
+URL for ConsoleLogin
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.mfa_used`*::
++
+--
+Identifies whether multi factor authentication was used during ConsoleLogin
+
+type: boolean
 
 --
 
@@ -22086,6 +22169,664 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-o365]]
+== Office 365 fields
+
+Module for handling logs from Office 365.
+
+
+
+[float]
+=== o365.audit
+
+Fields from Office 365 Management API audit logs.
+
+
+
+*`o365.audit.Actor`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.ActorContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorIpAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorYammerUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertEntityId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertLinks`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.AlertType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationDisplayName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AzureActiveDirectoryEventType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExchangeMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Category`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientAppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientInfoString`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIP`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIPAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Comments`*::
++
+--
+type: text
+
+--
+
+*`o365.audit.CorrelationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CreationTime`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CustomUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Data`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.DataType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventData`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventSource`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExceptionInfo.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExtendedProperties.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExternalAccess`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.GroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Id`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ImplicitShare`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IncidentId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InternalLogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InterSystemsId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IntraSystemId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Item.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Item.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ItemName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ItemType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListItemUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonError`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonUserSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerMasterAccountSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerUPN`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Members`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.Members.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ModifiedProperties.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Name`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ObjectId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Operation`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OriginatingServer`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Parameters.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.PolicyDetails`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.PolicyId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.RecordType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ResultStatus`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SensitiveInfoDetectionIsIncluded`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SharePointMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.SessionId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Severity`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Site`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SiteUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Source`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileExtension`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceRelativeUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Status`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SupportTicketId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Target`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.TargetContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UniqueSharingId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserAgent`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserKey`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Version`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.WebId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Workload`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.YammerNetworkId`*::
++
+--
+type: keyword
 
 --
 
