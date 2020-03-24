@@ -34,7 +34,9 @@
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Instance CPU Utilization"
+                        },
                         "gridData": {
                             "h": 16,
                             "i": "ea4c505b-43fb-4869-a94a-bba028071ecc",
@@ -44,10 +46,13 @@
                         },
                         "panelIndex": "ea4c505b-43fb-4869-a94a-bba028071ecc",
                         "panelRefName": "panel_1",
+                        "title": "Container Instance CPU Utilization",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Instance Memory Utilization"
+                        },
                         "gridData": {
                             "h": 16,
                             "i": "0899027b-629e-4889-821f-45ee0161bd91",
@@ -57,10 +62,13 @@
                         },
                         "panelIndex": "0899027b-629e-4889-821f-45ee0161bd91",
                         "panelRefName": "panel_2",
+                        "title": "Container Instance Memory Utilization",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Containers Filters"
+                        },
                         "gridData": {
                             "h": 11,
                             "i": "f72bd066-3696-4e0a-9660-78fb47c92152",
@@ -70,10 +78,13 @@
                         },
                         "panelIndex": "f72bd066-3696-4e0a-9660-78fb47c92152",
                         "panelRefName": "panel_3",
+                        "title": "Containers Filters",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Instance Netowrk Bytes Received/s"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "7c9016b9-a76e-41f6-9945-ac6880fd9ab0",
@@ -83,10 +94,13 @@
                         },
                         "panelIndex": "7c9016b9-a76e-41f6-9945-ac6880fd9ab0",
                         "panelRefName": "panel_4",
+                        "title": "Container Instance Netowrk Bytes Received/s",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Instance Network Bytes Transmitted/s"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "0abdf4ee-b569-430b-972a-a60160ef2221",
@@ -96,6 +110,7 @@
                         },
                         "panelIndex": "0abdf4ee-b569-430b-972a-a60160ef2221",
                         "panelRefName": "panel_5",
+                        "title": "Container Instance Network Bytes Transmitted/s",
                         "version": "7.6.0"
                     }
                 ],
@@ -140,8 +155,8 @@
                 }
             ],
             "type": "dashboard",
-            "updated_at": "2020-03-23T19:04:27.603Z",
-            "version": "WzY0NTMsNV0="
+            "updated_at": "2020-03-24T13:44:34.832Z",
+            "version": "WzY1MzIsN10="
         },
         {
             "attributes": {

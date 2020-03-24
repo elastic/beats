@@ -34,7 +34,9 @@
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Registry Successful Pull Count"
+                        },
                         "gridData": {
                             "h": 16,
                             "i": "dde974c7-6d81-4580-9b7f-c7a999ecc19e",
@@ -44,10 +46,13 @@
                         },
                         "panelIndex": "dde974c7-6d81-4580-9b7f-c7a999ecc19e",
                         "panelRefName": "panel_1",
+                        "title": "Container Registry Successful Pull Count",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Registry Successful Push Count"
+                        },
                         "gridData": {
                             "h": 16,
                             "i": "25a02616-f735-494a-97f7-4a56531e9e5e",
@@ -57,10 +62,13 @@
                         },
                         "panelIndex": "25a02616-f735-494a-97f7-4a56531e9e5e",
                         "panelRefName": "panel_2",
+                        "title": "Container Registry Successful Push Count",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Containers Filters"
+                        },
                         "gridData": {
                             "h": 11,
                             "i": "ec183a66-545b-4a67-bfb4-568def660612",
@@ -70,10 +78,13 @@
                         },
                         "panelIndex": "ec183a66-545b-4a67-bfb4-568def660612",
                         "panelRefName": "panel_3",
+                        "title": "Containers Filters",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Registry Total Pull Count"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "7f508c43-afd7-4874-86ef-c6976700759b",
@@ -83,10 +94,13 @@
                         },
                         "panelIndex": "7f508c43-afd7-4874-86ef-c6976700759b",
                         "panelRefName": "panel_4",
+                        "title": "Container Registry Total Pull Count",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Registry Total Push Count"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "97a048da-9b56-420b-af8c-1f0d568f0f94",
@@ -96,6 +110,7 @@
                         },
                         "panelIndex": "97a048da-9b56-420b-af8c-1f0d568f0f94",
                         "panelRefName": "panel_5",
+                        "title": "Container Registry Total Push Count",
                         "version": "7.6.0"
                     }
                 ],
@@ -140,8 +155,8 @@
                 }
             ],
             "type": "dashboard",
-            "updated_at": "2020-03-23T19:01:29.505Z",
-            "version": "WzY0NDMsNV0="
+            "updated_at": "2020-03-24T13:49:52.134Z",
+            "version": "WzY1NDUsN10="
         },
         {
             "attributes": {

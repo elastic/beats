@@ -34,7 +34,9 @@
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Service Kube Node Status Allocatable Memory"
+                        },
                         "gridData": {
                             "h": 17,
                             "i": "c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
@@ -44,10 +46,13 @@
                         },
                         "panelIndex": "c35d3d89-2f34-43a0-b346-85ba0e7c9e89",
                         "panelRefName": "panel_1",
+                        "title": "Container Service Kube Node Status Allocatable Memory",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Service Kube Node Status Allocatable CPU Cores"
+                        },
                         "gridData": {
                             "h": 17,
                             "i": "e1952edf-ed31-49ee-8db1-24370998ab89",
@@ -57,10 +62,13 @@
                         },
                         "panelIndex": "e1952edf-ed31-49ee-8db1-24370998ab89",
                         "panelRefName": "panel_2",
+                        "title": "Container Service Kube Node Status Allocatable CPU Cores",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Filters"
+                        },
                         "gridData": {
                             "h": 12,
                             "i": "ec183a66-545b-4a67-bfb4-568def660612",
@@ -70,10 +78,13 @@
                         },
                         "panelIndex": "ec183a66-545b-4a67-bfb4-568def660612",
                         "panelRefName": "panel_3",
+                        "title": "Container Filters",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Service Kube Pod Status Phase"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "ada37452-619f-470a-b9cd-bafa20e7d7b1",
@@ -83,10 +94,13 @@
                         },
                         "panelIndex": "ada37452-619f-470a-b9cd-bafa20e7d7b1",
                         "panelRefName": "panel_4",
+                        "title": "Container Service Kube Pod Status Phase",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Service Kube Pod Status Ready"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
@@ -96,10 +110,13 @@
                         },
                         "panelIndex": "c8d3ed1a-6e72-4115-9a69-db1919a36fc4",
                         "panelRefName": "panel_5",
+                        "title": "Container Service Kube Pod Status Ready",
                         "version": "7.6.0"
                     },
                     {
-                        "embeddableConfig": {},
+                        "embeddableConfig": {
+                            "title": "Container Service Kube Node Status Condition"
+                        },
                         "gridData": {
                             "h": 15,
                             "i": "707fb714-99af-4484-a56e-bfecdf592c58",
@@ -109,6 +126,7 @@
                         },
                         "panelIndex": "707fb714-99af-4484-a56e-bfecdf592c58",
                         "panelRefName": "panel_6",
+                        "title": "Container Service Kube Node Status Condition",
                         "version": "7.6.0"
                     }
                 ],
@@ -158,8 +176,8 @@
                 }
             ],
             "type": "dashboard",
-            "updated_at": "2020-03-23T18:57:22.323Z",
-            "version": "WzY0MjEsNV0="
+            "updated_at": "2020-03-24T13:52:52.325Z",
+            "version": "WzY1NTAsN10="
         },
         {
             "attributes": {
