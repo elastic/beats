@@ -58,10 +58,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
-|<<metricbeat-module-cloudfoundry,cloudfoundry>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> experimental[]  
-|<<metricbeat-metricset-cloudfoundry-counter,counter>> experimental[]  
-|<<metricbeat-metricset-cloudfoundry-value,value>> experimental[]  
+|<<metricbeat-module-cloudfoundry,cloudfoundry>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> beta[]  
+|<<metricbeat-metricset-cloudfoundry-counter,counter>> beta[]  
+|<<metricbeat-metricset-cloudfoundry-value,value>> beta[]  
 |<<metricbeat-module-cockroachdb,CockroachDB>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  

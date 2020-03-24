@@ -2,7 +2,7 @@
   title: "cloudfoundry"
   description: >
     Cloud Foundry module
-  release: experimental
+  release: beta
   fields:
     - name: cloudfoundry
       type: group
