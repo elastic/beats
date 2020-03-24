@@ -54,6 +54,7 @@ func unpack(r io.Reader, dir string) error {
 	}
 
 	tr := tar.NewReader(zr)
+	var rootDir string
 
 	for {
 		f, err := tr.Next()
@@ -69,6 +70,11 @@ func unpack(r io.Reader, dir string) error {
 		}
 		rel := filepath.FromSlash(f.Name)
 		abs := filepath.Join(dir, rel)
+
+		// find the root dir
+		if currentDir := filepath.Dir(abs); rootDir == "" || len(filepath.Dir(rootDir)) > len(currentDir) {
+			rootDir = currentDir
+		}
 
 		fi := f.FileInfo()
 		mode := fi.Mode()

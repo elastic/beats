@@ -191,17 +191,16 @@ jobs:
       stage: test
 
     # Generators
-    # https://github.com/elastic/beats/issues/16951
-    #- os: linux
-    #  before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat || travis_terminate 0
-    #  env: TARGETS="-C generator/_templates/metricbeat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
-    #- os: linux
-    #  before_install: .ci/scripts/travis_has_changes.sh generator libbeat || travis_terminate 0
-    #  env: TARGETS="-C generator/_templates/beat test test-package"
-    #  go: $TRAVIS_GO_VERSION
-    #  stage: test
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C generator/_templates/metricbeat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh generator libbeat || travis_terminate 0
+      env: TARGETS="-C generator/_templates/beat test test-package"
+      go: $TRAVIS_GO_VERSION
+      stage: test
 
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh generator metricbeat libbeat || travis_terminate 0
