@@ -33,10 +33,15 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 }
@@ -44,7 +49,7 @@ func init() {
 // Aliases provides compatibility with CI while we transition all Beats
 // to having common testing targets.
 var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
+	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -182,29 +187,11 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
