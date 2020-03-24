@@ -49,7 +49,6 @@ func newPublishClient(
 	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
-		log:    logp.NewLogger(selector),
 		es:     es,
 		params: params,
 		format: format,
