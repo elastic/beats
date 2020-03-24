@@ -44,7 +44,7 @@ github.com/Azure/azure-amqp-common-go/v3/internal/tracing
 github.com/Azure/azure-amqp-common-go/v3/rpc
 github.com/Azure/azure-amqp-common-go/v3/sas
 github.com/Azure/azure-amqp-common-go/v3/uuid
-# github.com/Azure/azure-event-hubs-go/v3 v3.1.0
+# github.com/Azure/azure-event-hubs-go/v3 v3.1.2
 github.com/Azure/azure-event-hubs-go/v3
 github.com/Azure/azure-event-hubs-go/v3/atom
 github.com/Azure/azure-event-hubs-go/v3/eph
