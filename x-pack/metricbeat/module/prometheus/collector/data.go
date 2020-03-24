@@ -58,7 +58,7 @@ func (g *typedGenerator) Stop() {
 }
 
 // GeneratePromEvents stores all Prometheus metrics using
-// only double field type in Elasticsearch.
+// specific Elasticsearch data types.
 func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
