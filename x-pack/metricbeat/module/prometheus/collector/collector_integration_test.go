@@ -18,10 +18,11 @@ func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "prometheus")
 
 	config := map[string]interface{}{
-		"module":     "prometheus",
-		"metricsets": []string{"collector"},
-		"hosts":      []string{service.Host()},
-		"use_types":  true,
+		"module":        "prometheus",
+		"metricsets":    []string{"collector"},
+		"hosts":         []string{service.Host()},
+		"use_types":     true,
+		"rate_counters": true,
 	}
 	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	var err error
