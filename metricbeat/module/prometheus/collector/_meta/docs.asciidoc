@@ -43,7 +43,7 @@ metricbeat.modules:
 `use_types` paramater (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
 types, including https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html[histograms].
 
-`rate_counters` paramater (default: false) enables calculating a rate out of Prometheus counters. It will stored
+`rate_counters` paramater (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
 the counter increment since the last collection. This metric should make some aggregations easier and with better
 performance. This parameter can only be enabled in combination with `use_types`.
 
