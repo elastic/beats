@@ -10,6 +10,10 @@ class Test(XPackTest):
 
     COMPOSE_SERVICES = ['oracle']
 
+    def get_hosts(self):
+        return [self.compose_host(port='1521/tcp')+'/ORCLPDB1.localdomain']
+
+    @metricbeat.tag('oracle')
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_performance(self):
         """
@@ -20,6 +24,8 @@ class Test(XPackTest):
             "metricsets": ["performance"],
             "hosts": self.get_hosts(),
             "period": "5s",
+            "username":"sys"
+            "password":"Oradoc_db1"
         }])
         proc = self.start_beat(home=self.beat_path)
         self.wait_until(lambda: self.output_lines() > 0)
@@ -32,6 +38,7 @@ class Test(XPackTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
 
+    @metricbeat.tag('oracle')
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_tablespace(self):
         """
@@ -42,6 +49,8 @@ class Test(XPackTest):
             "metricsets": ["tablespace"],
             "hosts": self.get_hosts(),
             "period": "5s",
+            "username":"sys"
+            "password":"Oradoc_db1"
         }])
         proc = self.start_beat(home=self.beat_path)
         self.wait_until(lambda: self.output_lines() > 0)
