@@ -2,10 +2,6 @@ version: '2.3'
 
 services:
   prometheus:
-    image: docker.elastic.co/integrations-ci/beats-prometheus:${PROMETHEUS_VERSION:-2.6.0}-2
-    build:
-      context: ./_meta
-      args:
-        PROMETHEUS_VERSION: ${PROMETHEUS_VERSION:-2.6.0}
-    ports:
-      - 9090
+    extends:
+      file: ../../../../metricbeat/module/prometheus/docker-compose.yml
+      service: prometheus
