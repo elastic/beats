@@ -140,6 +140,11 @@ jobs:
       env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/functionbeat libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/functionbeat test-gcp-functions"
+      go: 1.13.1
+      stage: test
 
     # Docker Log Driver
     - os: linux
