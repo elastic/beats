@@ -40,6 +40,7 @@ func TestEvaluation(t *testing.T) {
 
 			// cleanup
 			os.Remove("fleet.yml")
+			os.Remove("fleet.yml.old")
 		})
 	}
 }

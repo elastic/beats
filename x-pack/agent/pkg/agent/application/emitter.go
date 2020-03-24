@@ -15,7 +15,7 @@ import (
 )
 
 type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
-type filterFunc = func(*transpiler.AST) error
+type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
 type configModifiers struct {
 	Filters    []filterFunc
@@ -40,8 +40,7 @@ func emitter(log *logger.Logger, router *router, modifiers *configModifiers) emi
 		}
 
 		for _, filter := range modifiers.Filters {
-			if err := filter(ast); err != nil {
-				log.Errorf("filtering by constraints failed: %v", err)
+			if err := filter(log, ast); err != nil {
 				return errors.New(err, "failed to filter configuration", errors.TypeConfig)
 			}
 		}

@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 )
@@ -48,7 +49,7 @@ var (
 )
 
 // ConstraintFilter filters ast based on included constraints.
-func ConstraintFilter(ast *transpiler.AST) error {
+func ConstraintFilter(log *logger.Logger, ast *transpiler.AST) error {
 	// get datasources
 	dsNode, found := transpiler.Lookup(ast, datasourcesKey)
 	if !found {
@@ -69,7 +70,7 @@ func ConstraintFilter(ast *transpiler.AST) error {
 	i := 0
 	originalLen := len(dsList)
 	for i < len(dsList) {
-		constraintMatch, err := evaluateConstraints(dsList[i])
+		constraintMatch, err := evaluateConstraints(log, dsList[i])
 		if err != nil {
 			return err
 		}
@@ -94,7 +95,7 @@ func ConstraintFilter(ast *transpiler.AST) error {
 	return transpiler.Insert(ast, newList, datasourcesKey)
 }
 
-func evaluateConstraints(datasourceNode transpiler.Node) (bool, error) {
+func evaluateConstraints(log *logger.Logger, datasourceNode transpiler.Node) (bool, error) {
 	constraintsNode, found := datasourceNode.Find(constraintsKey)
 	if !found {
 		return true, nil
@@ -116,7 +117,13 @@ func evaluateConstraints(datasourceNode transpiler.Node) (bool, error) {
 			return false, errors.New("constraints is not a string")
 		}
 
-		if isOK, err := evaluateConstraint(strval.String()); !isOK || err != nil {
+		constraint := strval.String()
+		if isOK, err := evaluateConstraint(constraint); !isOK || err != nil {
+			if err == nil {
+				// log only constraint not matching
+				log.Infof("constraint '%s' not matching for datasource: %v", constraint, datasourceNode.String())
+			}
+
 			return false, err
 		}
 	}
@@ -183,8 +190,7 @@ func regValidateVersion(args []interface{}) (interface{}, error) {
 		return false, errors.New(fmt.Sprintf("version '%s' is invalid", version))
 	}
 
-	isOK, m := c.Validate(v)
-	fmt.Println(m)
+	isOK, _ := c.Validate(v)
 	return isOK, nil
 }
 
