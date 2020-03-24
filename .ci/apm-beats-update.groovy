@@ -79,7 +79,7 @@ pipeline {
             sh(label: 'Update Beats script', script: """
               export BEATS_VERSION=${env.GIT_BASE_COMMIT}
               git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
-              script/jenkins/update-beats.sh
+              make update-beats
             """)
           }
         }
