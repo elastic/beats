@@ -11,6 +11,7 @@ pipeline {
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
     HOME = "${env.WORKSPACE}"
     GOPATH = "${env.WORKSPACE}"
+    SHELL = "/bin/bash"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -76,11 +77,15 @@ pipeline {
           dir("${BASE_DIR}"){
             git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
               url:  "git@github.com:elastic/${REPO}.git")
-            sh(label: 'Update Beats script', script: """
-              export BEATS_VERSION=${env.GIT_BASE_COMMIT}
-              git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
-              make update-beats
-            """)
+          }
+          golang(){
+            dir("${BASE_DIR}"){
+              sh(label: 'Update Beats script', script: """
+                export BEATS_VERSION=${env.GIT_BASE_COMMIT}
+                git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
+                make update-beats
+              """)
+            }
           }
         }
       }
@@ -98,4 +103,11 @@ pipeline {
   //     notifyBuildResult()
   //   }
   // }
+}
+
+def golang(Closure body){
+  //def goVersion = readFile(file: '.go-version')?.trim()
+  docker.image("golang:1.13.8").inside(){
+    body()
+  }
 }
