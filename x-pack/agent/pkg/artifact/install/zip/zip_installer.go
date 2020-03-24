@@ -5,11 +5,11 @@
 package zip
 
 import (
+	"archive/zip"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
@@ -35,37 +35,72 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
 func (i *Installer) Install(programName, version, installDir string) error {
-	if err := i.unzip(programName, version, installDir); err != nil {
-		return err
-	}
-
-	oldPath := filepath.Join(installDir, fmt.Sprintf("%s-%s-windows", programName, version))
-	newPath := filepath.Join(installDir, strings.Title(programName))
-	if err := os.Rename(oldPath, newPath); err != nil {
-		return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, newPath))
-	}
-
-	return i.runInstall(programName, installDir)
-}
-
-func (i *Installer) unzip(programName, version, installPath string) error {
 	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
 	}
 
+	if err := i.unzip(artifactPath, programName, version); err != nil {
+		return err
+	}
+
+	rootDir, err := i.getRootDir(artifactPath)
+	if err != nil {
+		return err
+	}
+
+	// if root directory is not the same as desired directory rename
+	// e.g contains `-windows-` or  `-SNAPSHOT-`
+	if rootDir != installDir {
+		if err := os.Rename(rootDir, installDir); err != nil {
+			return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
+		}
+	}
+
+	return i.runInstall(programName, version, installDir)
+}
+
+func (i *Installer) unzip(artifactPath, programName, version string) error {
 	if _, err := os.Stat(artifactPath); err != nil {
 		return errors.New(fmt.Sprintf("artifact for '%s' version '%s' could not be found at '%s'", programName, version, artifactPath), errors.TypeFilesystem, errors.M(errors.MetaKeyPath, artifactPath))
 	}
 
-	powershellArg := fmt.Sprintf("Expand-Archive -Path \"%s\" -DestinationPath \"%s\"", artifactPath, installPath)
+	powershellArg := fmt.Sprintf("Expand-Archive -LiteralPath \"%s\" -DestinationPath \"%s\"", artifactPath, i.config.InstallPath)
 	installCmd := exec.Command("powershell", "-command", powershellArg)
 	return installCmd.Run()
 }
 
-func (i *Installer) runInstall(programName, installPath string) error {
+func (i *Installer) runInstall(programName, version, installPath string) error {
 	powershellCmd := fmt.Sprintf(powershellCmdTemplate, installPath, programName)
-
 	installCmd := exec.Command("powershell", "-command", powershellCmd)
+
 	return installCmd.Run()
+}
+
+// retrieves root directory from zip archive
+func (i *Installer) getRootDir(zipPath string) (dir string, err error) {
+	defer func() {
+		if dir != "" {
+			dir = filepath.Join(i.config.InstallPath, dir)
+		}
+	}()
+
+	zipReader, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return "", err
+	}
+	defer zipReader.Close()
+
+	var rootDir string
+	for _, f := range zipReader.File {
+		if filepath.Base(f.Name) == filepath.Dir(f.Name) {
+			return f.Name, nil
+		}
+
+		if currentDir := filepath.Dir(f.Name); rootDir == "" || len(currentDir) < len(rootDir) {
+			rootDir = currentDir
+		}
+	}
+
+	return rootDir, nil
 }
