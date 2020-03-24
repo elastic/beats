@@ -27,8 +27,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch/estest"
 )
 
 const sampleJob = `
@@ -104,7 +105,7 @@ const sampleDatafeed = `
 func TestImportJobs(t *testing.T) {
 	logp.TestingSetup()
 
-	client := estest.GetTestingElasticsearch(t)
+	client := getTestingElasticsearch(t)
 
 	haveXpack, err := HaveXpackML(client)
 	assert.NoError(t, err)
@@ -193,4 +194,25 @@ func TestImportJobs(t *testing.T) {
 	// importing again should not error out
 	err = ImportMachineLearningJob(client, &mlconfig)
 	assert.NoError(t, err)
+}
+
+func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:     eslegtest.GetURL(),
+		Timeout: 0,
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
 }

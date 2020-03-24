@@ -209,7 +209,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	}
 
 	esConfig := b.Config.Output.Config()
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	esClient, err := eslegclient.NewConnectedClient(esConfig)
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
@@ -271,7 +271,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	return errs.Err()
 }
 
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client) error {
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
 	}
