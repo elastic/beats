@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -454,6 +455,7 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
+	l, _ := logger.New()
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -466,7 +468,7 @@ func TestConfiguration(t *testing.T) {
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
 
-			filters.ConstraintFilter(ast)
+			filters.ConstraintFilter(l, ast)
 
 			programs, err := Programs(ast)
 			if test.err {
