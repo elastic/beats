@@ -200,8 +200,13 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = io.MultiWriter(output, os.Stdout)
-	goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	goTest.Stdout = output
+	goTest.Stderr = output
+
+	if mg.Verbose() {
+		goTest.Stdout = io.MultiWriter(output, os.Stdout)
+		goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	}
 
 	// Execute 'go test' and measure duration.
 	start := time.Now()

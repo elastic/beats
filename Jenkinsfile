@@ -25,6 +25,7 @@ pipeline {
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
+    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
   }
   stages {
@@ -77,7 +78,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat x-pack Linux", "-C x-pack/filebeat testsuite")
+            mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
           }
         }
         stage('Filebeat Mac OS X'){
@@ -86,7 +87,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false"
+              return env.BUILD_FILEBEAT != "false" && params.macosTest
             }
           }
           steps {
@@ -103,8 +104,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "-d filebeat goUnitTest")
-            //mageTargetWin("Filebeat oss Windows Integration test", "-d filebeat goIntegTest")
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "unitTest")
           }
         }
         stage('Heartbeat'){
@@ -125,6 +125,12 @@ pipeline {
             stage('Heartbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
               steps {
                 makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
               }
@@ -139,7 +145,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "-d heartbeat goTestUnit")
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "unitTest")
               }
             }
           }
@@ -167,6 +173,12 @@ pipeline {
             stage('Auditbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
               steps {
                 makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
               }
@@ -181,8 +193,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Auditbeat Windows Unit test", "-d auditbeat goUnitTest")
-                //mageTargetWin("Auditbeat Windows Integration test", "-d auditbeat goIntegTest")
+                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "unitTest")
               }
             }
           }
@@ -197,7 +208,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Auditbeat x-pack Linux", "-C x-pack/auditbeat testsuite")
+            mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
           }
         }
         stage('Libbeat'){
@@ -289,7 +300,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat x-pack Linux", "-C x-pack/metricbeat testsuite")
+            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "update build test")
           }
         }
         stage('Metricbeat crosscompile'){
@@ -311,7 +322,7 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false"
+              return env.BUILD_METRICBEAT != "false" && params.macosTest
             }
           }
           steps {
@@ -328,8 +339,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "-d metricbeat goUnitTest")
-            //mageTargetWin("Metricbeat Windows Integration test", "-d metricbeat goIntegTest")
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "unitTest")
           }
         }
         stage('Packetbeat'){
@@ -361,7 +371,7 @@ pipeline {
           stages {
             stage('Dockerlogbeat'){
               steps {
-                makeTarget("Elastic Log Plugin unit tests", "-C x-pack/dockerlogbeat testsuite")
+                mageTarget("Elastic Docker Logging Driver Plugin unit tests", "x-pack/dockerlogbeat", "update build test")
               }
             }
           }
@@ -391,7 +401,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "-d winlogbeat goUnitTest")
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "unitTest")
               }
             }
           }
@@ -406,7 +416,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "-d x-pack/winlogbeat  update:fields goUnitTest")
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "unitTest")
           }
         }
         stage('Functionbeat'){
@@ -421,14 +431,20 @@ pipeline {
           stages {
             stage('Functionbeat x-pack'){
               steps {
-                makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat testsuite")
+                mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
               }
             }
             stage('Functionbeat Mac OS X x-pack'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
               steps {
-                makeTarget("Functionbeat x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite")
+                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "update build test")
               }
             }
             stage('Functionbeat Windows'){
@@ -441,7 +457,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "-d x-pack/functionbeat goUnitTest")
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "unitTest")
               }
             }
           }
@@ -488,6 +504,12 @@ pipeline {
             stage('Generators Metricbeat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
               steps {
                 makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
               }
@@ -495,6 +517,12 @@ pipeline {
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
               options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.macosTest
+                }
+              }
               steps {
                 makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
               }
@@ -530,82 +558,108 @@ pipeline {
   }
 }
 
-def makeTarget(context, target, clean = true){
-  whenTrue(params.debug){
-    dumpFilteredEnvironment()
-    dumpMage()
-  }
+def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(){
-      sh(label: "Make ${target}", script: """
-        eval "\$(gvm use ${GO_VERSION} --format=bash)"
-        make ${target}
-      """)
-      if(clean) {
+    withBeatsEnv(true) {
+      whenTrue(params.debug) {
+        dumpFilteredEnvironment()
+        dumpMage()
+      }
+      sh(label: "Make ${target}", script: "make ${target}")
+      if (clean) {
         sh(script: 'script/fix_permissions.sh ${HOME}')
       }
     }
   }
 }
 
-def mageTargetWin(context, target){
-  whenTrue(params.debug){
-    dumpFilteredEnvironment()
-    withBeatsEnvWin(){
-      dumpMage()
-    }
-  }
+def mageTarget(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin(){
-      bat(label: "Mage ${target}", script: """
-        set
-        mage ${target}
-      """)
+    withBeatsEnv(true) {
+      whenTrue(params.debug) {
+        dumpFilteredEnvironment()
+        dumpMage()
+      }
+
+      def verboseFlag = params.debug ? "-v" : ""
+      dir(directory) {
+        sh(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+      }
     }
   }
 }
 
-def withBeatsEnv(Closure body){
+def mageTargetWin(String context, String directory, String target) {
+  withGithubNotify(context: "${context}") {
+    withBeatsEnvWin() {
+      whenTrue(params.debug) {
+        dumpFilteredEnvironment()
+        dumpMageWin()
+      }
+
+      def verboseFlag = params.debug ? "-v" : ""
+      dir(directory) {
+        bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+      }
+    }
+  }
+}
+
+def withBeatsEnv(boolean archive, Closure body) {
+  def os = goos()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+
   withEnv([
     "HOME=${env.WORKSPACE}",
     "GOPATH=${env.WORKSPACE}",
-    "PATH+GO=${env.WORKSPACE}/bin:${env.PATH}",
-    "MAGEFILE_CACHE=${WORKSPACE}\\.magefile",
+    "GOROOT=${goRoot}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+    "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
     "TEST_TAGS=oracle",
     "DOCKER_PULL=0",
-  ]){
+  ]) {
     deleteDir()
     unstash 'source'
-    dir("${BASE_DIR}"){
+    dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
+      sh(label: "Install Mage", script: "make mage")
       try {
         body()
       } finally {
+        if (archive) {
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
+          }
+        }
         reportCoverage()
       }
     }
   }
 }
 
-def withBeatsEnvWin(Closure body){
+def withBeatsEnvWin(Closure body) {
+  final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
+  final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
+
   withEnv([
-    "HOME=${WORKSPACE}",
-    "GOPATH=${WORKSPACE}",
-    "PATH+GO=${WORKSPACE}\\bin;${goRoot}\\bin;C:\\ProgramData\\chocolatey\\bin",
-    "MAGEFILE_CACHE=${WORKSPACE}\\.magefile",
+    "HOME=${env.WORKSPACE}",
+    "GOPATH=${env.WORKSPACE}",
     "GOROOT=${goRoot}",
+    "PATH=${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};${env.PATH}",
+    "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
   ]){
     deleteDir()
     unstash 'source'
-    dir("${BASE_DIR}"){
-      bat(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
+    dir("${env.BASE_DIR}"){
+      bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
       try {
         body()
       } finally {
@@ -618,14 +672,37 @@ def withBeatsEnvWin(Closure body){
   }
 }
 
+def goos(){
+  def labels = env.NODE_LABELS
+
+  if (labels.contains('linux')) {
+    return 'linux'
+  } else if (labels.contains('windows')) {
+    return 'windows'
+  } else if (labels.contains('darwin')) {
+    return 'darwin'
+  }
+
+  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
+}
+
 def dumpMage(){
   echo "### MAGE DUMP ###"
   sh(label: "Dump mage variables", script: "mage dumpVariables")
   echo "### END MAGE DUMP ###"
 }
 
+def dumpMageWin(){
+  echo "### MAGE DUMP ###"
+  bat(label: "Dump mage variables", script: "mage dumpVariables")
+  echo "### END MAGE DUMP ###"
+}
+
 def dumpFilteredEnvironment(){
   echo "### ENV DUMP ###"
+  echo "PATH: ${env.PATH}"
+  echo "HOME: ${env.HOME}"
+  echo "USERPROFILE: ${env.USERPROFILE}"
   echo "BUILD_DIR: ${env.BUILD_DIR}"
   echo "COVERAGE_DIR: ${env.COVERAGE_DIR}"
   echo "BEATS: ${env.BEATS}"
@@ -679,7 +756,7 @@ def k8sTest(versions){
     stage("k8s ${v}"){
       withEnv(["K8S_VERSION=${v}"]){
         withGithubNotify(context: "K8s ${v}") {
-          withBeatsEnv(){
+          withBeatsEnv(false) {
             sh(label: "Install k8s", script: """
               eval "\$(gvm use ${GO_VERSION} --format=bash)"
               .ci/scripts/kind-setup.sh
@@ -695,8 +772,6 @@ def k8sTest(versions){
 
 def reportCoverage(){
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/TEST-*.xml")
-    archiveArtifacts(allowEmptyArchive: true, artifacts: '**/TEST-*.out')
     retry(2){
       sh(label: 'Report to Codecov', script: '''
         curl -sSLo codecov https://codecov.io/bash
