@@ -124,6 +124,12 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	switch service {
 	case googlecloud.ServicePubsub, googlecloud.ServiceLoadBalancing:
 		return
+	case googlecloud.ServiceStorage:
+		if r.config.Region == "" {
+			return
+		}
+
+		f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
 	default:
 		if r.config.Region != "" && r.config.Zone != "" {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
