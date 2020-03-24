@@ -185,7 +185,7 @@ func BuildPkgForFunctions() error {
 	return nil
 }
 
-// TestGCPFunctions are used by Travis to test if the GCP functions can be built with
+// TestGCPFunctions are used by the CI to test if the GCP functions can be built with
 // the selected Go version.
 // The version is 1.13.1 (Ref: https://cloud.google.com/functions/docs/concepts/go-runtime)
 func TestGCPFunctions() error {
