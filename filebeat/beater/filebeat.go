@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
@@ -38,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
