@@ -167,7 +167,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 
 			// Accumulate metrics in the event
-			eventList[labelsHash].Update(promEvent.Data)
+			eventList[labelsHash].DeepUpdate(promEvent.Data)
 		}
 	}
 

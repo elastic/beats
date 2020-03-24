@@ -64,7 +64,9 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Event: []PromEvent{
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
 					Labels: labels,
 				},
@@ -86,7 +88,9 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Event: []PromEvent{
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
 					Labels: common.MapStr{},
 				},
@@ -115,14 +119,18 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Event: []PromEvent{
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds_count": uint64(10),
-						"http_request_duration_microseconds_sum":   float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_count": uint64(10),
+							"http_request_duration_microseconds_sum":   float64(10),
+						},
 					},
 					Labels: common.MapStr{},
 				},
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
 					Labels: common.MapStr{
 						"quantile": "0.99",
@@ -153,14 +161,18 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Event: []PromEvent{
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds_count": uint64(10),
-						"http_request_duration_microseconds_sum":   float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_count": uint64(10),
+							"http_request_duration_microseconds_sum":   float64(10),
+						},
 					},
 					Labels: common.MapStr{},
 				},
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds_bucket": uint64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds_bucket": uint64(10),
+						},
 					},
 					Labels: common.MapStr{"le": "0.99"},
 				},
@@ -188,7 +200,9 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Event: []PromEvent{
 				{
 					Data: common.MapStr{
-						"http_request_duration_microseconds": float64(10),
+						"metrics": common.MapStr{
+							"http_request_duration_microseconds": float64(10),
+						},
 					},
 					Labels: labels,
 				},
