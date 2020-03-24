@@ -343,6 +343,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
 - Add Storage metricsets to GCP module {pull}15598[15598]
+- Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 
 *Packetbeat*
 
