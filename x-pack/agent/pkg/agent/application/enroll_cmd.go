@@ -161,7 +161,7 @@ func (c *EnrollCmd) Execute() error {
 			errors.TypeNetwork)
 	}
 
-	fleetConfig, err := createFleetConfigFromEnroll(&APIAccess{
+	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.ID, &APIAccess{
 		AccessAPIKey: resp.Item.AccessAPIKey,
 		Kibana:       c.kibanaConfig,
 	})

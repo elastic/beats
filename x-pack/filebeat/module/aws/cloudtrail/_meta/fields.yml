@@ -51,6 +51,33 @@
           description: >-
             The name of the AWS service that made the request, such as
             Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
+        - name: session_issuer
+          type: group
+          description: >-
+            If the request was made with temporary security
+            credentials, an element that provides information about
+            how the credentials were obtained.
+          fields:
+            - name: type
+              type: keyword
+              description: >-
+                The source of the temporary security credentials, such
+                as Root, IAMUser, or Role.
+            - name: principal_id
+              type: keyword
+              description: >-
+                The internal ID of the entity that was used to get
+                credentials.
+            - name: arn
+              type: keyword
+              description: >-
+                The ARN of the source (account, IAM user, or role)
+                that was used to get temporary security credentials.
+            - name: account_id
+              type: keyword
+              description: >-
+                The account that owns the entity that was used to get
+                credentials.
     - name: error_code
       type: keyword
       description: >-
@@ -133,3 +160,26 @@
       description: >-
         Identifies the VPC endpoint in which requests were made from a
         VPC to another AWS service, such as Amazon S3.
+    - name: console_login
+      type: group
+      description: >-
+        Fields specific to ConsoleLogin events
+      fields:
+        - name: additional_eventdata
+          type: group
+          description: >
+            Additional Event Data for ConsoleLogin events
+          fields:
+            - name: mobile_version
+              type: boolean
+              description: >-
+                Identifies whether ConsoleLogin was from mobile version
+            - name: login_to
+              type: keyword
+              description: >-
+                URL for ConsoleLogin
+            - name: mfa_used
+              type: boolean
+              description: >-
+                Identifies whether multi factor authentication was
+                used during ConsoleLogin
