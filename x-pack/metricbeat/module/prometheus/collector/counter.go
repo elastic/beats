@@ -21,7 +21,7 @@ type CounterCache interface {
 	// Stop the cache cleanup worker. It mus be called when the cache is disposed
 	Stop()
 
-	// RateUUint64 returns, for a given counter name, the difference between the given value
+	// RateUint64 returns, for a given counter name, the difference between the given value
 	// and the value that was given in a previous call. It will return 0 on the first call
 	RateUint64(counterName string, value uint64) uint64
 
