@@ -24,7 +24,7 @@ class Test(XPackTest):
             "metricsets": ["performance"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "username":"sys"
+            "username":"sys",
             "password":"Oradoc_db1"
         }])
         proc = self.start_beat(home=self.beat_path)
@@ -49,7 +49,7 @@ class Test(XPackTest):
             "metricsets": ["tablespace"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "username":"sys"
+            "username":"sys",
             "password":"Oradoc_db1"
         }])
         proc = self.start_beat(home=self.beat_path)
