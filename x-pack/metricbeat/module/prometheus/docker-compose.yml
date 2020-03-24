@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   prometheus:
-    #image: docker.elastic.co/integrations-ci/beats-prometheus:${PROMETHEUS_VERSION:-2.6.0}-2
+    image: docker.elastic.co/integrations-ci/beats-prometheus:${PROMETHEUS_VERSION:-2.6.0}-2
     build:
       context: ./_meta
       args:
