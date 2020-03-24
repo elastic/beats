@@ -66,6 +66,7 @@ grouped in the following categories:
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-prometheus>>
+* <<exported-fields-prometheus-xpack>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
@@ -31638,6 +31639,53 @@ query metricset
 
 remote write metrics from Prometheus server
 
+
+[[exported-fields-prometheus-xpack]]
+== Prometheus typed metrics fields
+
+Stats scraped from a Prometheus endpoint.
+
+
+
+*`prometheus.*.value`*::
++
+--
+Prometheus gauge metric
+
+
+type: object
+
+--
+
+*`prometheus.*.counter`*::
++
+--
+Prometheus counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.rate`*::
++
+--
+Prometheus rated counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.histogram`*::
++
+--
+Prometheus histogram metric - release: ga
+
+
+type: object
+
+--
 
 [[exported-fields-rabbitmq]]
 == RabbitMQ fields
