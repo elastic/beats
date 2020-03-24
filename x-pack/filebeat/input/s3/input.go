@@ -428,6 +428,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
+	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
+		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
+		p.logger.Error(err)
+		return err
+	}
+
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(reader)
@@ -440,7 +447,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 		return nil
 	}
 
-	// Check content-type
+	// Check content-type = "application/x-gzip" or filename ends with ".gz"
 	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
