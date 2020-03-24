@@ -6,6 +6,7 @@ package azureeventhub
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -48,8 +49,15 @@ func (a *azureInput) runWithEPH() error {
 	// register a message handler -- many can be registered
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
+			var onEventErr error
 			// partitionID is not yet mapped in the azure-eventhub sdk
-			return a.processEvents(e, "")
+			ok := a.processEvents(e, "")
+			if !ok {
+				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
+				a.log.Debug(onEventErr.Error())
+				a.Stop()
+			}
+			return onEventErr
 		})
 	if err != nil {
 		return err

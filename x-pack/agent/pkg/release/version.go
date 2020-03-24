@@ -4,7 +4,10 @@
 
 package release
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 // version is the current version of the agent.
 var version = "8.0.0"
@@ -18,7 +21,10 @@ var buildTime = "<unknown>"
 // qualifier returns the version qualifier like alpha1.
 var qualifier = ""
 
-// Commit returns the current build hash or unkown if it was not injected in the build process.
+// snapshot is a flag marking build as a snapshot.
+var snapshot = ""
+
+// Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return commit
 }
@@ -38,4 +44,10 @@ func Version() string {
 		return version
 	}
 	return version + "-" + qualifier
+}
+
+// Snapshot returns true if binary was built as snapshot.
+func Snapshot() bool {
+	val, err := strconv.ParseBool(snapshot)
+	return err == nil && val
 }

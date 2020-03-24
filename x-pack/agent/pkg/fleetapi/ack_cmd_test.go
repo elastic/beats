@@ -32,7 +32,7 @@ func TestAck(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				responses := struct {
-					ActionIDs []string `json:"action_ids"`
+					Events []AckEvent `json:"events"`
 				}{}
 
 				decoder := json.NewDecoder(r.Body)
@@ -41,9 +41,9 @@ func TestAck(t *testing.T) {
 				err := decoder.Decode(&responses)
 				require.NoError(t, err)
 
-				require.Equal(t, 1, len(responses.ActionIDs))
+				require.Equal(t, 1, len(responses.Events))
 
-				id := responses.ActionIDs[0]
+				id := responses.Events[0].ActionID
 				require.Equal(t, "my-id", id)
 
 				fmt.Fprintf(w, raw)
@@ -62,8 +62,12 @@ func TestAck(t *testing.T) {
 			cmd := NewAckCmd(&agentinfo{}, client)
 
 			request := AckRequest{
-				Actions: []string{
-					action.ID(),
+				Events: []AckEvent{
+					AckEvent{
+						EventType: "ACTION_RESULT",
+						SubType:   "ACKNOWLEDGED",
+						ActionID:  action.ID(),
+					},
 				},
 			}
 

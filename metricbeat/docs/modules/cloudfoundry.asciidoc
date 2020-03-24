@@ -6,7 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == cloudfoundry module
 
-experimental[]
+beta[]
 
 This is the cloudfoundry module.
 
