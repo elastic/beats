@@ -20,7 +20,7 @@ import (
 
 func TestAcker(t *testing.T) {
 	type ackRequest struct {
-		Actions []string `json:"action_ids"`
+		Events []fleetapi.AckEvent `json:"events"`
 	}
 
 	log, _ := logger.New()
@@ -45,8 +45,8 @@ func TestAcker(t *testing.T) {
 		err = json.Unmarshal(content, &cr)
 		assert.NoError(t, err)
 
-		assert.EqualValues(t, 1, len(cr.Actions))
-		assert.EqualValues(t, testID, cr.Actions[0])
+		assert.EqualValues(t, 1, len(cr.Events))
+		assert.EqualValues(t, testID, cr.Events[0].ActionID)
 
 		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 		return resp, nil
