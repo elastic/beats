@@ -192,6 +192,14 @@ func TestDefaultMetricSet(t *testing.T) {
 	assert.Contains(t, names, metricSetName)
 }
 
+func TestMustReplaceMetricSet(t *testing.T) {
+	registry := NewRegister()
+	err := registry.addMetricSet(moduleName, metricSetName, fakeMetricSetFactory, MustReplace())
+	if assert.Error(t, err) {
+		assert.Equal(t, "metricset 'mymodule/mymetricset' should be replacing an existing metricset, none found", err.Error())
+	}
+}
+
 func TestMetricSetQuery(t *testing.T) {
 	registry := NewRegister()
 	err := registry.AddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)

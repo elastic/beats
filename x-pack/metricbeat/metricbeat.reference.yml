@@ -1004,6 +1004,28 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
+#----------------------- Prometheus Typed Metrics Module -----------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  #use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  #rate_counters: true
 #------------------------------ Prometheus Module ------------------------------
 # Metrics collected from a Prometheus endpoint
 - module: prometheus
