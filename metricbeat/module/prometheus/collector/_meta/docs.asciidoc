@@ -47,7 +47,7 @@ types, including https://www.elastic.co/guide/en/elasticsearch/reference/current
 the counter increment since the last collection. This metric should make some aggregations easier and with better
 performance. This parameter can only be enabled in combination with `use_types`.
 
-When `use_types` and `rate_counters` are enabled, metrics will be stored like this:
+When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 
 [source,json]
 ----
