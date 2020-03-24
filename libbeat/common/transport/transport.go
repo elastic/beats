@@ -32,8 +32,6 @@ type DialerFunc func(network, address string) (net.Conn, error)
 
 var (
 	ErrNotConnected = errors.New("client is not connected")
-
-	debugf = logp.MakeDebug("transport")
 )
 
 func (d DialerFunc) Dial(network, address string) (net.Conn, error) {
@@ -51,7 +49,7 @@ func Dial(c Config, network, address string) (net.Conn, error) {
 func MakeDialer(c Config) (Dialer, error) {
 	var err error
 	dialer := NetDialer(c.Timeout)
-	dialer, err = ProxyDialer(c.Proxy, dialer)
+	dialer, err = ProxyDialer(logp.NewLogger(logSelector), c.Proxy, dialer)
 	if err != nil {
 		return nil, err
 	}
