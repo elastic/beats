@@ -4,7 +4,7 @@
 outputs:
   default:
     type: elasticsearch
-    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    hosts: [127.0.0.1:9200]
     username: elastic
     password: changeme
 
