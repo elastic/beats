@@ -153,8 +153,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				eventList[labelsHash] = common.MapStr{}
 
 				// Add default instance label if not already there
-				if exists, _ := promEvent.Labels.HasKey("instance"); !exists {
-					promEvent.Labels.Put("instance", m.Host())
+				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
+					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
 				}
 				// Add default job label if not already there
 				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
