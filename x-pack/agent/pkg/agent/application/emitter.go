@@ -41,6 +41,7 @@ func emitter(log *logger.Logger, router *router, modifiers *configModifiers) emi
 
 		for _, filter := range modifiers.Filters {
 			if err := filter(ast); err != nil {
+				log.Errorf("filtering by constraints failed: %v", err)
 				return errors.New(err, "failed to filter configuration", errors.TypeConfig)
 			}
 		}
