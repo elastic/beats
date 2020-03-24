@@ -55,7 +55,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - TLS: The behavior of send_certificates and include_raw_certificates options has changed. {pull}15497[15497]
 - Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 - Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
-- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873] 
 
 *Winlogbeat*
 
@@ -341,6 +340,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
+- Add Storage metricsets to GCP module {pull}15598[15598]
 
 *Packetbeat*
 
