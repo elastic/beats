@@ -24,14 +24,27 @@ const (
 	validateVersionFuncName = "validate_version"
 )
 
+// List of variables available to be used in constraint definitions.
 const (
-	agentIDKey      = "agent.id"
+	// `agent.id` is a generated (in standalone) or assigned (in fleet) agent identifier.
+	agentIDKey = "agent.id"
+	// `agent.version` specifies current version of an agent.
 	agentVersionKey = "agent.version"
-	hostArchKey     = "host.architecture"
-	osFamilyKey     = "os.family"
-	osKernelKey     = "os.kernel"
-	osPlatformKey   = "os.platform"
-	osVersionKey    = "os.version"
+	// `host.architecture` defines architecture of a host (e.g. x86_64, arm, ppc, mips).
+	hostArchKey = "host.architecture"
+	// `os.family` defines a family of underlying operating system (e.g. redhat, debian, freebsd, windows).
+	osFamilyKey = "os.family"
+	// `os.kernel` specifies current version of a kernel in a semver format.
+	osKernelKey = "os.kernel"
+	// `os.platform` specifies platform agent is running on (e.g. centos, ubuntu, windows).
+	osPlatformKey = "os.platform"
+	// `os.version` specifies version of underlying operating system (e.g. 10.12.6).
+	osVersionKey = "os.version"
+)
+
+var (
+	boolexpVarStore    *constraintVarStore
+	boolexpMethodsRegs *boolexp.MethodsReg
 )
 
 // ConstraintFilter filters ast based on included constraints.
@@ -112,21 +125,37 @@ func evaluateConstraints(datasourceNode transpiler.Node) (bool, error) {
 }
 
 func evaluateConstraint(constraint string) (bool, error) {
-	regs := boolexp.NewMethodsReg()
-	if err := regs.Register(validateVersionFuncName, regValidateVersion); err != nil {
-		return false, err
-	}
-
-	store, err := newVarStore()
+	store, regs, err := boolexpMachinery()
 	if err != nil {
 		return false, err
 	}
 
-	if err := initVarStore(store); err != nil {
-		return false, err
+	return boolexp.Eval(constraint, regs, store)
+}
+
+func boolexpMachinery() (*constraintVarStore, *boolexp.MethodsReg, error) {
+	if boolexpMethodsRegs != nil && boolexpVarStore != nil {
+		return boolexpVarStore, boolexpMethodsRegs, nil
 	}
 
-	return boolexp.Eval(constraint, regs, store)
+	regs := boolexp.NewMethodsReg()
+	if err := regs.Register(validateVersionFuncName, regValidateVersion); err != nil {
+		return nil, nil, err
+	}
+
+	store, err := newVarStore()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if err := initVarStore(store); err != nil {
+		return nil, nil, err
+	}
+
+	boolexpMethodsRegs = regs
+	boolexpVarStore = store
+
+	return boolexpVarStore, boolexpMethodsRegs, nil
 }
 
 func regValidateVersion(args []interface{}) (interface{}, error) {
