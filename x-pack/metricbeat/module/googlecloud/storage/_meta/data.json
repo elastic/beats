@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2020-01-15T19:50:00.000Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "ecs": {
+        "version": "1.4.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "ephemeral_id": "b925f861-f858-4aa8-8075-99fc8e86e736",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+        "version": "8.0.0"
+    },
+    "metricset": {
+        "name": "storage",
+        "period": 300000
+    },
+    "googlecloud": {
+        "labels": {
+            "metrics": {
+                "storage_class": "REGIONAL"
+            },
+            "resource": {
+                "location": "us-central1",
+                "bucket_name": "test-elastic-metricbeat"
+            }
+        },
+        "storage": {
+            "storage": {
+                "object_count": 1
+            }
+        }
+    },
+    "service": {
+        "type": "googlecloud"
+    },
+    "cloud": {
+        "account": {
+            "id": "elastic-metricbeat"
+        },
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.storage",
+        "module": "googlecloud",
+        "duration": 818254385
+    }
+}
