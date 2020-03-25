@@ -9,3 +9,6 @@ ES_BEATS?=../../
 #
 include $(ES_BEATS)/dev-tools/make/xpack.mk
 
+.PHONY: test-gcp-functions
+test-gcp-functions: mage
+	mage testGCPFunctions
