@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
 - Fix panics that could result from invalid TLS certificates. This can affect Beats that connect over TLS, or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
@@ -75,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 - system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
+- system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 
 *Filebeat*
 
@@ -97,6 +99,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 - Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
 - Re-obtain AWS credentials if they expired in s3 input. {pull}17205[17205]
+- Fix `elasticsearch.gc` fileset to not collect _all_ logs when Elasticsearch is running in Docker. {issue}13164[13164] {issue}16583[16583] {pull}17164[17164]
+- Fixed a mapping exception when ingesting CEF logs that used the spriv or dpriv extensions. {issue}17216[17216] {pull}17220[17220]
 
 *Heartbeat*
 
@@ -155,7 +159,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
 - Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
 - Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
+- Add capability of enrich `container.id` with process id in `add_process_metadata` processor {pull}15947[15947]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
+- Update supported versions of `redis` output. {pull}17198[17198]
 
 *Auditbeat*
 
@@ -170,6 +176,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ingress nginx controller fileset {pull}16197[16197]
 - move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
+- Work on e2e ACK's for the azure-eventhub input {issue}15671[15671] {pull}16215[16215]
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Add a TLS test and more debug output to httpjson input {pull}16315[16315]
@@ -199,6 +206,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
 - Add pattern for Cisco ASA / FTD Message 734001 {issue}16212[16212] {pull}16612[16612]
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
+- Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 
 *Heartbeat*
 
@@ -257,7 +265,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 - Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
+- Add dashboards for the azure container metricsets. {pull}17194[17194]
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
+- Use Elasticsearch histogram type to store Prometheus histograms {pull}17061[17061]
+- Allow to rate Prometheus counters when scraping them {pull}17061[17061]
+- Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
+- Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
+- Add Storage metricsets to GCP module {pull}15598[15598]
 
 *Packetbeat*
 

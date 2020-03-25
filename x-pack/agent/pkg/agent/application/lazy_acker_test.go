@@ -21,7 +21,7 @@ import (
 
 func TestLazyAcker(t *testing.T) {
 	type ackRequest struct {
-		Actions []string `json:"action_ids"`
+		Events []fleetapi.AckEvent `json:"events"`
 	}
 
 	log, _ := logger.New()
@@ -52,16 +52,16 @@ func TestLazyAcker(t *testing.T) {
 		err = json.Unmarshal(content, &cr)
 		assert.NoError(t, err)
 
-		if len(cr.Actions) == 0 {
+		if len(cr.Events) == 0 {
 			t.Fatal("expected events but got none")
 		}
-		if cr.Actions[0] == testID1 {
-			assert.EqualValues(t, 2, len(cr.Actions))
-			assert.EqualValues(t, testID1, cr.Actions[0])
-			assert.EqualValues(t, testID2, cr.Actions[1])
+		if cr.Events[0].ActionID == testID1 {
+			assert.EqualValues(t, 2, len(cr.Events))
+			assert.EqualValues(t, testID1, cr.Events[0].ActionID)
+			assert.EqualValues(t, testID2, cr.Events[1].ActionID)
 
 		} else {
-			assert.EqualValues(t, 1, len(cr.Actions))
+			assert.EqualValues(t, 1, len(cr.Events))
 		}
 
 		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
