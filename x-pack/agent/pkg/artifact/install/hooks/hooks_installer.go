@@ -46,7 +46,7 @@ func (i *Installer) Install(programName, version, installDir string) error {
 		}
 
 		if spec.PostInstallSteps != nil {
-			return spec.PostInstallSteps.Apply(installDir)
+			return spec.PostInstallSteps.Execute(installDir)
 		}
 
 		// only one spec for type

@@ -18,15 +18,16 @@ type StepList struct {
 	Steps []Step
 }
 
+// Step is an execution step which needs to be run.
 type Step interface {
-	Apply(rootDir string) error
+	Execute(rootDir string) error
 }
 
-// Apply applies a list of steps.
-func (r *StepList) Apply(rootDir string) error {
+// Execute executes a list of steps.
+func (r *StepList) Execute(rootDir string) error {
 	var err error
 	for _, step := range r.Steps {
-		err = step.Apply(rootDir)
+		err = step.Execute(rootDir)
 		if err != nil {
 			return err
 		}
@@ -120,8 +121,8 @@ type DeleteFileStep struct {
 	FailOnMissing bool
 }
 
-// Apply applies delete file step.
-func (r *DeleteFileStep) Apply(rootDir string) error {
+// Execute executes delete file step.
+func (r *DeleteFileStep) Execute(rootDir string) error {
 	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
 	err := os.Remove(path)
 
@@ -154,8 +155,8 @@ type MoveFileStep struct {
 	FailOnMissing bool `yaml:"fail_on_missing" config:"fail_on_missing"`
 }
 
-// Apply applies delete file step.
-func (r *MoveFileStep) Apply(rootDir string) error {
+// Execute executes move file step.
+func (r *MoveFileStep) Execute(rootDir string) error {
 	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
 	target := filepath.Join(rootDir, filepath.FromSlash(r.Target))
 
