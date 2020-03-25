@@ -147,7 +147,7 @@ func DeleteFile(path string, failOnMissing bool) *DeleteFileStep {
 	}
 }
 
-// MoveFileStep removes a file from disk.
+// MoveFileStep moves a file to a new location.
 type MoveFileStep struct {
 	Path   string
 	Target string
