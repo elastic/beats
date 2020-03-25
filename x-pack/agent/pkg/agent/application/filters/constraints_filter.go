@@ -121,7 +121,7 @@ func evaluateConstraints(log *logger.Logger, datasourceNode transpiler.Node) (bo
 		if isOK, err := evaluateConstraint(constraint); !isOK || err != nil {
 			if err == nil {
 				// log only constraint not matching
-				log.Infof("constraint '%s' not matching for datasource: %v", constraint, datasourceNode.String())
+				log.Infof("constraint '%s' not matching for datasource '%s'", constraint, datasourceIdentifier(datasourceNode))
 			}
 
 			return false, err
@@ -129,6 +129,41 @@ func evaluateConstraints(log *logger.Logger, datasourceNode transpiler.Node) (bo
 	}
 
 	return true, nil
+}
+
+func datasourceIdentifier(datasourceNode transpiler.Node) string {
+	namespace := "default"
+	output := "default"
+
+	if nsNode, found := datasourceNode.Find("namespace"); found {
+		nsKey, ok := nsNode.(*transpiler.Key)
+		if ok {
+			if valNode, ok := nsKey.Value().(transpiler.Node); ok {
+				namespace = valNode.String()
+			}
+		}
+	}
+
+	if outNode, found := datasourceNode.Find("use_output"); found {
+		nsKey, ok := outNode.(*transpiler.Key)
+		if ok {
+			if valNode, ok := nsKey.Value().(transpiler.Node); ok {
+				output = valNode.String()
+			}
+		}
+	}
+
+	ID := "unknown"
+	if idNode, found := datasourceNode.Find("id"); found {
+		nsKey, ok := idNode.(*transpiler.Key)
+		if ok {
+			if valNode, ok := nsKey.Value().(transpiler.Node); ok {
+				ID = valNode.String()
+			}
+		}
+	}
+
+	return fmt.Sprintf("namespace:%s, output:%s, id:%s", namespace, output, ID)
 }
 
 func evaluateConstraint(constraint string) (bool, error) {
