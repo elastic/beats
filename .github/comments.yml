@@ -2,4 +2,4 @@
 comments:
   - label: needs_team
     comment: |
-      This issue doesn't have an `Team:<team>` label.
+      This issue doesn't have a `Team:<team>` label.
