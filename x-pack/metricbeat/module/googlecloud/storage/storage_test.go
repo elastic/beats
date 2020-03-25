@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package stackdriver
+package storage
 
 import (
 	"os"
@@ -10,8 +10,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	// Register input module and metricset
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
 )
 
 func init() {
