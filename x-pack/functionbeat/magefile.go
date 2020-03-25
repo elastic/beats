@@ -183,6 +183,29 @@ func BuildPkgForFunctions() error {
 	return nil
 }
 
+// TestGCPFunctions are used by the CI to test if the GCP functions can be built with
+// the selected Go version.
+// The version is 1.13.1 (Ref: https://cloud.google.com/functions/docs/concepts/go-runtime)
+func TestGCPFunctions() error {
+	for _, f := range []string{"pubsub", "storage"} {
+		params := devtools.DefaultBuildArgs()
+		inputFiles := filepath.Join("provider", "gcp", f, f+".go")
+		params.InputFiles = []string{inputFiles}
+		params.Name = f
+		params.CGO = false
+		params.Env = map[string]string{
+			"GOOS":   "linux",
+			"GOARCH": "amd64",
+		}
+
+		err := devtools.Build(params)
+		if err != nil {
+			return fmt.Errorf("error while building %s for GCP: %+v", f, err)
+		}
+	}
+	return nil
+}
+
 // BuildSystemTestBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
