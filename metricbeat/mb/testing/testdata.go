@@ -336,9 +336,22 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 					return nil
 				}
 			}
-			// If a field is defined as object it can also be defined as `status_codes.*`
-			// So this checks if such a key with the * exists by removing the last part.
+			// If a field is defined as object it can also have a * somewhere
+			// So this checks if such a key with the * exists by testing with it
 			splits := strings.Split(foundKey, ".")
+			found := false
+			for pos := 1; pos < len(splits)-1; pos++ {
+				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:len(splits)], ".")
+				if _, ok := knownKeys[key]; ok {
+					found = true
+					break
+				}
+			}
+			if found {
+				continue
+			}
+
+			// last case `status_codes.*`:
 			prefix := strings.Join(splits[0:len(splits)-1], ".")
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
