@@ -17,7 +17,7 @@
 
 // +build integration
 
-package elasticsearch
+package eslegclient
 
 import (
 	"fmt"
@@ -54,7 +54,7 @@ func TestBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Bulk(index, "type1", params, body)
+	_, _, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -87,7 +87,7 @@ func TestEmptyBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Bulk(index, "type1", params, body)
+	_, resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -155,7 +155,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Bulk(index, "type1", params, body)
+	_, resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s [%s]", err, resp)
 	}

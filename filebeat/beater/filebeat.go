@@ -22,30 +22,28 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/kibana"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
 	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
+	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/registrar"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
@@ -157,7 +155,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig)
 		if err != nil {
 			return err
 		}
@@ -191,7 +189,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 
 	// register pipeline loading to happen every time a new ES connection is
 	// established
-	callback := func(esClient *elasticsearch.Client) error {
+	callback := func(esClient *eslegclient.Connection) error {
 		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	_, err := elasticsearch.RegisterConnectCallback(callback)
@@ -211,7 +209,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	}
 
 	esConfig := b.Config.Output.Config()
-	esClient, err := elasticsearch.NewConnectedClient(esConfig)
+	esClient, err := eslegclient.NewConnectedClient(esConfig)
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
@@ -273,7 +271,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	return errs.Err()
 }
 
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client) error {
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
 	}
@@ -457,7 +455,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig)
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}

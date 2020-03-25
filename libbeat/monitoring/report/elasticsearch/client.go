@@ -26,9 +26,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
-	esout "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -36,22 +36,24 @@ import (
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
-	log    *logp.Logger
-	es     *esout.Client
+	es     *eslegclient.Connection
 	params map[string]string
 	format report.Format
+
+	log *logp.Logger
 }
 
 func newPublishClient(
-	es *esout.Client,
+	es *eslegclient.Connection,
 	params map[string]string,
 	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
-		log:    logp.NewLogger(selector),
 		es:     es,
 		params: params,
 		format: format,
+
+		log: logp.NewLogger(logSelector),
 	}
 	return p, nil
 }
@@ -161,7 +163,7 @@ func (c *publishClient) Test(d testing.Driver) {
 }
 
 func (c *publishClient) String() string {
-	return "publish(" + c.es.String() + ")"
+	return "monitoring(" + c.es.URL + ")"
 }
 
 func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
@@ -231,8 +233,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	// FIXME: index name (first param below)
-	result, err := c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	_, result, err := c.es.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
 		return err
 	}
@@ -247,25 +248,38 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result esout.BulkResult, events []report.Event) {
-	reader := esout.NewJSONReader(result)
-	err := esout.BulkReadToItems(reader)
-	if err != nil {
-		log.Errorf("failed to parse monitoring bulk items: %+v", err)
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+	var response struct {
+		Items []map[string]map[string]interface{} `json:"items"`
+	}
+
+	if err := json.Unmarshal(result, &response); err != nil {
+		log.Errorf("failed to parse monitoring bulk items: %v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := esout.BulkReadItemStatus(log, reader)
-		if err != nil {
-			log.Errorf("failed to parse monitoring bulk item status: %+v", err)
-			return
-		}
-		switch {
-		case status < 300, status == http.StatusConflict:
-			continue
-		default:
-			log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		for _, innerItem := range response.Items[i] {
+			var status int
+			if s, exists := innerItem["status"]; exists {
+				if v, ok := s.(int); ok {
+					status = v
+				}
+			}
+
+			var errorMsg string
+			if e, exists := innerItem["error"]; exists {
+				if v, ok := e.(string); ok {
+					errorMsg = v
+				}
+			}
+
+			switch {
+			case status < 300, status == http.StatusConflict:
+				continue
+			default:
+				log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, errorMsg)
+			}
 		}
 	}
 }

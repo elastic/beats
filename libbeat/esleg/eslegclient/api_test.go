@@ -16,17 +16,15 @@
 // under the License.
 
 // Need for unit and integration tests
-package elasticsearch
+package eslegclient
 
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 func GetValidQueryResult() QueryResult {
@@ -172,23 +170,19 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestClient(url string) *Client {
-	client, err := NewClient(ClientSettings{
-		URL:              url,
-		Index:            outil.MakeSelector(),
-		Timeout:          60 * time.Second,
-		CompressionLevel: 3,
-	}, nil)
-	if err != nil {
-		panic(err)
-	}
-	return client
+func newTestConnection(url string) *Connection {
+	conn, _ := NewConnection(ConnectionSettings{
+		URL:     url,
+		Timeout: 0,
+	})
+	conn.Encoder = NewJSONEncoder(nil, false)
+	return conn
 }
 
 func (r QueryResult) String() string {
 	out, err := json.Marshal(r)
 	if err != nil {
-		logp.NewLogger(logSelector).Warnf("failed to marshal QueryResult (%+v): %#v", err, r)
+		logp.L().Warnf("failed to marshal QueryResult (%+v): %#v", err, r)
 		return "ERROR"
 	}
 	return string(out)
