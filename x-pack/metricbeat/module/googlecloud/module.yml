@@ -3,3 +3,4 @@ metricsets:
 - compute
 - pubsub
 - loadbalancing
+- storage
