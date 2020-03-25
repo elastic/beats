@@ -46,6 +46,8 @@ const (
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
+
+	elasticBeatsModulePath = "github.com/elastic/beats/v7"
 )
 
 // Common settings with defaults derived from files, CWD, and environment.
@@ -284,7 +286,7 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-	return listModuleDir("github.com/elastic/beats/v7")
+	return listModuleDir(elasticBeatsModulePath)
 }
 
 var (
