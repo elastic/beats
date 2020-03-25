@@ -126,6 +126,7 @@ func New(
 		maxLines:     maxLines,
 		separator:    []byte(separator),
 		message:      reader.Message{},
+		logger:       logp.NewLogger("reader_multiline"),
 	}
 	return mlr, nil
 }

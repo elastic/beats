@@ -17,7 +17,10 @@ import (
 
 const (
 	packagePermissions = 0660
-	beatsSubfolder     = "beats"
+)
+
+var (
+	defaultDropSubdir = filepath.Join("data", "downloads")
 )
 
 // Downloader is a downloader able to fetch artifacts from elastic.co web page.
@@ -83,13 +86,13 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 func getDropPath(cfg *artifact.Config) string {
 	// if drop path is not provided fallback to beats subfolder
 	if cfg == nil || cfg.DropPath == "" {
-		return beatsSubfolder
+		return defaultDropSubdir
 	}
 
 	// if droppath does not exist fallback to beats subfolder
 	stat, err := os.Stat(cfg.DropPath)
 	if err != nil || !stat.IsDir() {
-		return beatsSubfolder
+		return defaultDropSubdir
 	}
 
 	return cfg.DropPath

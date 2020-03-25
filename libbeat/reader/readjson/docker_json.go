@@ -66,6 +66,7 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
+		logger:   logp.NewLogger("reader_docker_json"),
 	}
 
 	switch strings.ToLower(format) {

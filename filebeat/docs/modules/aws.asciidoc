@@ -33,7 +33,25 @@ Example config:
 [source,yaml]
 ----
 - module: aws
-  s3access:
+  cloudtrail:
+    enabled: false
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
+
+  cloudwatch:
+    enabled: false
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
+
+  ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -44,48 +62,31 @@ Example config:
 
   elb:
     enabled: false
-
-    # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
 
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    # var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    # var.credential_profile_name: fb-aws
+  s3access:
+    enabled: false
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
 
   vpcflow:
     enabled: false
-
-    # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+    #var.credential_profile_name: fb-aws
+    #var.visibility_timeout: 300s
+    #var.api_timeout: 120s
+    #var.endpoint: amazonaws.com
 
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    # var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    # var.credential_profile_name: fb-aws
-
-  cloudtrail:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    # var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    # var.credential_profile_name: fb-aws
 ----
 
 *`var.queue_url`*::
@@ -121,6 +122,22 @@ delivers those events as log files to a specific Amazon S3 bucket.
 The `cloudtrail` fileset does not read the CloudTrail Digest files
 that are delivered to the S3 bucket when Log File Integrity is turned
 on, it only reads the CloudTrail logs.
+
+[float]
+=== cloudwatch fileset
+
+Users can use Amazon CloudWatch Logs to monitor, store, and access log files
+from different sources. Export logs from log groups to an Amazon S3 bucket which
+has SQS notification setup already. This fileset will parse these logs into
+`timestamp` and `message` field.
+
+[float]
+=== ec2 fileset
+
+This fileset is specifically for EC2 logs stored in AWS CloudWatch. Export logs
+from log groups to Amazon S3 bucket which has SQS notification setup already.
+With this fileset, EC2 logs will be parsed into fields like  `ip`
+and `program_name`. For logs from other services, please use `cloudwatch` fileset.
 
 [float]
 === elb fileset

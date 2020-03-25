@@ -32,7 +32,7 @@ func TestAck(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				responses := struct {
-					ActionIDs []string `json:"action_ids"`
+					Events []AckEvent `json:"events"`
 				}{}
 
 				decoder := json.NewDecoder(r.Body)
@@ -41,9 +41,9 @@ func TestAck(t *testing.T) {
 				err := decoder.Decode(&responses)
 				require.NoError(t, err)
 
-				require.Equal(t, 1, len(responses.ActionIDs))
+				require.Equal(t, 1, len(responses.Events))
 
-				id := responses.ActionIDs[0]
+				id := responses.Events[0].ActionID
 				require.Equal(t, "my-id", id)
 
 				fmt.Fprintf(w, raw)
@@ -51,19 +51,23 @@ func TestAck(t *testing.T) {
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			action := &ActionPolicyChange{
+			action := &ActionConfigChange{
 				ActionID:   "my-id",
-				ActionType: "POLICY_CHANGE",
-				Policy: map[string]interface{}{
-					"id": "policy_id",
+				ActionType: "CONFIG_CHANGE",
+				Config: map[string]interface{}{
+					"id": "config_id",
 				},
 			}
 
 			cmd := NewAckCmd(&agentinfo{}, client)
 
 			request := AckRequest{
-				Actions: []string{
-					action.ID(),
+				Events: []AckEvent{
+					AckEvent{
+						EventType: "ACTION_RESULT",
+						SubType:   "ACKNOWLEDGED",
+						ActionID:  action.ID(),
+					},
 				},
 			}
 

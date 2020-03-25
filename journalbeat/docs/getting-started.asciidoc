@@ -1,5 +1,9 @@
 [id="{beatname_lc}-getting-started"]
-== Getting started with {beatname_uc}
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 

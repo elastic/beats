@@ -428,6 +428,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
+	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
+		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
+		p.logger.Error(err)
+		return err
+	}
+
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(reader)
@@ -440,7 +447,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 		return nil
 	}
 
-	// Check content-type
+	// Check content-type = "application/x-gzip" or filename ends with ".gz"
 	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
@@ -587,33 +594,34 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
-	f := common.MapStr{
-		"message": log,
-		"log": common.MapStr{
-			"offset":    int64(offset),
-			"file.path": constructObjectURL(info),
-		},
-		"aws": common.MapStr{
-			"s3": common.MapStr{
-				"bucket": common.MapStr{
-					"name": info.name,
-					"arn":  info.arn},
-				"object.key": info.key,
+	s3Ctx.Inc()
+
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": log,
+			"log": common.MapStr{
+				"offset":    int64(offset),
+				"file.path": constructObjectURL(info),
+			},
+			"aws": common.MapStr{
+				"s3": common.MapStr{
+					"bucket": common.MapStr{
+						"name": info.name,
+						"arn":  info.arn},
+					"object.key": info.key,
+				},
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   info.region,
 			},
 		},
-		"cloud": common.MapStr{
-			"provider": "aws",
-			"region":   info.region,
-		},
+		Private: s3Ctx,
 	}
+	event.SetID(objectHash + "-" + fmt.Sprintf("%012d", offset))
 
-	s3Ctx.Inc()
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields:    f,
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Ctx,
-	}
+	return event
 }
 
 func constructObjectURL(info s3Info) string {

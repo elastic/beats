@@ -1,5 +1,9 @@
 [id="{beatname_lc}-getting-started"]
-== Getting started with {beatname_uc}
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
 
 {beatname_uc} helps you monitor your servers and the services they host by
 collecting metrics from the operating system and services.
