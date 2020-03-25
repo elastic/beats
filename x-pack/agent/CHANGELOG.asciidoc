@@ -13,6 +13,7 @@
 ==== Bugfixes
 
 - Fixed tests on windows {pull}16922[16922]
+- Fixed installers for SNAPSHOTs and windows {pull}17077[17077]
 
 ==== New features
 

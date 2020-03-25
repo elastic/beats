@@ -7,12 +7,15 @@ package application
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/scheduler"
 )
+
+const fleetTimeFormat = "2006-01-02T15:04:05.99999-07:00"
 
 type actionAcker struct {
 	log        *logger.Logger
@@ -38,16 +41,17 @@ func newActionAcker(
 
 func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
+	agentID := f.agentInfo.AgentID()
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
-		Actions: []string{
-			action.ID(),
+		Events: []fleetapi.AckEvent{
+			constructEvent(action, agentID),
 		},
 	}
 
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("acknowledge action '%s' failed", action.ID()), errors.TypeNetwork)
+		return errors.New(err, fmt.Sprintf("acknowledge action '%s' for agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
 	}
 
 	return nil
@@ -55,19 +59,20 @@ func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 
 func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
 	// checkin
-	ids := make([]string, 0, len(actions))
+	agentID := f.agentInfo.AgentID()
+	events := make([]fleetapi.AckEvent, 0, len(actions))
 	for _, action := range actions {
-		ids = append(ids, action.ID())
+		events = append(events, constructEvent(action, agentID))
 	}
 
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
 	req := &fleetapi.AckRequest{
-		Actions: ids,
+		Events: events,
 	}
 
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' failed", len(actions), actions), errors.TypeNetwork)
+		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' for agent '%s' failed", len(actions), actions, agentID), errors.TypeNetwork)
 	}
 
 	return nil
@@ -75,6 +80,17 @@ func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) e
 
 func (f *actionAcker) Commit(ctx context.Context) error {
 	return nil
+}
+
+func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
+	return fleetapi.AckEvent{
+		EventType: "ACTION_RESULT",
+		SubType:   "ACKNOWLEDGED",
+		Timestamp: time.Now().Format(fleetTimeFormat),
+		ActionID:  action.ID(),
+		AgentID:   agentID,
+		Message:   fmt.Sprintf("Action '%s' ot type '%s' acknowledged.", action.ID(), action.Type()),
+	}
 }
 
 type noopAcker struct{}
