@@ -6,7 +6,10 @@ package transpiler
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,14 +19,14 @@ type StepList struct {
 }
 
 type Step interface {
-	Apply() error
+	Apply(rootDir string) error
 }
 
 // Apply applies a list of steps.
-func (r *StepList) Apply() error {
+func (r *StepList) Apply(rootDir string) error {
 	var err error
-	for _, rule := range r.Steps {
-		err = rule.Apply()
+	for _, step := range r.Steps {
+		err = step.Apply(rootDir)
 		if err != nil {
 			return err
 		}
@@ -41,6 +44,8 @@ func (r *StepList) MarshalYAML() (interface{}, error) {
 		switch step.(type) {
 		case *DeleteFileStep:
 			name = "delete_file"
+		case *MoveFileStep:
+			name = "move_file"
 
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", step)
@@ -73,7 +78,8 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		if err != nil {
 			return err
 		}
-		return yaml.Unmarshal(b, out)
+		fmt.Println(string(b))
+		return errors.Wrap(yaml.Unmarshal(b, out), "ajaj")
 	}
 
 	var steps []Step
@@ -91,11 +97,13 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		switch name {
 		case "delete_file":
 			s = &DeleteFileStep{}
+		case "move_file":
+			s = &MoveFileStep{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
 
-		if err := unpack(fields, r); err != nil {
+		if err := unpack(fields, s); err != nil {
 			return err
 		}
 
@@ -113,7 +121,20 @@ type DeleteFileStep struct {
 }
 
 // Apply applies delete file step.
-func (r *DeleteFileStep) Apply() error {
+func (r *DeleteFileStep) Apply(rootDir string) error {
+	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
+	err := os.Remove(path)
+
+	if os.IsNotExist(err) && r.FailOnMissing {
+		// is not found and should be reported
+		return err
+	}
+
+	if err != nil && !os.IsNotExist(err) {
+		// report others
+		return err
+	}
+
 	return nil
 }
 
@@ -121,6 +142,43 @@ func (r *DeleteFileStep) Apply() error {
 func DeleteFile(path string, failOnMissing bool) *DeleteFileStep {
 	return &DeleteFileStep{
 		Path:          path,
+		FailOnMissing: failOnMissing,
+	}
+}
+
+// MoveFileStep removes a file from disk.
+type MoveFileStep struct {
+	Path   string
+	Target string
+	// FailOnMissing fails if file is already missing
+	FailOnMissing bool `yaml:"fail_on_missing" config:"fail_on_missing"`
+}
+
+// Apply applies delete file step.
+func (r *MoveFileStep) Apply(rootDir string) error {
+	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
+	target := filepath.Join(rootDir, filepath.FromSlash(r.Target))
+
+	err := os.Rename(path, target)
+
+	if os.IsNotExist(err) && r.FailOnMissing {
+		// is not found and should be reported
+		return err
+	}
+
+	if err != nil && !os.IsNotExist(err) {
+		// report others
+		return err
+	}
+
+	return nil
+}
+
+// MoveFile creates a MoveFileStep
+func MoveFile(path, target string, failOnMissing bool) *MoveFileStep {
+	return &MoveFileStep{
+		Path:          path,
+		Target:        target,
 		FailOnMissing: failOnMissing,
 	}
 }
