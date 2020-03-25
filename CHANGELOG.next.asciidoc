@@ -343,6 +343,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 - Add dashboards for the azure container metricsets. {pull}17194[17194]
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
+- Use Elasticsearch histogram type to store Prometheus histograms {pull}17061[17061]
+- Allow to rate Prometheus counters when scraping them {pull}17061[17061]
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
 - Add Storage metricsets to GCP module {pull}15598[15598]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]

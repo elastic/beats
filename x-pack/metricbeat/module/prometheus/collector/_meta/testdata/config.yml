@@ -1,0 +1,13 @@
+type: http
+url: "/metrics"
+suffix: plain
+omit_documented_fields_check:
+   # these are not mapped by this module but the oss one
+  - prometheus.labels.*
+  # histogram values & counts are not mapped (it's part of the type data)
+  - '*.histogram.values'
+  - '*.histogram.counts'
+remove_fields_from_comparison: ["prometheus.labels.instance"]
+module:
+  use_types: true
+  rate_counters: true
