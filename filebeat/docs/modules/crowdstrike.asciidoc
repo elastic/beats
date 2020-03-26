@@ -47,7 +47,7 @@ include::../include/configuring-intro.asciidoc[]
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `falcon` fileset settings
+==== `falcon_endpoint` fileset settings
 
 The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
 
@@ -63,10 +63,8 @@ include::../include/var-paths.asciidoc[]
 
 :fileset_ex: falcon_audit
 
-include::../include/config-option-intro.asciidoc[]
-
 [float]
-==== `falcon` fileset settings
+==== `falcon_audit` fileset settings
 
 The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, and UserActivityAuditEvent events.
 
