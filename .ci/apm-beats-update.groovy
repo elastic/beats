@@ -6,6 +6,8 @@ pipeline {
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    BEATS_MOD = 'github.com/elastic/beats-local'
+    BEATS_DIR = "src/${BEATS_MOD}"
     NOTIFY_TO = credentials('notify-to')
     GITHUB_CHECK_ITS_NAME = 'APM Server Beats update'
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
@@ -34,16 +36,15 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "beats", githubNotifyFirstTimeContributor: false)
+        gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
         script {
-          dir("beats"){
+          dir("${BEATS_DIR}"){
             env.GO_VERSION = readFile(".go-version").trim()
             def regexps =[
               "^devtools/mage.*",
               "^libbeat/scripts/Makefile",
             ]
             env.BEATS_UPDATED = isGitRegionMatch(patterns: regexps)
-
             // Skip all the stages except docs for PR's with asciidoc changes only
             env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
           }
@@ -73,7 +74,11 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Check Apm Server Beats Update') {
-          deleteDir()
+          // golang(){
+          //   dir("${BEATS_DIR}"){
+          //     sh(label: 'Get Beats module', script: "go get -v ${BEATS_MOD}")
+          //   }
+          // }
           dir("${BASE_DIR}"){
             git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
               url:  "git@github.com:elastic/${REPO}.git")
@@ -82,6 +87,17 @@ pipeline {
             dir("${BASE_DIR}"){
               sh(label: 'Update Beats script', script: """
                 export BEATS_VERSION=${env.GIT_BASE_COMMIT}
+                git config --global user.email "you@example.com"
+                git config --global user.name "Your Name"
+                go build -o build/mage github.com/magefile/mage
+                export PATH=\${WORKSPACE}/\${BASE_DIR}/build:\${PATH}
+                mage pythonEnv
+                . build/ve/linux/bin/activate
+                go mod edit -replace github.com/elastic/beats/v7=${env.GOPATH}/src/github.com/elastic/beats-local
+                git commit -m beats-update go.mod # commit locally to prevent "Error: some files are not up-to-date."
+                make update
+                git commit -a -m "update"
+                make check
                 git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
                 make update-beats
               """)
@@ -106,8 +122,7 @@ pipeline {
 }
 
 def golang(Closure body){
-  //def goVersion = readFile(file: '.go-version')?.trim()
-  docker.image("golang:1.13.8").inside(){
+  docker.image("golang:${GO_VERSION}").inside(){
     body()
   }
 }
