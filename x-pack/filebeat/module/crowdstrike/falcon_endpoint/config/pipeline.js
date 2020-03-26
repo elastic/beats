@@ -78,7 +78,15 @@ var crowdstrikeFalcon = (function() {
                 evt.Put("event.severity", evt.Get("crowdstrike.event.Severity"))
                 evt.Put("message", evt.Get("crowdstrike.event.DetectDescription"))
                 evt.Put("process.name", evt.Get("crowdstrike.event.FileName"))
-                evt.Put("process.executable", evt.Get("crowdstrike.event.CommandLine"))
+
+                var command_line = evt.Get("crowdstrike.event.CommandLine")
+                var args = command_line.split(' ')
+                var executable = args[0]
+
+                evt.Put("process.command_line", command_line)
+                evt.Put("process.args", args)
+                evt.Put("process.executable", executable)
+
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
                 evt.Put("user.domain", evt.Get("crowdstrike.event.MachineDomain"))
                 evt.Put("agent.id", evt.Get("crowdstrike.event.SensorId"))

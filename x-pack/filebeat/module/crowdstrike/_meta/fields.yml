@@ -17,7 +17,7 @@
           default_field: false
           fields:
             - name: eventType
-              type: text
+              type: keyword
               description: >
                 DetectionSummaryEvent or IncidentSummaryEvent
 
@@ -32,11 +32,11 @@
                 Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
 
             - name: customerIDString
-              type: text
+              type: keyword
               description: >
                 Customer identifier
 
             - name: version
-              type: text
+              type: keyword
               description: >
                 Schema version

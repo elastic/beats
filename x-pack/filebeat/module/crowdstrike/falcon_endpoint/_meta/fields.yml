@@ -26,22 +26,22 @@
         Parent process ID related to the detection.
 
     - name: ComputerName
-      type: text
+      type: keyword
       description: >
         Name of the computer where the detection occurred.
 
     - name: UserName
-      type: text
+      type: keyword
       description: >
         User name associated with the detection.
 
     - name: DetectName
-      type: text
+      type: keyword
       description: >
         Name of the detection.
 
     - name: DetectDescription
-      type: text
+      type: keyword
       description: >
         Description of the detection.
 
@@ -51,82 +51,82 @@
         Severity score of the detection.
 
     - name: SeverityName
-      type: text
+      type: keyword
       description: >
         Severity score text.
 
     - name: FileName
-      type: text
+      type: keyword
       description: >
         File name of the associated process for the detection.
 
     - name: FilePath
-      type: text
+      type: keyword
       description: >
         Path of the executable associated with the detection.
 
     - name: CommandLine
-      type: text
+      type: keyword
       description: >
-        Executable path with comand line arguments.
+        Executable path with command line arguments.
 
     - name: SHA256String
-      type: text
+      type: keyword
       description: >
         SHA256 sum of the executable associated with the detection.
  
     - name: MD5String
-      type: text
+      type: keyword
       description: >
         MD5 sum of the executable associated with the detection.
 
     - name: MachineDomain
-      type: text
+      type: keyword
       description: >
         Domain for the machine associated with the detection.
 
     - name: FalconHostLink
-      type: text
+      type: keyword
       description: >
         URL to view the detection in Falcon.
 
     - name: SensorId
-      type: text
+      type: keyword
       description: >
         Unique ID associated with the Falcon sensor.
 
     - name: DetectId
-      type: text
+      type: keyword
       description: >
         Unique ID associated with the detection.
 
     - name: LocalIP
-      type: text
+      type: keyword
       description: >
         IP address of the host associated with the detection.
 
     - name: MACAddress
-      type: text
+      type: keyword
       description: >
         MAC address of the host associated with the detection.
 
     - name: Tactic
-      type: text
+      type: keyword
       description: >
         MITRE tactic category of the detection.
 
     - name: Technique
-      type: text
+      type: keyword
       description: >
         MITRE technique category of the detection.
 
     - name: Objective
-      type: text
+      type: keyword
       description: >
         Method of detection.
 
     - name: PatternDispositionDescription
-      type: text
+      type: keyword
       description: >
         Action taken by Falcon.
 
@@ -141,7 +141,7 @@
         Flags indicating actions taken.
 
     - name: State
-      type: text
+      type: keyword
       description: >
         Whether the incident summary is open and ongoing or closed.
 

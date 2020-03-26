@@ -6,22 +6,22 @@
   default_field: false
   fields: 
     - name: UserId
-      type: text
+      type: keyword
       description: >
         Email address or user ID associated with the event.
 
     - name: UserIp
-      type: text
+      type: keyword
       description: >
         IP address associated with the user.
 
     - name: OperationName
-      type: text
+      type: keyword
       description: >
         Event subtype.
 
     - name: ServiceName
-      type: text
+      type: keyword
       description: >
         Service associated with this event.
 
@@ -41,12 +41,12 @@
         Fields that were changed in this event.
 
     - name: SessionId
-      type: text
+      type: keyword
       description: >
         Session ID of the remote response session.
 
     - name: HostnameField
-      type: text
+      type: keyword
       description: >
         Host name of the machine for the remote session.
 

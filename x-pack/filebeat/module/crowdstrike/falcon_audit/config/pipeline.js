@@ -61,10 +61,10 @@ var crowdstrikeFalcon = (function() {
 
         evt.Put("event.kind", "event")
 
-        if (outcome == true) {
+        if (outcome === true) {
             evt.Put("event.outcome", "success")
         }
-        else if (outcome == false) {
+        else if (outcome === false) {
             evt.Put("event.outcome", "failure")
         }
         else {
