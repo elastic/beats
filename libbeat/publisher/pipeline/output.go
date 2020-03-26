@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 
 	"go.elastic.co/apm"
 
@@ -130,13 +131,21 @@ func (w *netClientWorker) run() {
 				return
 			}
 
-			tx := tracer.StartTransaction("publish", "output")
-			tx.Context.SetLabel("worker", "netclient")
-			err := w.client.Publish(apm.ContextWithTransaction(context.Background(), tx), batch)
-			tx.End()
-			if err != nil {
-				w.logger.Errorf("Failed to publish events: %v", err)
-				// on error return to connect loop
+			if err := func() error {
+				tx := tracer.StartTransaction("publish", "output")
+				defer tx.End()
+				tx.Context.SetLabel("worker", "netclient")
+				ctx := apm.ContextWithTransaction(context.Background(), tx)
+				err := w.client.Publish(ctx, batch)
+				if err != nil {
+					err = fmt.Errorf("failed to publish events: %w", err)
+					apm.CaptureError(ctx, err).Send()
+					w.logger.Error(err)
+					// on error return to connect loop
+					return err
+				}
+				return nil
+			}(); err != nil {
 				break
 			}
 		}
