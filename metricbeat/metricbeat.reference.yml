@@ -553,6 +553,17 @@ metricbeat.modules:
   # Timeout to connect to Libvirt server
   #timeout: 1s
 
+#-------------------------------- Linux Module --------------------------------
+- module: linux
+  period: 10s
+  metricsets:
+    - "pageinfo"
+    # - ksm
+  enabled: true
+  #hostfs: /hostfs
+
+
+
 #------------------------------- Logstash Module -------------------------------
 - module: logstash
   metricsets: ["node", "node_stats"]

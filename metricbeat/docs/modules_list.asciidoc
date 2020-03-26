@@ -165,6 +165,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,kvm>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
+|<<metricbeat-module-linux,linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-linux-ksm,ksm>> beta[]  
+|<<metricbeat-metricset-linux-pageinfo,pageinfo>> beta[]  
 |<<metricbeat-module-logstash,Logstash>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-logstash-node,node>>   
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
@@ -302,6 +305,7 @@ include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]
 include::modules/kvm.asciidoc[]
+include::modules/linux.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]

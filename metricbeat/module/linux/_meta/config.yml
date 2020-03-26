@@ -1,0 +1,9 @@
+- module: linux
+  period: 10s
+  metricsets:
+    - "pageinfo"
+    # - ksm
+  enabled: true
+  #hostfs: /hostfs
+
+
