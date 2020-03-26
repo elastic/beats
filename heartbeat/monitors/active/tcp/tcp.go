@@ -104,6 +104,7 @@ func create(
 	}
 
 	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
+
 	return errWrappedJobs, numHosts, nil
 }
 
@@ -130,23 +131,28 @@ func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.
 		}
 
 		pair := strings.SplitN(host, ":", 2)
-		ports := config.Ports
 		if len(pair) == 2 {
-			port, err := strconv.ParseUint(pair[1], 10, 16)
+			port64, err := strconv.ParseUint(pair[1], 10, 16)
 			if err != nil {
 				return nil, fmt.Errorf("'%v' is no valid port number in '%v'", pair[1], h)
 			}
 
-			ports = []uint16{uint16(port)}
 			host = pair[0]
+			endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
+				Host: host,
+				Port: uint16(port64),
+			})
 		} else if len(config.Ports) == 0 {
+			// If there's no port in the URL or in the Ports config field bail.
 			return nil, fmt.Errorf("host '%v' missing port number", h)
 		}
 
-		endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
-			Host:  host,
-			Ports: ports,
-		})
+		for _, port := range config.Ports {
+			endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
+				Host: host,
+				Port: port,
+			})
+		}
 	}
 	return endpoints, nil
 }

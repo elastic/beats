@@ -40,7 +40,7 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 
 *Heartbeat*
-
+- Fix crashes when multiple TCP ports are specified. {pull}17262[17262]
 
 *Journalbeat*
 

@@ -51,8 +51,8 @@ type BuilderSettings struct {
 // Endpoint configures a host with all port numbers to be monitored by a dialer
 // based job.
 type Endpoint struct {
-	Host  string
-	Ports []uint16
+	Host string
+	Port uint16
 }
 
 // NewBuilder creates a new Builder for constructing dialers.
@@ -137,23 +137,23 @@ func MakeDialerJobs(
 ) ([]monitors.Job, error) {
 	var jobs []monitors.Job
 	for _, endpoint := range endpoints {
-		endpointJobs, err := makeEndpointJobs(b, typ, scheme, endpoint, mode, fn)
+		endpointJob, err := makeEndpointJob(b, typ, scheme, endpoint, mode, fn)
 		if err != nil {
 			return nil, err
 		}
-		jobs = append(jobs, endpointJobs...)
+		jobs = append(jobs, endpointJob)
 	}
 
 	return jobs, nil
 }
 
-func makeEndpointJobs(
+func makeEndpointJob(
 	b *Builder,
 	typ, scheme string,
 	endpoint Endpoint,
 	mode monitors.IPSettings,
 	fn func(*beat.Event, transport.Dialer, string) error,
-) ([]monitors.Job, error) {
+) (monitors.Job, error) {
 
 	fields := common.MapStr{
 		"monitor": common.MapStr{
@@ -166,25 +166,22 @@ func makeEndpointJobs(
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
 	if b.resolveViaSocks5 {
-		jobs := make([]monitors.Job, len(endpoint.Ports))
-		for i, port := range endpoint.Ports {
-			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			jobs[i] = monitors.MakeSimpleJob(func(event *beat.Event) error {
-				return b.Run(event, address, func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, address)
-				})
+		address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(endpoint.Port)))
+		job := monitors.MakeSimpleJob(func(event *beat.Event) error {
+			return b.Run(event, address, func(event *beat.Event, dialer transport.Dialer) error {
+				return fn(event, dialer, address)
 			})
-		}
-		return jobs, nil
+		})
+		return job, nil
 	}
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	jobID := jobID(typ, scheme, endpoint.Host, endpoint.Ports)
+	jobID := jobID(typ, scheme, endpoint.Host, []uint16{endpoint.Port})
 	settings := monitors.MakeHostJobSettings(jobID, endpoint.Host, mode)
 
 	job, err := monitors.MakeByHostJob(settings,
-		monitors.MakePingAllIPPortFactory(endpoint.Ports,
+		monitors.MakePingAllIPPortFactory([]uint16{endpoint.Port},
 			func(event *beat.Event, ip *net.IPAddr, port uint16) error {
 				// use address from resolved IP
 				portStr := strconv.Itoa(int(port))
@@ -199,7 +196,7 @@ func makeEndpointJobs(
 	if err != nil {
 		return nil, err
 	}
-	return []monitors.Job{monitors.WithJobId(jobID, monitors.WithFields(fields, job))}, nil
+	return monitors.WithJobId(jobID, monitors.WithFields(fields, job)), nil
 }
 
 func jobID(typ, jobType, host string, ports []uint16) string {
