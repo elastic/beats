@@ -7,30 +7,26 @@
         "provider": "googlecloud"
     },
     "event": {
-        "dataset": "googlecloud.storage",
+        "dataset": "googlecloud.pubsub",
         "duration": 115000,
         "module": "googlecloud"
     },
     "googlecloud": {
         "labels": {
-            "metrics": {
-                "storage_class": "REGIONAL"
-            },
             "resource": {
-                "bucket_name": "elastic-vsphere-images",
-                "location": "us-east1"
+                "topic_id": "test-ks"
             }
         },
-        "storage": {
-            "storage": {
-                "object_count": 3,
-                "total_byte_seconds": 58816542441472,
-                "total_bytes": 680747019
+        "pubsub": {
+            "subscription": {
+                "backlog_bytes": 20,
+                "num_undelivered_messages": 4,
+                "oldest_unacked_message_age": 435752
             }
         }
     },
     "metricset": {
-        "name": "storage",
+        "name": "pubsub",
         "period": 10000
     },
     "service": {
