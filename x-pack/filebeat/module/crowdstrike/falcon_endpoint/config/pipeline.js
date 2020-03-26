@@ -16,6 +16,21 @@ var crowdstrikeFalcon = (function() {
         max_depth: 8
     });
 
+    // Don't process non-endpoint related events handled by the endpoint fileset
+    // This avoids generating duplicate events since both event types come from 
+    // the same log file. Abort early to minimize CPU time.
+    var cancelNonEndpointEvents = function(evt) {
+        var eventType = evt.Get("crowdstrike.metadata.eventType")
+        switch (eventType) {
+            case "UserActivityAuditEvent":
+            case "AuthActivityAuditEvent":
+            case "RemoteResponseSessionStartEvent":
+            case "RemoteResponseSessionEndEvent":
+                evt.Cancel()
+                break;
+        }
+    };
+
     var dropFields = function(evt) {
         evt.Delete("message");
         evt.Delete("host.name");
@@ -28,14 +43,12 @@ var crowdstrikeFalcon = (function() {
     var convertFields = new processor.Convert({
         fields: [
             // DetectionSummaryEvent
-            { from: "crowdstrike.event.LocalIP", to: "source.ip" },
+            { from: "crowdstrike.event.LocalIP", to: "source.ip", type: "ip" },
             { from: "crowdstrike.event.ProcessId", to: "process.pid" },
-
-            // UserActivityAuditEvent and AuthActivityAuditEvent
-            { from: "crowdstrike.event.UserIp", to: "source.ip" },
         ],
         mode: "copy",
         ignore_missing: true,
+        ignore_failure: true
     });
 
     var parseTimestamp = new processor.Timestamp({
@@ -49,62 +62,42 @@ var crowdstrikeFalcon = (function() {
     var processEvent = function(evt) {
         var eventType = evt.Get("crowdstrike.metadata.eventType")
 
-        evt.Put("agent.type", "falcon")
-        evt.Put("event.kind", "event")
-        evt.Put("host.name", "")
-
         switch (eventType) {
             case "DetectionSummaryEvent":
                 var tactic = evt.Get("crowdstrike.event.Tactic").toLowerCase()
                 var technique = evt.Get("crowdstrike.event.Technique").toLowerCase()
-                  
-                evt.Put("event.action", tactic + "_" + technique)
+                evt.Put("threat.technique.name", technique) 
+                evt.Put("threat.tactic.name", tactic)
+
+                evt.Put("event.action", evt.Get("crowdstrike.event.PatternDispositionDescription"))
                 evt.Put("event.kind", "alert")
-                evt.Put("event.type", "info")
-                evt.Put("event.category", "malware")
+                evt.Put("event.type", ["info"])
+                evt.Put("event.category", ["malware"])
+                evt.Put("event.url", evt.Get("crowdstrike.event.FalconHostLink"))
+
                 evt.Put("event.severity", evt.Get("crowdstrike.event.Severity"))
                 evt.Put("message", evt.Get("crowdstrike.event.DetectDescription"))
                 evt.Put("process.name", evt.Get("crowdstrike.event.FileName"))
                 evt.Put("process.executable", evt.Get("crowdstrike.event.CommandLine"))
                 evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
                 evt.Put("user.domain", evt.Get("crowdstrike.event.MachineDomain"))
-                evt.Put("rule.reference", evt.Get("crowdstrike.event.FalconHostLink"))
                 evt.Put("agent.id", evt.Get("crowdstrike.event.SensorId"))
                 evt.Put("host.name", evt.Get("crowdstrike.event.ComputerName"))
-
-                break;
-
-            case "UserActivityAuditEvent":
-                evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
-                evt.Put("message", evt.Get("crowdstrike.event.OperationName"))
-                evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.type", "change")
-
-                break;
-
-            case "AuthActivityAuditEvent":
-                evt.Put("user.name", evt.Get("crowdstrike.event.UserId"))
-                evt.Put("message", evt.Get("crowdstrike.event.ServiceName"))
-                evt.Put("event.action", convertUnderscore(evt.Get("crowdstrike.event.OperationName")))
-                evt.Put("event.type", "change")
- 
-                break;
-
-            case "RemoteResponseSessionStartEvent":
-            case "RemoteResponseSessionEndEvent":
-                evt.Put("user.name", evt.Get("crowdstrike.event.UserName"))
-                evt.Put("host.name", evt.Get("crowdstrike.event.HostnameField"))
-                evt.Put("event.action", convertUnderscore(eventType))
-                evt.Put("event.type", "info")
+                evt.Put("agent.type", "falcon")
+                evt.Put("file.hash.sha256", evt.Get("crowdstrike.event.SHA256String"))
+                evt.Put("file.hash.md5", evt.Get("crowdstrike.event.MD5String"))
+                evt.Put("rule.name", evt.Get("crowdstrike.event.DetectName"))
+                evt.Put("rule.description", evt.Get("crowdstrike.event.DetectDescription"))
 
                 break;
 
             case "IncidentSummaryEvent":
-                evt.Put("rule.reference", evt.Get("crowdstrike.event.FalconHostLink"))
                 evt.Put("event.kind", "alert")
-                evt.Put("event.type", "info")
-                evt.Put("event.category", "malware")
+                evt.Put("event.type", ["info"])
+                evt.Put("event.category", ["malware"])
                 evt.Put("event.action", "incident")
+                evt.Put("event.url", evt.Get("crowdstrike.event.FalconHostLink"))
+
                 evt.Put("message", "Incident score " + evt.Get("crowdstrike.event.FineScore"))
 
                 break;
@@ -116,6 +109,7 @@ var crowdstrikeFalcon = (function() {
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
+        .Add(cancelNonEndpointEvents)
         .Add(parseTimestamp)
         .Add(dropFields)
         .Add(convertFields)

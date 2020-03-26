@@ -15,5 +15,5 @@ multiline.timeout: 10
 processors:
 - script:
     lang: javascript
-    id: crowdstrike_falcon
-    file: ${path.home}/module/crowdstrike/falcon/config/pipeline.js
+    id: crowdstrike_falcon_audit
+    file: ${path.home}/module/crowdstrike/falcon_audit/config/pipeline.js

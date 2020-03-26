@@ -6029,7 +6029,7 @@ Meta data fields for each event that include type and timestamp.
 *`crowdstrike.metadata.eventType`*::
 +
 --
-Type of event, such as DetectionSummaryEvent, UserActivityAuditEvent, AuthActivityAuditEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, or IncidentSummaryEvent
+DetectionSummaryEvent or IncidentSummaryEvent
 
 
 type: text
@@ -6073,6 +6073,123 @@ Schema version
 
 
 type: text
+
+--
+
+[float]
+=== event
+
+Event data fields for each event and alert.
+
+
+
+*`crowdstrike.event.UserId`*::
++
+--
+Email address or user ID associated with the event.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.UserIp`*::
++
+--
+IP address associated with the user.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.OperationName`*::
++
+--
+Event subtype.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.ServiceName`*::
++
+--
+Service associated with this event.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.Success`*::
++
+--
+Indicator of whether or not this event was successful.
+
+
+type: boolean
+
+--
+
+*`crowdstrike.event.UTCTimestamp`*::
++
+--
+Timestamp associated with this event in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.AuditKeyValues`*::
++
+--
+Fields that were changed in this event.
+
+
+type: nested
+
+--
+
+*`crowdstrike.event.SessionId`*::
++
+--
+Session ID of the remote response session.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.HostnameField`*::
++
+--
+Host name of the machine for the remote session.
+
+
+type: text
+
+--
+
+*`crowdstrike.event.StartTimestamp`*::
++
+--
+Start time for the remote session in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.EndTimestamp`*::
++
+--
+End time for the remote session in UTC UNIX format.
+
+
+type: date
 
 --
 
@@ -6350,116 +6467,6 @@ Flags indicating actions taken.
 
 
 type: object
-
---
-
-*`crowdstrike.event.UserId`*::
-+
---
-Email address or user ID associated with the event.
-
-
-type: text
-
---
-
-*`crowdstrike.event.UserIp`*::
-+
---
-IP address associated with the user.
-
-
-type: text
-
---
-
-*`crowdstrike.event.OperationName`*::
-+
---
-Event subtype.
-
-
-type: text
-
---
-
-*`crowdstrike.event.ServiceName`*::
-+
---
-Service associated with this event.
-
-
-type: text
-
---
-
-*`crowdstrike.event.Success`*::
-+
---
-Indicator of whether or not this event was successful.
-
-
-type: boolean
-
---
-
-*`crowdstrike.event.UTCTimestamp`*::
-+
---
-Timestamp associated with this event in UTC UNIX format.
-
-
-type: date
-
---
-
-*`crowdstrike.event.AuditKeyValues`*::
-+
---
-Fields that were changed in this event.
-
-
-type: nested
-
---
-
-*`crowdstrike.event.SessionId`*::
-+
---
-Session ID of the remote response session.
-
-
-type: text
-
---
-
-*`crowdstrike.event.HostnameField`*::
-+
---
-Host name of the machine for the remote session.
-
-
-type: text
-
---
-
-*`crowdstrike.event.StartTimestamp`*::
-+
---
-Start time for the remote session in UTC UNIX format.
-
-
-type: date
-
---
-
-*`crowdstrike.event.EndTimestamp`*::
-+
---
-End time for the remote session in UTC UNIX format.
-
-
-type: date
 
 --
 
