@@ -137,13 +137,6 @@ func MakeDialerJobs(
 ) ([]monitors.Job, error) {
 	var jobs []monitors.Job
 	for _, endpoint := range endpoints {
-		/*
-			endpointJobs, err := makeEndpointJobs(b, typ, scheme, endpoint, mode, fn)
-			if err != nil {
-				return nil, err
-			}
-			jobs = append(jobs, endpointJobs...)
-		*/
 		endpointJob, err := makeEndpointJob(b, typ, scheme, endpoint, mode, fn)
 		if err != nil {
 			return nil, err
