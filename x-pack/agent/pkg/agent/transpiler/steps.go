@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -79,8 +80,7 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(b))
-		return errors.Wrap(yaml.Unmarshal(b, out), "ajaj")
+		return yaml.Unmarshal(b, out)
 	}
 
 	var steps []Step
@@ -123,7 +123,11 @@ type DeleteFileStep struct {
 
 // Execute executes delete file step.
 func (r *DeleteFileStep) Execute(rootDir string) error {
-	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
+	path, isSubpath := joinPaths(rootDir, r.Path)
+	if !isSubpath {
+		return fmt.Errorf("invalid path value for operation 'Delete': %s", path)
+	}
+
 	err := os.Remove(path)
 
 	if os.IsNotExist(err) && r.FailOnMissing {
@@ -157,8 +161,15 @@ type MoveFileStep struct {
 
 // Execute executes move file step.
 func (r *MoveFileStep) Execute(rootDir string) error {
-	path := filepath.Join(rootDir, filepath.FromSlash(r.Path))
-	target := filepath.Join(rootDir, filepath.FromSlash(r.Target))
+	path, isSubpath := joinPaths(rootDir, r.Path)
+	if !isSubpath {
+		return fmt.Errorf("invalid path value for operation 'Move': %s", path)
+	}
+
+	target, isSubpath := joinPaths(rootDir, r.Target)
+	if !isSubpath {
+		return fmt.Errorf("invalid target value for operation 'Move': %s", target)
+	}
 
 	err := os.Rename(path, target)
 
@@ -182,4 +193,22 @@ func MoveFile(path, target string, failOnMissing bool) *MoveFileStep {
 		Target:        target,
 		FailOnMissing: failOnMissing,
 	}
+}
+
+// joinPaths joins paths and returns true if path is subpath of rootDir
+func joinPaths(rootDir, path string) (string, bool) {
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(rootDir, path)
+	}
+
+	absRoot := filepath.Clean(filepath.FromSlash(rootDir))
+	absPath := filepath.Clean(filepath.FromSlash(path))
+
+	// path on windows are case insensitive
+	if runtime.GOOS == "windows" {
+		absRoot = strings.ToLower(absRoot)
+		absPath = strings.ToLower(absPath)
+	}
+
+	return absPath, strings.HasPrefix(absPath, absRoot)
 }
