@@ -19,6 +19,11 @@ type StepList struct {
 	Steps []Step
 }
 
+// NewStepList returns a new list of rules to be executed.
+func NewStepList(steps ...Step) *StepList {
+	return &StepList{Steps: steps}
+}
+
 // Step is an execution step which needs to be run.
 type Step interface {
 	Execute(rootDir string) error
@@ -118,7 +123,7 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 type DeleteFileStep struct {
 	Path string
 	// FailOnMissing fails if file is already missing
-	FailOnMissing bool
+	FailOnMissing bool `yaml:"fail_on_missing" config:"fail_on_missing"`
 }
 
 // Execute executes delete file step.

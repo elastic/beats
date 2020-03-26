@@ -33,5 +33,4 @@ func TestIsSubpath(t *testing.T) {
 			assert.Equal(t, test.isSubpath, result)
 		})
 	}
-
 }
