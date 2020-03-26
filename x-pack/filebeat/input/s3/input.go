@@ -201,8 +201,9 @@ func (p *s3Input) run(visibilityTimeout int64) {
 					continue
 				}
 
-				if awsErr.Code() == "InvalidClientTokenId" || awsErr.Code() == "ExpiredToken" {
-					p.logger.Warn(errors.Wrap(err, "credentials are invalid, acquiring AWS credentials again from config"))
+				// When AWS credentials are expired, re-obtain AWS credentials again
+				if awssdk.IsErrorExpiredCreds(awsErr) {
+					p.logger.Warn(errors.Wrap(err, "credentials are expired, please update the credentials"))
 
 					awsConfig, err := awscommon.GetAWSCredentials(p.config.AwsConfig)
 					if err != nil {
