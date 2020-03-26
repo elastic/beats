@@ -69,21 +69,16 @@ type Reload struct {
 	Enabled bool          `config:"enabled"`
 }
 
-// RunnerFactory is used for creating of new Runners
+// RunnerFactory is used for validating generated configurations and creating
+// of new Runners
 type RunnerFactory interface {
-	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
-}
+	// Create creates a new Runner based on the given configuration.
+	Create(p beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 
-// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
-// without a pipeline and metadata.
-type ConfigChecker interface {
+	// CheckConfig tests if a confiugation can be used to create an input. If it
+	// is not possible to create an input using the configuration, an error must
+	// be returned.
 	CheckConfig(config *common.Config) error
-}
-
-// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
-type CheckableRunnerFactory interface {
-	RunnerFactory
-	ConfigChecker
 }
 
 // Runner is a simple interface providing a simple way to
@@ -145,7 +140,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	// Load all config objects
 	configs, err := rl.loadConfigs(files)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "loading configs")
 	}
 
 	debugf("Number of module configs found: %v", len(configs))
@@ -157,13 +152,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 			continue
 		}
 
-		if checker, ok := runnerFactory.(ConfigChecker); ok {
-			err = checker.CheckConfig(c.Config)
-		} else {
-			_, err = runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
-		}
-
-		if err != nil {
+		if err = runnerFactory.CheckConfig(c.Config); err != nil {
 			return err
 		}
 	}

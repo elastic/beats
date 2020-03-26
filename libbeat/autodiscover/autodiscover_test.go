@@ -92,7 +92,7 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(_ beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 		meta:   meta,
@@ -166,7 +166,7 @@ func TestAutodiscover(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -293,7 +293,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -359,7 +359,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
