@@ -74,42 +74,7 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Check Apm Server Beats Update') {
-          // golang(){
-          //   dir("${BEATS_DIR}"){
-          //     sh(label: 'Get Beats module', script: "go get -v ${BEATS_MOD}")
-          //   }
-          // }
-          dir("${BASE_DIR}"){
-            git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
-              url:  "git@github.com:elastic/${REPO}.git")
-          }
-          golang(){
-            dir("${BASE_DIR}"){
-              sh(label: 'Update Beats script', script: """
-                export BEATS_VERSION=${env.GIT_BASE_COMMIT}
-                git config --global user.email "you@example.com"
-                git config --global user.name "Your Name"
-                go build -o build/mage github.com/magefile/mage
-                export PATH=\${WORKSPACE}/\${BASE_DIR}/build:\${PATH}
-                mage pythonEnv
-                . build/ve/linux/bin/activate
-                go mod edit -replace github.com/elastic/beats/v7=${env.GOPATH}/src/github.com/elastic/beats-local
-                git commit -m beats-update go.mod # commit locally to prevent "Error: some files are not up-to-date."
-                make update
-                git commit -a -m "update"
-                make check
-                git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
-                make update-beats
-              """)
-            }
-          }
-        }
-      }
-      post {
-        always {
-          catchError(buildResult: 'SUCCESS', message: 'Failed to grab test results tar files', stageResult: 'SUCCESS') {
-            tar(file: "update-beats-system-tests-linux-files.tgz", archive: true, dir: "system-tests", pathPrefix: "${BASE_DIR}/build")
-          }
+          beatsUpdate()
         }
       }
     }
@@ -121,8 +86,34 @@ pipeline {
   // }
 }
 
-def golang(Closure body){
-  docker.image("golang:${GO_VERSION}").inside(){
-    body()
+def beatsUpdate() {
+  def os = "linux"
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+
+  withEnv([
+    "HOME=${env.WORKSPACE}",
+    "GOPATH=${env.WORKSPACE}",
+    "GOROOT=${goRoot}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+    "MAGEFILE_CACHE=${env.WORKSPACE}/.magefile",
+  ]) {
+    dir("${BEATS_DIR}") {
+      sh(label: "Create branch localVersion", script: "git checkout -b localVersion")
+      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
+    }
+    dir("${BASE_DIR}"){
+      git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
+        url:  "git@github.com:elastic/${env.REPO}.git")
+      sh(label: 'Update Beats script', script: """
+        git config --global user.email "none@example.com"
+        git config --global user.name "None"
+        git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
+
+        go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        git commit -m beats-update go.mod
+
+        make check
+      """)
+    }
   }
 }
