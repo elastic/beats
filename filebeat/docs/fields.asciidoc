@@ -6032,7 +6032,7 @@ Meta data fields for each event that include type and timestamp.
 DetectionSummaryEvent or IncidentSummaryEvent
 
 
-type: text
+type: keyword
 
 --
 
@@ -6062,7 +6062,7 @@ type: integer
 Customer identifier
 
 
-type: text
+type: keyword
 
 --
 
@@ -6072,7 +6072,7 @@ type: text
 Schema version
 
 
-type: text
+type: keyword
 
 --
 
@@ -6089,7 +6089,7 @@ Event data fields for each event and alert.
 Email address or user ID associated with the event.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6099,7 +6099,7 @@ type: text
 IP address associated with the user.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6109,7 +6109,7 @@ type: text
 Event subtype.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6119,7 +6119,7 @@ type: text
 Service associated with this event.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6159,7 +6159,7 @@ type: nested
 Session ID of the remote response session.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6169,7 +6169,7 @@ type: text
 Host name of the machine for the remote session.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6246,7 +6246,7 @@ type: integer
 Name of the computer where the detection occurred.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6256,7 +6256,7 @@ type: text
 User name associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6266,7 +6266,7 @@ type: text
 Name of the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6276,7 +6276,7 @@ type: text
 Description of the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6296,7 +6296,7 @@ type: integer
 Severity score text.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6306,7 +6306,7 @@ type: text
 File name of the associated process for the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6316,17 +6316,17 @@ type: text
 Path of the executable associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
 *`crowdstrike.event.CommandLine`*::
 +
 --
-Executable path with comand line arguments.
+Executable path with command line arguments.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6336,7 +6336,7 @@ type: text
 SHA256 sum of the executable associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6346,7 +6346,7 @@ type: text
 MD5 sum of the executable associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6356,7 +6356,7 @@ type: text
 Domain for the machine associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6366,7 +6366,7 @@ type: text
 URL to view the detection in Falcon.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6376,7 +6376,7 @@ type: text
 Unique ID associated with the Falcon sensor.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6386,7 +6386,7 @@ type: text
 Unique ID associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6396,7 +6396,7 @@ type: text
 IP address of the host associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6406,7 +6406,7 @@ type: text
 MAC address of the host associated with the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6416,7 +6416,7 @@ type: text
 MITRE tactic category of the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6426,7 +6426,7 @@ type: text
 MITRE technique category of the detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6436,7 +6436,7 @@ type: text
 Method of detection.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6446,7 +6446,7 @@ type: text
 Action taken by Falcon.
 
 
-type: text
+type: keyword
 
 --
 
@@ -6476,7 +6476,7 @@ type: object
 Whether the incident summary is open and ongoing or closed.
 
 
-type: text
+type: keyword
 
 --
 
