@@ -18,7 +18,6 @@
 package testing
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,7 +43,7 @@ func testEvent() beat.Event {
 func TestChanClientPublishEvent(t *testing.T) {
 	cc := NewChanClient(1)
 	e1 := testEvent()
-	cc.Publish(context.Background(), e1)
+	cc.Publish(e1)
 	assert.Equal(t, e1, cc.ReceiveEvent())
 }
 
@@ -53,7 +52,7 @@ func TestChanClientPublishEvents(t *testing.T) {
 	cc := NewChanClient(1)
 
 	e1, e2 := testEvent(), testEvent()
-	go cc.PublishAll(context.Background(), []beat.Event{e1, e2})
+	go cc.PublishAll([]beat.Event{e1, e2})
 	assert.Equal(t, e1, cc.ReceiveEvent())
 	assert.Equal(t, e2, cc.ReceiveEvent())
 }

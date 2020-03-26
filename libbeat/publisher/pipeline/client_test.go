@@ -104,7 +104,7 @@ func TestClient(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					client.Publish(nil, beat.Event{})
+					client.Publish(beat.Event{})
 				}()
 
 				test.close(client, cancel)
