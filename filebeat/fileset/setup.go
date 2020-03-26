@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
@@ -41,7 +42,7 @@ func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFac
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
-func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
+func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config, _ *common.MapStrPointer) (cfgfile.Runner, error) {
 	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatInfo, false)
 	if err != nil {
 		return nil, err
@@ -52,6 +53,11 @@ func (sf *SetupFactory) Create(_ beat.Pipeline, c *common.Config, _ *common.MapS
 		pipelineLoaderFactory: sf.pipelineLoaderFactory,
 		overwritePipelines:    sf.overwritePipelines,
 	}, nil
+}
+
+func (sf *SetupFactory) CheckConfig(c *common.Config) error {
+	_, err := sf.Create(pubpipeline.NewNilPipeline(), c, nil)
+	return err
 }
 
 // SetupCfgRunner is for loading assets of modules.
