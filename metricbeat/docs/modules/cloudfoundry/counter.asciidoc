@@ -5,7 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-cloudfoundry-counter]]
 === cloudfoundry counter metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/cloudfoundry/counter/_meta/docs.asciidoc[]
 

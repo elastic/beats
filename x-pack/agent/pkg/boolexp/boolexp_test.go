@@ -36,6 +36,7 @@ func TestBoolexp(t *testing.T) {
 	}{
 		// Variables
 		{expression: "%{[hello.var]} == 'hello'", result: true},
+		{expression: "%{[hello.var]} != 'hello'", result: false},
 		{expression: "contains(%{[hello.var]}, 'hell')", result: true},
 
 		{expression: "true", result: true},

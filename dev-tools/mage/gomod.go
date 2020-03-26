@@ -50,6 +50,7 @@ var (
 	}
 	filesToRemove = []string{
 		filepath.Join("github.com", "yuin", "gopher-lua", "parse", "Makefile"),
+		filepath.Join("github.com", "yuin", "gopher-lua", "parse", "parser.go.y"),
 	}
 )
 
