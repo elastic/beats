@@ -3,7 +3,9 @@
         "@timestamp": "2020-02-19T08:30:00.000Z",
         "process.pid": 38684386611,
         "process.name": "explorer.exe",
+        "process.command_line": "C:\\Windows\\Explorer.EXE",
         "process.executable": "C:\\Windows\\Explorer.EXE",
+        "process.args": ["C:\\Windows\\Explorer.EXE"],
         "event.dataset": "crowdstrike.falcon_endpoint",
         "event.kind": "alert",
         "event.action": "Prevention, process killed.",
@@ -12,6 +14,7 @@
         "event.severity": 4,
         "event.module": "crowdstrike",
         "event.url": "https://falcon.crowdstrike.com/ec86abd353824e96765ecbe18eb4f0b4",
+        "event.outcome": "unknown",
         "service.type": "crowdstrike",
         "user.name": "alice",
         "user.domain": "CORP-DOMAIN",
@@ -26,7 +29,7 @@
         "agent.type": "falcon",
         "host.name": "alice-laptop",
         "message": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
-        "fileset.name": "falcon_endpoint",
+        "fileset.name": "falcon",
         "input.type": "log",
         "file.hash.md5": "ac4c51eb24aa95b77f705ab159189e24",
         "file.hash.sha256": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
@@ -91,6 +94,7 @@
         "event.category": ["malware"],
         "event.action": "incident",
         "event.url": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "event.outcome": "unknown",
         "input.type": "log",
         "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
         "crowdstrike.metadata.offset": 1824,
@@ -103,7 +107,7 @@
         "crowdstrike.event.State": "open",
         "crowdstrike.event.FineScore": 1.2,
         "message": "Incident score 1.2",
-        "fileset.name": "falcon_endpoint",
+        "fileset.name": "falcon",
         "service.type": "crowdstrike"
     }
 ]

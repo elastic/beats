@@ -336,14 +336,7 @@ filebeat.modules:
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
   
-  falcon_endpoint:
-    enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-  falcon_audit:
+  falcon:
     enabled: true
 
     # Set custom paths for the log files. If left empty,

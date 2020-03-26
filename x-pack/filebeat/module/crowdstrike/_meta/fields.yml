@@ -9,34 +9,3 @@
       description: >
         Fields for Crowdstrike Falcon event and alert data.
       fields:
-        - name: metadata
-          title: Metadata fields
-          description: >
-            Meta data fields for each event that include type and timestamp.
-          type: group
-          default_field: false
-          fields:
-            - name: eventType
-              type: keyword
-              description: >
-                DetectionSummaryEvent or IncidentSummaryEvent
-
-            - name: eventCreationTime
-              type: date
-              description: >
-                The time this event occurred on the endpoint in UTC UNIX_MS format.
-
-            - name: offset
-              type: integer
-              description: >
-                Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
-
-            - name: customerIDString
-              type: keyword
-              description: >
-                Customer identifier
-
-            - name: version
-              type: keyword
-              description: >
-                Schema version

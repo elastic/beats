@@ -1,3 +1,35 @@
+- name: metadata
+  title: Metadata fields
+  description: >
+    Meta data fields for each event that include type and timestamp.
+  type: group
+  default_field: false
+  fields:
+    - name: eventType
+      type: keyword
+      description: >
+        DetectionSummaryEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
+
+    - name: eventCreationTime
+      type: date
+      description: >
+        The time this event occurred on the endpoint in UTC UNIX_MS format.
+
+    - name: offset
+      type: integer
+      description: >
+        Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
+
+    - name: customerIDString
+      type: keyword
+      description: >
+        Customer identifier
+
+    - name: version
+      type: keyword
+      description: >
+        Schema version
+
 - name: event
   title: Event fields
   description: >
@@ -159,3 +191,58 @@
       type: float
       description: >
         Score for incident.
+
+    - name: UserId
+      type: keyword
+      description: >
+        Email address or user ID associated with the event.
+
+    - name: UserIp
+      type: keyword
+      description: >
+        IP address associated with the user.
+
+    - name: OperationName
+      type: keyword
+      description: >
+        Event subtype.
+
+    - name: ServiceName
+      type: keyword
+      description: >
+        Service associated with this event.
+
+    - name: Success
+      type: boolean
+      description: >
+        Indicator of whether or not this event was successful.
+
+    - name: UTCTimestamp
+      type: date
+      description: >
+        Timestamp associated with this event in UTC UNIX format.
+
+    - name: AuditKeyValues
+      type: nested
+      description: >
+        Fields that were changed in this event.
+
+    - name: SessionId
+      type: keyword
+      description: >
+        Session ID of the remote response session.
+
+    - name: HostnameField
+      type: keyword
+      description: >
+        Host name of the machine for the remote session.
+
+    - name: StartTimestamp
+      type: date
+      description: >
+        Start time for the remote session in UTC UNIX format.
+
+    - name: EndTimestamp
+      type: date
+      description: >
+        End time for the remote session in UTC UNIX format.

@@ -5,4 +5,4 @@ var:
     default:
       - /var/log/crowdstrike/falconhoseclient/output
 
-input: config/falcon_audit.yml
+input: config/falcon.yml
