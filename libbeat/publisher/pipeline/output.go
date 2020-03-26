@@ -18,6 +18,10 @@
 package pipeline
 
 import (
+	"context"
+
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -41,15 +45,18 @@ type netClientWorker struct {
 	batchSize  int
 	batchSizer func() int
 	logger     *logp.Logger
+
+	getTracer func() *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
+func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, traceGetter func() *apm.Tracer) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{
-			observer: observer,
-			qu:       qu,
-			client:   nc,
-			logger:   logp.NewLogger("publisher_pipeline_output"),
+			observer:  observer,
+			qu:        qu,
+			client:    nc,
+			logger:    logp.NewLogger("publisher_pipeline_output"),
+			getTracer: traceGetter,
 		}
 		go c.run()
 		return c
@@ -69,7 +76,7 @@ func (w *clientWorker) run() {
 		for batch := range w.qu {
 			w.observer.outBatchSend(len(batch.events))
 
-			if err := w.client.Publish(batch); err != nil {
+			if err := w.client.Publish(context.TODO(), batch); err != nil {
 				break
 			}
 		}
@@ -114,6 +121,7 @@ func (w *netClientWorker) run() {
 		}
 
 		// send loop
+		tracer := w.getTracer()
 		for batch := range w.qu {
 			if w.closed.Load() {
 				if batch != nil {
@@ -122,7 +130,10 @@ func (w *netClientWorker) run() {
 				return
 			}
 
-			err := w.client.Publish(batch)
+			tx := tracer.StartTransaction("publish", "output")
+			tx.Context.SetLabel("worker", "netclient")
+			err := w.client.Publish(apm.ContextWithTransaction(context.Background(), tx), batch)
+			tx.End()
 			if err != nil {
 				w.logger.Errorf("Failed to publish events: %v", err)
 				// on error return to connect loop

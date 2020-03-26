@@ -20,12 +20,15 @@ package beat
 import (
 	"time"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type Pipeline interface {
 	PipelineConnector
 	SetACKHandler(PipelineACKHandler) error
+	SetTracer(*apm.Tracer) error
 }
 
 // PipelineConnector creates a publishing Client. This is typically backed by a Pipeline.
@@ -78,6 +81,8 @@ type ClientConfig struct {
 	// ACKLastEvent reports the last ACKed event out of a batch of ACKed events only.
 	// Only the events 'Private' field will be reported.
 	ACKLastEvent func(interface{})
+
+	Tracer *apm.Tracer
 }
 
 // CloseRef allows users to close the client asynchronously.

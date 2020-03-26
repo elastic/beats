@@ -58,7 +58,7 @@ func TestClientPublishEvent(t *testing.T) {
 		},
 	})
 
-	err := output.Publish(batch)
+	err := output.Publish(context.Background(), batch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		err := output.Publish(outest.NewBatch(event))
+		err := output.Publish(context.Background(), outest.NewBatch(event))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -177,7 +177,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		err := output.Publish(outest.NewBatch(events...))
+		err := output.Publish(context.Background(), outest.NewBatch(events...))
 		if err != nil {
 			t.Fatal(err)
 		}

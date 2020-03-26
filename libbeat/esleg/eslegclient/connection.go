@@ -26,6 +26,8 @@ import (
 	"net/url"
 	"time"
 
+	"go.elastic.co/apm/module/apmhttp"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -119,12 +121,12 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	return &Connection{
 		ConnectionSettings: s,
 		HTTP: &http.Client{
-			Transport: &http.Transport{
+			Transport: apmhttp.WrapRoundTripper(&http.Transport{
 				Dial:            dialer.Dial,
 				DialTLS:         tlsDialer.Dial,
 				TLSClientConfig: s.TLS.ToConfig(),
 				Proxy:           proxy,
-			},
+			}),
 			Timeout: s.Timeout,
 		},
 		Encoder: encoder,

@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -39,6 +41,8 @@ type outputController struct {
 	retryer  *retryer
 	consumer *eventConsumer
 	out      *outputGroup
+
+	getTracer func() *apm.Tracer
 }
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
@@ -63,12 +67,14 @@ func newOutputController(
 	monitors Monitors,
 	observer outputObserver,
 	b queue.Queue,
+	traceGetter func() *apm.Tracer,
 ) *outputController {
 	c := &outputController{
-		beat:     beat,
-		monitors: monitors,
-		observer: observer,
-		queue:    b,
+		beat:      beat,
+		monitors:  monitors,
+		observer:  observer,
+		queue:     b,
+		getTracer: traceGetter,
 	}
 
 	ctx := &batchContext{}
@@ -103,7 +109,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	queue := makeWorkQueue()
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(c.observer, queue, client)
+		worker[i] = makeClientWorker(c.observer, queue, client, c.getTracer)
 	}
 	grp := &outputGroup{
 		workQueue:  queue,

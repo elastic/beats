@@ -7,6 +7,8 @@ package core
 import (
 	"testing"
 
+	"go.elastic.co/apm"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -50,6 +52,10 @@ func (d *dummyPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) 
 }
 
 func (d *dummyPipeline) SetACKHandler(ackhandler beat.PipelineACKHandler) error {
+	return nil
+}
+
+func (d *dummyPipeline) SetTracer(_ *apm.Tracer) error {
 	return nil
 }
 

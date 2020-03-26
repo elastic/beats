@@ -26,6 +26,8 @@ import (
 	"sync"
 	"time"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -82,6 +84,7 @@ type Pipeline struct {
 	sigNewClient             chan *client
 
 	processors processing.Supporter
+	tracer     *apm.Tracer
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -154,6 +157,11 @@ func New(
 		monitors.Logger = logp.NewLogger("publish")
 	}
 
+	tracer, err := apm.NewTracer(beat.Beat, beat.Version)
+	if err != nil {
+		panic(err)
+	}
+
 	p := &Pipeline{
 		beatInfo:         beat,
 		monitors:         monitors,
@@ -161,6 +169,7 @@ func New(
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		tracer:           tracer,
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
@@ -195,10 +204,19 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(beat, monitors, p.observer, p.queue)
+	p.output = newOutputController(beat, monitors, p.observer, p.queue, p.getTracer)
 	p.output.Set(out)
 
 	return p, nil
+}
+
+func (p *Pipeline) getTracer() *apm.Tracer {
+	return p.tracer
+}
+
+func (p *Pipeline) SetTracer(tracer *apm.Tracer) error {
+	p.tracer = tracer
+	return nil
 }
 
 // SetACKHandler sets a global ACK handler on all events published to the pipeline.
