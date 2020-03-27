@@ -9,6 +9,7 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -26,7 +27,7 @@ import (
 type Config struct {
 	Period     time.Duration       `config:"period" validate:"nonzero,required"`
 	Regions    []string            `config:"regions"`
-	AWSConfig  awscommon.ConfigAWS `config:",inline"`
+	ConfigAWS  awscommon.ConfigAWS `config:",inline"`
 	TagsFilter []Tag               `config:"tags_filter"`
 }
 
@@ -40,6 +41,7 @@ type MetricSet struct {
 	AccountName string
 	AccountID   string
 	TagsFilter  []Tag
+	ConfigAWS   awscommon.ConfigAWS
 }
 
 // Tag holds a configuration specific for ec2 and cloudwatch metricset.
@@ -73,7 +75,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	awsConfig, err := awscommon.GetAWSCredentials(config.ConfigAWS)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get aws credentials, please check AWS credential in config")
 	}
@@ -88,12 +90,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Period:        config.Period,
 		AwsConfig:     &awsConfig,
 		TagsFilter:    config.TagsFilter,
+		ConfigAWS:     config.ConfigAWS,
 	}
 
 	// Get IAM account name
 	awsConfig.Region = "us-east-1"
 	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, "iam", "", awsConfig))
+		config.ConfigAWS.Endpoint, "iam", "", awsConfig))
 	req := svcIam.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
 	output, err := req.Send(context.TODO())
 	if err != nil {
@@ -108,7 +111,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Get IAM account id
 	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, "sts", "", awsConfig))
+		config.ConfigAWS.Endpoint, "sts", "", awsConfig))
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
@@ -120,7 +123,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "ec2", "", awsConfig))
+			config.ConfigAWS.Endpoint, "ec2", "", awsConfig))
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
@@ -212,4 +215,23 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 		}
 	}
 	return true
+}
+
+func (m *MetricSet) UpdateExpiredCreds(err error) (errorIsExpiredCreds bool) {
+	errorIsExpiredCreds = false
+	if awsErr, ok := err.(awserr.Error); ok {
+		if awssdk.IsErrorExpiredCreds(awsErr) {
+			errorIsExpiredCreds = true
+			m.Logger().Warn("AWS credentials are expired")
+			awsConfig, err := awscommon.GetAWSCredentials(m.ConfigAWS)
+			if err != nil {
+				m.Logger().Error(err, "failed to update aws credentials, please check AWS credential in config")
+			}
+
+			// update awsConfig in m
+			m.AwsConfig = &awsConfig
+		}
+		return
+	}
+	return
 }

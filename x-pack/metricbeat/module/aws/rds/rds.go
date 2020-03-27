@@ -91,10 +91,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Get DBInstance IDs per region
 		dbInstanceIDs, dbDetailsMap, err := m.getDBInstancesPerRegion(svc)
 		if err != nil {
-			err = errors.Wrap(err, "getDBInstancesPerRegion failed, skipping region "+regionName)
-			m.Logger().Errorf(err.Error())
-			report.Error(err)
-			continue
+			isExpired := m.UpdateExpiredCreds(err)
+			if !isExpired {
+				err = errors.Wrap(err, "getDBInstancesPerRegion failed, skipping region "+regionName)
+				m.Logger().Errorf(err.Error())
+				report.Error(err)
+				continue
+			}
 		}
 
 		if len(dbInstanceIDs) == 0 {
@@ -156,7 +159,7 @@ func (m *MetricSet) getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, m
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
+		return nil, nil, err
 	}
 
 	var dbInstanceIDs []string
