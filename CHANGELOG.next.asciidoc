@@ -224,6 +224,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add Kerberos support to Kafka input and output. {pull}16781[16781]
 - Update supported versions of `redis` output. {pull}17198[17198]
+- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 
 *Auditbeat*
 
