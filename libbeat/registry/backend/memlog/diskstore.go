@@ -26,11 +26,11 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cleanup"
-	"github.com/elastic/beats/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 type diskStore struct {

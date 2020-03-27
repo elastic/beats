@@ -20,7 +20,7 @@ package registry
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 // Registry manages multiple key-value stores.

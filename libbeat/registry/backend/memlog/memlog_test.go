@@ -20,8 +20,8 @@ package memlog
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/registry/backend"
-	"github.com/elastic/beats/libbeat/registry/backend/cptest"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/registry/backend/cptest"
 )
 
 func TestComplianceDefaults(t *testing.T) {

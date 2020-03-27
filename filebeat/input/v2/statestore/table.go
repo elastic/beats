@@ -20,8 +20,9 @@ package statestore
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/go-concert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // In memory registry state table. Updates are written directly to this table.

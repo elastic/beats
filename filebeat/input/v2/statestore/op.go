@@ -20,7 +20,7 @@ package statestore
 import (
 	"runtime"
 
-	"github.com/elastic/beats/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/registry"
 )
 
 // ResourceUpdateOp defers a state update to be written to the persistent store.

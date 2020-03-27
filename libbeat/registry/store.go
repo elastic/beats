@@ -20,8 +20,8 @@ package registry
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 type sharedStore struct {
