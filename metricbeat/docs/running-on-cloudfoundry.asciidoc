@@ -19,13 +19,13 @@ command will create the required credentials for connecting to loggregator.
 
 ["source", "sh"]
 ------------------------------------------------
-uaac client add filebeat --name filebeat --secret changeme --authorized_grant_types client_credentials,refresh_token --authorities doppler.firehose,cloud_controller.admin_read_only
+uaac client add {beatname_lc} --name {beatname_lc} --secret changeme --authorized_grant_types client_credentials,refresh_token --authorities doppler.firehose,cloud_controller.admin_read_only
 ------------------------------------------------
 
 [WARNING]
 =======================================
 *Use a unique secret:* The uaac command above is just an example and the secret should be changed and the
-`filebeat.yml` should be updated with your choosen secret.
+`{beatname_lc}.yml` should be updated with your choosen secret.
 =======================================
 
 
