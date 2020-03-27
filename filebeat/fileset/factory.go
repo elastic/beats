@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -75,7 +76,7 @@ func NewFactory(
 }
 
 // Create creates a module based on a config
-func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (f *Factory) Create(p beat.PipelineConnector, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	// Start a registry of one module:
 	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
 	if err != nil {
@@ -112,6 +113,11 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
 	}, nil
+}
+
+func (f *Factory) CheckConfig(c *common.Config) error {
+	_, err := f.Create(pubpipeline.NewNilPipeline(), c, nil)
+	return err
 }
 
 func (p *inputsRunner) Start() {
@@ -153,6 +159,7 @@ func (p *inputsRunner) Start() {
 		moduleList.Add(m)
 	}
 }
+
 func (p *inputsRunner) Stop() {
 	if p.pipelineCallbackID != uuid.Nil {
 		elasticsearch.DeregisterConnectCallback(p.pipelineCallbackID)
