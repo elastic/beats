@@ -1,7 +1,7 @@
 [[running-on-cloudfoundry]]
 === Running {beatname_uc} on Cloud Foundry
 
-You can use {beatname_uc} on Cloud Foundry to retrieve and ship logs.
+You can use {beatname_uc} on Cloud Foundry to retrieve and ship metrics.
 
 ifeval::["{release-state}"=="unreleased"]
 
@@ -64,11 +64,11 @@ To check the status, run:
 ------------------------------------------------
 $ cf apps
 
-name       requested state   instances   memory   disk   urls
-filebeat   started           1/1         256M     1G
+name         requested state   instances   memory   disk   urls
+metricbeat   started           1/1         256M     1G
 ------------------------------------------------
 
-Log events should start flowing to Elasticsearch. The events are annotated with
+Metrics should start flowing to Elasticsearch. The events are annotated with
 metadata added by the <<add-cloudfoundry-metadata>> processor.
 
 
