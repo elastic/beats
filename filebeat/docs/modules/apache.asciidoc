@@ -13,6 +13,8 @@ https://httpd.apache.org/[Apache HTTP] server.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
@@ -20,16 +22,6 @@ The +{modulename}+ module was tested with logs from versions 2.2.22 and 2.4.23.
 
 On Windows, the module was tested with Apache HTTP Server installed from the Chocolatey
 repository.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-apache.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -85,6 +77,14 @@ Add %v config in httpd.conf in log section
     # By
     LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 -----
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-apache.png[]
 
 :has-dashboards!:
 

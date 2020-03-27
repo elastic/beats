@@ -20,8 +20,8 @@ package pending_tasks
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 // init registers the MetricSet with the central registry.

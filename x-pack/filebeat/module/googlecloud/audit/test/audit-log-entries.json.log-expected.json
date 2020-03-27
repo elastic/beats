@@ -2,7 +2,10 @@
     {
         "@timestamp": "2019-12-19T00:49:36.086Z",
         "cloud.project.id": "elastic-beats",
+        "event.action": "GetResourceBillingInfo",
         "event.dataset": "googlecloud.audit",
+        "event.id": "-uihnmjctwo",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.outcome": "success",
         "fileset.name": "audit",
@@ -33,7 +36,10 @@
     {
         "@timestamp": "2019-12-19T00:45:51.228Z",
         "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.machineTypes.aggregatedList",
         "event.dataset": "googlecloud.audit",
+        "event.id": "-h6onuze1h7dg",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.outcome": "failure",
         "fileset.name": "audit",
@@ -78,7 +84,10 @@
     {
         "@timestamp": "2019-12-19T00:44:25.051Z",
         "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.instances.aggregatedList",
         "event.dataset": "googlecloud.audit",
+        "event.id": "yonau2dg2zi",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.outcome": "success",
         "fileset.name": "audit",
@@ -123,7 +132,10 @@
     {
         "@timestamp": "2019-12-19T00:44:25.051Z",
         "cloud.project.id": "elastic-beats",
+        "event.action": "beta.compute.instances.aggregatedList",
         "event.dataset": "googlecloud.audit",
+        "event.id": "yonau3dc2zi",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.outcome": "failure",
         "fileset.name": "audit",

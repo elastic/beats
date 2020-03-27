@@ -29,7 +29,7 @@
   "description": "Creates and runs virtual machines on Google Cloud Platform.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/compute/docs/reference/latest/",
-  "etag": "\"F5McR9eEaw0XRpaO3M9gbIugkbs/SUAabl0tEHVm4xtF3n0zpfUm3IU\"",
+  "etag": "\"F5McR9eEaw0XRpaO3M9gbIugkbs/SaxEFFt9Jrfs1w316mmn35GXCN4\"",
   "icons": {
     "x16": "https://www.google.com/images/icons/product/compute_engine-16.png",
     "x32": "https://www.google.com/images/icons/product/compute_engine-32.png"
@@ -21636,7 +21636,7 @@
       }
     }
   },
-  "revision": "20191014",
+  "revision": "20191025",
   "rootUrl": "https://compute.googleapis.com/",
   "schemas": {
     "AcceleratorConfig": {
@@ -22888,7 +22888,7 @@
           "type": "string"
         },
         "status": {
-          "description": "[Output Only] The status of the autoscaler configuration. Current set of possible values: PENDING: Autoscaler backend hasn't read new/updated configuration DELETING: Configuration is being deleted ACTIVE: Configuration is acknowledged to be effective. Some warnings might or might not be present in the status_details field. ERROR: Configuration has errors. Actionable for users. Details are present in the status_details field. New values might be added in the future.",
+          "description": "[Output Only] The status of the autoscaler configuration. Current set of possible values:  \n- PENDING: Autoscaler backend hasn't read new/updated configuration. \n- DELETING: Configuration is being deleted. \n- ACTIVE: Configuration is acknowledged to be effective. Some warnings might be present in the statusDetails field. \n- ERROR: Configuration has errors. Actionable for users. Details are present in the statusDetails field.  New values might be added in the future.",
           "enum": [
             "ACTIVE",
             "DELETING",
@@ -23153,7 +23153,7 @@
           "type": "string"
         },
         "type": {
-          "description": "The type of error, warning or notice returned. Current set of possible values: ALL_INSTANCES_UNHEALTHY (WARNING): All instances in the instance group are unhealthy (not in RUNNING state). BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend service attached to the instance group. CAPPED_AT_MAX_NUM_REPLICAS (WARNING): Autoscaler recommends size bigger than maxNumReplicas. CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric samples are not exported often enough to be a credible base for autoscaling. CUSTOM_METRIC_INVALID (ERROR): The custom metric that was specified does not exist or does not have the necessary labels. MIN_EQUALS_MAX (WARNING): The minNumReplicas is equal to maxNumReplicas. This means the autoscaler cannot add or remove instances from the instance group. MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The autoscaler did not receive any data from the custom metric configured for autoscaling. MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The autoscaler is configured to scale based on a load balancing signal but the instance group has not received any requests from the load balancer. MODE_OFF (WARNING): Autoscaling is turned off. The number of instances in the group won't change automatically. The autoscaling configuration is preserved. MODE_ONLY_UP (WARNING): Autoscaling is in the \"Autoscale only up\" mode. Instances in the group will be only added. MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group cannot be autoscaled because it has more than one backend service attached to it. NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): Exceeded quota for necessary resources, such as CPU, number of instances and so on. REGION_RESOURCE_STOCKOUT (ERROR): Showed only for regional autoscalers: there is a resource stockout in the chosen region. SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not exist. UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR): Autoscaling does not work with an HTTP/S load balancer that has been configured for maxRate. ZONE_RESOURCE_STOCKOUT (ERROR): For zonal autoscalers: there is a resource stockout in the chosen zone. For regional autoscalers: in at least one of the zones you're using there is a resource stockout. New values might be added in the future. Some of the values might not be available in all API versions.",
+          "description": "The type of error, warning, or notice returned. Current set of possible values:  \n- ALL_INSTANCES_UNHEALTHY (WARNING): All instances in the instance group are unhealthy (not in RUNNING state). \n- BACKEND_SERVICE_DOES_NOT_EXIST (ERROR): There is no backend service attached to the instance group. \n- CAPPED_AT_MAX_NUM_REPLICAS (WARNING): Autoscaler recommends a size greater than maxNumReplicas. \n- CUSTOM_METRIC_DATA_POINTS_TOO_SPARSE (WARNING): The custom metric samples are not exported often enough to be a credible base for autoscaling. \n- CUSTOM_METRIC_INVALID (ERROR): The custom metric that was specified does not exist or does not have the necessary labels. \n- MIN_EQUALS_MAX (WARNING): The minNumReplicas is equal to maxNumReplicas. This means the autoscaler cannot add or remove instances from the instance group. \n- MISSING_CUSTOM_METRIC_DATA_POINTS (WARNING): The autoscaler did not receive any data from the custom metric configured for autoscaling. \n- MISSING_LOAD_BALANCING_DATA_POINTS (WARNING): The autoscaler is configured to scale based on a load balancing signal but the instance group has not received any requests from the load balancer. \n- MODE_OFF (WARNING): Autoscaling is turned off. The number of instances in the group won't change automatically. The autoscaling configuration is preserved. \n- MODE_ONLY_UP (WARNING): Autoscaling is in the \"Autoscale only up\" mode. The autoscaler can add instances but not remove any. \n- MORE_THAN_ONE_BACKEND_SERVICE (ERROR): The instance group cannot be autoscaled because it has more than one backend service attached to it. \n- NOT_ENOUGH_QUOTA_AVAILABLE (ERROR): There is insufficient quota for the necessary resources, such as CPU or number of instances. \n- REGION_RESOURCE_STOCKOUT (ERROR): Shown only for regional autoscalers: there is a resource stockout in the chosen region. \n- SCALING_TARGET_DOES_NOT_EXIST (ERROR): The target to be scaled does not exist. \n- UNSUPPORTED_MAX_RATE_LOAD_BALANCING_CONFIGURATION (ERROR): Autoscaling does not work with an HTTP/S load balancer that has been configured for maxRate. \n- ZONE_RESOURCE_STOCKOUT (ERROR): For zonal autoscalers: there is a resource stockout in the chosen zone. For regional autoscalers: in at least one of the zones you're using there is a resource stockout.  New values might be added in the future. Some of the values might not be available in all API versions.",
           "enum": [
             "ALL_INSTANCES_UNHEALTHY",
             "BACKEND_SERVICE_DOES_NOT_EXIST",
@@ -28684,6 +28684,13 @@
             ""
           ],
           "type": "string"
+        },
+        "storageLocations": {
+          "description": "Cloud Storage bucket storage location of the image (regional or multi-regional).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"
@@ -36133,7 +36140,7 @@
         },
         "interval": {
           "$ref": "Duration",
-          "description": "Time interval between ejection sweep analysis. This can result in both new ejections as well as hosts being returned to service. Defaults to 1 seconds."
+          "description": "Time interval between ejection analysis sweeps. This can result in both new ejections as well as hosts being returned to service. Defaults to 1 second."
         },
         "maxEjectionPercent": {
           "description": "Maximum percentage of hosts in the load balancing pool for the backend service that can be ejected. Defaults to 50%.",
@@ -36473,6 +36480,7 @@
             "IN_USE_BACKUP_SCHEDULES",
             "IN_USE_SNAPSHOT_SCHEDULES",
             "LOCAL_SSD_TOTAL_GB",
+            "MACHINE_IMAGES",
             "N2_CPUS",
             "NETWORKS",
             "NETWORK_ENDPOINT_GROUPS",
@@ -36519,6 +36527,7 @@
             "VPN_TUNNELS"
           ],
           "enumDescriptions": [
+            "",
             "",
             "",
             "",
@@ -40417,7 +40426,7 @@
       "id": "Snapshot",
       "properties": {
         "autoCreated": {
-          "description": "[Output Only] Set to true if snapshots are automatically by applying resource policy on the target disk.",
+          "description": "[Output Only] Set to true if snapshots are automatically created by applying resource policy on the target disk.",
           "type": "boolean"
         },
         "creationTimestamp": {

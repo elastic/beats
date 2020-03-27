@@ -22,6 +22,7 @@ import (
 
 	vkit "cloud.google.com/go/pubsub/apiv1"
 	"cloud.google.com/go/pubsub/internal/distribution"
+	"github.com/golang/protobuf/proto"
 	gax "github.com/googleapis/gax-go/v2"
 	pb "google.golang.org/genproto/googleapis/pubsub/v1"
 	"google.golang.org/grpc"
@@ -375,7 +376,9 @@ func (it *messageIterator) handleKeepAlives() {
 }
 
 func (it *messageIterator) sendAck(m map[string]bool) bool {
-	return it.sendAckIDRPC(m, func(ids []string) error {
+	// Account for the Subscription field.
+	overhead := calcFieldSizeString(it.subName)
+	return it.sendAckIDRPC(m, maxPayload-overhead, func(ids []string) error {
 		recordStat(it.ctx, AckCount, int64(len(ids)))
 		addAcks(ids)
 		// Use context.Background() as the call's context, not it.ctx. We don't
@@ -392,13 +395,16 @@ func (it *messageIterator) sendAck(m map[string]bool) bool {
 // percentile in order to capture the highest amount of time necessary without
 // considering 1% outliers.
 func (it *messageIterator) sendModAck(m map[string]bool, deadline time.Duration) bool {
-	return it.sendAckIDRPC(m, func(ids []string) error {
+	deadlineSec := int32(deadline / time.Second)
+	// Account for the Subscription and AckDeadlineSeconds fields.
+	overhead := calcFieldSizeString(it.subName) + calcFieldSizeInt(int(deadlineSec))
+	return it.sendAckIDRPC(m, maxPayload-overhead, func(ids []string) error {
 		if deadline == 0 {
 			recordStat(it.ctx, NackCount, int64(len(ids)))
 		} else {
 			recordStat(it.ctx, ModAckCount, int64(len(ids)))
 		}
-		addModAcks(ids, int32(deadline/time.Second))
+		addModAcks(ids, deadlineSec)
 		// Retry this RPC on Unavailable for a short amount of time, then give up
 		// without returning a fatal error. The utility of this RPC is by nature
 		// transient (since the deadline is relative to the current time) and it
@@ -414,7 +420,7 @@ func (it *messageIterator) sendModAck(m map[string]bool, deadline time.Duration)
 		for {
 			err := it.subc.ModifyAckDeadline(cctx, &pb.ModifyAckDeadlineRequest{
 				Subscription:       it.subName,
-				AckDeadlineSeconds: int32(deadline / time.Second),
+				AckDeadlineSeconds: deadlineSec,
 				AckIds:             ids,
 			})
 			switch status.Code(err) {
@@ -436,14 +442,14 @@ func (it *messageIterator) sendModAck(m map[string]bool, deadline time.Duration)
 	})
 }
 
-func (it *messageIterator) sendAckIDRPC(ackIDSet map[string]bool, call func([]string) error) bool {
+func (it *messageIterator) sendAckIDRPC(ackIDSet map[string]bool, maxSize int, call func([]string) error) bool {
 	ackIDs := make([]string, 0, len(ackIDSet))
 	for k := range ackIDSet {
 		ackIDs = append(ackIDs, k)
 	}
 	var toSend []string
 	for len(ackIDs) > 0 {
-		toSend, ackIDs = splitRequestIDs(ackIDs, maxPayload)
+		toSend, ackIDs = splitRequestIDs(ackIDs, maxSize)
 		if err := call(toSend); err != nil {
 			// The underlying client handles retries, so any error is fatal to the
 			// iterator.
@@ -465,11 +471,35 @@ func (it *messageIterator) pingStream() {
 	_ = it.ps.Send(&pb.StreamingPullRequest{})
 }
 
+// calcFieldSizeString returns the number of bytes string fields
+// will take up in an encoded proto message.
+func calcFieldSizeString(fields ...string) int {
+	overhead := 0
+	for _, field := range fields {
+		overhead += 1 + len(field) + proto.SizeVarint(uint64(len(field)))
+	}
+	return overhead
+}
+
+// calcFieldSizeInt returns the number of bytes int fields
+// will take up in an encoded proto message.
+func calcFieldSizeInt(fields ...int) int {
+	overhead := 0
+	for _, field := range fields {
+		overhead += 1 + proto.SizeVarint(uint64(field))
+	}
+	return overhead
+}
+
+// splitRequestIDs takes a slice of ackIDs and returns two slices such that the first
+// ackID slice can be used in a request where the payload does not exceed maxSize.
 func splitRequestIDs(ids []string, maxSize int) (prefix, remainder []string) {
-	size := reqFixedOverhead
+	size := 0
 	i := 0
+	// TODO(hongalex): Use binary search to find split index, since ackIDs are
+	// fairly constant.
 	for size < maxSize && i < len(ids) {
-		size += overheadPerID + len(ids[i])
+		size += calcFieldSizeString(ids[i])
 		i++
 	}
 	if size > maxSize {

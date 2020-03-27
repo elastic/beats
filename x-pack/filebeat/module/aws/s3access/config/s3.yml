@@ -16,3 +16,7 @@ visibility_timeout: {{ .visibility_timeout }}
 {{ if .api_timeout }}
 api_timeout: {{ .api_timeout }}
 {{ end }}
+
+{{ if .endpoint }}
+endpoint: {{ .endpoint }}
+{{ end }}

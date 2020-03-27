@@ -1,0 +1,3 @@
+[
+    {"ceph":{"cluster_disk":{"available":{"bytes":9659875328},"total":{"bytes":10737418240},"used":{"bytes":3801088}}},"event":{"dataset":"ceph.mgr_cluster_disk","duration":115000,"module":"ceph"},"metricset":{"name":"mgr_cluster_disk","period":10000},"service":{"address":"127.0.0.1:55555","type":"ceph"}}
+]

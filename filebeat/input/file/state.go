@@ -25,7 +25,7 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // State is used to communicate the reading state of a file

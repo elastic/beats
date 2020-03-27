@@ -4,6 +4,7 @@
     HAProxy Module
   short_config: false
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: haproxy
       type: group

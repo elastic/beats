@@ -11,12 +11,12 @@ import (
 	"cloud.google.com/go/functions/metadata"
 	"cloud.google.com/go/pubsub"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 const (
@@ -98,8 +98,8 @@ func (p *PubSub) getEventDataFromContext(ctx context.Context) (PubSubEvent, erro
 }
 
 // PubSubDetails returns the details of the feature.
-func PubSubDetails() *feature.Details {
-	return feature.NewDetails("Google Pub/Sub trigger", "receive messages from Google Pub/Sub.", feature.Stable)
+func PubSubDetails() feature.Details {
+	return feature.MakeDetails("Google Pub/Sub trigger", "receive messages from Google Pub/Sub.", feature.Stable)
 }
 
 // Name returns the name of the function.

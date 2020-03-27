@@ -5,9 +5,9 @@
 package mesh
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 const (

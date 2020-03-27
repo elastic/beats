@@ -56,6 +56,27 @@ processors:
       target_field: "aws.cloudtrail.user_identity.invoked_by"
       ignore_failure: true
   - rename:
+      field: "json.userIdentity.sessionIssuer.type"
+      target_field: "aws.cloudtrail.user_identity.session_issuer.type"
+      ignore_failure: true
+# userIdentity.sessionIssuer.userName is only set with assumed roles.
+  - rename:
+      field: "json.userIdentity.sessionIssuer.userName"
+      target_field: "user.name"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionIssuer.principalId"
+      target_field: "aws.cloudtrail.user_identity.session_issuer.principal_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionIssuer.arn"
+      target_field: "aws.cloudtrail.user_identity.session_issuer.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionIssuer.accountId"
+      target_field: "aws.cloudtrail.user_identity.session_issuer.account_id"
+      ignore_failure: true
+  - rename:
       field: "json.eventSource"
       target_field: "event.provider"
       ignore_failure: true
@@ -67,14 +88,20 @@ processors:
       field: "json.awsRegion"
       target_field: "cloud.region"
       ignore_failure: true
-  - geoip:
-      field: "json.sourceIPAddress"
-      target_field: "source.geo"
-      ignore_failure: true
   - rename:
       field: "json.sourceIPAddress"
       target_field: "source.address"
       ignore_failure: true
+  - grok:
+      field: source.address
+      ignore_failure: true
+      patterns:
+        - ^%{IP:source.ip}$
+  - geoip:
+      field: "source.ip"
+      target_field: "source.geo"
+      ignore_failure: true
+      ignore_missing: true
   - user_agent:
       field: "json.userAgent"
       target_field: "user_agent"
@@ -204,6 +231,38 @@ processors:
         if (ctx.json?.requestParameters.newUserName != null) {
           addRelatedUser(ctx, ctx.json.requestParameters.newUserName);
         }
+
+  - script:
+      lang: painless
+      ignore_failure: true
+      source: >-
+        if (ctx.json?.eventName != 'ConsoleLogin') {
+          return;
+        }
+        Map aed_map = new HashMap();
+        if (ctx.json?.additionalEventData?.MobileVersion != null) {
+          if (ctx.json.additionalEventData.MobileVersion == 'No') {
+            aed_map.put("mobile_version", false);
+          } else {
+            aed_map.put("mobile_version", true);
+          }
+        }
+        if (ctx.json?.additionalEventData?.LoginTo != null) {
+          aed_map.put("login_to", ctx.json.additionalEventData.LoginTo);
+        }
+        if (ctx.json?.additionalEventData?.MFAUsed != null) {
+          if (ctx.json.additionalEventData.MFAUsed == 'No') {
+            aed_map.put("mfa_used", false);
+          } else {
+            aed_map.put("mfa_used", true);
+          }
+        }
+        if (aed_map.size() > 0) {
+          Map cl_map = new HashMap();
+          cl_map.put("additional_eventdata", aed_map);
+          ctx.aws.cloudtrail.put("console_login", cl_map);
+        }
+
   - remove:
       field:
         - "json"

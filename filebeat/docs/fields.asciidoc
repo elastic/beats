@@ -48,6 +48,8 @@ grouped in the following categories:
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-o365>>
+* <<exported-fields-okta>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -1154,6 +1156,48 @@ type: keyword
 
 --
 
+[float]
+=== session_issuer
+
+If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
+
+*`aws.cloudtrail.user_identity.session_issuer.type`*::
++
+--
+The source of the temporary security credentials, such as Root, IAMUser, or Role.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
++
+--
+The internal ID of the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.arn`*::
++
+--
+The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
++
+--
+The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
 *`aws.cloudtrail.error_code`*::
 +
 --
@@ -1308,6 +1352,69 @@ type: keyword
 +
 --
 Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
+
+type: keyword
+
+--
+
+[float]
+=== console_login
+
+Fields specific to ConsoleLogin events
+
+
+[float]
+=== additional_eventdata
+
+Additional Event Data for ConsoleLogin events
+
+
+
+*`aws.cloudtrail.console_login.additional_eventdata.mobile_version`*::
++
+--
+Identifies whether ConsoleLogin was from mobile version
+
+type: boolean
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.login_to`*::
++
+--
+URL for ConsoleLogin
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.mfa_used`*::
++
+--
+Identifies whether multi factor authentication was used during ConsoleLogin
+
+type: boolean
+
+--
+
+[float]
+=== cloudwatch
+
+Fields for AWS CloudWatch logs.
+
+
+[float]
+=== ec2
+
+Fields for AWS EC2 logs in CloudWatch.
+
+
+
+*`aws.ec2.ip_address`*::
++
+--
+The internet address of the requester.
+
 
 type: keyword
 
@@ -3632,7 +3739,52 @@ type: double
 
 --
 
+*`cef.extensions.deviceCustomIPv6Address1`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
 *`cef.extensions.deviceCustomIPv6Address1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3`*::
++
+--
+One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
+
+type: ip
+
+--
+
+*`cef.extensions.deviceCustomIPv6Address3Label`*::
 +
 --
 All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
@@ -3659,33 +3811,6 @@ type: keyword
 
 --
 
-*`cef.extensions.deviceCustomIPv6Address1`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3`*::
-+
---
-One of four IPv6 address fields available to map fields that do not apply to any other in this dictionary.
-
-type: ip
-
---
-
-*`cef.extensions.deviceCustomIPv6Address3Label`*::
-+
---
-All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
-
-type: keyword
-
---
-
 *`cef.extensions.deviceCustomNumber1`*::
 +
 --
@@ -3704,7 +3829,7 @@ type: keyword
 
 --
 
-*`cef.extensions.DeviceCustomNumber2`*::
+*`cef.extensions.deviceCustomNumber2`*::
 +
 --
 One of three number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
@@ -3888,6 +4013,42 @@ type: keyword
 +
 --
 The facility generating this event. For example, Syslog has an explicit facility associated with every event.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber1`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber1Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
+
+type: keyword
+
+--
+
+*`cef.extensions.deviceFlexNumber2`*::
++
+--
+One of two alternative number fields available to map fields that do not apply to any other in this dictionary. Use sparingly and seek a more specific, dictionary supplied field when possible.
+
+type: long
+
+--
+
+*`cef.extensions.deviceFlexNumber2Label`*::
++
+--
+All custom fields have a corresponding label field. Each of these fields is a string and describes the purpose of the custom field.
 
 type: keyword
 
@@ -4676,6 +4837,545 @@ type: keyword
 
 --
 
+[float]
+=== checkpoint
+
+Fields for Check Point custom string mappings.
+
+
+
+*`checkpoint.app_risk`*::
++
+--
+Application risk.
+
+type: keyword
+
+--
+
+*`checkpoint.app_severity`*::
++
+--
+Application threat severity.
+
+type: keyword
+
+--
+
+*`checkpoint.app_sig_id`*::
++
+--
+The signature ID which the application was detected by.
+
+type: keyword
+
+--
+
+*`checkpoint.auth_method`*::
++
+--
+Password authentication protocol used.
+
+type: keyword
+
+--
+
+*`checkpoint.category`*::
++
+--
+Category.
+
+type: keyword
+
+--
+
+*`checkpoint.confidence_level`*::
++
+--
+Confidence level determined.
+
+type: keyword
+
+--
+
+*`checkpoint.connectivity_state`*::
++
+--
+Connectivity state.
+
+type: keyword
+
+--
+
+*`checkpoint.cookie`*::
++
+--
+IKE cookie.
+
+type: keyword
+
+--
+
+*`checkpoint.dst_phone_number`*::
++
+--
+Destination IP-Phone.
+
+type: keyword
+
+--
+
+*`checkpoint.email_control`*::
++
+--
+Engine name.
+
+type: keyword
+
+--
+
+*`checkpoint.email_id`*::
++
+--
+Internal email ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_recipients_num`*::
++
+--
+Number of recipients.
+
+type: long
+
+--
+
+*`checkpoint.email_session_id`*::
++
+--
+Internal email session ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_spool_id`*::
++
+--
+Internal email spool ID.
+
+type: keyword
+
+--
+
+*`checkpoint.email_subject`*::
++
+--
+Email subject.
+
+type: keyword
+
+--
+
+*`checkpoint.event_count`*::
++
+--
+Number of events associated with the log.
+
+type: long
+
+--
+
+*`checkpoint.file_hash`*::
++
+--
+File hash (SHA1 or MD5).
+
+type: keyword
+
+--
+
+*`checkpoint.frequency`*::
++
+--
+Scan frequency.
+
+type: keyword
+
+--
+
+*`checkpoint.icmp_type`*::
++
+--
+ICMP type.
+
+type: long
+
+--
+
+*`checkpoint.icmp_code`*::
++
+--
+ICMP code.
+
+type: long
+
+--
+
+*`checkpoint.identity_type`*::
++
+--
+Identity type.
+
+type: keyword
+
+--
+
+*`checkpoint.incident_extension`*::
++
+--
+Format of original data.
+
+type: keyword
+
+--
+
+*`checkpoint.integrity_av_invoke_type`*::
++
+--
+Scan invoke type.
+
+type: keyword
+
+--
+
+*`checkpoint.peer_gateway`*::
++
+--
+Main IP of the peer Security Gateway.
+
+type: ip
+
+--
+
+*`checkpoint.performance_impact`*::
++
+--
+Protection performance impact.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_id`*::
++
+--
+Protection malware ID.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_name`*::
++
+--
+Specific signature name of the attack.
+
+type: keyword
+
+--
+
+*`checkpoint.protection_type`*::
++
+--
+Type of protection used to detect the attack.
+
+type: keyword
+
+--
+
+*`checkpoint.scan_result`*::
++
+--
+Scan result.
+
+type: keyword
+
+--
+
+*`checkpoint.sensor_mode`*::
++
+--
+Sensor mode.
+
+type: keyword
+
+--
+
+*`checkpoint.severity`*::
++
+--
+Threat severity.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_status`*::
++
+--
+Malware status.
+
+type: keyword
+
+--
+
+*`checkpoint.subscription_expiration`*::
++
+--
+The expiration date of the subscription.
+
+type: date
+
+--
+
+*`checkpoint.tcp_flags`*::
++
+--
+TCP packet flags.
+
+type: keyword
+
+--
+
+*`checkpoint.termination_reason`*::
++
+--
+Termination reason.
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Update status.
+
+type: keyword
+
+--
+
+*`checkpoint.user_status`*::
++
+--
+User response.
+
+type: keyword
+
+--
+
+*`checkpoint.uuid`*::
++
+--
+External ID.
+
+type: keyword
+
+--
+
+*`checkpoint.virus_name`*::
++
+--
+Virus name.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_name`*::
++
+--
+Malware name.
+
+type: keyword
+
+--
+
+*`checkpoint.malware_family`*::
++
+--
+Malware family.
+
+type: keyword
+
+--
+
+*`checkpoint.voip_log_type`*::
++
+--
+VoIP log types.
+
+type: keyword
+
+--
+
+[float]
+=== cef.extensions
+
+Extra vendor-specific extensions.
+
+
+
+*`cef.extensions.cp_app_risk`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.cp_severity`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.ifname`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.inzone`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.layer_uuid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.layer_name`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.logid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.loguid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.match_id`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.nat_addtnl_rulenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.nat_rulenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.origin`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.originsicname`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.outzone`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.parent_rule`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.product`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.rule_action`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.rule_uid`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.sequencenum`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.service_id`*::
++
+--
+type: keyword
+
+--
+
+*`cef.extensions.version`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-cisco]]
 == Cisco fields
 
@@ -4859,6 +5559,26 @@ type: short
 
 --
 
+*`cisco.asa.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.asa.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
+
+--
+
 [float]
 === ftd
 
@@ -5034,6 +5754,26 @@ type: short
 Raw fields for Security Events.
 
 type: object
+
+--
+
+*`cisco.ftd.connection_type`*::
++
+--
+The VPN connection type
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.dap_records`*::
++
+--
+The assigned DAP records
+
+
+type: keyword
 
 --
 
@@ -5340,7 +6080,7 @@ Example: `docker` and `k8s` labels.
 
 type: object
 
-example: {'application': 'foo-bar', 'env': 'production'}
+example: {"application": "foo-bar", "env": "production"}
 
 --
 
@@ -5795,7 +6535,7 @@ type: keyword
 *`client.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -5902,6 +6642,70 @@ example: us-east-1
 --
 
 [float]
+=== code_signature
+
+These fields contain information about binary code signatures.
+
+
+*`code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+[float]
 === container
 
 Container fields are used for meta information about the specific container that is the source of information.
@@ -5929,7 +6733,7 @@ type: keyword
 *`container.image.tag`*::
 +
 --
-Container image tag.
+Container image tags.
 
 type: keyword
 
@@ -6288,7 +7092,7 @@ type: keyword
 *`destination.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -6309,6 +7113,189 @@ example: albert
 +
 --
 type: text
+
+--
+
+[float]
+=== dll
+
+These fields contain information about code libraries dynamically loaded into processes.
+
+Many operating systems refer to "shared code libraries" with different names, but this field set refers to all of the following:
+* Dynamic-link library (`.dll`) commonly used on Windows
+* Shared Object (`.so`) commonly used on Unix-like operating systems
+* Dynamic library (`.dylib`) commonly used on macOS
+
+
+*`dll.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`dll.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`dll.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.name`*::
++
+--
+Name of the library.
+This generally maps to the name of the file on disk.
+
+type: keyword
+
+example: kernel32.dll
+
+--
+
+*`dll.path`*::
++
+--
+Full file path of the library.
+
+type: keyword
+
+example: C:\Windows\System32\kernel32.dll
+
+--
+
+*`dll.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`dll.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`dll.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`dll.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`dll.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -6613,7 +7600,7 @@ example: java.lang.NullPointerException
 === event
 
 The event fields are used for context information about the log or metric event itself.
-A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host and device temperature. See the `event.kind` definition in this section for additional details about metric and state events.
 
 
 *`event.action`*::
@@ -6663,7 +7650,7 @@ In case the two timestamps are identical, @timestamp should be used.
 
 type: date
 
-example: 2016-05-23 08:05:34.857000
+example: 2016-05-23T08:05:34.857Z
 
 --
 
@@ -6732,7 +7719,7 @@ In normal conditions, assuming no tampering, the timestamps should chronological
 
 type: date
 
-example: 2016-05-23 08:05:35.101000
+example: 2016-05-23T08:05:35.101Z
 
 --
 
@@ -6777,7 +7764,10 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 +
 --
 This is one of four ECS Categorization Fields, and indicates the lowest level in the ECS category hierarchy.
-`event.outcome` simply denotes whether the event represent a success or a failure. Note that not all events will have an associated outcome. For example, this field is generally not populated for metric events or events with `event.type:info`.
+`event.outcome` simply denotes whether the event represents a success or a failure from the perspective of the entity that produced the event.
+Note that when a single transaction is described in multiple events, each event may populate different values of `event.outcome`, according to their perspective.
+Also note that in the case of a compound event (a single event that contains multiple logical events), this field should be populated with the value that best captures the overall success or failure from the perspective of the event producer.
+Further note that not all events will have an associated outcome. For example, this field is generally not populated for metric events, events with `event.type:info`, or any events for which an outcome does not make logical sense.
 
 type: keyword
 
@@ -6794,6 +7784,18 @@ Event transports such as Syslog or the Windows Event Log typically mention the s
 type: keyword
 
 example: kernel
+
+--
+
+*`event.reference`*::
++
+--
+Reference URL linking to additional information about this event.
+This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://system.vendor.com/event/#0001234
 
 --
 
@@ -6820,7 +7822,7 @@ type: float
 +
 --
 Sequence number of the event.
-The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regarless of the timestamp precision.
+The sequence number is a value published by some event sources, to make the exact ordering of events unambiguous, regardless of the timestamp precision.
 
 type: long
 
@@ -6873,6 +7875,18 @@ type: keyword
 
 --
 
+*`event.url`*::
++
+--
+URL linking to an external system to continue investigation of this event.
+This URL links to another system where in-depth investigation of the specific occurence of this event can take place. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+
+type: keyword
+
+example: https://mysystem.mydomain.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
 [float]
 === file
 
@@ -6899,6 +7913,64 @@ Attributes names will vary by platform. Here's a non-exhaustive list of values t
 type: keyword
 
 example: ["readonly", "system"]
+
+--
+
+*`file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
 
 --
 
@@ -7036,6 +8108,15 @@ example: 256383
 
 --
 
+*`file.mime_type`*::
++
+--
+MIME type should identify the format of the file or stream of bytes using https://www.iana.org/assignments/media-types/media-types.xhtml[IANA official types], where possible. When more than one type is applicable, the most specific type should be used.
+
+type: keyword
+
+--
+
 *`file.mode`*::
 +
 --
@@ -7093,6 +8174,61 @@ example: /home/alice/example.png
 +
 --
 type: text
+
+--
+
+*`file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -7464,7 +8600,7 @@ type: keyword
 *`host.ip`*::
 +
 --
-Host ip address.
+Host ip addresses.
 
 type: ip
 
@@ -7473,7 +8609,7 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac address.
+Host mac addresses.
 
 type: keyword
 
@@ -7668,7 +8804,7 @@ type: keyword
 *`host.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -7830,6 +8966,45 @@ HTTP version.
 type: keyword
 
 example: 1.1
+
+--
+
+[float]
+=== interface
+
+The interface fields are used to record ingress and egress interface information when reported by an observer (e.g. firewall, router, load balancer) in the context of the observer handling a network connection.  In the case of a single observer interface (e.g. network sensor on a span port) only the observer.ingress information should be populated.
+
+
+*`interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
 
 --
 
@@ -8070,6 +9245,37 @@ example: 6
 
 --
 
+*`network.inner`*::
++
+--
+Network.inner fields are added in addition to network.vlan fields to describe  the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include  vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+
+type: object
+
+--
+
+*`network.inner.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.inner.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
 *`network.name`*::
 +
 --
@@ -8129,12 +9335,109 @@ example: ipv4
 
 --
 
+*`network.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`network.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
 [float]
 === observer
 
 An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
 This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, web proxies, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
+
+*`observer.egress`*::
++
+--
+Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.egress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.egress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.egress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.egress.zone`*::
++
+--
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: Public_Internet
+
+--
 
 *`observer.geo.city_name`*::
 +
@@ -8235,10 +9538,85 @@ type: keyword
 
 --
 
+*`observer.ingress`*::
++
+--
+Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+
+type: object
+
+--
+
+*`observer.ingress.interface.alias`*::
++
+--
+Interface alias as reported by the system, typically used in firewall implementations for e.g. inside, outside, or dmz logical interface naming.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.interface.id`*::
++
+--
+Interface ID as reported by an observer (typically SNMP interface ID).
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.interface.name`*::
++
+--
+Interface name as reported by the system.
+
+type: keyword
+
+example: eth0
+
+--
+
+*`observer.ingress.vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`observer.ingress.vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
+
+--
+
+*`observer.ingress.zone`*::
++
+--
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+
+type: keyword
+
+example: DMZ
+
+--
+
 *`observer.ip`*::
 +
 --
-IP address of the observer.
+IP addresses of the observer.
 
 type: ip
 
@@ -8247,7 +9625,7 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC address of the observer
+MAC addresses of the observer
 
 type: keyword
 
@@ -8669,6 +10047,67 @@ example: 1.12.9
 --
 
 [float]
+=== pe
+
+These fields contain Windows Portable Executable (PE) metadata.
+
+
+*`pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+[float]
 === process
 
 These fields contain information about a process.
@@ -8699,6 +10138,64 @@ example: 4
 
 --
 
+*`process.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
 *`process.command_line`*::
 +
 --
@@ -8715,6 +10212,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -8827,6 +10337,64 @@ example: 4
 
 --
 
+*`process.parent.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`process.parent.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`process.parent.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
 *`process.parent.command_line`*::
 +
 --
@@ -8843,6 +10411,19 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.parent.entity_id`*::
++
+--
+Unique identifier for the process.
+The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+
+type: keyword
+
+example: c2c455d9f99375d
 
 --
 
@@ -8873,6 +10454,42 @@ The field should be absent if there is no exit code for the event (e.g. process 
 type: long
 
 example: 137
+
+--
+
+*`process.parent.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
 
 --
 
@@ -9010,6 +10627,61 @@ example: /home/alice
 +
 --
 type: text
+
+--
+
+*`process.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`process.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`process.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`process.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`process.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -9221,8 +10893,17 @@ example: Debugger
 
 This field set is meant to facilitate pivoting around a piece of data.
 Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
-A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:192.0.2.15`.
 
+
+*`related.hash`*::
++
+--
+All the hashes seen on your event. Populating this field, then using it to search for hashes can help in situations where you're unsure what the hash algorithm is (and therefore which key name to search).
+
+type: keyword
+
+--
 
 *`related.ip`*::
 +
@@ -9248,6 +10929,17 @@ type: keyword
 Rule fields are used to capture the specifics of any observer or agent rules that generate alerts or other notable events.
 Examples of data sources that would populate the rule fields include: network admission control platforms, network or host IDS/IPS, network firewalls, web application firewalls, url filters, endpoint detection and response (EDR) systems, etc.
 
+
+*`rule.author`*::
++
+--
+Name, organization, or pseudonym of the author or authors who created the rule used to generate this event.
+
+type: keyword
+
+example: ['Star-Lord']
+
+--
 
 *`rule.category`*::
 +
@@ -9279,6 +10971,17 @@ A rule ID that is unique within the scope of an agent, observer, or other entity
 type: keyword
 
 example: 101
+
+--
+
+*`rule.license`*::
++
+--
+Name of the license under which the rule used to generate this event is made available.
+
+type: keyword
+
+example: Apache 2.0
 
 --
 
@@ -9663,7 +11366,7 @@ type: keyword
 *`server.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -10103,7 +11806,7 @@ type: keyword
 *`source.user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -10820,7 +12523,7 @@ type: keyword
 *`user.id`*::
 +
 --
-One or multiple unique identifiers of the user.
+Unique identifiers of the user.
 
 type: keyword
 
@@ -10979,6 +12682,37 @@ Version of the user agent.
 type: keyword
 
 example: 12.0
+
+--
+
+[float]
+=== vlan
+
+The VLAN fields are used to identify 802.1q tag(s) of a packet, as well as ingress and egress VLAN associations of an observer in relation to a specific packet or connection.
+Network.vlan fields are used to record a single VLAN tag, or the outer tag in the case of q-in-q encapsulations, for a packet or connection as observed, typically provided by a network sensor (e.g. Zeek, Wireshark) passively reporting on traffic.
+Network.inner VLAN fields are used to report inner q-in-q 802.1q tags (multiple 802.1q encapsulations) as observed, typically provided by a network sensor  (e.g. Zeek, Wireshark) passively reporting on traffic. Network.inner VLAN fields should only be used in addition to network.vlan fields to indicate q-in-q tagging.
+Observer.ingress and observer.egress VLAN values are used to record observer specific information when observer events contain discrete ingress and egress VLAN information, typically provided by firewalls, routers, or load balancers.
+
+
+*`vlan.id`*::
++
+--
+VLAN ID as reported by the observer.
+
+type: keyword
+
+example: 10
+
+--
+
+*`vlan.name`*::
++
+--
+Optional VLAN name as reported by the observer.
+
+type: keyword
+
+example: outside
 
 --
 
@@ -20137,6 +21871,1530 @@ alias to: process.thread.id
 type: alias
 
 alias to: message
+
+--
+
+[float]
+=== ingress_controller
+
+Contains fields for the Ingress Nginx controller access logs.
+
+
+
+*`nginx.ingress_controller.remote_ip_list`*::
++
+--
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
+
+
+type: array
+
+--
+
+*`nginx.ingress_controller.http.request.length`*::
++
+--
+The request length (including request line, header, and request body)
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nginx.ingress_controller.http.request.time`*::
++
+--
+Time elapsed since the first bytes were read from the client
+
+
+type: double
+
+format: duration
+
+--
+
+*`nginx.ingress_controller.upstream.name`*::
++
+--
+The name of the upstream.
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.alternative_name`*::
++
+--
+The name of the alternative upstream.
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.response.length`*::
++
+--
+The length of the response obtained from the upstream server
+
+
+type: long
+
+format: bytes
+
+--
+
+*`nginx.ingress_controller.upstream.response.time`*::
++
+--
+The time spent on receiving the response from the upstream server as seconds with millisecond resolution
+
+
+type: double
+
+format: duration
+
+--
+
+*`nginx.ingress_controller.upstream.response.status_code`*::
++
+--
+The status code of the response obtained from the upstream server
+
+
+type: long
+
+--
+
+*`nginx.ingress_controller.http.request.id`*::
++
+--
+The randomly generated ID of the request
+
+
+type: text
+
+--
+
+*`nginx.ingress_controller.upstream.ip`*::
++
+--
+The IP address of the upstream server. If several servers were contacted during request processing, their addresses are separated by commas.
+
+
+type: ip
+
+--
+
+*`nginx.ingress_controller.upstream.port`*::
++
+--
+The port of the upstream server.
+
+
+type: long
+
+--
+
+*`nginx.ingress_controller.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`nginx.ingress_controller.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`nginx.ingress_controller.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`nginx.ingress_controller.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`nginx.ingress_controller.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`nginx.ingress_controller.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`nginx.ingress_controller.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`nginx.ingress_controller.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`nginx.ingress_controller.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device.name
+
+--
+
+*`nginx.ingress_controller.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`nginx.ingress_controller.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`nginx.ingress_controller.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`nginx.ingress_controller.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`nginx.ingress_controller.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`nginx.ingress_controller.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`nginx.ingress_controller.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`nginx.ingress_controller.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`nginx.ingress_controller.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`nginx.ingress_controller.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-o365]]
+== Office 365 fields
+
+Module for handling logs from Office 365.
+
+
+
+[float]
+=== o365.audit
+
+Fields from Office 365 Management API audit logs.
+
+
+
+*`o365.audit.Actor`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.ActorContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorIpAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorYammerUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertEntityId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertLinks`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.AlertType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationDisplayName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AzureActiveDirectoryEventType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExchangeMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Category`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientAppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientInfoString`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIP`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIPAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Comments`*::
++
+--
+type: text
+
+--
+
+*`o365.audit.CorrelationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CreationTime`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CustomUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Data`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.DataType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventData`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventSource`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExceptionInfo.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExtendedProperties.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExternalAccess`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.GroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Id`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ImplicitShare`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IncidentId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InternalLogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InterSystemsId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IntraSystemId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Item.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Item.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ItemName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ItemType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListItemUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonError`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonUserSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerMasterAccountSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerUPN`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Members`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.Members.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ModifiedProperties.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Name`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ObjectId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Operation`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OriginatingServer`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Parameters.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.PolicyDetails`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.PolicyId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.RecordType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ResultStatus`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SensitiveInfoDetectionIsIncluded`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SharePointMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.SessionId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Severity`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Site`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SiteUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Source`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileExtension`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceRelativeUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Status`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SupportTicketId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Target`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.TargetContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UniqueSharingId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserAgent`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserKey`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Version`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.WebId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Workload`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.YammerNetworkId`*::
++
+--
+type: keyword
+
+--
+
+[[exported-fields-okta]]
+== Okta fields
+
+Module for handling system logs from Okta.
+
+
+
+[float]
+=== okta
+
+Fields from Okta.
+
+
+
+*`okta.uuid`*::
++
+--
+The unique identifier of the Okta LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.event_type`*::
++
+--
+The type of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.version`*::
++
+--
+The version of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.severity`*::
++
+--
+The severity of the LogEvent. Must be one of DEBUG, INFO, WARN, or ERROR.
+
+
+type: keyword
+
+--
+
+*`okta.display_message`*::
++
+--
+The display message of the LogEvent.
+
+
+type: keyword
+
+--
+
+[float]
+=== actor
+
+Fields that let you store information of the actor for the LogEvent.
+
+
+
+*`okta.actor.id`*::
++
+--
+Identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.type`*::
++
+--
+Type of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.alternate_id`*::
++
+--
+Alternate identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.display_name`*::
++
+--
+Display name of the actor.
+
+
+type: keyword
+
+--
+
+[float]
+=== client
+
+Fields that let you store information about the client of the actor.
+
+
+
+*`okta.client.ip`*::
++
+--
+The IP address of the client.
+
+
+type: ip
+
+--
+
+[float]
+=== user_agent
+
+Fields about the user agent information of the client.
+
+
+
+*`okta.client.user_agent.raw_user_agent`*::
++
+--
+The raw informaton of the user agent.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.os`*::
++
+--
+The OS informaton.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.browser`*::
++
+--
+The browser informaton of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.zone`*::
++
+--
+The zone information of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.device`*::
++
+--
+The information of the client device.
+
+
+type: keyword
+
+--
+
+*`okta.client.id`*::
++
+--
+The identifier of the client.
+
+
+type: keyword
+
+--
+
+[float]
+=== outcome
+
+Fields that let you store information about the outcome.
+
+
+
+*`okta.outcome.reason`*::
++
+--
+The reason of the outcome.
+
+
+type: keyword
+
+--
+
+*`okta.outcome.result`*::
++
+--
+The result of the outcome. Must be one of: SUCCESS, FAILURE, SKIPPED, ALLOW, DENY, CHALLENGE, UNKNOWN.
+
+
+type: keyword
+
+--
+
+*`okta.target`*::
++
+--
+The list of targets.
+
+
+type: array
+
+--
+
+[float]
+=== transaction
+
+Fields that let you store information about related transaction.
+
+
+
+*`okta.transaction.id`*::
++
+--
+Identifier of the transaction.
+
+
+type: keyword
+
+--
+
+*`okta.transaction.type`*::
++
+--
+The type of transaction. Must be one of "WEB", "JOB".
+
+
+type: keyword
+
+--
+
+[float]
+=== debug_context
+
+Fields that let you store information about the debug context.
+
+
+
+[float]
+=== debug_data
+
+The debug data.
+
+
+
+*`okta.debug_context.debug_data.device_fingerprint`*::
++
+--
+The fingerprint of the device.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_id`*::
++
+--
+The identifier of the request.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_uri`*::
++
+--
+The request URI.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.threat_suspected`*::
++
+--
+Threat suspected.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.url`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+[float]
+=== authentication_context
+
+Fields that let you store information about authentication context.
+
+
+
+*`okta.authentication_context.authentication_provider`*::
++
+--
+The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.authentication_step`*::
++
+--
+The authentication step.
+
+
+type: integer
+
+--
+
+*`okta.authentication_context.credential_provider`*::
++
+--
+The information about credential provider. Must be one of OKTA_CREDENTIAL_PROVIDER, RSA, SYMANTEC, GOOGLE, DUO, YUBIKEY.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.credential_type`*::
++
+--
+The information about credential type. Must be one of OTP, SMS, PASSWORD, ASSERTION, IWA, EMAIL, OAUTH2, JWT, CERTIFICATE, PRE_SHARED_SYMMETRIC_KEY, OKTA_CLIENT_SESSION, DEVICE_UDID.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.issuer`*::
++
+--
+The information about the issuer.
+
+
+type: array
+
+--
+
+*`okta.authentication_context.external_session_id`*::
++
+--
+The session identifer of the external session if any.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.interface`*::
++
+--
+The interface used. e.g., Outlook, Office365, wsTrust
+
+
+type: keyword
+
+--
+
+[float]
+=== security_context
+
+Fields that let you store information about security context.
+
+
+
+[float]
+=== as
+
+The autonomous system.
+
+
+
+*`okta.security_context.as.number`*::
++
+--
+The AS number.
+
+
+type: integer
+
+--
+
+[float]
+=== organization
+
+The organization that owns the AS number.
+
+
+
+*`okta.security_context.as.organization.name`*::
++
+--
+The organization name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.isp`*::
++
+--
+The Internet Service Provider.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.domain`*::
++
+--
+The domain name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.is_proxy`*::
++
+--
+Whether it is a proxy or not.
+
+
+type: boolean
+
+--
+
+[float]
+=== request
+
+Fields that let you store information about the request, in the form of list of ip_chain.
+
+
+
+[float]
+=== ip_chain
+
+List of ip_chain objects.
+
+
+
+*`okta.request.ip_chain.ip`*::
++
+--
+IP address.
+
+
+type: ip
+
+--
+
+*`okta.request.ip_chain.version`*::
++
+--
+IP version. Must be one of V4, V6.
+
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.source`*::
++
+--
+Source information.
+
+
+type: keyword
+
+--
+
+[float]
+=== geographical_context
+
+Geographical information.
+
+
+
+*`okta.request.ip_chain.geographical_context.city`*::
++
+--
+The city.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.state`*::
++
+--
+The state.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.postal_code`*::
++
+--
+The postal code.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.country`*::
++
+--
+The country.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.geolocation`*::
++
+--
+Geolocation information.
+
+
+type: geo_point
 
 --
 

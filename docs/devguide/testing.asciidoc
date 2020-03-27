@@ -23,7 +23,7 @@ All Go tests are in the same package as the tested code itself and have the post
 
 ==== Running Python Tests
 
-The system tests require a testing binary to be available and the python environment to be set up. To create the testing binary run `make {beatname}.test`. This will create the test binary in the beat directory. To setup the testing environment `make python-env` can be run which will use `virtualenv` to load the dependencies. Then `nosetests` has to be run inside `tests/system`.
+The system tests require a testing binary to be available and the python environment to be set up. To create the testing binary run `make {beatname}.test`. This will create the test binary in the beat directory. To setup the testing environment `make python-env` can be run which will use `venv` to load the dependencies. Then `nosetests` has to be run inside `tests/system`.
 
 To automate all these steps into one `make system-tests` can be run. This creates the binary, the environment and runs all tests which do not require and external service.
 

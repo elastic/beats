@@ -20,10 +20,10 @@ package input
 import (
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/config"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Config stores the options of an input.

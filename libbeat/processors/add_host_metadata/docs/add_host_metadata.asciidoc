@@ -1,11 +1,14 @@
 [[add-host-metadata]]
 === Add Host metadata
 
+++++
+<titleabbrev>add_host_metadata</titleabbrev>
+++++
+
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
 - add_host_metadata:
-    netinfo.enabled: false
     cache.ttl: 5m
     geo:
       name: nyc-dc1-rack1
@@ -19,7 +22,7 @@ processors:
 
 It has the following settings:
 
-`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
+`netinfo.enabled`:: (Optional) Default true. Include IP addresses and MAC addresses as fields host.ip and host.mac
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 

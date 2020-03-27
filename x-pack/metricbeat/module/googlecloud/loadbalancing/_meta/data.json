@@ -1,0 +1,142 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.loadbalancing",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "labels": {
+            "metrics": {
+                "cache_result": "DISABLED",
+                "proxy_continent": "Europe",
+                "response_code": "502",
+                "response_code_class": "500"
+            },
+            "resource": {
+                "backend_name": "INVALID_BACKEND",
+                "backend_scope": "INVALID_BACKEND",
+                "backend_scope_type": "INVALID_BACKEND",
+                "backend_target_name": "test1-backend-ks",
+                "backend_target_type": "BACKEND_SERVICE",
+                "backend_type": "INVALID_BACKEND",
+                "forwarding_rule_name": "test-lb-ks-forwarding-rule",
+                "matched_url_path_rule": "UNMATCHED",
+                "region": "global",
+                "target_proxy_name": "test-lb-ks-target-proxy",
+                "url_map_name": "test-lb-ks"
+            }
+        },
+        "loadbalancing": {
+            "https": {
+                "backend_latencies": {
+                    "count": 4,
+                    "mean": 97.927,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "num_finite_buckets": 66,
+                                "growth_factor": 1.4,
+                                "scale": 1
+                            }
+                        }
+                    },
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        4
+                    ]
+                },
+                "backend_request_bytes_count": 736,
+                "backend_request_count": 4,
+                "backend_response_bytes_count": 1952,
+                "frontend_tcp_rtt": {
+                    "count": 4,
+                    "mean": 50,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "num_finite_buckets": 66,
+                                "growth_factor": 1.4,
+                                "scale": 1
+                            }
+                        }
+                    },
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        4
+                    ]
+                },
+                "request_bytes_count": 736,
+                "request_count": 4,
+                "response_bytes_count": 1952,
+                "total_latencies": {
+                    "count": 4,
+                    "mean": 98.423,
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "num_finite_buckets": 66,
+                                "growth_factor": 1.4,
+                                "scale": 1
+                            }
+                        }
+                    },
+                    "bucket_counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        4
+                    ]
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "loadbalancing",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

@@ -257,10 +257,7 @@ func (p *Decoder) unmarshalDictionary(dict *cfDictionary, val reflect.Value) {
 			sval := dict.values[i]
 
 			keyv := reflect.ValueOf(k).Convert(typ.Key())
-			mapElem := val.MapIndex(keyv)
-			if !mapElem.IsValid() {
-				mapElem = reflect.New(typ.Elem()).Elem()
-			}
+			mapElem := reflect.New(typ.Elem()).Elem()
 
 			p.unmarshal(sval, mapElem)
 			val.SetMapIndex(keyv, mapElem)

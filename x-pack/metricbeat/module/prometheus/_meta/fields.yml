@@ -1,0 +1,31 @@
+- key: prometheus-xpack
+  title: "Prometheus typed metrics"
+  description: >
+    Stats scraped from a Prometheus endpoint.
+  release: ga
+  settings: ["ssl", "http"]
+  fields:
+    - name: prometheus.*.value
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Prometheus gauge metric
+    - name: prometheus.*.counter
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Prometheus counter metric
+    - name: prometheus.*.rate
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Prometheus rated counter metric
+    - name: prometheus.*.histogram
+      type: object
+      object_type: histogram
+      object_type_mapping_type: "*"
+      description: >
+        Prometheus histogram metric

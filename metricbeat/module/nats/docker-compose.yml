@@ -5,19 +5,8 @@ services:
     image: docker.elastic.co/integrations-ci/beats-nats:${NATS_VERSION:-2.0.4}-1
     build:
       context: ./_meta
-      dockerfile: Dockerfile.2.0.X
+      dockerfile: Dockerfile
       args:
         NATS_VERSION: ${NATS_VERSION:-2.0.4}
     ports:
       - 8222
-
-  nats_1_3:
-    image: docker.elastic.co/integrations-ci/beats-nats:${NATS_VERSION:-1.3.0}-1
-    build:
-      context: ./_meta
-      dockerfile: Dockerfile.1.3
-      args:
-        NATS_VERSION: ${NATS_VERSION:-1.3.0}
-    ports:
-      - 8222
-

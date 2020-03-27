@@ -75,7 +75,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), expected_events)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(KUBERNETES_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(KUBERNETES_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 

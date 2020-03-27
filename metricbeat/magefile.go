@@ -28,32 +28,42 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
-	build "github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/dashboards"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	update "github.com/elastic/beats/dev-tools/mage/target/update"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
+	test.RegisterDeps(GoIntegTest)
+	unittest.RegisterGoTestDeps(Fields)
+	unittest.RegisterPythonTestDeps(Fields)
+
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 //CollectAll generates the docs and the fields.
@@ -114,7 +124,7 @@ func configYML() error {
 func MockedTests(ctx context.Context) error {
 	params := devtools.DefaultGoTestUnitArgs()
 
-	params.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
+	params.ExtraFlags = []string{"github.com/elastic/beats/v7/metricbeat/mb/testing/data/."}
 
 	if module := os.Getenv("MODULE"); module != "" {
 		params.ExtraFlags = append(params.ExtraFlags, "-module="+module)
@@ -132,13 +142,6 @@ func MockedTests(ctx context.Context) error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML("module")
-}
-
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
@@ -172,6 +175,8 @@ func CollectDocs() error {
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
 func GoIntegTest(ctx context.Context) error {
+	mg.Deps(Fields)
 	return devtools.GoTestIntegrationForModule(ctx)
 }

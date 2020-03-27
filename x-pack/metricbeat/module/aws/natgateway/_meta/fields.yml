@@ -1,0 +1,6 @@
+- name: natgateway
+  type: group
+  description: >
+    `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
+  release: beta
+  fields:

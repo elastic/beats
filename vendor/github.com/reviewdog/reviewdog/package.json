@@ -1,0 +1,9 @@
+{
+  "name": "reviewdog",
+  "devDependencies": {
+    "textlint": "^11.3.1",
+    "textlint-rule-common-misspellings": "^1.0.1",
+    "textlint-rule-no-dead-link": "^4.4.4",
+    "textlint-rule-write-good": "^1.6.2"
+  }
+}

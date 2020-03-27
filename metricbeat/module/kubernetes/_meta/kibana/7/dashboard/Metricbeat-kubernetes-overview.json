@@ -543,7 +543,7 @@
                                     {
                                         "field": "kubernetes.pod.network.rx.bytes",
                                         "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
-                                        "type": "sum"
+                                        "type": "max"
                                     },
                                     {
                                         "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
@@ -578,7 +578,7 @@
             "id": "16fa4470-2bfd-11e7-859b-f78b612cde28-ecs",
             "type": "visualization",
             "updated_at": "2018-03-01T18:58:07.906Z",
-            "version": 3
+            "version": 4
         },
         {
             "attributes": {
@@ -637,7 +637,7 @@
                                     {
                                         "field": "kubernetes.pod.network.tx.bytes",
                                         "id": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
-                                        "type": "sum"
+                                        "type": "max"
                                     },
                                     {
                                         "field": "0d5c9221-2bf2-11e7-859b-f78b612cde28",
@@ -672,7 +672,7 @@
             "id": "294546b0-30d6-11e7-8df8-6d3604a72912-ecs",
             "type": "visualization",
             "updated_at": "2018-03-01T18:58:07.906Z",
-            "version": 3
+            "version": 4
         },
         {
             "attributes": {
@@ -797,7 +797,7 @@
                                     {
                                         "field": "kubernetes.container.cpu.usage.core.ns",
                                         "id": "5d3692a2-2bfc-11e7-859b-f78b612cde28",
-                                        "type": "sum"
+                                        "type": "max"
                                     },
                                     {
                                         "field": "5d3692a2-2bfc-11e7-859b-f78b612cde28",
@@ -834,7 +834,7 @@
             "id": "58e644f0-30d6-11e7-8df8-6d3604a72912-ecs",
             "type": "visualization",
             "updated_at": "2018-03-01T18:58:07.906Z",
-            "version": 3
+            "version": 4
         },
         {
             "attributes": {
