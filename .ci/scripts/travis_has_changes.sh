@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
-# commit range to check for. For example master...<PR branch>
-RANGE=$TRAVIS_COMMIT_RANGE
-DIRLIST=$@
+# Changes on these files will trigger all builds.
+COMMON_DIRLIST="vendor dev-tools .travis.yml"
 
-# find modified files in range and filter out docs only changes
+# Commit range to check for. For example master...<PR branch>
+RANGE=$TRAVIS_COMMIT_RANGE
+DIRLIST="$@ $COMMON_DIRLIST"
+
+# Find modified files in range and filter out docs only changes.
 CHANGED_FILES=$(git diff --name-only $RANGE | grep -v '.asciidoc')
 
 beginswith() { case $2 in "$1"*) true;; *) false;; esac }

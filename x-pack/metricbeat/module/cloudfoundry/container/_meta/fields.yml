@@ -2,7 +2,7 @@
   type: group
   description: >
     `container` contains container metrics from Cloud Foundry.
-  release: experimental
+  release: beta
   fields:
     - name: instance_index
       type: long

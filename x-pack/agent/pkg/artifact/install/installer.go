@@ -39,5 +39,6 @@ func NewInstaller(config *artifact.Config) (Installer, error) {
 	if runtime.GOOS == "windows" {
 		return zip.NewInstaller(config)
 	}
+
 	return tar.NewInstaller(config)
 }

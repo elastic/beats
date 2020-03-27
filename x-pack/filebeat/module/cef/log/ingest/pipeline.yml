@@ -80,6 +80,9 @@ processors:
   - pipeline:
         name: '{< IngestPipeline "fp-pipeline" >}'
         if: "ctx.cef?.device?.vendor == 'FORCEPOINT'"
+  - pipeline:
+        name: '{< IngestPipeline "cp-pipeline" >}'
+        if: "ctx.cef?.device?.vendor == 'Check Point'"
 on_failure:
   - set:
         field: error.message

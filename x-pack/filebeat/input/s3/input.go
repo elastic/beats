@@ -178,30 +178,46 @@ func (p *s3Input) Run() {
 		if err != nil {
 			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
 		}
-
-		awsConfig := p.awsConfig.Copy()
-		awsConfig.Region = regionName
-
-		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
-		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
+		p.awsConfig.Region = regionName
 
 		p.workerWg.Add(1)
-		go p.run(svcSQS, svcS3, visibilityTimeout)
+		go p.run(visibilityTimeout)
 		p.workerWg.Done()
 	})
 }
 
-func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
+func (p *s3Input) run(visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
+	svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
+
 	for p.context.Err() == nil {
 		// receive messages from sqs
 		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
-			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				continue
+			if awsErr, ok := err.(awserr.Error); ok {
+				if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+					continue
+				}
+
+				// When AWS credentials are expired, re-obtain AWS credentials again
+				if awssdk.IsErrorExpiredCreds(awsErr) {
+					p.logger.Warn(errors.Wrap(err, "credentials are expired, please update the credentials"))
+
+					awsConfig, err := awscommon.GetAWSCredentials(p.config.AwsConfig)
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "getAWSCredentials failed"))
+						continue
+					}
+
+					awsConfig.Region = p.awsConfig.Region
+					p.awsConfig = awsConfig
+					svcSQS = sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
+					continue
+				}
 			}
+
 			p.logger.Error("failed to receive message from SQS: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
@@ -213,6 +229,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 		}
 
 		// process messages received from sqs, get logs from s3 and create events
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", p.awsConfig.Region, p.awsConfig))
 		p.processor(p.config.QueueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
 	}
 }
@@ -428,6 +445,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
+	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
+		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
+		p.logger.Error(err)
+		return err
+	}
+
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(reader)
@@ -440,7 +464,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 		return nil
 	}
 
-	// Check content-type
+	// Check content-type = "application/x-gzip" or filename ends with ".gz"
 	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
@@ -587,33 +611,34 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
-	f := common.MapStr{
-		"message": log,
-		"log": common.MapStr{
-			"offset":    int64(offset),
-			"file.path": constructObjectURL(info),
-		},
-		"aws": common.MapStr{
-			"s3": common.MapStr{
-				"bucket": common.MapStr{
-					"name": info.name,
-					"arn":  info.arn},
-				"object.key": info.key,
+	s3Ctx.Inc()
+
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": log,
+			"log": common.MapStr{
+				"offset":    int64(offset),
+				"file.path": constructObjectURL(info),
+			},
+			"aws": common.MapStr{
+				"s3": common.MapStr{
+					"bucket": common.MapStr{
+						"name": info.name,
+						"arn":  info.arn},
+					"object.key": info.key,
+				},
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   info.region,
 			},
 		},
-		"cloud": common.MapStr{
-			"provider": "aws",
-			"region":   info.region,
-		},
+		Private: s3Ctx,
 	}
+	event.SetID(objectHash + "-" + fmt.Sprintf("%012d", offset))
 
-	s3Ctx.Inc()
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields:    f,
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Ctx,
-	}
+	return event
 }
 
 func constructObjectURL(info s3Info) string {

@@ -1,0 +1,17 @@
+default: false
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: storage
+      metrics:
+        - "storage.googleapis.com/api/request_count"
+        - "storage.googleapis.com/authz/acl_based_object_access_count"
+        - "storage.googleapis.com/authz/acl_operations_count"
+        - "storage.googleapis.com/authz/object_specific_acl_mutation_count"
+        - "storage.googleapis.com/network/received_bytes_count"
+        - "storage.googleapis.com/network/sent_bytes_count"
+        - "storage.googleapis.com/storage/object_count"
+        - "storage.googleapis.com/storage/total_byte_seconds"
+        - "storage.googleapis.com/storage/total_bytes"
