@@ -28,6 +28,7 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
+    booleanParam(name: 'arm64Test', defaultValue: false, description: 'Allow Linux/arm64 stages.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -69,6 +70,20 @@ pipeline {
           }
           steps {
             makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+          }
+        }
+
+        stage('Elastic Agent X-Pack linux/arm64'){
+          agent { label 'aarch64' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.arm64Test
+            }
+          }
+          steps {
+            mageTarget("Elastic Agent X-Pack linux/arm64", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -155,6 +170,32 @@ pipeline {
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "unitTest")
           }
         }
+        stage('Filebeat OSS linux/arm64'){
+          agent { label 'aarch64' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT != "false" && params.arm64Test
+            }
+          }
+          steps {
+            mageTarget('Filebeat OSS linux/arm64', "filebeat", "build goUnitTest")
+          }
+        }
+        stage('Filebeat X-Pack linux/arm64'){
+          agent { label 'aarch64' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.arm64Test
+            }
+          }
+          steps {
+            mageTarget('Filebeat X-Pack linux/arm64', "x-pack/filebeat", "build goUnitTest")
+          }
+        }
         stage('Heartbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -194,6 +235,19 @@ pipeline {
               }
               steps {
                 mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "unitTest")
+              }
+            }
+            stage('Heartbeat linux/arm64'){
+              agent { label 'aarch64' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return env.BUILD_HEARTBEAT != "false" && params.arm64Test
+                }
+              }
+              steps {
+                mageTarget('Heartbeat linux/arm64', "heartbeat", "build goUnitTest")
               }
             }
           }
@@ -244,6 +298,19 @@ pipeline {
                 mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "unitTest")
               }
             }
+            stage('Auditbeat OSS linux/arm64'){
+              agent { label 'aarch64' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return env.BUILD_AUDITBEAT != "false" && params.arm64Test
+                }
+              }
+              steps {
+                mageTarget('Auditbeat OSS linux/arm64', "auditbeat", "build goUnitTest")
+              }
+            }
           }
         }
         stage('Auditbeat x-pack'){
@@ -255,8 +322,25 @@ pipeline {
               return env.BUILD_AUDITBEAT_XPACK != "false"
             }
           }
-          steps {
-            mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+          stages {
+            stage('Auditbeat X-Pack linux/amd64') {
+              steps {
+                mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+              }
+            }
+            stage('Auditbeat X-Pack linux/arm64'){
+              agent { label 'aarch64' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return env.BUILD_AUDITBEAT_XPACK != "false" && params.arm64Test
+                }
+              }
+              steps {
+                mageTarget('Auditbeat X-Pack linux/arm64', "x-pack/auditbeat", "build goUnitTest")
+              }
+            }
           }
         }
         stage('Libbeat'){
@@ -282,6 +366,19 @@ pipeline {
             stage('Libbeat stress-tests'){
               steps {
                 makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
+              }
+            }
+            stage('Libbeat OSS linux/arm64'){
+              agent { label 'aarch64' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return env.BUILD_LIBBEAT != "false" && params.arm64Test
+                }
+              }
+              steps {
+                mageTarget('Libbeat OSS linux/arm64', "libbeat", "build goUnitTest")
               }
             }
           }
@@ -647,7 +744,8 @@ def mageTargetWin(String context, String directory, String target) {
 
 def withBeatsEnv(boolean archive, Closure body) {
   def os = goos()
-  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+  def arch = goarch()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.${arch}"
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -728,10 +826,10 @@ def withBeatsEnvWin(Closure body) {
   }
 }
 
-def goos(){
+def goos() {
   def labels = env.NODE_LABELS
 
-  if (labels.contains('linux')) {
+  if (labels.contains('linux') || labels.contains('aarch64')) {
     return 'linux'
   } else if (labels.contains('windows')) {
     return 'windows'
@@ -740,6 +838,16 @@ def goos(){
   }
 
   error("Unhandled OS name in NODE_LABELS: " + labels)
+}
+
+def goarch() {
+  def labels = env.NODE_LABELS
+
+  if (labels.contains('aarch64')) {
+    return 'arm64'
+  }
+
+  return 'amd64'
 }
 
 def dumpMage(){
