@@ -1,0 +1,7 @@
+version: '2.3'
+
+services:
+  prometheus:
+    extends:
+      file: ../../../../metricbeat/module/prometheus/docker-compose.yml
+      service: prometheus

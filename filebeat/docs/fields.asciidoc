@@ -48,6 +48,8 @@ grouped in the following categories:
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-o365>>
+* <<exported-fields-okta>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
@@ -1154,6 +1156,48 @@ type: keyword
 
 --
 
+[float]
+=== session_issuer
+
+If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
+
+*`aws.cloudtrail.user_identity.session_issuer.type`*::
++
+--
+The source of the temporary security credentials, such as Root, IAMUser, or Role.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
++
+--
+The internal ID of the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.arn`*::
++
+--
+The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
++
+--
+The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
 *`aws.cloudtrail.error_code`*::
 +
 --
@@ -1310,6 +1354,46 @@ type: keyword
 Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
 
 type: keyword
+
+--
+
+[float]
+=== console_login
+
+Fields specific to ConsoleLogin events
+
+
+[float]
+=== additional_eventdata
+
+Additional Event Data for ConsoleLogin events
+
+
+
+*`aws.cloudtrail.console_login.additional_eventdata.mobile_version`*::
++
+--
+Identifies whether ConsoleLogin was from mobile version
+
+type: boolean
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.login_to`*::
++
+--
+URL for ConsoleLogin
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.console_login.additional_eventdata.mfa_used`*::
++
+--
+Identifies whether multi factor authentication was used during ConsoleLogin
+
+type: boolean
 
 --
 
@@ -22085,6 +22169,1232 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-o365]]
+== Office 365 fields
+
+Module for handling logs from Office 365.
+
+
+
+[float]
+=== o365.audit
+
+Fields from Office 365 Management API audit logs.
+
+
+
+*`o365.audit.Actor`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.ActorContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorIpAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ActorYammerUserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertEntityId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AlertLinks`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.AlertType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationDisplayName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ApplicationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.AzureActiveDirectoryEventType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExchangeMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Category`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientAppId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientInfoString`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIP`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ClientIPAddress`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Comments`*::
++
+--
+type: text
+
+--
+
+*`o365.audit.CorrelationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CreationTime`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.CustomUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Data`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.DataType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventData`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.EventSource`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ExceptionInfo.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExtendedProperties.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ExternalAccess`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.GroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Id`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ImplicitShare`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IncidentId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InternalLogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.InterSystemsId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.IntraSystemId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Item.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Item.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ItemName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ItemType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListItemUniqueId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonError`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.LogonUserSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerMasterAccountSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerSid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.MailboxOwnerUPN`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Members`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.Members.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.ModifiedProperties.*.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.Name`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ObjectId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Operation`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OrganizationName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.OriginatingServer`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Parameters.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.PolicyDetails`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.PolicyId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.RecordType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ResultStatus`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SensitiveInfoDetectionIsIncluded`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SharePointMetaData.*`*::
++
+--
+type: object
+
+--
+
+*`o365.audit.SessionId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Severity`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Site`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SiteUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Source`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileExtension`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceFileName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SourceRelativeUrl`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Status`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.SupportTicketId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Target`*::
++
+--
+type: array
+
+--
+
+*`o365.audit.TargetContextId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TargetUserOrGroupType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamName`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UniqueSharingId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserAgent`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserKey`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.UserType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Version`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.WebId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.Workload`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.YammerNetworkId`*::
++
+--
+type: keyword
+
+--
+
+[[exported-fields-okta]]
+== Okta fields
+
+Module for handling system logs from Okta.
+
+
+
+[float]
+=== okta
+
+Fields from Okta.
+
+
+
+*`okta.uuid`*::
++
+--
+The unique identifier of the Okta LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.event_type`*::
++
+--
+The type of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.version`*::
++
+--
+The version of the LogEvent.
+
+
+type: keyword
+
+--
+
+*`okta.severity`*::
++
+--
+The severity of the LogEvent. Must be one of DEBUG, INFO, WARN, or ERROR.
+
+
+type: keyword
+
+--
+
+*`okta.display_message`*::
++
+--
+The display message of the LogEvent.
+
+
+type: keyword
+
+--
+
+[float]
+=== actor
+
+Fields that let you store information of the actor for the LogEvent.
+
+
+
+*`okta.actor.id`*::
++
+--
+Identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.type`*::
++
+--
+Type of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.alternate_id`*::
++
+--
+Alternate identifier of the actor.
+
+
+type: keyword
+
+--
+
+*`okta.actor.display_name`*::
++
+--
+Display name of the actor.
+
+
+type: keyword
+
+--
+
+[float]
+=== client
+
+Fields that let you store information about the client of the actor.
+
+
+
+*`okta.client.ip`*::
++
+--
+The IP address of the client.
+
+
+type: ip
+
+--
+
+[float]
+=== user_agent
+
+Fields about the user agent information of the client.
+
+
+
+*`okta.client.user_agent.raw_user_agent`*::
++
+--
+The raw informaton of the user agent.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.os`*::
++
+--
+The OS informaton.
+
+
+type: keyword
+
+--
+
+*`okta.client.user_agent.browser`*::
++
+--
+The browser informaton of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.zone`*::
++
+--
+The zone information of the client.
+
+
+type: keyword
+
+--
+
+*`okta.client.device`*::
++
+--
+The information of the client device.
+
+
+type: keyword
+
+--
+
+*`okta.client.id`*::
++
+--
+The identifier of the client.
+
+
+type: keyword
+
+--
+
+[float]
+=== outcome
+
+Fields that let you store information about the outcome.
+
+
+
+*`okta.outcome.reason`*::
++
+--
+The reason of the outcome.
+
+
+type: keyword
+
+--
+
+*`okta.outcome.result`*::
++
+--
+The result of the outcome. Must be one of: SUCCESS, FAILURE, SKIPPED, ALLOW, DENY, CHALLENGE, UNKNOWN.
+
+
+type: keyword
+
+--
+
+*`okta.target`*::
++
+--
+The list of targets.
+
+
+type: array
+
+--
+
+[float]
+=== transaction
+
+Fields that let you store information about related transaction.
+
+
+
+*`okta.transaction.id`*::
++
+--
+Identifier of the transaction.
+
+
+type: keyword
+
+--
+
+*`okta.transaction.type`*::
++
+--
+The type of transaction. Must be one of "WEB", "JOB".
+
+
+type: keyword
+
+--
+
+[float]
+=== debug_context
+
+Fields that let you store information about the debug context.
+
+
+
+[float]
+=== debug_data
+
+The debug data.
+
+
+
+*`okta.debug_context.debug_data.device_fingerprint`*::
++
+--
+The fingerprint of the device.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_id`*::
++
+--
+The identifier of the request.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.request_uri`*::
++
+--
+The request URI.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.threat_suspected`*::
++
+--
+Threat suspected.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.url`*::
++
+--
+The URL.
+
+
+type: keyword
+
+--
+
+[float]
+=== authentication_context
+
+Fields that let you store information about authentication context.
+
+
+
+*`okta.authentication_context.authentication_provider`*::
++
+--
+The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.authentication_step`*::
++
+--
+The authentication step.
+
+
+type: integer
+
+--
+
+*`okta.authentication_context.credential_provider`*::
++
+--
+The information about credential provider. Must be one of OKTA_CREDENTIAL_PROVIDER, RSA, SYMANTEC, GOOGLE, DUO, YUBIKEY.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.credential_type`*::
++
+--
+The information about credential type. Must be one of OTP, SMS, PASSWORD, ASSERTION, IWA, EMAIL, OAUTH2, JWT, CERTIFICATE, PRE_SHARED_SYMMETRIC_KEY, OKTA_CLIENT_SESSION, DEVICE_UDID.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.issuer`*::
++
+--
+The information about the issuer.
+
+
+type: array
+
+--
+
+*`okta.authentication_context.external_session_id`*::
++
+--
+The session identifer of the external session if any.
+
+
+type: keyword
+
+--
+
+*`okta.authentication_context.interface`*::
++
+--
+The interface used. e.g., Outlook, Office365, wsTrust
+
+
+type: keyword
+
+--
+
+[float]
+=== security_context
+
+Fields that let you store information about security context.
+
+
+
+[float]
+=== as
+
+The autonomous system.
+
+
+
+*`okta.security_context.as.number`*::
++
+--
+The AS number.
+
+
+type: integer
+
+--
+
+[float]
+=== organization
+
+The organization that owns the AS number.
+
+
+
+*`okta.security_context.as.organization.name`*::
++
+--
+The organization name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.isp`*::
++
+--
+The Internet Service Provider.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.domain`*::
++
+--
+The domain name.
+
+
+type: keyword
+
+--
+
+*`okta.security_context.is_proxy`*::
++
+--
+Whether it is a proxy or not.
+
+
+type: boolean
+
+--
+
+[float]
+=== request
+
+Fields that let you store information about the request, in the form of list of ip_chain.
+
+
+
+[float]
+=== ip_chain
+
+List of ip_chain objects.
+
+
+
+*`okta.request.ip_chain.ip`*::
++
+--
+IP address.
+
+
+type: ip
+
+--
+
+*`okta.request.ip_chain.version`*::
++
+--
+IP version. Must be one of V4, V6.
+
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.source`*::
++
+--
+Source information.
+
+
+type: keyword
+
+--
+
+[float]
+=== geographical_context
+
+Geographical information.
+
+
+
+*`okta.request.ip_chain.geographical_context.city`*::
++
+--
+The city.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.state`*::
++
+--
+The state.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.postal_code`*::
++
+--
+The postal code.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.country`*::
++
+--
+The country.
+
+type: keyword
+
+--
+
+*`okta.request.ip_chain.geographical_context.geolocation`*::
++
+--
+Geolocation information.
+
+
+type: geo_point
 
 --
 

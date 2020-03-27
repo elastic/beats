@@ -19,10 +19,11 @@ package transport
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ProxyConfig = transport.ProxyConfig
 
 func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
-	return transport.ProxyDialer(config, forward)
+	return transport.ProxyDialer(logp.NewLogger("transport"), config, forward)
 }
