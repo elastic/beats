@@ -150,5 +150,39 @@
         "tags": [
             "cef"
         ]
+    },
+    {
+        "cef.device.event_class_id": "18",
+        "cef.device.product": "Vaporware",
+        "cef.device.vendor": "Elastic",
+        "cef.device.version": "1.0.0-alpha",
+        "cef.extensions.destinationAddress": "192.168.1.2",
+        "cef.extensions.message": "This event is padded with whitespace",
+        "cef.extensions.sourceAddress": "192.168.3.4",
+        "cef.name": "Authentication",
+        "cef.severity": "low",
+        "cef.version": "0",
+        "destination.ip": "192.168.1.2",
+        "event.code": "18",
+        "event.dataset": "cef.log",
+        "event.module": "cef",
+        "event.original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|message=This event is padded with whitespace dst=192.168.1.2 src=192.168.3.4     ",
+        "event.severity": 0,
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 611,
+        "message": "This event is padded with whitespace",
+        "observer.product": "Vaporware",
+        "observer.vendor": "Elastic",
+        "observer.version": "1.0.0-alpha",
+        "related.ip": [
+            "192.168.1.2",
+            "192.168.3.4"
+        ],
+        "service.type": "cef",
+        "source.ip": "192.168.3.4",
+        "tags": [
+            "cef"
+        ]
     }
 ]
