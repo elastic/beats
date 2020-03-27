@@ -6,7 +6,7 @@ You can use {beatname_uc} on Cloud Foundry to retrieve and ship container logs.
 ifeval::["{release-state}"=="unreleased"]
 
 However, version {version} of {beatname_uc} has not yet been
-released, so build is currently available for this version.
+released, no build is currently available for this version.
 
 endif::[]
 
