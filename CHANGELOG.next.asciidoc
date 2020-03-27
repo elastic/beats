@@ -210,6 +210,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add pattern for Cisco ASA / FTD Message 734001 {issue}16212[16212] {pull}16612[16612]
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
+- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 
 *Heartbeat*
 
@@ -275,6 +276,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add Storage metricsets to GCP module {pull}15598[15598]
+- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
 
 *Packetbeat*
 
