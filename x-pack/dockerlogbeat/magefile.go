@@ -41,8 +41,8 @@ const (
 	hubID             = "elastic"
 	logDriverName     = "elastic-logging-plugin"
 	dockerPluginName  = hubID + "/" + logDriverName
-	packageStagingDir = "build/package"
-	packageEndDir     = "build/distributions"
+	packageStagingDir = "build/package/"
+	packageEndDir     = "build/distributions/"
 	rootImageName     = "rootfsimage"
 )
 
