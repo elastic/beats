@@ -5,8 +5,12 @@
 package googlepubsub
 
 import (
+	"context"
 	"fmt"
 	"os"
+
+	"cloud.google.com/go/pubsub"
+	"golang.org/x/oauth2/google"
 )
 
 type config struct {
