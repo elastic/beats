@@ -51,12 +51,8 @@ func (c *config) Validate() error {
 	}
 
 	// credentials_json
-	if c.CredentialsJSON != "" {
-		if _, err := os.Stat(c.CredentialsJSON); os.IsNotExist(err) {
-			return fmt.Errorf("credentials_json is configured, but the file: %q cannot be found.", c.CredentialsJSON)
-		} else {
-			return nil
-		}
+	if c.CredentialsJSON != nil {
+		return nil
 	}
 
 	return fmt.Errorf("None of the authentication mechanisms (ADC, credentials_file, credentials_json) is available.")
