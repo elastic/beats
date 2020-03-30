@@ -1027,7 +1027,6 @@ metricbeat.modules:
   # Store counter rates instead of original cumulative counters (experimental, default: false)
   #rate_counters: true
 
-
 # Metrics sent by a Prometheus server using remote_write option
 #- module: prometheus
 #  metricsets: ["remote_write"]
