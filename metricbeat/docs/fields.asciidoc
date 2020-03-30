@@ -21988,6 +21988,33 @@ type: keyword
 --
 
 [float]
+=== source
+
+The component reporting this event
+
+
+
+*`kubernetes.event.source.component`*::
++
+--
+Component from which the event is generated
+
+
+type: keyword
+
+--
+
+*`kubernetes.event.source.host`*::
++
+--
+Node name on which the event is generated
+
+
+type: keyword
+
+--
+
+[float]
 === metadata
 
 Metadata associated with the given event
