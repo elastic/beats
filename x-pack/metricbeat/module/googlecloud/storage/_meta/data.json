@@ -1,26 +1,15 @@
 {
-    "@timestamp": "2020-01-15T19:50:00.000Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "googlecloud"
     },
-    "ecs": {
-        "version": "1.4.0"
-    },
-    "host": {
-        "name": "mcastro"
-    },
-    "agent": {
-        "type": "metricbeat",
-        "ephemeral_id": "b925f861-f858-4aa8-8075-99fc8e86e736",
-        "hostname": "mcastro",
-        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
-        "version": "8.0.0"
-    },
-    "metricset": {
-        "name": "storage",
-        "period": 300000
+    "event": {
+        "dataset": "googlecloud.storage",
+        "duration": 115000,
+        "module": "googlecloud"
     },
     "googlecloud": {
         "labels": {
@@ -28,28 +17,23 @@
                 "storage_class": "REGIONAL"
             },
             "resource": {
-                "location": "us-central1",
-                "bucket_name": "test-elastic-metricbeat"
+                "bucket_name": "elastic-vsphere-images",
+                "location": "us-east1"
             }
         },
         "storage": {
             "storage": {
-                "object_count": 1
+                "object_count": 3,
+                "total_byte_seconds": 58816542441472,
+                "total_bytes": 680747019
             }
         }
     },
+    "metricset": {
+        "name": "storage",
+        "period": 10000
+    },
     "service": {
         "type": "googlecloud"
-    },
-    "cloud": {
-        "account": {
-            "id": "elastic-metricbeat"
-        },
-        "provider": "googlecloud"
-    },
-    "event": {
-        "dataset": "googlecloud.storage",
-        "module": "googlecloud",
-        "duration": 818254385
     }
 }

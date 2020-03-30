@@ -15,8 +15,14 @@ import (
 )
 
 type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
+type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
-func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) emitterFunc {
+type configModifiers struct {
+	Filters    []filterFunc
+	Decorators []decoratorFunc
+}
+
+func emitter(log *logger.Logger, router *router, modifiers *configModifiers) emitterFunc {
 	return func(c *config.Config) error {
 		if err := InjectAgentConfig(c); err != nil {
 			return err
@@ -33,6 +39,12 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 			return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 		}
 
+		for _, filter := range modifiers.Filters {
+			if err := filter(log, ast); err != nil {
+				return errors.New(err, "failed to filter configuration", errors.TypeConfig)
+			}
+		}
+
 		log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 		log.Debug("Converting single configuration into specific programs configuration")
 
@@ -41,7 +53,7 @@ func emitter(log *logger.Logger, router *router, decorators ...decoratorFunc) em
 			return err
 		}
 
-		for _, decorator := range decorators {
+		for _, decorator := range modifiers.Decorators {
 			for outputType, ptr := range programsToRun {
 				programsToRun[outputType], err = decorator(outputType, ast, ptr)
 				if err != nil {

@@ -51,6 +51,28 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 	}
 
+	// mock of the cgroup processCgroupPaths
+	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
+		testMap := map[int]map[string]string{
+			1: map[string]string{
+				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+			},
+		}
+		return testMap[pid], nil
+	}
+
 	for _, test := range []struct {
 		description             string
 		config, event, expected common.MapStr
@@ -82,6 +104,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 				},
 			},
 		},
@@ -161,6 +186,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"ppid":       0,
 						"start_time": startTime,
 					},
+					"container": common.MapStr{
+						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+					},
 				},
 			},
 		},
@@ -191,6 +219,9 @@ func TestAddProcessMetadata(t *testing.T) {
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
 						},
+					},
+					"container": common.MapStr{
+						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
 					},
 				},
 			},
@@ -385,12 +416,132 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 			err: ErrNoProcess,
 		},
+		{
+			description: "env field",
+			config: common.MapStr{
+				"match_pids": []string{"system.process.ppid"},
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"process": common.MapStr{
+					"name":       "systemd",
+					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+					"executable": "/usr/lib/systemd/systemd",
+					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+					"pid":        1,
+					"ppid":       0,
+					"start_time": startTime,
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "env field (IncludeContainer id), process not found",
+			config: common.MapStr{
+				"match_pids": []string{"ppid"},
+			},
+			event: common.MapStr{
+				"ppid": 42,
+			},
+			expected: common.MapStr{
+				"ppid": 42,
+			},
+			err: ErrNoProcess,
+		},
+		{
+			description: "container.id only",
+			config: common.MapStr{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "without cgroup cache",
+			config: common.MapStr{
+				"match_pids":               []string{"system.process.ppid"},
+				"include_fields":           []string{"container.id"},
+				"cgroup_cache_expire_time": 0,
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "custom cache expire time",
+			config: common.MapStr{
+				"match_pids":               []string{"system.process.ppid"},
+				"include_fields":           []string{"container.id"},
+				"cgroup_cache_expire_time": 10 * time.Second,
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := common.NewConfigFrom(test.config)
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs)
 			if test.initErr == nil {
 				if err != nil {
@@ -419,6 +570,92 @@ func TestAddProcessMetadata(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUsingCache(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors(processorName))
+
+	selfPID := os.Getpid()
+
+	// mock of the cgroup processCgroupPaths
+	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
+		testMap := map[int]map[string]string{
+			selfPID: map[string]string{
+				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+			},
+		}
+		return testMap[pid], nil
+	}
+
+	config, err := common.NewConfigFrom(common.MapStr{
+		"match_pids":     []string{"system.process.ppid"},
+		"include_fields": []string{"container.id"},
+		"target":         "meta",
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	proc, err := New(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ev := beat.Event{
+		Fields: common.MapStr{
+			"system": common.MapStr{
+				"process": common.MapStr{
+					"ppid": selfPID,
+				},
+			},
+		},
+	}
+
+	// first run
+	result, err := proc.Run(&ev)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(result.Fields)
+	containerID, err := result.Fields.GetValue("meta.container.id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
+
+	ev = beat.Event{
+		Fields: common.MapStr{
+			"system": common.MapStr{
+				"process": common.MapStr{
+					"ppid": selfPID,
+				},
+			},
+		},
+	}
+
+	// cached result
+	result, err = proc.Run(&ev)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(result.Fields)
+	containerID, err = result.Fields.GetValue("meta.container.id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
 }
 
 func TestSelf(t *testing.T) {

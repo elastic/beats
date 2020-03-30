@@ -30,11 +30,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/gosigar/cgroup"
 )
 
 const (
-	processorName   = "add_process_metadata"
-	cacheExpiration = time.Second * 30
+	processorName      = "add_process_metadata"
+	cacheExpiration    = time.Second * 30
+	containerIDMapping = "container.id"
 )
 
 var (
@@ -47,14 +49,17 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
 
+	processCgroupPaths = cgroup.ProcessCgroupPaths
+
 	instanceID atomic.Uint32
 )
 
 type addProcessMetadata struct {
-	config   config
-	provider processMetadataProvider
-	log      *logp.Logger
-	mappings common.MapStr
+	config      config
+	provider    processMetadataProvider
+	cidProvider cidProvider
+	log         *logp.Logger
+	mappings    common.MapStr
 }
 
 type processMetadata struct {
@@ -69,6 +74,10 @@ type processMetadata struct {
 
 type processMetadataProvider interface {
 	GetProcessMetadata(pid int) (*processMetadata, error)
+}
+
+type cidProvider interface {
+	GetCid(pid int) (string, error)
 }
 
 func init() {
@@ -93,16 +102,48 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	p := addProcessMetadata{
-		config:   config,
-		provider: provider,
-		log:      log,
-	}
-	if p.mappings, err = config.getMappings(); err != nil {
+	mappings, err := config.getMappings()
+
+	if err != nil {
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
 	}
 
+	var p addProcessMetadata
+
+	p = addProcessMetadata{
+		config:   config,
+		provider: provider,
+		log:      log,
+		mappings: mappings,
+	}
+	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
+	if ok := containsValue(mappings, "container.id"); ok {
+		if config.CgroupCacheExpireTime != 0 {
+			p.log.Debug("Initializing cgroup cache")
+			evictionListener := func(k common.Key, v common.Value) {
+				p.log.Debugf("Evicted cached cgroups for PID=%v", k)
+			}
+
+			cgroupsCache := common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
+			cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
+			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, cgroupsCache)
+		} else {
+			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, processCgroupPaths, nil)
+		}
+
+	}
+
 	return &p, nil
+}
+
+// check if the value exist in mapping
+func containsValue(m common.MapStr, v string) bool {
+	for _, x := range m {
+		if x == v {
+			return true
+		}
+	}
+	return false
 }
 
 // Run enriches the given event with the host meta data
@@ -156,6 +197,10 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 	}
 	meta := metaPtr.fields
 
+	if err = p.enrichContainerID(pid, meta); err != nil {
+		return nil, err
+	}
+
 	result = event.Clone()
 	for dest, sourceIf := range p.mappings {
 		source, castOk := sourceIf.(string)
@@ -168,23 +213,41 @@ func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (resul
 				return nil, errors.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
+
 		value, err := meta.GetValue(source)
 		if err != nil {
 			// Should never happen
 			return nil, err
 		}
+
 		if _, err = result.Put(dest, value); err != nil {
 			return nil, err
 		}
 	}
+
 	return result, nil
+}
+
+// enrichContainerID adds container.id into meta for mapping to pickup
+func (p *addProcessMetadata) enrichContainerID(pid int, meta common.MapStr) error {
+	if p.cidProvider == nil {
+		return nil
+	}
+	cid, err := p.cidProvider.GetCid(pid)
+	if err != nil {
+		return err
+	}
+	if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // String returns the processor representation formatted as a string
 func (p *addProcessMetadata) String() string {
-	return fmt.Sprintf("%v=[match_pids=%v, mappings=%v, ignore_missing=%v, overwrite_fields=%v, restricted_fields=%v]",
+	return fmt.Sprintf("%v=[match_pids=%v, mappings=%v, ignore_missing=%v, overwrite_fields=%v, restricted_fields=%v, host_path=%v, cgroup_prefixes=%v]",
 		processorName, p.config.MatchPIDs, p.mappings, p.config.IgnoreMissing,
-		p.config.OverwriteKeys, p.config.RestrictedFields)
+		p.config.OverwriteKeys, p.config.RestrictedFields, p.config.HostPath, p.config.CgroupPrefixes)
 }
 
 func (p *processMetadata) toMap() common.MapStr {

@@ -11,4 +11,4 @@ var:
   - name: endpoint
 
 ingest_pipeline: ingest/pipeline.yml
-input: config/cloudtrail.yml
+input: config/{{.input}}.yml
