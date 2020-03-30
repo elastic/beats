@@ -9,8 +9,6 @@
 <titleabbrev>Azure eventhub</titleabbrev>
 ++++
 
-beta[]
-
 Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub.
 The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
 State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.

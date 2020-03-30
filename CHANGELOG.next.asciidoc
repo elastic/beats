@@ -284,6 +284,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 - Add Filebeat Okta module. {pull}16362[16362]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
+- Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 
 *Heartbeat*
 
