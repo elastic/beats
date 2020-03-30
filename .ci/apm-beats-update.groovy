@@ -110,9 +110,10 @@ def beatsUpdate() {
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        make update
         git commit -m beats-update go.mod
 
-        make update check
+        make check
       """)
     }
   }
