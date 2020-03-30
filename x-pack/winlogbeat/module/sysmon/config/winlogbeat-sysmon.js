@@ -307,6 +307,7 @@ var sysmon = (function () {
             return;
         }
         evt.Put(field, winlogbeat.splitCommandLine(commandLine));
+        evt.Put("process.command_line", commandLine);
     };
 
     var splitProcessArgs = function(evt) {
@@ -468,6 +469,7 @@ var sysmon = (function () {
                 {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.Image", to: "process.executable"},
+                {from: "winlog.event_data.CommandLine", to: "process.command_line"},
                 {from: "winlog.event_data.CommandLine", to: "process.args"},
                 {from: "winlog.event_data.CurrentDirectory", to: "process.working_directory"},
                 {from: "winlog.event_data.ParentProcessGuid", to: "process.parent.entity_id"},
