@@ -6,6 +6,7 @@ package program
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,8 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -409,6 +412,8 @@ func TestGroupBy(t *testing.T) {
 }
 
 func TestConfiguration(t *testing.T) {
+	defer os.Remove("fleet.yml")
+
 	testcases := map[string]struct {
 		programs []string
 		expected int
@@ -417,6 +422,10 @@ func TestConfiguration(t *testing.T) {
 		"single_config": {
 			programs: []string{"filebeat", "metricbeat"},
 			expected: 2,
+		},
+		"constraints_config": {
+			programs: []string{"filebeat"},
+			expected: 1,
 		},
 		// "audit_config": {
 		// 	programs: []string{"auditbeat"},
@@ -446,6 +455,7 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
+	l, _ := logger.New()
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -457,6 +467,8 @@ func TestConfiguration(t *testing.T) {
 
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
+
+			filters.ConstraintFilter(l, ast)
 
 			programs, err := Programs(ast)
 			if test.err {

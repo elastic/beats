@@ -28,6 +28,8 @@ import (
 )
 
 func init() {
+	unittest.RegisterGoTestDeps(winlogbeat.Update.Fields)
+
 	winlogbeat.SelectLogic = devtools.XPackProject
 	devtools.BeatLicense = "Elastic License"
 }

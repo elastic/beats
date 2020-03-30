@@ -10195,16 +10195,6 @@ type: keyword
 --
 
 
-*`process.entity_id`*::
-+
---
-ID uniquely identifying the process. It is computed as a SHA-256 hash of the host ID, PID, and process start time.
-
-
-type: keyword
-
---
-
 [float]
 === hash
 

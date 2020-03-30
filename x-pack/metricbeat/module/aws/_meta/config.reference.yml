@@ -45,4 +45,9 @@
     - key: "dept"
       value: "eng"
   metricsets:
+    - elb
+    - natgateway
     - rds
+    - transitgateway
+    - usage
+    - vpn
