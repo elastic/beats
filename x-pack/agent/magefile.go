@@ -468,19 +468,29 @@ func (Demo) NoEnroll() error {
 
 func runAgent(env map[string]string) error {
 	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
-	// produce docker package
-	packageAgent([]string{
-		"linux-x86.tar.gz",
-		"linux-x86_64.tar.gz",
-	}, devtools.UseElasticAgentDemoPackaging)
 
-	dockerPackagePath := filepath.Join("build", "package", "agent", "agent-linux-amd64.docker", "docker-build")
-	if err := os.Chdir(dockerPackagePath); err != nil {
+	tag := dockerTag()
+	dockerImageOut, err := sh.Output("docker", "image", "ls")
+	if err != nil {
 		return err
 	}
 
-	// build docker image
-	sh.Run("docker", "build", "-t", "elastic-agent", ".")
+	// docker does not exists for this commit, build it
+	if !strings.Contains(dockerImageOut, tag) {
+		// produce docker package
+		packageAgent([]string{
+			"linux-x86.tar.gz",
+			"linux-x86_64.tar.gz",
+		}, devtools.UseElasticAgentDemoPackaging)
+
+		dockerPackagePath := filepath.Join("build", "package", "agent", "agent-linux-amd64.docker", "docker-build")
+		if err := os.Chdir(dockerPackagePath); err != nil {
+			return err
+		}
+
+		// build docker image
+		sh.Run("docker", "build", "-t", tag, ".")
+	}
 
 	// prepare env variables
 	var envs []string
@@ -539,4 +549,16 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package)
+}
+
+func dockerTag() string {
+	const commitLen = 7
+	tagBase := "elastic-agent"
+
+	commit, err := devtools.CommitHash()
+	if err == nil && len(commit) > commitLen {
+		return fmt.Sprintf("%s-%s", tagBase, commit[:commitLen])
+	}
+
+	return tagBase
 }
