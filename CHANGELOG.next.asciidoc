@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Check if CCR feature is available on Elasticsearch cluster before attempting to call CCR APIs from `elasticsearch/ccr` metricset. {issue}16511[16511] {pull}17073[17073]
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
+- Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 
 *Packetbeat*
 
@@ -209,8 +210,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
 - Add pattern for Cisco ASA / FTD Message 734001 {issue}16212[16212] {pull}16612[16612]
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
+- Add source field in k8s events {pull}17209[17209]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
+- Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 
 *Heartbeat*
 
