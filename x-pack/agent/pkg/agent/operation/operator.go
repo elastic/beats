@@ -214,6 +214,10 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 	}
 
 	for _, op := range operations {
+		if err := o.bgContext.Err(); err != nil {
+			return err
+		}
+
 		shouldRun, err := op.Check()
 		if err != nil {
 			return err
@@ -252,7 +256,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	monitor := monitoring.NewMonitor(isMonitorable(p), p.BinaryName(), o.pipelineID, o.config.DownloadConfig, o.config.MonitoringConfig.MonitorLogs, o.config.MonitoringConfig.MonitorMetrics)
 
-	a, err := app.NewApplication(p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, monitor)
+	a, err := app.NewApplication(o.bgContext, p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, monitor)
 	if err != nil {
 		return nil, err
 	}

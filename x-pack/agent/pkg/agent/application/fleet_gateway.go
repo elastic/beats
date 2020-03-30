@@ -6,6 +6,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -155,7 +156,8 @@ func (f *fleetGateway) worker() {
 
 func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	f.backoff.Reset()
-	for {
+	for f.bgContext.Err() == nil {
+		fmt.Println(">>> loop: ", f.bgContext.Err())
 		// TODO: wrap with timeout context
 		resp, err := f.execute(f.bgContext)
 		if err != nil {
@@ -171,6 +173,8 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 		}
 		return resp, nil
 	}
+
+	return nil, f.bgContext.Err()
 }
 
 func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, error) {
