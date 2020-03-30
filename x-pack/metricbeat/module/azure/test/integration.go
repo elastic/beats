@@ -5,13 +5,28 @@
 package test
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
-	"github.com/stretchr/testify/assert"
+	"errors"
 	"os"
 	"testing"
-	"errors"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+func GetConf(metricSetName string) map[string]interface{} {
+
+	return map[string]interface{}{
+		"module":                "azure",
+		"period":                "300s",
+		"refresh_list_interval": "600s",
+		"metricsets":            []string{metricSetName},
+		"client_id":             "85b17640-f4a8-4e0d-b83f-ad309753e0e9",
+		"client_secret":         "yfGBWT7sJj6Xfqa9",
+		"tenant_id":             "aa40685b-417d-4664-b4ec-8f7640719adb",
+		"subscription_id":       "70bd6e77-4b1e-4835-8896-db77b8eef364",
+	}
+}
 
 // GetConfig function gets azure credentials for integration tests.
 func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
@@ -45,28 +60,28 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	}
 }
 
-
-func TestFieldsDocumentation(events []mb.Event, t *testing.T){
+// TestFieldsDocumentation func checks if all the documented fields have the expected type
+func TestFieldsDocumentation(t *testing.T, events []mb.Event) {
 	for _, event := range events {
 		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
+		checkIsDocumented("service.name", "string", event, t)
+		checkIsDocumented("cloud.provider", "string", event, t)
+		checkIsDocumented("cloud.region", "string", event, t)
+		checkIsDocumented("cloud.instance.name", "string", event, t)
+		checkIsDocumented("cloud.instance.id", "string", event, t)
+
 		// MetricSetField
-		mtest.CheckEventField("empty_receives", "float", event, t)
-		mtest.CheckEventField("messages.delayed", "float", event, t)
-		mtest.CheckEventField("messages.deleted", "float", event, t)
-		mtest.CheckEventField("messages.not_visible", "float", event, t)
-		mtest.CheckEventField("messages.received", "float", event, t)
-		mtest.CheckEventField("messages.sent", "float", event, t)
-		mtest.CheckEventField("messages.visible", "float", event, t)
-		mtest.CheckEventField("oldest_message_age.sec", "float", event, t)
-		mtest.CheckEventField("sent_message_size", "float", event, t)
-		mtest.CheckEventField("queue.name", "string", event, t)
+		checkIsDocumented("azure.timegrain", "string", event, t)
+		checkIsDocumented("azure.subscription_id", "string", event, t)
+		checkIsDocumented("azure.namespace", "string", event, t)
+		checkIsDocumented("azure.resource.type", "string", event, t)
+		checkIsDocumented("azure.resource.group", "string", event, t)
 	}
 }
 
-// CheckEventField function checks a given field type and compares it with the expected type for integration tests.
-func CheckDocumenteded (metricName string, expectedType string, event mb.Event, t *testing.T) {
+// checkIsDocumented function checks a given field type and compares it with the expected type for integration tests.
+// this implementation is only temporary, will be replaced by issue https://github.com/elastic/beats/issues/17315
+func checkIsDocumented(metricName string, expectedType string, event mb.Event, t *testing.T) {
 	t.Helper()
 
 	ok1, err1 := event.MetricSetFields.HasKey(metricName)
