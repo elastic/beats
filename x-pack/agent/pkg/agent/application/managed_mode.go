@@ -13,6 +13,7 @@ import (
 
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/storage"
@@ -123,7 +124,7 @@ func newManaged(
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
-	emit := emitter(log, router)
+	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}})
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err

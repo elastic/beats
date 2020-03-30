@@ -80,6 +80,10 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 			errors.M(errors.MetaKeyPath, AgentConfigFile))
 	}
 
+	if err := reader.Close(); err != nil {
+		return nil, err
+	}
+
 	configMap, err := cfg.ToMapStr()
 	if err != nil {
 		return nil, errors.New(err,
@@ -116,6 +120,10 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 		return errors.New(err, fmt.Sprintf("fail to read configuration %s for the agent", AgentConfigFile),
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, AgentConfigFile))
+	}
+
+	if err := reader.Close(); err != nil {
+		return err
 	}
 
 	configMap := make(map[string]interface{})
