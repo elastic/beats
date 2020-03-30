@@ -11,8 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -62,7 +60,6 @@ func NewInput(
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
-	cfgwarn.Beta("The %s input is beta", inputName)
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "reading %s input config", inputName)
