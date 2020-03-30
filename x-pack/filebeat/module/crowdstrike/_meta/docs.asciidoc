@@ -5,7 +5,7 @@
 
 == Crowdstrike module
 
-This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formated Falcon Streaming API event data in JSON format.
+This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
 
 This module segments events forwarded by the Falcon SIEM connector into two datasets for endpoint data and Falcon platform audit data.
 
@@ -42,7 +42,7 @@ include::../include/configuring-intro.asciidoc[]
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `falcon_endpoint` fileset settings
+==== `falcon` fileset settings
 
 The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
 
@@ -55,24 +55,6 @@ var:
 -----
 
 include::../include/var-paths.asciidoc[]
-
-:fileset_ex: falcon_audit
-
-[float]
-==== `falcon_audit` fileset settings
-
-The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, and UserActivityAuditEvent events.
-
-["source","yaml",subs="attributes"]
------
-var:
-  - name: paths
-    default:
-      - /var/log/crowdstrike/falconhoseclient/output
------
-
-include::../include/var-paths.asciidoc[]
-
 
 :has-dashboards!:
 
