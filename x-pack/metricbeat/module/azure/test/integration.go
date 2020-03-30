@@ -14,20 +14,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func GetConf(metricSetName string) map[string]interface{} {
-
-	return map[string]interface{}{
-		"module":                "azure",
-		"period":                "300s",
-		"refresh_list_interval": "600s",
-		"metricsets":            []string{metricSetName},
-		"client_id":             "85b17640-f4a8-4e0d-b83f-ad309753e0e9",
-		"client_secret":         "yfGBWT7sJj6Xfqa9",
-		"tenant_id":             "aa40685b-417d-4664-b4ec-8f7640719adb",
-		"subscription_id":       "70bd6e77-4b1e-4835-8896-db77b8eef364",
-	}
-}
-
 // GetConfig function gets azure credentials for integration tests.
 func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
