@@ -14,12 +14,6 @@
 package ulid
 
 import (
-<<<<<<< HEAD
-	"bytes"
-	"database/sql/driver"
-	"errors"
-	"io"
-=======
 	"bufio"
 	"bytes"
 	"database/sql/driver"
@@ -29,7 +23,6 @@ import (
 	"math"
 	"math/bits"
 	"math/rand"
->>>>>>> master
 	"time"
 )
 
@@ -74,13 +67,10 @@ var (
 	// larger than 7, thereby exceeding the valid bit depth of 128.
 	ErrOverflow = errors.New("ulid: overflow when unmarshaling")
 
-<<<<<<< HEAD
-=======
 	// ErrMonotonicOverflow is returned by a Monotonic entropy source when
 	// incrementing the previous ULID's entropy bytes would result in overflow.
 	ErrMonotonicOverflow = errors.New("ulid: monotonic entropy overflow")
 
->>>>>>> master
 	// ErrScanValue is returned when the value passed to scan cannot be unmarshaled
 	// into the ULID.
 	ErrScanValue = errors.New("ulid: source value must be a string or byte slice")
@@ -97,10 +87,6 @@ func New(ms uint64, entropy io.Reader) (id ULID, err error) {
 		return id, err
 	}
 
-<<<<<<< HEAD
-	if entropy != nil {
-		_, err = entropy.Read(id[6:])
-=======
 	switch e := entropy.(type) {
 	case nil:
 		return id, err
@@ -108,7 +94,6 @@ func New(ms uint64, entropy io.Reader) (id ULID, err error) {
 		err = e.MonotonicRead(ms, id[6:])
 	default:
 		_, err = io.ReadFull(e, id[6:])
->>>>>>> master
 	}
 
 	return id, err
@@ -373,11 +358,8 @@ func (id *ULID) UnmarshalText(v []byte) error {
 }
 
 // Time returns the Unix time in milliseconds encoded in the ULID.
-<<<<<<< HEAD
-=======
 // Use the top level Time function to convert the returned value to
 // a time.Time.
->>>>>>> master
 func (id ULID) Time() uint64 {
 	return uint64(id[5]) | uint64(id[4])<<8 |
 		uint64(id[3])<<16 | uint64(id[2])<<24 |
@@ -406,8 +388,6 @@ func Timestamp(t time.Time) uint64 {
 		uint64(t.Nanosecond()/int(time.Millisecond))
 }
 
-<<<<<<< HEAD
-=======
 // Time converts Unix milliseconds in the format
 // returned by the Timestamp function to a time.Time.
 func Time(ms uint64) time.Time {
@@ -416,7 +396,6 @@ func Time(ms uint64) time.Time {
 	return time.Unix(s, ns)
 }
 
->>>>>>> master
 // SetTime sets the time component of the ULID to the given Unix time
 // in milliseconds.
 func (id *ULID) SetTime(ms uint64) error {
@@ -489,8 +468,6 @@ func (id *ULID) Scan(src interface{}) error {
 func (id ULID) Value() (driver.Value, error) {
 	return id.MarshalBinary()
 }
-<<<<<<< HEAD
-=======
 
 // Monotonic returns an entropy source that is guaranteed to yield
 // strictly increasing entropy bytes for the same ULID timestamp.
@@ -635,4 +612,3 @@ func (u *uint80) Add(n uint64) (overflow bool) {
 func (u uint80) IsZero() bool {
 	return u.Hi == 0 && u.Lo == 0
 }
->>>>>>> master

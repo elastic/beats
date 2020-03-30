@@ -18,8 +18,8 @@
 package memlog
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 type txState struct {

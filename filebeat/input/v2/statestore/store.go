@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/atomic"
 
-	"github.com/elastic/beats/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/registry"
 )
 
 // Store provides some coordinates access to a registry.Store.

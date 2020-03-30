@@ -20,7 +20,7 @@ package cptest
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 // Registry wraps a backend.Registry and adds testing.T. The methods on

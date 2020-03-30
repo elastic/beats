@@ -22,8 +22,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/registry/backend"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/registry/backend"
 )
 
 type store struct {

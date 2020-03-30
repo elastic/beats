@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 ## 1.3.1 / 2018-10-02
 
 * Use underlying entropy source for random increments in Monotonic (#32)
@@ -16,7 +14,6 @@
 
 * Ensure random part is always read from the entropy reader in full (#28)
 
->>>>>>> master
 ## 1.0.0 / 2018-07-29
 
 * Add ParseStrict and MustParseStrict functions (#26)
