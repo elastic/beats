@@ -19,3 +19,4 @@
 
 - Generate index name in a format type-dataset-namespace {pull}16903[16903]
 - OS agnostic default configuration {pull}17016[17016]
+- Support for config constraints {pull}17112[17112]

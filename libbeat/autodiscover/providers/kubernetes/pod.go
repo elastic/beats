@@ -133,22 +133,18 @@ func (p *pod) OnAdd(obj interface{}) {
 // events are sent sequentially to recreate the resources assotiated to the pod.
 func (p *pod) OnUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Node update (terminating): %+v", obj)
-		// Node is terminating, don't reload its configuration and ignore the event
-		// if some pod is still running, we will receive more events when containers
-		// terminate.
-		for _, container := range pod.Status.ContainerStatuses {
-			if container.State.Running != nil {
-				return
-			}
-		}
+
+	// If Pod is in a phase where all containers in the have terminated emit a stop event
+	if pod.Status.Phase == kubernetes.PodSucceeded || pod.Status.Phase == kubernetes.PodFailed {
+		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
+
 		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-	} else {
-		p.logger.Debugf("Watcher Node update: %+v", obj)
-		p.emit(pod, "stop")
-		p.emit(pod, "start")
+		return
 	}
+
+	p.logger.Infof("Watcher Pod update: %+v", obj)
+	p.emit(pod, "stop")
+	p.emit(pod, "start")
 }
 
 // GenerateHints creates hints needed for hints builder

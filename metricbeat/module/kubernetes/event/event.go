@@ -169,6 +169,10 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		"reason":  eve.Reason,
 		"type":    eve.Type,
 		"count":   eve.Count,
+		"source": common.MapStr{
+			"host":      eve.Source.Host,
+			"component": eve.Source.Component,
+		},
 		"involved_object": common.MapStr{
 			"api_version":      eve.InvolvedObject.APIVersion,
 			"resource_version": eve.InvolvedObject.ResourceVersion,
