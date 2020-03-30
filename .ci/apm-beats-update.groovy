@@ -111,7 +111,7 @@ def beatsUpdate() {
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
         make update
-        git commit -m beats-update go.mod
+        git commit -a -m beats-update
 
         make check
       """)
