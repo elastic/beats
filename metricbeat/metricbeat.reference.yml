@@ -621,7 +621,7 @@ metricbeat.modules:
 - module: mysql
   metricsets:
     - "status"
-    - "galera_status"
+  #  - "galera_status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -632,13 +632,13 @@ metricbeat.modules:
   hosts: ["root:secret@tcp(127.0.0.1:3306)/"]
 
   # Username of hosts. Empty by default.
-  username: ""
+  #username: root
 
   # Password of hosts. Empty by default.
-  password: ""
+  #password: secret
 
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
-  raw: false
+  #raw: false
 
 #--------------------------------- Nats Module ---------------------------------
 - module: nats
