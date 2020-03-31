@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -82,7 +80,6 @@ type MetricSet struct {
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	cfgwarn.Beta("The azure %s metricset is beta.", metricsetName)
 	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {

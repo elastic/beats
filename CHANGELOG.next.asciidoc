@@ -354,6 +354,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Storage metricsets to GCP module {pull}15598[15598]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
+- Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
 
 *Packetbeat*
 
