@@ -35,43 +35,40 @@ type ksmData struct {
 
 // fetchKSMStats reads the KSM stat counters and returns a struct
 func fetchKSMStats(ksmPath string) (ksmData, error) {
-
-	data := ksmData{}
-
 	// ReadIntFromFile returns pretty verbose error strings, so omit errors.Wrap here
 	pshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_shared"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	pSharing, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_sharing"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	pUnshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_unshared"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	pVolatile, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_volatile"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	fScans, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "full_scans"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	stableChains, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_chains"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	stableDups, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_dups"), 10)
 	if err != nil {
-		return data, err
+		return ksmData{}, err
 	}
 
 	return ksmData{PagesShared: pshared, PagesSharing: pSharing, PagesUnshared: pUnshared,

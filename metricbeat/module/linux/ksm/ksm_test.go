@@ -27,7 +27,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

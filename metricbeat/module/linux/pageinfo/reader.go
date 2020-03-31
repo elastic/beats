@@ -53,7 +53,6 @@ var pageinfoLine = regexp.MustCompile(`Node\s*(\d), zone\s*([a-zA-z0-9]*), type\
 // readPageFile reads a PageTypeInfo file and returns the parsed data
 // This returns a massive representation of all the meaningful data in /proc/pagetypeinfo
 func readPageFile(path string) (pageInfo, error) {
-
 	fd, err := os.Open(path)
 	if err != nil {
 		return pageInfo{}, errors.Wrap(err, "error opening file")

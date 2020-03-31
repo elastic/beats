@@ -65,7 +65,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-
 	fullPath := filepath.Join(m.fs, "/sys/kernel/mm/ksm")
 	ksmData, err := fetchKSMStats(fullPath)
 	if err != nil {
