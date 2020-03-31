@@ -28,6 +28,8 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/docker/docker/api/types"
@@ -335,11 +337,6 @@ func Package() {
 // BuildAndInstall builds and installs the plugin
 func BuildAndInstall() {
 	mg.SerialDeps(Build, Install)
-}
-
-// IntegTest is currently a dummy test for the `testsuite` target
-func IntegTest() {
-	fmt.Printf("There are no Integration tests for The Elastic Log Plugin\n")
 }
 
 // Update is currently a dummy test for the `testsuite` target

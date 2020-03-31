@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/app"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/release"
 )
 
 type handleFunc func(step configrequest.Step) error
@@ -66,7 +67,12 @@ func getProgramFromStepWithTags(step configrequest.Step, artifactConfig *artifac
 		return nil, nil, err
 	}
 
-	p := app.NewDescriptor(step.Process, step.Version, artifactConfig, tags)
+	version := step.Version
+	if release.Snapshot() {
+		version = fmt.Sprintf("%s-SNAPSHOT", version)
+	}
+
+	p := app.NewDescriptor(step.Process, version, artifactConfig, tags)
 	return p, config, nil
 }
 

@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == azure module
 
-beta[]
-
 This is the azure module.
 
 The Azure Monitor feature collects and aggregates logs and metrics from a variety of sources into a common data platform where it can be used for analysis, visualization, and alerting.

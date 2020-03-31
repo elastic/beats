@@ -36,6 +36,7 @@ const (
 	goLicenserRepo = "github.com/elastic/go-licenser"
 	buildDir       = "build"
 	metaDir        = "_meta"
+	snapshotEnv    = "SNAPSHOT"
 )
 
 // Aliases for commands required by master makefile
@@ -101,6 +102,7 @@ func (Build) GenerateConfig() error {
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.InputFiles = []string{"cmd/agent/agent.go"}
+	params.LDFlags = flagsSet()
 	return devtools.GolangCrossBuild(params)
 }
 
@@ -110,6 +112,7 @@ func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.InputFiles = []string{"cmd/agent/agent.go"}
 	params.OutputDir = "build/golang-crossbuild"
+	params.LDFlags = flagsSet()
 	if err := devtools.GolangCrossBuild(params); err != nil {
 		return err
 	}
@@ -210,7 +213,7 @@ func (Check) License() error {
 	)
 }
 
-// Changes run git status --porcelain and return an error if we have changes or uncommited files.
+// Changes run git status --porcelain and return an error if we have changes or uncommitted files.
 func (Check) Changes() error {
 	out, err := sh.Output("git", "status", "--porcelain")
 	if err != nil {
@@ -354,14 +357,19 @@ func commitID() string {
 }
 
 func flags() string {
+	return strings.Join(flagsSet(), " ")
+}
+
+func flagsSet() []string {
 	ts := time.Now().Format(time.RFC3339)
 	commitID := commitID()
+	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 
-	return fmt.Sprintf(
-		`-X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.buildTime=%s" -X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.commit=%s"`,
-		ts,
-		commitID,
-	)
+	return []string{
+		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.buildTime=%s"`, ts),
+		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.commit=%s"`, commitID),
+		fmt.Sprintf(` -X "github.com/elastic/beats/v7/x-pack/agent/pkg/release.snapshot=%s"`, isSnapshot),
+	}
 }
 
 // Update is an alias for executing fields, dashboards, config, includes.
