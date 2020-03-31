@@ -207,7 +207,9 @@ func (s *State) reapLoop() {
 		case <-reportTicker.C:
 			s.Lock()
 			s.CleanUp()
-			for _, flow := range s.PopFlows() {
+			flows := s.PopFlows()
+			s.Unlock()
+			for _, flow := range flows {
 				if flow.IsCurrentProcess() {
 					// Do not report flows for which we are the source
 					// to prevent a feedback loop.
@@ -218,7 +220,6 @@ func (s *State) reapLoop() {
 					return
 				}
 			}
-			s.Unlock()
 		case <-logTicker.C:
 			s.logState()
 		}
