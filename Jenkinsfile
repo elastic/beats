@@ -545,17 +545,6 @@ pipeline {
             k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
           }
         }
-        stage('Docs'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return env.BUILD_DOCS != "false" }
-          }
-          steps {
-            makeTarget("Docs", "docs")
-          }
-        }
       }
     }
   }
@@ -797,69 +786,73 @@ def isChanged(patterns){
   )
 }
 
+def isChangedOSSCode(patterns) {
+  def always = [
+    "Jenkinsfile",
+    "^vendor/*",
+    "^libbeat/*",
+    "^testing/*",
+    "^dev-tools/*",
+  ]
+  return isChanged(always + patterns)
+}
+
+def isChangedXPackCode(patterns) {
+  def always = [
+    "Jenkinsfile",
+    "^vendor/*",
+    "^libbeat/*",
+    "^dev-tools/*",
+    "^testing/*",
+    "^x-pack/libbeat/.*",
+  ]
+  return isChanged(always + patterns)
+}
+
 def loadConfigEnvVars(){
   env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
-  env.BUILD_AUDITBEAT_XPACK = isChanged([
+  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode([
     "^auditbeat/.*",
     "^x-pack/auditbeat/.*",
-    "^x-pack/libbeat/.*",
   ])
-  env.BUILD_DOCKERLOGBEAT_XPACK = isChanged([
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode([
     "^x-pack/dockerlogbeat/.*",
-    "^x-pack/libbeat/.*",
   ])
-  env.BUILD_DOCS = isChanged(
-    patterns: ["^docs/.*"],
-    comparator: 'regexp'
-  )
-  env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
-  env.BUILD_FILEBEAT_XPACK = isChanged([
+  env.BUILD_FILEBEAT = isChangedOSSCode(["^filebeat/.*"])
+  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode([
     "^filebeat/.*",
     "^x-pack/filebeat/.*",
-    "^x-pack/libbeat/.*",
   ])
-  env.BUILD_FUNCTIONBEAT_XPACK = isChanged([
+  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode([
     "^x-pack/functionbeat/.*",
-    "^x-pack/libbeat/.*",
   ])
-  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
-  env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
-  env.BUILD_HEARTBEAT_XPACK = isChanged([
+  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+  env.BUILD_HEARTBEAT = isChangedOSSCode(["^heartbeat/.*"])
+  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode([
     "^heartbeat/.*",
     "^x-pack/heartbeat/.*",
-    "^x-pack/libbeat/.*",
   ])
-  env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
-  env.BUILD_JOURNALBEAT_XPACK = isChanged([
+  env.BUILD_JOURNALBEAT = isChangedOSSCode(["^journalbeat/.*"])
+  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode([
     "^journalbeat/.*",
     "^x-pack/journalbeat/.*",
-    "^x-pack/libbeat/.*",
   ])
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-  env.BUILD_LIBBEAT = isChanged(
-    patterns: ["^libbeat/.*"],
-    comparator: 'regexp'
-  )
-  env.BUILD_LIBBEAT_XPACK = isChanged([
-    "^libbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
-  env.BUILD_METRICBEAT_XPACK = isChanged([
+  env.BUILD_LIBBEAT = isChangedOSSCode([])
+  env.BUILD_LIBBEAT_XPACK = isChangedXPackCode([])
+  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode([
     "^metricbeat/.*",
-    "^x-pack/libbeat/.*",
     "^x-pack/metricbeat/.*",
   ])
-  env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
-  env.BUILD_PACKETBEAT_XPACK = isChanged([
+  env.BUILD_PACKETBEAT = isChangedOSSCode(["^packetbeat/.*"])
+  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode([
     "^packetbeat/.*",
-    "^x-pack/libbeat/.*",
     "^x-pack/packetbeat/.*",
   ])
-  env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
-  env.BUILD_WINLOGBEAT_XPACK = isChanged([
+  env.BUILD_WINLOGBEAT = isChangedOSSCode(["^winlogbeat/.*"])
+  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode([
     "^winlogbeat/.*",
-    "^x-pack/libbeat/.*",
     "^x-pack/winlogbeat/.*",
   ])
   env.GO_VERSION = readFile(".go-version").trim()
