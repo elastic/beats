@@ -361,22 +361,23 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 					found = true
 					break
 				}
-				// should cover scenarios as azure.compute_vm_scaleset.*.*
-				key = strings.Join(splits[0:pos], ".") + ".*.*"
-				if _, ok := knownKeys[key]; ok {
-					found = true
-					break
-				}
 			}
 			if found {
 				continue
 			}
-
-			// last case `status_codes.*`:
+			// case `status_codes.*`:
 			prefix := strings.Join(splits[0:len(splits)-1], ".")
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
 			}
+			// should cover scenarios as status_codes.*.*` and `azure.compute_vm_scaleset.*.*`
+			if len(splits) > 2 {
+				prefix = strings.Join(splits[0:len(splits)-2], ".")
+				if _, ok := knownKeys[prefix+".*.*"]; ok {
+					continue
+				}
+			}
+
 			return errors.Errorf("field missing '%s'", foundKey)
 		}
 	}
