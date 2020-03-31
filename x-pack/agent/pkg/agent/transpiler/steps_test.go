@@ -27,7 +27,7 @@ func TestIsSubpath(t *testing.T) {
 			{"/a/b", "/a/b/../c", "/a/c", false},
 			{"/a/b", "../c", "/a/c", false},
 			{"/a", "/a/b/c", "/a/b/c", true},
-			{"/a", "/A/b/c", "/a/b/c", false},
+			{"/a", "/A/b/c", "/A/b/c", false},
 		},
 		"darwin": {
 			{"/", "a", "/a", true},
