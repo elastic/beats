@@ -34,9 +34,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-linux-conntrack,conntrack>>
+
 * <<metricbeat-metricset-linux-ksm,ksm>>
 
 * <<metricbeat-metricset-linux-pageinfo,pageinfo>>
+
+include::linux/conntrack.asciidoc[]
 
 include::linux/ksm.asciidoc[]
 

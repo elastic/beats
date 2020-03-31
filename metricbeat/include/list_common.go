@@ -93,6 +93,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm/dommemstat"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	_ "github.com/elastic/beats/v7/metricbeat/module/linux/conntrack"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/ksm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pageinfo"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash"

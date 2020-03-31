@@ -24355,6 +24355,100 @@ linux module
 
 
 [float]
+=== conntrack
+
+conntrack
+
+
+
+[float]
+=== summary
+
+summary of nf_conntrack statistics, summed across CPU cores
+
+
+
+*`linux.conntrack.summary.drop`*::
++
+--
+packets dropped due to conntrack failiure
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.early_drop`*::
++
+--
+conntrack entries dropped to make room for new ones
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.entries`*::
++
+--
+entries in the conntrack table
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.found`*::
++
+--
+successfully searched entries
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.ignore`*::
++
+--
+packets seen already connected to a conntrack entry
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.insert_failed`*::
++
+--
+Number of entries where list insert insert failed 
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.invalid`*::
++
+--
+packets seen that cannot be tracked
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.search_restart`*::
++
+--
+table lookups which had to be restarted due to table resizes
+
+
+type: long
+
+--
+
+[float]
 === ksm
 
 ksm
