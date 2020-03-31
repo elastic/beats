@@ -11,6 +11,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cef>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
+  * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-googlecloud>>
@@ -54,6 +55,7 @@ include::modules/azure.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
+include::modules/crowdstrike.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/googlecloud.asciidoc[]
