@@ -76,7 +76,7 @@ func (r *StepList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
-	// NOTE(ph): this is a bit of a hack because I want to make sure
+	// NOTE: this is a bit of a hack because I want to make sure
 	// the unpack strategy stay in the struct implementation and yaml
 	// doesn't have a RawMessage similar to the JSON package, so partial unpack
 	// is not possible.
@@ -210,10 +210,39 @@ func joinPaths(rootDir, path string) (string, bool) {
 	absPath := filepath.Clean(filepath.FromSlash(path))
 
 	// path on windows are case insensitive
-	if runtime.GOOS == "windows" {
+	if !isFsCaseSensitive(rootDir) {
 		absRoot = strings.ToLower(absRoot)
 		absPath = strings.ToLower(absPath)
 	}
 
 	return absPath, strings.HasPrefix(absPath, absRoot)
+}
+
+func isFsCaseSensitive(rootDir string) bool {
+	defaultCaseSens := runtime.GOOS != "windows" && runtime.GOOS != "darwin"
+
+	dir := filepath.Dir(rootDir)
+	base := filepath.Base(rootDir)
+	// if rootdir not exist create it
+	if _, err := os.Stat(rootDir); os.IsNotExist(err) {
+		os.MkdirAll(rootDir, 0775)
+		defer os.RemoveAll(rootDir)
+	}
+
+	lowDir := filepath.Join(base, strings.ToLower(dir))
+	upDir := filepath.Join(base, strings.ToUpper(dir))
+
+	if _, err := os.Stat(rootDir); err != nil {
+		return defaultCaseSens
+	}
+
+	// check lower/upper dir
+	if _, lowErr := os.Stat(lowDir); os.IsNotExist(lowErr) {
+		return true
+	}
+	if _, upErr := os.Stat(upDir); os.IsNotExist(upErr) {
+		return true
+	}
+
+	return defaultCaseSens
 }
