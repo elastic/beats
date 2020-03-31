@@ -2,7 +2,7 @@
 set -exuo pipefail
 
 # Changes on these files will trigger all builds.
-COMMON_DIRLIST="vendor dev-tools .travis.yml"
+COMMON_DIRLIST="vendor dev-tools .travis.yml testing"
 
 # Commit range to check for. For example master...<PR branch>
 RANGE=$TRAVIS_COMMIT_RANGE
