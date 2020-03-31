@@ -51,16 +51,21 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		qu:       qu,
 	}
 
+	var c interface {
+		outputWorker
+		run()
+	}
+
 	if nc, ok := client.(outputs.NetworkClient); ok {
-		c := &netClientWorker{
+		c = &netClientWorker{
 			worker: w,
 			client: nc,
 			logger: logp.NewLogger("publisher_pipeline_output"),
 		}
-		go c.run()
-		return c
+	} else {
+		c = &clientWorker{worker: w, client: client}
 	}
-	c := &clientWorker{worker: w, client: client}
+
 	go c.run()
 	return c
 }
