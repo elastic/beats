@@ -2,7 +2,7 @@
   title: "azure"
   description: >
     azure module
-  release: beta
+  release: ga
   fields:
     - name: azure
       type: group
