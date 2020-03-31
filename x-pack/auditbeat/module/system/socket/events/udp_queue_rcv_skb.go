@@ -36,7 +36,8 @@ type UDPQueueRcvSkbCall struct {
 
 func (e *UDPQueueRcvSkbCall) Flow() *common.Flow {
 	var remote *common.Endpoint
-	if valid := validIPv4Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); valid {
+	var valid bool
+	if valid = validIPv4Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
 		// TODO: This should check for SK_BUFF_HAS_POINTERS. Instead is just
 		//		 treating IPHdr/UDPHdr as the lower 16bits of a pointer which
@@ -56,11 +57,11 @@ func (e *UDPQueueRcvSkbCall) Flow() *common.Flow {
 				e.UDPHdr = udpOff
 			}
 		}
-		if valid {
-			raddr := tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
-			rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-			remote = common.NewEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize)
-		}
+	}
+	if valid {
+		raddr := tracing.MachineEndian.Uint32(e.Packet[e.IPHdr+12:])
+		rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
+		remote = common.NewEndpointIPv4(raddr, rport, 1, uint64(e.Size)+minIPv4UdpPacketSize)
 	}
 
 	return common.NewFlow(

@@ -37,7 +37,8 @@ type UDPv6QueueRcvSkbCall struct {
 
 func (e *UDPv6QueueRcvSkbCall) Flow() *common.Flow {
 	var remote *common.Endpoint
-	if valid := validIPv6Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); valid {
+	var valid bool
+	if valid = validIPv6Headers(e.IPHdr, e.UDPHdr, e.Packet[:]); !valid {
 		// Check if we're dealing with pointers
 		// TODO: This only works in little-endian, same as in udpQueueRcvSkb
 		base := uint16(e.Base)
@@ -49,12 +50,12 @@ func (e *UDPv6QueueRcvSkbCall) Flow() *common.Flow {
 				e.UDPHdr = udpOff
 			}
 		}
-		if valid {
-			raddrA := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
-			raddrB := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
-			rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
-			remote = common.NewEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize)
-		}
+	}
+	if valid {
+		raddrA := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+8:])
+		raddrB := tracing.MachineEndian.Uint64(e.Packet[e.IPHdr+16:])
+		rport := tracing.MachineEndian.Uint16(e.Packet[e.UDPHdr:])
+		remote = common.NewEndpointIPv6(raddrA, raddrB, rport, 1, uint64(e.Size)+minIPv6UdpPacketSize)
 	}
 
 	return common.NewFlow(
