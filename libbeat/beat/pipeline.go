@@ -81,8 +81,6 @@ type ClientConfig struct {
 	// ACKLastEvent reports the last ACKed event out of a batch of ACKed events only.
 	// Only the events 'Private' field will be reported.
 	ACKLastEvent func(interface{})
-
-	Tracer *apm.Tracer
 }
 
 // CloseRef allows users to close the client asynchronously.
