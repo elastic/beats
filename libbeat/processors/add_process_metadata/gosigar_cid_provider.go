@@ -107,7 +107,7 @@ func (p gosigarCidProvider) getCid(cgroups map[string]string) string {
 	for _, path := range cgroups {
 		for _, prefix := range p.cgroupPrefixes {
 			if strings.HasPrefix(path, prefix) {
-				return filepath.Base(strings.TrimSuffix(path, "/kube-proxy"))
+				return filepath.Base(path)
 			}
 		}
 	}
