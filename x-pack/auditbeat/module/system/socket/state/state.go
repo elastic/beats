@@ -26,6 +26,9 @@ const (
 )
 
 type State struct {
+	// atomic operations require this to be aligned to 64-bits on 386.
+	eventCount uint64
+
 	sync.Mutex
 
 	reporter mb.PushReporterV2
@@ -41,7 +44,6 @@ type State struct {
 	clock *clock
 	dns   *dnsTracker
 
-	eventCount uint64
 	lastEvents uint64
 	lastTime   time.Time
 }
