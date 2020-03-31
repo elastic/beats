@@ -123,7 +123,8 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 
 	st := state.NewState(r,
 		m.log,
-		m.config.InactiveTimeout,
+		m.config.ProcessInactiveTimeout,
+		m.config.SocketInactiveTimeout,
 		m.config.FlowInactiveTimeout,
 		m.config.FlowTerminationTimeout,
 		m.config.ClockMaxDrift)

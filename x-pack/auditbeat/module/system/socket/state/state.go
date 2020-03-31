@@ -48,13 +48,13 @@ type State struct {
 	lastTime   time.Time
 }
 
-func NewState(r mb.PushReporterV2, log helper.Logger, processTimeout, inactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
-	s := makeState(r, log, processTimeout, inactiveTimeout*2, inactiveTimeout, closeTimeout, clockMaxDrift)
+func NewState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTimeout, flowTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
+	s := makeState(r, log, processTimeout, socketTimeout, flowTimeout, closeTimeout, clockMaxDrift)
 	go s.reapLoop()
 	return s
 }
 
-func makeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTimeout, inactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
+func makeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTimeout, flowInactiveTimeout, closeTimeout, clockMaxDrift time.Duration) *State {
 	clock := newClock(log, clockMaxDrift)
 
 	newState := &State{
@@ -64,14 +64,20 @@ func makeState(r mb.PushReporterV2, log helper.Logger, processTimeout, socketTim
 		dns:      newDNSTracker(socketTimeout),
 		done:     []*socket_common.Flow{},
 	}
-	flowCache := newFlowCache(inactiveTimeout, newState.finalizeFlow)
+	flowCache := newFlowCache(flowInactiveTimeout, newState.finalizeFlow)
 	socketCache := newSocketCache(socketTimeout, closeTimeout, newState.finalizeSocket)
 	processCache := newProcessCache(processTimeout)
 
 	newState.flows = flowCache
 	newState.sockets = socketCache
 	newState.processes = processCache
-	newState.threads = common.NewCache(processTimeout, 8)
+
+	// Hard-coding this expiration timeout for now. The life span of an entry
+	// on this cache is very short, as values are added at entry of non-blocking
+	// calls and removed on exit. A timeout of a minute prevents leaks in the
+	// long term while never evicting valid entries.
+	const threadCacheExpiration = time.Minute
+	newState.threads = common.NewCache(threadCacheExpiration, 8)
 
 	return newState
 }

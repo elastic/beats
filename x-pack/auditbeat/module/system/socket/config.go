@@ -28,13 +28,17 @@ type Config struct {
 	// The actual size is 2**exponent memory pages, per CPU.
 	RingSizeExp int `config:"socket.ring_size_exponent,min=1"`
 
+	// SocketInactiveTimeout determines how long a socket has to be inactive
+	// to be considered terminated or closed.
+	SocketInactiveTimeout time.Duration `config:"socket.socket_inactive_timeout"`
+
+	// ProcessInactiveTimeout determines how long a process has to be inactive
+	// for it's metadata to be evicted from the cache.
+	ProcessInactiveTimeout time.Duration `config:"socket.process_inactive_timeout"`
+
 	// FlowInactiveTimeout determines how long a flow has to be inactive to be
 	// considered closed.
 	FlowInactiveTimeout time.Duration `config:"socket.flow_inactive_timeout"`
-
-	// SocketInactiveTimeout determines how long a socket has to be inactive to be
-	// considered terminated or closed.
-	SocketInactiveTimeout time.Duration `config:"socket.socket_inactive_timeout"`
 
 	// FlowTerminationTimeout determines how long to wait after a flow has been
 	// closed for out of order packets. With TCP, some packets can be received
@@ -70,12 +74,24 @@ func (c *Config) Validate() error {
 }
 
 var defaultConfig = Config{
-	PerfQueueSize:          4096,
-	LostQueueSize:          128,
-	ErrQueueSize:           1,
-	RingSizeExp:            7,
-	FlowInactiveTimeout:    30 * time.Second,
-	InactiveTimeout:        60 * time.Second,
+	PerfQueueSize:         4096,
+	LostQueueSize:         128,
+	ErrQueueSize:          1,
+	RingSizeExp:           7,
+	FlowInactiveTimeout:   30 * time.Second,
+	SocketInactiveTimeout: time.Minute,
+
+	// Setting process inactive timeout to an arbitrarily-large value to disable
+	// expiration of processes. Otherwise we risk losing enrichment information
+	// for any process that manages to avoid network I/O during this timeout.
+	//
+	// We can re-introduce this timeout once a way is found to refresh process
+	// info from events other than process creation. Currently the drawback of
+	// failing to enrich some processes is bigger than using more memory than
+	// required, also taking into account that the number of PIDs is limited
+	// so the process cache won't grow too large.
+	ProcessInactiveTimeout: 365 * 24 * time.Hour,
+
 	FlowTerminationTimeout: 5 * time.Second,
 	ClockMaxDrift:          100 * time.Millisecond,
 	ClockSyncPeriod:        10 * time.Second,
