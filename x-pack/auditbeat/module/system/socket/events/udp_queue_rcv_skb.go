@@ -9,9 +9,10 @@ package events
 import (
 	"fmt"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"golang.org/x/sys/unix"
 )
 
 func validIPv4Headers(ipHdr uint16, udpHdr uint16, data []byte) bool {

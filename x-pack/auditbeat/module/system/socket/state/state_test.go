@@ -13,15 +13,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/events"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/sys/unix"
 )
 
 type logWrapper testing.T
