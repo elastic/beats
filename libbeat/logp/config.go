@@ -54,6 +54,8 @@ type FileConfig struct {
 	RedirectStderr  bool          `config:"redirect_stderr"`
 }
 
+const defaultLevel = InfoLevel
+
 // DefaultConfig returns the default config options for a given environment the
 // Beat is supposed to be run within.
 func DefaultConfig(environment Environment) Config {
@@ -70,23 +72,28 @@ func DefaultConfig(environment Environment) Config {
 
 func defaultToStderrConfig() Config {
 	return Config{
-		Level:     InfoLevel,
+		Level:     defaultLevel,
 		ToStderr:  true,
+		Files:     defaultFileConfig(),
 		addCaller: true,
 	}
 }
 
 func defaultToFileConfig() Config {
 	return Config{
-		Level:   InfoLevel,
-		ToFiles: true,
-		Files: FileConfig{
-			MaxSize:         10 * 1024 * 1024,
-			MaxBackups:      7,
-			Permissions:     0600,
-			Interval:        0,
-			RotateOnStartup: true,
-		},
+		Level:     defaultLevel,
+		ToFiles:   true,
+		Files:     defaultFileConfig(),
 		addCaller: true,
+	}
+}
+
+func defaultFileConfig() FileConfig {
+	return FileConfig{
+		MaxSize:         10 * 1024 * 1024,
+		MaxBackups:      7,
+		Permissions:     0600,
+		Interval:        0,
+		RotateOnStartup: true,
 	}
 }
