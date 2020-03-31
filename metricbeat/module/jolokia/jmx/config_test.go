@@ -166,6 +166,17 @@ func TestParseMBean(t *testing.T) {
 			ok: true,
 		},
 		{
+			mbean: `java.lang:name="foo,\"bar\"",type=Runtime`,
+			expected: &MBeanName{
+				Domain: `java.lang`,
+				Properties: map[string]string{
+					"name": `"foo,\"bar\""`,
+					"type": "Runtime",
+				},
+			},
+			ok: true,
+		},
+		{
 			mbean: `java.lang:type=Memory`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -187,13 +198,30 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
+		{
+			mbean: `org.apache.activemq.artemis:broker="0.0.0.0",component=addresses,address="helloworld",subcomponent=queues,routing-type="anycast",queue="helloworld"`,
+			expected: &MBeanName{
+				Domain: `org.apache.activemq.artemis`,
+				Properties: map[string]string{
+					"broker":       `"0.0.0.0"`,
+					"component":    `addresses`,
+					"address":      `"helloworld"`,
+					"subcomponent": `queues`,
+					"routing-type": `"anycast"`,
+					"queue":        `"helloworld"`,
+				},
+			},
+			ok: true,
+		},
 	}
 
 	for _, c := range cases {
 		beanObj, err := ParseMBeanName(c.mbean)
 
 		if c.ok {
-			assert.NoError(t, err, "failed parsing for: "+c.mbean)
+			if assert.NoError(t, err, "failed parsing for: "+c.mbean) {
+				t.Log("Canonicalized mbean: ", beanObj.Canonicalize(true))
+			}
 			assert.Equal(t, c.expected, beanObj, "mbean: "+c.mbean)
 		} else {
 			assert.Error(t, err, "should have failed for: "+c.mbean)
