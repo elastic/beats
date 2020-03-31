@@ -23,20 +23,22 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
-// clientWorker manages output client of type outputs.Client, not supporting reconnect.
-type clientWorker struct {
+type worker struct {
 	observer outputObserver
 	qu       workQueue
-	client   outputs.Client
 	closed   atomic.Bool
+}
+
+// clientWorker manages output client of type outputs.Client, not supporting reconnect.
+type clientWorker struct {
+	worker
+	client outputs.Client
 }
 
 // netClientWorker manages reconnectable output clients of type outputs.NetworkClient.
 type netClientWorker struct {
-	observer outputObserver
-	qu       workQueue
-	client   outputs.NetworkClient
-	closed   atomic.Bool
+	worker
+	client outputs.NetworkClient
 
 	batchSize  int
 	batchSizer func() int
@@ -44,17 +46,21 @@ type netClientWorker struct {
 }
 
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
+	w := worker{
+		observer: observer,
+		qu:       qu,
+	}
+
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{
-			observer: observer,
-			qu:       qu,
-			client:   nc,
-			logger:   logp.NewLogger("publisher_pipeline_output"),
+			worker: w,
+			client: nc,
+			logger: logp.NewLogger("publisher_pipeline_output"),
 		}
 		go c.run()
 		return c
 	}
-	c := &clientWorker{observer: observer, qu: qu, client: client}
+	c := &clientWorker{worker: w, client: client}
 	go c.run()
 	return c
 }
