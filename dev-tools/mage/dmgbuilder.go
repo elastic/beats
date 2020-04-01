@@ -244,6 +244,7 @@ func (b *dmgBuilder) buildDMG() error {
 		"create",
 		"-volname", b.MustExpand("{{.BeatName | title}} {{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}"),
 		"-srcfolder", b.dmgDir,
+		"-size", "500m", // allowing extra space
 		"-ov",
 		createDir(dmgFile),
 	}
