@@ -45,7 +45,7 @@ type ArrayResponse struct {
 	Data   arrayData `json:"data"`
 }
 type arrayData struct {
-	Results    []interface{} `json:"result"`
+	Results []interface{} `json:"result"`
 }
 
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
@@ -62,7 +62,7 @@ type InstantVectorResponse struct {
 	Data   instantVectorData `json:"data"`
 }
 type instantVectorData struct {
-	Results    []instantVectorResult `json:"result"`
+	Results []instantVectorResult `json:"result"`
 }
 type instantVectorResult struct {
 	Metric map[string]string `json:"metric"`
@@ -83,7 +83,7 @@ type RangeVectorResponse struct {
 	Data   rangeVectorData `json:"data"`
 }
 type rangeVectorData struct {
-	Results    []rangeVectorResult `json:"result"`
+	Results []rangeVectorResult `json:"result"`
 }
 type rangeVectorResult struct {
 	Metric  map[string]string `json:"metric"`
