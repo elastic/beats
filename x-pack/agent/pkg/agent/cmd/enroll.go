@@ -15,6 +15,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
@@ -44,6 +45,8 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 }
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+	warn.PrintNotGA(streams.Out)
+
 	config, err := config.LoadYAML(flags.PathConfigFile)
 	if err != nil {
 		return errors.New(err,
