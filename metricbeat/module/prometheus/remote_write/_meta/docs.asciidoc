@@ -7,6 +7,10 @@ remote_write:
   - url: "http://localhost:9201/write"
 ------------------------------------------------------------------------------
 
+TIP: It is recommended to carefully choose the https://prometheus.io/docs/practices/remote_write/#parameters[parameters]
+of remote_write configuration so as to tune the queue according to each specific case and system's characteristics.
+
+
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
 A basic configuration would look like:
 
