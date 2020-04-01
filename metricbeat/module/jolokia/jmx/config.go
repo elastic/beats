@@ -118,11 +118,13 @@ type MBeanName struct {
 }
 
 // Parse strings with properties with the format key=value, being:
-// - key a nonempty string of characters which may not contain any of the characters,
+// - Key a nonempty string of characters which may not contain any of the characters,
 //   comma (,), equals (=), colon, asterisk, or question mark.
-// - value a string that can be quoted or unquoted, if unquoted it cannot be empty and
+// - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
 //   cannot contain any of the characters comma, equals, colon, or quote.
-var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|".*?")`)
+//   If quoted, it can contain any character, including newlines, but quote needs to be
+//   escaped with a backslash.
+var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|"([^\\"]|\\.)*?")`)
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs
 // For more information refer: https://jolokia.org/reference/html/protocol.html

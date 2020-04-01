@@ -187,6 +187,17 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
+		"newline in quoted property": {
+			mbean: `java.lang:name="foo\nbar",type=Runtime`,
+			expected: &MBeanName{
+				Domain: `java.lang`,
+				Properties: map[string]string{
+					"name": `"foo\nbar"`,
+					"type": "Runtime",
+				},
+			},
+			ok: true,
+		},
 		"real catalina mbean": {
 			mbean: `Catalina:name=HttpRequest1,type=RequestProcessor,worker="http-nio-8080"`,
 			expected: &MBeanName{
