@@ -306,7 +306,7 @@ func createEventBulkMeta(
 			if s, ok := tmp.(string); ok {
 				id = s
 			} else {
-				log.Errorf("Event ID '%v' is no string value", id)
+				log.Errorf("Event ID '%v' is no string value", tmp)
 			}
 		}
 	}
