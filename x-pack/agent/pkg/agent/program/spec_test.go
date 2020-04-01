@@ -44,6 +44,10 @@ func TestSerialization(t *testing.T) {
 				"log",
 			),
 		),
+		PostInstallSteps: transpiler.NewStepList(
+			transpiler.DeleteFile("d-1", true),
+			transpiler.MoveFile("m-1", "m-2", false),
+		),
 		When: "1 == 1",
 	}
 	yml := `name: hello
@@ -85,6 +89,14 @@ rules:
     key: type
     values:
     - log
+post_install:
+- delete_file:
+    path: d-1
+    fail_on_missing: true
+- move_file:
+    path: m-1
+    target: m-2
+    fail_on_missing: false
 when: 1 == 1
 `
 	t.Run("serialization", func(t *testing.T) {
