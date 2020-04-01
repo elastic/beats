@@ -12,9 +12,12 @@ RUN apt-get -qq clean
 RUN locale-gen "en_US.UTF-8"
 RUN echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
 
+# Kerberos user information
 ENV REALM ELASTIC
-ENV KADMIN_PRINCIPAL kafka/kafka_kerberos
-ENV KADMIN_PASSWORD changeme
+ENV LIBBEAT_USER_PRINCIPAL elastic
+ENV KAFKA_SERVICE_PRINCIPAL kafka/kafka_kerberos
+ENV PASSWORD changeme
+ENV PRINCIPALS "$LIBBEAT_USER_PRINCIPAL $KAFKA_SERVICE_PRINCIPAL"
 
 COPY init-script.sh /tmp/
 CMD /tmp/init-script.sh

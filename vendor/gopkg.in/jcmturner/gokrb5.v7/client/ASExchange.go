@@ -18,7 +18,7 @@ func (cl *Client) ASExchange(realm string, ASReq messages.ASReq, referral int) (
 	if ok, err := cl.IsConfigured(); !ok {
 		return messages.ASRep{}, krberror.Errorf(err, krberror.ConfigError, "AS Exchange cannot be performed")
 	}
-	fmt.Println(ASReq)
+	fmt.Println("ASReq", ASReq, "<<<")
 
 	// Set PAData if required
 	err := setPAData(cl, nil, &ASReq)

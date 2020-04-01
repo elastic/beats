@@ -60,10 +60,12 @@ type KerberosClient interface {
 
 func (krbAuth *GSSAPIKerberosAuth) writePackage(broker *Broker, payload []byte) (int, error) {
 	length := len(payload)
+	fmt.Println(string(payload))
 	finalPackage := make([]byte, length+4) //4 byte length header + payload
-	copy(finalPackage[4:], payload)
 	binary.BigEndian.PutUint32(finalPackage, uint32(length))
+	copy(finalPackage[4:], payload)
 	bytes, err := broker.conn.Write(finalPackage)
+	fmt.Println(bytes, length)
 	if err != nil {
 		return bytes, err
 	}
@@ -81,13 +83,17 @@ func (krbAuth *GSSAPIKerberosAuth) readPackage(broker *Broker) ([]byte, int, err
 	lengthInBytes := make([]byte, 4)
 	bytes, err := io.ReadFull(broker.conn, lengthInBytes)
 	if err != nil {
+		fmt.Println("ez")
 		return nil, bytesRead, err
 	}
+	fmt.Println(bytes, string(lengthInBytes))
 	bytesRead += bytes
 	payloadLength := binary.BigEndian.Uint32(lengthInBytes)
+	fmt.Println(payloadLength)
 	payloadBytes := make([]byte, payloadLength)         // buffer for read..
 	bytes, err = io.ReadFull(broker.conn, payloadBytes) // read bytes
 	if err != nil {
+		fmt.Println("az", payloadLength, bytes, string(payloadBytes[0:50]))
 		return payloadBytes, bytesRead, err
 	}
 	bytesRead += bytes
@@ -204,13 +210,13 @@ func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 	fmt.Println("kerberos authorize")
 	kerberosClient, err := krbAuth.NewKerberosClientFunc(krbAuth.Config)
 	if err != nil {
-		Logger.Printf("Kerberos client error: %s", err)
+		fmt.Printf("Kerberos client error: %s", err)
 		return err
 	}
 
 	err = kerberosClient.Login()
 	if err != nil {
-		Logger.Printf("Kerberos client error: %s", err)
+		fmt.Printf("Kerberos client error: %s", err)
 		return err
 	}
 	// Construct SPN using serviceName and host
@@ -223,7 +229,7 @@ func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 	ticket, encKey, err := kerberosClient.GetServiceTicket(spn)
 
 	if err != nil {
-		Logger.Printf("Error getting Kerberos service ticket : %s", err)
+		fmt.Printf("Error getting Kerberos service ticket : %s", err)
 		return err
 	}
 	krbAuth.ticket = ticket
@@ -234,13 +240,14 @@ func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 	for {
 		packBytes, err := krbAuth.initSecContext(receivedBytes, kerberosClient)
 		if err != nil {
-			Logger.Printf("Error while performing GSSAPI Kerberos Authentication: %s\n", err)
+			fmt.Printf("Error while performing GSSAPI Kerberos Authentication 1: %s\n", err)
 			return err
 		}
 		requestTime := time.Now()
+		fmt.Println("writing")
 		bytesWritten, err := krbAuth.writePackage(broker, packBytes)
 		if err != nil {
-			Logger.Printf("Error while performing GSSAPI Kerberos Authentication: %s\n", err)
+			fmt.Printf("Error while performing GSSAPI Kerberos Authentication 2: %s\n", err)
 			return err
 		}
 		broker.updateOutgoingCommunicationMetrics(bytesWritten)
@@ -250,7 +257,7 @@ func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 			requestLatency := time.Since(requestTime)
 			broker.updateIncomingCommunicationMetrics(bytesRead, requestLatency)
 			if err != nil {
-				Logger.Printf("Error while performing GSSAPI Kerberos Authentication: %s\n", err)
+				fmt.Printf("Error while performing GSSAPI Kerberos Authentication 3: %s\n", err)
 				return err
 			}
 		} else if krbAuth.step == GSS_API_FINISH {

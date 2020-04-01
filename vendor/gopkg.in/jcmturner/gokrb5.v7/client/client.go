@@ -186,11 +186,13 @@ func (cl *Client) Login() error {
 		return err
 	}
 	cl.addSession(ASRep.Ticket, ASRep.DecryptedEncPart)
+	fmt.Println(">>>LOGINDONE")
 	return nil
 }
 
 // realmLogin obtains or renews a TGT and establishes a session for the realm specified.
 func (cl *Client) realmLogin(realm string) error {
+	fmt.Println(">>realmLogin")
 	if realm == cl.Credentials.Domain() {
 		return cl.Login()
 	}
@@ -216,6 +218,7 @@ func (cl *Client) realmLogin(realm string) error {
 		return err
 	}
 	cl.addSession(tgsRep.Ticket, tgsRep.DecryptedEncPart)
+	fmt.Println(">>realmLogin DONE")
 
 	return nil
 }
@@ -226,5 +229,5 @@ func (cl *Client) Destroy() {
 	cl.sessions.destroy()
 	cl.cache.clear()
 	cl.Credentials = creds
-	cl.Log("client destroyed")
+	fmt.Println("client destroyed")
 }

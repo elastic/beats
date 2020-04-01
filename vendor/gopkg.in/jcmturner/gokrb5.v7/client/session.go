@@ -88,7 +88,7 @@ func (cl *Client) addSession(tgt messages.Ticket, dep messages.EncKDCRepPart) {
 	}
 	cl.sessions.update(s)
 	cl.enableAutoSessionRenewal(s)
-	cl.Log("TGT session added for %s (EndTime: %v)", realm, dep.EndTime)
+	fmt.Println("TGT session added for %s (EndTime: %v)", realm, dep.EndTime)
 }
 
 // update overwrites the session details with those from the TGT and decrypted encPart
@@ -159,7 +159,7 @@ func (cl *Client) enableAutoSessionRenewal(s *session) {
 			case <-timer.C:
 				renewal, err := cl.refreshSession(s)
 				if err != nil {
-					cl.Log("error refreshing session: %v", err)
+					fmt.Println("error refreshing session: %v", err)
 				}
 				if !renewal && err == nil {
 					// end this goroutine as there will have been a new login and new auto renewal goroutine created.
@@ -187,7 +187,7 @@ func (cl *Client) renewTGT(s *session) error {
 	}
 	s.update(tgsRep.Ticket, tgsRep.DecryptedEncPart)
 	cl.sessions.update(s)
-	cl.Log("TGT session renewed for %s (EndTime: %v)", realm, tgsRep.DecryptedEncPart.EndTime)
+	fmt.Println("TGT session renewed for %s (EndTime: %v)", realm, tgsRep.DecryptedEncPart.EndTime)
 	return nil
 }
 
@@ -198,7 +198,7 @@ func (cl *Client) refreshSession(s *session) (bool, error) {
 	realm := s.realm
 	renewTill := s.renewTill
 	s.mux.RUnlock()
-	cl.Log("refreshing TGT session for %s", realm)
+	fmt.Println("refreshing TGT session for %s", realm)
 	if time.Now().UTC().Before(renewTill) {
 		err := cl.renewTGT(s)
 		return true, err

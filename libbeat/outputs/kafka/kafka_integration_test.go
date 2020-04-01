@@ -241,11 +241,14 @@ func TestKafkaPublish(t *testing.T) {
 				"hosts": []string{kafkaKerberosHost},
 				"kerberos": map[string]interface{}{
 					"auth_type":    "password",
-					"username":     "elastic@ELASTIC",
+					"username":     "elastic",
 					"password":     "changeme",
 					"config_path":  "/etc/krb5.conf",
-					"service_name": "kafka/kafka_kerberos@ELASTIC",
+					"service_name": "kafka",
 					"realm":        "ELASTIC",
+				},
+				"metadata": map[string]interface{}{
+					"retry.max": "0",
 				},
 			},
 			kafkaKerberosHost,
