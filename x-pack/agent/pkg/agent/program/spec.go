@@ -27,12 +27,13 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 // NOTE: Current spec are build at compile time, we want to revisit that to allow other program
 // to register their spec in a secure way.
 type Spec struct {
-	Name         string               `yaml:"name"`
-	Cmd          string               `yaml:"cmd"`
-	Configurable string               `yaml:"configurable"`
-	Args         []string             `yaml:"args"`
-	Rules        *transpiler.RuleList `yaml:"rules"`
-	When         string               `yaml:"when"`
+	Name             string               `yaml:"name"`
+	Cmd              string               `yaml:"cmd"`
+	Configurable     string               `yaml:"configurable"`
+	Args             []string             `yaml:"args"`
+	Rules            *transpiler.RuleList `yaml:"rules"`
+	PostInstallSteps *transpiler.StepList `yaml:"post_install"`
+	When             string               `yaml:"when"`
 }
 
 // ReadSpecs reads all the specs that match the provided globbing path.
