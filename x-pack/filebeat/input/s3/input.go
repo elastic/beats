@@ -178,30 +178,46 @@ func (p *s3Input) Run() {
 		if err != nil {
 			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
 		}
-
-		awsConfig := p.awsConfig.Copy()
-		awsConfig.Region = regionName
-
-		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
-		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
+		p.awsConfig.Region = regionName
 
 		p.workerWg.Add(1)
-		go p.run(svcSQS, svcS3, visibilityTimeout)
+		go p.run(visibilityTimeout)
 		p.workerWg.Done()
 	})
 }
 
-func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
+func (p *s3Input) run(visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
+	svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
+
 	for p.context.Err() == nil {
 		// receive messages from sqs
 		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
-			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				continue
+			if awsErr, ok := err.(awserr.Error); ok {
+				if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+					continue
+				}
+
+				// When AWS credentials are expired, re-obtain AWS credentials again
+				if awssdk.IsErrorExpiredCreds(awsErr) {
+					p.logger.Warn(errors.Wrap(err, "credentials are expired, please update the credentials"))
+
+					awsConfig, err := awscommon.GetAWSCredentials(p.config.AwsConfig)
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "getAWSCredentials failed"))
+						continue
+					}
+
+					awsConfig.Region = p.awsConfig.Region
+					p.awsConfig = awsConfig
+					svcSQS = sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
+					continue
+				}
 			}
+
 			p.logger.Error("failed to receive message from SQS: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
@@ -213,6 +229,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 		}
 
 		// process messages received from sqs, get logs from s3 and create events
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", p.awsConfig.Region, p.awsConfig))
 		p.processor(p.config.QueueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
 	}
 }

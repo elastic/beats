@@ -33,6 +33,19 @@
     type: keyword
     description: >
       Type of the given event
+  - name: source
+    type: group
+    description: >
+      The component reporting this event
+    fields:
+    - name: component
+      type: keyword
+      description: >
+        Component from which the event is generated
+    - name: host
+      type: keyword
+      description: >
+        Node name on which the event is generated
   - name: metadata
     type: group
     description: >
