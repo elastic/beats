@@ -219,6 +219,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new module `crowdstrike` for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
+- Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 
 *Heartbeat*
 
