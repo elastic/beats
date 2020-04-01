@@ -26,11 +26,14 @@ datasources:
       streams:
         - metricset: status
           dataset: docker.status
+      hosts: ["http://127.0.0.1:8080"]
     - type: logs
       streams:
         - paths:
           - /var/log/hello1.log
           - /var/log/hello2.log
+      vars:
+        var: value
   - namespace: testing
     use_output: default
     inputs:
@@ -38,6 +41,9 @@ datasources:
         streams:
           - enabled: true
             metricset: info
+            hosts: ["http://apache.remote"]
+        hosts: ["http://apache.local"]
+        id: apache-metrics-id
 
 settings.monitoring:
   use_output: monitoring
