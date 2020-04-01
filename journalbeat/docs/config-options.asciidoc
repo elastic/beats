@@ -51,8 +51,8 @@ journal.
 {beatname_lc}.inputs:
 - paths: []
   include_matches:
-    - "CONTAINER_TAG=redis"
-    - "_COMM=redis"
+    - "container.image.tag=redis"
+    - "process.name=redis"
 ----
 
 [[filter-using-translated-names]]
@@ -65,8 +65,8 @@ in a Docker container. However, in this example the fields are matched using the
 {beatname_lc}.inputs:
 - paths: []
   include_matches:
-    - "container.image.tag=redis"
-    - "process.name=redis"
+    - "CONTAINER_TAG=redis"
+    - "_COMM=redis"
 ----
 
 [id="{beatname_lc}-options"]
