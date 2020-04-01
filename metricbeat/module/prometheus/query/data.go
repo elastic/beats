@@ -63,7 +63,6 @@ type InstantVectorResponse struct {
 	Data   instantVectorData `json:"data"`
 }
 type instantVectorData struct {
-	ResultType string                `json:"resultType"`
 	Results    []instantVectorResult `json:"result"`
 }
 type instantVectorResult struct {
@@ -85,7 +84,6 @@ type RangeVectorResponse struct {
 	Data   rangeVectorData `json:"data"`
 }
 type rangeVectorData struct {
-	ResultType string              `json:"resultType"`
 	Results    []rangeVectorResult `json:"result"`
 }
 type rangeVectorResult struct {
