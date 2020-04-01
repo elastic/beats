@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
@@ -26,7 +25,7 @@ import (
 type worker struct {
 	observer outputObserver
 	qu       workQueue
-	closed   atomic.Bool
+	done     chan struct{}
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -49,6 +48,7 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 	w := worker{
 		observer: observer,
 		qu:       qu,
+		done:     make(chan struct{}),
 	}
 
 	var c interface {
@@ -71,80 +71,77 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 }
 
 func (w *clientWorker) Close() error {
-	w.closed.Store(true)
+	close(w.worker.done)
 	return w.client.Close()
 }
 
 func (w *clientWorker) run() {
-	for !w.closed.Load() {
-		for batch := range w.qu {
-			if w.closed.Load() {
-				if batch != nil {
-					batch.Cancelled()
-				}
+	for {
+		// We wait for either the worker to be closed or for there to be a batch of
+		// events to publish.
+		select {
+
+		case <-w.done:
+			return
+
+		case batch := <-w.qu:
+			w.observer.outBatchSend(len(batch.events))
+			if err := w.client.Publish(batch); err != nil {
 				return
 			}
 
-			w.observer.outBatchSend(len(batch.events))
-
-			if err := w.client.Publish(batch); err != nil {
-				break
-			}
 		}
 	}
 }
 
 func (w *netClientWorker) Close() error {
-	w.closed.Store(true)
+	close(w.worker.done)
 	return w.client.Close()
 }
 
 func (w *netClientWorker) run() {
-	for !w.closed.Load() {
-		reconnectAttempts := 0
+	var (
+		connected         = false
+		reconnectAttempts = 0
+	)
 
-		// start initial connect loop from first batch, but return
-		// batch to pipeline for other outputs to catch up while we're trying to connect
-		for batch := range w.qu {
-			batch.Cancelled()
+	for {
+		// We wait for either the worker to be closed or for there to be a batch of
+		// events to publish.
+		select {
 
-			if w.closed.Load() {
-				w.logger.Infof("Closed connection to %v", w.client)
-				return
-			}
+		case <-w.done:
+			return
 
-			if reconnectAttempts > 0 {
-				w.logger.Infof("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
-			} else {
-				w.logger.Infof("Connecting to %v", w.client)
-			}
+		case batch := <-w.qu:
+			// Try to (re)connect so we can publish batch
+			if !connected {
+				// Return batch to other output workers while we try to (re)connect
+				batch.Cancelled()
 
-			err := w.client.Connect()
-			if err != nil {
-				w.logger.Errorf("Failed to connect to %v: %v", w.client, err)
-				reconnectAttempts++
+				if reconnectAttempts == 0 {
+					w.logger.Infof("Connecting to %v", w.client)
+				} else {
+					w.logger.Infof("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
+				}
+
+				err := w.client.Connect()
+				connected = err == nil
+				if connected {
+					w.logger.Infof("Connection to %v established", w.client)
+					reconnectAttempts = 0
+				} else {
+					w.logger.Errorf("Failed to connect to %v: %v", w.client, err)
+					reconnectAttempts++
+				}
+
 				continue
 			}
 
-			w.logger.Infof("Connection to %v established", w.client)
-			reconnectAttempts = 0
-			break
-		}
-
-		// send loop
-		for batch := range w.qu {
-			if w.closed.Load() {
-				if batch != nil {
-					batch.Cancelled()
-				}
-				return
-			}
-
-			err := w.client.Publish(batch)
-			if err != nil {
+			if err := w.client.Publish(batch); err != nil {
 				w.logger.Errorf("Failed to publish events: %v", err)
 				// on error return to connect loop
-				break
+				connected = false
 			}
 		}
 	}
