@@ -35,7 +35,7 @@ class Test(BaseTest):
 """
 
         # Use default of \n and stripping \r
-        if delimiter is not "":
+        if delimiter != "":
             input_raw += "\n  line_delimiter: {}".format(delimiter)
 
         input_raw = input_raw.format(host, port)

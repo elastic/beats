@@ -57,9 +57,9 @@ func TestProcessEvents(t *testing.T) {
 		Data:             []byte(msg),
 		SystemProperties: &properties,
 	}
-	err = input.processEvents(&ev, "0")
-	if err != nil {
-		t.Fatal(err)
+	ok := input.processEvents(&ev, "0")
+	if !ok {
+		t.Fatal("OnEvent function returned false")
 	}
 	assert.Equal(t, len(o.Events), 1)
 	message, err := o.Events[0].Fields.GetValue("message")

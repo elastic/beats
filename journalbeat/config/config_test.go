@@ -18,3 +18,77 @@
 // +build !integration
 
 package config
+
+import (
+	"testing"
+)
+
+func TestUnpack(t *testing.T) {
+
+	tests := []struct {
+		mode    SeekMode
+		modeStr string
+	}{
+		{
+			mode:    SeekHead,
+			modeStr: seekHeadStr,
+		},
+		{
+			mode:    SeekTail,
+			modeStr: seekTailStr,
+		},
+		{
+			mode:    SeekCursor,
+			modeStr: seekCursorStr,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+
+		t.Run(tc.modeStr, func(t *testing.T) {
+			t.Parallel()
+
+			m := SeekInvalid
+			err := m.Unpack(tc.modeStr)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if m != tc.mode {
+				t.Errorf("wrong mode, expected %v, got %v", tc.mode, m)
+			}
+		})
+	}
+}
+
+func TestUnpackFailure(t *testing.T) {
+
+	tests := []struct {
+		modeStr string
+	}{
+		{
+			modeStr: "invalid",
+		},
+		{
+			modeStr: "",
+		},
+		{
+			modeStr: "unknown",
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+
+		t.Run(tc.modeStr, func(t *testing.T) {
+			t.Parallel()
+
+			m := SeekInvalid
+			err := m.Unpack(tc.modeStr)
+			if err == nil {
+				t.Errorf("an error was expected, got %v", m)
+			}
+		})
+	}
+}
