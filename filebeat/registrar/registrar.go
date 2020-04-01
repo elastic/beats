@@ -24,13 +24,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/registry"
-	"github.com/elastic/beats/v7/libbeat/registry/backend/memlog"
 )
 
 type Registrar struct {
@@ -43,9 +40,8 @@ type Registrar struct {
 	wg   sync.WaitGroup
 
 	// state storage
-	states       *file.States       // Map with all file paths inside and the corresponding state
-	provider     *registry.Registry // XXX: should not be managed by the Registrar
-	store        *registry.Store    // Store keeps states in memory and on disk
+	states       *file.States    // Map with all file paths inside and the corresponding state
+	store        *registry.Store // Store keeps states in memory and on disk
 	flushTimeout time.Duration
 
 	gcEnabled, gcRequired bool
@@ -66,29 +62,8 @@ var (
 
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
-func New(cfg config.Registry, out successLogger) (*Registrar, error) {
-	home := paths.Resolve(paths.Data, cfg.Path)
-	migrateFile := cfg.MigrateFile
-	if migrateFile != "" {
-		migrateFile = paths.Resolve(paths.Data, migrateFile)
-	}
-
-	err := ensureCurrent(home, migrateFile, cfg.Permissions)
-	if err != nil {
-		return nil, err
-	}
-
-	memlog, err := memlog.New(memlog.Settings{
-		Root:     cfg.Path,
-		FileMode: cfg.Permissions,
-	})
-	if err != nil {
-		logp.Err("Failed to open registry: %+v", err)
-		return nil, err
-	}
-
-	provider := registry.New(memlog)
-	store, err := provider.Get("filebeat")
+func New(stateStore *registry.Registry, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
+	store, err := stateStore.Get("filebeat")
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +74,8 @@ func New(cfg config.Registry, out successLogger) (*Registrar, error) {
 		done:         make(chan struct{}),
 		wg:           sync.WaitGroup{},
 		states:       file.NewStates(),
-		provider:     provider,
 		store:        store,
-		flushTimeout: cfg.FlushTimeout,
+		flushTimeout: flushTimeout,
 	}
 	return r, nil
 }
@@ -144,8 +118,6 @@ func (r *Registrar) Start() error {
 // Stop stops the registry. It waits until Run function finished.
 func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
-
-	defer r.provider.Close()
 	defer r.store.Close()
 
 	close(r.done)
@@ -314,6 +286,34 @@ func (r *Registrar) processEventStates(states []file.State) {
 		r.states.UpdateWithTs(states[i], ts)
 		statesUpdate.Add(1)
 	}
+}
+
+func readStatesFrom(store *registry.Store) ([]file.State, error) {
+	var states []file.State
+
+	err := store.View(func(tx *registry.Tx) error {
+		return tx.Each(func(k registry.Key, v registry.ValueDecoder) (bool, error) {
+			var st file.State
+
+			// try to decode. Ingore faulty/incompatible values.
+			if err := v.Decode(&st); err != nil {
+				// XXX: Do we want to log here? In case we start to store other
+				// state types in the registry, then this operation will likely fail
+				// quite often, producing some false-positives in the logs...
+				return true, nil
+			}
+
+			st.Id = string(k)
+			states = append(states, st)
+			return true, nil
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	states = resetStates(states)
+	return states, nil
 }
 
 func writeStateUpdates(tx *registry.Tx, states []file.State) error {

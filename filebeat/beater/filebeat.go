@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/config"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
@@ -41,7 +42,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v7/libbeat/registry"
+	"github.com/elastic/beats/v7/libbeat/registry/backend/memlog"
 
 	_ "github.com/elastic/beats/v7/filebeat/include"
 
@@ -219,8 +223,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
+	registryMigrator := registrar.NewMigrator(config.Registry)
+	if err := registryMigrator.Run(); err != nil {
+		logp.Err("Failed to migrate registry file: %+v", err)
+		return err
+	}
+
+	stateStore, err := openStateStore(config.Registry)
+	if err != nil {
+		logp.Err("Failed to open state store: %+v", err)
+		return err
+	}
+	defer stateStore.Close()
+
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.Registry, finishedLogger)
+	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
@@ -370,6 +387,17 @@ func (fb *Filebeat) Stop() {
 
 	// Stop Filebeat
 	close(fb.done)
+}
+
+func openStateStore(cfg config.Registry) (*registry.Registry, error) {
+	memlog, err := memlog.New(memlog.Settings{
+		Root:     paths.Resolve(paths.Data, cfg.Path),
+		FileMode: cfg.Permissions,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return registry.New(memlog), nil
 }
 
 // Create a new pipeline loader (es client) factory

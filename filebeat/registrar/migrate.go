@@ -26,9 +26,11 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/registry"
 	"github.com/elastic/beats/v7/libbeat/registry/backend/memlog"
 )
@@ -43,6 +45,30 @@ const (
 )
 
 const currentVersion = version1
+
+type Migrator struct {
+	dataPath    string
+	migrateFile string
+	permissions os.FileMode
+}
+
+func NewMigrator(cfg config.Registry) *Migrator {
+	path := paths.Resolve(paths.Data, cfg.Path)
+	migrateFile := cfg.MigrateFile
+	if migrateFile != "" {
+		migrateFile = paths.Resolve(paths.Data, migrateFile)
+	}
+
+	return &Migrator{
+		dataPath:    path,
+		migrateFile: migrateFile,
+		permissions: cfg.Permissions,
+	}
+}
+
+func (m *Migrator) Run() error {
+	return ensureCurrent(m.dataPath, m.migrateFile, m.permissions)
+}
 
 // ensureCurrent migrates old registry versions to the most recent version.
 func ensureCurrent(home, migrateFile string, perm os.FileMode) error {
@@ -148,10 +174,6 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 // migrateVersion1 migrates the filebeat registry from version 0 to version 1
 // only. Version 1 is based on the implementation of version 1 in
 // libbeat/registry/backend/memlog.
-// The migration itself only needs to rename the data file and update
-// meta.json.  During migration we take advantage of the fact that the memlog
-// snapshot format is backwards compatible to the old filebeat registry file,
-// and that timestamp decoding has support for different formats.
 func migrateVersion1(home, regHome string, perm os.FileMode) error {
 	logp.Info("Migrate registry version 0 to version 1")
 
@@ -178,6 +200,8 @@ func migrateVersion1(home, regHome string, perm os.FileMode) error {
 	if err != nil {
 		return err
 	}
+
+	states = resetStates(fixStates(states))
 
 	registryBackend, err := memlog.New(memlog.Settings{
 		Root:       home,
@@ -291,4 +315,99 @@ func safeWriteFile(path string, data []byte, perm os.FileMode) error {
 		err = err1
 	}
 	return err
+}
+
+// fixStates cleans up the registry states when updating from an older version
+// of filebeat potentially writing invalid entries.
+func fixStates(states []file.State) []file.State {
+	if len(states) == 0 {
+		return states
+	}
+
+	// we use a map of states here, so to identify and merge duplicate entries.
+	idx := map[string]*file.State{}
+	for i := range states {
+		state := &states[i]
+		fixState(state)
+
+		id := state.ID()
+		old, exists := idx[id]
+		if !exists {
+			idx[id] = state
+		} else {
+			mergeStates(old, state) // overwrite the entry in 'old'
+		}
+	}
+
+	if len(idx) == len(states) {
+		return states
+	}
+
+	i := 0
+	newStates := make([]file.State, len(idx))
+	for _, state := range idx {
+		newStates[i] = *state
+		i++
+	}
+	return newStates
+}
+
+// fixState updates a read state to fullfil required invariantes:
+// - "Meta" must be nil if len(Meta) == 0
+func fixState(st *file.State) {
+	if len(st.Meta) == 0 {
+		st.Meta = nil
+	}
+}
+
+// resetStates sets all states to finished and disable TTL on restart
+// For all states covered by an input, TTL will be overwritten with the input value
+func resetStates(states []file.State) []file.State {
+	for key, state := range states {
+		state.Finished = true
+		// Set ttl to -2 to easily spot which states are not managed by a input
+		state.TTL = -2
+		states[key] = state
+	}
+	return states
+}
+
+// mergeStates merges 2 states by trying to determine the 'newer' state.
+// The st state is overwritten with the updated fields.
+func mergeStates(st, other *file.State) {
+	st.Finished = st.Finished || other.Finished
+	if st.Offset < other.Offset { // always select the higher offset
+		st.Offset = other.Offset
+	}
+
+	// update file meta-data. As these are updated concurrently by the
+	// inputs, select the newer state based on the update timestamp.
+	var meta, metaOld, metaNew map[string]string
+	if st.Timestamp.Before(other.Timestamp) {
+		st.Source = other.Source
+		st.Timestamp = other.Timestamp
+		st.TTL = other.TTL
+		st.FileStateOS = other.FileStateOS
+
+		metaOld, metaNew = st.Meta, other.Meta
+	} else {
+		metaOld, metaNew = other.Meta, st.Meta
+	}
+
+	if len(metaOld) == 0 || len(metaNew) == 0 {
+		meta = metaNew
+	} else {
+		meta = map[string]string{}
+		for k, v := range metaOld {
+			meta[k] = v
+		}
+		for k, v := range metaNew {
+			meta[k] = v
+		}
+	}
+
+	if len(meta) == 0 {
+		meta = nil
+	}
+	st.Meta = meta
 }
