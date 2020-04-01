@@ -37,10 +37,21 @@ type gosigarCidProvider struct {
 	hostPath           string
 	cgroupPrefixes     []string
 	processCgroupPaths func(string, int) (map[string]string, error)
-	cgroupsCache       *common.Cache
+	pidCidCache        *common.Cache
 }
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
+
+	var cid string
+	var ok bool
+
+	// check from cache
+	if p.pidCidCache != nil {
+		if cid, ok = p.pidCidCache.Get(pid).(string); ok {
+			p.log.Debugf("Using cached container id for pid=%v", pid)
+			return cid, nil
+		}
+	}
 
 	cgroups, err := p.getProcessCgroups(pid)
 
@@ -48,18 +59,22 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 		p.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 	}
 
-	cid := p.getCid(cgroups)
+	cid = p.getCid(cgroups)
 
+	// add pid and cid to cache
+	if p.pidCidCache != nil {
+		p.pidCidCache.Put(pid, cid)
+	}
 	return cid, nil
 }
 
-func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error), cgroupsCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		processCgroupPaths: processCgroupPaths,
-		cgroupsCache:       cgroupsCache,
+		pidCidCache:        pidCidCache,
 	}
 }
 
@@ -68,14 +83,6 @@ func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths
 func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error) {
 
 	var cgroup map[string]string
-	var ok bool
-
-	if p.cgroupsCache != nil {
-		if cgroup, ok = p.cgroupsCache.Get(pid).(map[string]string); ok {
-			p.log.Debugf("Using cached cgroups for pid=%v", pid)
-			return cgroup, nil
-		}
-	}
 
 	cgroup, err := p.processCgroupPaths(p.hostPath, pid)
 	switch err.(type) {
@@ -85,10 +92,6 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error
 	default:
 		// should never happen
 		return cgroup, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
-	}
-
-	if p.cgroupsCache != nil {
-		p.cgroupsCache.Put(pid, cgroup)
 	}
 
 	return cgroup, nil
