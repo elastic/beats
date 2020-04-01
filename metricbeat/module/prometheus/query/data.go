@@ -129,7 +129,6 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 
 func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	resultType := "matrix"
 	convertedMap, err := convertJSONToRangeVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -149,7 +148,6 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 				if math.IsNaN(val) || math.IsInf(val, 0) {
 					continue
 				}
-				result.Metric["dataType"] = resultType
 				events = append(events, mb.Event{
 					Timestamp:    getTimestamp(timestamp),
 					ModuleFields: common.MapStr{"labels": result.Metric},
@@ -167,7 +165,6 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 
 func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	resultType := "vector"
 	convertedMap, err := convertJSONToInstantVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -186,7 +183,6 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 			if math.IsNaN(val) || math.IsInf(val, 0) {
 				continue
 			}
-			result.Metric["dataType"] = resultType
 			events = append(events, mb.Event{
 				Timestamp:    getTimestamp(timestamp),
 				ModuleFields: common.MapStr{"labels": result.Metric},
@@ -221,11 +217,6 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
-				ModuleFields: common.MapStr{
-					"labels": common.MapStr{
-						"dataType": resultType,
-					},
-				},
 				MetricSetFields: common.MapStr{
 					queryName: val,
 				},
@@ -240,8 +231,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				Timestamp: getTimestamp(timestamp),
 				ModuleFields: common.MapStr{
 					"labels": common.MapStr{
-						queryName:  value,
-						"dataType": resultType,
+						queryName: value,
 					},
 				},
 				MetricSetFields: common.MapStr{

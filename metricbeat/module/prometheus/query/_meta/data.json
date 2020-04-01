@@ -12,7 +12,6 @@
     "prometheus": {
         "labels": {
             "__name__": "go_threads",
-            "dataType": "vector",
             "instance": "localhost:9090",
             "job": "prometheus"
         },
@@ -21,7 +20,7 @@
         }
     },
     "service": {
-        "address": "localhost:32768",
+        "address": "localhost:32769",
         "type": "prometheus"
     }
 }
