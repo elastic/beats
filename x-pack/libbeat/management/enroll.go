@@ -90,9 +90,9 @@ func Enroll(
 func storeAccessToken(beat *instance.Beat, accessToken string) error {
 	keyStore := beat.Keystore()
 
-	wKeystore, ok := keyStore.(keystore.WritableKeystore)
-	if !ok {
-		return fmt.Errorf("the configured keystore is not writable")
+	wKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		return err
 	}
 
 	if !keyStore.IsPersisted() {

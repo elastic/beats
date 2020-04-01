@@ -31,6 +31,12 @@ var (
 
 	// ErrKeyDoesntExists is returned when the key doesn't exist in the store
 	ErrKeyDoesntExists = errors.New("cannot retrieve the key")
+
+	// ErrNotWritable is returned when the keystore is not writable
+	ErrNotWritable = errors.New("the configured keystore is not writable")
+
+	// ErrNotWritable is returned when the keystore is not writable
+	ErrNotListing = errors.New("the configured keystore is not listing")
 )
 
 // Keystore implement a way to securely saves and retrieves secrets to be used in the configuration
@@ -88,4 +94,24 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 
 		return string(v), parse.DefaultConfig, nil
 	}
+}
+
+// AsWritableKeystore casts a keystore to WritableKeystore, returning an error if the given keystore does not implement
+// WritableKeystore interface
+func AsWritableKeystore(store Keystore) (WritableKeystore, error) {
+	w, ok := store.(WritableKeystore)
+	if !ok {
+		return nil, ErrNotWritable
+	}
+	return w, nil
+}
+
+// AsListingKeystore casts a keystore to ListingKeystore, returning an error if the given keystore does not implement
+// ListingKeystore interface
+func AsListingKeystore(store Keystore) (ListingKeystore, error) {
+	w, ok := store.(ListingKeystore)
+	if !ok {
+		return nil, ErrNotListing
+	}
+	return w, nil
 }

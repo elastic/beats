@@ -40,11 +40,11 @@ func TestCanCreateAKeyStore(t *testing.T) {
 	keyStore, err := NewFileKeystore(path)
 	assert.NoError(t, err)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
-	assert.Nil(t, wKeystore.Store(keyValue, secretValue))
-	assert.Nil(t, wKeystore.Save())
+	assert.Nil(t, writableKeystore.Store(keyValue, secretValue))
+	assert.Nil(t, writableKeystore.Save())
 }
 
 func TestCanReadAnExistingKeyStoreWithEmptyString(t *testing.T) {
@@ -74,14 +74,14 @@ func TestCanDeleteAKeyFromTheStoreAndPersistChanges(t *testing.T) {
 	_, err := keyStore.Retrieve(keyValue)
 	assert.NoError(t, err)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
-	wKeystore.Delete(keyValue)
+	writableKeystore.Delete(keyValue)
 	_, err = keyStore.Retrieve(keyValue)
 	assert.Error(t, err)
 
-	_ = wKeystore.Save()
+	_ = writableKeystore.Save()
 	newKeystore, err := NewFileKeystore(path)
 	_, err = newKeystore.Retrieve(keyValue)
 	assert.Error(t, err)
@@ -122,12 +122,12 @@ func TestFilePermissionOnUpdate(t *testing.T) {
 
 	keyStore := CreateAnExistingKeystore(path)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
-
-	err := wKeystore.Store("newkey", []byte("newsecret"))
+	writableKeystore, err := AsWritableKeystore(keyStore)
 	assert.NoError(t, err)
-	err = wKeystore.Save()
+
+	err = writableKeystore.Store("newkey", []byte("newsecret"))
+	assert.NoError(t, err)
+	err = writableKeystore.Save()
 	assert.NoError(t, err)
 	stats, err := os.Stat(path)
 	assert.NoError(t, err)
@@ -165,10 +165,10 @@ func TestReturnsUsedKeysInTheStore(t *testing.T) {
 
 	keyStore := CreateAnExistingKeystore(path)
 
-	wKeystore, ok := keyStore.(ListingKeystore)
-	assert.True(t, ok)
+	listingKeystore, err := AsListingKeystore(keyStore)
+	assert.NoError(t, err)
 
-	keys, err := wKeystore.List()
+	keys, err := listingKeystore.List()
 
 	assert.NoError(t, err)
 	assert.Equal(t, len(keys), 1)
@@ -181,11 +181,11 @@ func TestCannotDecryptKeyStoreWithWrongPassword(t *testing.T) {
 
 	keyStore, err := NewFileKeystoreWithPassword(path, NewSecureString([]byte("password")))
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
-	wKeystore.Store("hello", []byte("world"))
-	wKeystore.Save()
+	writableKeystore.Store("hello", []byte("world"))
+	writableKeystore.Save()
 
 	_, err = NewFileKeystoreWithPassword(path, NewSecureString([]byte("wrongpassword")))
 	if assert.Error(t, err, "should fail to decrypt the keystore") {
@@ -219,12 +219,12 @@ func TestGetConfig(t *testing.T) {
 
 	keyStore := CreateAnExistingKeystore(path)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
 	// Add a bit more data of different type
-	wKeystore.Store("super.nested", []byte("hello"))
-	wKeystore.Save()
+	writableKeystore.Store("super.nested", []byte("hello"))
+	writableKeystore.Save()
 
 	cfg, err := keyStore.GetConfig()
 	assert.NotNil(t, cfg)
@@ -282,11 +282,11 @@ func createAndReadKeystoreSecret(t *testing.T, password []byte, key string, valu
 	keyStore, err := NewFileKeystoreWithPassword(path, NewSecureString(password))
 	assert.Nil(t, err)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
-	wKeystore.Store(key, value)
-	wKeystore.Save()
+	writableKeystore.Store(key, value)
+	writableKeystore.Save()
 
 	newStore, err := NewFileKeystoreWithPassword(path, NewSecureString(password))
 	s, _ := newStore.Retrieve(key)
@@ -301,11 +301,11 @@ func createAndReadKeystoreWithPassword(t *testing.T, password []byte) {
 	keyStore, err := NewFileKeystoreWithPassword(path, NewSecureString(password))
 	assert.NoError(t, err)
 
-	wKeystore, ok := keyStore.(WritableKeystore)
-	assert.True(t, ok)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	assert.NoError(t, err)
 
-	wKeystore.Store("hello", []byte("world"))
-	wKeystore.Save()
+	writableKeystore.Store("hello", []byte("world"))
+	writableKeystore.Save()
 
 	newStore, err := NewFileKeystoreWithPassword(path, NewSecureString(password))
 	s, _ := newStore.Retrieve("hello")
@@ -323,10 +323,13 @@ func CreateAnExistingKeystore(path string) Keystore {
 		panic(err)
 	}
 
-	wKeystore, _ := keyStore.(WritableKeystore)
+	writableKeystore, err := AsWritableKeystore(keyStore)
+	if err != nil {
+		panic(err)
+	}
 
-	wKeystore.Store(keyValue, secretValue)
-	wKeystore.Save()
+	writableKeystore.Store(keyValue, secretValue)
+	writableKeystore.Save()
 	return keyStore
 }
 
