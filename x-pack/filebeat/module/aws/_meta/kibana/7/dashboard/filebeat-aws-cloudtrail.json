@@ -228,7 +228,7 @@
         "description": "",
         "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"2c7b49fb-3fb5-4e18-b27f-fabe930971f3\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"7bfe2df9-9398-4f1a-8cf7-b57aa5f3f31e\",\"geoField\":\"source.geo.location\",\"filterByMapBounds\":true,\"scalingType\":\"LIMIT\",\"topHitsSize\":1,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"a10fa758-30ad-4e2a-bf9d-472e133a7f17\",\"label\":\"CloudTrail Soure Location\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[],\"query\":{\"query\":\"event.dataset:aws.cloudtrail\",\"language\":\"kuery\"}}]",
         "mapStateJSON": "{\"zoom\":1.97,\"center\":{\"lon\":0,\"lat\":19.94277},\"timeFilters\":{\"from\":\"now-15m\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[]}",
-        "title": "Source Location [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail Source Location [Filebeat AWS]",
         "uiStateJSON": {
           "isLayerTOCOpen": true,
           "openTOCDetails": []
@@ -259,7 +259,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Event Outcome over time [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail Event Outcome over time [Filebeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -383,7 +383,7 @@
               }
             ]
           },
-          "title": "Event Outcome over time [Filebeat AWS CloudTrail]",
+          "title": "CloudTrail Event Outcome over time [Filebeat AWS]",
           "type": "area"
         }
       },
@@ -415,7 +415,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Actions [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail Actions [Filebeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -473,7 +473,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Actions [Filebeat AWS CloudTrail]",
+          "title": "CloudTrail Actions [Filebeat AWS]",
           "type": "pie"
         }
       },
@@ -505,7 +505,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "CloudTrail Event Type [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail Event Type [Filebeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -548,7 +548,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "CloudTrail Event Type [Filebeat AWS CloudTrail]",
+          "title": "CloudTrail Event Type [Filebeat AWS]",
           "type": "pie"
         }
       },
@@ -580,7 +580,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "User Agents [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail User Agents [Filebeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -622,7 +622,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "User Agents [Filebeat AWS CloudTrail]",
+          "title": "CloudTrail User Agents [Filebeat AWS]",
           "type": "pie"
         }
       },
@@ -654,7 +654,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Error Code [Filebeat AWS CloudTraill]",
+        "title": "CloudTrail Error Code [Filebeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -696,7 +696,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Error Code [Filebeat AWS CloudTraill]",
+          "title": "CloudTrail Error Code [Filebeat AWS]",
           "type": "pie"
         }
       },
@@ -799,7 +799,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top User IDs [Filebeat AWS CloudTrail]",
+        "title": "CloudTrail Top User IDs [Filebeat AWS]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -852,7 +852,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top User IDs [Filebeat AWS CloudTrail]",
+          "title": "CloudTrail Top User IDs [Filebeat AWS]",
           "type": "table"
         }
       },
