@@ -17,7 +17,7 @@ BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /scripts/cmd/ )
+GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep outputs/kafka )
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make release"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt
@@ -52,6 +52,10 @@ ES_HOST_SSL?=elasticsearchssl
 ES_PORT_SSL?=9200
 KIBANA_HOST?=kibana
 KIBANA_PORT?=5601
+KAFKA_HOST=kafka
+KAFKA_PORT=9092
+KAFKA_KERBEROS_HOST=kafka_kerberos
+KAFKA_KERBEROS_PORT=9093
 # Kibana's Elaticsearch user
 KIBANA_ES_USER?=beats
 KIBANA_ES_PASS?=testing
@@ -214,7 +218,7 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	$(COVERAGE_TOOL) -timeout=120s -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
@@ -432,6 +436,10 @@ write-environment:
 	echo "KIBANA_PORT=${KIBANA_PORT}" >> ${BUILD_DIR}/test.env
 	echo "KIBANA_USER=${BEAT_KIBANA_USER}" >> ${BUILD_DIR}/test.env
 	echo "KIBANA_PASS=${BEAT_KIBANA_PASS}" >> ${BUILD_DIR}/test.env
+	echo "KAFKA_HOST=${KAFKA_HOST}" >> ${BUILD_DIR}/test.env
+	echo "KAFKA_PORT=${KAFKA_PORT}" >> ${BUILD_DIR}/test.env
+	echo "KAFKA_KERBEROS_HOST=${KAFKA_KERBEROS_HOST}" >> ${BUILD_DIR}/test.env
+	echo "KAFKA_KERBEROS_PORT=${KAFKA_KERBEROS_PORT}" >> ${BUILD_DIR}/test.env
 	# set Kibana ENV variables
 	echo "ELASTICSEARCH_URL=${ES_HOST}:${ES_PORT}" > ${BUILD_DIR}/kibana.test.env
 	echo "ELASTICSEARCH_USERNAME=${KIBANA_ES_USER}" >> ${BUILD_DIR}/kibana.test.env

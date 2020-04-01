@@ -39,6 +39,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			"kerberos": common.MapStr{
 				"auth_type":    "keytab",
 				"keytab":       "testdata/kafka.keytab",
+				"username":     "elastic",
 				"config_path":  "testdata/krb5.conf",
 				"service_name": "HTTP/elastic@ELASTIC",
 				"realm":        "ELASTIC",

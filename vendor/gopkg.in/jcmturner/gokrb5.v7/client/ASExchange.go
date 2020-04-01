@@ -1,6 +1,8 @@
 package client
 
 import (
+	"fmt"
+
 	"gopkg.in/jcmturner/gokrb5.v7/crypto"
 	"gopkg.in/jcmturner/gokrb5.v7/crypto/etype"
 	"gopkg.in/jcmturner/gokrb5.v7/iana/errorcode"
@@ -16,6 +18,7 @@ func (cl *Client) ASExchange(realm string, ASReq messages.ASReq, referral int) (
 	if ok, err := cl.IsConfigured(); !ok {
 		return messages.ASRep{}, krberror.Errorf(err, krberror.ConfigError, "AS Exchange cannot be performed")
 	}
+	fmt.Println(ASReq)
 
 	// Set PAData if required
 	err := setPAData(cl, nil, &ASReq)

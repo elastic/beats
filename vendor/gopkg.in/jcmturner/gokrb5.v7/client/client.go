@@ -162,6 +162,7 @@ func (cl *Client) IsConfigured() (bool, error) {
 
 // Login the client with the KDC via an AS exchange.
 func (cl *Client) Login() error {
+	fmt.Println(">>>>>>>>>>>LOGIN")
 	if ok, err := cl.IsConfigured(); !ok {
 		return err
 	}

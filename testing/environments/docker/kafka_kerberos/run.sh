@@ -72,11 +72,12 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override advertised.listeners=PLAINTEXT://${ADVERTISED_HOST}:9092,SASL_SSL://${ADVERTISED_HOST}:9093 \
     --override logs.dir=${KAFKA_LOGS_DIR} --override log.flush.interval.ms=200 \
     --override num.partitions=3 \
+    --override port=9093 \
     --override sasl.enabled.mechanisms=GSSAPI \
     --override sasl.mechanism.inter.broker.protocol=GSSAPI \
     --override sasl.kerberos.service.name=${KAFKA_KERBEROS_HOST} &
 
-wait_for_port 9092
+wait_for_port 9093
 
 echo "Kafka load status code $?"
 

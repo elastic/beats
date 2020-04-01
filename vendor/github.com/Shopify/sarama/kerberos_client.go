@@ -1,6 +1,8 @@
 package sarama
 
 import (
+	"fmt"
+
 	krb5client "gopkg.in/jcmturner/gokrb5.v7/client"
 	krb5config "gopkg.in/jcmturner/gokrb5.v7/config"
 	"gopkg.in/jcmturner/gokrb5.v7/keytab"
@@ -28,6 +30,7 @@ func (c *KerberosGoKrb5Client) CName() types.PrincipalName {
 *
  */
 func NewKerberosClient(config *GSSAPIConfig) (KerberosClient, error) {
+	fmt.Println("NewKerberosClient kafka")
 	cfg, err := krb5config.Load(config.KerberosConfigPath)
 	if err != nil {
 		return nil, err

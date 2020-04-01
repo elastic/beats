@@ -201,6 +201,7 @@ func (krbAuth *GSSAPIKerberosAuth) initSecContext(bytes []byte, kerberosClient K
 /* This does the handshake for authorization */
 func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 
+	fmt.Println("kerberos authorize")
 	kerberosClient, err := krbAuth.NewKerberosClientFunc(krbAuth.Config)
 	if err != nil {
 		Logger.Printf("Kerberos client error: %s", err)
@@ -217,6 +218,7 @@ func (krbAuth *GSSAPIKerberosAuth) Authorize(broker *Broker) error {
 
 	host := strings.SplitN(broker.addr, ":", 2)[0] // Strip port part
 	spn := fmt.Sprintf("%s/%s", broker.conf.Net.SASL.GSSAPI.ServiceName, host)
+	fmt.Println(spn)
 
 	ticket, encKey, err := kerberosClient.GetServiceTicket(spn)
 

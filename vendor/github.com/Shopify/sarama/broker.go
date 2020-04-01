@@ -136,6 +136,7 @@ func (b *Broker) Open(conf *Config) error {
 	if !atomic.CompareAndSwapInt32(&b.opened, 0, 1) {
 		return ErrAlreadyConnected
 	}
+	fmt.Println("opening broker")
 
 	if conf == nil {
 		conf = NewConfig()
@@ -188,7 +189,9 @@ func (b *Broker) Open(conf *Config) error {
 			b.registerMetrics()
 		}
 
+		fmt.Println("enabled?", conf.Net.SASL.Enable)
 		if conf.Net.SASL.Enable {
+			fmt.Println("ENABLED")
 
 			b.connErr = b.authenticateViaSASL()
 
@@ -879,6 +882,7 @@ func (b *Broker) responseReceiver() {
 }
 
 func (b *Broker) authenticateViaSASL() error {
+	fmt.Println("authenticateViaSASL")
 	switch b.conf.Net.SASL.Mechanism {
 	case SASLTypeOAuth:
 		return b.sendAndReceiveSASLOAuth(b.conf.Net.SASL.TokenProvider)

@@ -159,6 +159,7 @@ var (
 	V2_0_0_0  = newKafkaVersion(2, 0, 0, 0)
 	V2_0_1_0  = newKafkaVersion(2, 0, 1, 0)
 	V2_1_0_0  = newKafkaVersion(2, 1, 0, 0)
+	V2_1_1_0  = newKafkaVersion(2, 1, 1, 0)
 	V2_2_0_0  = newKafkaVersion(2, 2, 0, 0)
 	V2_3_0_0  = newKafkaVersion(2, 3, 0, 0)
 
@@ -183,6 +184,7 @@ var (
 		V2_0_0_0,
 		V2_0_1_0,
 		V2_1_0_0,
+		V2_1_1_0,
 		V2_2_0_0,
 		V2_3_0_0,
 	}

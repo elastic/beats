@@ -22,6 +22,10 @@ ENV KADMIN_PASSWORD changeme
 
 ENV KAFKA_HOME /kafka
 # The advertised host is kafka. This means it will not work if container is started locally and connected from localhost to it
+ENV KAFKA_LOG4J_ROOT_LOGLEVEL DEBUG
+ENV KAFKA_TOOLS_LOG4J_LOGLEVEL DEBUG
+ENV CONNECT_LOG4J_ROOT_LOGLEVEL DEBUG
+ENV CONNECT_TOOLS_LOG4J_LOGLEVEL DEBUG
 ENV KAFKA_ADVERTISED_HOST kafka_kerberos
 ENV KAFKA_KERBEROS_HOST kafka_kerberos
 ENV KAFKA_LOGS_DIR="/kafka-logs"
@@ -35,6 +39,7 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && curl -s -o $INSTALL_
 
 ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf
 ADD zookeeper_jaas.conf /etc/kafka/zookeeper_jaas.conf
+ADD log4j.properties /etc/kafka/log4j.properties
 ADD kafka.keytab /etc/security/keytabs/kafka.keytab
 ADD krb5.conf /etc/kafka/krb5.conf
 ADD run.sh /run.sh

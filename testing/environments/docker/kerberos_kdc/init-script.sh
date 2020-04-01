@@ -1,4 +1,16 @@
 #!/bin/bash
+
+add_principal_to_elastic_realm() {
+    username = $1
+    password = $2
+
+    echo "Adding $username principal"
+    kadmin.local -q "delete_principal -force $username@$REALM"
+    echo ""
+    kadmin.local -q "addprinc -pw $password $username@$REALM"
+    echo ""
+}
+
 echo "==================================================================================="
 echo "==== Kerberos KDC and Kadmin ======================================================"
 echo "==================================================================================="
@@ -65,11 +77,9 @@ echo ""
 echo "==================================================================================="
 echo "==== Create the principals in the acl ============================================="
 echo "==================================================================================="
-echo "Adding $KADMIN_PRINCIPAL principal"
-kadmin.local -q "delete_principal -force $KADMIN_PRINCIPAL_FULL"
-echo ""
-kadmin.local -q "addprinc -pw $KADMIN_PASSWORD $KADMIN_PRINCIPAL_FULL"
-echo ""
+for $princial in ["kafka/kafka_kerberos", "elastic"];
+do add_principal_to_elastic_realm $principal $KADMIN_PASSWORD \
+done
 
 echo "Adding noPermissions principal"
 kadmin.local -q "delete_principal -force noPermissions@$REALM"
