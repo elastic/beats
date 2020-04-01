@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/logger"
 )
@@ -42,6 +43,7 @@ func createApplication(
 	pathConfigFile string,
 	config *config.Config,
 ) (Application, error) {
+	warn.LogNotGA(log)
 
 	log.Info("Detecting execution mode")
 	c := localDefaultConfig()
