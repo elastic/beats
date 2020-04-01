@@ -72,3 +72,28 @@ func TestFormProps(t *testing.T) {
 	assert.Equal(t, event.MetricSetFields["state_since"], testEvent["state_since"])
 	assert.NotEmpty(t, event.RootFields)
 }
+
+func TestFilter(t *testing.T) {
+	unitsIn := []dbus.UnitStatus{
+		dbus.UnitStatus{
+			Name: "sshd.service",
+		},
+		dbus.UnitStatus{
+			Name: "metricbeat.service",
+		},
+	}
+
+	filtersMatch := []string{
+		"ssh*",
+	}
+	filtersBad := []string{
+		"asdf",
+	}
+
+	shouldMatch, err := matchUnitPatterns(filtersMatch, unitsIn)
+	assert.NoError(t, err)
+	assert.Len(t, shouldMatch, 1)
+	shouldNotMatch, err := matchUnitPatterns(filtersBad, unitsIn)
+	assert.NoError(t, err)
+	assert.Empty(t, shouldNotMatch)
+}
