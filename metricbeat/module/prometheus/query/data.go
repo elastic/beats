@@ -45,7 +45,6 @@ type ArrayResponse struct {
 	Data   arrayData `json:"data"`
 }
 type arrayData struct {
-	ResultType string        `json:"resultType"`
 	Results    []interface{} `json:"result"`
 }
 
