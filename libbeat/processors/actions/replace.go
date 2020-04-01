@@ -19,9 +19,8 @@ package actions
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/pkg/errors"
+	"regexp"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -36,15 +35,15 @@ type replaceString struct {
 }
 
 type replaceStringConfig struct {
-	Fields        []replaceWith `config:"fields"`
+	Fields        []replaceConfig `config:"fields"`
 	IgnoreMissing bool          `config:"ignore_missing"`
 	FailOnError   bool          `config:"fail_on_error"`
 }
 
-type replaceWith struct {
-	FieldName   string `config:"fieldname"`
-	SearchValue string `config:"search_value"`
-	ReplaceWith string `config:"replace_with"`
+type replaceConfig struct {
+	Field   string `config:"field"`
+	Pattern string `config:"pattern"`
+	Replacement string `config:"replacement"`
 }
 
 func init() {
@@ -80,7 +79,7 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.replaceField(field.FieldName, field.SearchValue, field.ReplaceWith, event.Fields)
+		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event.Fields)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
 			logp.Debug("replace", errMsg.Error())
@@ -95,20 +94,21 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *replaceString) replaceField(fieldName string, searchValue string, replaceWith string, fields common.MapStr) error {
-	currentValue, err := fields.GetValue(fieldName)
+func (f *replaceString) replaceField(field string, pattern string, replacement string, fields common.MapStr) error {
+	currentValue, err := fields.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", fieldName, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
 	}
 
-	updatedString := strings.Replace(currentValue.(string), searchValue, replaceWith, -1)
-	_, err = fields.Put(fieldName, updatedString)
+	re := regexp.MustCompile(pattern)
+	updatedString := re.ReplaceAllString(currentValue.(string), replacement)
+	_, err = fields.Put(field, updatedString)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", replaceWith, currentValue, err)
+		return fmt.Errorf("could not put value: %s: %v, %v", replacement, currentValue, err)
 	}
 	return nil
 }

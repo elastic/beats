@@ -30,7 +30,7 @@ import (
 func TestReplaceRun(t *testing.T) {
 	var tests = []struct {
 		description   string
-		Fields        []replaceWith
+		Fields        []replaceConfig
 		IgnoreMissing bool
 		FailOnError   bool
 		Input         common.MapStr
@@ -39,11 +39,11 @@ func TestReplaceRun(t *testing.T) {
 	}{
 		{
 			description: "simple field replacing",
-			Fields: []replaceWith{
+			Fields: []replaceConfig{
 				{
-					FieldName:   "f",
-					SearchValue: "a",
-					ReplaceWith: "b",
+					Field:   "f",
+					Pattern: "a",
+					Replacement: "b",
 				},
 			},
 			Input: common.MapStr{
@@ -58,11 +58,11 @@ func TestReplaceRun(t *testing.T) {
 		},
 		{
 			description: "Add one more hierarchy to event",
-			Fields: []replaceWith{
+			Fields: []replaceConfig{
 				{
-					FieldName:   "f.b",
-					SearchValue: "a",
-					ReplaceWith: "b",
+					Field:   "f.b",
+					Pattern: "a",
+					Replacement: "b",
 				},
 			},
 			Input: common.MapStr{
@@ -81,24 +81,24 @@ func TestReplaceRun(t *testing.T) {
 		},
 		{
 			description: "replace two fields at the same time.",
-			Fields: []replaceWith{
+			Fields: []replaceConfig{
 				{
-					FieldName:   "f",
-					SearchValue: "a",
-					ReplaceWith: "b",
+					Field:   "f",
+					Pattern: "a.*c",
+					Replacement: "cab",
 				},
 				{
-					FieldName:   "g",
-					SearchValue: "ef",
-					ReplaceWith: "oor",
+					Field:   "g",
+					Pattern: "ef",
+					Replacement: "oor",
 				},
 			},
 			Input: common.MapStr{
-				"f": "abc",
+				"f": "abbbc",
 				"g": "def",
 			},
 			Output: common.MapStr{
-				"f": "bbc",
+				"f": "cab",
 				"g": "door",
 			},
 			error:         false,
@@ -107,16 +107,16 @@ func TestReplaceRun(t *testing.T) {
 		},
 		{
 			description: "test missing fields",
-			Fields: []replaceWith{
+			Fields: []replaceConfig{
 				{
-					FieldName:   "f",
-					SearchValue: "abc",
-					ReplaceWith: "xyz",
+					Field:   "f",
+					Pattern: "abc",
+					Replacement: "xyz",
 				},
 				{
-					FieldName:   "g",
-					SearchValue: "def",
-					ReplaceWith: "",
+					Field:   "g",
+					Pattern: "def",
+					Replacement: "",
 				},
 			},
 			Input: common.MapStr{
@@ -163,9 +163,9 @@ func TestReplaceRun(t *testing.T) {
 
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
-		FieldName     string
-		SearchValue   string
-		ReplaceWith   string
+		Field     string
+		Pattern   string
+		Replacement   string
 		ignoreMissing bool
 		failOnError   bool
 		Input         common.MapStr
@@ -175,9 +175,9 @@ func TestReplaceField(t *testing.T) {
 	}{
 		{
 			description: "replace part of field value with another string",
-			FieldName:   "f",
-			SearchValue: "a",
-			ReplaceWith: "b",
+			Field:   "f",
+			Pattern: "a",
+			Replacement: "b",
 			Input: common.MapStr{
 				"f": "abc",
 			},
@@ -190,9 +190,9 @@ func TestReplaceField(t *testing.T) {
 		},
 		{
 			description: "Add hierarchy to event and replace",
-			FieldName:   "f.b",
-			SearchValue: "a",
-			ReplaceWith: "b",
+			Field:   "f.b",
+			Pattern: "a",
+			Replacement: "b",
 			Input: common.MapStr{
 				"f": common.MapStr{
 					"b": "abc",
@@ -209,9 +209,9 @@ func TestReplaceField(t *testing.T) {
 		},
 		{
 			description: "try replacing value of missing fields in event",
-			FieldName:   "f",
-			SearchValue: "abc",
-			ReplaceWith: "xyz",
+			Field:   "f",
+			Pattern: "abc",
+			Replacement: "xyz",
 			Input: common.MapStr{
 				"m": "abc",
 				"n": "def",
@@ -236,7 +236,7 @@ func TestReplaceField(t *testing.T) {
 				},
 			}
 
-			err := f.replaceField(test.FieldName, test.SearchValue, test.ReplaceWith, test.Input)
+			err := f.replaceField(test.Field, test.Pattern, test.Replacement, test.Input)
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
