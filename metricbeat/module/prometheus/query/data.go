@@ -149,12 +149,12 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 				if math.IsNaN(val) || math.IsInf(val, 0) {
 					continue
 				}
+				result.Metric["dataType"] = resultType
 				events = append(events, mb.Event{
 					Timestamp:    getTimestamp(timestamp),
 					ModuleFields: common.MapStr{"labels": result.Metric},
 					MetricSetFields: common.MapStr{
-						"dataType": resultType,
-						queryName:  val,
+						queryName: val,
 					},
 				})
 			} else {
@@ -186,12 +186,12 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 			if math.IsNaN(val) || math.IsInf(val, 0) {
 				continue
 			}
+			result.Metric["dataType"] = resultType
 			events = append(events, mb.Event{
 				Timestamp:    getTimestamp(timestamp),
 				ModuleFields: common.MapStr{"labels": result.Metric},
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  val,
+					queryName: val,
 				},
 			})
 		} else {
@@ -221,9 +221,13 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
+				ModuleFields: common.MapStr{
+					"labels": common.MapStr{
+						"dataType": resultType,
+					},
+				},
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  val,
+					queryName: val,
 				},
 			}, nil
 		} else if resultType == "string" {
@@ -233,11 +237,15 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				return mb.Event{}, errors.New(msg)
 			}
 			return mb.Event{
-				Timestamp:    getTimestamp(timestamp),
-				ModuleFields: common.MapStr{"labels": common.MapStr{queryName: value}},
+				Timestamp: getTimestamp(timestamp),
+				ModuleFields: common.MapStr{
+					"labels": common.MapStr{
+						queryName:  value,
+						"dataType": resultType,
+					},
+				},
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  1,
+					queryName: 1,
 				},
 			}, nil
 		}
