@@ -407,6 +407,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.Host = host
 	}
 
+	// TODO: workaround for output reloading leaking FDs until context.WithCancel is used on transport dialer instead
+	req.Header.Set("Connection", "close")
+
 	resp, err := conn.HTTP.Do(req)
 	if err != nil {
 		return 0, nil, err
