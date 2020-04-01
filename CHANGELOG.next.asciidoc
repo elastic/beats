@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a mapping exception when ingesting CEF logs that used the spriv or dpriv extensions. {issue}17216[17216] {pull}17220[17220]
 - CEF: Fixed decoding errors caused by trailing spaces in messages. {pull}17253[17253]
 - Fixed a mapping exception when ingesting Logstash plain logs (7.4+) with pipeline ids containing non alphanumeric chars. {issue}17242[17242] {pull}17243[17243]
+- Fixed MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
 
 *Heartbeat*
 
@@ -134,6 +135,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
+- Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
+- Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
 
 *Packetbeat*
 
@@ -216,6 +219,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new module `crowdstrike` for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
+- Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
 
 *Heartbeat*
@@ -275,6 +279,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 - Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
+- Add dashboard for pubsub metricset in googlecloud module. {pull}17161[17161]
 - Add dashboards for the azure container metricsets. {pull}17194[17194]
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
 - Use Elasticsearch histogram type to store Prometheus histograms {pull}17061[17061]

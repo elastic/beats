@@ -810,8 +810,12 @@ def isChangedXPackCode(patterns) {
 }
 
 def loadConfigEnvVars(){
-  env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
+  env.BUILD_AUDITBEAT = isChanged([
+    "^metricbeat/.*",
+    "^auditbeat/.*",
+  ])
   env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode([
+    "^metricbeat/.*",
     "^auditbeat/.*",
     "^x-pack/auditbeat/.*",
   ])
