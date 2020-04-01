@@ -96,7 +96,7 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 	}
 }
 
-// AsWritableKeystore casts a keystore to WritableKeystore, returning an error if the given keystore does not implement
+// AsWritableKeystore casts a keystore to WritableKeystore, returning an ErrNotWritable error if the given keystore does not implement
 // WritableKeystore interface
 func AsWritableKeystore(store Keystore) (WritableKeystore, error) {
 	w, ok := store.(WritableKeystore)
@@ -106,7 +106,7 @@ func AsWritableKeystore(store Keystore) (WritableKeystore, error) {
 	return w, nil
 }
 
-// AsListingKeystore casts a keystore to ListingKeystore, returning an error if the given keystore does not implement
+// AsListingKeystore casts a keystore to ListingKeystore, returning an ErrNotListing error if the given keystore does not implement
 // ListingKeystore interface
 func AsListingKeystore(store Keystore) (ListingKeystore, error) {
 	w, ok := store.(ListingKeystore)
