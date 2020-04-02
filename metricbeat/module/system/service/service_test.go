@@ -29,6 +29,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+var exampleUnits = []dbus.UnitStatus{
+	dbus.UnitStatus{
+		Name: "sshd.service",
+	},
+	dbus.UnitStatus{
+		Name: "metricbeat.service",
+	},
+	dbus.UnitStatus{
+		Name: "filebeat.service",
+	},
+}
+
 func TestFormProps(t *testing.T) {
 	testUnit := dbus.UnitStatus{
 		Name:        "test.service",
@@ -73,27 +85,22 @@ func TestFormProps(t *testing.T) {
 	assert.NotEmpty(t, event.RootFields)
 }
 
-func TestFilter(t *testing.T) {
-	unitsIn := []dbus.UnitStatus{
-		dbus.UnitStatus{
-			Name: "sshd.service",
-		},
-		dbus.UnitStatus{
-			Name: "metricbeat.service",
-		},
-	}
+func TestFilterEmpty(t *testing.T) {
 
-	filtersMatch := []string{
-		"ssh*",
-	}
 	filtersBad := []string{
 		"asdf",
 	}
-
-	shouldMatch, err := matchUnitPatterns(filtersMatch, unitsIn)
-	assert.NoError(t, err)
-	assert.Len(t, shouldMatch, 1)
-	shouldNotMatch, err := matchUnitPatterns(filtersBad, unitsIn)
+	shouldNotMatch, err := matchUnitPatterns(filtersBad, exampleUnits)
 	assert.NoError(t, err)
 	assert.Empty(t, shouldNotMatch)
+}
+
+func TestFilterMatches(t *testing.T) {
+	filtersMatch := []string{
+		"ssh*",
+	}
+
+	shouldMatch, err := matchUnitPatterns(filtersMatch, exampleUnits)
+	assert.NoError(t, err)
+	assert.Len(t, shouldMatch, 1)
 }
