@@ -14,12 +14,10 @@ rules:
 - map:
     path: inputsstreams
     rules:
-    - copy_to_list:
-        item: type
+    - copy_all_to_list:
         to: streams
-    - copy_to_list:
-        item: processors
-        to: streams
+        overwrite: false
+        except: ["streams", "id", "enabled", "title", "package", "namespace", "constraints", "use_output"]
 
 - extract_list_items:
     path: inputsstreams
