@@ -47,17 +47,17 @@ type netClientWorker struct {
 	batchSizer func() int
 	logger     *logp.Logger
 
-	getTracer func() *apm.Tracer
+	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, traceGetter func() *apm.Tracer) outputWorker {
+func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, tracer *apm.Tracer) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{
-			observer:  observer,
-			qu:        qu,
-			client:    nc,
-			logger:    logp.NewLogger("publisher_pipeline_output"),
-			getTracer: traceGetter,
+			observer: observer,
+			qu:       qu,
+			client:   nc,
+			logger:   logp.NewLogger("publisher_pipeline_output"),
+			tracer:   tracer,
 		}
 		go c.run()
 		return c
@@ -122,7 +122,6 @@ func (w *netClientWorker) run() {
 		}
 
 		// send loop
-		tracer := w.getTracer()
 		for batch := range w.qu {
 			if w.closed.Load() {
 				if batch != nil {
@@ -132,7 +131,7 @@ func (w *netClientWorker) run() {
 			}
 
 			if err := func() error {
-				tx := tracer.StartTransaction("publish", "output")
+				tx := w.tracer.StartTransaction("publish", "output")
 				defer tx.End()
 				tx.Context.SetLabel("worker", "netclient")
 				ctx := apm.ContextWithTransaction(context.Background(), tx)

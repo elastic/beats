@@ -24,6 +24,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"go.elastic.co/apm"
 	"io"
 	"math"
 	"math/big"
@@ -331,11 +332,17 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		}
 	}
 
+	tracer, err := apm.NewTracer(b.Info.Beat, b.Info.Version)
+	if err != nil {
+		return nil, err
+	}
+
 	pipeline, err := pipeline.Load(b.Info,
 		pipeline.Monitors{
 			Metrics:   reg,
 			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
 			Logger:    logp.L().Named("publisher"),
+			Tracer:    tracer,
 		},
 		b.Config.Pipeline,
 		b.processing,
