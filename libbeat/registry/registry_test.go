@@ -31,7 +31,7 @@ func TestAccessStore(t *testing.T) {
 		mr.OnAccess("test").Once().Return(ms, nil)
 		ms.OnClose().Once().Return(nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 		store, _ := reg.Get("test")
 		assert.NoError(t, store.Close())
 		assert.NoError(t, reg.Close())
@@ -49,7 +49,7 @@ func TestAccessStore(t *testing.T) {
 		mr.OnAccess("test").Once().Return(ms, nil)
 		ms.OnClose().Once().Return(nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 		s1, _ := reg.Get("test")
 		s2, _ := reg.Get("test")
 		assert.NoError(t, s1.Close())
@@ -69,7 +69,7 @@ func TestAccessStore(t *testing.T) {
 		mr.OnAccess("test").Twice().Return(ms, nil)
 		ms.OnClose().Twice().Return(nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 
 		store, err := reg.Get("test")
 		assert.NoError(t, err)
@@ -97,7 +97,7 @@ func TestAccessStore(t *testing.T) {
 		ms2.OnClose().Once().Return(nil)
 		mr.OnAccess("s2").Once().Return(ms2, nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 		s1, err := reg.Get("s1")
 		assert.NoError(t, err)
 		s2, err := reg.Get("s2")

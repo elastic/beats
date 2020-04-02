@@ -35,7 +35,7 @@ func testStoreBeginTxClosed(t *testing.T) {
 		mr := newMockRegistry()
 		mr.OnAccess("test").Once().Return(ms, nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 
 		s, err := reg.Get("test")
 		require.NoError(t, err)
@@ -95,7 +95,7 @@ func testStoreWithTx(t *testing.T) {
 		mr := newMockRegistry()
 		mr.OnAccess("test").Once().Return(ms, nil)
 
-		reg := NewRegistry(mr)
+		reg := New(mr)
 		s, err := reg.Get("test")
 		require.NoError(t, err)
 
