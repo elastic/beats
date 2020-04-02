@@ -109,6 +109,22 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	assert.Equal(t, expectedFields, event.MetricSetFields)
 }
 
+func TestMemoryServiceBadData(t *testing.T) {
+
+	badMemStats := types.StatsJSON{
+		Stats: types.Stats{
+			Read:        time.Now(),
+			MemoryStats: types.MemoryStats{}, //Test for cases where this is empty
+		},
+	}
+
+	memoryService := &MemoryService{}
+	memoryRawStats := []docker.Stat{docker.Stat{Stats: badMemStats}}
+	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
+	assert.Len(t, rawStats, 0)
+
+}
+
 func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
 
 	myMemoryStats := types.StatsJSON{
