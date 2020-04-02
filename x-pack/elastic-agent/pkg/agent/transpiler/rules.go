@@ -49,6 +49,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "copy"
 		case *CopyToListRule:
 			name = "copy_to_list"
+		case *CopyAllToListRule:
+			name = "copy_all_to_list"
 		case *RenameRule:
 			name = "rename"
 		case *TranslateRule:
@@ -123,6 +125,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &CopyRule{}
 		case "copy_to_list":
 			r = &CopyToListRule{}
+		case "copy_all_to_list":
+			r = &CopyAllToListRule{}
 		case "rename":
 			r = &RenameRule{}
 		case "translate":
@@ -231,8 +235,9 @@ func MakeArray(item Selector, to string) *MakeArrayRule {
 // CopyToListRule is a rule which copies a specified
 // node into every item in a provided list.
 type CopyToListRule struct {
-	Item Selector
-	To   string
+	Item      Selector
+	To        string
+	Overwrite bool
 }
 
 // Apply copies specified node into every item of the list.
@@ -260,6 +265,13 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 			continue
 		}
 
+		if !r.Overwrite {
+			_, found := listItemMap.Find(r.Item)
+			if found {
+				continue
+			}
+		}
+
 		listItemMap.value = append(listItemMap.value, sourceNode.Clone())
 	}
 
@@ -267,10 +279,60 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 }
 
 // CopyToList creates a CopyToListRule
-func CopyToList(item Selector, to string) *CopyToListRule {
+func CopyToList(item Selector, to string, overwrite bool) *CopyToListRule {
 	return &CopyToListRule{
-		Item: item,
-		To:   to,
+		Item:      item,
+		To:        to,
+		Overwrite: overwrite,
+	}
+}
+
+// CopyAllToListRule is a rule which copies a all nodes
+// into every item in a provided list.
+type CopyAllToListRule struct {
+	To        string
+	Except    []string
+	Overwrite bool
+}
+
+// Apply copies all nodes into every item of the list.
+func (r *CopyAllToListRule) Apply(ast *AST) error {
+	// get list of nodes
+	astMap, err := ast.Map()
+	if err != nil {
+		return err
+	}
+
+	isFiltered := func(item string) bool {
+		for _, f := range r.Except {
+			if f == item {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// foreach node if not filtered out
+	for item := range astMap {
+		if isFiltered(item) {
+			continue
+		}
+
+		if err := CopyToList(item, r.To, r.Overwrite).Apply(ast); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// CopyAllToList creates a CopyAllToListRule
+func CopyAllToList(to string, overwrite bool, except ...string) *CopyAllToListRule {
+	return &CopyAllToListRule{
+		To:        to,
+		Except:    except,
+		Overwrite: overwrite,
 	}
 }
 
