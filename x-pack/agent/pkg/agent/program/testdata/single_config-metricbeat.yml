@@ -3,9 +3,11 @@ metricbeat:
   - module: docker
     metricsets: [status]
     index: metrics-docker.status-default
+    hosts: ["http://127.0.0.1:8080"]
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
+    hosts: ["http://apache.remote"]
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
