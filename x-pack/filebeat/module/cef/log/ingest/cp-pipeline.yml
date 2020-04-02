@@ -104,6 +104,10 @@ processors:
             to: checkpoint.termination_reason
 
           # Possibly an IKE cookie
+          - name: requestCookies
+            to: checkpoint.cookie
+
+          # Probably a typo in CP's CEF docs
           - name: checkrequestCookies
             to: checkpoint.cookie
 

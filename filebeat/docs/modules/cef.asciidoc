@@ -72,7 +72,7 @@ Check Point CEF extensions are mapped as follows:
 | externalId                 | -                           | -                        | checkpoint.uuid                |
 | fileHash                   | -                           | file.hash.{md5,sha1,sha256| -                             |
 | reason                     | -                           | -                        | checkpoint.termination_reason  |
-| checkrequestCookies        | -                           | -                        | checkpoint.cookie              |
+| requestCookies             | -                           | -                        | checkpoint.cookie              |
 | sourceNtDomain             | -                           | dns.question.name        | -                              |
 | Signature                  | -                           | vulnerability.id         | -                              |
 | Recipient                  | -                           | destination.user.email   | -                              |
