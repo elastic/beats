@@ -45,8 +45,7 @@ type ArrayResponse struct {
 	Data   arrayData `json:"data"`
 }
 type arrayData struct {
-	ResultType string        `json:"resultType"`
-	Results    []interface{} `json:"result"`
+	Results []interface{} `json:"result"`
 }
 
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
@@ -63,8 +62,7 @@ type InstantVectorResponse struct {
 	Data   instantVectorData `json:"data"`
 }
 type instantVectorData struct {
-	ResultType string                `json:"resultType"`
-	Results    []instantVectorResult `json:"result"`
+	Results []instantVectorResult `json:"result"`
 }
 type instantVectorResult struct {
 	Metric map[string]string `json:"metric"`
@@ -85,8 +83,7 @@ type RangeVectorResponse struct {
 	Data   rangeVectorData `json:"data"`
 }
 type rangeVectorData struct {
-	ResultType string              `json:"resultType"`
-	Results    []rangeVectorResult `json:"result"`
+	Results []rangeVectorResult `json:"result"`
 }
 type rangeVectorResult struct {
 	Metric  map[string]string `json:"metric"`
@@ -129,7 +126,6 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 
 func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	resultType := "matrix"
 	convertedMap, err := convertJSONToRangeVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -153,8 +149,7 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 					Timestamp:    getTimestamp(timestamp),
 					ModuleFields: common.MapStr{"labels": result.Metric},
 					MetricSetFields: common.MapStr{
-						"dataType": resultType,
-						queryName:  val,
+						queryName: val,
 					},
 				})
 			} else {
@@ -167,7 +162,6 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 
 func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 	events := []mb.Event{}
-	resultType := "vector"
 	convertedMap, err := convertJSONToInstantVectorResponse(body)
 	if err != nil {
 		return events, err
@@ -190,8 +184,7 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 				Timestamp:    getTimestamp(timestamp),
 				ModuleFields: common.MapStr{"labels": result.Metric},
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  val,
+					queryName: val,
 				},
 			})
 		} else {
@@ -222,8 +215,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  val,
+					queryName: val,
 				},
 			}, nil
 		} else if resultType == "string" {
@@ -233,11 +225,14 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 				return mb.Event{}, errors.New(msg)
 			}
 			return mb.Event{
-				Timestamp:    getTimestamp(timestamp),
-				ModuleFields: common.MapStr{"labels": common.MapStr{queryName: value}},
+				Timestamp: getTimestamp(timestamp),
+				ModuleFields: common.MapStr{
+					"labels": common.MapStr{
+						queryName: value,
+					},
+				},
 				MetricSetFields: common.MapStr{
-					"dataType": resultType,
-					queryName:  1,
+					queryName: 1,
 				},
 			}, nil
 		}

@@ -77,8 +77,8 @@ Example config:
   firewall:
     enabled: true
     var.project_id: my-gcp-project-id
-    var.topic: googlecloud-vpc-flowlogs
-    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+    var.topic: googlecloud-vpc-firewall
+    var.subscription_name: filebeat-googlecloud-vpc-firewall-sub
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
     var.keep_original_message: false
 ----

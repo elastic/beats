@@ -19,7 +19,6 @@ package keystore
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	ucfg "github.com/elastic/go-ucfg"
@@ -32,6 +31,12 @@ var (
 
 	// ErrKeyDoesntExists is returned when the key doesn't exist in the store
 	ErrKeyDoesntExists = errors.New("cannot retrieve the key")
+
+	// ErrNotWritable is returned when the keystore is not writable
+	ErrNotWritable = errors.New("the configured keystore is not writable")
+
+	// ErrNotWritable is returned when the keystore is not writable
+	ErrNotListing = errors.New("the configured keystore is not listing")
 )
 
 // Keystore implement a way to securely saves and retrieves secrets to be used in the configuration
@@ -39,67 +44,33 @@ var (
 // to that concept, so we can deal with tokens that has a limited duration or can be revoked by a
 // remote keystore.
 type Keystore interface {
-	// Store add keys to the keystore, wont be persisted until we save.
-	Store(key string, secret []byte) error
-
 	// Retrieve returns a SecureString instance of the searched key or an error.
 	Retrieve(key string) (*SecureString, error)
-
-	// Delete removes a specific key from the keystore.
-	Delete(key string) error
-
-	// List returns the list of keys in the keystore, return an empty list if none is found.
-	List() ([]string, error)
 
 	// GetConfig returns the key value pair in the config format to be merged with other configuration.
 	GetConfig() (*common.Config, error)
 
-	// Create Allow to create an empty keystore.
-	Create(override bool) error
-
 	// IsPersisted check if the current keystore is persisted.
 	IsPersisted() bool
+}
+
+type WritableKeystore interface {
+	// Store add keys to the keystore, wont be persisted until we save.
+	Store(key string, secret []byte) error
+
+	// Delete removes a specific key from the keystore.
+	Delete(key string) error
+
+	// Create Allow to create an empty keystore.
+	Create(override bool) error
 
 	// Save persist the changes to the keystore.
 	Save() error
 }
 
-// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
-type Packager interface {
-	Package() ([]byte, error)
-	ConfiguredPath() string
-}
-
-// Factory Create the right keystore with the configured options.
-func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
-	config := defaultConfig
-
-	if cfg == nil {
-		cfg = common.NewConfig()
-	}
-	err := cfg.Unpack(&config)
-
-	if err != nil {
-		return nil, fmt.Errorf("could not read keystore configuration, err: %v", err)
-	}
-
-	if config.Path == "" {
-		config.Path = defaultPath
-	}
-
-	keystore, err := NewFileKeystore(config.Path)
-	return keystore, err
-}
-
-// ResolverFromConfig create a resolver from a configuration.
-func ResolverFromConfig(cfg *common.Config, dataPath string) (func(string) (string, parse.Config, error), error) {
-	keystore, err := Factory(cfg, dataPath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return ResolverWrap(keystore), nil
+type ListingKeystore interface {
+	// List returns the list of keys in the keystore, return an empty list if none is found.
+	List() ([]string, error)
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.
@@ -123,4 +94,24 @@ func ResolverWrap(keystore Keystore) func(string) (string, parse.Config, error) 
 
 		return string(v), parse.DefaultConfig, nil
 	}
+}
+
+// AsWritableKeystore casts a keystore to WritableKeystore, returning an ErrNotWritable error if the given keystore does not implement
+// WritableKeystore interface
+func AsWritableKeystore(store Keystore) (WritableKeystore, error) {
+	w, ok := store.(WritableKeystore)
+	if !ok {
+		return nil, ErrNotWritable
+	}
+	return w, nil
+}
+
+// AsListingKeystore casts a keystore to ListingKeystore, returning an ErrNotListing error if the given keystore does not implement
+// ListingKeystore interface
+func AsListingKeystore(store Keystore) (ListingKeystore, error) {
+	w, ok := store.(ListingKeystore)
+	if !ok {
+		return nil, ErrNotListing
+	}
+	return w, nil
 }
