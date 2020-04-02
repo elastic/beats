@@ -70,7 +70,7 @@ Check Point CEF extensions are mapped as follows:
 | deviceInboundInterface     | -                           | observer.ingress.interface.name | -                       |
 | deviceOutboundInterface    | -                           | observer.egress.interface.name | -                        |
 | externalId                 | -                           | -                        | checkpoint.uuid                |
-| fileHash                   | -                           | file.hash.{md5,sha1}     | checkpoint.file_hash           |
+| fileHash                   | -                           | file.hash.{md5,sha1,sha256| -                             |
 | reason                     | -                           | -                        | checkpoint.termination_reason  |
 | checkrequestCookies        | -                           | -                        | checkpoint.cookie              |
 | sourceNtDomain             | -                           | dns.question.name        | -                              |

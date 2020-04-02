@@ -295,15 +295,19 @@ processors:
             field: event.duration
             ignore_missing: true
 
-  # checkpoint.file_hash can be either MD5 or SHA1.
-  - set:
-      field: file.hash.md5
-      value: '{{checkpoint.file_hash}}'
+  # checkpoint.file_hash can be either MD5, SHA1 or SHA256.
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.md5
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==32'
-  - set:
-      field: file.hash.sha1
-      value: '{{checkpoint.file_hash}}'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha1
       if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==40'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha256
+      if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==64'
 
   # Event kind is 'event' by default. 'alert' when a risk score and rule info
   # is present.

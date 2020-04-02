@@ -80,10 +80,6 @@
       type: long
       description: Number of events associated with the log.
 
-    - name: file_hash
-      type: keyword
-      description: File hash (SHA1 or MD5).
-
     - name: frequency
       type: keyword
       description: Scan frequency.

@@ -4989,15 +4989,6 @@ type: long
 
 --
 
-*`checkpoint.file_hash`*::
-+
---
-File hash (SHA1 or MD5).
-
-type: keyword
-
---
-
 *`checkpoint.frequency`*::
 +
 --
