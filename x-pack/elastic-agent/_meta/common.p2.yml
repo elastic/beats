@@ -24,9 +24,9 @@ datasources:
             dataset: system.filesystem
 
 management:
-  # Mode of management, the elastic-agent support two modes of operation:
+  # Mode of management, the Elastic Agent support two modes of operation:
   #
-  # local: The elastic-agent will expect to find the inputs configuration in the local file.
+  # local: The Elastic Agent will expect to find the inputs configuration in the local file.
   #
   # Default is local.
   mode: "local"
@@ -65,7 +65,7 @@ management:
   # Allow fleet to reload his configuration locally on disk.
   # Notes: Only specific process configuration will be reloaded.
   reload:
-    # enabled configure the elastic-agent to reload or not the local configuration.
+    # enabled configure the Elastic Agent to reload or not the local configuration.
     #
     # Default is true
     enabled: true
