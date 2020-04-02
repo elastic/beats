@@ -1346,13 +1346,13 @@ func TestInsertTags(t *testing.T) {
 			"test identifier with only s3 bucket name",
 			identifier1,
 			"aws.tags.organization",
-			"engineering",
+			tagValue1,
 		},
 		{
 			"test identifier with storage type and s3 bucket name",
 			identifier2,
 			"aws.tags.owner",
-			"foo",
+			tagValue2,
 		},
 	}
 

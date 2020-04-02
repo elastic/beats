@@ -401,7 +401,7 @@ func generateFieldName(namespace string, labels []string) string {
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
 	statMethod, _ := statisticLookup(stat)
-	// By default, replace dot "." using under bar "_" for metric names
+	// By default, replace dot "." using underscore "_" for metric names
 	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
 }
 
@@ -571,7 +571,7 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 	for _, v := range subIdentifiers {
 		tags := resourceTagMap[v]
 		if len(tags) != 0 {
-			// By default, replace dot "." using under bar "_" for tag keys and values
+			// By default, replace dot "." using underscore "_" for tag keys and values
 			for _, tag := range tags {
 				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
 			}
