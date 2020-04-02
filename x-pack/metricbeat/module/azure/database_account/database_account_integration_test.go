@@ -25,7 +25,7 @@ func TestFetchMetricset(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-	test.TestFieldsDocumentation(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
