@@ -10,7 +10,7 @@ remote_write:
 TIP: It is recommended to carefully choose the https://prometheus.io/docs/practices/remote_write/#parameters[parameters]
 of remote_write configuration so as to tune the queue according to each specific case and system's characteristics. More
 specifically, `max_shards` option sets the max number of parallelism with which Prometheus will try to send metrics to
-the remote storage. The default value of this is `1000`, which means that in case that Prometheus falls behind the
+the remote storage. The default value of this is `1000`, which means that in case of Prometheus falls behind the
 remote storage the number of shards will be increased up to `1000` to increase thoughput. This can happen in cases
 of network delays for instance where the whole queue faces issues to consume metrics and finally send metrics to Elasticsearch.
 However increasing the number of parallelism, means that we increase the number of parallel connections from Prometheus
