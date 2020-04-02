@@ -82,7 +82,6 @@ type consumer struct {
 
 // NewConsumer creates a new consumer using the given broker addresses and configuration.
 func NewConsumer(addrs []string, config *Config) (Consumer, error) {
-	fmt.Println("=============================")
 	client, err := NewClient(addrs, config)
 	if err != nil {
 		return nil, err
@@ -251,7 +250,7 @@ func (c *consumer) abandonBrokerConsumer(brokerWorker *brokerConsumer) {
 // loop. The PartitionConsumer will only stop itself in one case: when the offset being consumed is reported
 // as out of range by the brokers. In this case you should decide what you want to do (try a different offset,
 // notify a human, etc) and handle it appropriately. For all other error cases, it will just keep retrying.
-// By default, it logs these errors to sarama.fmt; if you want to be notified directly of all errors, set
+// By default, it logs these errors to sarama.Logger; if you want to be notified directly of all errors, set
 // your config's Consumer.Return.Errors to true and read from the Errors channel, using a select statement
 // or a separate goroutine. Check out the Consumer examples to see implementations of these different approaches.
 //
@@ -322,7 +321,7 @@ func (child *partitionConsumer) sendError(err error) {
 	if child.conf.Consumer.Return.Errors {
 		child.errors <- cErr
 	} else {
-		fmt.Println(cErr)
+		Logger.Println(cErr)
 	}
 }
 
@@ -345,7 +344,7 @@ func (child *partitionConsumer) dispatcher() {
 				child.broker = nil
 			}
 
-			fmt.Printf("consumer/%s/%d finding new broker\n", child.topic, child.partition)
+			Logger.Printf("consumer/%s/%d finding new broker\n", child.topic, child.partition)
 			if err := child.dispatch(); err != nil {
 				child.sendError(err)
 				child.trigger <- none{}
@@ -565,7 +564,7 @@ func (child *partitionConsumer) parseResponse(response *FetchResponse) ([]*Consu
 
 	// If request was throttled and empty we log and return without error
 	if response.ThrottleTime != time.Duration(0) && len(response.Blocks) == 0 {
-		fmt.Printf(
+		Logger.Printf(
 			"consumer/broker/%d FetchResponse throttled %v\n",
 			child.broker.broker.ID(), response.ThrottleTime)
 		return nil, nil
@@ -779,7 +778,7 @@ func (bc *brokerConsumer) subscriptionConsumer() {
 		response, err := bc.fetchNewMessages()
 
 		if err != nil {
-			fmt.Printf("consumer/broker/%d disconnecting due to error processing FetchRequest: %s\n", bc.broker.ID(), err)
+			Logger.Printf("consumer/broker/%d disconnecting due to error processing FetchRequest: %s\n", bc.broker.ID(), err)
 			bc.abort(err)
 			return
 		}
@@ -796,13 +795,13 @@ func (bc *brokerConsumer) subscriptionConsumer() {
 func (bc *brokerConsumer) updateSubscriptions(newSubscriptions []*partitionConsumer) {
 	for _, child := range newSubscriptions {
 		bc.subscriptions[child] = none{}
-		fmt.Printf("consumer/broker/%d added subscription to %s/%d\n", bc.broker.ID(), child.topic, child.partition)
+		Logger.Printf("consumer/broker/%d added subscription to %s/%d\n", bc.broker.ID(), child.topic, child.partition)
 	}
 
 	for child := range bc.subscriptions {
 		select {
 		case <-child.dying:
-			fmt.Printf("consumer/broker/%d closed dead subscription to %s/%d\n", bc.broker.ID(), child.topic, child.partition)
+			Logger.Printf("consumer/broker/%d closed dead subscription to %s/%d\n", bc.broker.ID(), child.topic, child.partition)
 			close(child.trigger)
 			delete(bc.subscriptions, child)
 		default:
@@ -821,26 +820,26 @@ func (bc *brokerConsumer) handleResponses() {
 		case nil:
 			// no-op
 		case errTimedOut:
-			fmt.Printf("consumer/broker/%d abandoned subscription to %s/%d because consuming was taking too long\n",
+			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because consuming was taking too long\n",
 				bc.broker.ID(), child.topic, child.partition)
 			delete(bc.subscriptions, child)
 		case ErrOffsetOutOfRange:
 			// there's no point in retrying this it will just fail the same way again
 			// shut it down and force the user to choose what to do
 			child.sendError(result)
-			fmt.Printf("consumer/%s/%d shutting down because %s\n", child.topic, child.partition, result)
+			Logger.Printf("consumer/%s/%d shutting down because %s\n", child.topic, child.partition, result)
 			close(child.trigger)
 			delete(bc.subscriptions, child)
 		case ErrUnknownTopicOrPartition, ErrNotLeaderForPartition, ErrLeaderNotAvailable, ErrReplicaNotAvailable:
 			// not an error, but does need redispatching
-			fmt.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
+			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
 				bc.broker.ID(), child.topic, child.partition, result)
 			child.trigger <- none{}
 			delete(bc.subscriptions, child)
 		default:
 			// dunno, tell the user and try redispatching
 			child.sendError(result)
-			fmt.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
+			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because %s\n",
 				bc.broker.ID(), child.topic, child.partition, result)
 			child.trigger <- none{}
 			delete(bc.subscriptions, child)

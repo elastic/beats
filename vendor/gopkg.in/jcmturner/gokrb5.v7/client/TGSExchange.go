@@ -1,8 +1,6 @@
 package client
 
 import (
-	"fmt"
-
 	"gopkg.in/jcmturner/gokrb5.v7/iana/flags"
 	"gopkg.in/jcmturner/gokrb5.v7/iana/nametype"
 	"gopkg.in/jcmturner/gokrb5.v7/krberror"
@@ -77,7 +75,6 @@ func (cl *Client) TGSExchange(tgsReq messages.TGSReq, kdcRealm string, tgt messa
 		tgsRep.DecryptedEncPart.Key,
 	)
 	cl.Log("ticket added to cache for %s (EndTime: %v)", tgsRep.Ticket.SName.PrincipalNameString(), tgsRep.DecryptedEncPart.EndTime)
-	fmt.Println("ticket added to cache for %s (EndTime: %v)", tgsRep.Ticket.SName.PrincipalNameString(), tgsRep.DecryptedEncPart.EndTime)
 	return tgsReq, tgsRep, err
 }
 
