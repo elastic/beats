@@ -161,6 +161,18 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
 
+    # Agent
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/elastic-agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     # Generators
     - os: linux
       env: TARGETS="-C generator/_templates/metricbeat test test-package"
