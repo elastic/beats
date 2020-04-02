@@ -41,6 +41,9 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
   cloudwatch:
     enabled: false
@@ -50,6 +53,9 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
   ec2:
     enabled: false
@@ -59,6 +65,9 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
   elb:
     enabled: false
@@ -68,6 +77,9 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
   s3access:
     enabled: false
@@ -77,6 +89,9 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
   vpcflow:
     enabled: false
@@ -86,12 +101,14 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
-
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 ----
 
 *`var.queue_url`*::
 
-AWS SQS queue url.
+(Required) AWS SQS queue url.
 
 *`var.shared_credential_file`*::
 
@@ -113,6 +130,15 @@ Maximum duration before AWS API request will be interrupted. Default to be 120 s
 *`var.endpoint`*::
 
 Custom endpoint used to access AWS APIs.
+
+*`var.access_key_id`*::
+First part of access key.
+
+*`var.access_key_id`*::
+Second part of access key.
+
+*`var.access_key_id`*::
+Required when using temporary security credentials.
 
 [float]
 === cloudtrail fileset
