@@ -42,7 +42,7 @@ type replaceStringConfig struct {
 
 type replaceConfig struct {
 	Field   string `config:"field"`
-	Pattern string `config:"pattern"`
+	Pattern *regexp.Regexp `config:"pattern"`
 	Replacement string `config:"replacement"`
 }
 
@@ -94,7 +94,7 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *replaceString) replaceField(field string, pattern string, replacement string, fields common.MapStr) error {
+func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, replacement string, fields common.MapStr) error {
 	currentValue, err := fields.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
@@ -104,8 +104,7 @@ func (f *replaceString) replaceField(field string, pattern string, replacement s
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
 	}
 
-	re := regexp.MustCompile(pattern)
-	updatedString := re.ReplaceAllString(currentValue.(string), replacement)
+	updatedString := pattern.ReplaceAllString(currentValue.(string), replacement)
 	_, err = fields.Put(field, updatedString)
 	if err != nil {
 		return fmt.Errorf("could not put value: %s: %v, %v", replacement, currentValue, err)

@@ -19,6 +19,7 @@ package actions
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,7 +43,7 @@ func TestReplaceRun(t *testing.T) {
 			Fields: []replaceConfig{
 				{
 					Field:   "f",
-					Pattern: "a",
+					Pattern: regexp.MustCompile(`a`),
 					Replacement: "b",
 				},
 			},
@@ -61,7 +62,7 @@ func TestReplaceRun(t *testing.T) {
 			Fields: []replaceConfig{
 				{
 					Field:   "f.b",
-					Pattern: "a",
+					Pattern: regexp.MustCompile(`a`),
 					Replacement: "b",
 				},
 			},
@@ -84,12 +85,12 @@ func TestReplaceRun(t *testing.T) {
 			Fields: []replaceConfig{
 				{
 					Field:   "f",
-					Pattern: "a.*c",
+					Pattern: regexp.MustCompile(`a.*c`),
 					Replacement: "cab",
 				},
 				{
 					Field:   "g",
-					Pattern: "ef",
+					Pattern: regexp.MustCompile(`ef`),
 					Replacement: "oor",
 				},
 			},
@@ -110,12 +111,12 @@ func TestReplaceRun(t *testing.T) {
 			Fields: []replaceConfig{
 				{
 					Field:   "f",
-					Pattern: "abc",
+					Pattern: regexp.MustCompile(`abc`),
 					Replacement: "xyz",
 				},
 				{
 					Field:   "g",
-					Pattern: "def",
+					Pattern: regexp.MustCompile(`def`),
 					Replacement: "",
 				},
 			},
@@ -164,7 +165,7 @@ func TestReplaceRun(t *testing.T) {
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
 		Field     string
-		Pattern   string
+		Pattern   *regexp.Regexp
 		Replacement   string
 		ignoreMissing bool
 		failOnError   bool
@@ -176,7 +177,7 @@ func TestReplaceField(t *testing.T) {
 		{
 			description: "replace part of field value with another string",
 			Field:   "f",
-			Pattern: "a",
+			Pattern: regexp.MustCompile(`a`),
 			Replacement: "b",
 			Input: common.MapStr{
 				"f": "abc",
@@ -191,7 +192,7 @@ func TestReplaceField(t *testing.T) {
 		{
 			description: "Add hierarchy to event and replace",
 			Field:   "f.b",
-			Pattern: "a",
+			Pattern: regexp.MustCompile(`a`),
 			Replacement: "b",
 			Input: common.MapStr{
 				"f": common.MapStr{
@@ -210,7 +211,7 @@ func TestReplaceField(t *testing.T) {
 		{
 			description: "try replacing value of missing fields in event",
 			Field:   "f",
-			Pattern: "abc",
+			Pattern: regexp.MustCompile(`abc`),
 			Replacement: "xyz",
 			Input: common.MapStr{
 				"m": "abc",
