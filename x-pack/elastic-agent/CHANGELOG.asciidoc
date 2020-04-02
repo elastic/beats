@@ -9,6 +9,7 @@
 
 
 ==== Breaking changes
+- Rename agent to elastic-agent {pull}17391[17391]
 
 ==== Bugfixes
 
