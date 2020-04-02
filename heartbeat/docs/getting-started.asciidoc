@@ -20,7 +20,7 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 === Step 1: Install Heartbeat
 
 Unlike most Beats, which you install on edge nodes, you typically install
-Heartbeat as part of monitoring service that runs on a separate machine
+Heartbeat as part of a monitoring service that runs on a separate machine
 and possibly even outside of the network where the services that you want to
 monitor are running.
 
