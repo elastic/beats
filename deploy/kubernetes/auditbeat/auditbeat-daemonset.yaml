@@ -38,6 +38,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -69,6 +73,9 @@ spec:
         - name: etc
           mountPath: /hostfs/etc
           readOnly: true
+        - name: run-containerd
+          mountPath: /run/containerd
+          readOnly: true
       volumes:
       - name: bin
         hostPath:
@@ -96,4 +103,8 @@ spec:
       - name: data
         hostPath:
           path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate
+      - name: run-containerd
+        hostPath:
+          path: /run/containerd
           type: DirectoryOrCreate
