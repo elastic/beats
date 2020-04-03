@@ -40,14 +40,16 @@ func TestIsSubpath(t *testing.T) {
 			{"/a", "/A/b/c", "/a/b/c", true},
 		},
 		"windows": {
-			{"/", "a", "\\a", true},
-			{"/a", "b", "\\a\\b", true},
-			{"/a", "b/c", "\\a\\b\\c", true},
-			{"/a/b", "/a/c", "\\a\\c", false},
-			{"/a/b", "/a/b/../c", "\\a\\c", false},
-			{"/a/b", "../c", "\\a\\c", false},
-			{"/a", "/a/b/c", "\\a\\b\\c", true},
-			{"/a", "/A/b/c", "\\a\\b\\c", true},
+			{"c:/", "/a", "c:\\a", true},
+			{"c:/a", "b", "c:\\a\\b", true},
+			{"c:/a", "b/c", "c:\\a\\b\\c", true},
+			{"c:/a/b", "/a/c", "c:\\a\\c", false},
+			{"c:/a/b", "/a/b/../c", "c:\\a\\c", false},
+			{"c:/a/b", "../c", "c:\\a\\c", false},
+			{"c:/a", "/a/b/c", "c:\\a\\b\\c", true},
+			{"c:/a", "/A/b/c", "c:\\a\\b\\c", true},
+			{"c:/a", "c:/A/b/c", "c:\\a\\b\\c", true},
+			{"c:/a", "c:/b/c", "c:\\b\\c", false},
 		},
 	}
 
@@ -58,7 +60,8 @@ func TestIsSubpath(t *testing.T) {
 
 	for _, test := range osSpecificTests {
 		t.Run(fmt.Sprintf("[%s]'%s-%s'", runtime.GOOS, test.root, test.path), func(t *testing.T) {
-			newPath, result := joinPaths(test.root, test.path)
+			newPath, result, err := joinPaths(test.root, test.path)
+			assert.Nil(t, err)
 			assert.Equal(t, test.resultPath, newPath)
 			assert.Equal(t, test.isSubpath, result)
 		})
