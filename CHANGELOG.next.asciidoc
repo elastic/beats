@@ -179,6 +179,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
+- check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 
 *Packetbeat*
 
