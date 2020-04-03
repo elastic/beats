@@ -31,7 +31,8 @@ var (
 	identifierNameIdx  = 3
 	identifierValueIdx = 4
 	defaultStatistics  = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
-	labelSeperator     = "|"
+	labelSeparator     = "|"
+	dimensionSeparator = ","
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -360,21 +361,21 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, period ti
 
 func constructLabel(metric cloudwatch.Metric, statistic string) string {
 	// label = metricName + namespace + statistic + dimKeys + dimValues
-	label := *metric.MetricName + labelSeperator + *metric.Namespace + labelSeperator + statistic
+	label := *metric.MetricName + labelSeparator + *metric.Namespace + labelSeparator + statistic
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metric.Dimensions {
 		dimNames += *dim.Name
 		dimValues += *dim.Value
 		if i != len(metric.Dimensions)-1 {
-			dimNames += ","
-			dimValues += ","
+			dimNames += dimensionSeparator
+			dimValues += dimensionSeparator
 		}
 	}
 
 	if dimNames != "" && dimValues != "" {
-		label += labelSeperator + dimNames
-		label += labelSeperator + dimValues
+		label += labelSeparator + dimNames
+		label += labelSeparator + dimValues
 	}
 	return label
 }
@@ -400,7 +401,7 @@ func generateFieldName(namespace string, labels []string) string {
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
 	statMethod, _ := statisticLookup(stat)
-	// By default, replace dot "." using under bar "_" for metric names
+	// By default, replace dot "." using underscore "_" for metric names
 	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
 }
 
@@ -454,7 +455,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 				exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 				if exists {
-					labels := strings.Split(*output.Label, labelSeperator)
+					labels := strings.Split(*output.Label, labelSeparator)
 					if len(labels) != 5 {
 						// when there is no identifier value in label, use region+accountID+namespace instead
 						identifier := regionName + m.AccountID + labels[namespaceIdx]
@@ -503,7 +504,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 				exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 				if exists {
-					labels := strings.Split(*output.Label, labelSeperator)
+					labels := strings.Split(*output.Label, labelSeparator)
 					if len(labels) != 5 {
 						// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
 						if len(tagsFilter) != 0 {
@@ -520,20 +521,13 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 					}
 
 					identifierValue := labels[identifierValueIdx]
-					tags := resourceTagMap[identifierValue]
-					if len(tagsFilter) != 0 && len(tags) == 0 {
-						continue
-					}
-
 					if _, ok := events[identifierValue]; !ok {
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 
-					// By default, replace dot "." using under bar "_" for tag keys and values
-					for _, tag := range tags {
-						events[identifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
-					}
+					// add tags to event based on identifierValue
+					insertTags(events, identifierValue, resourceTagMap)
 				}
 			}
 		}
@@ -566,4 +560,22 @@ func compareAWSDimensions(dim1 []cloudwatch.Dimension, dim2 []cloudwatch.Dimensi
 	sort.Strings(dim1String)
 	sort.Strings(dim2String)
 	return reflect.DeepEqual(dim1String, dim2String)
+}
+
+func insertTags(events map[string]mb.Event, identifier string, resourceTagMap map[string][]resourcegroupstaggingapi.Tag) {
+	// Check if identifier includes dimensionSeparator (comma in this case),
+	// split the identifier and check for each sub-identifier.
+	// For example, identifier might be [storageType, s3BucketName].
+	// And tags are only store under s3BucketName in resourceTagMap.
+	subIdentifiers := strings.Split(identifier, dimensionSeparator)
+	for _, v := range subIdentifiers {
+		tags := resourceTagMap[v]
+		if len(tags) != 0 {
+			// By default, replace dot "." using underscore "_" for tag keys and values
+			for _, tag := range tags {
+				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), common.DeDot(*tag.Value))
+			}
+			continue
+		}
+	}
 }

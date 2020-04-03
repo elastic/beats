@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
 - Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
+- Fix bug with `monitoring.cluster_uuid` setting not always being exposed via GET /state Beats API. {issue}16732[16732] {pull}17420[17420]
 
 *Auditbeat*
 
@@ -140,6 +141,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Further revise check for bad data in docker/memory. {pull}17400[17400] 
 - Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
+- Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
+- check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 
 *Packetbeat*
 
@@ -174,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update supported versions of `redis` output. {pull}17198[17198]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - Add `replace` processor for replacing string values of fields. {pull}17342[17342]
+- Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
 
 *Auditbeat*
 
@@ -225,6 +229,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 - Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
+- Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
 
 *Heartbeat*
 
