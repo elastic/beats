@@ -58,8 +58,6 @@ spec:
         - name: modules
           mountPath: /usr/share/metricbeat/modules.d
           readOnly: true
-        - name: data
-          mountPath: /usr/share/metricbeat/data
       volumes:
       - name: config
         configMap:
@@ -69,7 +67,3 @@ spec:
         configMap:
           defaultMode: 0600
           name: metricbeat-deployment-modules
-      - name: data
-        hostPath:
-          path: /var/lib/metricbeat-data
-          type: DirectoryOrCreate
