@@ -883,8 +883,7 @@ def loadConfigEnvVars(){
   // Metricbeat depends on libbeat only.
   // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
   env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
-  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode([
-    "^metricbeat/.*",
+  env.BUILD_METRICBEAT_XPACK = env.BUILD_METRICBEAT || isChangedXPackCode([
     "^x-pack/metricbeat/.*",
   ])
 
