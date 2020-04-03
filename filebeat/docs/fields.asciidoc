@@ -5052,15 +5052,6 @@ type: keyword
 
 --
 
-*`checkpoint.malware_name`*::
-+
---
-Malware name.
-
-type: keyword
-
---
-
 *`checkpoint.peer_gateway`*::
 +
 --
@@ -5128,6 +5119,15 @@ type: keyword
 +
 --
 Threat severity.
+
+type: keyword
+
+--
+
+*`checkpoint.spyware_name`*::
++
+--
+Spyware name.
 
 type: keyword
 
