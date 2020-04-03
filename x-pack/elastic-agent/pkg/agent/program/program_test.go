@@ -421,8 +421,7 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			// programs: []string{"filebeat", "metricbeat"},
-			programs: []string{"metricbeat"},
+			programs: []string{"filebeat", "metricbeat"},
 			expected: 2,
 		},
 		"constraints_config": {
