@@ -28,6 +28,11 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
+
+    booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
+    // XXX: Set to false by default
+    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
+
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -53,6 +58,23 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         makeTarget("Lint", "check")
+      }
+    }
+    stage('Prepare integration tests environments'){
+      parallel {
+        stage('AWS cloud scenario'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            expression {
+              return params.runAllCloudTests || params.awsCloudTests
+            }
+          }
+          steps {
+            echo "### TODO: provision AWS cloud test scenario"
+            // XXX: Run terraform or ansible to provision resources in AWS
+          }
+        }
       }
     }
     stage('Build and Test'){
@@ -345,6 +367,7 @@ pipeline {
             }
           }
           steps {
+            loadCloudTestEnv()
             mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
           }
         }
@@ -593,6 +616,11 @@ pipeline {
       }
     }
   }
+  post {
+    cleanup {
+      cleanupAWS()
+    }
+  }
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
@@ -655,7 +683,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
-    "TEST_TAGS=oracle",
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
@@ -870,6 +898,27 @@ def isChangedXPackCode(patterns) {
   allPatterns.addAll(patterns)
   allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
   return isChanged(allPatterns)
+}
+
+def loadCloudTestEnv() {
+  if (params.allCloudTests || params.awsCloudTests) {
+    env.TEST_TAGS="${env.TEST_TAGS},aws"
+    // XXX: credentials
+  }
+}
+
+def cleanupAWS() {
+  stage('Remove AWS cloud scenario'){
+    when {
+      expression {
+        return params.runAllCloudTests || params.awsCloudTests
+      }
+    }
+    steps {
+      echo "### TODO: cleanup AWS cloud test scenario"
+      // XXX: Run terraform or ansible to cleanup resources in AWS
+    }
+  }
 }
 
 def loadConfigEnvVars(){
