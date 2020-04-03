@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 
 	"github.com/stretchr/testify/assert"
@@ -70,8 +72,9 @@ func TestPublish(t *testing.T) {
 			wg.Wait()
 
 			// Give some time for events to be published
-			time.Sleep(time.Duration(numEvents.Load()*2) * time.Microsecond)
+			time.Sleep(time.Duration(numEvents.Load()*3) * time.Microsecond)
 
+			// Make sure that all events have eventually been published
 			c := test.client.(interface{ Published() int })
 			assert.Equal(t, numEvents.Load(), c.Published())
 		})
@@ -79,9 +82,42 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublishWithClose(t *testing.T) {
-	// Test that multiple batches are all published, even if
-	// the worker is closed midway
-	// TODO
+	rand.Seed(time.Now().UnixNano())
+
+	wqu := makeWorkQueue()
+	client := &mockNetworkClient{}
+	worker := makeClientWorker(nilObserver, wqu, client)
+
+	numEvents := atomic.MakeInt(0)
+	var wg sync.WaitGroup
+	for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			batch := randomBatch(50, 150, wqu)
+
+			numEvents.Add(len(batch.Events()))
+
+			wqu <- batch
+		}()
+	}
+
+	// Close worker before all batches have had time to be published
+	err := worker.Close()
+	require.NoError(t, err)
+
+	remaining := numEvents.Load() - client.Published()
+	assert.Greater(t, remaining, 0)
+
+	// Start new worker to drain work queue
+	makeClientWorker(nilObserver, wqu, client)
+	wg.Wait()
+
+	// Give some time for events to be published
+	time.Sleep(time.Duration(remaining*3) * time.Microsecond)
+
+	// Make sure that all events have eventually been published
+	assert.Equal(t, numEvents.Load(), client.Published())
 }
 
 type mockClient struct{ published int }
