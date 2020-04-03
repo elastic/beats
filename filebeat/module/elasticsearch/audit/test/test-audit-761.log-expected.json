@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2020-04-01T13:21:06.725Z",
+        "elasticsearch.audit.action": "indices:data/read/mget[shard]",
+        "elasticsearch.audit.indices": [
+            ".logstash",
+            ".logstash",
+            ".logstash",
+            ".logstash",
+            ".logstash",
+            ".logstash",
+            ".logstash",
+            ".logstash"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "rLBMfPM2Q9q-DQEB_g30ww",
+        "elasticsearch.audit.request.name": "MultiGetShardRequest",
+        "elasticsearch.audit.user.realm": "native1",
+        "elasticsearch.audit.user.roles": [
+            "logstash_admin",
+            "cluster_monitor"
+        ],
+        "elasticsearch.node.id": "vvj136QVQ2Ci2aXmrhyi3Q",
+        "event.action": "access_granted",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"@timestamp\":\"2020-04-01T11:21:06,725+0200\", \"node.id\":\"vvj136QVQ2Ci2aXmrhyi3Q\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"logstash_manager\", \"user.realm\":\"native1\", \"user.roles\":[\"logstash_admin\",\"cluster_monitor\"], \"origin.type\":\"rest\", \"origin.address\":\"10.54.25.111:52148\", \"request.id\":\"rLBMfPM2Q9q-DQEB_g30ww\", \"action\":\"indices:data/read/mget[shard]\", \"request.name\":\"MultiGetShardRequest\", \"indices\":[\".logstash\",\".logstash\",\".logstash\",\".logstash\",\".logstash\",\".logstash\",\".logstash\",\".logstash\"]}",
+        "service.type": "elasticsearch",
+        "source.address": "10.54.25.111:52148",
+        "source.ip": "10.54.25.111",
+        "source.port": 52148,
+        "user.name": "logstash_manager"
+    }
+]
