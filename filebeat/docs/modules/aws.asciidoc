@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[filebeat-module-aws]]
 [role="xpack"]
 
+:libbeat-xpack-dir: ../../../x-pack/libbeat
+
 :modulename: aws
 :has-dashboards: true
 
@@ -26,7 +28,7 @@ that represent actions taken by a user, role or AWS service.
 The `aws` module requires AWS credentials configuration in order to make AWS API calls.
 Users can either use `access_key_id`, `secret_access_key` and/or
 `session_token`, or use shared AWS credentials file.
-Please see <<aws-credentials-config,AWS credentials options>> for more details.
+Please see <<aws-credentials-options,AWS credentials options>> for more details.
 
 include::../include/gs-link.asciidoc[]
 
@@ -219,7 +221,7 @@ This fileset comes with a predefined dashboard:
 [role="screenshot"]
 image::./images/filebeat-aws-vpcflow-overview.png[]
 
-[id="aws-credentials-config"]
+[id="aws-credentials-options"]
 include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 
