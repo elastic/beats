@@ -78,6 +78,12 @@ func TestPublish(t *testing.T) {
 	}
 }
 
+func TestPublishWithClose(t *testing.T) {
+	// Test that multiple batches are all published, even if
+	// the worker is closed midway
+	// TODO
+}
+
 type mockClient struct{ published int }
 
 func (c *mockClient) Published() int { return c.published }
