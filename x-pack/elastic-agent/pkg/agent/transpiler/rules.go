@@ -413,6 +413,17 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 					name:  "index",
 					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
 				})
+				streamMap.value = append(streamMap.value, &Key{
+					name: "_meta_index",
+					value: &Dict{
+						value: []Node{
+							&Key{name: "type", value: &StrVal{value: r.Type}},
+							&Key{name: "dataset", value: &StrVal{value: dataset}},
+							&Key{name: "namespace", value: &StrVal{value: namespace}},
+						},
+					},
+				})
+
 			}
 
 		}
