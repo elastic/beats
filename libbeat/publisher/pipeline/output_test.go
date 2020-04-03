@@ -83,42 +83,57 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublishWithClose(t *testing.T) {
-	seedPRNG(t)
-
-	wqu := makeWorkQueue()
-	client := &mockNetworkClient{}
-	worker := makeClientWorker(nilObserver, wqu, client)
-
-	numEvents := atomic.MakeInt(0)
-	var wg sync.WaitGroup
-	for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			batch := randomBatch(50, 150, wqu)
-
-			numEvents.Add(len(batch.Events()))
-
-			wqu <- batch
-		}()
+	tests := map[string]struct {
+		client outputs.Client
+	}{
+		"client": {
+			&mockClient{},
+		},
+		"network_client": {
+			&mockNetworkClient{},
+		},
 	}
 
-	// Close worker before all batches have had time to be published
-	err := worker.Close()
-	require.NoError(t, err)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			seedPRNG(t)
 
-	remaining := numEvents.Load() - client.Published()
-	assert.Greater(t, remaining, 0)
+			wqu := makeWorkQueue()
+			worker := makeClientWorker(nilObserver, wqu, test.client)
 
-	// Start new worker to drain work queue
-	makeClientWorker(nilObserver, wqu, client)
-	wg.Wait()
+			numEvents := atomic.MakeInt(0)
+			var wg sync.WaitGroup
+			for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					batch := randomBatch(50, 150, wqu)
 
-	// Give some time for events to be published
-	time.Sleep(time.Duration(remaining*3) * time.Microsecond)
+					numEvents.Add(len(batch.Events()))
 
-	// Make sure that all events have eventually been published
-	assert.Equal(t, numEvents.Load(), client.Published())
+					wqu <- batch
+				}()
+			}
+
+			// Close worker before all batches have had time to be published
+			err := worker.Close()
+			require.NoError(t, err)
+
+			c := test.client.(interface{ Published() int })
+			remaining := numEvents.Load() - c.Published()
+			assert.Greater(t, remaining, 0)
+
+			// Start new worker to drain work queue
+			makeClientWorker(nilObserver, wqu, test.client)
+			wg.Wait()
+
+			// Give some time for events to be published
+			time.Sleep(time.Duration(remaining*3) * time.Microsecond)
+
+			// Make sure that all events have eventually been published
+			assert.Equal(t, numEvents.Load(), c.Published())
+		})
+	}
 }
 
 type mockClient struct{ published int }
