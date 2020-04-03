@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
@@ -23,9 +25,10 @@ import (
 )
 
 var (
-	regionName = "us-west-1"
-	timestamp  = time.Now()
-	accountID  = "123456789012"
+	regionName  = "us-west-1"
+	timestamp   = time.Now()
+	accountID   = "123456789012"
+	accountName = "test"
 
 	id1    = "cpu"
 	value1 = 0.25
@@ -1305,4 +1308,60 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value2, dimension)
+}
+
+func TestInsertTags(t *testing.T) {
+	identifier1 := "StandardStorage,test-s3-1"
+	identifier2 := "test-s3-2"
+	tagKey1 := "organization"
+	tagValue1 := "engineering"
+	tagKey2 := "owner"
+	tagValue2 := "foo"
+
+	events := map[string]mb.Event{}
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
+
+	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
+	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey1),
+			Value: awssdk.String(tagValue1),
+		},
+	}
+	resourceTagMap["test-s3-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey2),
+			Value: awssdk.String(tagValue2),
+		},
+	}
+
+	cases := []struct {
+		title            string
+		identifier       string
+		expectedTagKey   string
+		expectedTagValue string
+	}{
+		{
+			"test identifier with storage type and s3 bucket name",
+			identifier1,
+			"aws.tags.organization",
+			tagValue1,
+		},
+		{
+			"test identifier with only s3 bucket name",
+			identifier2,
+			"aws.tags.owner",
+			tagValue2,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			insertTags(events, c.identifier, resourceTagMap)
+			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expectedTagValue, value)
+		})
+	}
 }
