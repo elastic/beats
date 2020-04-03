@@ -20,6 +20,7 @@ package add_process_metadata
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -36,6 +37,7 @@ type gosigarCidProvider struct {
 	log                *logp.Logger
 	hostPath           string
 	cgroupPrefixes     []string
+	cgroupRegex        string
 	processCgroupPaths func(string, int) (map[string]string, error)
 	pidCidCache        *common.Cache
 }
@@ -68,11 +70,12 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath string, cgroupPrefixes []string, processCgroupPaths func(string, int) (map[string]string, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath string, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(string, int) (map[string]string, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
+		cgroupRegex:        cgroupRegex,
 		processCgroupPaths: processCgroupPaths,
 		pidCidCache:        pidCidCache,
 	}
@@ -104,11 +107,24 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error
 // Example:
 // /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
 func (p gosigarCidProvider) getCid(cgroups map[string]string) string {
-	for _, path := range cgroups {
-		for _, prefix := range p.cgroupPrefixes {
-			if strings.HasPrefix(path, prefix) {
-				return filepath.Base(path)
+	// if regex defined use it to find cid
+	if len(p.cgroupRegex) != 0 {
+		re := regexp.MustCompile(p.cgroupRegex)
+		for _, path := range cgroups {
+			rs := re.FindStringSubmatch(path)
+			if rs != nil {
+				return rs[1]
 			}
+		}
+	} else {
+		// use string prefix to find cid
+		for _, path := range cgroups {
+			for _, prefix := range p.cgroupPrefixes {
+				if strings.HasPrefix(path, prefix) {
+					return filepath.Base(path)
+				}
+			}
+
 		}
 	}
 	return ""
