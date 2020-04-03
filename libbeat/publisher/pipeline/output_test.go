@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"flag"
 	"math/rand"
 	"sync"
 	"testing"
@@ -31,6 +32,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+)
+
+var (
+	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
 func TestPublish(t *testing.T) {
@@ -47,7 +52,7 @@ func TestPublish(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			rand.Seed(time.Now().UnixNano())
+			seedPRNG(t)
 
 			wqu := makeWorkQueue()
 			makeClientWorker(nilObserver, wqu, test.client)
@@ -78,7 +83,7 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublishWithClose(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+	seedPRNG(t)
 
 	wqu := makeWorkQueue()
 	client := &mockNetworkClient{}
@@ -178,4 +183,14 @@ func randomBatch(min, max int, wqu workQueue) *Batch {
 // randIntBetween returns a random integer in [min, max)
 func randIntBetween(min, max int) int {
 	return rand.Intn(max-min) + min
+}
+
+func seedPRNG(t *testing.T) {
+	seed := *SeedFlag
+	if seed == 0 {
+		seed = time.Now().UnixNano()
+	}
+
+	t.Logf("seeding PRNG with %v", seed)
+	rand.Seed(seed)
 }
