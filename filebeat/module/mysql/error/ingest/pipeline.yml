@@ -12,6 +12,17 @@ processors:
       GREEDYMULTILINE: |-
         (.|
         )+
+- grok:
+    field: message
+    patterns:
+    - '(\[%{DATA:event.code}\])%{SPACE}(\[%{DATA:event.provider}\])%{SPACE}%{GREEDYMULTILINE}'
+    - '%{GREEDYDATA}'
+    ignore_missing: true
+    ignore_failure: true
+    pattern_definitions:
+      GREEDYMULTILINE: |-
+        (.|
+        )+
 - rename:
     field: '@timestamp'
     target_field: event.created
@@ -40,6 +51,19 @@ processors:
 - remove:
     field: _tmp
     ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: database
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: error
+    if: "ctx?.log?.level != null && ctx.log.level.toLowerCase() == 'error'"
 on_failure:
 - set:
     field: error.message
