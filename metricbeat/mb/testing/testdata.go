@@ -171,6 +171,22 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 	}
 }
 
+// TestMetricsetFieldsDocumented checks metricset fields are documented from metricsets that cannot run `TestDataFiles` test which contains this check
+func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events []mb.Event) {
+	var data []common.MapStr
+	for _, e := range events {
+		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
+		data = append(data, beatEvent.Fields)
+	}
+
+	if err := checkDocumented(data, nil); err != nil {
+		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
+			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
+			err, metricSet.Module().Name(), metricSet.Name())
+	}
+
+}
+
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL)
@@ -215,7 +231,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		return h1 < h2
 	})
 
-	if err := checkDocumented(t, data, config.OmitDocumentedFieldsCheck); err != nil {
+	if err := checkDocumented(data, config.OmitDocumentedFieldsCheck); err != nil {
 		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
 			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
 			err, module, metricSetName)
@@ -300,7 +316,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, path string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) error {
+func checkDocumented(data []common.MapStr, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		return err
@@ -310,7 +326,6 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) er
 	if err != nil {
 		return err
 	}
-
 	documentedFields := fields.GetKeys()
 	keys := map[string]interface{}{}
 
@@ -350,12 +365,19 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			if found {
 				continue
 			}
-
-			// last case `status_codes.*`:
+			// case `status_codes.*`:
 			prefix := strings.Join(splits[0:len(splits)-1], ".")
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
 			}
+			// should cover scenarios as status_codes.*.*` and `azure.compute_vm_scaleset.*.*`
+			if len(splits) > 2 {
+				prefix = strings.Join(splits[0:len(splits)-2], ".")
+				if _, ok := knownKeys[prefix+".*.*"]; ok {
+					continue
+				}
+			}
+
 			return errors.Errorf("field missing '%s'", foundKey)
 		}
 	}
