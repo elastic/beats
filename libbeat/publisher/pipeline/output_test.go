@@ -141,13 +141,24 @@ func TestPublishWithClose(t *testing.T) {
 	}
 }
 
-type mockClient struct{ published int }
+type mockClient struct {
+	mu        sync.RWMutex
+	published int
+}
 
-func (c *mockClient) Published() int { return c.published }
+func (c *mockClient) Published() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return c.published
+}
 
 func (c *mockClient) String() string { return "mock_client" }
 func (c *mockClient) Close() error   { return nil }
 func (c *mockClient) Publish(batch publisher.Batch) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.published += len(batch.Events())
 	return nil
 }
