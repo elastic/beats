@@ -23,18 +23,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 func TestPublish(t *testing.T) {
