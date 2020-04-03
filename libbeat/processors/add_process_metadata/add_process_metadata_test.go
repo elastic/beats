@@ -486,6 +486,31 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 		},
 		{
+			description: "container.id based on regex in config",
+			config: common.MapStr{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+				"cgroup_regex":   "\\/.+\\/.+\\/.+\\/([0-9a-f]{64}).*",
+			},
+			event: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: common.MapStr{
+				"system": common.MapStr{
+					"process": common.MapStr{
+						"ppid": "1",
+					},
+				},
+				"container": common.MapStr{
+					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
 			description: "without cgroup cache",
 			config: common.MapStr{
 				"match_pids":               []string{"system.process.ppid"},
