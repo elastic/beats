@@ -45,7 +45,7 @@ type ValueDecoder interface {
 	Decode(to interface{}) error
 }
 
-// NewRegistry creates a new Registry with a configured backend.
+// New creates a new Registry with a configured backend.
 func New(backend backend.Registry) *Registry {
 	return &Registry{
 		backend: backend,

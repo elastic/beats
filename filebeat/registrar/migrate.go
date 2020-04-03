@@ -177,14 +177,14 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 func migrateVersion1(home, regHome string, perm os.FileMode) error {
 	logp.Info("Migrate registry version 0 to version 1")
 
-	origDataFile := filepath.Join(regHome, "data.json")
-	if !isFile(origDataFile) {
-		return fmt.Errorf("missing original data file at: %v", origDataFile)
+	originalDataFile := filepath.Join(regHome, "data.json")
+	if !isFile(originalDataFile) {
+		return fmt.Errorf("missing original data file at: %v", originalDataFile)
 	}
 
 	// read states from file and ensure file is closed immediately.
 	states, err := func() ([]file.State, error) {
-		origIn, err := os.Open(origDataFile)
+		origIn, err := os.Open(originalDataFile)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to open original data file")
 		}
@@ -193,7 +193,7 @@ func migrateVersion1(home, regHome string, perm os.FileMode) error {
 		var states []file.State
 		decoder := json.NewDecoder(origIn)
 		if err := decoder.Decode(&states); err != nil {
-			return nil, errors.Wrapf(err, "Error decoding original data file '%v'", origDataFile)
+			return nil, errors.Wrapf(err, "Error decoding original data file '%v'", originalDataFile)
 		}
 		return states, nil
 	}()
@@ -228,8 +228,8 @@ func migrateVersion1(home, regHome string, perm os.FileMode) error {
 		return errors.Wrap(err, "failed to migrate registry states")
 	}
 
-	if err := os.Remove(origDataFile); err != nil {
-		return errors.Wrapf(err, "migration complete but failed to remove original data file: %v", origDataFile)
+	if err := os.Remove(originalDataFile); err != nil {
+		return errors.Wrapf(err, "migration complete but failed to remove original data file: %v", originalDataFile)
 	}
 
 	return nil
