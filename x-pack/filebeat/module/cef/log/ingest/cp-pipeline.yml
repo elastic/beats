@@ -212,7 +212,7 @@ processors:
 
           - name: deviceCustomDate2
             labels:
-              subscription expiration: checkpoint.subscription_expiration
+              subscription expiration: checkpoint.subs_exp
 
           - name: deviceFlexNumber1
             labels:

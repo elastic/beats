@@ -116,7 +116,7 @@
         "cef.severity": "Unknown",
         "cef.version": "0",
         "checkpoint.email_control": "SMTP Policy Restrictions",
-        "checkpoint.subscription_expiration": "2020-04-11T10:42:13.000Z",
+        "checkpoint.subs_exp": "2020-04-11T10:42:13.000Z",
         "destination.port": 25,
         "event.action": "Bypass",
         "event.code": "Log",

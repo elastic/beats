@@ -37,7 +37,7 @@
       description: Category.
 
     - name: confidence_level
-      type: keyword
+      type: long
       description: Confidence level determined.
 
     - name: connectivity_state
@@ -104,12 +104,20 @@
       type: keyword
       description: Scan invoke type.
 
+    - name: malware_family
+      type: keyword
+      description: Malware family.
+
+    - name: malware_name
+      type: keyword
+      description: Malware name.
+
     - name: peer_gateway
       type: ip
       description: Main IP of the peer Security Gateway.
 
     - name: performance_impact
-      type: keyword
+      type: long
       description: Protection performance impact.
 
     - name: protection_id
@@ -136,11 +144,11 @@
       type: keyword
       description: Threat severity.
 
-    - name: malware_status
+    - name: spyware_status
       type: keyword
-      description: Malware status.
+      description: Spyware status.
 
-    - name: subscription_expiration
+    - name: subs_exp
       type: date
       description: The expiration date of the subscription.
 
@@ -167,14 +175,6 @@
     - name: virus_name
       type: keyword
       description: Virus name.
-
-    - name: malware_name
-      type: keyword
-      description: Malware name.
-
-    - name: malware_family
-      type: keyword
-      description: Malware family.
 
     - name: voip_log_type
       type: keyword

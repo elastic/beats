@@ -117,7 +117,7 @@ Check Point CEF extensions are mapped as follows:
                              | vlan id                     | network.vlan.id          | -                              |
                              | authentication method       | -                        | checkpoint.auth_method         |
                              | email session id            | -                        | checkpoint.email_session_id    |
-| deviceCustomDate2          | subscription expiration     | -                        | checkpoint.subscription_expiration |
+| deviceCustomDate2          | subscription expiration     | -                        | checkpoint.subs_exp |
 | deviceFlexNumber1          | confidence                  | -                        | checkpoint.confidence_level    |
 .2+| deviceFlexNumber2       | performance impact          | -                        | checkpoint.performance_impact  |
                              | destination phone number    | -                        | checkpoint.dst_phone_number    |
