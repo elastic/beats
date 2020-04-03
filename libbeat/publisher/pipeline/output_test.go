@@ -73,11 +73,13 @@ func TestPublish(t *testing.T) {
 			wg.Wait()
 
 			// Give some time for events to be published
-			time.Sleep(time.Duration(numEvents.Load()*3) * time.Microsecond)
+			timeout := time.Duration(numEvents.Load()*3) * time.Microsecond
 
 			// Make sure that all events have eventually been published
 			c := test.client.(interface{ Published() int })
-			assert.Equal(t, numEvents.Load(), c.Published())
+			require.True(t, waitUntilTrue(timeout, func() bool {
+				return numEvents.Load() == c.Published()
+			}))
 		})
 	}
 }
@@ -128,10 +130,13 @@ func TestPublishWithClose(t *testing.T) {
 			wg.Wait()
 
 			// Give some time for events to be published
-			time.Sleep(time.Duration(remaining*3) * time.Microsecond)
+			timeout := time.Duration(remaining*3) * time.Microsecond
 
 			// Make sure that all events have eventually been published
-			assert.Equal(t, numEvents.Load(), c.Published())
+			require.True(t, waitUntilTrue(timeout, func() bool {
+				return numEvents.Load() == c.Published()
+			}))
+
 		})
 	}
 }
@@ -208,4 +213,15 @@ func seedPRNG(t *testing.T) {
 
 	t.Logf("seeding PRNG with %v", seed)
 	rand.Seed(seed)
+}
+
+func waitUntilTrue(duration time.Duration, fn func() bool) bool {
+	end := time.Now().Add(duration)
+	for time.Now().Before(end) {
+		if fn() {
+			return true
+		}
+		time.Sleep(100 * time.Nanosecond)
+	}
+	return false
 }
