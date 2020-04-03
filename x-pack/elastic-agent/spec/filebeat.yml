@@ -24,6 +24,9 @@ rules:
     item: streams
     to: inputs
 
+- inject_stream_processor:
+    target: inputs
+
 - map:
     path: inputs
     rules:

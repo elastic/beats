@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
@@ -420,7 +421,8 @@ func TestConfiguration(t *testing.T) {
 		err      bool
 	}{
 		"single_config": {
-			programs: []string{"filebeat", "metricbeat"},
+			// programs: []string{"filebeat", "metricbeat"},
+			programs: []string{"metricbeat"},
 			expected: 2,
 		},
 		"constraints_config": {
@@ -492,7 +494,7 @@ func TestConfiguration(t *testing.T) {
 				require.NoError(t, err)
 				var m map[string]interface{}
 				err = yamltest.FromYAML(programConfig, &m)
-				require.NoError(t, err)
+				require.NoError(t, errors.Wrap(err, program.Cmd()))
 
 				compareMap := &transpiler.MapVisitor{}
 				program.Config.Accept(compareMap)

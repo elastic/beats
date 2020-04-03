@@ -28,6 +28,8 @@ rules:
     item: streams
     to: inputs
 
+- inject_stream_processor:
+    target: inputs
 
 - filter_values_with_regexp:
     key: type

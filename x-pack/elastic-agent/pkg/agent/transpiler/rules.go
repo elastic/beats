@@ -14,6 +14,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+const (
+	metaIndexKey = "_meta_index"
+)
+
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
 type RuleList struct {
 	Rules []Rule
@@ -69,6 +73,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "extract_list_items"
 		case *InjectIndexRule:
 			name = "inject_index"
+		case *InjectStreamProcessorRule:
+			name = "inject_stream_processor"
 		case *MakeArrayRule:
 			name = "make_array"
 		case *RemoveKeyRule:
@@ -145,6 +151,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &ExtractListItemRule{}
 		case "inject_index":
 			r = &InjectIndexRule{}
+		case "inject_stream_processor":
+			r = &InjectStreamProcessorRule{}
 		case "make_array":
 			r = &MakeArrayRule{}
 		case "remove_key":
@@ -414,7 +422,7 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
 				})
 				streamMap.value = append(streamMap.value, &Key{
-					name: "_meta_index",
+					name: metaIndexKey,
 					value: &Dict{
 						value: []Node{
 							&Key{name: "type", value: &StrVal{value: r.Type}},
@@ -437,6 +445,111 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 func InjectIndex(indexType string) *InjectIndexRule {
 	return &InjectIndexRule{
 		Type: indexType,
+	}
+}
+
+// InjectStreamProcessorRule expect target to be a collection of fields including
+// _meta_index map with dataset, index and namespace keys defined.
+// if any key is missing this rule fails.
+type InjectStreamProcessorRule struct {
+	Target string
+}
+
+// Apply injects processor into input.
+func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
+	const defaultNamespace = "default"
+	const defaultDataset = "generic"
+
+	inputsNode, found := Lookup(ast, r.Target)
+	if !found {
+		return nil
+	}
+
+	inputsList, ok := inputsNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for i := range inputsList.value {
+		inputNode := inputsList.value[i]
+		metaNode, ok := inputNode.Find(metaIndexKey)
+		if !ok {
+			continue
+		}
+
+		streamType, found := metaNode.Find("type")
+		if !found {
+			return errors.New("InjectStreamProcessorRule: stream type not found")
+		}
+
+		streamNamespace, found := metaNode.Find("namespace")
+		if !found {
+			return errors.New("InjectStreamProcessorRule: stream namespace not found")
+		}
+
+		streamDataset, found := metaNode.Find("dataset")
+		if !found {
+			return errors.New("InjectStreamProcessorRule: stream dataset not found")
+		}
+
+		inputDict, ok := inputNode.(*Dict)
+		if !ok {
+			return errors.New("InjectStreamProcessorRule: input node is not a map")
+		}
+
+		// get processors node
+		processorsNode, found := inputNode.Find("processors")
+		if !found {
+			processorsNode = &Key{
+				name:  "processors",
+				value: &List{value: make([]Node, 0)},
+			}
+
+			inputDict.value = append(inputDict.value, processorsNode)
+		}
+
+		processorsList, ok := processorsNode.Value().(*List)
+		if !ok {
+			return errors.New("InjectStreamProcessorRule: processors is not a list")
+		}
+
+		processorMap := &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "stream.type", value: &StrVal{value: streamType.Value().(Node).String()}},
+			&Key{name: "stream.namespace", value: &StrVal{value: streamNamespace.Value().(Node).String()}},
+			&Key{name: "stream.dataset", value: &StrVal{value: streamDataset.Value().(Node).String()}},
+		}}})
+
+		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = append(processorsList.value, addFieldsMap)
+
+		// clear meta
+		index := -1
+		for i, node := range inputDict.value {
+			key, ok := node.(*Key)
+			if !ok {
+				continue
+			}
+
+			if key.name == metaIndexKey {
+				index = i
+				break
+			}
+		}
+
+		// sanity  check, but should always pass
+		if index != -1 {
+			inputDict.value = append(inputDict.value[:index], inputDict.value[index+1:]...)
+		}
+	}
+
+	return nil
+}
+
+// InjectStreamProcessor creates a InjectStreamProcessorRule
+func InjectStreamProcessor(target string) *InjectStreamProcessorRule {
+	return &InjectStreamProcessorRule{
+		Target: target,
 	}
 }
 

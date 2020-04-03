@@ -577,6 +577,7 @@ func TestSerialization(t *testing.T) {
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
 		InjectIndex("index-type"),
+		InjectStreamProcessor("target"),
 		CopyToList("t1", "t2", false),
 		CopyAllToList("t2", false, "a", "b"),
 	)
@@ -625,6 +626,8 @@ func TestSerialization(t *testing.T) {
     to: target
 - inject_index:
     type: index-type
+- inject_stream_processor:
+    to: target
 - copy_to_list:
     item: t1
     to: t2
