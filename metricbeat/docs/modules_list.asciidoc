@@ -32,15 +32,15 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-transitgateway,transitgateway>> beta[]  
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
-|<<metricbeat-module-azure,azure>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>> beta[]  
-|<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>> beta[]  
-|<<metricbeat-metricset-azure-container_instance,container_instance>> beta[]  
-|<<metricbeat-metricset-azure-container_registry,container_registry>> beta[]  
-|<<metricbeat-metricset-azure-container_service,container_service>> beta[]  
-|<<metricbeat-metricset-azure-database_account,database_account>> beta[]  
-|<<metricbeat-metricset-azure-monitor,monitor>> beta[]  
-|<<metricbeat-metricset-azure-storage,storage>> beta[]  
+|<<metricbeat-module-azure,azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
+|<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>   
+|<<metricbeat-metricset-azure-container_instance,container_instance>>   
+|<<metricbeat-metricset-azure-container_registry,container_registry>>   
+|<<metricbeat-metricset-azure-container_service,container_service>>   
+|<<metricbeat-metricset-azure-database_account,database_account>>   
+|<<metricbeat-metricset-azure-monitor,monitor>>   
+|<<metricbeat-metricset-azure-storage,storage>>   
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   

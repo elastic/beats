@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/plugin/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/server"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 
 	xmanagement "github.com/elastic/beats/v7/x-pack/libbeat/management"
