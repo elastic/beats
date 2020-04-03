@@ -58,19 +58,11 @@ func TestPublish(t *testing.T) {
 			makeClientWorker(nilObserver, wqu, test.client)
 
 			numEvents := atomic.MakeInt(0)
-			var wg sync.WaitGroup
 			for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
-					batch := randomBatch(50, 150, wqu)
-
-					numEvents.Add(len(batch.Events()))
-
-					wqu <- batch
-				}()
+				batch := randomBatch(50, 150, wqu)
+				numEvents.Add(len(batch.Events()))
+				wqu <- batch
 			}
-			wg.Wait()
 
 			// Give some time for events to be published
 			timeout := time.Duration(numEvents.Load()*3) * time.Microsecond
