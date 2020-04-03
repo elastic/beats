@@ -22,6 +22,7 @@ import (
 	"math/rand"
 	"sync"
 	"testing"
+	"testing/quick"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -39,99 +40,105 @@ var (
 )
 
 func TestPublish(t *testing.T) {
-	tests := map[string]struct {
-		client outputs.Client
-	}{
-		"client": {
-			&mockClient{},
-		},
-		"network_client": {
-			&mockNetworkClient{},
-		},
+	tests := map[string]func() outputs.Client{
+		"client":         newMockClient,
+		"network_client": newMockNetworkClient,
 	}
 
-	for name, test := range tests {
+	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
 			seedPRNG(t)
 
-			wqu := makeWorkQueue()
-			makeClientWorker(nilObserver, wqu, test.client)
+			err := quick.Check(func(i uint) bool {
+				numBatches := 100 + (i % 200) // between 100 and 299
 
-			numEvents := atomic.MakeInt(0)
-			for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
-				batch := randomBatch(50, 150, wqu)
-				numEvents.Add(len(batch.Events()))
-				wqu <- batch
+				client := ctor()
+				wqu := makeWorkQueue()
+				makeClientWorker(nilObserver, wqu, client)
+
+				numEvents := atomic.MakeInt(0)
+				for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
+					batch := randomBatch(50, 150, wqu)
+					numEvents.Add(len(batch.Events()))
+					wqu <- batch
+				}
+
+				// Give some time for events to be published
+				timeout := time.Duration(numEvents.Load()*3) * time.Microsecond
+
+				// Make sure that all events have eventually been published
+				c := client.(interface{ Published() int })
+				return waitUntilTrue(timeout, func() bool {
+					return numEvents.Load() == c.Published()
+				})
+			}, nil)
+
+			if err != nil {
+				t.Error(err)
 			}
-
-			// Give some time for events to be published
-			timeout := time.Duration(numEvents.Load()*3) * time.Microsecond
-
-			// Make sure that all events have eventually been published
-			c := test.client.(interface{ Published() int })
-			require.True(t, waitUntilTrue(timeout, func() bool {
-				return numEvents.Load() == c.Published()
-			}))
 		})
 	}
 }
 
 func TestPublishWithClose(t *testing.T) {
-	tests := map[string]struct {
-		client outputs.Client
-	}{
-		"client": {
-			&mockClient{},
-		},
-		"network_client": {
-			&mockNetworkClient{},
-		},
+	tests := map[string]func() outputs.Client{
+		"client":         newMockClient,
+		"network_client": newMockNetworkClient,
 	}
 
-	for name, test := range tests {
+	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
 			seedPRNG(t)
 
-			wqu := makeWorkQueue()
-			worker := makeClientWorker(nilObserver, wqu, test.client)
+			err := quick.Check(func(i uint) bool {
+				numBatches := 2000 + (i % 1000) // between 2000 and 2999
 
-			numEvents := atomic.MakeInt(0)
-			var wg sync.WaitGroup
-			for batchIdx := 0; batchIdx <= randIntBetween(25, 200); batchIdx++ {
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
-					batch := randomBatch(50, 150, wqu)
+				wqu := makeWorkQueue()
+				numEvents := atomic.MakeInt(0)
 
-					numEvents.Add(len(batch.Events()))
+				var wg sync.WaitGroup
+				for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						batch := randomBatch(50, 150, wqu)
+						numEvents.Add(len(batch.Events()))
+						wqu <- batch
+					}()
+				}
 
-					wqu <- batch
-				}()
+				client := ctor()
+				worker := makeClientWorker(nilObserver, wqu, client)
+
+				// Close worker before all batches have had time to be published
+				err := worker.Close()
+				require.NoError(t, err)
+
+				c := client.(interface{ Published() int })
+				remaining := numEvents.Load() - c.Published()
+				assert.Greater(t, remaining, 0)
+
+				// Start new worker to drain work queue
+				makeClientWorker(nilObserver, wqu, client)
+				wg.Wait()
+
+				// Give some time for events to be published
+				timeout := time.Duration(remaining*3) * time.Microsecond
+
+				// Make sure that all events have eventually been published
+				return waitUntilTrue(timeout, func() bool {
+					return numEvents.Load() == c.Published()
+				})
+			}, nil)
+
+			if err != nil {
+				t.Error(err)
 			}
-
-			// Close worker before all batches have had time to be published
-			err := worker.Close()
-			require.NoError(t, err)
-
-			c := test.client.(interface{ Published() int })
-			remaining := numEvents.Load() - c.Published()
-			assert.Greater(t, remaining, 0)
-
-			// Start new worker to drain work queue
-			makeClientWorker(nilObserver, wqu, test.client)
-			wg.Wait()
-
-			// Give some time for events to be published
-			timeout := time.Duration(remaining*3) * time.Microsecond
-
-			// Make sure that all events have eventually been published
-			require.True(t, waitUntilTrue(timeout, func() bool {
-				return numEvents.Load() == c.Published()
-			}))
-
 		})
 	}
 }
+
+func newMockClient() outputs.Client { return &mockClient{} }
 
 type mockClient struct {
 	mu        sync.RWMutex
@@ -155,13 +162,26 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 	return nil
 }
 
-type mockNetworkClient struct{ published int }
+func newMockNetworkClient() outputs.Client { return &mockNetworkClient{} }
 
-func (c *mockNetworkClient) Published() int { return c.published }
+type mockNetworkClient struct {
+	mu        sync.RWMutex
+	published int
+}
+
+func (c *mockNetworkClient) Published() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return c.published
+}
 
 func (c *mockNetworkClient) String() string { return "mock_network_client" }
 func (c *mockNetworkClient) Close() error   { return nil }
 func (c *mockNetworkClient) Publish(batch publisher.Batch) error {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	c.published += len(batch.Events())
 	return nil
 }
@@ -214,7 +234,7 @@ func seedPRNG(t *testing.T) {
 		seed = time.Now().UnixNano()
 	}
 
-	t.Logf("seeding PRNG with %v", seed)
+	t.Logf("reproduce test with `go test ... -seed %v`", seed)
 	rand.Seed(seed)
 }
 
