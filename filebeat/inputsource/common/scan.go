@@ -15,16 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package common
 
 import (
 	"bufio"
 	"bytes"
 )
 
-// factoryDelimiter return a function to split line using a custom delimiter supporting multibytes
+// FactoryDelimiter return a function to split line using a custom delimiter supporting multibytes
 // delimiter, the delimiter is stripped from the returned value.
-func factoryDelimiter(delimiter []byte) bufio.SplitFunc {
+func FactoryDelimiter(delimiter []byte) bufio.SplitFunc {
 	return func(data []byte, eof bool) (int, []byte, error) {
 		if eof && len(data) == 0 {
 			return 0, nil, nil

@@ -15,9 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package common
 
 import (
+	"math/rand"
 	"strings"
 	"testing"
 
@@ -57,4 +58,13 @@ func TestResetableLimitedReader(t *testing.T) {
 		_, err = m.Read(toRead)
 		assert.NoError(t, err)
 	})
+}
+
+func randomString(l int) string {
+	charsets := []byte("abcdefghijklmnopqrstuvwzyzABCDEFGHIJKLMNOPQRSTUVWZYZ0123456789")
+	message := make([]byte, l)
+	for i := range message {
+		message[i] = charsets[rand.Intn(len(charsets))]
+	}
+	return string(message)
 }
