@@ -218,7 +218,7 @@ class Test(BaseTest):
             assert output[0]["message"] == "invalid"
             sock.close()
 
-    def assert_syslog(self, syslog, has_address = True):
+    def assert_syslog(self, syslog, has_address=True):
         assert syslog["event.severity"] == 5
         assert syslog["hostname"] == "wopr.mymachine.co"
         assert syslog["input.type"] == "syslog"
