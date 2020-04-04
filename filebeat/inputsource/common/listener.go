@@ -114,7 +114,7 @@ func (l *Listener) run() {
 
 		l.wg.Add(1)
 		go func() {
-			defer logp.Recover("recovering from a" + string(l.family) + "client crash")
+			defer logp.Recover("recovering from a " + l.family.String() + " client crash")
 			defer l.wg.Done()
 			defer closer.Close()
 
