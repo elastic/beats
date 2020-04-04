@@ -224,7 +224,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>> beta[]  
+.3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
 |<<metricbeat-metricset-zookeeper-server,server>>   
 |===

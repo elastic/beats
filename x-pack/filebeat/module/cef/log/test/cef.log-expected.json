@@ -50,5 +50,34 @@
             "cef"
         ],
         "url.original": "https://www.example.com/cart"
+    },
+    {
+        "cef.device.event_class_id": "18",
+        "cef.device.product": "Vaporware",
+        "cef.device.vendor": "Elastic",
+        "cef.device.version": "1.0.0-alpha",
+        "cef.extensions.destinationUserPrivileges": "root",
+        "cef.extensions.sourceUserPrivileges": "user",
+        "cef.name": "Authentication",
+        "cef.severity": "low",
+        "cef.version": "0",
+        "destination.user.group.name": "root",
+        "event.code": "18",
+        "event.dataset": "cef.log",
+        "event.module": "cef",
+        "event.original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|spriv=user dpriv=root",
+        "event.severity": 0,
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 269,
+        "message": "Authentication",
+        "observer.product": "Vaporware",
+        "observer.vendor": "Elastic",
+        "observer.version": "1.0.0-alpha",
+        "service.type": "cef",
+        "source.user.group.name": "user",
+        "tags": [
+            "cef"
+        ]
     }
 ]
