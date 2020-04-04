@@ -6,6 +6,8 @@ import unittest
 
 # AF_UNIX support in python isn't available until
 # Python 3.9, see https://bugs.python.org/issue33408
+
+
 @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
 class Test(BaseTest):
     """

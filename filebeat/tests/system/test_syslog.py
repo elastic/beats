@@ -4,6 +4,7 @@ import os
 import tempfile
 import unittest
 
+
 class Test(BaseTest):
     """
     Test filebeat with the syslog input
