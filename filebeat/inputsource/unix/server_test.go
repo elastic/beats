@@ -173,7 +173,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := SplitHandlerFactory(to, test.splitFunc)
+			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, MetadataCallback, to, test.splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -225,7 +225,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := SplitHandlerFactory(to, bufio.ScanLines)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, MetadataCallback, to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {

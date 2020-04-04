@@ -18,13 +18,78 @@
 package common
 
 import (
+	"bufio"
 	"net"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // HandlerFactory returns a ConnectionHandler func
 type HandlerFactory func(config ListenerConfig) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming connections
-type ConnectionHandler interface {
-	Handle(CloseRef, net.Conn) error
+type ConnectionHandler func(CloseRef, net.Conn) error
+
+// MetadataFunc defines callback executed when a line is read from the split handler.
+type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
+
+// SplitHandlerFactory allows creation of a handler that has splitting capabilities.
+func SplitHandlerFactory(family Family, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
+	return func(config ListenerConfig) ConnectionHandler {
+		return ConnectionHandler(func(closer CloseRef, conn net.Conn) error {
+			metadata := metadataCallback(conn)
+			maxMessageSize := uint64(config.MaxMessageSize)
+
+			var log *logp.Logger
+			if family == FamilyUnix {
+				// unix sockets have an empty `RemoteAddr` value, so no need to capture it
+				log = logp.NewLogger("split_client")
+			} else {
+				log = logp.NewLogger("split_client").With("remote_addr", conn.RemoteAddr().String())
+			}
+
+			r := NewResetableLimitedReader(NewDeadlineReader(conn, config.Timeout), maxMessageSize)
+			buf := bufio.NewReader(r)
+			scanner := bufio.NewScanner(buf)
+			scanner.Split(splitFunc)
+			//16 is ratio of MaxScanTokenSize/startBufSize
+			buffer := make([]byte, maxMessageSize/16)
+			scanner.Buffer(buffer, int(maxMessageSize))
+			for {
+				select {
+				case <-closer.Done():
+					break
+				default:
+				}
+
+				// Ensure that if the Conn is already closed then dont attempt to scan again
+				if closer.Err() == ErrClosed {
+					break
+				}
+
+				if !scanner.Scan() {
+					break
+				}
+
+				err := scanner.Err()
+				if err != nil {
+					// This is a user defined limit and we should notify the user.
+					if IsMaxReadBufferErr(err) {
+						log.Errorw("split_client error", "error", err)
+					}
+					return errors.Wrap(err, string(family)+" split_client error")
+				}
+				r.Reset()
+				callback(scanner.Bytes(), metadata)
+			}
+
+			// We are out of the scanner, either we reached EOF or another fatal error occurred.
+			// like we failed to complete the TLS handshake or we are missing the splitHandler certificate when
+			// mutual auth is on, which is the default.
+			return scanner.Err()
+		})
+	}
 }

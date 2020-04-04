@@ -88,7 +88,7 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	factory := unix.SplitHandlerFactory(cb, splitFunc)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, unix.MetadataCallback, cb, splitFunc)
 
 	server, err := unix.New(&config.Config, factory)
 	if err != nil {

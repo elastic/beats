@@ -122,7 +122,7 @@ func (l *Listener) run() {
 				l.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", l.clientsCount.Load())
 			}
 
-			err := handler.Handle(closer, conn)
+			err := handler(closer, conn)
 			if err != nil {
 				l.log.Debugw("client error", "error", err)
 			}
