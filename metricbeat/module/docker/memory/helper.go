@@ -51,7 +51,7 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 		//during this time, there doesn't appear to be any meaningful data,
 		// and Limit will never be 0 unless the container is not running
 		//and there's no cgroup data, and CPU usage should be greater than 0 for any running container.
-		if containerStats.Stats.MemoryStats.Limit == 0 && containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
+		if containerStats.Stats.MemoryStats.Limit == 0 || containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
 			continue
 		}
 		formattedStats = append(formattedStats, s.getMemoryStats(containerStats, dedot))

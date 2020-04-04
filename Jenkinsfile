@@ -55,6 +55,48 @@ pipeline {
     stage('Build and Test'){
       failFast false
       parallel {
+        stage('Elastic Agent x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false"
+            }
+          }
+          steps {
+            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+          }
+        }
+
+        stage('Elastic Agent x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
+          }
+        }
+
+        stage('Elastic Agent Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
+          }
+        }
+
         stage('Filebeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -545,17 +587,6 @@ pipeline {
             k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
           }
         }
-        stage('Docs'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return env.BUILD_DOCS != "false" }
-          }
-          steps {
-            makeTarget("Docs", "docs")
-          }
-        }
       }
     }
   }
@@ -797,70 +828,113 @@ def isChanged(patterns){
   )
 }
 
+def isChangedOSSCode(patterns) {
+  def always = [
+    "Jenkinsfile",
+    "^vendor/*",
+    "^libbeat/*",
+    "^testing/*",
+    "^dev-tools/*",
+  ]
+  return isChanged(always + patterns)
+}
+
+def isChangedXPackCode(patterns) {
+  def always = [
+    "Jenkinsfile",
+    "^vendor/*",
+    "^libbeat/*",
+    "^dev-tools/*",
+    "^testing/*",
+    "^x-pack/libbeat/.*",
+  ]
+  return isChanged(always + patterns)
+}
+
 def loadConfigEnvVars(){
-  env.BUILD_AUDITBEAT = isChanged(["^auditbeat/.*"])
-  env.BUILD_AUDITBEAT_XPACK = isChanged([
-    "^auditbeat/.*",
-    "^x-pack/auditbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_DOCKERLOGBEAT_XPACK = isChanged([
-    "^x-pack/dockerlogbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_DOCS = isChanged(
-    patterns: ["^docs/.*"],
-    comparator: 'regexp'
-  )
-  env.BUILD_FILEBEAT = isChanged(["^filebeat/.*"])
-  env.BUILD_FILEBEAT_XPACK = isChanged([
-    "^filebeat/.*",
-    "^x-pack/filebeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_FUNCTIONBEAT_XPACK = isChanged([
-    "^x-pack/functionbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_GENERATOR = isChanged(["^generator/.*"])
-  env.BUILD_HEARTBEAT = isChanged(["^heartbeat/.*"])
-  env.BUILD_HEARTBEAT_XPACK = isChanged([
-    "^heartbeat/.*",
-    "^x-pack/heartbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_JOURNALBEAT = isChanged(["^journalbeat/.*"])
-  env.BUILD_JOURNALBEAT_XPACK = isChanged([
-    "^journalbeat/.*",
-    "^x-pack/journalbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-  env.BUILD_LIBBEAT = isChanged(
-    patterns: ["^libbeat/.*"],
-    comparator: 'regexp'
-  )
-  env.BUILD_LIBBEAT_XPACK = isChanged([
-    "^libbeat/.*",
-    "^x-pack/libbeat/.*",
-  ])
-  env.BUILD_METRICBEAT = isChanged(["^metricbeat/.*"])
-  env.BUILD_METRICBEAT_XPACK = isChanged([
+  // Libbeat is the core framework of Beats. It has no additional dependencies
+  // on other projects in the Beats repository.
+  env.BUILD_LIBBEAT = isChangedOSSCode([])
+  env.BUILD_LIBBEAT_XPACK = env.BUILD_LIBBEAT || isChangedXPackCode([])
+
+  // Auditbeat depends on metricbeat as framework, but does not include any of
+  // the modules from Metricbeat.
+  // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
+  env.BUILD_AUDITBEAT = isChangedOSSCode([
     "^metricbeat/.*",
-    "^x-pack/libbeat/.*",
+    "^auditbeat/.*",
+  ])
+  env.BUILD_AUDITBEAT_XPACK = env.BUILD_AUDITBEAT || isChangedXPackCode([
+    "^x-pack/auditbeat/.*",
+  ])
+
+  // Dockerlogbeat is a standalone Beat that only relies on libbeat.
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode([
+    "^x-pack/dockerlogbeat/.*",
+  ])
+
+  // Filebeat depends on libbeat only.
+  // The Filebeat x-pack build contains all functionality from OSS Filebeat.
+  env.BUILD_FILEBEAT = isChangedOSSCode(["^filebeat/.*"])
+  env.BUILD_FILEBEAT_XPACK = env.BUILD_FILEBEAT || isChangedXPackCode([
+    "^x-pack/filebeat/.*",
+  ])
+
+  // Metricbeat depends on libbeat only.
+  // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
+  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = env.BUILD_METRICBEAT || isChangedXPackCode([
     "^x-pack/metricbeat/.*",
   ])
-  env.BUILD_PACKETBEAT = isChanged(["^packetbeat/.*"])
-  env.BUILD_PACKETBEAT_XPACK = isChanged([
-    "^packetbeat/.*",
-    "^x-pack/libbeat/.*",
+
+  // Functionbeat is a standalone beat that depends on libbeat only.
+  // Functionbeat is available as x-pack build only.
+  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode([
+    "^x-pack/functionbeat/.*",
+  ])
+
+  // Heartbeat depends on libbeat only.
+  // The Heartbeat x-pack build contains all functionality from OSS Heartbeat.
+  env.BUILD_HEARTBEAT = isChangedOSSCode(["^heartbeat/.*"])
+  env.BUILD_HEARTBEAT_XPACK = env.BUILD_HEARTBEAT || isChangedXPackCode([
+    "^x-pack/heartbeat/.*",
+  ])
+
+
+  // Journalbeat depends on libbeat only.
+  // The Journalbeat x-pack build contains all functionality from OSS Journalbeat.
+  env.BUILD_JOURNALBEAT = isChangedOSSCode(["^journalbeat/.*"])
+  env.BUILD_JOURNALBEAT_XPACK = env.BUILD_JOURNALBEAT || isChangedXPackCode([
+    "^x-pack/journalbeat/.*",
+  ])
+
+  // Packetbeat depends on libbeat only.
+  // The Packetbeat x-pack build contains all functionality from OSS Packetbeat.
+  env.BUILD_PACKETBEAT = isChangedOSSCode(["^packetbeat/.*"])
+  env.BUILD_PACKETBEAT_XPACK = env.BUILD_PACKETBEAT || isChangedXPackCode([
     "^x-pack/packetbeat/.*",
   ])
-  env.BUILD_WINLOGBEAT = isChanged(["^winlogbeat/.*"])
-  env.BUILD_WINLOGBEAT_XPACK = isChanged([
-    "^winlogbeat/.*",
-    "^x-pack/libbeat/.*",
+
+  // Winlogbeat depends on libbeat only.
+  // The Winlogbeat x-pack build contains all functionality from OSS Winlogbeat.
+  env.BUILD_WINLOGBEAT = isChangedOSSCode(["^winlogbeat/.*"])
+  env.BUILD_WINLOGBEAT_XPACK = env.BUILD_WINLOGBEAT || isChangedXPackCode([
     "^x-pack/winlogbeat/.*",
   ])
+
+  // Elastic-agent is a self-contained product, that depends on libbeat only.
+  // The agent acts as a supervisor for other Beats like Filebeat or Metricbeat.
+  // The agent is available as x-pack build only.
+  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode([
+    "^x-pack/elastic-agent/.*",
+  ])
+
+  // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
+  // if the deployment scripts have been updated. No Beats specific testing is
+  // involved.
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+
+  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+
   env.GO_VERSION = readFile(".go-version").trim()
 }
