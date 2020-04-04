@@ -18,6 +18,7 @@
 package node_stats
 
 import (
+	"net/url"
 	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -69,16 +70,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	var err error
-	m.initialized.Do(func() {
-		err = m.init()
-	})
-	if err != nil {
-		if m.XPack {
+	if m.XPack {
+		err := m.CheckPipelineGraphAPIsAvailable()
+		if err != nil {
 			m.Logger().Error(err)
 			return nil
 		}
-		return err
+
+		if err := m.setServiceURI(); err != nil {
+			m.Logger().Error(err)
+			return nil
+		}
 	}
 
 	content, err := m.HTTP.FetchContent()
@@ -102,15 +104,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) init() error {
-	if m.XPack {
-		err := m.CheckPipelineGraphAPIsAvailable()
-		if err != nil {
-			return err
-		}
-
-		m.HTTP.SetURI(m.HTTP.GetURI() + "?vertices=true")
+func (m *MetricSet) setServiceURI() error {
+	u, err := url.Parse(m.HTTP.GetURI())
+	if err != nil {
+		return err
 	}
 
+	q := u.Query()
+	if q.Get("vertices") == "" {
+		q.Set("vertices", "true")
+	}
+
+	u.RawQuery = q.Encode()
+	m.HTTP.SetURI(u.String())
 	return nil
 }
