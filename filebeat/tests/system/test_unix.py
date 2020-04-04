@@ -2,8 +2,11 @@ from filebeat import BaseTest
 import os
 import socket
 import tempfile
+import unittest
 
-
+# AF_UNIX support in python isn't available until
+# Python 3.9, see https://bugs.python.org/issue33408
+@unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
 class Test(BaseTest):
     """
     Test filebeat UNIX input
@@ -35,7 +38,7 @@ class Test(BaseTest):
             path = os.path.join(tempdir, "filebeat.sock")
             input_raw = """
 - type: unix
-  path: "{}"
+  path: {}
   enabled: true
 """
 

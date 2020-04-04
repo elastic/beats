@@ -2,7 +2,7 @@ from filebeat import BaseTest
 import socket
 import os
 import tempfile
-
+import unittest
 
 class Test(BaseTest):
     """
@@ -131,6 +131,9 @@ class Test(BaseTest):
         assert len(output) == 2
         self.assert_syslog(output[0])
 
+    # AF_UNIX support in python isn't available until
+    # Python 3.9, see https://bugs.python.org/issue33408
+    @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
     def test_syslog_with_unix(self):
         """
         Test syslog input with events from UNIX.
@@ -144,7 +147,7 @@ class Test(BaseTest):
 - type: syslog
   protocol:
     unix:
-        path: "{}"
+        path: {}
 """
 
             input_raw = input_raw.format(path)
@@ -176,6 +179,9 @@ class Test(BaseTest):
             assert len(output) == 2
             self.assert_syslog(output[0], False)
 
+    # AF_UNIX support in python isn't available until
+    # Python 3.9, see https://bugs.python.org/issue33408
+    @unittest.skipIf(not hasattr(socket, 'AF_UNIX'), "No Windows AF_UNIX support before Python 3.9")
     def test_syslog_with_unix_invalid_message(self):
         """
         Test syslog input with invalid events from UNIX.
@@ -189,7 +195,7 @@ class Test(BaseTest):
 - type: syslog
   protocol:
     unix:
-        path: "{}"
+        path: {}
 """
 
             input_raw = input_raw.format(path)
