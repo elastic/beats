@@ -33,8 +33,8 @@ type Config struct {
 	FlowInactiveTimeout time.Duration `config:"socket.flow_inactive_timeout"`
 
 	// SocketInactiveTimeout determines how long a socket has to be inactive to be
-	// considered closed.
-	SocketInactiveTimeout time.Duration `config:"socket.inactive_timeout"`
+	// considered terminated or closed.
+	SocketInactiveTimeout time.Duration `config:"socket.socket_inactive_timeout"`
 
 	// FlowTerminationTimeout determines how long to wait after a flow has been
 	// closed for out of order packets. With TCP, some packets can be received
