@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"net"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -36,6 +37,10 @@ const (
 	// FamilyTCP represents a tcp socket listener
 	FamilyTCP = "tcp"
 )
+
+func (f Family) String() string {
+	return strings.ToUpper(string(f))
+}
 
 // ListenerFactory returns a net.Listener
 type ListenerFactory func() (net.Listener, error)
@@ -59,6 +64,7 @@ func NewListener(family Family, location string, handlerFactory HandlerFactory, 
 	return &Listener{
 		config:          config,
 		done:            make(chan struct{}),
+		family:          family,
 		log:             logp.NewLogger(string(family)).With("address", location),
 		closer:          NewCloser(nil),
 		handlerFactory:  handlerFactory,
@@ -75,7 +81,7 @@ func (l *Listener) Start() error {
 	}
 
 	l.closer.SetCallback(func() { l.Listener.Close() })
-	l.log.Info("Started listening for " + string(l.family) + " connection")
+	l.log.Info("Started listening for " + l.family.String() + " connection")
 
 	l.wg.Add(1)
 	go func() {
@@ -141,10 +147,10 @@ func (l *Listener) run() {
 
 // Stop stops accepting new incoming connections and Close any active clients
 func (l *Listener) Stop() {
-	l.log.Info("Stopping" + string(l.family) + "server")
+	l.log.Info("Stopping" + l.family.String() + "server")
 	l.closer.Close()
 	l.wg.Wait()
-	l.log.Info(l.family + " server stopped")
+	l.log.Info(l.family.String() + " server stopped")
 }
 
 func (l *Listener) registerHandler() {
