@@ -73,6 +73,9 @@ spec:
         - name: etc
           mountPath: /hostfs/etc
           readOnly: true
+        # Directory with root filesystems of containers executed with containerd, this can be
+        # different with other runtimes. This volume is needed to monitor the file integrity
+        # of files in containers.
         - name: run-containerd
           mountPath: /run/containerd
           readOnly: true
