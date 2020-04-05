@@ -326,7 +326,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log: 
+  log:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -335,7 +335,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-  
+
   falcon:
     enabled: true
 
@@ -380,7 +380,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log: 
+  log:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -596,7 +596,7 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
-   
+
     # You can also pass SSL options. For example:
     #var.ssl: |-
     #  {
@@ -762,7 +762,7 @@ filebeat.modules:
     # URL of the Okta REST API
     #var.url
 
-    # Disable SSL verification 
+    # Disable SSL verification
     #var.ssl: |-
     #  {
     #    "verification_mode": "none"
@@ -893,7 +893,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true    
+    enabled: true
   irc:
     enabled: true
   kerberos:
@@ -1729,6 +1729,16 @@ filebeat.inputs:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
