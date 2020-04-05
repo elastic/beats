@@ -108,7 +108,7 @@ func TestPublishWithClose(t *testing.T) {
 						wqu <- batch
 
 						// To ensure worker doesn't have time to publish all batches
-						time.Sleep(750 * time.Microsecond)
+						time.Sleep(1 * time.Millisecond)
 					}()
 				}
 
