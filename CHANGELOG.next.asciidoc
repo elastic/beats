@@ -182,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
