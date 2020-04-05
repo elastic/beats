@@ -52,8 +52,8 @@ func TestPublish(t *testing.T) {
 			err := quick.Check(func(i uint) bool {
 				numBatches := 3000 + (i % 1000) // between 3000 and 3999
 
-				client := ctor()
 				wqu := makeWorkQueue()
+				client := ctor()
 				makeClientWorker(nilObserver, wqu, client)
 
 				numEvents := atomic.MakeInt(0)
@@ -94,6 +94,7 @@ func TestPublishWithClose(t *testing.T) {
 				numBatches := 3000 + (i % 1000) // between 3000 and 3999
 
 				wqu := makeWorkQueue()
+
 				numEvents := atomic.MakeInt(0)
 
 				var wg sync.WaitGroup
@@ -101,9 +102,13 @@ func TestPublishWithClose(t *testing.T) {
 					wg.Add(1)
 					go func() {
 						defer wg.Done()
+
 						batch := randomBatch(50, 150, wqu)
 						numEvents.Add(len(batch.Events()))
 						wqu <- batch
+
+						// To ensure worker doesn't have time to publish all batches
+						time.Sleep(750 * time.Microsecond)
 					}()
 				}
 
