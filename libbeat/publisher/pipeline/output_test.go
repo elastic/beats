@@ -106,9 +106,6 @@ func TestPublishWithClose(t *testing.T) {
 						batch := randomBatch(50, 150, wqu)
 						numEvents.Add(len(batch.Events()))
 						wqu <- batch
-
-						// To ensure worker doesn't have time to publish all batches
-						time.Sleep(1 * time.Millisecond)
 					}()
 				}
 
@@ -143,6 +140,8 @@ func TestPublishWithClose(t *testing.T) {
 	}
 }
 
+const publishLatency = 1 * time.Microsecond
+
 func newMockClient() outputs.Client { return &mockClient{} }
 
 type mockClient struct {
@@ -163,6 +162,7 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	time.Sleep(publishLatency)
 	c.published += len(batch.Events())
 	return nil
 }
@@ -187,6 +187,7 @@ func (c *mockNetworkClient) Publish(batch publisher.Batch) error {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	time.Sleep(publishLatency)
 	c.published += len(batch.Events())
 	return nil
 }
