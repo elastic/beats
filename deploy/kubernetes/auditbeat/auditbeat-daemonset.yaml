@@ -24,6 +24,7 @@ spec:
         image: docker.elastic.co/beats/auditbeat:%VERSION%
         args: [
           "-c", "/etc/auditbeat.yml"
+          "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
