@@ -140,7 +140,7 @@ func TestPublishWithClose(t *testing.T) {
 	}
 }
 
-const publishLatency = 5 * time.Microsecond
+const publishLatency = 50 * time.Microsecond
 
 func newMockClient() outputs.Client { return &mockClient{} }
 
