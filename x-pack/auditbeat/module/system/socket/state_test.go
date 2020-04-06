@@ -49,7 +49,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -127,6 +127,120 @@ func TestTCPConnWithProcess(t *testing.T) {
 	}
 }
 
+func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 443
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&tcpIPv4ConnectCall{Meta: meta(1234, 1235, 8), Sock: sock, RAddr: rAddr, RPort: rPort},
+		&ipLocalOutCall{
+			Meta:  meta(1234, 1235, 8),
+			Sock:  sock,
+			Size:  20,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+		&tcpConnectResult{Meta: meta(1234, 1235, 9), Retval: 0},
+		&tcpV4DoRcv{
+			Meta:  meta(0, 0, 12),
+			Sock:  sock,
+			Size:  12,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	evs = []event{
+		&inetReleaseCall{Meta: meta(0, 0, 15), Sock: sock},
+		&tcpV4DoRcv{
+			Meta:  meta(0, 0, 17),
+			Sock:  sock,
+			Size:  7,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 2)
+	flow := flows[0]
+	t.Log("read flow 0", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           localIP,
+		"source.port":         localPort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(20),
+		"client.ip":           localIP,
+		"client.port":         localPort,
+		"destination.ip":      remoteIP,
+		"destination.port":    remotePort,
+		"destination.packets": uint64(1),
+		"destination.bytes":   uint64(12),
+		"server.ip":           remoteIP,
+		"server.port":         remotePort,
+		"network.direction":   "outbound",
+		"network.transport":   "tcp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "curl",
+		"user.id":             "501",
+	} {
+		if !assertValue(t, flow, expected, field) {
+			t.Fatal("expected value not found")
+		}
+	}
+
+	// we have a truncated flow with no directionality,
+	// so just report what we can
+	flow = flows[1]
+	t.Log("read flow 1", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":         localIP,
+		"source.port":       localPort,
+		"client.ip":         localIP,
+		"client.port":       localPort,
+		"destination.ip":    remoteIP,
+		"destination.port":  remotePort,
+		"server.ip":         remoteIP,
+		"server.port":       remotePort,
+		"network.direction": "unknown",
+		"network.transport": "tcp",
+		"network.type":      "ipv4",
+	} {
+		if !assertValue(t, flow, expected, field) {
+			t.Fatal("expected value not found")
+		}
+	}
+}
+
 func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 	const (
 		localIP            = "192.168.33.10"
@@ -135,7 +249,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -199,7 +313,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	var packet [256]byte
