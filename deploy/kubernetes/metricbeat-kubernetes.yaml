@@ -149,6 +149,8 @@ spec:
           mountPath: /etc/metricbeat.yml
           readOnly: true
           subPath: metricbeat.yml
+        - name: data
+          mountPath: /usr/share/metricbeat/data
         - name: modules
           mountPath: /usr/share/metricbeat/modules.d
           readOnly: true
