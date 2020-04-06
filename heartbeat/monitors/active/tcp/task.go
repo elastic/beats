@@ -33,7 +33,7 @@ func pingHost(
 	dialer transport.Dialer,
 	addr string,
 	timeout time.Duration,
-	validator ConnCheck,
+	validator DataCheck,
 ) error {
 	start := time.Now()
 	deadline := start.Add(timeout)
@@ -55,7 +55,7 @@ func pingHost(
 	}
 
 	validateStart := time.Now()
-	err = validator.Validate(conn)
+	err = validator.Check(conn)
 	if err != nil && err != errRecvMismatch {
 		debugf("check failed with: %v", err)
 		return reason.IOFailed(err)

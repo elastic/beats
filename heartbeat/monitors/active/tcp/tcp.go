@@ -70,7 +70,7 @@ func create(
 
 		epJobs, err := MakeDialerJobs(db, scheme, eps, tm.config.Mode,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
-				return pingHost(event, dialer, addr, tm.config.Timeout, tm.validator)
+				return pingHost(event, dialer, addr, tm.config.Timeout, tm.dataCheck)
 			})
 		if err != nil {
 			return nil, 0, err
@@ -92,7 +92,7 @@ type tcpMonitor struct {
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
 	schemeHosts   map[string][]Endpoint
-	validator     ConnCheck
+	dataCheck     DataCheck
 }
 
 func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
@@ -116,7 +116,7 @@ func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 		return nil, err
 	}
 
-	tm.validator = makeValidateConn(&tm.config)
+	tm.dataCheck = makeDataCheck(&tm.config)
 
 	return tm, nil
 }
