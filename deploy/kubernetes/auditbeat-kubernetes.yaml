@@ -108,6 +108,8 @@ spec:
         - name: modules
           mountPath: /usr/share/auditbeat/modules.d
           readOnly: true
+        - name: data
+          mountPath: /usr/share/auditbeat/data
         - name: bin
           mountPath: /hostfs/bin
           readOnly: true
