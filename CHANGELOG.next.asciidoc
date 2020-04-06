@@ -240,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
@@ -379,6 +380,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
+- Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
 
