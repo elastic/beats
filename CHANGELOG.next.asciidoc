@@ -307,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 - Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
+- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
 
 *Heartbeat*
 
