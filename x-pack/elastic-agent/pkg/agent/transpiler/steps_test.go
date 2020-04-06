@@ -23,7 +23,9 @@ func TestIsSubpath(t *testing.T) {
 			{"/", "a", "/a", true},
 			{"/a", "b", "/a/b", true},
 			{"/a", "b/c", "/a/b/c", true},
+
 			{"/a/b", "/a/c", "/a/c", false},
+
 			{"/a/b", "/a/b/../c", "/a/c", false},
 			{"/a/b", "../c", "/a/c", false},
 			{"/a", "/a/b/c", "/a/b/c", true},
@@ -59,9 +61,14 @@ func TestIsSubpath(t *testing.T) {
 	}
 
 	for _, test := range osSpecificTests {
+<<<<<<< HEAD
 		t.Run(fmt.Sprintf("[%s]'%s-%s'", runtime.GOOS, test.root, test.path), func(t *testing.T) {
 			newPath, result, err := joinPaths(test.root, test.path)
 			assert.Nil(t, err)
+=======
+		t.Run(fmt.Sprintf("[%s] root:'%s path: %s'", runtime.GOOS, test.root, test.path), func(t *testing.T) {
+			newPath, result := joinPaths(test.root, test.path)
+>>>>>>> master
 			assert.Equal(t, test.resultPath, newPath)
 			assert.Equal(t, test.isSubpath, result)
 		})

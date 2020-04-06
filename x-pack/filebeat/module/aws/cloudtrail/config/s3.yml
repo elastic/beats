@@ -21,3 +21,15 @@ api_timeout: {{ .api_timeout }}
 {{ if .endpoint }}
 endpoint: {{ .endpoint }}
 {{ end }}
+
+{{ if .access_key_id }}
+access_key_id: {{ .access_key_id }}
+{{ end }}
+
+{{ if .secret_access_key }}
+secret_access_key: {{ .secret_access_key }}
+{{ end }}
+
+{{ if .session_token }}
+session_token: {{ .session_token }}
+{{ end }}
