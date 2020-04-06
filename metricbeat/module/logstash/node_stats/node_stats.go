@@ -19,7 +19,6 @@ package node_stats
 
 import (
 	"net/url"
-	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -51,7 +50,6 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	initialized sync.Once
 }
 
 // New create a new instance of the MetricSet
