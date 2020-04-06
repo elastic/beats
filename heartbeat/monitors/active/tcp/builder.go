@@ -18,15 +18,9 @@
 package tcp
 
 import (
-	"fmt"
-	"net"
-	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -124,76 +118,4 @@ func (b *Builder) Run(
 	}
 
 	return fn(event, dialer)
-}
-
-// MakeDialerJobs creates a set of monitoring jobs. The jobs behavior depends
-// on the builder, endpoint and mode configurations, normally set by user
-// configuration.  The task to execute the actual 'ping' receives the dialer
-// and the address pair (<hostname>:<port>), required to be used, to ping the
-// correctly resolved endpoint.
-func MakeDialerJobs(
-	b *Builder,
-	scheme string,
-	endpoints []Endpoint,
-	mode monitors.IPSettings,
-	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
-) ([]jobs.Job, error) {
-	var jobs []jobs.Job
-	for _, endpoint := range endpoints {
-		for _, port := range endpoint.Ports {
-			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
-			if err != nil {
-				return nil, err
-			}
-			endpointJob, err := makeEndpointJob(b, endpointURL, mode, fn)
-			if err != nil {
-				return nil, err
-			}
-			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
-		}
-
-	}
-
-	return jobs, nil
-}
-
-func makeEndpointJob(
-	b *Builder,
-	endpointURL *url.URL,
-	mode monitors.IPSettings,
-	fn func(*beat.Event, transport.Dialer, string) error,
-) (jobs.Job, error) {
-
-	// Check if SOCKS5 is configured, with relying on the socks5 proxy
-	// in resolving the actual IP.
-	// Create one job for every port number configured.
-	if b.resolveViaSocks5 {
-		return wrappers.WithURLField(endpointURL,
-			jobs.MakeSimpleJob(func(event *beat.Event) error {
-				hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
-				return b.Run(event, hostPort, func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, hostPort)
-				})
-			})), nil
-	}
-
-	// Create job that first resolves one or multiple IP (depending on
-	// config.Mode) in order to create one continuation Task per IP.
-	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), mode)
-
-	job, err := monitors.MakeByHostJob(settings,
-		monitors.MakePingIPFactory(
-			func(event *beat.Event, ip *net.IPAddr) error {
-				// use address from resolved IP
-				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
-				cb := func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, ipPort)
-				}
-				err := b.Run(event, ipPort, cb)
-				return err
-			}))
-	if err != nil {
-		return nil, err
-	}
-	return job, nil
 }

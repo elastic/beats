@@ -19,12 +19,14 @@ package tcp
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
@@ -54,21 +56,18 @@ func create(
 	}
 
 	for scheme, eps := range tm.schemeHosts {
-		schemeTLS := tm.tlsConfig
-		if scheme == "tcp" || scheme == "plain" {
-			schemeTLS = nil
-		}
+		/*
+			db, err := NewBuilder(BuilderSettings{
+				Timeout: tm.config.Timeout,
+				Socks5:  tm.config.Socks5,
+				TLS:     schemeTLS,
+			})
+			if err != nil {
+				return nil, 0, err
+			}
+		*/
 
-		db, err := NewBuilder(BuilderSettings{
-			Timeout: tm.config.Timeout,
-			Socks5:  tm.config.Socks5,
-			TLS:     schemeTLS,
-		})
-		if err != nil {
-			return nil, 0, err
-		}
-
-		epJobs, err := MakeDialerJobs(db, scheme, eps, tm.config.Mode,
+		epJobs, err := tm.MakeDialerJobsFor(scheme, eps,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
 				return pingHost(event, dialer, addr, tm.config.Timeout, tm.dataCheck)
 			})
@@ -105,6 +104,85 @@ func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 	return tm, nil
 }
 
+func (tm *tcpMonitor) MakeDialerJobsFor(
+	scheme string,
+	endpoints []Endpoint,
+	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
+) ([]jobs.Job, error) {
+	var jobs []jobs.Job
+	for _, endpoint := range endpoints {
+		for _, port := range endpoint.Ports {
+			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
+			if err != nil {
+				return nil, err
+			}
+			endpointJob, err := tm.makeEndpointJobFor(endpointURL, fn)
+			if err != nil {
+				return nil, err
+			}
+			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
+		}
+
+	}
+
+	return jobs, nil
+}
+
+func (tm *tcpMonitor) makeEndpointJobFor(
+	endpointURL *url.URL,
+	fn func(*beat.Event, transport.Dialer, string) error,
+) (jobs.Job, error) {
+
+	// Check if SOCKS5 is configured, with relying on the socks5 proxy
+	// in resolving the actual IP.
+	// Create one job for every port number configured.
+	/*
+		if !tm.config.Socks5.LocalResolve {
+			return wrappers.WithURLField(endpointURL,
+				jobs.MakeSimpleJob(func(event *beat.Event) error {
+					hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
+
+					return b.Run(event, hostPort, func(event *beat.Event, dialer transport.Dialer) error {
+						return fn(event, dialer, hostPort)
+					})
+				})), nil
+		}
+	*/
+
+	// Create job that first resolves one or multiple IP (depending on
+	// config.Mode) in order to create one continuation Task per IP.
+	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), tm.config.Mode)
+
+	job, err := monitors.MakeByHostJob(settings,
+		monitors.MakePingIPFactory(
+			func(event *beat.Event, ip *net.IPAddr) error {
+				// use address from resolved IP
+				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
+				cb := func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, ipPort)
+				}
+
+				schemeTLS := tm.tlsConfig
+				if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
+					schemeTLS = nil
+				}
+
+				db, err := NewBuilder(BuilderSettings{
+					Timeout: tm.config.Timeout,
+					TLS:     schemeTLS,
+				})
+				if err != nil {
+					return err
+				}
+
+				return db.Run(event, ipPort, cb)
+			}))
+	if err != nil {
+		return nil, err
+	}
+	return job, nil
+}
+
 func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
 	if err := commonCfg.Unpack(&tm.config); err != nil {
 		return err
@@ -126,6 +204,8 @@ func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
 	}
 
 	tm.dataCheck = makeDataCheck(&tm.config)
+
+	return nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, error) {
