@@ -64,7 +64,7 @@ func TestPublish(t *testing.T) {
 				}
 
 				// Give some time for events to be published
-				timeout := time.Duration(numEvents.Load()*3) * time.Microsecond
+				timeout := 20 * time.Second
 
 				// Make sure that all events have eventually been published
 				c := client.(interface{ Published() int })
@@ -125,7 +125,7 @@ func TestPublishWithClose(t *testing.T) {
 				wg.Wait()
 
 				// Give some time for events to be published
-				timeout := time.Duration(remaining*3) * time.Microsecond
+				timeout := 20 * time.Second
 
 				// Make sure that all events have eventually been published
 				return waitUntilTrue(timeout, func() bool {
