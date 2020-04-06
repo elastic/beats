@@ -38,6 +38,7 @@ type Config struct {
 
 	Files FileConfig `config:"files"`
 
+	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
 }
@@ -59,41 +60,16 @@ const defaultLevel = InfoLevel
 // DefaultConfig returns the default config options for a given environment the
 // Beat is supposed to be run within.
 func DefaultConfig(environment Environment) Config {
-	switch environment {
-	case SystemdEnvironment, ContainerEnvironment:
-		return defaultToStderrConfig()
-
-	case MacOSServiceEnvironment, WindowsServiceEnvironment:
-		fallthrough
-	default:
-		return defaultToFileConfig()
-	}
-}
-
-func defaultToStderrConfig() Config {
 	return Config{
-		Level:     defaultLevel,
-		ToStderr:  true,
-		Files:     defaultFileConfig(),
-		addCaller: true,
-	}
-}
-
-func defaultToFileConfig() Config {
-	return Config{
-		Level:     defaultLevel,
-		ToFiles:   true,
-		Files:     defaultFileConfig(),
-		addCaller: true,
-	}
-}
-
-func defaultFileConfig() FileConfig {
-	return FileConfig{
-		MaxSize:         10 * 1024 * 1024,
-		MaxBackups:      7,
-		Permissions:     0600,
-		Interval:        0,
-		RotateOnStartup: true,
+		Level: defaultLevel,
+		Files: FileConfig{
+			MaxSize:         10 * 1024 * 1024,
+			MaxBackups:      7,
+			Permissions:     0600,
+			Interval:        0,
+			RotateOnStartup: true,
+		},
+		environment: environment,
+		addCaller:   true,
 	}
 }
