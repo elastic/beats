@@ -97,13 +97,22 @@ type tcpMonitor struct {
 
 func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 	tm = &tcpMonitor{config: DefaultConfig}
-	if err := commonCfg.Unpack(&tm.config); err != nil {
+	err = tm.loadConfig(commonCfg)
+	if err != nil {
 		return nil, err
+	}
+
+	return tm, nil
+}
+
+func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
+	if err := commonCfg.Unpack(&tm.config); err != nil {
+		return err
 	}
 
 	tm.tlsConfig, err = tlscommon.LoadTLSConfig(tm.config.TLS)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	tm.defaultScheme = "tcp"
@@ -113,12 +122,10 @@ func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 
 	tm.schemeHosts, err = collectHosts(&tm.config, tm.defaultScheme)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	tm.dataCheck = makeDataCheck(&tm.config)
-
-	return tm, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, error) {
