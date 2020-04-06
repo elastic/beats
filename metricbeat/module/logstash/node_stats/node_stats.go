@@ -68,17 +68,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	if m.XPack {
-		err := m.CheckPipelineGraphAPIsAvailable()
-		if err != nil {
+	if err := m.setServiceURI(); err != nil {
+		if m.XPack {
 			m.Logger().Error(err)
 			return nil
 		}
-
-		if err := m.setServiceURI(); err != nil {
-			m.Logger().Error(err)
-			return nil
-		}
+		return err
 	}
 
 	content, err := m.HTTP.FetchContent()
@@ -103,6 +98,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) setServiceURI() error {
+	if !m.XPack {
+		// No massaging is needed to default service URI
+		return nil
+	}
+
+	if err := m.CheckPipelineGraphAPIsAvailable(); err != nil {
+		return err
+	}
+
 	u, err := url.Parse(m.HTTP.GetURI())
 	if err != nil {
 		return err
