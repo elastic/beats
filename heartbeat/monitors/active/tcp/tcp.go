@@ -53,14 +53,7 @@ func create(
 		return nil, 0, err
 	}
 
-	schemeHosts, err := collectHosts(&tm.config, tm.defaultScheme)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	validator := makeValidateConn(&tm.config)
-
-	for scheme, eps := range schemeHosts {
+	for scheme, eps := range tm.schemeHosts {
 		schemeTLS := tm.tlsConfig
 		if scheme == "tcp" || scheme == "plain" {
 			schemeTLS = nil
@@ -77,7 +70,7 @@ func create(
 
 		epJobs, err := MakeDialerJobs(db, scheme, eps, tm.config.Mode,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
-				return pingHost(event, dialer, addr, tm.config.Timeout, validator)
+				return pingHost(event, dialer, addr, tm.config.Timeout, tm.validator)
 			})
 		if err != nil {
 			return nil, 0, err
@@ -87,7 +80,7 @@ func create(
 	}
 
 	numHosts := 0
-	for _, hosts := range schemeHosts {
+	for _, hosts := range tm.schemeHosts {
 		numHosts += len(hosts)
 	}
 
@@ -98,6 +91,8 @@ type tcpMonitor struct {
 	config        Config
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
+	schemeHosts   map[string][]Endpoint
+	validator     ConnCheck
 }
 
 func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
@@ -115,6 +110,13 @@ func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 	if tm.tlsConfig != nil {
 		tm.defaultScheme = "ssl"
 	}
+
+	tm.schemeHosts, err = collectHosts(&tm.config, tm.defaultScheme)
+	if err != nil {
+		return nil, err
+	}
+
+	tm.validator = makeValidateConn(&tm.config)
 
 	return tm, nil
 }
