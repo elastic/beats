@@ -154,7 +154,7 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 	return job, nil
 }
 
-// makeDirectEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
+// makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
 func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	return wrappers.WithURLField(endpointURL,
 		jobs.MakeSimpleJob(func(event *beat.Event) error {
@@ -169,11 +169,14 @@ func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job
 // also which hostname should be passed to the TLS implementation for validation of the server cert.
 func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) error {
 	dc := &dialchain.DialerChain{
-		Net: dialchain.MakeConstAddrDialer(dialAddr, dialchain.TCPDialer(jf.config.Timeout)),
+		Net: dialchain.CreateNetDialer(jf.config.Timeout),
 	}
+
 	if jf.config.Socks5.URL != "" {
 		dc.AddLayer(dialchain.SOCKS5Layer(&jf.config.Socks5))
 	}
+
+	dc.AddLayer(dialchain.ConstAddrLayer(dialAddr))
 
 	isTLS := true
 	if canonicalURL.Scheme == "tcp" || canonicalURL.Scheme == "plain" {

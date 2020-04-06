@@ -26,9 +26,11 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/armon/go-socks5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -316,6 +318,69 @@ func TestNXDomainJob(t *testing.T) {
 	)
 }
 
+func TestSocks5Job(t *testing.T) {
+	scenarios := []struct {
+		name          string
+		localResolver bool
+	}{
+		{
+			name:          "using local resolver",
+			localResolver: true,
+		},
+		{
+			name:          "not using local resolver",
+			localResolver: false,
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			host, port, ip, closeEcho, err := startEchoServer(t)
+			require.NoError(t, err)
+			defer closeEcho()
+
+			_, proxyPort, proxyIp, closeProxy, err := startSocks5Server(t)
+			require.NoError(t, err)
+			defer closeProxy()
+
+			proxyURL := &url.URL{Scheme: "socks5", Host: net.JoinHostPort(proxyIp, fmt.Sprint(proxyPort))}
+			configMap := common.MapStr{
+				"hosts":                    host,
+				"ports":                    port,
+				"timeout":                  "1s",
+				"proxy_url":                proxyURL.String(),
+				"proxy_use_local_resolver": scenario.localResolver,
+				"check.receive":            "echo123",
+				"check.send":               "echo123",
+			}
+			event := testTCPConfigCheck(t, configMap, host, port)
+
+			testslike.Test(
+				t,
+				lookslike.Strict(lookslike.Compose(
+					hbtest.BaseChecks(ip, "up", "tcp"),
+					hbtest.RespondingTCPChecks(),
+					hbtest.SimpleURLChecks(t, "tcp", host, port),
+					hbtest.SummaryChecks(1, 0),
+					lookslike.MustCompile(map[string]interface{}{
+						"resolve": map[string]interface{}{
+							"ip":     ip,
+							"rtt.us": isdef.IsDuration,
+						},
+						"tcp": map[string]interface{}{
+							"rtt.validate.us": isdef.IsDuration,
+						},
+						"socks5": map[string]interface{}{
+							"rtt.connect.us": isdef.IsDuration,
+						},
+					}),
+				)),
+				event.Fields,
+			)
+		})
+	}
+}
+
 // startEchoServer starts a simple TCP echo server for testing. Only handles a single connection once.
 // Note you MUST connect to this server exactly once to avoid leaking a goroutine. This is only useful
 // for the specific tests used here.
@@ -345,4 +410,42 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}
 
 	return "localhost", uint16(portUint64), ip, listener.Close, nil
+}
+
+func startSocks5Server(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
+	host = "localhost"
+	config := &socks5.Config{}
+	server, err := socks5.New(config)
+	if err != nil {
+		return "", 0, "", nil, err
+	}
+
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		return "", 0, "", nil, err
+	}
+	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	portUint64, err := strconv.ParseUint(portStr, 10, 16)
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		if err := server.Serve(listener); err != nil {
+			debugf("Error in SOCKS5 Test Server %v", err)
+		}
+		wg.Done()
+	}()
+
+	return host, uint16(portUint64), ip, func() error {
+		err := listener.Close()
+		if err != nil {
+			return err
+		}
+		wg.Wait()
+		return nil
+	}, nil
 }
