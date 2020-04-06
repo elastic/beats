@@ -299,6 +299,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
+- Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
 
 *Heartbeat*
 
