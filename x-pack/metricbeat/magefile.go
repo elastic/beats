@@ -140,6 +140,7 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }

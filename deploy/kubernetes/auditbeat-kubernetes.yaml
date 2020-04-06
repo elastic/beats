@@ -77,6 +77,7 @@ spec:
         image: docker.elastic.co/beats/auditbeat:7.8.0
         args: [
           "-c", "/etc/auditbeat.yml"
+          "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
@@ -107,6 +108,8 @@ spec:
         - name: modules
           mountPath: /usr/share/auditbeat/modules.d
           readOnly: true
+        - name: data
+          mountPath: /usr/share/auditbeat/data
         - name: bin
           mountPath: /hostfs/bin
           readOnly: true
