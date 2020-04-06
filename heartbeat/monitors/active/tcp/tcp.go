@@ -23,10 +23,14 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -40,39 +44,26 @@ func init() {
 	monitors.RegisterActive("tcp", create)
 }
 
-// Endpoint configures a host with all port numbers to be monitored by a dialer
-// based job.
-type Endpoint struct {
-	Scheme string
-	Host   string
-	Ports  []uint16
-}
-
 var debugf = logp.MakeDebug("tcp")
 
 func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	tm, err := createTCPMonitor(cfg)
+	jc, err := MakeJobFactory(cfg)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	epJobs, err := tm.MakeDialerJobsFor(tm.endpoints,
-		func(event *beat.Event, dialer transport.Dialer, addr string) error {
-			return pingHost(event, dialer, addr, tm.config.Timeout, tm.dataCheck)
-		})
+	jobs, err = jc.makeJobs()
 	if err != nil {
 		return nil, 0, err
 	}
 
-	jobs = append(jobs, epJobs...)
-
-	return jobs, len(tm.endpoints), nil
+	return jobs, len(jc.endpoints), nil
 }
 
-type tcpMonitor struct {
+type jobFactory struct {
 	config        Config
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
@@ -80,32 +71,50 @@ type tcpMonitor struct {
 	dataCheck     DataCheck
 }
 
-func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
-	tm = &tcpMonitor{config: DefaultConfig}
-	err = tm.loadConfig(commonCfg)
+func MakeJobFactory(commonCfg *common.Config) (jf *jobFactory, err error) {
+	jf = &jobFactory{config: DefaultConfig}
+	err = jf.loadConfig(commonCfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return tm, nil
+	return jf, nil
 }
 
-func (tm *tcpMonitor) MakeDialerJobsFor(
-	endpoints []Endpoint,
-	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
-) ([]jobs.Job, error) {
+func (jf *jobFactory) loadConfig(commonCfg *common.Config) (err error) {
+	if err := commonCfg.Unpack(&jf.config); err != nil {
+		return err
+	}
+
+	jf.tlsConfig, err = tlscommon.LoadTLSConfig(jf.config.TLS)
+	if err != nil {
+		return err
+	}
+
+	jf.defaultScheme = "tcp"
+	if jf.tlsConfig != nil {
+		jf.defaultScheme = "ssl"
+	}
+
+	jf.endpoints, err = makeEndpoints(&jf.config, jf.defaultScheme)
+	if err != nil {
+		return err
+	}
+
+	jf.dataCheck = makeDataCheck(&jf.config)
+
+	return nil
+}
+
+func (jf *jobFactory) makeJobs() ([]jobs.Job, error) {
 	var jobs []jobs.Job
-	for _, endpoint := range endpoints {
-		for _, port := range endpoint.Ports {
-			endpointURL := &url.URL{
-				Scheme: endpoint.Scheme,
-				Host:   net.JoinHostPort(endpoint.Host, fmt.Sprint(port)),
-			}
-			endpointJob, err := tm.makeEndpointJobFor(endpointURL, fn)
+	for _, endpoint := range jf.endpoints {
+		for _, url := range endpoint.perPortURLs() {
+			endpointJob, err := jf.makeEndpointJobFor(url)
 			if err != nil {
 				return nil, err
 			}
-			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
+			jobs = append(jobs, wrappers.WithURLField(url, endpointJob))
 		}
 
 	}
@@ -113,58 +122,29 @@ func (tm *tcpMonitor) MakeDialerJobsFor(
 	return jobs, nil
 }
 
-func (tm *tcpMonitor) makeEndpointJobFor(
-	endpointURL *url.URL,
-	fn func(*beat.Event, transport.Dialer, string) error,
-) (jobs.Job, error) {
-
+func (jf *jobFactory) makeEndpointJobFor(endpointURL *url.URL) (jobs.Job, error) {
 	// Check if SOCKS5 is configured, with relying on the socks5 proxy
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
-	/*
-		if !tm.config.Socks5.LocalResolve {
-			return wrappers.WithURLField(endpointURL,
-				jobs.MakeSimpleJob(func(event *beat.Event) error {
-					hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
-
-					return b.Run(event, hostPort, func(event *beat.Event, dialer transport.Dialer) error {
-						return fn(event, dialer, hostPort)
-					})
-				})), nil
-		}
-	*/
+	if jf.config.Socks5.URL != "" && !jf.config.Socks5.LocalResolve {
+		return wrappers.WithURLField(endpointURL,
+			jobs.MakeSimpleJob(func(event *beat.Event) error {
+				hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
+				return jf.dial(event, hostPort, endpointURL)
+			})), nil
+	}
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), tm.config.Mode)
+	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), jf.config.Mode)
 
 	job, err := monitors.MakeByHostJob(settings,
 		monitors.MakePingIPFactory(
 			func(event *beat.Event, ip *net.IPAddr) error {
 				// use address from resolved IP
 				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
-				cb := func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, ipPort)
-				}
 
-				dc := &dialchain.DialerChain{
-					Net: dialchain.MakeConstAddrDialer(ipPort, dialchain.TCPDialer(tm.config.Timeout)),
-				}
-
-				isTLS := tm.tlsConfig != nil
-				if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
-					isTLS = false
-				}
-				if isTLS {
-					dc.AddLayer(dialchain.TLSLayer(tm.tlsConfig, tm.config.Timeout))
-					dc.AddLayer(dialchain.ConstAddrLayer(endpointURL.Host))
-				}
-
-				dialer, err := dc.Build(event)
-				if err != nil {
-					return err
-				}
-				return cb(event, dialer)
+				return jf.dial(event, ipPort, endpointURL)
 			}))
 	if err != nil {
 		return nil, err
@@ -172,27 +152,73 @@ func (tm *tcpMonitor) makeEndpointJobFor(
 	return job, nil
 }
 
-func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
-	if err := commonCfg.Unpack(&tm.config); err != nil {
-		return err
+func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) error {
+	dc := &dialchain.DialerChain{
+		Net: dialchain.MakeConstAddrDialer(dialAddr, dialchain.TCPDialer(jf.config.Timeout)),
+	}
+	if jf.config.Socks5.URL != "" {
+		dc.AddLayer(dialchain.SOCKS5Layer(&jf.config.Socks5))
 	}
 
-	tm.tlsConfig, err = tlscommon.LoadTLSConfig(tm.config.TLS)
+	isTLS := true
+	if canonicalURL.Scheme == "tcp" || canonicalURL.Scheme == "plain" {
+		isTLS = false
+	}
+	if isTLS {
+		dc.AddLayer(dialchain.TLSLayer(jf.tlsConfig, jf.config.Timeout))
+		dc.AddLayer(dialchain.ConstAddrLayer(canonicalURL.Host))
+	}
+
+	dialer, err := dc.Build(event)
 	if err != nil {
 		return err
 	}
 
-	tm.defaultScheme = "tcp"
-	if tm.tlsConfig != nil {
-		tm.defaultScheme = "ssl"
-	}
+	return jf.pingAddr(event, dialer, dialAddr)
+}
 
-	tm.endpoints, err = makeEndpoints(&tm.config, tm.defaultScheme)
+func (jf *jobFactory) pingAddr(
+	event *beat.Event,
+	dialer transport.Dialer,
+	addr string,
+) error {
+	start := time.Now()
+	deadline := start.Add(jf.config.Timeout)
+
+	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
-		return err
+		debugf("dial failed with: %v", err)
+		return reason.IOFailed(err)
+	}
+	defer conn.Close()
+	if jf.dataCheck == nil {
+		// no additional validation step => ping success
+		return nil
 	}
 
-	tm.dataCheck = makeDataCheck(&tm.config)
+	if err := conn.SetDeadline(deadline); err != nil {
+		debugf("setting connection deadline failed with: %v", err)
+		return reason.IOFailed(err)
+	}
+
+	validateStart := time.Now()
+	err = jf.dataCheck.Check(conn)
+	if err != nil && err != errRecvMismatch {
+		debugf("check failed with: %v", err)
+		return reason.IOFailed(err)
+	}
+
+	end := time.Now()
+	eventext.MergeEventFields(event, common.MapStr{
+		"tcp": common.MapStr{
+			"rtt": common.MapStr{
+				"validate": look.RTT(end.Sub(validateStart)),
+			},
+		},
+	})
+	if err != nil {
+		return reason.MakeValidateError(err)
+	}
 
 	return nil
 }
@@ -214,7 +240,7 @@ func makeEndpoints(config *Config, defaultScheme string) (endpoints []Endpoint, 
 		switch scheme {
 		case "tcp", "plain", "tls", "ssl":
 		default:
-			err := fmt.Errorf("'%v' is no supported connection scheme in '%v'", scheme, h)
+			err := fmt.Errorf("'%v' is not a supported connection scheme in '%v'", scheme, h)
 			return nil, err
 		}
 
@@ -233,9 +259,9 @@ func makeEndpoints(config *Config, defaultScheme string) (endpoints []Endpoint, 
 		}
 
 		endpoints = append(endpoints, Endpoint{
-			Scheme: scheme,
-			Host:   host,
-			Ports:  ports,
+			Scheme:   scheme,
+			Hostname: host,
+			Ports:    ports,
 		})
 	}
 	return endpoints, nil
