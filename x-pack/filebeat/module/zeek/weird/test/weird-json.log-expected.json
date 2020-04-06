@@ -21,5 +21,20 @@
         "zeek.weird.name": "dns_unmatched_reply",
         "zeek.weird.notice": false,
         "zeek.weird.peer": "worker-6"
+    },
+    {
+        "@timestamp": "2020-01-28T16:00:59.342Z",
+        "event.dataset": "zeek.weird",
+        "event.module": "zeek",
+        "fileset.name": "weird",
+        "input.type": "log",
+        "log.offset": 197,
+        "service.type": "zeek",
+        "tags": [
+            "zeek.weird"
+        ],
+        "zeek.weird.name": "non_ip_packet_in_ethernet",
+        "zeek.weird.notice": false,
+        "zeek.weird.peer": "ens3f1-4"
     }
 ]

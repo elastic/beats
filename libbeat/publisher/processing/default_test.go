@@ -26,10 +26,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -165,7 +165,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
 					g := newGroup("test", logp.L())
-					g.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true))
+					g.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true, true))
 					return g
 				}(),
 			},

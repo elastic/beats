@@ -57,8 +57,7 @@ values as shown below.
 "%[measurement_label]": <perfmon_counter_value>,
 ----
 
-*`instance_label`*:: The label used to identify the counter instance. This
-field is required.
+*`instance_label`*:: The label used to identify the counter instance.
 
 *`instance_name`*:: The instance name to use in the event when the counter's
 path (`query`) does not include an instance or when you want to override the

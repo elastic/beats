@@ -19,6 +19,11 @@
       type: object
       description: >
         key and value debugging information.
+    - name: pipeline_id
+      type: keyword
+      example: main
+      description: >
+        The ID of the pipeline.
 
     - name: message
       type: alias

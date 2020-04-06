@@ -120,6 +120,36 @@
       description: >
         IGMP type.
 
+
+    - name: azure
+      type: group
+      fields:
+        - name: eventhub
+          type: keyword
+          description: >
+            Name of the eventhub.
+        - name: offset
+          type: long
+          description: >
+            The offset.
+        - name: enqueued_time
+          type: date
+          description: >
+            The enqueued time.
+        - name: partition_id
+          type: long
+          description: >
+            The partition id.
+        - name: consumer_group
+          type: keyword
+          description: >
+            The consumer group.
+        - name: sequence_number
+          type: long
+          description: >
+            The sequence number.
+
+
     - name: kafka
       type: group
       fields:

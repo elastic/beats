@@ -343,7 +343,6 @@
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
-        "cisco.ftd.icmp_code": 17233,
         "cisco.ftd.mapped_source_ip": "192.168.132.46",
         "cisco.ftd.message_id": "302021",
         "destination.address": "172.24.177.29",

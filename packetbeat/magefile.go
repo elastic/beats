@@ -31,11 +31,13 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 )
 
 func init() {
@@ -150,7 +152,10 @@ func Config() error {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"protos/*"}, nil)
+	options := devtools.DefaultIncludeListOptions()
+	options.ImportDirs = []string{"protos/*"}
+	options.ModuleDirs = nil
+	return devtools.GenerateIncludeListGo(options)
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
@@ -185,11 +190,6 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
-}
-
-// IntegTest executes integration tests (it uses Docker to run the tests).
-func IntegTest() {
-	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
 }
 
 // UnitTest executes the unit tests.
@@ -280,7 +280,7 @@ var crossBuildDeps = map[string]func() error{
 
 // buildLibpcapFromSource builds libpcap from source because the library needs
 // to be compiled with -fPIC.
-// See https://github.com/elastic/beats/pull/4217.
+// See https://github.com/elastic/beats/v7/pull/4217.
 func buildLibpcapFromSource(params map[string]string) error {
 	tarFile, err := devtools.DownloadFile(libpcapURL, "/libpcap")
 	if err != nil {
@@ -422,7 +422,7 @@ func generateWin64StaticWinpcap() error {
 
 	// Notes: We are using absolute path to make sure the files
 	// are available for x-pack build.
-	// Ref: https://github.com/elastic/beats/issues/1259
+	// Ref: https://github.com/elastic/beats/v7/issues/1259
 	defer devtools.DockerChown(devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
 	return devtools.RunCmds(
 		// Requires mingw-w64-tools.

@@ -19,7 +19,6 @@ package ptest
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -29,14 +28,13 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/assert"
-)
 
-var expectedFlag = flag.Bool("update_expected", false, "Update prometheus expected files")
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+)
 
 // TestCases holds the list of test cases to test a metricset
 type TestCases []struct {
@@ -49,7 +47,7 @@ type TestCases []struct {
 
 // TestMetricSetEventsFetcher goes over the given TestCases and ensures that source Prometheus metrics gets converted
 // into the expected events when passed by the given metricset.
-// If -update_expected flag is passed, the expected JSON file will be updated with the result
+// If -data flag is passed, the expected JSON file will be updated with the result
 func TestMetricSetEventsFetcher(t *testing.T, module, metricset string, cases TestCases) {
 	for _, test := range cases {
 		t.Logf("Testing %s file\n", test.MetricsFile)
@@ -79,7 +77,7 @@ func TestMetricSetEventsFetcher(t *testing.T, module, metricset string, cases Te
 		events, err := f.Fetch()
 		assert.Nil(t, err, "Errors while fetching metrics")
 
-		if *expectedFlag {
+		if *flags.DataFlag {
 			sort.SliceStable(events, func(i, j int) bool {
 				h1, _ := hashstructure.Hash(events[i], nil)
 				h2, _ := hashstructure.Hash(events[j], nil)
@@ -130,7 +128,7 @@ func TestMetricSetEventsFetcher(t *testing.T, module, metricset string, cases Te
 
 // TestMetricSet goes over the given TestCases and ensures that source Prometheus metrics gets converted into the expected
 // events when passed by the given metricset.
-// If -update_expected flag is passed, the expected JSON file will be updated with the result
+// If -data flag is passed, the expected JSON file will be updated with the result
 func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 	for _, test := range cases {
 		t.Logf("Testing %s file\n", test.MetricsFile)
@@ -160,7 +158,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		events, errs := f.FetchEvents()
 		assert.Nil(t, errs, "Errors while fetching metrics")
 
-		if *expectedFlag {
+		if *flags.DataFlag {
 			sort.SliceStable(events, func(i, j int) bool {
 				h1, _ := hashstructure.Hash(events[i], nil)
 				h2, _ := hashstructure.Hash(events[j], nil)

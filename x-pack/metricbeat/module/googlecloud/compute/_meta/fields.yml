@@ -1,0 +1,62 @@
+- name: compute
+  release: beta
+  type: group
+  description: Google Cloud Compute metrics
+  fields:
+    - name: instance
+      type: group
+      fields:
+        - name: firewall
+          type: group
+          fields:
+            - name: dropped_bytes_count
+              type: long
+              description: Incoming bytes dropped by the firewall
+            - name: dropped_packets_count
+              type: long
+              description: Incoming packets dropped by the firewall
+        - name: cpu
+          type: group
+          fields:
+            - name: reserved_cores
+              type: double
+              description: Number of cores reserved on the host of the instance
+            - name: utilization
+              type: double
+              description: The fraction of the allocated CPU that is currently in use on the instance
+            - name: usage_time
+              type: double
+              description: Usage for all cores in seconds
+        - name: disk
+          type: group
+          fields:
+            - name: read_bytes_count
+              type: long
+              description: Count of bytes read from disk
+            - name: read_ops_count
+              type: long
+              description: Count of disk read IO operations
+            - name: write_bytes_count
+              type: long
+              description: Count of bytes written to disk
+            - name: write_ops_count
+              type: long
+              description: Count of disk write IO operations
+        - name: uptime
+          type: long
+          description: How long the VM has been running, in seconds
+        - name: network
+          type: group
+          fields:
+            - name: received_bytes_count
+              type: long
+              description: Count of bytes received from the network
+            - name: received_packets_count
+              type: long
+              description: Count of packets received from the network
+            - name: sent_bytes_count
+              type: long
+              description: Count of bytes sent over the network
+            - name: sent_packets_count
+              type: long
+              description: Count of packets sent over the network

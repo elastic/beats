@@ -28,11 +28,10 @@ import (
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/libbeat/logp"
-	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 var availableMLModules = map[string]string{
@@ -48,7 +47,8 @@ type ModuleRegistry struct {
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
-	beatVersion string) (*ModuleRegistry, error) {
+	beatInfo beat.Info,
+) (*ModuleRegistry, error) {
 
 	var reg ModuleRegistry
 	reg.registry = map[string]map[string]*Fileset{}
@@ -89,7 +89,7 @@ func newModuleRegistry(modulesPath string,
 			if err != nil {
 				return nil, err
 			}
-			err = fileset.Read(beatVersion)
+			err = fileset.Read(beatInfo)
 			if err != nil {
 				return nil, fmt.Errorf("Error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
@@ -108,7 +108,7 @@ func newModuleRegistry(modulesPath string,
 				}
 			}
 			if !found {
-				return nil, fmt.Errorf("Fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
+				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
 		}
 	}
@@ -117,7 +117,7 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init bool) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -153,7 +153,7 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatVersion string, init 
 		return nil, err
 	}
 
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatVersion)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
 }
 
 func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
@@ -381,68 +381,6 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 		return errors.New(errorMsg)
 	}
 
-	return nil
-}
-
-// LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
-func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
-	haveXpack, err := mlimporter.HaveXpackML(esClient)
-	if err != nil {
-		return errors.Errorf("error checking if xpack is available: %v", err)
-	}
-	if !haveXpack {
-		logp.Warn("X-Pack Machine Learning is not enabled")
-		return nil
-	}
-
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
-			for _, mlConfig := range fileset.GetMLConfigs() {
-				err := mlimporter.ImportMachineLearningJob(esClient, &mlConfig)
-				if err != nil {
-					return errors.Errorf("error loading ML config from %s/%s: %v", module, name, err)
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-// SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
-func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
-	haveXpack, err := mlimporter.HaveXpackML(esClient)
-	if err != nil {
-		return errors.Errorf("Error checking if xpack is available: %v", err)
-	}
-	if !haveXpack {
-		logp.Warn("X-Pack Machine Learning is not enabled")
-		return nil
-	}
-
-	modules := make(map[string]string)
-	if reg.Empty() {
-		modules = availableMLModules
-	} else {
-		for _, module := range reg.ModuleNames() {
-			if fileset, ok := availableMLModules[module]; ok {
-				modules[module] = fileset
-			}
-		}
-	}
-
-	for module, fileset := range modules {
-		// XXX workaround to setup modules after changing the module IDs due to ECS migration
-		// the proper solution would be to query available modules, and setup the required ones
-		// related issue: https://github.com/elastic/kibana/issues/30934
-		module = module + "_ecs"
-
-		prefix := fmt.Sprintf("filebeat-%s-%s-", module, fileset)
-		err := mlimporter.SetupModule(kibanaClient, module, prefix)
-		if err != nil {
-			return errors.Errorf("Error setting up ML for %s: %v", module, err)
-		}
-	}
 	return nil
 }
 

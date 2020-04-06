@@ -1,0 +1,46 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "producer"
+    hosts: ["localhost:8775"]
+    path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+    jmx.mappings:
+      - mbean: 'kafka.producer:type=producer-metrics,client-id=*'
+        attributes:
+          - attr: buffer-available-bytes
+            field: available_buffer_bytes
+          - attr: batch-size-avg
+            field: batch_size_avg
+          - attr: batch-size-max
+            field: batch_size_max
+          - attr: record-send-rate
+            field: record_send_rate
+          - attr: record-retry-rate
+            field: record_retry_rate
+          - attr: record-error-rate
+            field: record_error_rate
+          - attr: records-per-request-avg
+            field: records_per_request
+          - attr: record-size-avg
+            field: record_size_avg
+          - attr: record-size-max
+            field: record_size_max
+          - attr: request-rate
+            field: request_rate
+          - attr: response-rate
+            field: response_rate
+          - attr: io-wait-time-ns-avg
+            field: io_wait
+      - mbean: 'kafka.producer:client-id=*,node-id=*,type=producer-node-metrics'
+        attributes:
+          - attr: outgoing-byte-total
+            field: out.bytes_per_sec
+      - mbean: 'kafka\.producer:type=ProducerTopicMetrics,name=MessagesPerSec,clientId=.*'
+        attributes:
+          - attr: Count
+            field: message_rate
+
+
+

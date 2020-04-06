@@ -12,15 +12,18 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/cloudformation"
+	lambdarunner "github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 type startingPosition uint
@@ -125,13 +128,15 @@ func NewKinesis(provider provider.Provider, cfg *common.Config) (provider.Functi
 }
 
 // KinesisDetails returns the details of the feature.
-func KinesisDetails() *feature.Details {
-	return feature.NewDetails("Kinesis trigger", "receive events from a Kinesis stream", feature.Stable)
+func KinesisDetails() feature.Details {
+	return feature.MakeDetails("Kinesis trigger", "receive events from a Kinesis stream", feature.Stable)
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (k *Kinesis) Run(_ context.Context, client core.Client) error {
-	lambda.Start(k.createHandler(client))
+func (k *Kinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+	t.AddTriggeredFunction()
+
+	lambdarunner.Start(k.createHandler(client))
 	return nil
 }
 
@@ -140,6 +145,7 @@ func (k *Kinesis) createHandler(client core.Client) func(request events.KinesisE
 		k.log.Debugf("The handler receives %d events", len(request.Records))
 
 		events := transformer.KinesisEvent(request)
+
 		if err := client.PublishAll(events); err != nil {
 			k.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
 			return err
@@ -169,7 +175,7 @@ func (k *Kinesis) Template() *cloudformation.Template {
 
 	for _, trigger := range k.config.Triggers {
 		resourceName := prefix(k.Name() + trigger.EventSourceArn)
-		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
+		template.Resources[resourceName] = &lambda.EventSourceMapping{
 			BatchSize:        trigger.BatchSize,
 			EventSourceArn:   trigger.EventSourceArn,
 			FunctionName:     cloudformation.GetAtt(prefix(""), "Arn"),
@@ -181,7 +187,7 @@ func (k *Kinesis) Template() *cloudformation.Template {
 }
 
 // Policies returns a slice of policy to add to the lambda role.
-func (k *Kinesis) Policies() []cloudformation.AWSIAMRole_Policy {
+func (k *Kinesis) Policies() []iam.Role_Policy {
 	resources := make([]string, len(k.config.Triggers))
 	for idx, trigger := range k.config.Triggers {
 		resources[idx] = trigger.EventSourceArn
@@ -191,8 +197,8 @@ func (k *Kinesis) Policies() []cloudformation.AWSIAMRole_Policy {
 	// to help with updates.
 	sort.Strings(resources)
 
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
+	policies := []iam.Role_Policy{
+		iam.Role_Policy{
 			PolicyName: cloudformation.Join("-", []string{"fnb", "kinesis", k.config.Name}),
 			PolicyDocument: map[string]interface{}{
 				"Statement": []map[string]interface{}{

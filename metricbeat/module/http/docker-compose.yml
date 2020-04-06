@@ -1,0 +1,9 @@
+version: '2.3'
+
+services:
+  http:
+    image: docker.elastic.co/integrations-ci/beats-http:1
+    build:
+      context: ./_meta
+    ports:
+      - 8080

@@ -12,16 +12,17 @@ import (
 	e "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 type simpleFunction struct {
 	err error
 }
 
-func (s *simpleFunction) Run(ctx context.Context, client core.Client) error {
+func (s *simpleFunction) Run(ctx context.Context, client core.Client, _ telemetry.T) error {
 	return s.err
 }
 
@@ -45,7 +46,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: nil},
 		}
 
-		errReceived := runnable.Run(context.Background())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.Equal(t, err, e.Cause(errReceived))
 	})
 
@@ -57,7 +58,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: err},
 		}
 
-		errReceived := runnable.Run(context.Background())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.Equal(t, err, e.Cause(errReceived))
 	})
 
@@ -68,7 +69,7 @@ func TestRunnable(t *testing.T) {
 			function:   &simpleFunction{err: nil},
 		}
 
-		errReceived := runnable.Run(context.Background())
+		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
 		assert.NoError(t, errReceived)
 	})
 }

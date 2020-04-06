@@ -29,17 +29,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
-
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
 var userAgent = useragent.UserAgent("Heartbeat")
@@ -53,14 +52,6 @@ func newHTTPMonitorHostJob(
 	validator multiValidator,
 ) (jobs.Job, error) {
 
-	// Trace visited URLs when redirects occur
-	var redirects []string
-	client := &http.Client{
-		CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
-		Transport:     transport,
-		Timeout:       config.Timeout,
-	}
-
 	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
@@ -69,7 +60,17 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response, &redirects)
+		var redirects []string
+		client := &http.Client{
+			// Trace visited URLs when redirects occur
+			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
+			Transport:     transport,
+			Timeout:       config.Timeout,
+		}
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		if len(redirects) > 0 {
+			event.PutValue("http.response.redirects", redirects)
+		}
 		return err
 	}), nil
 }
@@ -77,7 +78,7 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -104,14 +105,13 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
-	checkRedirect := makeCheckRedirect(config.MaxRedirects, nil)
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
@@ -137,6 +137,10 @@ func createPingFactory(
 		// It seems they can be invoked still sometime after the request is done
 		cbMutex := sync.Mutex{}
 
+		// We don't support redirects for IP jobs, so this effectively just
+		// prevents following redirects in this case, we know that
+		// config.MaxRedirects must be zero to even be here
+		checkRedirect := makeCheckRedirect(0, nil)
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
@@ -160,7 +164,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response, nil)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -221,7 +225,6 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-	redirects *[]string,
 ) (start, end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -248,9 +251,6 @@ func execPing(
 
 	httpFields := common.MapStr{"response": responseFields}
 
-	if redirects != nil && len(*redirects) > 0 {
-		httpFields["redirects"] = redirects
-	}
 	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading

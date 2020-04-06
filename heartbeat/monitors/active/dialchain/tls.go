@@ -24,10 +24,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // TLSLayer configures the TLS layer in a DialerChain.
@@ -39,7 +40,7 @@ import (
 //        "rtt": { "handshake": { "us": ... }}
 //    }
 //  }
-func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
+func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
@@ -62,14 +63,14 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 			timer.stop()
 			event.PutValue("tls.rtt.handshake", look.RTT(timer.duration()))
 
-			addCertMetdata(event.Fields, tlsConn.ConnectionState().VerifiedChains)
+			addCertMetdata(event.Fields, tlsConn.ConnectionState().PeerCertificates)
 
 			return conn, nil
 		}), nil
 	}
 }
 
-func addCertMetdata(fields common.MapStr, chains [][]*x509.Certificate) {
+func addCertMetdata(fields common.MapStr, certs []*x509.Certificate) {
 	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
 	// Why might we do this?
 	// The root cause is that the x509.Certificate type uses time.Time for these fields instead of *time.Time
@@ -94,15 +95,13 @@ func addCertMetdata(fields common.MapStr, chains [][]*x509.Certificate) {
 	// To do this correctly, we take the maximum NotBefore and the minimum NotAfter.
 	// This *should* always wind up being the terminal cert in the chain, but we should
 	// compute this correctly.
-	for _, chain := range chains {
-		for _, cert := range chain {
-			if chainNotValidBefore.Before(cert.NotBefore) {
-				chainNotValidBefore = cert.NotBefore
-			}
+	for _, cert := range certs {
+		if chainNotValidBefore.Before(cert.NotBefore) {
+			chainNotValidBefore = cert.NotBefore
+		}
 
-			if cert.NotAfter != zeroTime && (chainNotValidAfter == nil || chainNotValidAfter.After(cert.NotAfter)) {
-				chainNotValidAfter = &cert.NotAfter
-			}
+		if cert.NotAfter != zeroTime && (chainNotValidAfter == nil || chainNotValidAfter.After(cert.NotAfter)) {
+			chainNotValidAfter = &cert.NotAfter
 		}
 	}
 

@@ -30,10 +30,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -124,17 +126,21 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	} else {
 		ipCheck = isdef.Optional(isdef.IsEqual(ip))
 	}
-	return lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"ip":          ipCheck,
-			"duration.us": isdef.IsDuration,
-			"status":      status,
-			"id":          isdef.IsNonEmptyString,
-			"name":        isdef.IsString,
-			"type":        typ,
-			"check_group": isdef.IsString,
-		},
-	})
+
+	return lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
+				"ip":          ipCheck,
+				"status":      status,
+				"duration.us": isdef.IsDuration,
+				"id":          isdef.IsNonEmptyString,
+				"name":        isdef.IsString,
+				"type":        typ,
+				"check_group": isdef.IsString,
+			},
+		}),
+		hbtestllext.MonitorTimespanValidator,
+	)
 }
 
 // SummaryChecks validates the "summary" field and its subfields.

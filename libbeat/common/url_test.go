@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetUrl(t *testing.T) {
@@ -112,5 +113,57 @@ func TestURLParamsEncode(t *testing.T) {
 		urlWithParams := EncodeURLParams(urlNew, params)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlWithParams)
+	}
+}
+
+func TestParseURL(t *testing.T) {
+	tests := map[string]struct {
+		input           string
+		hints           []ParseHint
+		expected        string
+		errorAssertFunc require.ErrorAssertionFunc
+	}{
+		"http": {
+			"http://host:1234/path",
+			nil,
+			"http://host:1234/path",
+			require.NoError,
+		},
+		"https": {
+			"https://host:1234/path",
+			nil,
+			"https://host:1234/path",
+			require.NoError,
+		},
+		"no_scheme": {
+			"host:1234/path",
+			nil,
+			"http://host:1234/path",
+			require.NoError,
+		},
+		"default_scheme_https": {
+			"host:1234/path",
+			[]ParseHint{WithDefaultScheme("https")},
+			"https://host:1234/path",
+			require.NoError,
+		},
+		"invalid": {
+			"foobar:port",
+			nil,
+			"",
+			require.Error,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			u, err := ParseURL(test.input, test.hints...)
+			test.errorAssertFunc(t, err)
+			if test.expected != "" {
+				require.Equal(t, test.expected, u.String())
+			} else {
+				require.Nil(t, u)
+			}
+		})
 	}
 }

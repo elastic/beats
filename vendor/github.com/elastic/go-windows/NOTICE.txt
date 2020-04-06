@@ -1,0 +1,5 @@
+Elastic go-windows
+Copyright 2017-2019 Elasticsearch B.V.
+
+This product includes software developed at
+Elasticsearch, B.V. (https://www.elastic.co/).

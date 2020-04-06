@@ -49,7 +49,7 @@ func isContainerizedCgroup(data []byte) (bool, error) {
 
 		// Following a suggestion on Stack Overflow on how to detect
 		// being inside a container: https://stackoverflow.com/a/20012536/235203
-		if bytes.Contains(line, []byte("docker")) || bytes.Contains(line, []byte("lxc")) {
+		if bytes.Contains(line, []byte("docker")) || bytes.Contains(line, []byte(".slice")) || bytes.Contains(line, []byte("lxc")) {
 			return true, nil
 		}
 	}

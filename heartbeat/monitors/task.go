@@ -18,21 +18,20 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
-
-type taskCanceller func() error
 
 // configuredJob represents a job combined with its config and any
 // subsequent processors.
@@ -41,7 +40,7 @@ type configuredJob struct {
 	config     jobConfig
 	monitor    *Monitor
 	processors *processors.Processors
-	cancelFn   taskCanceller
+	cancelFn   context.CancelFunc
 	client     beat.Client
 }
 
@@ -89,7 +88,7 @@ func (e ProcessorsError) Error() string {
 }
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
-	return func() []scheduler.TaskFunc {
+	return func(_ context.Context) []scheduler.TaskFunc {
 		return runPublishJob(job, t.client)
 	}
 }
@@ -177,7 +176,7 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		// Without this only the last continuation will be executed len(conts) times
 		localCont := cont
 
-		contTasks[i] = func() []scheduler.TaskFunc {
+		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
 			return runPublishJob(localCont, client)
 		}
 	}

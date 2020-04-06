@@ -27,9 +27,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 )
 
 const (
@@ -236,8 +237,12 @@ type PushMetricSetV2WithContext interface {
 
 // HostData contains values parsed from the 'host' configuration. Other
 // configuration data like protocols, usernames, and passwords may also be
-// used to construct this HostData data.
+// used to construct this HostData data. HostData also contains information when combined scheme are
+// used, like doing HTTP request over a UNIX socket.
+//
 type HostData struct {
+	Transport dialer.Builder // The transport builder to use when creating the connection.
+
 	URI          string // The full URI that should be used in connections.
 	SanitizedURI string // A sanitized version of the URI without credentials.
 

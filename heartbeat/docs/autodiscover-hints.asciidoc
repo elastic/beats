@@ -1,0 +1,42 @@
+{beatname_uc} supports autodiscover based on hints from the both Docker and Kubernetes. The hints system looks for
+hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.monitor`. As soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get logs for the given container.
+
+Hints for {beatname_uc} take the form `co.elastic.monitor/MONITOR_INDEX.CONFIG_OPTION=VALUE`, where `MONITOR_INDEX` represents
+the index of monitor, and `CONFIG_OPTION` is any of the <<configuration-heartbeat-options>> options, with `VALUE` being the value
+you'd like to set that option to.
+
+As an example let's convert the regular syntax {beatname_uc} monitors below into autodiscover hints.
+
+[source,yml]
+----------------------------------------------------------------------
+-- heartbeat.monitors:
+- type: tcp
+  hosts: '${data.host}:6379'
+  schedule: @every 10s
+- type: icmp
+  hosts: '${data.host}'
+  schedule: @every 10s
+----------------------------------------------------------------------
+
+To configure this with autodiscover, add the following line to your Dockerfile to add the requisite labels.
+
+----------------------------------------------------------------------
+LABEL co.elastic.monitor/1.type=tcp co.elastic.monitor/1.hosts='${data.host}:6379' co.elastic.monitor/1.schedule='@every 10s'
+LABEL co.elastic.monitor/2.type=icmp co.elastic.monitor/2.hosts='${data.host}' co.elastic.monitor/2.schedule='@every 10s'
+----------------------------------------------------------------------
+
+Then, add the following to `heartbeat.yml`:
+
+[source,yml]
+----------------------------------------------------------------------
+heartbeat.autodiscover:
+  providers:
+  - type: docker
+    hints.enabled: true
+----------------------------------------------------------------------
+
+Then, start {beatname_uc}. This should discover the container you built and ping it once with ICMP, another time with TCP.
+
+For a full list of variables available, see the provider-specific docs in <<configuration-autodiscover>>.

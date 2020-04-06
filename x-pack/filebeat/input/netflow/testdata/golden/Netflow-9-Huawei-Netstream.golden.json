@@ -6,6 +6,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 0,
           "ip": "10.111.112.204",
           "locality": "private",
           "port": 2598

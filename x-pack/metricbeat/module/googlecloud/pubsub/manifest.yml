@@ -1,0 +1,27 @@
+default: true
+input:
+  module: googlecloud
+  metricset: stackdriver
+  defaults:
+    stackdriver:
+      service: pubsub
+      metrics:
+        - "pubsub.googleapis.com/subscription/ack_message_count"
+        - "pubsub.googleapis.com/subscription/backlog_bytes"
+        - "pubsub.googleapis.com/subscription/num_outstanding_messages"
+        - "pubsub.googleapis.com/subscription/num_undelivered_messages"
+        - "pubsub.googleapis.com/subscription/oldest_unacked_message_age"
+        - "pubsub.googleapis.com/subscription/pull_ack_message_operation_count"
+        - "pubsub.googleapis.com/subscription/pull_ack_request_count"
+        - "pubsub.googleapis.com/subscription/pull_message_operation_count"
+        - "pubsub.googleapis.com/subscription/pull_request_count"
+        - "pubsub.googleapis.com/subscription/push_request_count"
+        - "pubsub.googleapis.com/subscription/push_request_latencies"
+        - "pubsub.googleapis.com/subscription/sent_message_count"
+        - "pubsub.googleapis.com/subscription/streaming_pull_ack_message_operation_count"
+        - "pubsub.googleapis.com/subscription/streaming_pull_ack_request_count"
+        - "pubsub.googleapis.com/subscription/streaming_pull_message_operation_count"
+        - "pubsub.googleapis.com/subscription/streaming_pull_response_count"
+        - "pubsub.googleapis.com/topic/message_sizes"
+        - "pubsub.googleapis.com/topic/send_message_operation_count"
+        - "pubsub.googleapis.com/topic/send_request_count"

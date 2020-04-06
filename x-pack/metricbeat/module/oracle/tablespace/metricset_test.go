@@ -3,21 +3,21 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build oracle
 
 package tablespace
 
 import (
 	"testing"
 
-	_ "gopkg.in/goracle.v2"
+	_ "github.com/godror/godror"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
 	r := compose.EnsureUp(t, "oracle")
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))

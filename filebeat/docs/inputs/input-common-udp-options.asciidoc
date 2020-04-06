@@ -18,6 +18,12 @@ The host and UDP port to listen on for event streams.
 
 [float]
 [id="{beatname_lc}-input-{type}-udp-read-buffer"]
-=== `read_buffer`
+==== `read_buffer`
 
 The size of the read buffer on the UDP socket.
+
+[float]
+[id="{beatname_lc}-input-{type}-udp-timeout"]
+==== `timeout`
+
+The read and write timeout for socket operations.

@@ -1,0 +1,27 @@
+sudo: false
+
+language: go
+
+os:
+- linux
+- osx
+- windows
+
+go:
+- 1.12.x
+
+env:
+- GO111MODULE=on
+
+go_import_path: github.com/elastic/go-sysinfo
+
+before_install:
+- git config -l
+- GO111MODULE=off go get -u github.com/elastic/go-licenser
+
+script:
+- go mod verify
+- go-licenser -d
+- go run .ci/scripts/check_format.go
+- go run .ci/scripts/check_lint.go
+- go test -v ./...

@@ -1,0 +1,91 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-istio]]
+[role="xpack"]
+== istio module
+
+beta[]
+
+This is the Istio module. The Istio module collects metrics from the
+Istio https://istio.io/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
+
+The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
+
+[float]
+=== Compatibility
+
+The Istio module is tested with Istio 1.4
+
+
+[float]
+=== Example configuration
+
+The istio module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+# Istio mesh. To collect all Mixer-generated metrics
+- module: istio
+  metricsets: ["mesh"]
+  period: 10s
+  # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:42422"]
+
+# Istio mixer. To monitor Mixer itself.
+- module: istio
+  metricsets: ["mixer"]
+  period: 10s
+  # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio galley. To collect all Galley-generated metrics
+- module: istio
+  metricsets: ["galley"]
+  period: 10s
+  # use istio-galley.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio pilot. To collect all Pilot-generated metrics.
+- module: istio
+  metricsets: ["pilot"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+
+# Istio citadel. To collect all Citadel-generated metrics.
+- module: istio
+  metricsets: ["citadel"]
+  period: 10s
+  # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ["localhost:15014"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-istio-citadel,citadel>>
+
+* <<metricbeat-metricset-istio-galley,galley>>
+
+* <<metricbeat-metricset-istio-mesh,mesh>>
+
+* <<metricbeat-metricset-istio-mixer,mixer>>
+
+* <<metricbeat-metricset-istio-pilot,pilot>>
+
+include::istio/citadel.asciidoc[]
+
+include::istio/galley.asciidoc[]
+
+include::istio/mesh.asciidoc[]
+
+include::istio/mixer.asciidoc[]
+
+include::istio/pilot.asciidoc[]
+

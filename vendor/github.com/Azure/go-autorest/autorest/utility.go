@@ -140,18 +140,18 @@ func MapToValues(m map[string]interface{}) url.Values {
 	return v
 }
 
-// AsStringSlice method converts interface{} to []string. This expects a
-//that the parameter passed to be a slice or array of a type that has the underlying
-//type a string.
+// AsStringSlice method converts interface{} to []string.
+// s must be of type slice or array or an error is returned.
+// Each element of s will be converted to its string representation.
 func AsStringSlice(s interface{}) ([]string, error) {
 	v := reflect.ValueOf(s)
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
-		return nil, NewError("autorest", "AsStringSlice", "the value's type is not an array.")
+		return nil, NewError("autorest", "AsStringSlice", "the value's type is not a slice or array.")
 	}
 	stringSlice := make([]string, 0, v.Len())
 
 	for i := 0; i < v.Len(); i++ {
-		stringSlice = append(stringSlice, v.Index(i).String())
+		stringSlice = append(stringSlice, fmt.Sprintf("%v", v.Index(i)))
 	}
 	return stringSlice, nil
 }

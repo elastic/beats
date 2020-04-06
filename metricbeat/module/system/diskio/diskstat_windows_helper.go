@@ -29,13 +29,15 @@ import (
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
-	errorSuccess            syscall.Errno = 0
-	ioctlDiskPerformance                  = 0x70020
-	ioctlDiskPerformanceOff               = 0x70060
+	errorSuccess syscall.Errno = 0
+	// ioctlDiskPerformance is used to enable performance counters that provide disk performance information.
+	ioctlDiskPerformance = 0x70020
+	// ioctlDiskPerformanceOff used to disable performance counters that provide disk performance information.
+	ioctlDiskPerformanceOff = 0x70060
 )
 
 var (
@@ -47,24 +49,6 @@ var (
 type logicalDrive struct {
 	Name    string
 	UNCPath string
-}
-
-type diskPerformance struct {
-	BytesRead    int64
-	BytesWritten int64
-	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	ReadTime int64
-	// Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	WriteTime int64
-	//Contains a cumulative time, expressed in increments of 100 nanoseconds (or ticks).
-	IdleTime            int64
-	ReadCount           uint32
-	WriteCount          uint32
-	QueueDepth          uint32
-	SplitCount          uint32
-	QueryTime           int64
-	StorageDeviceNumber uint32
-	StorageManagerName  [8]uint16
 }
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.
@@ -138,6 +122,16 @@ func ioCounter(path string, diskPerformance *diskPerformance) error {
 // enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
 func enablePerformanceCounters() error {
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\partmgr", registry.READ|registry.WRITE)
+	// closing handler for the registry key. If the key is not one of the predefined registry keys (which is the case here), a call the RegCloseKey function should be executed after using the handle.
+	defer func() {
+		if key != 0 {
+			clErr := key.Close()
+			if clErr != nil {
+				logp.L().Named("diskio").Errorf("cannot close handler for HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry: %s", clErr)
+			}
+		}
+	}()
+
 	if err != nil {
 		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
 	}
@@ -148,6 +142,7 @@ func enablePerformanceCounters() error {
 		}
 		logp.L().Named("diskio").Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
+
 	return nil
 }
 

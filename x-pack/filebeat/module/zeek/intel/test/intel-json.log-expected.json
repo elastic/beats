@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2019-11-06T09:03:00.989Z",
+        "destination.address": "198.41.0.4",
+        "destination.as.number": 20172,
+        "destination.as.organization.name": "VeriSign Global Registry Services",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "198.41.0.4",
+        "destination.port": 53,
+        "event.dataset": "zeek.intel",
+        "event.module": "zeek",
+        "event.original": "{\"ts\":1573030980.989353,\"uid\":\"Ctefoj1tgOPt4D0EK2\",\"id.orig_h\":\"192.168.1.1\",\"id.orig_p\":37598,\"id.resp_h\":\"198.41.0.4\",\"id.resp_p\":53,\"seen.indicator\":\"198.41.0.4\",\"seen.indicator_type\":\"Intel::ADDR\",\"seen.where\":\"Conn::IN_RESP\",\"seen.node\":\"worker-1-2\",\"matched\":[\"Intel::ADDR\"],\"sources\":[\"ETPRO Rep: AbusedTLD Score: 127\"]}",
+        "fileset.name": "intel",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "zeek",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "source.port": 37598,
+        "tags": [
+            "zeek.intel"
+        ],
+        "zeek.intel.matched": [
+            "Intel::ADDR"
+        ],
+        "zeek.intel.seen.indicator": "198.41.0.4",
+        "zeek.intel.seen.indicator_type": "Intel::ADDR",
+        "zeek.intel.seen.node": "worker-1-2",
+        "zeek.intel.seen.where": "Conn::IN_RESP",
+        "zeek.intel.sources": [
+            "ETPRO Rep: AbusedTLD Score: 127"
+        ],
+        "zeek.session_id": "Ctefoj1tgOPt4D0EK2"
+    }
+]

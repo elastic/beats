@@ -22,9 +22,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
 // Config is used for unpacking a common.Config.
@@ -111,12 +111,13 @@ func (cfg *Config) Validate() error {
 
 func defaultConfig(info beat.Info) Config {
 	name := info.Beat + "-%{[agent.version]}"
-	nameFmt := fmtstr.MustCompileEvent(name)
+	aliasFmt := fmtstr.MustCompileEvent(name)
+	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
 		Mode:          ModeAuto,
-		PolicyName:    *nameFmt,
-		RolloverAlias: *nameFmt,
+		PolicyName:    *policyFmt,
+		RolloverAlias: *aliasFmt,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",
 		CheckExists:   true,

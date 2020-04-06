@@ -30,6 +30,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -97,6 +100,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -166,6 +172,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -240,6 +249,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -307,6 +319,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -383,6 +398,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -446,6 +464,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -520,6 +541,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -579,6 +603,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -655,6 +682,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -764,6 +794,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -827,6 +860,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -895,6 +931,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -969,6 +1008,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1028,6 +1070,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -1103,6 +1148,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1171,6 +1219,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1238,6 +1289,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -1334,6 +1388,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1408,6 +1465,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -1529,6 +1589,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1636,6 +1699,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -1750,6 +1816,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -1827,6 +1896,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -1942,6 +2014,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -2061,6 +2136,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2124,6 +2202,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -2234,6 +2315,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2301,6 +2385,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -2411,6 +2498,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2475,6 +2565,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2538,6 +2631,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -2642,6 +2738,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2734,6 +2833,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -2797,6 +2899,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -2896,6 +3001,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3010,6 +3118,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3126,6 +3237,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -3189,6 +3303,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3304,6 +3421,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -3412,6 +3532,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -3476,6 +3599,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -3535,6 +3661,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3612,6 +3741,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3716,6 +3848,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -3825,6 +3960,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -3896,6 +4034,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -4012,6 +4153,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4084,6 +4228,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -4178,6 +4325,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4246,6 +4396,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4310,6 +4463,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4361,6 +4517,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4411,6 +4570,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -4521,6 +4683,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4594,6 +4759,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4657,6 +4825,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -4767,6 +4938,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -4839,6 +5013,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -4949,6 +5126,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5012,6 +5192,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -5092,6 +5275,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5171,6 +5357,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5235,6 +5424,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -5344,6 +5536,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -5460,6 +5655,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5575,6 +5773,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5684,6 +5885,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5756,6 +5960,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -5836,6 +6043,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -5899,6 +6109,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -6008,6 +6221,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -6128,6 +6344,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -6236,6 +6455,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -6303,6 +6525,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -6418,6 +6643,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -6485,6 +6713,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -6600,6 +6831,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -6709,6 +6943,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -6795,6 +7032,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -6911,6 +7151,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7000,6 +7243,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7059,6 +7305,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -7169,6 +7418,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7248,6 +7500,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7307,6 +7562,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -7416,6 +7674,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -7527,6 +7788,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7615,6 +7879,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -7725,6 +7992,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7823,6 +8093,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -7920,6 +8193,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -8040,6 +8316,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8150,6 +8429,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8252,6 +8534,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -8362,6 +8647,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8471,6 +8759,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8538,6 +8829,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -8646,6 +8940,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8713,6 +9010,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -8793,6 +9093,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8861,6 +9164,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -8931,6 +9237,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -8998,6 +9307,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9068,6 +9380,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9131,6 +9446,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9205,6 +9523,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9272,6 +9593,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9345,6 +9669,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9412,6 +9739,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9481,6 +9811,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9548,6 +9881,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9664,6 +10000,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9743,6 +10082,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9812,6 +10154,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -9923,6 +10268,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -9982,6 +10330,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10050,6 +10401,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10165,6 +10519,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -10228,6 +10585,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10296,6 +10656,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10408,6 +10771,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10527,6 +10893,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -10594,6 +10963,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10708,6 +11080,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -10824,6 +11199,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -10934,6 +11312,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -11038,6 +11419,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -11153,6 +11537,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -11478,6 +11865,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -11607,6 +11997,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -11670,6 +12063,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -11743,6 +12139,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -11793,6 +12192,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -11861,6 +12263,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -11977,6 +12382,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12092,6 +12500,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12159,6 +12570,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -12269,6 +12683,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12378,6 +12795,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12486,6 +12906,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12583,6 +13006,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12651,6 +13077,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12718,6 +13147,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -12828,6 +13260,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -12907,6 +13342,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -13023,6 +13461,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13086,6 +13527,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -13155,6 +13599,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13219,6 +13666,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13270,6 +13720,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13320,6 +13773,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13369,6 +13825,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -13442,6 +13901,9 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "host": {
+      "name": "vagrant-2016"
+    },
     "log": {
       "level": "information"
     },
@@ -13505,6 +13967,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
@@ -13603,6 +14068,9 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2016"
     },
     "log": {
       "level": "information"

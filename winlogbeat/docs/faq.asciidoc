@@ -16,7 +16,7 @@ The index template might not be loaded correctly. See <<winlogbeat-template>>.
 Prior to the hostname configuration stage, during OS installation any event log
 records generated may have a randomly assigned hostname.
 
-include::{libbeat-dir}/docs/shared-faq.asciidoc[]
+include::{libbeat-dir}/shared-faq.asciidoc[]
 
 [[reading-from-evtx]]
 === Not sure how to read from .evtx files

@@ -28,4 +28,4 @@ See <<metricbeat-modules>> for the complete list of supported services.
 Metricbeat can insert the collected metrics directly into Elasticsearch
 or send them to Logstash, Redis, or Kafka.
 
-include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+include::{libbeat-dir}/shared-libbeat-description.asciidoc[]

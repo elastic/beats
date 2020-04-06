@@ -26,9 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/inputsource"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // splitHandler is a TCP client that has splitting capabilities.
@@ -94,15 +94,24 @@ func (c *splitHandler) Handle(closer CloseRef, conn net.Conn) error {
 	//16 is ratio of MaxScanTokenSize/startBufSize
 	buffer := make([]byte, c.maxMessageSize/16)
 	scanner.Buffer(buffer, int(c.maxMessageSize))
-	for scanner.Scan() {
+	for {
+		select {
+		case <-closer.Done():
+			break
+		default:
+		}
+
+		// Ensure that if the Conn is already closed then dont attempt to scan again
+		if closer.Err() == ErrClosed {
+			break
+		}
+
+		if !scanner.Scan() {
+			break
+		}
+
 		err := scanner.Err()
 		if err != nil {
-			// we are forcing a Close on the socket, lets ignore any error that could happen.
-			select {
-			case <-closer.Done():
-				break
-			default:
-			}
 			// This is a user defined limit and we should notify the user.
 			if IsMaxReadBufferErr(err) {
 				log.Errorw("split_client error", "error", err)

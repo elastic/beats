@@ -10,6 +10,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,6 +44,14 @@ const (
 	malformedExtensionEscape = `CEF:0|FooBar|Web Gateway|1.2.3.45.67|200|Success|2|rt=Sep 07 2018 14:50:39 cat=Access Log dst=1.1.1.1 dhost=foo.example.com suser=redacted src=2.2.2.2 requestMethod=POST request='https://foo.example.com/bar/bingo/1' requestClientApplication='Foo-Bar/2018.1.7; =Email:user@example.com; Guid:test=' cs1= cs1Label=Foo Bar`
 
 	multipleMalformedExtensionValues = `CEF:0|vendor|product|version|event_id|name|Very-High| msg=Hello World error=Failed because id==old_id user=root angle=106.7<=180`
+
+	paddedMessage = `CEF:0|security|threatmanager|1.0|100|message is padded|10|spt=1232 msg=Trailing space in non-final extensions is  preserved    src=10.0.0.192 `
+
+	crlfMessage = "CEF:0|security|threatmanager|1.0|100|message is padded|10|spt=1232 msg=Trailing space in final extensions is not preserved\t \r\n"
+
+	tabMessage = "CEF:0|security|threatmanager|1.0|100|message is padded|10|spt=1232 msg=Tabs\tand\rcontrol\ncharacters are preserved\t src=127.0.0.1"
+
+	tabNoSepMessage = "CEF:0|security|threatmanager|1.0|100|message has tabs|10|spt=1232 msg=Tab is not a separator\tsrc=127.0.0.1"
 )
 
 var testMessages = []string{
@@ -59,6 +68,9 @@ var testMessages = []string{
 	escapesInExtension,
 	malformedExtensionEscape,
 	multipleMalformedExtensionValues,
+	paddedMessage,
+	crlfMessage,
+	tabMessage,
 }
 
 func TestGenerateFuzzCorpus(t *testing.T) {
@@ -78,7 +90,7 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 func TestEventUnpack(t *testing.T) {
 	t.Run("standardMessage", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(standardMessage))
+		err := e.Unpack(standardMessage)
 		assert.NoError(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -87,17 +99,17 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src":     "10.0.0.192",
-			"dst":     "12.121.122.82",
-			"spt":     "1232",
-			"eventId": "1",
+		assert.Equal(t, map[string]*Field{
+			"src":     IPField("10.0.0.192"),
+			"dst":     IPField("12.121.122.82"),
+			"spt":     IntegerField(1232),
+			"eventId": LongField(1),
 		}, e.Extensions)
 	})
 
 	t.Run("headerOnly", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(headerOnly))
+		err := e.Unpack(headerOnly)
 		assert.NoError(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -111,7 +123,7 @@ func TestEventUnpack(t *testing.T) {
 
 	t.Run("escapedPipeInHeader", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(escapedPipeInHeader))
+		err := e.Unpack(escapedPipeInHeader)
 		assert.NoError(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -120,16 +132,16 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "12.121.122.82",
-			"spt": "1232",
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"dst": IPField("12.121.122.82"),
+			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
 
 	t.Run("equalsSignInHeader", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(equalsSignInHeader))
+		err := e.Unpack(equalsSignInHeader)
 		assert.NoError(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -138,17 +150,17 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "12.121.122.82",
-			"spt": "1232",
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"dst": IPField("12.121.122.82"),
+			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
 
 	t.Run("emptyExtensionValue", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(emptyExtensionValue))
-		assert.NoError(t, err)
+		err := e.Unpack(emptyExtensionValue)
+		assert.Error(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
 		assert.Equal(t, "threatmanager", e.DeviceProduct)
@@ -156,16 +168,15 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "",
-			"spt": "1232",
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
 
 	t.Run("emptyDeviceFields", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(emptyDeviceFields))
+		err := e.Unpack(emptyDeviceFields)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "", e.DeviceVendor)
@@ -174,16 +185,16 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "12.121.122.82",
-			"spt": "1232",
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"dst": IPField("12.121.122.82"),
+			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
 
 	t.Run("errorEscapedPipeInExtension", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(escapedPipeInExtension))
+		err := e.Unpack(escapedPipeInExtension)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
 		assert.Equal(t, "threatmanager", e.DeviceProduct)
@@ -191,7 +202,7 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Nil(t, e.Extensions)
+		assert.Empty(t, e.Extensions)
 
 		// Pipes in extensions should not be escaped.
 		assert.Error(t, err)
@@ -199,7 +210,7 @@ func TestEventUnpack(t *testing.T) {
 
 	t.Run("leadingWhitespace", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(leadingWhitespace))
+		err := e.Unpack(leadingWhitespace)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -208,16 +219,16 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"src": "10.0.0.192",
-			"dst": "12.121.122.82",
-			"spt": "1232",
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"dst": IPField("12.121.122.82"),
+			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
 
 	t.Run("pipeInMessage", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(pipeInMessage))
+		err := e.Unpack(pipeInMessage)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -226,14 +237,14 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"moo": "this|has an pipe",
+		assert.Equal(t, map[string]*Field{
+			"moo": UndocumentedField("this|has an pipe"),
 		}, e.Extensions)
 	})
 
 	t.Run("errorEqualsInMessage", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(equalsInMessage))
+		err := e.Unpack(equalsInMessage)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
 		assert.Equal(t, "threatmanager", e.DeviceProduct)
@@ -241,7 +252,7 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Nil(t, e.Extensions)
+		assert.Empty(t, e.Extensions)
 
 		// moo contains unescaped equals signs.
 		assert.Error(t, err)
@@ -249,7 +260,7 @@ func TestEventUnpack(t *testing.T) {
 
 	t.Run("escapesInExtension", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(escapesInExtension))
+		err := e.Unpack(escapesInExtension)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
@@ -258,15 +269,15 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "100", e.DeviceEventClassID)
 		assert.Equal(t, "trojan successfully stopped", e.Name)
 		assert.Equal(t, "10", e.Severity)
-		assert.Equal(t, map[string]string{
-			"msg": "a+b=c",
-			"x":   `c\d=z`,
+		assert.Equal(t, map[string]*Field{
+			"msg": StringField("a+b=c"),
+			"x":   UndocumentedField(`c\d=z`),
 		}, e.Extensions)
 	})
 
 	t.Run("errorMalformedExtensionEscape", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(malformedExtensionEscape))
+		err := e.Unpack(malformedExtensionEscape)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "FooBar", e.DeviceVendor)
 		assert.Equal(t, "Web Gateway", e.DeviceProduct)
@@ -274,17 +285,17 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "200", e.DeviceEventClassID)
 		assert.Equal(t, "Success", e.Name)
 		assert.Equal(t, "2", e.Severity)
-		assert.Equal(t, map[string]string{
-			"rt":            "Sep 07 2018 14:50:39",
-			"cat":           "Access Log",
-			"dst":           "1.1.1.1",
-			"dhost":         "foo.example.com",
-			"suser":         "redacted",
-			"src":           "2.2.2.2",
-			"requestMethod": "POST",
-			"request":       `'https://foo.example.com/bar/bingo/1'`,
-			"cs1":           "",
-			"cs1Label":      "Foo Bar",
+		assert.Equal(t, map[string]*Field{
+			"rt":            TimestampField("Sep 07 2018 14:50:39"),
+			"cat":           StringField("Access Log"),
+			"dst":           IPField("1.1.1.1"),
+			"dhost":         StringField("foo.example.com"),
+			"suser":         StringField("redacted"),
+			"src":           IPField("2.2.2.2"),
+			"requestMethod": StringField("POST"),
+			"request":       StringField(`'https://foo.example.com/bar/bingo/1'`),
+			"cs1":           StringField(""),
+			"cs1Label":      StringField("Foo Bar"),
 		}, e.Extensions)
 
 		// requestClientApplication is not valid because it contains an unescaped
@@ -296,7 +307,7 @@ func TestEventUnpack(t *testing.T) {
 
 	t.Run("errorMultipleMalformedExtensionValues", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte(multipleMalformedExtensionValues))
+		err := e.Unpack(multipleMalformedExtensionValues)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "vendor", e.DeviceVendor)
 		assert.Equal(t, "product", e.DeviceProduct)
@@ -304,10 +315,10 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "event_id", e.DeviceEventClassID)
 		assert.Equal(t, "name", e.Name)
 		assert.Equal(t, "Very-High", e.Severity)
-		assert.Equal(t, map[string]string{
-			"msg":   "Hello World",
-			"error": "Failed because",
-			"user":  "root",
+		assert.Equal(t, map[string]*Field{
+			"msg":   StringField("Hello World"),
+			"error": UndocumentedField("Failed because"),
+			"user":  UndocumentedField("root"),
 		}, e.Extensions)
 
 		// Both id and angle contain unescaped equals signs.
@@ -319,27 +330,68 @@ func TestEventUnpack(t *testing.T) {
 
 	t.Run("empty", func(t *testing.T) {
 		var e Event
-		err := e.Unpack([]byte("CEF:0|||||||a="))
+		err := e.Unpack("CEF:0|||||||a=")
 		assert.NoError(t, err)
+	})
+
+	t.Run("padded", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(paddedMessage)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]*Field{
+			"src": IPField("10.0.0.192"),
+			"spt": IntegerField(1232),
+			"msg": StringField("Trailing space in non-final extensions is  preserved   "),
+		}, e.Extensions)
+	})
+
+	t.Run("padded with extra whitespace chars", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(crlfMessage)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]*Field{
+			"spt": IntegerField(1232),
+			"msg": StringField("Trailing space in final extensions is not preserved"),
+		}, e.Extensions)
+	})
+
+	t.Run("internal whitespace chars", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(tabMessage)
+		assert.NoError(t, err)
+		assert.Equal(t, map[string]*Field{
+			"spt": IntegerField(1232),
+			"src": IPField("127.0.0.1"),
+			"msg": StringField("Tabs\tand\rcontrol\ncharacters are preserved\t"),
+		}, e.Extensions)
+	})
+
+	t.Run("No tab as separator", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(tabNoSepMessage)
+		assert.Error(t, err)
+		assert.Equal(t, map[string]*Field{
+			"spt": IntegerField(1232),
+		}, e.Extensions)
 	})
 }
 
 func TestEventUnpackWithFullExtensionNames(t *testing.T) {
 	var e Event
-	err := e.Unpack([]byte(standardMessage), WithFullExtensionNames())
+	err := e.Unpack(standardMessage, WithFullExtensionNames())
 	assert.NoError(t, err)
-	assert.Equal(t, map[string]string{
-		"sourceAddress":      "10.0.0.192",
-		"destinationAddress": "12.121.122.82",
-		"sourcePort":         "1232",
-		"eventId":            "1",
+	assert.Equal(t, map[string]*Field{
+		"sourceAddress":      IPField("10.0.0.192"),
+		"destinationAddress": IPField("12.121.122.82"),
+		"sourcePort":         IntegerField(1232),
+		"eventId":            LongField(1),
 	}, e.Extensions)
 }
 
 func BenchmarkEventUnpack(b *testing.B) {
-	var messages [][]byte
+	var messages []string
 	for _, m := range testMessages {
-		messages = append(messages, []byte(m))
+		messages = append(messages, m)
 	}
 	b.ResetTimer()
 
@@ -347,4 +399,21 @@ func BenchmarkEventUnpack(b *testing.B) {
 		var e Event
 		e.Unpack(messages[i%len(messages)])
 	}
+}
+
+func IPField(v string) *Field     { return &Field{String: v, Type: IPType, Interface: v} }
+func StringField(v string) *Field { return &Field{String: v, Type: StringType, Interface: v} }
+func IntegerField(v int32) *Field {
+	return &Field{String: strconv.Itoa(int(v)), Type: IntegerType, Interface: v}
+}
+func LongField(v int64) *Field {
+	return &Field{String: strconv.Itoa(int(v)), Type: LongType, Interface: v}
+}
+func UndocumentedField(v string) *Field { return &Field{String: v} }
+func TimestampField(v string) *Field {
+	ts, err := toTimestamp(v)
+	if err != nil {
+		panic(err)
+	}
+	return &Field{String: v, Type: TimestampType, Interface: ts}
 }

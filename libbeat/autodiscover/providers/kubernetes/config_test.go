@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
@@ -51,6 +51,22 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 	c = defaultConfig()
 	err = config.Unpack(&c)
 	assert.NotNil(t, err)
+}
+
+func TestConfigWithIncorrectScope(t *testing.T) {
+	cfg := common.MapStr{
+		"scope":         "node",
+		"resource":      "service",
+		"hints.enabled": true,
+	}
+
+	config := common.MustNewConfigFrom(&cfg)
+	c := defaultConfig()
+	err := config.Unpack(&c)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "service", c.Resource)
+	assert.Equal(t, "cluster", c.Scope)
 }
 
 type mockBuilder struct {

@@ -18,7 +18,7 @@ This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
 flow records with geolocation information about the IP endpoints by using
 Elasticsearch Ingest Node.
 
-include::../include/running-modules.asciidoc[]
+include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -51,6 +51,10 @@ traffic from network devices.
 `var.max_message_size`:: The maximum size of the message received over UDP.
 The default is `10KiB`.
 
+`var.read_buffer`:: The size of the read buffer on the UDP socket.
+
+`var.timeout`:: The read and write timeout for socket operations.
+
 `var.expiration_timeout`:: The time before an idle session or unused template is
 expired. Only applicable to v9 and IPFIX protocols. A value of zero disables
 expiration.
@@ -58,6 +62,15 @@ expiration.
 `var.queue_size`:: The maximum number of packets that can be queued for
 processing. Use this setting to avoid packet-loss when dealing with occasional
 bursts of traffic.
+
+`var.custom_definitions`:: A list of paths to field definitions YAML files.
+These allow to update the NetFlow/IPFIX fields with vendor extensions and to
+override existing fields. See <<filebeat-input-netflow,netflow input>> for
+details.
+
+`var.detect_sequence_reset`:: Flag controlling whether {beatname_uc} should
+monitor sequence numbers in the Netflow packets to detect an Exporting Process
+reset. See <<filebeat-input-netflow,netflow input>> for details.
 
 :has-dashboards!:
 

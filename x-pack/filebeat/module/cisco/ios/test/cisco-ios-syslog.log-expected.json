@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-02-08T06:00:47.272Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.22",
@@ -38,7 +37,6 @@
         ]
     },
     {
-        "@timestamp": "2019-02-09T06:00:47.272Z",
         "cisco.ios.access_list": "INBOUND-ON-F11",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.2",
@@ -77,7 +75,6 @@
         ]
     },
     {
-        "@timestamp": "2019-02-10T06:00:47.272Z",
         "cisco.ios.access_list": "171",
         "cisco.ios.facility": "SEC",
         "destination.address": "255.255.255.255",
@@ -115,7 +112,6 @@
         ]
     },
     {
-        "@timestamp": "2019-05-03T21:11:32.619Z",
         "cisco.ios.access_list": "ACL-IPv6-E0/0-IN/10",
         "cisco.ios.facility": "IPV6",
         "destination.address": "2001:DB8:1000::1",
@@ -155,7 +151,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:39.326Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -195,7 +190,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:44.921Z",
         "cisco.ios.access_list": "151",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.2",
@@ -235,7 +229,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:51.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -275,7 +268,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:55.222Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -321,7 +313,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:57.328Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -361,7 +352,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:03.334Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -401,7 +391,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:09.332Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -441,7 +430,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:15.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -481,7 +469,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:21.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -521,7 +508,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:27.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -561,7 +547,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:28.374Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
@@ -582,7 +567,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:33.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -622,7 +606,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:39.338Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -662,7 +645,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:45.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -702,7 +684,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:47.466Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -748,7 +729,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:51.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -788,7 +768,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:57.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -828,7 +807,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:03.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -868,7 +846,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:08.454Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -914,7 +891,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:15.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -954,7 +930,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:20.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "8.8.8.8",
@@ -1000,7 +975,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:21.348Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.195",
@@ -1046,7 +1020,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:28.403Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
@@ -1067,7 +1040,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:28.403Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.1",
@@ -1107,7 +1079,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:29.451Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -1153,7 +1124,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:33.352Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1193,7 +1163,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:39.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1233,7 +1202,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:44.173Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1273,7 +1241,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:45.356Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1313,7 +1280,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:50.473Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",

@@ -1,0 +1,60 @@
+{
+    "@timestamp": "2019-10-31T10:19:14.758Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "metricset": {
+        "name": "producer",
+        "period": 10000
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "host": {
+        "os": {
+            "name": "Mac OS X",
+            "kernel": "18.7.0",
+            "build": "18G95",
+            "platform": "darwin",
+            "version": "10.14.6",
+            "family": "darwin"
+        },
+        "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84",
+        "hostname": "abc.local",
+        "name": "abc.local",
+        "architecture": "x86_64"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "ephemeral_id": "b95327e7-2737-4262-a1a6-ab8547fc8c8d",
+        "hostname": "abc.local",
+        "id": "79dd1677-1bea-4efd-9131-e8ca464eddf0",
+        "version": "8.0.0"
+    },
+    "service": {
+        "address": "localhost:8775",
+        "type": "kafka"
+    },
+    "event": {
+        "dataset": "kafka.producer",
+        "module": "kafka",
+        "duration": 4485726
+    },
+    "kafka": {
+        "producer": {
+            "response_rate": 0,
+            "request_rate": 0,
+            "record_send_rate": 0,
+            "batch_size_avg": 0,
+            "record_size_avg": 0,
+            "record_retry_rate": 0,
+            "records_per_request": 0,
+            "io_wait": 1.2487715219630156e+07,
+            "mbean": "kafka.producer:client-id=console-producer,type=producer-metrics",
+            "available_buffer_bytes": 0,
+            "record_error_rate": 737.5234685412391
+        }
+    }
+}

@@ -1,0 +1,45 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: 'topic'
+    jmx.mappings:
+    - mbean: 'org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker'
+      attributes:
+      - attr: Name
+        field: name
+      - attr: AverageEnqueueTime
+        field: messages.enqueue.time.avg
+      - attr: AverageMessageSize
+        field: messages.size.avg
+      - attr: ConsumerCount
+        field: consumers.count
+      - attr: DequeueCount
+        field: messages.dequeue.count
+      - attr: DispatchCount
+        field: messages.dispatch.count
+      - attr: EnqueueCount
+        field: messages.enqueue.count
+      - attr: ExpiredCount
+        field: messages.expired.count
+      - attr: InFlightCount
+        field: messages.inflight.count
+      - attr: MaxEnqueueTime
+        field: messages.enqueue.time.max
+      - attr: MemoryPercentUsage
+        field: memory.broker.pct
+      - attr: MinEnqueueTime
+        field: messages.enqueue.time.min
+      - attr: ProducerCount
+        field: producers.count
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var topic_memory_broker_pct = event.Get("activemq.topic.memory.broker.pct")
+          if (topic_memory_broker_pct != null) {
+            event.Put("activemq.topic.memory.broker.pct", topic_memory_broker_pct / 100.0)
+          }
+        }

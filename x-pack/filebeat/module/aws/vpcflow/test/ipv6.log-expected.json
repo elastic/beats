@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2016-10-31T11:37:00.000Z",
+        "aws.vpcflow.account_id": "123456789010",
+        "aws.vpcflow.action": "ACCEPT",
+        "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
+        "aws.vpcflow.log_status": "OK",
+        "aws.vpcflow.version": "2",
+        "cloud.account.id": "123456789010",
+        "cloud.provider": "aws",
+        "destination.address": "2001:db8:1234:a102:3304:8879:34cf:4071",
+        "destination.ip": "2001:db8:1234:a102:3304:8879:34cf:4071",
+        "destination.port": 22,
+        "event.category": "network_traffic",
+        "event.dataset": "aws.vpcflow",
+        "event.end": "2016-10-31T11:37:00.000Z",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "2 123456789010 eni-1235b8ca123456789 2001:db8:1234:a100:8d6e:3477:df66:f105 2001:db8:1234:a102:3304:8879:34cf:4071 34892 22 6 54 8855 1477913708 1477913820 ACCEPT OK",
+        "event.outcome": "allow",
+        "event.start": "2016-10-31T11:35:08.000Z",
+        "event.type": "flow",
+        "fileset.name": "vpcflow",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.bytes": 8855,
+        "network.community_id": "1:hXZclvxUJScaVf0xMIJR6yW6tBQ=",
+        "network.iana_number": "6",
+        "network.packets": 54,
+        "network.transport": "tcp",
+        "network.type": "ipv6",
+        "related.ip": [
+            "2001:db8:1234:a100:8d6e:3477:df66:f105",
+            "2001:db8:1234:a102:3304:8879:34cf:4071"
+        ],
+        "service.type": "aws",
+        "source.address": "2001:db8:1234:a100:8d6e:3477:df66:f105",
+        "source.bytes": 8855,
+        "source.ip": "2001:db8:1234:a100:8d6e:3477:df66:f105",
+        "source.packets": 54,
+        "source.port": 34892
+    }
+]

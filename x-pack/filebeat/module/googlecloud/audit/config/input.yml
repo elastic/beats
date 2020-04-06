@@ -1,0 +1,26 @@
+{{ if eq .input "google-pubsub" }}
+
+type: google-pubsub
+project_id: {{ .project_id }}
+topic: {{ .topic }}
+subscription.name: {{ .subscription_name }}
+credentials_file: {{ .credentials_file }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+processors:
+  - script:
+      lang: javascript
+      id: googlecloud_audit_script
+      file: ${path.home}/module/googlecloud/audit/config/pipeline.js
+      params:
+        keep_original_message: {{ .keep_original_message }}

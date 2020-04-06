@@ -44,4 +44,4 @@ network traffic gathered by Packetbeat can be used for analysing the log files
 gathered by Logstash. This way, you can have network traffic and log analysis
 in the same system.
 
-include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+include::{libbeat-dir}/shared-libbeat-description.asciidoc[]

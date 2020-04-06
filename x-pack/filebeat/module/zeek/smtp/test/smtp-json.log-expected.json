@@ -20,6 +20,7 @@
         "tags": [
             "zeek.smtp"
         ],
+        "tls.established": true,
         "zeek.session_id": "CWWzPB3RjqhFf528c",
         "zeek.smtp.fuids": [],
         "zeek.smtp.helo": "EXAMPLE.COM",

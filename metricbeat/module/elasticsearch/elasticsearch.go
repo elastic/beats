@@ -25,13 +25,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 )
 
 func init() {
@@ -123,7 +123,8 @@ type License struct {
 	IssueDateInMillis  int        `json:"issue_date_in_millis"`
 	ExpiryDate         *time.Time `json:"expiry_date,omitempty"`
 	ExpiryDateInMillis int        `json:"expiry_date_in_millis,omitempty"`
-	MaxNodes           int        `json:"max_nodes"`
+	MaxNodes           int        `json:"max_nodes,omitempty"`
+	MaxResourceUnits   int        `json:"max_resource_units,omitempty"`
 	IssuedTo           string     `json:"issued_to"`
 	Issuer             string     `json:"issuer"`
 	StartDateInMillis  int        `json:"start_date_in_millis"`
@@ -362,6 +363,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+type XPack struct {
+	Features struct {
+		CCR struct {
+			Enabled bool `json:"enabled"`
+		} `json:"CCR"`
+	} `json:"features"`
+}
+
+// GetXPack returns information about xpack features.
+func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
+	content, err := fetchPath(http, resetURI, "_xpack", "")
+
+	if err != nil {
+		return XPack{}, err
+	}
+
+	var xpack XPack
+	err = json.Unmarshal(content, &xpack)
+	return xpack, err
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
@@ -436,8 +458,13 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently.
-var licenseCache = &_licenseCache{}
+var (
+	// Global cache for license information. Assumption is that license information changes infrequently.
+	licenseCache = &_licenseCache{}
+
+	// LicenseCacheEnabled controls whether license caching is enabled or not. Intended for test use.
+	LicenseCacheEnabled = true
+)
 
 type _licenseCache struct {
 	sync.RWMutex
@@ -459,6 +486,10 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
+	if !LicenseCacheEnabled {
+		return
+	}
+
 	c.Lock()
 	defer c.Unlock()
 
@@ -485,19 +516,35 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 // particular it ensures that ms-since-epoch values are marshaled as longs
 // and not floats in scientific notation as Elasticsearch does not like that.
 func (l *License) ToMapStr() common.MapStr {
-	return common.MapStr{
-		"status":                l.Status,
-		"id":                    l.ID,
-		"type":                  l.Type,
-		"issue_date":            l.IssueDate,
-		"issue_date_in_millis":  l.IssueDateInMillis,
-		"expiry_date":           l.ExpiryDate,
-		"expiry_date_in_millis": l.ExpiryDateInMillis,
-		"max_nodes":             l.MaxNodes,
-		"issued_to":             l.IssuedTo,
-		"issuer":                l.Issuer,
-		"start_date_in_millis":  l.StartDateInMillis,
+	m := common.MapStr{
+		"status":               l.Status,
+		"uid":                  l.ID,
+		"type":                 l.Type,
+		"issue_date":           l.IssueDate,
+		"issue_date_in_millis": l.IssueDateInMillis,
+		"expiry_date":          l.ExpiryDate,
+		"issued_to":            l.IssuedTo,
+		"issuer":               l.Issuer,
+		"start_date_in_millis": l.StartDateInMillis,
 	}
+
+	if l.ExpiryDateInMillis != 0 {
+		// We don't want to record a 0 expiry date as this means the license has expired
+		// in the Stack Monitoring UI
+		m["expiry_date_in_millis"] = l.ExpiryDateInMillis
+	}
+
+	// Enterprise licenses have max_resource_units. All other licenses have
+	// max_nodes.
+	if l.MaxNodes != 0 {
+		m["max_nodes"] = l.MaxNodes
+	}
+
+	if l.MaxResourceUnits != 0 {
+		m["max_resource_units"] = l.MaxResourceUnits
+	}
+
+	return m
 }
 
 func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {

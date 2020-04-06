@@ -69,6 +69,25 @@ func (r ResourceEventHandlerFuncs) OnDelete(obj interface{}) {
 	}
 }
 
+// NoOpEventHandlerFuncs ensures that watcher reconciliation can happen even without the required funcs
+type NoOpEventHandlerFuncs struct {
+}
+
+// OnAdd does a no-op on an add event
+func (n NoOpEventHandlerFuncs) OnAdd(obj interface{}) {
+
+}
+
+// OnUpdate does a no-op on an update event
+func (n NoOpEventHandlerFuncs) OnUpdate(obj interface{}) {
+
+}
+
+// OnDelete does a no-op on a delete event
+func (n NoOpEventHandlerFuncs) OnDelete(obj interface{}) {
+
+}
+
 // FilteringResourceEventHandler applies the provided filter to all events coming
 // in, ensuring the appropriate nested handler method is invoked. An object
 // that starts passing the filter after an update is considered an add, and an

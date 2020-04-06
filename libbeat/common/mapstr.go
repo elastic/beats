@@ -20,6 +20,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 
@@ -64,33 +65,51 @@ func (m MapStr) Update(d MapStr) {
 // DeepUpdate recursively copies the key-value pairs from d to this map.
 // If the key is present and a map as well, the sub-map will be updated recursively
 // via DeepUpdate.
+// DeepUpdateNoOverwrite is a version of this function that does not
+// overwrite existing values.
 func (m MapStr) DeepUpdate(d MapStr) {
+	m.deepUpdateMap(d, true)
+}
+
+// DeepUpdateNoOverwrite recursively copies the key-value pairs from d to this map.
+// If a key is already present it will not be overwritten.
+// DeepUpdate is a version of this function that overwrites existing values.
+func (m MapStr) DeepUpdateNoOverwrite(d MapStr) {
+	m.deepUpdateMap(d, false)
+}
+
+func (m MapStr) deepUpdateMap(d MapStr, overwrite bool) {
 	for k, v := range d {
 		switch val := v.(type) {
 		case map[string]interface{}:
-			m[k] = deepUpdateValue(m[k], MapStr(val))
+			m[k] = deepUpdateValue(m[k], MapStr(val), overwrite)
 		case MapStr:
-			m[k] = deepUpdateValue(m[k], val)
+			m[k] = deepUpdateValue(m[k], val, overwrite)
 		default:
-			m[k] = v
+			if overwrite {
+				m[k] = v
+			} else if _, exists := m[k]; !exists {
+				m[k] = v
+			}
 		}
 	}
 }
 
-func deepUpdateValue(old interface{}, val MapStr) interface{} {
+func deepUpdateValue(old interface{}, val MapStr, overwrite bool) interface{} {
 	if old == nil {
 		return val
 	}
 
 	switch sub := old.(type) {
 	case MapStr:
-		sub.DeepUpdate(val)
+		sub.deepUpdateMap(val, overwrite)
 		return sub
 	case map[string]interface{}:
 		tmp := MapStr(sub)
-		tmp.DeepUpdate(val)
+		tmp.deepUpdateMap(val, overwrite)
 		return tmp
 	default:
+		// This should never happen
 		return val
 	}
 }
@@ -200,13 +219,16 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	keys := make([]string, 0, len(m))
-	for k := range m {
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	keys := make([]string, 0, len(debugM))
+	for k := range debugM {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		v := m[k]
+		v := debugM[k]
 		if inner, ok := tryToMapStr(v); ok {
 			enc.AddObject(k, inner)
 			continue
@@ -214,6 +236,19 @@ func (m MapStr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		zap.Any(k, v).AddTo(enc)
 	}
 	return nil
+}
+
+// Format implements fmt.Formatter
+func (m MapStr) Format(f fmt.State, c rune) {
+	if f.Flag('+') || f.Flag('#') {
+		io.WriteString(f, m.String())
+		return
+	}
+
+	debugM := m.Clone()
+	applyLoggingMask(map[string]interface{}(debugM))
+
+	io.WriteString(f, debugM.String())
 }
 
 // Flatten flattens the given MapStr and returns a flat MapStr.
@@ -237,7 +272,7 @@ func flatten(prefix string, in, out MapStr) MapStr {
 		if prefix == "" {
 			fullKey = k
 		} else {
-			fullKey = fmt.Sprintf("%s.%s", prefix, k)
+			fullKey = prefix + "." + k
 		}
 
 		if m, ok := tryToMapStr(v); ok {

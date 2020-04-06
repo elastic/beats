@@ -2,6 +2,13 @@
   "description": "Pipeline for parsing azure activity logs.",
   "processors": [
       {
+          "rename" : {
+              "field" : "azure",
+              "target_field" : "azure-eventhub",
+              "ignore_missing": true
+          }
+      },
+      {
           "script": {
               "source": "ctx.message = ctx.message.replace(params.empty_field_name, '')",
               "params": {
@@ -218,7 +225,13 @@
               "ignore_failure": true
           }
       },
-
+      {
+          "script": {
+              "lang": "painless",
+              "source": "if (ctx.azure.activitylogs.identity.claims != null) { ctx.temp_claims = new HashMap(); for (String key : ctx.azure.activitylogs.identity.claims.keySet()) {  ctx.temp_claims[key.replace('.', '_')] = ctx.azure.activitylogs.identity.claims.get(key) ;}ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove('temp_claims');}",
+              "ignore_failure": true
+          }
+      },
       {
           "pipeline": {
               "name": "{< IngestPipeline "azure-shared-pipeline" >}"

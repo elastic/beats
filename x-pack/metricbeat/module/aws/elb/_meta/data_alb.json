@@ -1,0 +1,40 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "applicationelb": {
+            "metrics": {
+                "RequestCount": {
+                    "sum": 0
+                }
+            }
+        },
+        "cloudwatch": {
+            "namespace": "AWS/ApplicationELB"
+        },
+        "dimensions": {
+            "AvailabilityZone": "us-east-1b",
+            "LoadBalancer": "app/filebeat-aws-elb-test-lb/28cbae7655c8af5b",
+            "TargetGroup": "targetgroup/test-lb-instances/acc57bfd8306b90e"
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

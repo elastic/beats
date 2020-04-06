@@ -2,7 +2,7 @@
   type: group
   description: >
     kubernetes resourcequota metrics
-  release: beta
+  release: ga
   fields:
     - name: created.sec
       type: double

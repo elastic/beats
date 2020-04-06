@@ -5,7 +5,9 @@ import unittest
 from elasticsearch import Elasticsearch, TransportError, client
 from parameterized import parameterized
 from nose.plugins.skip import SkipTest
-import urllib2
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
 import semver
 
@@ -114,6 +116,9 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch-xpack module test for type:cluster_stats
         """
+
+        self.start_basic()
+
         self.render_config_template(modules=[{
             "name": "elasticsearch",
             "metricsets": [
@@ -148,6 +153,9 @@ class Test(metricbeat.BaseTest):
             license = doc["license"]
             issue_date = license["issue_date_in_millis"]
             self.assertIsNot(type(issue_date), float)
+
+            self.assertNotIn("expiry_date_in_millis", license)
+            self.assertNotIn("max_resource_units", license)
 
     def create_ml_job(self):
         # Check if an ml job already exists
@@ -293,7 +301,19 @@ class Test(metricbeat.BaseTest):
             self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
         except:
             e = sys.exc_info()[0]
-            print "Trial already enabled. Error: {}".format(e)
+            print("Trial already enabled. Error: {}".format(e))
+
+    def start_basic(self):
+        # Check if basic license is already enabled
+        response = self.es.transport.perform_request('GET', self.license_url)
+        if response["license"]["type"] == "basic":
+            return
+
+        try:
+            self.es.transport.perform_request('POST', self.license_url + "/start_basic?acknowledge=true")
+        except:
+            e = sys.exc_info()[0]
+            print("Basic license already enabled. Error: {}".format(e))
 
     def check_skip(self, metricset):
         if metricset == 'ccr' and not self.is_ccr_available():

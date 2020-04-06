@@ -1,7 +1,7 @@
 BEAT_NAME?=packetbeat
 BEAT_TITLE?=Packetbeat
 SYSTEM_TESTS?=true
-TEST_ENVIRONMENT=false
+TEST_ENVIRONMENT?=true
 ES_BEATS?=..
 EXCLUDE_COMMON_UPDATE_TARGET=true
 
@@ -17,4 +17,4 @@ benchmark:
 
 .PHONY: create-tcp-protocol
 create-tcp-protocol: python-env
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py

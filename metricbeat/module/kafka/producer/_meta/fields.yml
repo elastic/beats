@@ -1,0 +1,50 @@
+- name: producer
+  type: group
+  description: Producer metrics from Kafka Producer JMX
+  release: beta
+  fields:
+    - name: mbean
+      description: Mbean that this event is related to
+      type: keyword
+    - name: available_buffer_bytes
+      description: The total amount of buffer memory
+      type: float
+    - name: batch_size_avg
+      description: The average number of bytes sent
+      type: float
+    - name: batch_size_max
+      description: The maximum number of bytes sent
+      type: long
+    - name: record_send_rate
+      description: The average number of records sent per second
+      type: float
+    - name: record_retry_rate
+      description: The average number of retried record sends per second
+      type: float
+    - name: record_error_rate
+      description: The average number of retried record sends per second
+      type: float
+    - name: records_per_request
+      description: The average number of records sent per second
+      type: float
+    - name: record_size_avg
+      description: The average record size
+      type: float
+    - name: record_size_max
+      description: The maximum record size
+      type: long
+    - name: request_rate
+      description: The number of producer requests per second
+      type: float
+    - name: response_rate
+      description: The number of producer responses per second
+      type: float
+    - name: io_wait
+      description: The producer I/O wait time
+      type: float
+    - name: out.bytes_per_sec
+      description: The rate of bytes going out for the producer
+      type: float
+    - name: message_rate
+      description: The producer message rate
+      type: float

@@ -1,7 +1,11 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance the exported data
+== Filter and enhance data with processors
 
-include::{libbeat-dir}/docs/processors.asciidoc[]
+++++
+<titleabbrev>Processors</titleabbrev>
+++++
+
+include::{libbeat-dir}/processors.asciidoc[]
 
 For example, the following configuration includes a subset of the Packetbeat DNS
 fields so that only the requests and their response codes are reported:
@@ -70,4 +74,4 @@ processors:
      fields: ["request", "response"]
 ----
 
-include::{libbeat-dir}/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]

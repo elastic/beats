@@ -12,4 +12,4 @@ locations that you specify, collects log events, and forwards them to either to
 https://www.elastic.co/products/elasticsearch[Elasticsearch] or
 https://www.elastic.co/products/logstash[Logstash].
 
-include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+include::{libbeat-dir}/shared-libbeat-description.asciidoc[]

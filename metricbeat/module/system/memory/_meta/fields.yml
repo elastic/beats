@@ -46,8 +46,9 @@
           type: long
           format: bytes
           description: >
-            Actual free memory in bytes. It is calculated based on the OS. On Linux it consists of the free memory
-            plus caches and buffers. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
+            Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo, 
+            or calculated from free memory plus caches and buffers if /proc/meminfo is not available.
+            On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal
             to `system.memory.free`.
 
         - name: used.pct
@@ -100,6 +101,39 @@
           format: percent
           description: >
             The percentage of used swap memory.
+
+    - name: page_stats
+      type: group
+      description: memory page statistics
+      fields:
+        - name: pgscan_kswapd.pages
+          type: long
+          format: number
+          description: pages scanned by kswapd
+        - name: pgscan_direct.pages
+          type: long
+          format: number
+          description: pages scanned directly
+        - name: pgfree.pages
+          type: long
+          format: number
+          description: pages freed by the system
+        - name: pgsteal_kswapd.pages
+          type: long
+          format: number
+          description: number of pages reclaimed by kswapd
+        - name: pgsteal_direct.pages
+          type: long
+          format: number
+          description: number of pages reclaimed directly
+        - name: direct_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
+        - name: kswapd_efficiency.pct
+          type: scaled_float
+          format: percent
+          description: kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
 
     - name: hugepages
       type: group

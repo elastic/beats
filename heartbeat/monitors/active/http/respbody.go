@@ -22,16 +22,18 @@ import (
 	"encoding/hex"
 	"io"
 	"net/http"
-	"unicode/utf8"
+	"strings"
 
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/docker/go-units"
+
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
 // since we must buffer the whole body for body validators this is effectively a cap on that.
 // 100MiB out to be enough for everybody.
-const maxBufferBodyBytes = 100 * 1024 * 1024
+const maxBufferBodyBytes = 100 * units.MiB
 
 func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
@@ -94,43 +96,20 @@ func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodyS
 
 func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, prefix string, hashStr string, err error) {
 	hash := sha256.New()
-	// Function to lazily get the body of the response
-	rawBuf := make([]byte, 1024)
 
-	// Buffer to hold the prefix output along with tracking info
-	prefixBuf := make([]byte, maxPrefixSize)
-	prefixRemainingBytes := maxPrefixSize
-	prefixWriteOffset := 0
-	for {
-		readSize, readErr := body.Read(rawBuf)
+	var prefixBuf strings.Builder
 
-		respSize += readSize
-		hash.Write(rawBuf[:readSize])
-
-		if prefixRemainingBytes > 0 {
-			if readSize >= prefixRemainingBytes {
-				copy(prefixBuf[prefixWriteOffset:maxPrefixSize], rawBuf[:prefixRemainingBytes])
-				prefixWriteOffset += prefixRemainingBytes
-				prefixRemainingBytes = 0
-			} else {
-				copy(prefixBuf[prefixWriteOffset:prefixWriteOffset+readSize], rawBuf[:readSize])
-				prefixWriteOffset += readSize
-				prefixRemainingBytes -= readSize
-			}
-		}
-
-		if readErr == io.EOF {
-			break
-		}
-
-		if readErr != nil {
-			return 0, "", "", readErr
-		}
+	n, err := io.Copy(&prefixBuf, io.TeeReader(io.LimitReader(body, int64(maxPrefixSize)), hash))
+	if err == nil {
+		// finish streaming into hash if the body has not been fully consumed yet
+		var m int64
+		m, err = io.Copy(hash, body)
+		n += m
 	}
 
-	// We discard the body if it is not valid UTF-8
-	if utf8.Valid(prefixBuf[:prefixWriteOffset]) {
-		prefix = string(prefixBuf[:prefixWriteOffset])
+	if err != nil && err != io.EOF {
+		return 0, "", "", err
 	}
-	return respSize, prefix, hex.EncodeToString(hash.Sum(nil)), nil
+
+	return int(n), prefixBuf.String(), hex.EncodeToString(hash.Sum(nil)), nil
 }

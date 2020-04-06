@@ -37,6 +37,28 @@ const (
 	FieldsAllYML = "build/fields/fields.all.yml"
 )
 
+// IncludeListOptions stores the options for IncludeList generation
+type IncludeListOptions struct {
+	ImportDirs       []string
+	ModuleDirs       []string
+	ModulesToExclude []string
+	Outfile          string
+	BuildTags        string
+	Pkg              string
+}
+
+// DefaultIncludeListOptions initializes IncludeListOptions struct with default values
+func DefaultIncludeListOptions() IncludeListOptions {
+	return IncludeListOptions{
+		ImportDirs:       nil,
+		ModuleDirs:       []string{"module"},
+		ModulesToExclude: nil,
+		Outfile:          "include/list.go",
+		BuildTags:        "",
+		Pkg:              "include",
+	}
+}
+
 // FieldsBuilder is the interface projects to implement for building field data.
 type FieldsBuilder interface {
 	// Generate all fields.go files.
@@ -79,12 +101,17 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 		return err
 	}
 
-	globalFieldsCmd := sh.RunCmd("go", "run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
 		"-out", CreateDir(output),
 	)
+	globalFieldsCmd := sh.RunCmd("go", cmd...)
 
 	return globalFieldsCmd(moduleDirs...)
 }
@@ -103,7 +130,11 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		return err
 	}
 
-	assetCmd := sh.RunCmd("go", "run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
@@ -111,6 +142,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
 	)
+	assetCmd := sh.RunCmd("go", cmd...)
 
 	return assetCmd()
 }
@@ -130,12 +162,17 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		moduleDir = CWD(moduleDir)
 	}
 
-	moduleFieldsCmd := sh.RunCmd("go", "run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
 		moduleDir,
 	)
+	moduleFieldsCmd := sh.RunCmd("go", cmd...)
 
 	return moduleFieldsCmd()
 }
@@ -143,13 +180,13 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
 func GenerateModuleIncludeListGo() error {
-	return GenerateIncludeListGo(nil, []string{"module"})
+	return GenerateIncludeListGo(DefaultIncludeListOptions())
 }
 
 // GenerateIncludeListGo generates an include/list.go file containing imports
 // for the packages that match the paths (or globs) in importDirs (optional)
 // and moduleDirs (optional).
-func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
+func GenerateIncludeListGo(options IncludeListOptions) error {
 	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -157,25 +194,38 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 		return err
 	}
 
-	includeListCmd := sh.RunCmd("go", "run",
+	cmd := []string{"run"}
+	if UseVendor {
+		cmd = append(cmd, "-mod", "vendor")
+	}
+	cmd = append(cmd,
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
+		"-out", options.Outfile, "-buildTags", options.BuildTags,
+		"-pkg", options.Pkg,
 	)
 
+	includeListCmd := sh.RunCmd("go", cmd...)
+
 	var args []string
-	for _, dir := range importDirs {
+	for _, dir := range options.ImportDirs {
 		if !filepath.IsAbs(dir) {
 			dir = CWD(dir)
 		}
 		args = append(args, "-import", dir)
 	}
-	for _, dir := range moduleDirs {
+	for _, dir := range options.ModuleDirs {
 		if !filepath.IsAbs(dir) {
 			dir = CWD(dir)
 		}
 		args = append(args, "-moduleDir", dir)
 	}
-
+	for _, dir := range options.ModulesToExclude {
+		if !filepath.IsAbs(dir) {
+			dir = CWD(dir)
+		}
+		args = append(args, "-moduleExcludeDirs", dir)
+	}
 	return includeListCmd(args...)
 }
 

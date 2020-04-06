@@ -1,24 +1,26 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-
 // +build integration
+// +build oracle
 
 package performance
 
 import (
 	"testing"
 
-	_ "gopkg.in/goracle.v2"
+	_ "github.com/godror/godror"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
+	r := compose.EnsureUp(t, "oracle")
+
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))
 
 	findKey := func(key string) func(common.MapStr) bool {
 		return func(in common.MapStr) bool {
@@ -54,11 +56,11 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "oracle",
 		"metricsets": []string{"performance"},
-		"hosts":      []string{oracle.GetOracleConnectionDetails("localhost")},
+		"hosts":      []string{oracle.GetOracleConnectionDetails(host)},
 		"username":   "sys",
 		"password":   "Oradoc_db1",
 	}

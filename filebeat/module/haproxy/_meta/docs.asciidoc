@@ -7,23 +7,14 @@ The +{modulename}+ module collects and parses logs from a (`haproxy`) process.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from `haproxy` running on AWS Linux as a gateway to a cluster of microservices.
 
 This module is not available for Windows.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard showing geolocation, distribution of requests between backends and frontends,
-and status codes over time. For example:
-
-[role="screenshot"]
-image::./images/kibana-haproxy-overview.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -48,6 +39,17 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing geolocation, distribution of requests between backends and frontends,
+and status codes over time. For example:
+
+[role="screenshot"]
+image::./images/kibana-haproxy-overview.png[]
 
 :has-dashboards!:
 

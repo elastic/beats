@@ -1,0 +1,32 @@
+[[release-highlights-8.0.0]]
+=== 8.0 release highlights
+++++
+<titleabbrev>8.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Following are the most notable features and enhancements in 8.0.
+
+//For a complete list of highlights, see the 
+//https://www.elastic.co/blog/beats-8-0-0-released[{beats} 8.0 release blog].
+
+For a list of bug fixes and other changes, see the {beats}
+<<breaking-changes-8.0, Breaking Changes>> and <<release-notes, Release Notes>>.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+// ADD NOTABLE HIGHLIGHTS HERE
+
+//[float]
+//==== Add title here
+
+//Add description here.
+
+//[float]
+//==== Add title here
+
+//Add description here.
+
+// end::notable-highlights[]

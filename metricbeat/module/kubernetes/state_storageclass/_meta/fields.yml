@@ -1,0 +1,21 @@
+- name: storageclass
+  type: group
+  description: >
+    kubernetes storage class metrics
+  release: experimental
+  fields:
+    - name: name
+      type: keyword
+      description: Storage class name.
+    - name: provisioner
+      type: keyword
+      description: Volume provisioner for the storage class.
+    - name: reclaim_policy
+      type: keyword
+      description: Reclaim policy for dynamically created volumes
+    - name: volume_binding_mode
+      type: keyword
+      description: Mode for default provisioning and binding
+    - name: created
+      type: date
+      description: Storage class creation date

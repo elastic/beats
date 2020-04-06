@@ -25,7 +25,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.
@@ -67,6 +68,7 @@ type MetricSetRegistration struct {
 	IsDefault  bool
 	HostParser HostParser
 	Namespace  string
+	Replace    bool
 }
 
 // MetricSetOption sets an option for a MetricSetFactory that is being
@@ -98,6 +100,15 @@ func WithNamespace(namespace string) MetricSetOption {
 	}
 }
 
+// MustReplace specifies that the MetricSetFactory must be replacing an existing
+// metricset with the same name. An error will happen if there is no metricset
+// defined with the same params.
+func MustReplace() MetricSetOption {
+	return func(r *MetricSetRegistration) {
+		r.Replace = true
+	}
+}
+
 // Register contains the factory functions for creating new Modules and new
 // MetricSets. Registers are thread safe for concurrent usage.
 type Register struct {
@@ -116,11 +127,12 @@ type Register struct {
 type ModulesSource interface {
 	Modules() ([]string, error)
 	HasModule(module string) bool
-	MetricSets(module string) ([]string, error)
-	DefaultMetricSets(module string) ([]string, error)
+	MetricSets(r *Register, module string) ([]string, error)
+	DefaultMetricSets(r *Register, module string) ([]string, error)
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
-	String() string
+	ModulesInfo(r *Register) string
+	ProcessorsForMetricSet(r *Register, module, name string) (*processors.Processors, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -199,20 +211,26 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 	module = strings.ToLower(module)
 	name = strings.ToLower(name)
 
-	if metricsets, ok := r.metricSets[module]; !ok {
-		r.metricSets[module] = map[string]MetricSetRegistration{}
-	} else if _, exists := metricsets[name]; exists {
-		return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
-	}
-
-	if factory == nil {
-		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
-	}
-
 	// Set the options.
 	msInfo := MetricSetRegistration{Name: name, Factory: factory}
 	for _, opt := range options {
 		opt(&msInfo)
+	}
+
+	if metricsets, ok := r.metricSets[module]; !ok {
+		if msInfo.Replace {
+			return fmt.Errorf("metricset '%s/%s' should be replacing an existing metricset, none found", module, name)
+		}
+
+		r.metricSets[module] = map[string]MetricSetRegistration{}
+	} else if _, exists := metricsets[name]; exists {
+		if !msInfo.Replace {
+			return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
+		}
+	}
+
+	if factory == nil {
+		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
 	}
 
 	r.metricSets[module][name] = msInfo
@@ -280,7 +298,7 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 	// List also default metrics from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		exists = true
-		sourceDefaults, err := source.DefaultMetricSets(module)
+		sourceDefaults, err := source.DefaultMetricSets(r, module)
 		if err != nil {
 			r.log.Errorf("Failed to get default metric sets for module '%s' from secondary source: %s", module, err)
 		} else if len(sourceDefaults) > 0 {
@@ -352,7 +370,7 @@ func (r *Register) MetricSets(module string) []string {
 
 	// List also metric sets from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
-		sourceMetricSets, err := source.MetricSets(module)
+		sourceMetricSets, err := source.MetricSets(r, module)
 		if err != nil {
 			r.log.Errorf("Failed to get metricsets from secondary source: %s", err)
 		}
@@ -360,6 +378,28 @@ func (r *Register) MetricSets(module string) []string {
 	}
 
 	return metricsets
+}
+
+// ProcessorsForMetricSet returns a list of processors defined in manifest of the registered metricset.
+func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Processors, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	module = strings.ToLower(module)
+	name = strings.ToLower(name)
+
+	metricSets, exists := r.metricSets[module]
+	if exists {
+		_, exists := metricSets[name]
+		if exists {
+			return processors.NewList(nil), nil // Standard metricsets don't have processor definitions.
+		}
+	}
+
+	if source := r.secondarySource; source != nil {
+		return source.ProcessorsForMetricSet(r, module, name)
+	}
+	return nil, fmt.Errorf(`metricset "%s" is not registered (module: %s)'`, name, module)
 }
 
 // SetSecondarySource sets an additional source of modules
@@ -390,7 +430,7 @@ func (r *Register) String() string {
 
 	var secondarySource string
 	if source := r.secondarySource; source != nil {
-		secondarySource = ", " + source.String()
+		secondarySource = fmt.Sprintf(", LightModules:[%s]", source.ModulesInfo(r))
 	}
 
 	sort.Strings(modules)

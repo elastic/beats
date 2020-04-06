@@ -7,12 +7,13 @@ package aws
 import (
 	"testing"
 
-	"github.com/awslabs/goformation/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
 )
 
 func TestConfig(t *testing.T) {
@@ -49,7 +50,7 @@ func testPolicies(t *testing.T) {
 	}
 
 	// ensure permissions on specified resources
-	expected := cloudformation.AWSIAMRole_Policy{
+	expected := iam.Role_Policy{
 		PolicyName: cloudformation.Join("-", []string{"fnb", "kinesis", "myfunction"}),
 		PolicyDocument: map[string]interface{}{
 			"Statement": []map[string]interface{}{

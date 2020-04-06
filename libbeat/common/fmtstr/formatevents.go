@@ -19,7 +19,6 @@ package fmtstr
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -27,10 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/dtfmt"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/dtfmt"
 )
 
 // EventFormatString implements format string support on events
@@ -420,10 +420,9 @@ func fieldString(event *beat.Event, field string) (string, error) {
 
 	s, err := tryConvString(v)
 	if err != nil {
-		logp.Warn("Can not convert key '%v' value to string", v)
+		return s, errors.Wrapf(err, "can not convert key '%v' value to string", v)
 	}
-
-	return s, err
+	return s, nil
 }
 
 func tryConvString(v interface{}) (string, error) {

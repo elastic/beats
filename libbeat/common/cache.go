@@ -68,18 +68,26 @@ func (e *element) UpdateLastAccessTime(now time.Time, expiration time.Duration) 
 // the cache will cause a panic.
 type Cache struct {
 	sync.RWMutex
-	timeout     time.Duration    // Length of time before cache elements expire.
-	elements    map[Key]*element // Data stored by the cache.
-	clock       clock            // Function used to get the current time.
-	listener    RemovalListener  // Callback listen to notify of evictions.
-	janitorQuit chan struct{}    // Closing this channel stop the janitor.
+	timeout      time.Duration    // Length of time before cache elements expire.
+	accessExpire bool             // Expire objects based on access time instead of addition time.
+	elements     map[Key]*element // Data stored by the cache.
+	clock        clock            // Function used to get the current time.
+	listener     RemovalListener  // Callback listen to notify of evictions.
+	janitorQuit  chan struct{}    // Closing this channel stop the janitor.
 }
 
 // NewCache creates and returns a new Cache. d is the length of time after last
 // access that cache elements expire. initialSize is the initial allocation size
 // used for the Cache's underlying map.
 func NewCache(d time.Duration, initialSize int) *Cache {
-	return newCache(d, initialSize, nil, time.Now)
+	return newCache(d, true, initialSize, nil, time.Now)
+}
+
+// NewCacheWithExpireOnAdd creates and returns a new Cache that does not updated
+// the expiration time when the object is accessed. The expiration is only set when
+// a new object is added to the cache and is not updated until it expires and re-inserted.
+func NewCacheWithExpireOnAdd(d time.Duration, initialSize int) *Cache {
+	return newCache(d, false, initialSize, nil, time.Now)
 }
 
 // NewCacheWithRemovalListener creates and returns a new Cache and register a
@@ -88,15 +96,16 @@ func NewCache(d time.Duration, initialSize int) *Cache {
 // for the Cache's underlying map. l is the callback function that will be
 // invoked when cache elements are removed from the map on CleanUp.
 func NewCacheWithRemovalListener(d time.Duration, initialSize int, l RemovalListener) *Cache {
-	return newCache(d, initialSize, l, time.Now)
+	return newCache(d, true, initialSize, l, time.Now)
 }
 
-func newCache(d time.Duration, initialSize int, l RemovalListener, t clock) *Cache {
+func newCache(d time.Duration, accessExpire bool, initialSize int, l RemovalListener, t clock) *Cache {
 	return &Cache{
-		timeout:  d,
-		elements: make(map[Key]*element, initialSize),
-		listener: l,
-		clock:    t,
+		timeout:      d,
+		accessExpire: accessExpire,
+		elements:     make(map[Key]*element, initialSize),
+		listener:     l,
+		clock:        t,
 	}
 }
 
@@ -254,7 +263,9 @@ func (c *Cache) get(k Key) (Value, bool) {
 	elem, exists := c.elements[k]
 	now := c.clock()
 	if exists && !elem.IsExpired(now) {
-		elem.UpdateLastAccessTime(now, elem.timeout)
+		if c.accessExpire {
+			elem.UpdateLastAccessTime(now, elem.timeout)
+		}
 		return elem.value, true
 	}
 	return nil, false

@@ -21,11 +21,13 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type jvm struct {
@@ -96,6 +98,16 @@ type nodeInfo struct {
 	Pipeline    pipeline `json:"pipeline"`
 }
 
+// inNodeInfo represents the Logstash node info to be parsed from the Logstash API
+// response. It contains nodeInfo (which is also used as-is elsewhere) + monitoring
+// information.
+type inNodeInfo struct {
+	nodeInfo
+	Monitoring struct {
+		ClusterID string `json:"cluster_uuid"`
+	} `json:"monitoring"`
+}
+
 type reloads struct {
 	Successes int `json:"successes"`
 	Failures  int `json:"failures"`
@@ -103,7 +115,7 @@ type reloads struct {
 
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
-	nodeInfo
+	inNodeInfo
 	commonStats
 	Process   process                  `json:"process"`
 	OS        os                       `json:"os"`
@@ -166,7 +178,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
-	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, nodeStats.Monitoring.ClusterID)
 
 	for clusterUUID, clusterPipelines := range clusterToPipelinesMap {
 		logstashStats := LogstashStats{
@@ -197,24 +209,22 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	return nil
 }
 
-func makeClusterToPipelinesMap(pipelines []PipelineStats) map[string][]PipelineStats {
+func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID string) map[string][]PipelineStats {
 	var clusterToPipelinesMap map[string][]PipelineStats
 	clusterToPipelinesMap = make(map[string][]PipelineStats)
+
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
 
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
 		for _, vertex := range pipeline.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs = append(clusterUUIDs, clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one

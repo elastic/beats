@@ -1,9 +1,0 @@
-type: kafka
-hosts: {{ .namespace }}
-topics: {{ .eventhub }}
-group_id: {{ .consumer_group }}
-expand_event_list_from_field: "records"
-
-username: "$ConnectionString"
-password: {{ .connection_string }}
-ssl.enabled: true

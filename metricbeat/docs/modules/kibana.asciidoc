@@ -15,7 +15,7 @@ this module is `status`.
 [float]
 === Compatibility
 
-The Kibana module is tested with Kibana 6.3.
+The Kibana module works with Kibana 6.7.0 and later.
 
 
 [float]

@@ -17,7 +17,9 @@
 
 package logp
 
-import "time"
+import (
+	"time"
+)
 
 // Config contains the configuration options for the logger. To create a Config
 // from a common.Config use logp/config.Build.
@@ -36,6 +38,7 @@ type Config struct {
 
 	Files FileConfig `config:"files"`
 
+	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
 }
@@ -52,20 +55,21 @@ type FileConfig struct {
 	RedirectStderr  bool          `config:"redirect_stderr"`
 }
 
-var defaultConfig = Config{
-	Level:   InfoLevel,
-	ToFiles: true,
-	Files: FileConfig{
-		MaxSize:         10 * 1024 * 1024,
-		MaxBackups:      7,
-		Permissions:     0600,
-		Interval:        0,
-		RotateOnStartup: true,
-	},
-	addCaller: true,
-}
+const defaultLevel = InfoLevel
 
-// DefaultConfig returns the default config options.
-func DefaultConfig() Config {
-	return defaultConfig
+// DefaultConfig returns the default config options for a given environment the
+// Beat is supposed to be run within.
+func DefaultConfig(environment Environment) Config {
+	return Config{
+		Level: defaultLevel,
+		Files: FileConfig{
+			MaxSize:         10 * 1024 * 1024,
+			MaxBackups:      7,
+			Permissions:     0600,
+			Interval:        0,
+			RotateOnStartup: true,
+		},
+		environment: environment,
+		addCaller:   true,
+	}
 }

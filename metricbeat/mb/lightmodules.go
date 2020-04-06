@@ -26,8 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const (
@@ -38,12 +39,14 @@ const (
 // LightModulesSource loads module definitions from files in the provided paths
 type LightModulesSource struct {
 	paths []string
+	log   *logp.Logger
 }
 
 // NewLightModulesSource creates a new LightModulesSource
 func NewLightModulesSource(paths ...string) *LightModulesSource {
 	return &LightModulesSource{
 		paths: paths,
+		log:   logp.NewLogger("registry.lightmodules"),
 	}
 }
 
@@ -56,7 +59,7 @@ func (s *LightModulesSource) Modules() ([]string, error) {
 func (s *LightModulesSource) HasModule(moduleName string) bool {
 	names, err := s.moduleNames()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "failed to get list of light module names"))
+		s.log.Errorf("Failed to get list of light module names: %v", err)
 		return false
 	}
 	for _, name := range names {
@@ -68,10 +71,10 @@ func (s *LightModulesSource) HasModule(moduleName string) bool {
 }
 
 // DefaultMetricSets list the default metricsets for a given module
-func (s *LightModulesSource) DefaultMetricSets(moduleName string) ([]string, error) {
-	module, err := s.loadModule(moduleName)
+func (s *LightModulesSource) DefaultMetricSets(r *Register, moduleName string) ([]string, error) {
+	module, err := s.loadModule(r, moduleName)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get default metricsets for module '%s'", moduleName)
+		return nil, errors.Wrapf(err, "getting default metricsets for module '%s'", moduleName)
 	}
 	var metricsets []string
 	for _, ms := range module.MetricSets {
@@ -83,10 +86,10 @@ func (s *LightModulesSource) DefaultMetricSets(moduleName string) ([]string, err
 }
 
 // MetricSets list the available metricsets for a given module
-func (s *LightModulesSource) MetricSets(moduleName string) ([]string, error) {
-	module, err := s.loadModule(moduleName)
+func (s *LightModulesSource) MetricSets(r *Register, moduleName string) ([]string, error) {
+	module, err := s.loadModule(r, moduleName)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get metricsets for module '%s'", moduleName)
+		return nil, errors.Wrapf(err, "getting metricsets for module '%s'", moduleName)
 	}
 	metricsets := make([]string, 0, len(module.MetricSets))
 	for _, ms := range module.MetricSets {
@@ -104,7 +107,7 @@ func (s *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 
 	moduleConfig, err := s.loadModuleConfig(modulePath)
 	if err != nil {
-		logp.Error(errors.Wrapf(err, "failed to load module config for module '%s'", moduleName))
+		s.log.Errorf("Failed to load module config for module '%s': %v", moduleName, err)
 		return false
 	}
 
@@ -118,9 +121,9 @@ func (s *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 
 // MetricSetRegistration obtains a registration for a light metric set
 func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleName, metricSetName string) (MetricSetRegistration, error) {
-	lightModule, err := s.loadModule(moduleName)
+	lightModule, err := s.loadModule(register, moduleName)
 	if err != nil {
-		return MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
+		return MetricSetRegistration{}, errors.Wrapf(err, "loading module '%s'", moduleName)
 	}
 
 	ms, found := lightModule.MetricSets[metricSetName]
@@ -131,12 +134,18 @@ func (s *LightModulesSource) MetricSetRegistration(register *Register, moduleNam
 	return ms.Registration(register)
 }
 
-// String returns a string representation of this source, with a list of known metricsets
-func (s *LightModulesSource) String() string {
+// ModulesInfo returns a string representation of this source, with a list of known metricsets
+func (s *LightModulesSource) ModulesInfo(r *Register) string {
 	var metricSets []string
-	modules, _ := s.Modules()
+	modules, err := s.Modules()
+	if err != nil {
+		s.log.Errorf("Failed to list modules: %s", err)
+	}
 	for _, module := range modules {
-		moduleMetricSets, _ := s.MetricSets(module)
+		moduleMetricSets, err := s.MetricSets(r, module)
+		if err != nil {
+			s.log.Errorf("Failed to list light metricsets for module %s: %v", module, err)
+		}
 		for _, name := range moduleMetricSets {
 			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 		}
@@ -150,13 +159,26 @@ type lightModuleConfig struct {
 	MetricSets []string `config:"metricsets"`
 }
 
+// ProcessorsForMetricSet returns processors defined for the light metricset.
+func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error) {
+	module, err := s.loadModule(r, moduleName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "reading processors for metricset '%s' in module '%s'", metricSetName, moduleName)
+	}
+	metricSet, ok := module.MetricSets[metricSetName]
+	if !ok {
+		return nil, fmt.Errorf("unknown metricset '%s' in module '%s'", metricSetName, moduleName)
+	}
+	return processors.New(metricSet.Processors)
+}
+
 // LightModule contains the definition of a light module
 type LightModule struct {
 	Name       string
 	MetricSets map[string]LightMetricSet
 }
 
-func (s *LightModulesSource) loadModule(moduleName string) (*LightModule, error) {
+func (s *LightModulesSource) loadModule(register *Register, moduleName string) (*LightModule, error) {
 	modulePath, found := s.findModulePath(moduleName)
 	if !found {
 		return nil, fmt.Errorf("module '%s' not found", moduleName)
@@ -164,12 +186,12 @@ func (s *LightModulesSource) loadModule(moduleName string) (*LightModule, error)
 
 	moduleConfig, err := s.loadModuleConfig(modulePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to load light module '%s' definition", moduleName)
+		return nil, errors.Wrapf(err, "loading light module '%s' definition", moduleName)
 	}
 
-	metricSets, err := s.loadMetricSets(filepath.Dir(modulePath), moduleConfig.Name, moduleConfig.MetricSets)
+	metricSets, err := s.loadMetricSets(register, filepath.Dir(modulePath), moduleConfig.Name, moduleConfig.MetricSets)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to load metric sets for light module '%s'", moduleName)
+		return nil, errors.Wrapf(err, "loading metric sets for light module '%s'", moduleName)
 	}
 
 	return &LightModule{Name: moduleName, MetricSets: metricSets}, nil
@@ -188,24 +210,30 @@ func (s *LightModulesSource) findModulePath(moduleName string) (string, bool) {
 func (s *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleConfig, error) {
 	config, err := common.LoadFile(modulePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to load module configuration from '%s'", modulePath)
+		return nil, errors.Wrapf(err, "loading module configuration from '%s'", modulePath)
 	}
 
 	var moduleConfig lightModuleConfig
 	if err = config.Unpack(&moduleConfig); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse light module definition from '%s'", modulePath)
+		return nil, errors.Wrapf(err, "parsing light module definition from '%s'", modulePath)
 	}
 	return &moduleConfig, nil
 }
 
-func (s *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]LightMetricSet, error) {
+func (s *LightModulesSource) loadMetricSets(register *Register, moduleDirPath, moduleName string, metricSetNames []string) (map[string]LightMetricSet, error) {
 	metricSets := make(map[string]LightMetricSet)
 	for _, metricSet := range metricSetNames {
+		if moduleMetricSets, exists := register.metricSets[moduleName]; exists {
+			if _, exists := moduleMetricSets[metricSet]; exists {
+				continue
+			}
+		}
+
 		manifestPath := filepath.Join(moduleDirPath, metricSet, manifestYML)
 
 		metricSetConfig, err := s.loadMetricSetConfig(manifestPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to load light metricset '%s'", metricSet)
+			return nil, errors.Wrapf(err, "loading light metricset '%s'", metricSet)
 		}
 		metricSetConfig.Name = metricSet
 		metricSetConfig.Module = moduleName
@@ -218,11 +246,11 @@ func (s *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, me
 func (s *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
 	config, err := common.LoadFile(manifestPath)
 	if err != nil {
-		return ms, errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)
+		return ms, errors.Wrapf(err, "loading metricset manifest from '%s'", manifestPath)
 	}
 
 	if err := config.Unpack(&ms); err != nil {
-		return ms, errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
+		return ms, errors.Wrapf(err, "parsing metricset manifest from '%s'", manifestPath)
 	}
 	return
 }
@@ -230,11 +258,18 @@ func (s *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightM
 func (s *LightModulesSource) moduleNames() ([]string, error) {
 	modules := make(map[string]bool)
 	for _, dir := range s.paths {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			s.log.Debugf("Light modules directory '%d' doesn't exist", dir)
+			continue
+		}
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to list modules on path '%s'", dir)
+			return nil, errors.Wrapf(err, "listing modules on path '%s'", dir)
 		}
 		for _, f := range files {
+			if !f.IsDir() {
+				continue
+			}
 			modulePath := filepath.Join(dir, f.Name(), moduleYML)
 			if _, err := os.Stat(modulePath); os.IsNotExist(err) {
 				continue

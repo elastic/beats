@@ -32,14 +32,14 @@ $env:TEST_COVERAGE = "true"
 $env:RACE_DETECTOR = "true"
 
 # Install mage from vendor.
-exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage } "mage install FAILURE"
+exec { go install -mod=vendor github.com/magefile/mage } "mage install FAILURE"
 
 if (Test-Path "$env:beat\magefile.go") {
     cd "$env:beat"
 } else {
     echo "$env:beat\magefile.go does not exist"
     New-Item -ItemType directory -Path build | Out-Null
-    New-Item -Name build\TEST-empty.xml -ItemType File | Out-Null
+    New-Item -Name build\TEST-empty.out -ItemType File | Out-Null
     exit
 }
 
@@ -64,6 +64,11 @@ $packages = ($packages|group|Select -ExpandProperty Name) -join ","
 exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
 
 if (Test-Path "tests\system") {
-    Set-Location -Path tests\system
-    exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"
+    echo "Running python tests"
+    choco install python -y -r --no-progress --version 3.8.1.20200110
+    refreshenv
+    $env:PATH = "C:\Python38;C:\Python38\Scripts;$env:PATH"
+    $env:PYTHON_ENV = "$env:TEMP\python-env"
+    python --version
+    exec { mage pythonUnitTest } "System test FAILURE"
 }

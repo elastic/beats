@@ -26,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -35,7 +35,7 @@ import (
 const testFile = "../_meta/test/serverstats"
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/serverstats")
+	content, err := ioutil.ReadFile(testFile)
 	assert.NoError(t, err)
 
 	event, err := eventMapping(content)
@@ -49,6 +49,10 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(0), clusterManager["cluster_modified"])
 	assert.Equal(t, int64(0), clusterManager["cluster_removed"])
 	assert.Equal(t, int64(0), clusterManager["warming_clusters"])
+	assert.Equal(t, int64(0), clusterManager["cluster_updated"])
+	assert.Equal(t, int64(0), clusterManager["cluster_updated_via_merge"])
+	assert.Equal(t, int64(0), clusterManager["update_merge_cancelled"])
+	assert.Equal(t, int64(0), clusterManager["update_out_of_merge_window"])
 
 	fileSystem := event["filesystem"].(common.MapStr)
 	assert.Equal(t, int64(389), fileSystem["flushed_by_timer"])
@@ -56,6 +60,29 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(44), fileSystem["write_buffered"])
 	assert.Equal(t, int64(43), fileSystem["write_completed"])
 	assert.Equal(t, int64(0), fileSystem["write_total_buffered"])
+	assert.Equal(t, int64(0), fileSystem["write_total_buffered"])
+	assert.Equal(t, int64(0), fileSystem["write_failed"])
+
+	listenerManager := event["listener_manager"].(common.MapStr)
+	assert.Equal(t, int64(1), listenerManager["listener_added"])
+	assert.Equal(t, int64(0), listenerManager["listener_create_failure"])
+	assert.Equal(t, int64(4), listenerManager["listener_create_success"])
+	assert.Equal(t, int64(0), listenerManager["listener_modified"])
+	assert.Equal(t, int64(0), listenerManager["listener_removed"])
+	assert.Equal(t, int64(1), listenerManager["total_listeners_active"])
+	assert.Equal(t, int64(0), listenerManager["total_listeners_draining"])
+	assert.Equal(t, int64(0), listenerManager["total_listeners_warming"])
+	assert.Equal(t, int64(0), listenerManager["listener_stopped"])
+
+	runtime := event["runtime"].(common.MapStr)
+	assert.Equal(t, int64(0), runtime["admin_overrides_active"])
+	assert.Equal(t, int64(0), runtime["load_error"])
+	assert.Equal(t, int64(0), runtime["load_success"])
+	assert.Equal(t, int64(0), runtime["num_keys"])
+	assert.Equal(t, int64(0), runtime["override_dir_exists"])
+	assert.Equal(t, int64(0), runtime["override_dir_not_exists"])
+	assert.Equal(t, int64(0), runtime["deprecated_feature_use"])
+	assert.Equal(t, int64(2), runtime["num_layers"])
 
 	server := event["server"].(common.MapStr)
 	assert.Equal(t, int64(2147483647), server["days_until_first_cert_expiring"])
@@ -68,9 +95,24 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, int64(16364036), server["version"])
 	assert.Equal(t, int64(4), server["watchdog_mega_miss"])
 	assert.Equal(t, int64(4), server["watchdog_miss"])
+	assert.Equal(t, int64(12), server["concurrency"])
+	assert.Equal(t, int64(0), server["debug_assertion_failures"])
+	assert.Equal(t, int64(0), server["dynamic_unknown_fields"])
+	assert.Equal(t, int64(0), server["hot_restart_epoch"])
+	assert.Equal(t, int64(0), server["state"])
+	assert.Equal(t, int64(0), server["static_unknown_fields"])
+	assert.Equal(t, int64(0), server["stats_recent_lookups"])
 
 	stats := event["stats"].(common.MapStr)
 	assert.Equal(t, int64(0), stats["overflow"])
+
+	http2 := event["http2"].(common.MapStr)
+	assert.Equal(t, int64(0), http2["header_overflow"])
+	assert.Equal(t, int64(0), http2["headers_cb_no_stream"])
+	assert.Equal(t, int64(0), http2["rx_reset"])
+	assert.Equal(t, int64(0), http2["too_many_header_frames"])
+	assert.Equal(t, int64(0), http2["trailers"])
+	assert.Equal(t, int64(0), http2["tx_reset"])
 }
 
 func TestFetchEventContent(t *testing.T) {

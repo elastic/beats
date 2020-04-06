@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/elastic/go-ucfg/parse"
 )
 
 type reference struct {
@@ -140,22 +142,23 @@ func (r *reference) resolveRef(cfg *Config, opts *options) (value, error) {
 	return nil, err
 }
 
-func (r *reference) resolveEnv(cfg *Config, opts *options) (string, error) {
+func (r *reference) resolveEnv(cfg *Config, opts *options) (string, parse.Config, error) {
 	var err error
 
 	if len(opts.resolvers) > 0 {
 		key := r.Path.String()
 		for i := len(opts.resolvers) - 1; i >= 0; i-- {
 			var v string
+			var cfg parse.Config
 			resolver := opts.resolvers[i]
-			v, err = resolver(key)
+			v, cfg, err = resolver(key)
 			if err == nil {
-				return v, nil
+				return v, cfg, nil
 			}
 		}
 	}
 
-	return "", err
+	return "", parse.DefaultConfig, err
 }
 
 func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
@@ -166,7 +169,7 @@ func (r *reference) resolve(cfg *Config, opts *options) (value, error) {
 
 	previousErr := err
 
-	s, err := r.resolveEnv(cfg, opts)
+	s, _, err := r.resolveEnv(cfg, opts)
 	if err != nil {
 		// TODO(ph): Not everything is an Error, will do some cleanup in another PR.
 		if v, ok := previousErr.(Error); ok {

@@ -3,6 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<filebeat-modules-overview>>
+  * <<filebeat-module-activemq>>
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-aws>>
@@ -10,6 +11,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cef>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
+  * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-googlecloud>>
@@ -28,6 +30,8 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-nginx>>
+  * <<filebeat-module-o365>>
+  * <<filebeat-module-okta>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
   * <<filebeat-module-postgresql>>
@@ -43,6 +47,7 @@ This file is generated! See scripts/docs_collector.py
 --
 
 include::modules-overview.asciidoc[]
+include::modules/activemq.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/aws.asciidoc[]
@@ -50,6 +55,7 @@ include::modules/azure.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
+include::modules/crowdstrike.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/googlecloud.asciidoc[]
@@ -68,6 +74,8 @@ include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/o365.asciidoc[]
+include::modules/okta.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]

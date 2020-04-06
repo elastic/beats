@@ -6,27 +6,30 @@
   activitylogs:
     enabled: true
     var:
-      # Azure event hub namespace FQDN for example "eventhubs.servicebus.windows.net:9093"
-      namespace: ""
       # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
-      eventhub: ["insights-operational-logs"]
+      eventhub: "insights-operational-logs"
       # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
       consumer_group: "$Default"
       # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
       connection_string: ""
+      # the name of the storage account the state/offsets will be stored and updated.
+      storage_account: ""
+      #The storage account key, this key will be used to authorize access to data in your storage account.
+      storage_account_key: ""
 
- # auditlogs:
- #   enabled: true
+  auditlogs:
+    enabled: false
  #   var:
- #     namespace: ""
- #     eventhub: ["insights-logs-auditlogs"]
+ #     eventhub: "insights-logs-auditlogs"
  #     consumer_group: "$Default"
  #     connection_string: ""
-
- # signinlogs:
- #   enabled: true
+ #     storage_account: ""
+ #     storage_account_key: ""
+  signinlogs:
+    enabled: false
  #   var:
- #     namespace: ""
- #     eventhub: ["insights-logs-signinlogs"]
+ #     eventhub: "insights-logs-signinlogs"
  #     consumer_group: "$Default"
  #     connection_string: ""
+ #     storage_account: ""
+ #     storage_account_key: ""

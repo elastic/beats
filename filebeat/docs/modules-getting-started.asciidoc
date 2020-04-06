@@ -22,7 +22,7 @@ Can't find a module for your log file type? Follow the numbered steps under
 Before running {beatname_uc} modules:
 
 * Install and configure the Elastic stack. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+{stack-gs}/get-started-elastic-stack.html[Get started with the {stack}].
 
 * Complete the {beatname_uc} installation instructions described in
 <<filebeat-installation>>. After installing {beatname_uc}, return to this
@@ -40,9 +40,9 @@ To set up and run {beatname_uc} modules:
 installation. By default, {beatname_uc} assumes {es} is running locally on port
 9200.
 +
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
 . Enable the modules you want to run. For example, the following command enables
 the system, nginx, and mysql modules:

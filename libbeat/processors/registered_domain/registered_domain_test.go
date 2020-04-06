@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestProcessorRun(t *testing.T) {
@@ -36,10 +36,10 @@ func TestProcessorRun(t *testing.T) {
 		{false, "www.google.co.uk", "google.co.uk"},
 		{false, "google.com", "google.com"},
 		{false, "www.ak.local", "ak.local"},
-		{false, ".", "."},
 		{false, "www.navy.mil", "navy.mil"},
 
 		{true, "com", ""},
+		{true, ".", "."},
 		{true, "", ""},
 		{true, "localhost", ""},
 	}

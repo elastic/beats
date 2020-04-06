@@ -20,7 +20,7 @@ package ilm
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type stdSupport struct {
@@ -67,9 +67,10 @@ func NewStdSupport(
 	}
 }
 
-func (s *stdSupport) Mode() Mode     { return s.mode }
-func (s *stdSupport) Alias() Alias   { return s.alias }
-func (s *stdSupport) Policy() Policy { return s.policy }
+func (s *stdSupport) Mode() Mode      { return s.mode }
+func (s *stdSupport) Alias() Alias    { return s.alias }
+func (s *stdSupport) Policy() Policy  { return s.policy }
+func (s *stdSupport) Overwrite() bool { return s.overwrite }
 
 func (s *stdSupport) Manager(h ClientHandler) Manager {
 	return &stdManager{
@@ -78,7 +79,7 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 	}
 }
 
-func (m *stdManager) Enabled() (bool, error) {
+func (m *stdManager) CheckEnabled() (bool, error) {
 	if m.mode == ModeDisabled {
 		return false, nil
 	}
@@ -120,7 +121,7 @@ func (m *stdManager) EnsureAlias() error {
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
-	overwrite = overwrite || m.overwrite
+	overwrite = overwrite || m.Overwrite()
 
 	exists := true
 	if m.checkExists && !overwrite {

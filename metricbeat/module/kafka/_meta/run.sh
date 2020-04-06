@@ -34,6 +34,7 @@ wait_for_port() {
     nc -z localhost $port
 }
 
+${KAFKA_HOME}/bin/kafka-topics.sh --zookeeper=127.0.0.1:2181 --create --partitions 1 --topic test --replication-factor 1
 
 echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
@@ -41,7 +42,7 @@ wait_for_port 2181
 
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
-export KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf
+export KAFKA_OPTS="-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8779,host=0.0.0.0"
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer \
     --override super.users=User:admin \
@@ -55,6 +56,8 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
 wait_for_port 9092
+wait_for_port 8779
+
 
 echo "Kafka load status code $?"
 
@@ -67,6 +70,19 @@ ${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localh
 ${KAFKA_HOME}/bin/kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:stats --operation Read --topic '*'
 
 touch /tmp/.acls_loaded
+
+
+# Start a forever producer
+{ while sleep 1; do echo message; done } | KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-producer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8775,host=0.0.0.0" \
+ ${KAFKA_HOME}/bin/kafka-console-producer.sh --topic test --broker-list localhost:9091 --producer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
+
+wait_for_port 8775
+
+# Start a forever consumer
+KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-consumer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8774,host=0.0.0.0" \
+ ${KAFKA_HOME}/bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091 --consumer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
+
+wait_for_port 8774
 
 # Make sure the container keeps running
 tail -f /dev/null
