@@ -85,6 +85,8 @@ func TestXPackEnabled(t *testing.T) {
 
 		event := events[0]
 		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		//require.Equal(t, "TODO", event.RootFields["cluster_uuid"])
+		t.Logf("***** cluster_uuid: ", event.RootFields["cluster_uuid"])
 		require.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
 	}
 }
