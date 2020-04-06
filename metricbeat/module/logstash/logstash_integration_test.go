@@ -74,7 +74,7 @@ func TestXPackEnabled(t *testing.T) {
 	lsService := compose.EnsureUpWithTimeout(t, 300, "logstash")
 	esService := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 
-	clusterUUID := getESClusterUUID(esService.Host())
+	clusterUUID := getESClusterUUID(t, esService.Host())
 
 	metricSetToTypeMap := map[string]string{
 		"node":       "logstash_state",
@@ -112,15 +112,17 @@ func getXPackConfig(host string) map[string]interface{} {
 	}
 }
 
-func getESClusterUUID(host string) string {
-	resp, _ := http.Get("http://" + host + "/")
+func getESClusterUUID(t *testing.T, host string) string {
+	resp, err := http.Get("http://" + host + "/")
+	require.NoError(t, err)
 	defer resp.Body.Close()
 
 	var body struct {
 		ClusterUUID string `json:"cluster_uuid"`
 	}
 
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
 	json.Unmarshal(data, &body)
 
 	return body.ClusterUUID
