@@ -56,7 +56,15 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
-
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        kind:
+          - connection
+          - protocol
 {{ if .community_id }}
   - community_id:
       fields:

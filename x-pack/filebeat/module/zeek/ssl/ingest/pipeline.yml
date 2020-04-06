@@ -248,7 +248,14 @@ processors:
         ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
       }
       ctx.tls.version_protocol = parts[0].toLowerCase();
-
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
 on_failure:
 - set:
     field: error.message
