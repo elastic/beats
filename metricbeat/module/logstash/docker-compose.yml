@@ -20,3 +20,9 @@ services:
       context: ../elasticsearch/_meta
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.5.2}
+    environment:
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+    ports
+      - 9200
