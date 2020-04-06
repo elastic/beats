@@ -164,13 +164,6 @@ func (tm *tcpMonitor) makeEndpointJobFor(
 					return fn(event, dialer, ipPort)
 				}
 
-				/*
-					schemeTLS := tm.tlsConfig
-					if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
-						schemeTLS = nil
-					}
-				*/
-
 				dc := &dialchain.DialerChain{
 					Net: dialchain.MakeConstAddrDialer(ipPort, dialchain.TCPDialer(tm.config.Timeout)),
 				}
@@ -181,6 +174,7 @@ func (tm *tcpMonitor) makeEndpointJobFor(
 				}
 				if isTLS {
 					dc.AddLayer(dialchain.TLSLayer(tm.tlsConfig, tm.config.Timeout))
+					dc.AddLayer(dialchain.ConstAddrLayer(endpointURL.Host))
 				}
 
 				dialer, err := dc.Build(event)
