@@ -239,7 +239,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
 - Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
-- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}XXXXX[XXXXX]
+- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
+- Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
 
 *Heartbeat*
 

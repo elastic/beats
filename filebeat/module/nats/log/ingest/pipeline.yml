@@ -161,6 +161,20 @@ processors:
     - yyyy/MM/dd HH:mm:ss.SSSSSS
 - remove:
     field: nats.log.timestamp
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: error
+    if: "ctx?.log?.level != null && (ctx.log.level == 'error' || ctx.log.level == 'fatal')"
+- append:
+    field: related.ip
+    value: "{{client.ip}}"
+    if: "ctx?.client?.ip != null"
 on_failure:
 - set:
     field: error.message
