@@ -129,18 +129,18 @@ func (jf *jobFactory) makeEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
 	if jf.config.Socks5.URL != "" && !jf.config.Socks5.LocalResolve {
-		return wrappers.WithURLField(endpointURL,
-			jobs.MakeSimpleJob(func(event *beat.Event) error {
-				hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
-				return jf.dial(event, hostPort, endpointURL)
-			})), nil
+		jf.makeSocksLookupEndpointJob(endpointURL)
 	}
 
-	// Create job that first resolves one or multiple IP (depending on
-	// config.Mode) in order to create one continuation Task per IP.
-	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), jf.config.Mode)
+	return jf.makeDirectEndpointJob(endpointURL)
+}
 
-	job, err := monitors.MakeByHostJob(settings,
+// makeDirectEndpointJob makes jobs that directly lookup the IP of the endpoints, as opposed to using
+// a Socks5 proxy.
+func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
+	// Create job that first resolves one or multiple IPs (depending on
+	// config.Mode) in order to create one continuation Task per IP.
+	job, err := monitors.MakeByHostJob(endpointURL.Hostname(), jf.config.Mode,
 		monitors.MakePingIPFactory(
 			func(event *beat.Event, ip *net.IPAddr) error {
 				// use address from resolved IP
@@ -152,6 +152,15 @@ func (jf *jobFactory) makeEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 		return nil, err
 	}
 	return job, nil
+}
+
+// makeDirectEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
+func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
+	return wrappers.WithURLField(endpointURL,
+		jobs.MakeSimpleJob(func(event *beat.Event) error {
+			hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
+			return jf.dial(event, hostPort, endpointURL)
+		})), nil
 }
 
 // dial builds a dialer and executes the network request.
