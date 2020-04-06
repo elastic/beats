@@ -40,13 +40,15 @@ func init() {
 	monitors.RegisterActive("tcp", create)
 }
 
-var debugf = logp.MakeDebug("tcp")
-
-type connURL struct {
+// Endpoint configures a host with all port numbers to be monitored by a dialer
+// based job.
+type Endpoint struct {
 	Scheme string
 	Host   string
 	Ports  []uint16
 }
+
+var debugf = logp.MakeDebug("tcp")
 
 func create(
 	name string,
@@ -57,42 +59,24 @@ func create(
 		return nil, 0, err
 	}
 
-	for scheme, eps := range tm.schemeHosts {
-		/*
-			db, err := NewBuilder(BuilderSettings{
-				Timeout: tm.config.Timeout,
-				Socks5:  tm.config.Socks5,
-				TLS:     schemeTLS,
-			})
-			if err != nil {
-				return nil, 0, err
-			}
-		*/
-
-		epJobs, err := tm.MakeDialerJobsFor(scheme, eps,
-			func(event *beat.Event, dialer transport.Dialer, addr string) error {
-				return pingHost(event, dialer, addr, tm.config.Timeout, tm.dataCheck)
-			})
-		if err != nil {
-			return nil, 0, err
-		}
-
-		jobs = append(jobs, epJobs...)
+	epJobs, err := tm.MakeDialerJobsFor(tm.endpoints,
+		func(event *beat.Event, dialer transport.Dialer, addr string) error {
+			return pingHost(event, dialer, addr, tm.config.Timeout, tm.dataCheck)
+		})
+	if err != nil {
+		return nil, 0, err
 	}
 
-	numHosts := 0
-	for _, hosts := range tm.schemeHosts {
-		numHosts += len(hosts)
-	}
+	jobs = append(jobs, epJobs...)
 
-	return jobs, numHosts, nil
+	return jobs, len(tm.endpoints), nil
 }
 
 type tcpMonitor struct {
 	config        Config
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
-	schemeHosts   map[string][]Endpoint
+	endpoints     []Endpoint
 	dataCheck     DataCheck
 }
 
@@ -107,16 +91,15 @@ func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
 }
 
 func (tm *tcpMonitor) MakeDialerJobsFor(
-	scheme string,
 	endpoints []Endpoint,
 	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
 ) ([]jobs.Job, error) {
 	var jobs []jobs.Job
 	for _, endpoint := range endpoints {
 		for _, port := range endpoint.Ports {
-			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
-			if err != nil {
-				return nil, err
+			endpointURL := &url.URL{
+				Scheme: endpoint.Scheme,
+				Host:   net.JoinHostPort(endpoint.Host, fmt.Sprint(port)),
 			}
 			endpointJob, err := tm.makeEndpointJobFor(endpointURL, fn)
 			if err != nil {
@@ -204,7 +187,7 @@ func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
 		tm.defaultScheme = "ssl"
 	}
 
-	tm.schemeHosts, err = collectHosts(&tm.config, tm.defaultScheme)
+	tm.endpoints, err = makeEndpoints(&tm.config, tm.defaultScheme)
 	if err != nil {
 		return err
 	}
@@ -214,8 +197,7 @@ func (tm *tcpMonitor) loadConfig(commonCfg *common.Config) (err error) {
 	return nil
 }
 
-func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, error) {
-	endpoints := map[string][]Endpoint{}
+func makeEndpoints(config *Config, defaultScheme string) (endpoints []Endpoint, err error) {
 	for _, h := range config.Hosts {
 		scheme := defaultScheme
 		host := ""
@@ -250,9 +232,10 @@ func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, 
 			return nil, fmt.Errorf("host '%v' missing port number", h)
 		}
 
-		endpoints[scheme] = append(endpoints[scheme], Endpoint{
-			Host:  host,
-			Ports: ports,
+		endpoints = append(endpoints, Endpoint{
+			Scheme: scheme,
+			Host:   host,
+			Ports:  ports,
 		})
 	}
 	return endpoints, nil
