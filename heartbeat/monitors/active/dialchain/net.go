@@ -65,6 +65,7 @@ func UDPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
 
+// CreateNetDialer returns a NetDialer with the given timeout.
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {

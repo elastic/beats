@@ -18,11 +18,8 @@
 package tcp
 
 import (
-	"fmt"
 	"net"
 	"net/url"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -50,7 +47,7 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	jc, err := MakeJobFactory(cfg)
+	jc, err := makeJobFactory(cfg)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -63,15 +60,17 @@ func create(
 	return jobs, len(jc.endpoints), nil
 }
 
+// jobFactory is where most of the logic here lives. It provides a common context around
+// the complex logic of executing a TCP check.
 type jobFactory struct {
 	config        Config
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
-	endpoints     []Endpoint
-	dataCheck     DataCheck
+	endpoints     []endpoint
+	dataCheck     dataCheck
 }
 
-func MakeJobFactory(commonCfg *common.Config) (jf *jobFactory, err error) {
+func makeJobFactory(commonCfg *common.Config) (jf *jobFactory, err error) {
 	jf = &jobFactory{config: DefaultConfig}
 	err = jf.loadConfig(commonCfg)
 	if err != nil {
@@ -81,6 +80,7 @@ func MakeJobFactory(commonCfg *common.Config) (jf *jobFactory, err error) {
 	return jf, nil
 }
 
+// loadConfig parses the YAML config and populates the jobFactory fields.
 func (jf *jobFactory) loadConfig(commonCfg *common.Config) (err error) {
 	if err := commonCfg.Unpack(&jf.config); err != nil {
 		return err
@@ -96,7 +96,7 @@ func (jf *jobFactory) loadConfig(commonCfg *common.Config) (err error) {
 		jf.defaultScheme = "ssl"
 	}
 
-	jf.endpoints, err = makeEndpoints(&jf.config, jf.defaultScheme)
+	jf.endpoints, err = makeEndpoints(jf.config.Hosts, jf.config.Ports, jf.defaultScheme)
 	if err != nil {
 		return err
 	}
@@ -106,11 +106,12 @@ func (jf *jobFactory) loadConfig(commonCfg *common.Config) (err error) {
 	return nil
 }
 
+// makeJobs returns the actual schedulable jobs for this monitor.
 func (jf *jobFactory) makeJobs() ([]jobs.Job, error) {
 	var jobs []jobs.Job
 	for _, endpoint := range jf.endpoints {
 		for _, url := range endpoint.perPortURLs() {
-			endpointJob, err := jf.makeEndpointJobFor(url)
+			endpointJob, err := jf.makeEndpointJob(url)
 			if err != nil {
 				return nil, err
 			}
@@ -122,7 +123,8 @@ func (jf *jobFactory) makeJobs() ([]jobs.Job, error) {
 	return jobs, nil
 }
 
-func (jf *jobFactory) makeEndpointJobFor(endpointURL *url.URL) (jobs.Job, error) {
+// makeEndpointJob makes a job for a single check of a single scheme/host/port combo.
+func (jf *jobFactory) makeEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	// Check if SOCKS5 is configured, with relying on the socks5 proxy
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
@@ -152,6 +154,10 @@ func (jf *jobFactory) makeEndpointJobFor(endpointURL *url.URL) (jobs.Job, error)
 	return job, nil
 }
 
+// dial builds a dialer and executes the network request.
+// dialAddr is the host:port that the dialer will connect to, and where an explicit IP should go to.
+// canonicalURL is the URL used to determine if TLS is used via the scheme of the URL, and
+// also which hostname should be passed to the TLS implementation for validation of the server cert.
 func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) error {
 	dc := &dialchain.DialerChain{
 		Net: dialchain.MakeConstAddrDialer(dialAddr, dialchain.TCPDialer(jf.config.Timeout)),
@@ -174,10 +180,11 @@ func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url
 		return err
 	}
 
-	return jf.pingAddr(event, dialer, dialAddr)
+	return jf.execDialer(event, dialer, dialAddr)
 }
 
-func (jf *jobFactory) pingAddr(
+// exec dialer executes a network request against the given dialer.
+func (jf *jobFactory) execDialer(
 	event *beat.Event,
 	dialer transport.Dialer,
 	addr string,
@@ -221,48 +228,4 @@ func (jf *jobFactory) pingAddr(
 	}
 
 	return nil
-}
-
-func makeEndpoints(config *Config, defaultScheme string) (endpoints []Endpoint, err error) {
-	for _, h := range config.Hosts {
-		scheme := defaultScheme
-		host := ""
-		u, err := url.Parse(h)
-
-		if err != nil || u.Host == "" {
-			host = h
-		} else {
-			scheme = u.Scheme
-			host = u.Host
-		}
-		debugf("Add tcp endpoint '%v://%v'.", scheme, host)
-
-		switch scheme {
-		case "tcp", "plain", "tls", "ssl":
-		default:
-			err := fmt.Errorf("'%v' is not a supported connection scheme in '%v'", scheme, h)
-			return nil, err
-		}
-
-		pair := strings.SplitN(host, ":", 2)
-		ports := config.Ports
-		if len(pair) == 2 {
-			port, err := strconv.ParseUint(pair[1], 10, 16)
-			if err != nil {
-				return nil, fmt.Errorf("'%v' is no valid port number in '%v'", pair[1], h)
-			}
-
-			ports = []uint16{uint16(port)}
-			host = pair[0]
-		} else if len(config.Ports) == 0 {
-			return nil, fmt.Errorf("host '%v' missing port number", h)
-		}
-
-		endpoints = append(endpoints, Endpoint{
-			Scheme:   scheme,
-			Hostname: host,
-			Ports:    ports,
-		})
-	}
-	return endpoints, nil
 }
