@@ -139,7 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
-- Further revise check for bad data in docker/memory. {pull}17400[17400] 
+- Further revise check for bad data in docker/memory. {pull}17400[17400]
 - Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
 - Fix how we filter services by name in system/service {pull}17400[17400]
@@ -184,6 +184,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
+- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
