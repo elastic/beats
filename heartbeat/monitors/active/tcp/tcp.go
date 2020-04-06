@@ -48,47 +48,36 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	config := DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, 0, err
-	}
-
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tm, err := createTCPMonitor(cfg)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	defaultScheme := "tcp"
-	if tls != nil {
-		defaultScheme = "ssl"
-	}
-
-	schemeHosts, err := collectHosts(&config, defaultScheme)
+	schemeHosts, err := collectHosts(&tm.config, tm.defaultScheme)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	timeout := config.Timeout
-	validator := makeValidateConn(&config)
+	validator := makeValidateConn(&tm.config)
 
 	for scheme, eps := range schemeHosts {
-		schemeTLS := tls
+		schemeTLS := tm.tlsConfig
 		if scheme == "tcp" || scheme == "plain" {
 			schemeTLS = nil
 		}
 
 		db, err := NewBuilder(BuilderSettings{
-			Timeout: timeout,
-			Socks5:  config.Socks5,
+			Timeout: tm.config.Timeout,
+			Socks5:  tm.config.Socks5,
 			TLS:     schemeTLS,
 		})
 		if err != nil {
 			return nil, 0, err
 		}
 
-		epJobs, err := MakeDialerJobs(db, scheme, eps, config.Mode,
+		epJobs, err := MakeDialerJobs(db, scheme, eps, tm.config.Mode,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
-				return pingHost(event, dialer, addr, timeout, validator)
+				return pingHost(event, dialer, addr, tm.config.Timeout, validator)
 			})
 		if err != nil {
 			return nil, 0, err
@@ -103,6 +92,31 @@ func create(
 	}
 
 	return jobs, numHosts, nil
+}
+
+type tcpMonitor struct {
+	config        Config
+	tlsConfig     *tlscommon.TLSConfig
+	defaultScheme string
+}
+
+func createTCPMonitor(commonCfg *common.Config) (tm *tcpMonitor, err error) {
+	tm = &tcpMonitor{config: DefaultConfig}
+	if err := commonCfg.Unpack(&tm.config); err != nil {
+		return nil, err
+	}
+
+	tm.tlsConfig, err = tlscommon.LoadTLSConfig(tm.config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	tm.defaultScheme = "tcp"
+	if tm.tlsConfig != nil {
+		tm.defaultScheme = "ssl"
+	}
+
+	return tm, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, error) {
