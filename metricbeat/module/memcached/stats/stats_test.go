@@ -28,7 +28,7 @@ import (
 func TestGetNetworkAddress_URL(t *testing.T) {
 	hostData := mb.HostData{
 		Host: "127.0.0.1:11211",
-		URI: "tcp://127.0.0.1:11211",
+		URI:  "tcp://127.0.0.1:11211",
 	}
 	network, address, err := getNetworkAndAddress(hostData)
 	require.NoError(t, err)
@@ -39,7 +39,7 @@ func TestGetNetworkAddress_URL(t *testing.T) {
 func TestGetNetworkAddress_Unix(t *testing.T) {
 	hostData := mb.HostData{
 		Host: "/tmp/d.sock",
-		URI: "unix:///tmp/d.sock",
+		URI:  "unix:///tmp/d.sock",
 	}
 	network, address, err := getNetworkAndAddress(hostData)
 	require.NoError(t, err)
