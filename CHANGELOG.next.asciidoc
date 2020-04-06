@@ -182,7 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
-- Further revise check for bad data in docker/memory. {pull}17400[17400] 
+- Further revise check for bad data in docker/memory. {pull}17400[17400]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
 - Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
@@ -240,6 +240,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
+- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
