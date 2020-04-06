@@ -229,7 +229,7 @@ processors:
 
           - name: flexString2
             labels:
-              malware action: event.action
+              malware action: rule.description
               attack information: event.action
 
           - name: rule_uid
