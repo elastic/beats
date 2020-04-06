@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
@@ -162,20 +164,30 @@ func (tm *tcpMonitor) makeEndpointJobFor(
 					return fn(event, dialer, ipPort)
 				}
 
-				schemeTLS := tm.tlsConfig
-				if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
-					schemeTLS = nil
+				/*
+					schemeTLS := tm.tlsConfig
+					if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
+						schemeTLS = nil
+					}
+				*/
+
+				dc := &dialchain.DialerChain{
+					Net: dialchain.MakeConstAddrDialer(ipPort, dialchain.TCPDialer(tm.config.Timeout)),
 				}
 
-				db, err := NewBuilder(BuilderSettings{
-					Timeout: tm.config.Timeout,
-					TLS:     schemeTLS,
-				})
+				isTLS := tm.tlsConfig != nil
+				if endpointURL.Scheme == "tcp" || endpointURL.Scheme == "plain" {
+					isTLS = false
+				}
+				if isTLS {
+					dc.AddLayer(dialchain.TLSLayer(tm.tlsConfig, tm.config.Timeout))
+				}
+
+				dialer, err := dc.Build(event)
 				if err != nil {
 					return err
 				}
-
-				return db.Run(event, ipPort, cb)
+				return cb(event, dialer)
 			}))
 	if err != nil {
 		return nil, err
