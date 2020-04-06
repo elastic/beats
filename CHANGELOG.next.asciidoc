@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 - Further revise check for bad data in docker/memory. {pull}17400[17400]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
+- Fix how we filter services by name in system/service {pull}17400[17400]
 - Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 
