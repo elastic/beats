@@ -7,8 +7,6 @@ services:
       context: ./_meta
       args:
         LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.5.2}
-    volumes:
-      - ./_meta/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - 9600
     depends_on:
