@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -78,7 +77,7 @@ func create(
 			schemeTLS = nil
 		}
 
-		db, err := dialchain.NewBuilder(dialchain.BuilderSettings{
+		db, err := NewBuilder(BuilderSettings{
 			Timeout: timeout,
 			Socks5:  config.Socks5,
 			TLS:     schemeTLS,
@@ -87,7 +86,7 @@ func create(
 			return nil, 0, err
 		}
 
-		epJobs, err := dialchain.MakeDialerJobs(db, scheme, eps, config.Mode,
+		epJobs, err := MakeDialerJobs(db, scheme, eps, config.Mode,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
 				return pingHost(event, dialer, addr, timeout, validator)
 			})
@@ -106,8 +105,8 @@ func create(
 	return jobs, numHosts, nil
 }
 
-func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {
-	endpoints := map[string][]dialchain.Endpoint{}
+func collectHosts(config *Config, defaultScheme string) (map[string][]Endpoint, error) {
+	endpoints := map[string][]Endpoint{}
 	for _, h := range config.Hosts {
 		scheme := defaultScheme
 		host := ""
@@ -142,7 +141,7 @@ func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.
 			return nil, fmt.Errorf("host '%v' missing port number", h)
 		}
 
-		endpoints[scheme] = append(endpoints[scheme], dialchain.Endpoint{
+		endpoints[scheme] = append(endpoints[scheme], Endpoint{
 			Host:  host,
 			Ports: ports,
 		})

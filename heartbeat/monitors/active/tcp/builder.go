@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package dialchain
+package tcp
 
 import (
 	"fmt"
@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,7 +38,7 @@ import (
 // configured. This ensures the upper network layers (e.g. TLS) correctly see
 // and process the original hostname.
 type Builder struct {
-	template         *DialerChain
+	template         *dialchain.DialerChain
 	addrIndex        int
 	resolveViaSocks5 bool
 }
@@ -59,24 +60,24 @@ type Endpoint struct {
 
 // NewBuilder creates a new Builder for constructing dialers.
 func NewBuilder(settings BuilderSettings) (*Builder, error) {
-	d := &DialerChain{
-		Net: netDialer(settings.Timeout),
+	d := &dialchain.DialerChain{
+		Net: dialchain.CreateNetDialer(settings.Timeout),
 	}
 	resolveViaSocks5 := false
 	withProxy := settings.Socks5.URL != ""
 	if withProxy {
-		d.AddLayer(SOCKS5Layer(&settings.Socks5))
+		d.AddLayer(dialchain.SOCKS5Layer(&settings.Socks5))
 		resolveViaSocks5 = !settings.Socks5.LocalResolve
 	}
 
 	// insert empty placeholder, so address can be replaced in dialer chain
 	// by replacing this placeholder dialer
 	idx := len(d.Layers)
-	d.AddLayer(IDLayer())
+	d.AddLayer(dialchain.IDLayer())
 
 	// add tls layer doing the TLS handshake based on the original address
 	if tls := settings.TLS; tls != nil {
-		d.AddLayer(TLSLayer(tls, settings.Timeout))
+		d.AddLayer(dialchain.TLSLayer(tls, settings.Timeout))
 	}
 
 	// validate dialerchain
@@ -92,7 +93,7 @@ func NewBuilder(settings BuilderSettings) (*Builder, error) {
 }
 
 // AddLayer adds another custom network layer to the dialer chain.
-func (b *Builder) AddLayer(l Layer) {
+func (b *Builder) AddLayer(l dialchain.Layer) {
 	b.template.AddLayer(l)
 }
 
@@ -104,7 +105,7 @@ func (b *Builder) Build(addr string, event *beat.Event) (transport.Dialer, error
 	dchain := b.template.Clone()
 
 	// fix the final dialers TCP-level address
-	dchain.Layers[b.addrIndex] = ConstAddrLayer(addr)
+	dchain.Layers[b.addrIndex] = dialchain.ConstAddrLayer(addr)
 
 	// create dialer chain with event to add per network layer information
 	d, err := dchain.Build(event)

@@ -45,7 +45,7 @@ import (
 //    }
 //  }
 func TCPDialer(to time.Duration) NetDialer {
-	return netDialer(to)
+	return CreateNetDialer(to)
 }
 
 // UDPDialer creates a new NetDialer with constant event fields and default
@@ -62,10 +62,10 @@ func TCPDialer(to time.Duration) NetDialer {
 //    }
 //  }
 func UDPDialer(to time.Duration) NetDialer {
-	return netDialer(to)
+	return CreateNetDialer(to)
 }
 
-func netDialer(timeout time.Duration) NetDialer {
+func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {
 			namespace := ""
