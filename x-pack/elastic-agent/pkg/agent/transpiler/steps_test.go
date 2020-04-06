@@ -61,14 +61,9 @@ func TestIsSubpath(t *testing.T) {
 	}
 
 	for _, test := range osSpecificTests {
-<<<<<<< HEAD
-		t.Run(fmt.Sprintf("[%s]'%s-%s'", runtime.GOOS, test.root, test.path), func(t *testing.T) {
-			newPath, result, err := joinPaths(test.root, test.path)
-			assert.Nil(t, err)
-=======
 		t.Run(fmt.Sprintf("[%s] root:'%s path: %s'", runtime.GOOS, test.root, test.path), func(t *testing.T) {
-			newPath, result := joinPaths(test.root, test.path)
->>>>>>> master
+			newPath, result, err := joinPaths(test.root, test.path)
+			assert.NoError(t, err)
 			assert.Equal(t, test.resultPath, newPath)
 			assert.Equal(t, test.isSubpath, result)
 		})
