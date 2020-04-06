@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
 - Fix `elasticsearch.audit` data ingest pipeline to be more forgiving with date formats found in Elasticsearch audit logs. {pull}17406[17406]
 - Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
+- Remove migrationVersion map 7.7.0 reference from Kibana dashboard file to fix backward compatibility issues. {pull}17425[17425]
 
 *Heartbeat*
 
@@ -138,9 +139,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
-- Further revise check for bad data in docker/memory. {pull}17400[17400] 
+- Further revise check for bad data in docker/memory. {pull}17400[17400]
 - Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
+- Fix how we filter services by name in system/service {pull}17400[17400]
 - Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 
@@ -180,6 +182,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
+- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
@@ -228,6 +234,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 - Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
+- Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
+- Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
 - Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}XXXXX[XXXXX]
 
 *Heartbeat*
@@ -298,6 +306,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
+- Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
 
