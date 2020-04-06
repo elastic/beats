@@ -58,20 +58,12 @@ datasources:
       streams:
         - paths: /var/log/mysql/error.log
           index: mytype-generic-default
-          _meta_index:
-            dataset: generic
-            namespace: default
-            type: mytype
   - name: Specified namespace
     namespace: nsns
     inputs:
     - type: file
       streams:
         - paths: /var/log/mysql/access.log
-          _meta_index:
-            dataset: generic
-            namespace: nsns
-            type: mytype
           index: mytype-generic-nsns
   - name: Specified dataset
     inputs:
@@ -80,10 +72,6 @@ datasources:
         - paths: /var/log/mysql/access.log
           dataset: dsds
           index: mytype-dsds-default
-          _meta_index:
-            dataset: dsds
-            namespace: default
-            type: mytype
   - name: All specified
     namespace: nsns
     inputs:
@@ -92,10 +80,6 @@ datasources:
         - paths: /var/log/mysql/access.log
           dataset: dsds
           index: mytype-dsds-nsns
-          _meta_index:
-            dataset: dsds
-            namespace: nsns
-            type: mytype
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -497,7 +481,7 @@ inputs:
 `,
 			rule: &RuleList{
 				Rules: []Rule{
-					CopyToList("namespace", "inputs", false),
+					CopyToList("namespace", "inputs", "insert_after"),
 				},
 			},
 		},
@@ -577,9 +561,9 @@ func TestSerialization(t *testing.T) {
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
 		InjectIndex("index-type"),
-		InjectStreamProcessor("target"),
-		CopyToList("t1", "t2", false),
-		CopyAllToList("t2", false, "a", "b"),
+		InjectStreamProcessor("insert_after", "index-type"),
+		CopyToList("t1", "t2", "insert_after"),
+		CopyAllToList("t2", "insert_before", "a", "b"),
 	)
 
 	y := `- rename:
@@ -627,17 +611,18 @@ func TestSerialization(t *testing.T) {
 - inject_index:
     type: index-type
 - inject_stream_processor:
-    to: target
+    type: index-type
+    on_conflict: insert_after
 - copy_to_list:
     item: t1
     to: t2
-    overwrite: false
+    on_conflict: insert_after
 - copy_all_to_list:
     to: t2
     except:
     - a
     - b
-    overwrite: false
+    on_conflict: insert_before
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

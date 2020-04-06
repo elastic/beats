@@ -14,10 +14,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const (
-	metaIndexKey = "_meta_index"
-)
-
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
 type RuleList struct {
 	Rules []Rule
@@ -243,9 +239,9 @@ func MakeArray(item Selector, to string) *MakeArrayRule {
 // CopyToListRule is a rule which copies a specified
 // node into every item in a provided list.
 type CopyToListRule struct {
-	Item      Selector
-	To        string
-	Overwrite bool
+	Item       Selector
+	To         string
+	OnConflict string `yaml:"on_conflict" config:"on_conflict"`
 }
 
 // Apply copies specified node into every item of the list.
@@ -273,13 +269,18 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 			continue
 		}
 
-		if !r.Overwrite {
-			_, found := listItemMap.Find(r.Item)
-			if found {
-				continue
+		if existingNode, found := listItemMap.Find(r.Item); found {
+			sourceNodeItemsList := sourceNode.Clone().Value().(Node) // key.value == node
+			if existingList, ok := existingNode.Value().(*List); ok {
+				existingList.value = mergeStrategy(r.OnConflict).Inject(existingList.Clone().Value().([]Node), sourceNodeItemsList.Value())
+			} else if existingMap, ok := existingNode.Value().(*Dict); ok {
+				existingMap.value = mergeStrategy(r.OnConflict).Inject(existingMap.Clone().Value().([]Node), sourceNodeItemsList.Value())
 			}
+
+			continue
 		}
 
+		// if not conflicting move entire node
 		listItemMap.value = append(listItemMap.value, sourceNode.Clone())
 	}
 
@@ -287,20 +288,20 @@ func (r *CopyToListRule) Apply(ast *AST) error {
 }
 
 // CopyToList creates a CopyToListRule
-func CopyToList(item Selector, to string, overwrite bool) *CopyToListRule {
+func CopyToList(item Selector, to, onMerge string) *CopyToListRule {
 	return &CopyToListRule{
-		Item:      item,
-		To:        to,
-		Overwrite: overwrite,
+		Item:       item,
+		To:         to,
+		OnConflict: onMerge,
 	}
 }
 
 // CopyAllToListRule is a rule which copies a all nodes
 // into every item in a provided list.
 type CopyAllToListRule struct {
-	To        string
-	Except    []string
-	Overwrite bool
+	To         string
+	Except     []string
+	OnConflict string `yaml:"on_conflict" config:"on_conflict"`
 }
 
 // Apply copies all nodes into every item of the list.
@@ -327,7 +328,7 @@ func (r *CopyAllToListRule) Apply(ast *AST) error {
 			continue
 		}
 
-		if err := CopyToList(item, r.To, r.Overwrite).Apply(ast); err != nil {
+		if err := CopyToList(item, r.To, r.OnConflict).Apply(ast); err != nil {
 			return err
 		}
 	}
@@ -336,11 +337,11 @@ func (r *CopyAllToListRule) Apply(ast *AST) error {
 }
 
 // CopyAllToList creates a CopyAllToListRule
-func CopyAllToList(to string, overwrite bool, except ...string) *CopyAllToListRule {
+func CopyAllToList(to, onMerge string, except ...string) *CopyAllToListRule {
 	return &CopyAllToListRule{
-		To:        to,
-		Except:    except,
-		Overwrite: overwrite,
+		To:         to,
+		Except:     except,
+		OnConflict: onMerge,
 	}
 }
 
@@ -421,21 +422,8 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 					name:  "index",
 					value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
 				})
-				streamMap.value = append(streamMap.value, &Key{
-					name: metaIndexKey,
-					value: &Dict{
-						value: []Node{
-							&Key{name: "type", value: &StrVal{value: r.Type}},
-							&Key{name: "dataset", value: &StrVal{value: dataset}},
-							&Key{name: "namespace", value: &StrVal{value: namespace}},
-						},
-					},
-				})
-
 			}
-
 		}
-
 	}
 
 	return nil
@@ -452,7 +440,8 @@ func InjectIndex(indexType string) *InjectIndexRule {
 // _meta_index map with dataset, index and namespace keys defined.
 // if any key is missing this rule fails.
 type InjectStreamProcessorRule struct {
-	Target string
+	Type       string
+	OnConflict string `yaml:"on_conflict" config:"on_conflict"`
 }
 
 // Apply injects processor into input.
@@ -460,86 +449,90 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 	const defaultNamespace = "default"
 	const defaultDataset = "generic"
 
-	inputsNode, found := Lookup(ast, r.Target)
+	datasourcesNode, found := Lookup(ast, "datasources")
 	if !found {
 		return nil
 	}
 
-	inputsList, ok := inputsNode.Value().(*List)
+	datasourcesList, ok := datasourcesNode.Value().(*List)
 	if !ok {
 		return nil
 	}
 
-	for i := range inputsList.value {
-		inputNode := inputsList.value[i]
-		metaNode, ok := inputNode.Find(metaIndexKey)
+	for _, datasourceNode := range datasourcesList.value {
+		namespace := defaultNamespace
+		nsNode, found := datasourceNode.Find("namespace")
+		if found {
+			nsKey, ok := nsNode.(*Key)
+			if ok {
+				namespace = nsKey.value.String()
+			}
+		}
+
+		// get input
+		inputNode, found := datasourceNode.Find("inputs")
+		if !found {
+			continue
+		}
+
+		inputsList, ok := inputNode.Value().(*List)
 		if !ok {
 			continue
 		}
 
-		streamType, found := metaNode.Find("type")
-		if !found {
-			return errors.New("InjectStreamProcessorRule: stream type not found")
-		}
-
-		streamNamespace, found := metaNode.Find("namespace")
-		if !found {
-			return errors.New("InjectStreamProcessorRule: stream namespace not found")
-		}
-
-		streamDataset, found := metaNode.Find("dataset")
-		if !found {
-			return errors.New("InjectStreamProcessorRule: stream dataset not found")
-		}
-
-		inputDict, ok := inputNode.(*Dict)
-		if !ok {
-			return errors.New("InjectStreamProcessorRule: input node is not a map")
-		}
-
-		// get processors node
-		processorsNode, found := inputNode.Find("processors")
-		if !found {
-			processorsNode = &Key{
-				name:  "processors",
-				value: &List{value: make([]Node, 0)},
-			}
-
-			inputDict.value = append(inputDict.value, processorsNode)
-		}
-
-		processorsList, ok := processorsNode.Value().(*List)
-		if !ok {
-			return errors.New("InjectStreamProcessorRule: processors is not a list")
-		}
-
-		processorMap := &Dict{value: make([]Node, 0)}
-		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
-			&Key{name: "stream.type", value: &StrVal{value: streamType.Value().(Node).String()}},
-			&Key{name: "stream.namespace", value: &StrVal{value: streamNamespace.Value().(Node).String()}},
-			&Key{name: "stream.dataset", value: &StrVal{value: streamDataset.Value().(Node).String()}},
-		}}})
-
-		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
-		processorsList.value = append(processorsList.value, addFieldsMap)
-
-		// clear meta
-		index := -1
-		for i, node := range inputDict.value {
-			key, ok := node.(*Key)
+		for _, inputNode := range inputsList.value {
+			streamsNode, ok := inputNode.Find("streams")
 			if !ok {
 				continue
 			}
 
-			if key.name == metaIndexKey {
-				index = i
-				break
+			streamsList, ok := streamsNode.Value().(*List)
+			if !ok {
+				continue
 			}
-		}
 
-		// sanity  check, but should always pass
-		if index != -1 {
-			inputDict.value = append(inputDict.value[:index], inputDict.value[index+1:]...)
+			for _, streamNode := range streamsList.value {
+				streamMap, ok := streamNode.(*Dict)
+				if !ok {
+					continue
+				}
+
+				dataset := defaultDataset
+
+				dsNode, found := streamNode.Find("dataset")
+				if found {
+					dsKey, ok := dsNode.(*Key)
+					if ok {
+						dataset = dsKey.value.String()
+					}
+				}
+
+				// get processors node
+				processorsNode, found := streamNode.Find("processors")
+				if !found {
+					processorsNode = &Key{
+						name:  "processors",
+						value: &List{value: make([]Node, 0)},
+					}
+
+					streamMap.value = append(streamMap.value, processorsNode)
+				}
+
+				processorsList, ok := processorsNode.Value().(*List)
+				if !ok {
+					return errors.New("InjectStreamProcessorRule: processors is not a list")
+				}
+
+				processorMap := &Dict{value: make([]Node, 0)}
+				processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+					&Key{name: "stream.type", value: &StrVal{value: r.Type}},
+					&Key{name: "stream.namespace", value: &StrVal{value: namespace}},
+					&Key{name: "stream.dataset", value: &StrVal{value: dataset}},
+				}}})
+
+				addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
+			}
 		}
 	}
 
@@ -547,9 +540,10 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 }
 
 // InjectStreamProcessor creates a InjectStreamProcessorRule
-func InjectStreamProcessor(target string) *InjectStreamProcessorRule {
+func InjectStreamProcessor(onMerge, streamType string) *InjectStreamProcessorRule {
 	return &InjectStreamProcessorRule{
-		Target: target,
+		OnConflict: onMerge,
+		Type:       streamType,
 	}
 }
 
