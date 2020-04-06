@@ -33,7 +33,8 @@ pipeline {
     // XXX: Set to false by default
     booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
 
-    booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
+    // XXX: Set to false by default
+    booleanParam(name: 'debug', defaultValue: true, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
@@ -58,23 +59,6 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         makeTarget("Lint", "check")
-      }
-    }
-    stage('Prepare integration tests environments'){
-      parallel {
-        stage('AWS cloud scenario'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            expression {
-              return params.runAllCloudTests || params.awsCloudTests
-            }
-          }
-          steps {
-            echo "### TODO: provision AWS cloud test scenario"
-            // XXX: Run terraform or ansible to provision resources in AWS
-          }
-        }
       }
     }
     stage('Build and Test'){
@@ -366,9 +350,34 @@ pipeline {
               return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
-          steps {
-            loadCloudTestEnv()
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+          stages {
+            stage('Prepare cloud integration tests environments'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              when {
+                expression {
+                  return params.runAllCloudTests || params.awsCloudTests
+                }
+              }
+              steps {
+                echo "### TODO: provision AWS cloud test scenario"
+                // XXX: Run terraform or ansible to provision resources in AWS
+                // XXX: Parallelize at the script/mage level as cannot nest parallel blocks here
+              }
+            }
+            stage('Metricbeat x-pack'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                loadCloudTestEnv()
+                mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+              }
+            }
+          }
+          post {
+            cleanup {
+              cleanupAWS()
+            }
           }
         }
         stage('Metricbeat crosscompile'){
@@ -616,11 +625,6 @@ pipeline {
       }
     }
   }
-  post {
-    cleanup {
-      cleanupAWS()
-    }
-  }
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
@@ -812,6 +816,7 @@ def dumpFilteredEnvironment(){
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
   echo "STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}"
+  echo "TEST_TAGS: ${env.TEST_TAGS}"
   echo "GOX_OS: ${env.GOX_OS}"
   echo "GOX_OSARCH: ${env.GOX_OSARCH}"
   echo "GOX_FLAGS: ${env.GOX_FLAGS}"
