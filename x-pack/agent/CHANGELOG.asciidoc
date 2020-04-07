@@ -20,3 +20,4 @@
 - Generate index name in a format type-dataset-namespace {pull}16903[16903]
 - OS agnostic default configuration {pull}17016[17016]
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
+- Support for config constraints {pull}17112[17112]
