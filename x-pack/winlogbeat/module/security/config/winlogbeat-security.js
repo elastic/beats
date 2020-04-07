@@ -102,7 +102,6 @@ var security = (function () {
         "0x12": "AES256-CTS-HMAC-SHA1-96",
         "0x17": "RC4-HMAC",
         "0x18": "RC4-HMAC-EXP",
-        "0xFFFFFFFF": "FAIL",
         "0xffffffff": "FAIL",
    };
 
@@ -239,6 +238,8 @@ var security = (function () {
         "4767": ["iam","change","unlocked-user-account"],
         "4768": ["authentication","start","kerberos-authentication-ticket-requested"],
         "4769": ["authentication","start","kerberos-service-ticket-requested"],
+        "4770": ["authentication","start","kerberos-service-ticket-renewed"],
+        "4771": ["authentication","start","kerberos-preauth-failed"],
         "4776": ["authentication","start","credential-validated"],
         "4778": ["authentication","start","session-reconnected"],
         "4779": ["authentication","end","session-disconnected"],
@@ -1354,9 +1355,9 @@ var security = (function () {
         }
         var eventActionDescription = eventActionTypes[code][2];
         if (eventActionDescription) {
-            evt.Put("event.category", eventActionTypes[code][0]);
-            evt.Put("event.type", eventActionTypes[code][1]);
-            evt.Put("event.action", eventActionTypes[code][2]);
+            evt.AppendTo("event.category", eventActionTypes[code][0]);
+            evt.AppendTo("event.type", eventActionTypes[code][1]);
+            evt.AppendTo("event.action", eventActionTypes[code][2]);
         }
     };
 
@@ -1503,7 +1504,7 @@ var security = (function () {
     };
 
     var addTicketEncryptionType = function(evt) {
-        var code = evt.Get("winlog.event_data.TicketEncryptionType");
+        var code = evt.Get("winlog.event_data.TicketEncryptionType").toLowerCase();
         if (!code) {
             return;
         }
