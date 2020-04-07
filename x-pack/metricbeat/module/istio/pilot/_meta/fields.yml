@@ -17,15 +17,15 @@
       type: object
       object_type: long
       description: >
-        Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+        Total time Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
     - name: xds.push.time.ms.sum
       type: long
       description: >
-        Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+        Total time Pilot takes to push lds, rds, cds and eds, histogram sum of times in milliseconds.
     - name: xds.push.time.ms.count
       type: long
       description: >
-        Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+        Total time Pilot takes to push lds, rds, cds and eds, histogram count of times.
     - name: xds.eds.instances
       type: long
       description: >

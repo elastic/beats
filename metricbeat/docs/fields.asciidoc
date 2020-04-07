@@ -19349,7 +19349,7 @@ type: long
 *`istio.pilot.xds.push.time.ms.bucket.*`*::
 +
 --
-Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+Total time Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
 
 
 type: object
@@ -19359,7 +19359,7 @@ type: object
 *`istio.pilot.xds.push.time.ms.sum`*::
 +
 --
-Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+Total time Pilot takes to push lds, rds, cds and eds, histogram sum of times in milliseconds.
 
 
 type: long
@@ -19369,7 +19369,7 @@ type: long
 *`istio.pilot.xds.push.time.ms.count`*::
 +
 --
-Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+Total time Pilot takes to push lds, rds, cds and eds, histogram count of times.
 
 
 type: long
