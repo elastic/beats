@@ -69,6 +69,7 @@ func TestGetServiceURI(t *testing.T) {
 	}
 }
 
+// See https://github.com/elastic/beats/issues/15974
 func TestGetServiceURIMultipleCalls(t *testing.T) {
 	err := quick.Check(func(r uint) bool {
 		var err error
