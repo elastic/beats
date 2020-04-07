@@ -6,10 +6,10 @@
 ++++
 
 The `urldecode` processor specifies a list of fields to decode from URL encoded format. Under the `fields`
-key, each entry contains a `from: old-key` and a `to: new-key` pair, where:
+key, each entry contains a `from: source-field` and a `to: target-field` pair, where:
 
-* `from` is the original field name
-* `to` is the target field name
+* `from` is the source field name
+* `to` is the target field name (defaults to the `from` value)
 
 [source,yaml]
 -------

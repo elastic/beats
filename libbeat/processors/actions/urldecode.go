@@ -37,7 +37,7 @@ type urlDecode struct {
 }
 
 type urlDecodeConfig struct {
-	Fields        []fromTo `config:"fields"`
+	Fields        []fromTo `config:"fields" validate:"required"`
 	IgnoreMissing bool     `config:"ignore_missing"`
 	FailOnError   bool     `config:"fail_on_error"`
 }
@@ -56,8 +56,7 @@ func NewURLDecode(c *common.Config) (processors.Processor, error) {
 		FailOnError:   true,
 	}
 
-	err := c.Unpack(&config)
-	if err != nil {
+	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the configuration of urldecode processor: %s", err)
 	}
 
@@ -110,8 +109,7 @@ func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error
 	}
 
 	target := to
-	// If to is empty
-	if to == "" || from == to {
+	if to == "" {
 		target = from
 	}
 
