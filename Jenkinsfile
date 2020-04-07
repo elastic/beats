@@ -810,6 +810,7 @@ def isChangedXPackCode(patterns) {
 }
 
 def loadConfigEnvVars(){
+
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
   env.BUILD_LIBBEAT = isChangedOSSCode([])

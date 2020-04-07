@@ -456,7 +456,7 @@ metricbeat.modules:
     - volume
   period: 10s
   enabled: true
-  hosts: ["https://${HOSTNAME}:10250"]
+  hosts: ["https://${NODE_NAME}:10250"]
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.verification_mode: "none"
   #ssl.certificate_authorities:
@@ -1532,7 +1532,7 @@ output.elasticsearch:
   # The service principal name.
   #kerberos.service_name: HTTP/my-service@realm
 
-  # Name of the Kerberos user. It is used when auth_type is set to password.
+  # Name of the Kerberos user.
   #kerberos.username: elastic
 
   # Password of the Kerberos user. It is used when auth_type is set to password.
