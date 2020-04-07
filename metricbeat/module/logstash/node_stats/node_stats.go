@@ -68,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	if err := m.setServiceURI(); err != nil {
+	if err := m.updateServiceURI(); err != nil {
 		if m.XPack {
 			m.Logger().Error(err)
 			return nil
@@ -97,19 +97,30 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) setServiceURI() error {
-	if !m.XPack {
-		// No massaging is needed to default service URI
-		return nil
-	}
-
-	if err := m.CheckPipelineGraphAPIsAvailable(); err != nil {
-		return err
-	}
-
-	u, err := url.Parse(m.HTTP.GetURI())
+func (m *MetricSet) updateServiceURI() error {
+	u, err := getServiceURI(m.GetURI(), m.XPack, m.CheckPipelineGraphAPIsAvailable)
 	if err != nil {
 		return err
+	}
+
+	m.HTTP.SetURI(u)
+	return nil
+
+}
+
+func getServiceURI(currURI string, xpackEnabled bool, graphAPIsAvailable func() error) (string, error) {
+	if !xpackEnabled {
+		// No need to request pipeline vertices from service API
+		return currURI, nil
+	}
+
+	if err := graphAPIsAvailable(); err != nil {
+		return "", err
+	}
+
+	u, err := url.Parse(currURI)
+	if err != nil {
+		return "", err
 	}
 
 	q := u.Query()
@@ -118,6 +129,5 @@ func (m *MetricSet) setServiceURI() error {
 	}
 
 	u.RawQuery = q.Encode()
-	m.HTTP.SetURI(u.String())
-	return nil
+	return u.String(), nil
 }
