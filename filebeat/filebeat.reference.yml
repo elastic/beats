@@ -1084,6 +1084,16 @@ filebeat.inputs:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 

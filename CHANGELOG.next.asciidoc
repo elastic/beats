@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Unix socket path in memcached. {pull}17512[17512]
 - Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
 - Fix azure storage dashboards. {pull}17590[17590]
+- Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
 
 *Packetbeat*
 
@@ -183,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update supported versions of `redis` output. {pull}17198[17198]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
+- Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
 
 *Auditbeat*
 
