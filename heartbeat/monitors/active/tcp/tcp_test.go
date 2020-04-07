@@ -150,7 +150,8 @@ func TestUpEndpointJob(t *testing.T) {
 	)
 }
 
-func TestTLSConnection(t *testing.T) {
+// Tests that we can check a TLS connection with a cert for a SAN IP
+func TestTLSSANIPConnection(t *testing.T) {
 	// Start up a TLS Server
 	server, port := setupServer(t, httptest.NewTLSServer)
 	defer server.Close()

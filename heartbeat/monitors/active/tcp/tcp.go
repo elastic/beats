@@ -168,16 +168,25 @@ func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job
 // canonicalURL is the URL used to determine if TLS is used via the scheme of the URL, and
 // also which hostname should be passed to the TLS implementation for validation of the server cert.
 func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) error {
+	// First, create a plain dialer that can connect directly to either hostnames or IPs
 	dc := &dialchain.DialerChain{
 		Net: dialchain.CreateNetDialer(jf.config.Timeout),
 	}
 
+	// If Socks5 is configured make that the next layer, since everything needs to go through the proxy first.
 	if jf.config.Socks5.URL != "" {
 		dc.AddLayer(dialchain.SOCKS5Layer(&jf.config.Socks5))
 	}
 
+	// Now add the IP or Hostname of the server we want to connect to.
+	// Usually this is the IP we've resolved in a prior step.
+	// If we're using a proxy with host lookup enabled the dialAddr should be the
+	// hostname we want the server to resolve for us.
 	dc.AddLayer(dialchain.ConstAddrLayer(dialAddr))
 
+	// If we're using TLS we need to add a fake layer so that the TLS layer knows the hostname we're connecting to
+	// So, the canonical URL is fixed via a ConstAddrLayer to override the TLS layer's x509 logic so it doesn't
+	// try and directly match the IP from the prior ConstAddrLayer to the cert.
 	isTLS := true
 	if canonicalURL.Scheme == "tcp" || canonicalURL.Scheme == "plain" {
 		isTLS = false
