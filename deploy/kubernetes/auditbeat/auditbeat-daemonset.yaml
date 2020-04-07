@@ -40,6 +40,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
           capabilities:
@@ -79,6 +83,12 @@ spec:
         - name: etc
           mountPath: /hostfs/etc
           readOnly: true
+        # Directory with root filesystems of containers executed with containerd, this can be
+        # different with other runtimes. This volume is needed to monitor the file integrity
+        # of files in containers.
+        - name: run-containerd
+          mountPath: /run/containerd
+          readOnly: true
       volumes:
       - name: bin
         hostPath:
@@ -106,4 +116,8 @@ spec:
       - name: data
         hostPath:
           path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate
+      - name: run-containerd
+        hostPath:
+          path: /run/containerd
           type: DirectoryOrCreate
