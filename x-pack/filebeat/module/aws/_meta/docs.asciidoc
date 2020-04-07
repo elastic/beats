@@ -1,5 +1,7 @@
 [role="xpack"]
 
+:libbeat-xpack-dir: ../../../x-pack/libbeat
+
 :modulename: aws
 :has-dashboards: true
 
@@ -18,6 +20,11 @@ from network interfaces in AWS VPC. ELB access logs captures detailed informatio
 about requests sent to the load balancer. CloudTrail logs contain events
 that represent actions taken by a user, role or AWS service.
 
+The `aws` module requires AWS credentials configuration in order to make AWS API calls.
+Users can either use `access_key_id`, `secret_access_key` and/or
+`session_token`, or use shared AWS credentials file.
+Please see <<aws-credentials-options,AWS credentials options>> for more details.
+
 include::../include/gs-link.asciidoc[]
 
 [float]
@@ -33,6 +40,9 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
@@ -42,6 +52,9 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
@@ -51,6 +64,9 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
@@ -60,6 +76,9 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
@@ -69,6 +88,9 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
@@ -78,23 +100,17 @@ Example config:
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
-
 ----
 
 *`var.queue_url`*::
 
-AWS SQS queue url.
-
-*`var.shared_credential_file`*::
-
-Filename of AWS credential file.
-
-*`var.credential_profile_name`*::
-
-AWS credential profile name.
+(Required) AWS SQS queue url.
 
 *`var.visibility_timeout`*::
 
@@ -108,6 +124,23 @@ Maximum duration before AWS API request will be interrupted. Default to be 120 s
 *`var.endpoint`*::
 
 Custom endpoint used to access AWS APIs.
+
+*`var.shared_credential_file`*::
+
+Filename of AWS credential file.
+
+*`var.credential_profile_name`*::
+
+AWS credential profile name.
+
+*`var.access_key_id`*::
+First part of access key.
+
+*`var.access_key_id`*::
+Second part of access key.
+
+*`var.access_key_id`*::
+Required when using temporary security credentials.
 
 [float]
 === cloudtrail fileset
@@ -182,3 +215,6 @@ This fileset comes with a predefined dashboard:
 
 [role="screenshot"]
 image::./images/filebeat-aws-vpcflow-overview.png[]
+
+[id="aws-credentials-options"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]

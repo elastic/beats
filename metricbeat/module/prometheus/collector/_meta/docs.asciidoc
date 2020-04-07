@@ -79,6 +79,13 @@ When `use_types` and `rate_counters` are enabled, metrics are stored like this:
 [float]
 === Scraping all metrics from a Prometheus server
 
+[WARNING]
+=======================================
+Depending on your scale this method may not be suitable. We recommend using the
+<<metricbeat-metricset-prometheus-remote_write,remote_write>> metricset for this,
+and make Prometheus push metrics to Metricbeat.
+=======================================
+
 This module can scrape all metrics stored in a Prometheus server, by using the
 https://prometheus.io/docs/prometheus/latest/federation/[federation API]. By pointing this
 config to the Prometheus server:

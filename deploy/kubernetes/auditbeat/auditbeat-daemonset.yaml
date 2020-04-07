@@ -18,12 +18,14 @@ spec:
       serviceAccountName: auditbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
+      hostPID: true  # Required by auditd module
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
         image: docker.elastic.co/beats/auditbeat:%VERSION%
         args: [
           "-c", "/etc/auditbeat.yml"
+          "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
@@ -40,6 +42,12 @@ spec:
           value:
         securityContext:
           runAsUser: 0
+          capabilities:
+            add:
+              # Capabilities needed for auditd module
+              - 'AUDIT_READ'
+              - 'AUDIT_WRITE'
+              - 'AUDIT_CONTROL'
         resources:
           limits:
             memory: 200Mi
@@ -54,6 +62,8 @@ spec:
         - name: modules
           mountPath: /usr/share/auditbeat/modules.d
           readOnly: true
+        - name: data
+          mountPath: /usr/share/auditbeat/data
         - name: bin
           mountPath: /hostfs/bin
           readOnly: true
