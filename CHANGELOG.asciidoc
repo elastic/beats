@@ -26,7 +26,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 *Packetbeat*
 
 - Add `redact_headers` configuration option to allow HTTP request headers to be redacted whilst keeping the header field included in the Beat. {pull}15353[15353]
-- Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
+- Add `dns.question.subdomain` and `dns.question.top_level_domain` fields. {pull}14578[14578]
 
 ==== Bugfixes
 
