@@ -108,7 +108,7 @@ func TestPublishWithClose(t *testing.T) {
 					}()
 				}
 
-				publishLimit := math.Floor(float64(numEvents.Load()) * 0.2) // Only publish first 20% of events
+				publishLimit := math.Floor(float64(numEvents.Load()) * 0.2) // Only publish up to first 20% of events
 				client := ctor(uint(publishLimit))
 				worker := makeClientWorker(nilObserver, wqu, client)
 
@@ -124,12 +124,11 @@ func TestPublishWithClose(t *testing.T) {
 				makeClientWorker(nilObserver, wqu, client)
 				wg.Wait()
 
-				// Give some time for events to be published
-				timeout := 20 * time.Second
-
 				// Make sure that all events have eventually been published
+				timeout := 20 * time.Second
 				return waitUntilTrue(timeout, func() bool {
-					return numEvents.Load() == client.Published()+published
+					total := published + client.Published()
+					return numEvents.Load() == total
 				})
 			}, nil)
 
@@ -170,7 +169,8 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 
 	// Block publishing
 	if c.publishLimit > 0 && c.published >= c.publishLimit {
-		time.Sleep(30 * time.Second)
+		batch.Retry()                // to simulate not acking
+		time.Sleep(10 * time.Second) // block long enough for test
 		return nil
 	}
 
