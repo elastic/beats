@@ -90,7 +90,7 @@ func TestPublishWithClose(t *testing.T) {
 			seedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
-				numBatches := 300 + (i % 100) // between 300 and 399
+				numBatches := 600 + (i % 100) // between 600 and 699
 
 				wqu := makeWorkQueue()
 				numEvents := atomic.MakeUint(0)
