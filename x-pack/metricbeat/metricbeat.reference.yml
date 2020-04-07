@@ -727,7 +727,7 @@ metricbeat.modules:
     - volume
   period: 10s
   enabled: true
-  hosts: ["https://${HOSTNAME}:10250"]
+  hosts: ["https://${NODE_NAME}:10250"]
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.verification_mode: "none"
   #ssl.certificate_authorities:
