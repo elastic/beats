@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"flag"
+	"math"
 	"math/rand"
 	"sync"
 	"testing"
@@ -107,7 +108,7 @@ func TestPublishWithClose(t *testing.T) {
 					}()
 				}
 
-				client := ctor(numEvents.Load() / 2) // Stop short of publishing all events
+				client := ctor(uint(math.Floor(float64(numEvents.Load()) * 0.8))) // Stop short of publishing all events
 				worker := makeClientWorker(nilObserver, wqu, client)
 
 				// Close worker before all batches have had time to be published
