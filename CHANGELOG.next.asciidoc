@@ -189,6 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 - Fix Unix socket path in memcached. {pull}17512[17512]
+- Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
 
 *Packetbeat*
 
