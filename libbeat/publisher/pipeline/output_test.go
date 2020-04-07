@@ -169,7 +169,7 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 
 	// Block publishing
 	if c.publishLimit > 0 && c.published >= c.publishLimit {
-		time.Sleep(10 * time.Second)
+		time.Sleep(30 * time.Second)
 		return nil
 	}
 
