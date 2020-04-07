@@ -187,6 +187,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix how we filter services by name in system/service {pull}17400[17400]
 - Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
+- Fix aws.s3.bucket.name terms_field in s3 overview dashboard. {pull}17542[17542]
 - Fix Unix socket path in memcached. {pull}17512[17512]
 
 *Packetbeat*
