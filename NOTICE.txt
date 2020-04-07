@@ -3030,6 +3030,9 @@ Apache License 2.0
 Dependency: github.com/google/gopacket
 Version: v1.1.18
 Revision: 0ad7f2610e34
+Overwrite: github.com/adriansr/gopacket
+Overwrite-Version: v1.1.18
+Overwrite-Revision: dd62abfa8a41
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/google/gopacket/LICENSE:
 --------------------------------------------------------------------
