@@ -47,6 +47,7 @@ func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
 			// TODO: extract connection parameter from connection object?
 			// TODO: add proxy url to event?
+
 			timer.stop()
 			event.Fields.Put("socks5.rtt.connect", look.RTT(timer.duration()))
 			return conn, nil
