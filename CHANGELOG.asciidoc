@@ -76,7 +76,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Affecting all Beats*
 
-- Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
+- Include network information by default when using the `add_host_metadata` or `add_observer_metadata` processor. {issue}15347[15347] {pull}16077[16077]
 - Add `aws_ec2` provider for autodiscovery. {issue}12518[12518] {pull}14823[14823]
 - Add support for multiple passwords in redis output. {issue}16058[16058] {pull}16206[16206]
 - Add support for Histogram type in fields.yml. {pull}16570[16570]
