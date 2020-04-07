@@ -108,7 +108,8 @@ func TestPublishWithClose(t *testing.T) {
 					}()
 				}
 
-				client := ctor(uint(math.Floor(float64(numEvents.Load()) * 0.8))) // Stop short of publishing all events
+				publishLimit := math.Floor(float64(numEvents.Load()) * 0.2) // Only publish first 20% of events
+				client := ctor(uint(publishLimit))
 				worker := makeClientWorker(nilObserver, wqu, client)
 
 				// Close worker before all batches have had time to be published
