@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Journalbeat*
 
-- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+- Improve parsing of `syslog.pid` in Journalbeat to strip the username when present. {pull}16116[16116]
 
 *Metricbeat*
 
