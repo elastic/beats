@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+package urldecode
 
 import (
 	"fmt"
@@ -40,6 +40,11 @@ type urlDecodeConfig struct {
 	Fields        []fromTo `config:"fields" validate:"required"`
 	IgnoreMissing bool     `config:"ignore_missing"`
 	FailOnError   bool     `config:"fail_on_error"`
+}
+
+type fromTo struct {
+	From string `config:"from"`
+	To   string `config:"to"`
 }
 
 func init() {
