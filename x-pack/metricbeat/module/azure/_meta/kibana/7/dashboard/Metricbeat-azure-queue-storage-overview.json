@@ -222,7 +222,7 @@
       },
       "references": [
         {
-          "id": "ae516a00-78e0-11ea-9899-ed94914c140f",
+          "id": "metricbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
           "type": "index-pattern"
         },
