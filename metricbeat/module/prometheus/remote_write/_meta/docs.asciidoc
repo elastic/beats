@@ -14,9 +14,9 @@ the remote storage. The default value of this is `1000`, which means that in cas
 remote storage the number of shards will be increased up to `1000` to increase thoughput. This can happen in cases
 of network delays for instance where the whole queue faces issues to consume metrics and finally send metrics to Elasticsearch.
 However increasing the number of parallelism, means that we increase the number of parallel connections from Prometheus
-to Metricbeat. This can lead to resource saturation if the system where Metricbeat runs has limit in `fd` (file descriptors)
-which is lower than `max_shards`. This can be resolved either by setting a higher `fd` limit in the system with `ulimit -n 2048
-` or by setting a lower value for `max_shards`.
+to Metricbeat. This can lead to resource saturation if the system on which Metricbeat runs has a limit in `fd` (file descriptors)
+which is lower than `max_shards`. This can be resolved either by setting a higher `fd` limit in the system with `ulimit -n 2048`
+or by setting a lower value for `max_shards`.
 
 
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
