@@ -52,13 +52,7 @@ pipeline {
         dir("${BASE_DIR}"){
           sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
         }
-        googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
-          credentialsId: "${JOB_GCS_CREDENTIALS}",
-          pathPrefix: "${BASE_DIR}/build/distributions/",
-          pattern: "${BASE_DIR}/build/distributions/**/*",
-          sharedPublicly: true,
-          showInline: true
-        )
+        publishPackages()
       }
     }
     stage('Mac OS'){
@@ -84,15 +78,19 @@ pipeline {
           dir("${BASE_DIR}"){
             sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
           }
-          googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
-            credentialsId: "${JOB_GCS_CREDENTIALS}",
-            pathPrefix: "${BASE_DIR}/build/distributions/",
-            pattern: "${BASE_DIR}/build/distributions/**/*",
-            sharedPublicly: true,
-            showInline: true
-          )
+          publishPackages()
         }
       }
     }
   }
+}
+
+def publishPackages(){
+  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pathPrefix: "${BASE_DIR}/build/distributions/",
+    pattern: "${BASE_DIR}/build/distributions/**/*",
+    sharedPublicly: true,
+    showInline: true
+  )
 }
