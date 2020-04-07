@@ -25,7 +25,7 @@
     - name: xds.push.time.ms.count
       type: long
       description: >
-        Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in millisecondsms.
+        Total time in seconds Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
     - name: xds.eds.instances
       type: long
       description: >
