@@ -19299,13 +19299,13 @@ type: long
 
 --
 
-*`istio.mixer.handler`*::
+*`istio.mixer.handler.name`*::
 +
 --
 The name of the daemon  handler
 
 
-type: long
+type: keyword
 
 --
 
@@ -19315,7 +19315,7 @@ type: long
 The name of the variety
 
 
-type: long
+type: keyword
 
 --
 
