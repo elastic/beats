@@ -874,7 +874,7 @@ def loadConfigEnvVars(){
   // Auditbeat depends on metricbeat as framework, but does not include any of
   // the modules from Metricbeat.
   // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
-  env.BUILD_AUDITBEAT = isChanged(getVendorPatterns('auditbeat'))
+  env.BUILD_AUDITBEAT = isChangedOSSCode(getVendorPatterns('auditbeat'))
   env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/auditbeat'))
 
   // Dockerlogbeat is a standalone Beat that only relies on libbeat.
