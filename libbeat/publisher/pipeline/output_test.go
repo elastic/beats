@@ -140,7 +140,7 @@ func TestPublishWithClose(t *testing.T) {
 					total := published + client.Published()
 					return numEvents.Load() == total
 				})
-			}, nil)
+			}, &quick.Config{MaxCount: 50})
 
 			if err != nil {
 				t.Error(err)
