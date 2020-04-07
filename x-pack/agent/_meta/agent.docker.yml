@@ -8,12 +8,20 @@ outputs:
     username: '${ELASTICSEARCH_USERNAME:elastic}'
     password: '${ELASTICSEARCH_PASSWORD:changeme}'
 
-streams:
-  - type: event/file
-    enabled: true
-    paths:
-      - /var/log/hello1.log
-      - /var/log/hello2.log
+datasources:
+  - namespace: default
+    use_output: default
+    inputs:
+      - type: system/metrics
+        streams:
+          - metricset: cpu
+            dataset: system.cpu
+          - metricset: memory
+            dataset: system.memory
+          - metricset: network
+            dataset: system.network
+          - metricset: filesystem
+            dataset: system.filesystem
 
 management:
   # Mode of management, the agent support two modes of operation:
