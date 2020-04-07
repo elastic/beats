@@ -1504,11 +1504,12 @@ var security = (function () {
     };
 
     var addTicketEncryptionType = function(evt) {
-        var code = evt.Get("winlog.event_data.TicketEncryptionType").toLowerCase();
+        var code = evt.Get("winlog.event_data.TicketEncryptionType");
         if (!code) {
             return;
         }
-        evt.Put("winlog.event_data.TicketEncryptionTypeDescription",ticketEncryptionTypes[code]);
+        var enc_type_code=code.toLowerCase();
+        evt.Put("winlog.event_data.TicketEncryptionTypeDescription",ticketEncryptionTypes[enc_type_code]);
     };
 
     var addTicketStatus = function(evt) {
