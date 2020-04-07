@@ -39,7 +39,7 @@ var (
 	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
-func TestPublish(t *testing.T) {
+func TestMakeClientWorker(t *testing.T) {
 	tests := map[string]func(uint) publishCountable{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
@@ -79,7 +79,7 @@ func TestPublish(t *testing.T) {
 	}
 }
 
-func TestPublishWithClose(t *testing.T) {
+func TestMakeClientWorkerAndClose(t *testing.T) {
 	tests := map[string]func(uint) publishCountable{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
