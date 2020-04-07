@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"flag"
+	"fmt"
 	"math"
 	"math/rand"
 	"sync"
@@ -109,6 +110,7 @@ func TestPublishWithClose(t *testing.T) {
 				}
 
 				publishLimit := math.Floor(float64(numEvents.Load()) * 0.2) // Only publish up to first 20% of events
+				fmt.Printf("[%v] publishLimit = %v\n", name, publishLimit)
 				client := ctor(uint(publishLimit))
 				worker := makeClientWorker(nilObserver, wqu, client)
 
@@ -117,6 +119,7 @@ func TestPublishWithClose(t *testing.T) {
 				require.NoError(t, err)
 
 				published := client.Published()
+				fmt.Printf("[%v] published = %v, total = %v\n", name, published, numEvents.Load())
 				assert.Less(t, published, numEvents.Load())
 
 				// Start new worker to drain work queue
