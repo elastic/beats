@@ -19,7 +19,6 @@ package pipeline
 
 import (
 	"flag"
-	"fmt"
 	"math"
 	"math/rand"
 	"sync"
@@ -27,7 +26,6 @@ import (
 	"testing/quick"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -87,6 +85,8 @@ func TestPublishWithClose(t *testing.T) {
 		"network_client": newMockNetworkClient,
 	}
 
+	const minEventsInBatch = 50
+
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
 			seedPRNG(t)
@@ -103,24 +103,31 @@ func TestPublishWithClose(t *testing.T) {
 					go func() {
 						defer wg.Done()
 
-						batch := randomBatch(50, 150, wqu)
+						batch := randomBatch(minEventsInBatch, 150, wqu)
 						numEvents.Add(uint(len(batch.Events())))
 						wqu <- batch
 					}()
 				}
 
-				publishLimit := math.Floor(float64(numEvents.Load()) * 0.2) // Only publish up to first 20% of events
-				fmt.Printf("[%v] publishLimit = %v\n", name, publishLimit)
-				client := ctor(uint(publishLimit))
+				// Publish at least 1 batch worth of events but no more than 20% events
+				publishLimit := uint(math.Min(minEventsInBatch, float64(numEvents.Load())*0.2))
+				client := ctor(publishLimit)
 				worker := makeClientWorker(nilObserver, wqu, client)
+
+				// Allow the worker to make *some* progress before we close it
+				timeout := 10 * time.Second
+				progress := waitUntilTrue(timeout, func() bool {
+					return client.Published() >= publishLimit
+				})
+				if !progress {
+					return false
+				}
 
 				// Close worker before all batches have had time to be published
 				err := worker.Close()
 				require.NoError(t, err)
 
 				published := client.Published()
-				fmt.Printf("[%v] published = %v, total = %v\n", name, published, numEvents.Load())
-				assert.Less(t, published, numEvents.Load())
 
 				// Start new worker to drain work queue
 				client = ctor(0)
@@ -128,7 +135,7 @@ func TestPublishWithClose(t *testing.T) {
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
-				timeout := 20 * time.Second
+				timeout = 20 * time.Second
 				return waitUntilTrue(timeout, func() bool {
 					total := published + client.Published()
 					return numEvents.Load() == total
@@ -172,8 +179,7 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 
 	// Block publishing
 	if c.publishLimit > 0 && c.published >= c.publishLimit {
-		batch.Retry()                // to simulate not acking
-		time.Sleep(10 * time.Second) // block long enough for test
+		batch.Retry() // to simulate not acking
 		return nil
 	}
 
@@ -248,7 +254,7 @@ func waitUntilTrue(duration time.Duration, fn func() bool) bool {
 		if fn() {
 			return true
 		}
-		time.Sleep(100 * time.Nanosecond)
+		time.Sleep(1 * time.Millisecond)
 	}
 	return false
 }
