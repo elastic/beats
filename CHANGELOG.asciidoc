@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Metricbeat*
 
-- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
+- Add new dashboard for VSphere host cluster and virtual machine. {pull}14135[14135]
 
 *Packetbeat*
 
