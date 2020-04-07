@@ -75,7 +75,21 @@ func (t *testingDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
-	return t.callback(actions...)
+	// Get a dummy context.
+	ctx := context.Background()
+
+	// In context of testing we need to abort on error.
+	if err := t.callback(actions...); err != nil {
+		return err
+	}
+
+	// Ack everything and commit at the end.
+	for _, action := range actions {
+		acker.Ack(ctx, action)
+	}
+	acker.Commit(ctx)
+
+	return nil
 }
 
 func (t *testingDispatcher) Answer(fn testingDispatcherFunc) <-chan struct{} {
@@ -146,7 +160,6 @@ func wrapStrToResp(code int, body string) *http.Response {
 }
 
 func TestFleetGateway(t *testing.T) {
-	t.Skip("Concurrency issue see https://github.com/elastic/beats/issues/16771 for a stacktrace")
 
 	agentInfo := &testAgentInfo{}
 	settings := &fleetGatewaySettings{
@@ -304,7 +317,9 @@ func TestFleetGateway(t *testing.T) {
 	}))
 
 	t.Run("Test the wait loop is interruptible", func(t *testing.T) {
-		d := 10 * time.Minute
+		// 20mins is the double of the base timeout values for golang test suites.
+		// If we cannot interrupt we will timeout.
+		d := 20 * time.Minute
 		scheduler := scheduler.NewPeriodic(d)
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
@@ -325,22 +340,37 @@ func TestFleetGateway(t *testing.T) {
 			newNoopAcker(),
 		)
 
-		go gateway.Start()
-		defer gateway.Stop()
-
 		require.NoError(t, err)
 
+		go gateway.Start()
+
 		// Silently dispatch action.
-		go func() { <-dispatcher.Answer(func(actions ...action) error { return nil }) }()
+		ch1 := dispatcher.Answer(func(actions ...action) error { return nil })
+
+		go func() {
+			for range ch1 {
+			}
+		}()
 
 		// Make sure that all API calls to the checkin API are successfull, the following will happen:
-		// 1. Gateway -> checking api.
-		// 2. WaitTick() will block for 10 minutes.
-		// 3. Stop will unblock the Wait.
-		<-client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
+		ch2 := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 			resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
 			return resp, nil
 		})
+
+		// block on the first call.
+		<-ch2
+
+		go func() {
+			// drain the channel
+			for range ch2 {
+			}
+		}()
+
+		// 1. Gateway will check the API on boot.
+		// 2. WaitTick() will block for 20 minutes.
+		// 3. Stop will should unblock the wait.
+		gateway.Stop()
 	})
 }
 
