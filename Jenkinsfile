@@ -832,7 +832,7 @@ def isChanged(patterns){
 
 def isChangedOSSCode(patterns) {
   def always = [
-    "^Jenkinsfile$",
+    "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
     "^testing/.*",
@@ -844,7 +844,7 @@ def isChangedOSSCode(patterns) {
 
 def isChangedXPackCode(patterns) {
   def always = [
-    "^Jenkinsfile$",
+    "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
     "^dev-tools/.*",
