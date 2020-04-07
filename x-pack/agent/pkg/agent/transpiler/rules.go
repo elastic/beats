@@ -85,7 +85,7 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 	return doc, nil
 }
 
-// UnmarshalYAML unmashal a YAML document into a RuleList.
+// UnmarshalYAML unmarshal a YAML document into a RuleList.
 func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var unpackTo []map[string]interface{}
 
