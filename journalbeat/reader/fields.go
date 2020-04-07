@@ -80,7 +80,7 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_UID:               fieldConversion{"process.uid", true, false},
 
 		// docker journald fields from: https://docs.docker.com/config/containers/logging/journald/
-		"CONTAINER_ID":              fieldConversion{"conatiner.id_truncated", false, false},
+		"CONTAINER_ID":              fieldConversion{"container.id_truncated", false, false},
 		"CONTAINER_ID_FULL":         fieldConversion{"container.id", false, false},
 		"CONTAINER_NAME":            fieldConversion{"container.name", false, false},
 		"CONTAINER_TAG":             fieldConversion{"container.image.tag", false, false},
