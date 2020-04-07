@@ -50,7 +50,7 @@ func TestPublish(t *testing.T) {
 			seedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
-				numBatches := 3000 + (i % 1000) // between 3000 and 3999
+				numBatches := 300 + (i % 100) // between 300 and 399
 
 				wqu := makeWorkQueue()
 				client := ctor(0)
@@ -90,7 +90,7 @@ func TestPublishWithClose(t *testing.T) {
 			seedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
-				numBatches := 3000 + (i % 1000) // between 3000 and 3999
+				numBatches := 300 + (i % 100) // between 300 and 399
 
 				wqu := makeWorkQueue()
 				numEvents := atomic.MakeUint(0)
