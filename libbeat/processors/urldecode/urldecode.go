@@ -43,19 +43,19 @@ type urlDecodeConfig struct {
 }
 
 type fromTo struct {
-	From string `config:"from"`
+	From string `config:"from" validate:"required"`
 	To   string `config:"to"`
 }
 
 func init() {
 	processors.RegisterPlugin("urldecode",
-		checks.ConfigChecked(NewURLDecode,
+		checks.ConfigChecked(New,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "ignore_missing", "fail_on_error")))
-	jsprocessor.RegisterPlugin("URLDecode", NewURLDecode)
+	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func NewURLDecode(c *common.Config) (processors.Processor, error) {
+func New(c *common.Config) (processors.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
