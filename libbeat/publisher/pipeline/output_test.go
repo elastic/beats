@@ -98,16 +98,15 @@ func TestPublishWithClose(t *testing.T) {
 				numEvents := atomic.MakeUint(0)
 
 				var wg sync.WaitGroup
-				for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
-
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
 						batch := randomBatch(minEventsInBatch, 150, wqu)
 						numEvents.Add(uint(len(batch.Events())))
 						wqu <- batch
-					}()
-				}
+					}
+				}()
 
 				// Publish at least 1 batch worth of events but no more than 20% events
 				publishLimit := uint(math.Min(minEventsInBatch, float64(numEvents.Load())*0.2))
