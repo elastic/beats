@@ -16,6 +16,17 @@ data:
 
     processors:
       - add_cloud_metadata:
+      - add_process_metadata:
+          match_pids: ['process.pid']
+          include_fields: ['container.id']
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          default_indexers.enabled: false
+          default_matchers.enabled: false
+          indexers:
+            - container:
+          matchers:
+            - fields.lookup_fields: ['container.id']
 
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
@@ -50,6 +61,14 @@ data:
       max_file_size: 100 MiB
       hash_types: [sha1]
       recursive: true
+    - module: auditd
+      audit_rules: |
+        # Executions
+        -a always,exit -F arch=b64 -S execve,execveat -k exec
+
+        # Unauthorized access attempts
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 ---
 # Deploy a auditbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
@@ -71,6 +90,7 @@ spec:
       serviceAccountName: auditbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
+      hostPID: true  # Required by auditd module
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
@@ -94,6 +114,12 @@ spec:
           value:
         securityContext:
           runAsUser: 0
+          capabilities:
+            add:
+              # Capabilities needed for auditd module
+              - 'AUDIT_READ'
+              - 'AUDIT_WRITE'
+              - 'AUDIT_CONTROL'
         resources:
           limits:
             memory: 200Mi
