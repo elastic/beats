@@ -58,7 +58,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Metricbeat*
 
-- Change lookup_fields from metricset.host to service.address {pull}15883[15883]
+- Change `lookup_fields` setting from `metricset.host` to `service.address`. {pull}15883[15883]
 - Fix skipping protocol scheme by light modules. {pull}16205[pull]
 - Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
 - Fix detection and logging of some error cases with light modules. {pull}14706[14706]
