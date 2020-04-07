@@ -103,7 +103,7 @@ func MakeByIPJob(
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) (jobs.Job, error) {
 	// use ResolveIPAddr to parse the ip into net.IPAddr adding a zone info
-	// if ipv6 is used.
+	// if ipv6 is used. We intentionally do not use a custom resolver here.
 	addr, err := net.ResolveIPAddr("ip", ip.String())
 	if err != nil {
 		return nil, err
@@ -124,6 +124,7 @@ func MakeByIPJob(
 func MakeByHostJob(
 	host string,
 	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) (jobs.Job, error) {
 	if ip := net.ParseIP(host); ip != nil {
@@ -138,22 +139,23 @@ func MakeByHostJob(
 	mode := ipSettings.Mode
 
 	if mode == PingAny {
-		return makeByHostAnyIPJob(host, ipSettings, pingFactory), nil
+		return makeByHostAnyIPJob(host, ipSettings, resolver, pingFactory), nil
 	}
 
-	return makeByHostAllIPJob(host, ipSettings, pingFactory), nil
+	return makeByHostAllIPJob(host, ipSettings, resolver, pingFactory), nil
 }
 
 func makeByHostAnyIPJob(
 	host string,
 	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) jobs.Job {
 	network := ipSettings.Network()
 
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		resolveStart := time.Now()
-		ip, err := net.ResolveIPAddr(network, host)
+		ip, err := resolver.ResolveIPAddr(network, host)
 		if err != nil {
 			return nil, err
 		}
@@ -169,6 +171,7 @@ func makeByHostAnyIPJob(
 func makeByHostAllIPJob(
 	host string,
 	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) jobs.Job {
 	network := ipSettings.Network()

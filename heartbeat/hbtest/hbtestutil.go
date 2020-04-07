@@ -153,6 +153,15 @@ func SummaryChecks(up int, down int) validator.Validator {
 	})
 }
 
+func ResolveChecks(ip string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"resolve": map[string]interface{}{
+			"ip":     ip,
+			"rtt.us": isdef.IsDuration,
+		},
+	})
+}
+
 // SimpleURLChecks returns a check for a simple URL
 // with only a scheme, host, and port
 func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {

@@ -47,7 +47,16 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	jc, err := makeJobFactory(cfg)
+	return createWithResolver(cfg, monitors.StdResolver)
+}
+
+// Custom resolver is useful for tests against hostnames locally where we don't want to depend on any
+// hostnames existing in test environments
+func createWithResolver(
+	cfg *common.Config,
+	resolver monitors.Resolver,
+) (jobs []jobs.Job, endpoints int, err error) {
+	jc, err := makeJobFactory(cfg, resolver)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -68,10 +77,11 @@ type jobFactory struct {
 	defaultScheme string
 	endpoints     []endpoint
 	dataCheck     dataCheck
+	resolver      monitors.Resolver
 }
 
-func makeJobFactory(commonCfg *common.Config) (jf *jobFactory, err error) {
-	jf = &jobFactory{config: DefaultConfig}
+func makeJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (jf *jobFactory, err error) {
+	jf = &jobFactory{config: DefaultConfig, resolver: resolver}
 	err = jf.loadConfig(commonCfg)
 	if err != nil {
 		return nil, err
@@ -140,7 +150,10 @@ func (jf *jobFactory) makeEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	// Create job that first resolves one or multiple IPs (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	job, err := monitors.MakeByHostJob(endpointURL.Hostname(), jf.config.Mode,
+	job, err := monitors.MakeByHostJob(
+		endpointURL.Hostname(),
+		jf.config.Mode,
+		jf.resolver,
 		monitors.MakePingIPFactory(
 			func(event *beat.Event, ip *net.IPAddr) error {
 				// use address from resolved IP

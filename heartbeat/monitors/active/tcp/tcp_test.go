@@ -34,6 +34,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -72,7 +73,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	return event
 }
 
-func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string) *beat.Event {
+func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string, resolver monitors.Resolver) *beat.Event {
 	config, err := common.NewConfigFrom(common.MapStr{
 		"hosts":   host,
 		"ports":   int64(port),
@@ -81,7 +82,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	jobs, endpoints, err := create("tcp", config)
+	jobs, endpoints, err := createWithResolver(config, resolver)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -152,9 +153,77 @@ func TestUpEndpointJob(t *testing.T) {
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
 func TestTLSSANIPConnection(t *testing.T) {
+	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
+	defer teardown()
+
+	event := testTLSTCPCheck(t, ip, port, certFile.Name(), monitors.StdResolver)
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.TLSChecks(0, 0, cert),
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "up", "tcp"),
+			hbtest.SummaryChecks(1, 0),
+			hbtest.SimpleURLChecks(t, "ssl", ip, port),
+		)),
+		event.Fields,
+	)
+}
+
+func TestTLSHostname(t *testing.T) {
+	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
+	defer teardown()
+
+	hostname := cert.DNSNames[0] // Should be example.com
+	resolver := monitors.CreateStaticResolver()
+	resolver.Add(hostname, ip)
+	event := testTLSTCPCheck(t, hostname, port, certFile.Name(), resolver)
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.TLSChecks(0, 0, cert),
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "up", "tcp"),
+			hbtest.SummaryChecks(1, 0),
+			hbtest.SimpleURLChecks(t, "ssl", hostname, port),
+			hbtest.ResolveChecks(ip),
+		)),
+		event.Fields,
+	)
+}
+
+func TestTLSInvalidCert(t *testing.T) {
+	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
+	defer teardown()
+
+	mismatchedHostname := "notadomain.elastic.co"
+	resolver := monitors.CreateStaticResolver()
+	resolver.Add(cert.DNSNames[0], ip)
+	resolver.Add(mismatchedHostname, ip)
+	event := testTLSTCPCheck(t, mismatchedHostname, port, certFile.Name(), resolver)
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "down", "tcp"),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.SimpleURLChecks(t, "ssl", mismatchedHostname, port),
+			hbtest.ResolveChecks(ip),
+			lookslike.MustCompile(map[string]interface{}{
+				"error": map[string]interface{}{
+					"message": x509.HostnameError{Certificate: cert, Host: mismatchedHostname}.Error(),
+					"type":    "io",
+				},
+			}),
+		)),
+		event.Fields,
+	)
+}
+
+func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certificate, certFile *os.File, teardown func()) {
 	// Start up a TLS Server
 	server, port := setupServer(t, httptest.NewTLSServer)
-	defer server.Close()
 
 	// Parse its URL
 	serverURL, err := url.Parse(server.URL)
@@ -164,29 +233,20 @@ func TestTLSSANIPConnection(t *testing.T) {
 	ips, err := net.LookupHost(serverURL.Hostname())
 	require.NoError(t, err)
 	require.Len(t, ips, 1)
-	ip := ips[0]
+	ip = ips[0]
 
 	// Parse the cert so we can test against it
-	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
+	cert, err = x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
 	require.NoError(t, err)
 
 	// Save the server's cert to a file so heartbeat can use it
-	certFile := hbtest.CertToTempFile(t, cert)
+	certFile = hbtest.CertToTempFile(t, cert)
 	require.NoError(t, certFile.Close())
-	defer os.Remove(certFile.Name())
 
-	event := testTLSTCPCheck(t, ip, port, certFile.Name())
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.TLSChecks(0, 0, cert),
-			hbtest.RespondingTCPChecks(),
-			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
-			hbtest.SimpleURLChecks(t, "ssl", serverURL.Hostname(), port),
-		)),
-		event.Fields,
-	)
+	return ip, port, cert, certFile, func() {
+		os.Remove(certFile.Name())
+		server.Close()
+	}
 }
 
 func TestConnectionRefusedEndpointJob(t *testing.T) {
@@ -249,11 +309,8 @@ func TestCheckUp(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(1, 0),
+			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     ip,
-					"rtt.us": isdef.IsDuration,
-				},
 				"tcp": map[string]interface{}{
 					"rtt.validate.us": isdef.IsDuration,
 				},
