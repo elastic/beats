@@ -73,3 +73,12 @@ $ kubectl --namespace=kube-system get ds/{beatname_lc}
 NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
 {beatname_lc}   32        32        0         32           0           <none>          1m
 ------------------------------------------------
+
+[WARNING]
+=======================================
+{beatname_uc} is able to monitor the file integrity of files in pods,
+to do that, the directories with the container root file systems have to be
+mounted as volumes in the {beatname_uc} container. For example, containers
+executed with containerd have their root file systems under `/run/containerd`.
+The https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/{beatname_lc}-kubernetes.yaml[reference manifest] contains an example of this.
+=======================================
