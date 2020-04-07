@@ -81,7 +81,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Add support for multiple passwords in redis output. {issue}16058[16058] {pull}16206[16206]
 - Add support for Histogram type in fields.yml. {pull}16570[16570]
 - Windows .exe files now have embedded file version info. {issue}15232[15232]t
-- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
+- Remove experimental flag from `setup.template.append_fields`. {pull}16576[16576]
 - Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 - Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
 - Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
