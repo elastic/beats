@@ -1,0 +1,11 @@
+metricbeat:
+  modules:
+  - module: docker
+    setting: one
+  - module: apache
+    setting: two
+output:
+  elasticsearch:
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme

@@ -1,0 +1,113 @@
+######################################
+# Fleet configuration
+######################################
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme
+
+streams:
+  - type: event/file
+    enabled: true
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+
+management:
+  # Mode of management, the agent currently only support the following mode:
+  #
+  # local: The agent will expect to find the inputs configuration in the local file.
+  #
+  # Default is local.
+  mode: local
+
+  fleet:
+    access_token: ""
+    kibana:
+      # kibana minimal configuration
+      host: "localhost:5601"
+      ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # optional values
+      #protocol: "https"
+      #username: "elastic"
+      #password: "changeme"
+      #path: ""
+      #ssl.verification_mode: full
+      #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+      #ssl.cipher_suites: []
+      #ssl.curve_types: []
+
+  reporting:
+    log:
+      # format in which logs will be written, options are json or default.
+      format: "default"
+    fleet:
+      # enables fleet reporter. fleet reporting can be enabled only in fleet management.mode.
+      enabled: false
+
+      # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
+      reporting_threshold: 10000
+
+      # Frequency used to check the queue of events to be sent out to fleet.
+      reporting_check_frequency_sec: 30
+
+  # Allow fleet to reload his configuration locally on disk.
+  # Notes: Only specific process configuration will be reloaded.
+  reload:
+    # enabled configure the agent to reload or not the local configuration.
+    #
+    # Default is true
+    enabled: true
+
+    # period define how frequent we should look for changes in the configuration.
+    period: 10s
+
+download:
+  # source of the artifacts, requires elastic like structure and naming of the binaries
+  # e.g /windows-x86.zip
+  sourceURI: "https://artifacts.elastic.co/downloads/beats/"
+  # path to the directory containing downloaded packages
+  target_directory: "/home/elastic/downloads"
+  # timeout for downloading package
+  timeout: 30s
+  # file path to a public key used for verifying downloaded artifacts
+  # if not file is present agent will try to load public key from elastic.co website.
+  pgpfile: "/home/elastic/elastic.pgp"
+  # install_path describes the location of installed packages/programs. It is also used
+  # for reading program specifications.
+  install_path: "/home/elastic/install"
+
+process:
+  # minimal port number for spawned processes
+  min_port: 10000
+  # maximum port number for spawned processes
+  max_port: 30000
+  # timeout for creating new processes. when process is not successfully created by this timeout
+  # start operation is considered a failure
+  spawn_timeout: 30s
+
+retry:
+  # enabled determines whether retry is possible. Default is false.
+  enabled: true
+  # retries_count specifies number of retries. Default is 3.
+  # Retry count of 1 means it will be retried one time after one failure.
+  retries_count: 3
+  # delay specifies delay in ms between retries. Default is 30s
+  delay: 30s
+  # max_delay specifies maximum delay in ms between retries. Default is 300s
+  max_delay: 5m
+  # Exponential determines whether delay is treated as exponential.
+  # With 30s delay and 3 retries: 30, 60, 120s
+  # Default is false
+  exponential: false
+
+monitoring:
+  # enabled turns on monitoring of running processes
+  enabled: false
+  # enables log monitoring
+  logs: false
+  # enables metrics monitoring
+  metrics: false
