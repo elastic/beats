@@ -29,11 +29,11 @@ var validQuery = `\Processor Information(_Total)\% Processor Time`
 
 // TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
 func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+	counter := Counter{Format: "float", InstanceName: "TestInstanceName"}
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		CounterConfig:     []CounterConfig{counter},
+		Counters:          []Counter{counter},
 	}
 	reader, err := NewReader(config)
 	assert.NotNil(t, err)
@@ -43,11 +43,11 @@ func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 
 // TestNewReaderWithValidQueryPath should successfully instantiate the reader.
 func TestNewReaderWithValidQueryPath(t *testing.T) {
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
+	counter := Counter{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		CounterConfig:     []CounterConfig{counter},
+		Counters:          []Counter{counter},
 	}
 	reader, err := NewReader(config)
 	defer reader.Close()
@@ -62,11 +62,11 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 
 // TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.
 func TestReadSuccessfully(t *testing.T) {
-	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
+	counter := Counter{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
-		CounterConfig:     []CounterConfig{counter},
+		Counters:          []Counter{counter},
 	}
 	reader, err := NewReader(config)
 	if err != nil {

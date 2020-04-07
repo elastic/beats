@@ -5,57 +5,86 @@ input:
   defaults:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
-    perfmon.counters:
-    #network
-    - instance_label: 'name'
-      measurement_label: total_bytes_received
-      query: '\Web Service(*)\Total Bytes Received'
-    - instance_label: 'name'
-      measurement_label: total_bytes_sent
-      query: '\Web Service(*)\Total Bytes Sent'
-    - instance_label: 'name'
-      measurement_label: bytes_sent_per_sec
-      query: '\Web Service(*)\Bytes Sent/sec'
-    - instance_label: 'name'
-      measurement_label: bytes_received_per_sec
-      query: '\Web Service(*)\Bytes Received/sec'
-    - instance_label: 'name'
-      measurement_label: current_connections
-      query: '\Web Service(*)\Current Connections'
-    - instance_label: 'name'
-      measurement_label: maximum_connections
-      query: '\Web Service(*)\Maximum Connections'
-    - instance_label: 'name'
-      measurement_label: total_connection_attempts
-      query: '\Web Service(*)\Total Connection Attempts (all instances)'
-    - instance_label: 'name'
-      measurement_label: total_get_requests
-      query: '\Web Service(*)\Total Get Requests'
-    - instance_label: 'name'
-      measurement_label: get_requests_per_sec
-      query: '\Web Service(*)\Get Requests/sec'
-    - instance_label: 'name'
-      measurement_label: total_post_requests
-      query: '\Web Service(*)\Total Post Requests'
-    - instance_label: 'name'
-      measurement_label: post_requests_per_sec
-      query: '\Web Service(*)\Post Requests/sec'
-    - instance_label: 'name'
-      measurement_label: total_delete_requests
-      query: '\Web Service(*)\Total Delete Requests'
-    - instance_label: 'name'
-      measurement_label: delete_requests_per_sec
-      query: '\Web Service(*)\Delete Requests/sec'
-    - instance_label: 'name'
-      measurement_label: service_uptime
-      query: '\Web Service(*)\Service Uptime'
-    - instance_label: 'name'
-      measurement_label: total_put_requests
-      query: '\Web Service(*)\Total PUT Requests'
-    - instance_label: 'name'
-      measurement_label: put_requests_per_sec
-      query: '\Web Service(*)\PUT Requests/sec'
+    perfmon.queries:
+    - object: 'Web Service'
+      instance: "*"
+      counters:
+      - name: 'Total Bytes Received'
+        field: total_bytes_received
+      - name: 'Total Bytes Sent'
+        field: total_bytes_sent
+      - name: "Bytes Sent/sec"
+        field: bytes_sent_per_sec
+      - name: "Bytes Received/sec"
+        field: bytes_received_per_sec
+      - name: "Current Connections"
+        field: current_connections
+      - name: "Maximum Connections"
+        field: maximum_connections
+      - name: "Total Connection Attempts (all instances)"
+        field: total_connection_attempts
+      - name: "Total Get Requests"
+        field: total_get_requests
+      - name: "Get Requests/sec"
+        field: get_requests_per_sec
+      - name: "Total Post Requests"
+        field: total_post_requests
+      - name: "Post Requests/sec"
+        field: post_requests_per_sec
+      - name: "Total Delete Requests"
+        field: total_delete_requests
+      - name: "Delete Requests/sec"
+        field: delete_requests_per_sec
+      - name: "Service Uptime"
+        field: service_uptime
+      - name: "Total PUT Requests"
+        field: total_put_requests
+      - name: "PUT Requests/sec"
+        field: put_requests_per_sec
 
 processors:
 - drop_event.when.equals:
     iis.website.name: '_Total'
+- rename:
+    ignore_missing: true
+    fields:
+    - from: "iis.website.metrics.total_bytes_received"
+      to: "iis.website.total_bytes_received"
+    - from: "iis.website.metrics.total_bytes_sent"
+      to: "iis.website.total_bytes_sent"
+    - from: "iis.website.metrics.bytes_sent_per_sec"
+      to: "iis.website.bytes_sent_per_sec"
+    - from: "iis.website.metrics.bytes_received_per_sec"
+      to: "iis.website.bytes_received_per_sec"
+    - from: "iis.website.metrics.current_connections"
+      to: "iis.website.current_connections"
+    - from: "iis.website.metrics.maximum_connections"
+      to: "iis.website.maximum_connections"
+    - from: "iis.website.metrics.total_connection_attempts"
+      to: "iis.website.total_connection_attempts"
+    - from: "iis.website.metrics.total_get_requests"
+      to: "iis.website.total_get_requests"
+    - from: "iis.website.metrics.get_requests_per_sec"
+      to: "iis.website.get_requests_per_sec"
+    - from: "iis.website.metrics.total_post_requests"
+      to: "iis.website.total_post_requests"
+    - from: "iis.website.metrics.post_requests_per_sec"
+      to: "iis.website.post_requests_per_sec"
+    - from: "iis.website.metrics.total_delete_requests"
+      to: "iis.website.total_delete_requests"
+    - from: "iis.website.metrics.delete_requests_per_sec"
+      to: "iis.website.delete_requests_per_sec"
+    - from: "iis.website.metrics.service_uptime"
+      to: "iis.website.service_uptime"
+    - from: "iis.website.metrics.total_put_requests"
+      to: "iis.website.total_put_requests"
+    - from: "iis.website.metrics.put_requests_per_sec"
+      to: "iis.website.put_requests_per_sec"
+    - from: "iis.website.instance"
+      to: "iis.website.name"
+- drop_fields:
+    fields: ["iis.website.object", "iis.website.metrics"]
+
+
+
+

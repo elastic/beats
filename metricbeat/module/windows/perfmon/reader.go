@@ -20,32 +20,24 @@
 package perfmon
 
 import (
-	"fmt"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-var processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
 
 const instanceCountLabel = ":count"
 
 // Reader will contain the config options
 type Reader struct {
-	query         pdh.Query         // PDH Query
-	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed      bool              // Indicates if the query has been executed.
-	log           *logp.Logger      //
-	config        Config            // Metricset configuration
+	query    pdh.Query    // PDH Query
+	executed bool         // Indicates if the query has been executed.
+	log      *logp.Logger //
+	config   Config       // Metricset configuration
 }
 
 // NewReader creates a new instance of Reader.
@@ -55,13 +47,11 @@ func NewReader(config Config) (*Reader, error) {
 		return nil, err
 	}
 	r := &Reader{
-		query:         query,
-		instanceLabel: map[string]string{},
-		measurement:   map[string]string{},
-		log:           logp.NewLogger("perfmon"),
-		config:        config,
+		query: query,
+		log:   logp.NewLogger("perfmon"),
 	}
-	for _, counter := range config.CounterConfig {
+	for i, counter := range config.Counters {
+		config.Counters[i].ChildQueries = []string{}
 		childQueries, err := query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
@@ -91,17 +81,18 @@ func NewReader(config Config) (*Reader, error) {
 			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
-			r.instanceLabel[v] = counter.InstanceLabel
-			r.measurement[v] = counter.MeasurementLabel
+			config.Counters[i].ChildQueries = append(config.Counters[i].ChildQueries, v)
 		}
 	}
+	r.config = config
 	return r, nil
 }
 
 // RefreshCounterPaths will recheck for any new instances and add them to the counter list
 func (re *Reader) RefreshCounterPaths() error {
 	var newCounters []string
-	for _, counter := range re.config.CounterConfig {
+	for i, counter := range re.config.Counters {
+		re.config.Counters[i].ChildQueries = []string{}
 		childQueries, err := re.query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if re.config.IgnoreNECounters {
@@ -123,8 +114,7 @@ func (re *Reader) RefreshCounterPaths() error {
 				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
 				}
-				re.instanceLabel[v] = counter.InstanceLabel
-				re.measurement[v] = counter.MeasurementLabel
+				re.config.Counters[i].ChildQueries = append(re.config.Counters[i].ChildQueries, v)
 			}
 		}
 	}
@@ -161,114 +151,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	return events, nil
 }
 
-func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Event {
-	eventMap := make(map[string]*mb.Event)
-
-	for counterPath, values := range counters {
-		for ind, val := range values {
-			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-			if val.Err != nil && !re.executed {
-				re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-				continue
-			}
-
-			var eventKey string
-			if re.config.GroupMeasurements && val.Err == nil {
-				// Send measurements with the same instance label as part of the same event
-				eventKey = val.Instance
-			} else {
-				// Send every measurement as an individual event
-				// If a counter contains an error, it will always be sent as an individual event
-				eventKey = counterPath + strconv.Itoa(ind)
-			}
-
-			// Create a new event if the key doesn't exist in the map
-			if _, ok := eventMap[eventKey]; !ok {
-				eventMap[eventKey] = &mb.Event{
-					MetricSetFields: common.MapStr{},
-					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
-				}
-				if val.Instance != "" && re.instanceLabel[counterPath] != "" {
-					//will ignore instance counter
-					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(re.instanceLabel[counterPath], match)
-					} else {
-						eventMap[eventKey].MetricSetFields.Put(re.instanceLabel[counterPath], val.Instance)
-					}
-				}
-			}
-			event := eventMap[eventKey]
-			if val.Measurement != nil {
-				event.MetricSetFields.Put(re.measurement[counterPath], val.Measurement)
-			} else {
-				event.MetricSetFields.Put(re.measurement[counterPath], 0)
-			}
-		}
-	}
-	// Write the values into the map.
-	events := make([]mb.Event, 0, len(eventMap))
-	for _, val := range eventMap {
-		events = append(events, *val)
-	}
-	return events
-}
-
-func (re *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event {
-	event := mb.Event{
-		MetricSetFields: common.MapStr{},
-	}
-	measurements := make(map[string]float64, 0)
-	for counterPath, values := range counters {
-		for _, val := range values {
-			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
-			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-			if val.Err != nil && !re.executed {
-				re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-				continue
-			}
-			var counterVal float64
-			switch val.Measurement.(type) {
-			case int64:
-				counterVal = float64(val.Measurement.(int64))
-			default:
-				counterVal = val.Measurement.(float64)
-			}
-			if _, ok := measurements[re.measurement[counterPath]]; !ok {
-				measurements[re.measurement[counterPath]] = counterVal
-				measurements[re.measurement[counterPath]+instanceCountLabel] = 1
-			} else {
-				measurements[re.measurement[counterPath]+instanceCountLabel] = measurements[re.measurement[counterPath]+instanceCountLabel] + 1
-				measurements[re.measurement[counterPath]] = measurements[re.measurement[counterPath]] + counterVal
-			}
-		}
-	}
-	for key, val := range measurements {
-		if strings.Contains(key, instanceCountLabel) {
-			if val == 1 {
-				continue
-			} else {
-				event.MetricSetFields.Put(fmt.Sprintf("%s.%s", strings.Split(key, ".")[0], re.config.GroupAllCountersTo), val)
-			}
-		} else {
-			event.MetricSetFields.Put(key, val)
-		}
-	}
-	return event
-}
-
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
 	return re.query.Close()
-}
-
-// matchParentProcess will try to get the parent process name
-func matchesParentProcess(instanceName string) (bool, string) {
-	matches := processRegexp.FindStringSubmatch(instanceName)
-	if len(matches) == 2 {
-		return true, matches[1]
-	}
-	return false, instanceName
 }
