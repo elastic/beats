@@ -40,7 +40,7 @@ var (
 )
 
 func TestPublish(t *testing.T) {
-	tests := map[string]func() outputs.Client{
+	tests := map[string]func(uint) outputs.Client{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
 	}
@@ -53,7 +53,7 @@ func TestPublish(t *testing.T) {
 				numBatches := 3000 + (i % 1000) // between 3000 and 3999
 
 				wqu := makeWorkQueue()
-				client := ctor()
+				client := ctor(0)
 				makeClientWorker(nilObserver, wqu, client)
 
 				numEvents := atomic.MakeInt(0)
@@ -81,7 +81,7 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublishWithClose(t *testing.T) {
-	tests := map[string]func() outputs.Client{
+	tests := map[string]func(uint) outputs.Client{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
 	}
@@ -94,8 +94,7 @@ func TestPublishWithClose(t *testing.T) {
 				numBatches := 3000 + (i % 1000) // between 3000 and 3999
 
 				wqu := makeWorkQueue()
-
-				numEvents := atomic.MakeInt(0)
+				numEvents := atomic.MakeUint(0)
 
 				var wg sync.WaitGroup
 				for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
@@ -104,23 +103,24 @@ func TestPublishWithClose(t *testing.T) {
 						defer wg.Done()
 
 						batch := randomBatch(50, 150, wqu)
-						numEvents.Add(len(batch.Events()))
+						numEvents.Add(uint(len(batch.Events())))
 						wqu <- batch
 					}()
 				}
 
-				client := ctor()
+				client := ctor(numEvents.Load() / 2) // Stop short of publishing all events
 				worker := makeClientWorker(nilObserver, wqu, client)
 
 				// Close worker before all batches have had time to be published
 				err := worker.Close()
 				require.NoError(t, err)
 
-				c := client.(interface{ Published() int })
-				remaining := numEvents.Load() - c.Published()
-				assert.Greater(t, remaining, 0)
+				c := client.(interface{ Published() uint })
+				published := c.Published()
+				assert.Less(t, published, numEvents.Load())
 
 				// Start new worker to drain work queue
+				client = ctor(0)
 				makeClientWorker(nilObserver, wqu, client)
 				wg.Wait()
 
@@ -129,7 +129,8 @@ func TestPublishWithClose(t *testing.T) {
 
 				// Make sure that all events have eventually been published
 				return waitUntilTrue(timeout, func() bool {
-					return numEvents.Load() == c.Published()
+					c = client.(interface{ Published() uint })
+					return numEvents.Load() == c.Published()+published
 				})
 			}, nil)
 
@@ -140,14 +141,17 @@ func TestPublishWithClose(t *testing.T) {
 	}
 }
 
-func newMockClient() outputs.Client { return &mockClient{} }
-
-type mockClient struct {
-	mu        sync.RWMutex
-	published int
+func newMockClient(publishLimit uint) outputs.Client {
+	return &mockClient{publishLimit: publishLimit}
 }
 
-func (c *mockClient) Published() int {
+type mockClient struct {
+	mu           sync.RWMutex
+	publishLimit uint
+	published    uint
+}
+
+func (c *mockClient) Published() uint {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -160,18 +164,27 @@ func (c *mockClient) Publish(batch publisher.Batch) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.published += len(batch.Events())
+	// Simulate blocking (not publishing)
+	if c.publishLimit > 0 && c.published >= c.publishLimit {
+		batch.Cancelled()
+		return nil
+	}
+
+	c.published += uint(len(batch.Events()))
 	return nil
 }
 
-func newMockNetworkClient() outputs.Client { return &mockNetworkClient{} }
-
-type mockNetworkClient struct {
-	mu        sync.RWMutex
-	published int
+func newMockNetworkClient(publishLimit uint) outputs.Client {
+	return &mockNetworkClient{publishLimit: publishLimit}
 }
 
-func (c *mockNetworkClient) Published() int {
+type mockNetworkClient struct {
+	mu           sync.RWMutex
+	publishLimit uint
+	published    uint
+}
+
+func (c *mockNetworkClient) Published() uint {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -184,7 +197,13 @@ func (c *mockNetworkClient) Publish(batch publisher.Batch) error {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	c.published += len(batch.Events())
+	// Simulate blocking (not publishing)
+	if c.publishLimit > 0 && c.published >= c.publishLimit {
+		batch.Cancelled()
+		return nil
+	}
+
+	c.published += uint(len(batch.Events()))
 	return nil
 }
 func (c *mockNetworkClient) Connect() error { return nil }
