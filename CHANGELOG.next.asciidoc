@@ -239,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Reference kubernetes manifests include configuration for auditd and enrichment with kubernetes metadata. {pull}17431[17431]
 - Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 
