@@ -22,7 +22,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -45,37 +46,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 
 // Reconfigure module with required metricsets if xpack.enabled = true.
 func reconfigure(base *mb.BaseModule) error {
-	config := struct {
-		Metricsets   []string `config:"metricsets"`
-		XPackEnabled bool     `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return err
-	}
-
-	// No special configuration is needed if xpack.enabled != true
-	if !config.XPackEnabled {
-		return nil
-	}
-
-	var raw common.MapStr
-	if err := base.UnpackConfig(&raw); err != nil {
-		return err
-	}
-
-	// These metricsets are exactly the ones required if xpack.enabled == true
-	raw["metricsets"] = []string{"state", "stats"}
-
-	newConfig, err := common.NewConfigFrom(raw)
-	if err != nil {
-		return err
-	}
-
-	if err := base.Reconfigure(newConfig); err != nil {
-		return err
-	}
-
-	return nil
+	metricSets := []string{"state", "stats"}
+	return elastic.ReconfigureXPackEnabledMetricSets(base, metricSets)
 }
 
 // ModuleName is the name of this module.

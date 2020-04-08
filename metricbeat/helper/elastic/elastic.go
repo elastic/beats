@@ -127,3 +127,37 @@ func FixTimestampField(m common.MapStr, field string) error {
 	}
 	return nil
 }
+
+func ReconfigureXPackEnabledMetricSets(base *mb.BaseModule, metricsets []string) error {
+	config := struct {
+		Metricsets   []string `config:"metricsets"`
+		XPackEnabled bool     `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return err
+	}
+
+	// No special configuration is needed if xpack.enabled != true
+	if !config.XPackEnabled {
+		return nil
+	}
+
+	var raw common.MapStr
+	if err := base.UnpackConfig(&raw); err != nil {
+		return err
+	}
+
+	// These metricsets are exactly the ones required if xpack.enabled == true
+	raw["metricsets"] = metricsets
+
+	newConfig, err := common.NewConfigFrom(raw)
+	if err != nil {
+		return err
+	}
+
+	if err := base.Reconfigure(newConfig); err != nil {
+		return err
+	}
+
+	return nil
+}
