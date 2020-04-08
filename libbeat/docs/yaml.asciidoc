@@ -104,10 +104,10 @@ password field contains `$$`, the engine will resolve this to `$`.
 
 To work around this,
 either use the
-ifndef::standalone[]
+ifdef::no_keystore[]
 {filebeat-ref}/keystore.html[keystore]
 endif::[]
-ifdef::standalone[]
+ifndef::no_keystore[]
 <<keystore>>
 endif::[]
 or escape all instances of
