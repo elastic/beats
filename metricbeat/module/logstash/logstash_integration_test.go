@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -49,10 +48,8 @@ func TestFetch(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
-			}
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
 
 			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 				events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
