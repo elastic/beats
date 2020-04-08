@@ -20,8 +20,11 @@ package file
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -45,7 +48,7 @@ func (realClock) Now() time.Time {
 	return time.Now()
 }
 
-func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
+func newIntervalRotator(log Logger, interval time.Duration, rotateOnStartup bool, filename string) (*intervalRotator, error) {
 	if interval == 0 {
 		return nil, nil
 	}
@@ -54,11 +57,11 @@ func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
 	}
 
 	ir := &intervalRotator{interval: (interval / time.Second) * time.Second} // drop fractional seconds
-	ir.initialize()
+	ir.initialize(log, rotateOnStartup, filename)
 	return ir, nil
 }
 
-func (r *intervalRotator) initialize() error {
+func (r *intervalRotator) initialize(log Logger, rotateOnStartup bool, filename string) {
 	r.clock = realClock{}
 
 	switch r.interval {
@@ -93,7 +96,41 @@ func (r *intervalRotator) initialize() error {
 			return lastInterval != currentInterval
 		}
 	}
-	return nil
+
+	// if rotation is not allowed on startup, find the newest rotated file last modification time
+	// or that of the unrotated log file
+	if !rotateOnStartup {
+		logsDir := filepath.Dir(filename)
+		logfiles, err := ioutil.ReadDir(logsDir)
+		if err != nil && log != nil {
+			log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
+			return
+		}
+
+		r.lastRotate = time.Time{}
+		if len(logfiles) == 1 && logfiles[0].Name() == filename {
+			if log != nil {
+				log.Debugw("Setting last rotated time to the last modification time of the log")
+			}
+
+			r.lastRotate = logfiles[0].ModTime()
+			return
+		}
+		basenamePrefix := filepath.Base(filename) + "-"
+		for _, fi := range logfiles {
+			if strings.HasPrefix(fi.Name(), basenamePrefix) {
+				if fi.ModTime().After(r.lastRotate) {
+					r.lastRotate = fi.ModTime()
+				}
+			}
+		}
+
+		if log != nil {
+			log.Debugw("Set last rotated time to", r.lastRotate)
+		}
+	}
+
+	return
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
