@@ -436,9 +436,8 @@ func InjectIndex(indexType string) *InjectIndexRule {
 	}
 }
 
-// InjectStreamProcessorRule expect target to be a collection of fields including
-// _meta_index map with dataset, index and namespace keys defined.
-// if any key is missing this rule fails.
+// InjectStreamProcessorRule injects a add fields processor providing
+// stream type, namespace and dataset fields into events.
 type InjectStreamProcessorRule struct {
 	Type       string
 	OnConflict string `yaml:"on_conflict" config:"on_conflict"`
