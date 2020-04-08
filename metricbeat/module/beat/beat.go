@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -38,15 +36,15 @@ func init() {
 
 // NewModule creates a new module after performing validation.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := validateXPackMetricsets(base); err != nil {
+	if err := reconfigure(&base); err != nil {
 		return nil, err
 	}
 
 	return &base, nil
 }
 
-// Validate that correct metricsets have been specified if xpack.enabled = true.
-func validateXPackMetricsets(base mb.BaseModule) error {
+// Reconfigure module with required metricsets if xpack.enabled = true.
+func reconfigure(base *mb.BaseModule) error {
 	config := struct {
 		Metricsets   []string `config:"metricsets"`
 		XPackEnabled bool     `config:"xpack.enabled"`
@@ -55,18 +53,26 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 		return err
 	}
 
-	// Nothing to validate if xpack.enabled != true
+	// No special configuration is needed if xpack.enabled != true
 	if !config.XPackEnabled {
 		return nil
 	}
 
-	expectedXPackMetricsets := []string{
-		"state",
-		"stats",
+	var raw common.MapStr
+	if err := base.UnpackConfig(&raw); err != nil {
+		return err
 	}
 
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	// These metricsets are exactly the ones required if xpack.enabled == true
+	raw["metricsets"] = []string{"state", "stats"}
+
+	newConfig, err := common.NewConfigFrom(raw)
+	if err != nil {
+		return err
+	}
+
+	if err := base.Reconfigure(newConfig); err != nil {
+		return err
 	}
 
 	return nil
