@@ -120,7 +120,8 @@ func TestMakeClientWorkerAndClose(t *testing.T) {
 				var publishedFirst atomic.Uint
 				blockCtrl := make(chan struct{})
 				blockingPublishFn := func(batch publisher.Batch) error {
-					// Emulate blocking
+					// Emulate blocking. Upon unblocking the in-flight batch that was
+					// blocked is published.
 					if publishedFirst.Load() >= publishLimit {
 						<-blockCtrl
 					}
