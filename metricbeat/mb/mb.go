@@ -63,9 +63,10 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                      // Name returns the name of the Module.
-	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
+	Name() string                                                // Name returns the name of the Module.
+	Config() ModuleConfig                                        // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                           // UnpackConfig unpacks the raw module config to the given object.
+	ReConfigure(config *common.Config, register *Register) error // ReConfigure reconfigures the module with the new configuration object.
 }
 
 // BaseModule implements the Module interface.

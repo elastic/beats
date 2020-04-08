@@ -101,7 +101,7 @@ func TestFixTimestampField(t *testing.T) {
 		{
 			"converts float64s in scientific notation to ints",
 			map[string]interface{}{
-				"foo": 1.571284349E12,
+				"foo": 1.571284349e12,
 			},
 			map[string]interface{}{
 				"foo": 1571284349000,

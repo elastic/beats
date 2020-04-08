@@ -409,7 +409,11 @@ func TestModuleConfigQueryParams(t *testing.T) {
 	assert.NotEqual(t, "&", res[len(res)-1])
 }
 
+<<<<<<< HEAD
 func TestBaseModuleWithConfig(t *testing.T) {
+=======
+func TestModuleReConfigure(t *testing.T) {
+>>>>>>> Adding tests for ReConfigure() / making it part of Module interface
 	mockRegistry := NewRegister()
 
 	const moduleName = "test_module"
