@@ -20,12 +20,14 @@
 package mb
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type testModule struct {
@@ -405,4 +407,90 @@ func TestModuleConfigQueryParams(t *testing.T) {
 	assert.NotContains(t, res, "%")
 	assert.NotEqual(t, "&", res[0])
 	assert.NotEqual(t, "&", res[len(res)-1])
+}
+
+func TestModuleReConfigure(t *testing.T) {
+	mockRegistry := NewRegister()
+
+	const moduleName = "test_module"
+
+	err := mockRegistry.AddMetricSet(moduleName, "foo", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "bar", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "qux", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "baz", mockMetricSetFactory)
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		newConfig      metricSetConfig
+		expectedConfig metricSetConfig
+		expectedErrMsg string
+	}{
+		"metricsets": {
+			metricSetConfig{
+				MetricSets: []string{"qux", "baz", "bar"},
+			},
+			metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"qux", "baz", "bar"},
+			},
+			"",
+		},
+		"module_name": {
+			metricSetConfig{
+				Module: "new_test_module",
+			},
+			metricSetConfig{},
+			fmt.Sprintf("cannot change module name from %v to %v", moduleName, "new_test_module"),
+		},
+		"unregistered_metricsets": {
+			metricSetConfig{
+				MetricSets: []string{"invalid", "foo"},
+			},
+			metricSetConfig{},
+			"could not reconfigure module test_module: 1 error: metricset 'test_module/invalid' not found",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			initConfig := metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"foo", "bar"},
+			}
+
+			m, _, err := NewModule(common.MustNewConfigFrom(initConfig), mockRegistry)
+			require.NoError(t, err)
+
+			err = m.ReConfigure(common.MustNewConfigFrom(test.newConfig), mockRegistry)
+			if test.expectedErrMsg == "" {
+				require.NoError(t, err)
+
+				var actualNewConfig metricSetConfig
+				err = m.UnpackConfig(&actualNewConfig)
+				require.NoError(t, err)
+				require.Equal(t, test.expectedConfig, actualNewConfig)
+			} else {
+				require.Equal(t, test.expectedErrMsg, err.Error())
+			}
+
+		})
+	}
+}
+
+type mockMetricSet struct {
+	BaseMetricSet
+}
+
+func (m *mockMetricSet) Fetch(r ReporterV2) error { return nil }
+
+type metricSetConfig struct {
+	Module     string   `config:"module"`
+	MetricSets []string `config:"metricsets"`
+}
+
+func mockMetricSetFactory(base BaseMetricSet) (MetricSet, error) {
+	return &mockMetricSet{base}, nil
 }

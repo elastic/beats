@@ -44,10 +44,10 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
-// Reconfigure module with required metricsets if xpack.enabled = true.
+// ReConfigure module with required metricsets if xpack.enabled = true.
 func reconfigure(base *mb.BaseModule) error {
 	metricSets := []string{"state", "stats"}
-	return elastic.ReconfigureXPackEnabledMetricSets(base, metricSets)
+	return elastic.ReConfigureXPackEnabledMetricSets(base, metricSets, mb.Registry)
 }
 
 // ModuleName is the name of this module.

@@ -69,9 +69,10 @@ type TestModule struct {
 	RawConfig *common.Config
 }
 
-func (m *TestModule) Name() string                      { return m.ModName }
-func (m *TestModule) Config() mb.ModuleConfig           { return m.ModConfig }
-func (m *TestModule) UnpackConfig(to interface{}) error { return m.RawConfig.Unpack(to) }
+func (m *TestModule) Name() string                                                   { return m.ModName }
+func (m *TestModule) Config() mb.ModuleConfig                                        { return m.ModConfig }
+func (m *TestModule) UnpackConfig(to interface{}) error                              { return m.RawConfig.Unpack(to) }
+func (m *TestModule) ReConfigure(config *common.Config, register *mb.Register) error { return nil }
 
 func NewTestModule(t testing.TB, config interface{}) *TestModule {
 	c, err := common.NewConfigFrom(config)

@@ -63,9 +63,10 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                      // Name returns the name of the Module.
-	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
+	Name() string                                                // Name returns the name of the Module.
+	Config() ModuleConfig                                        // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                           // UnpackConfig unpacks the raw module config to the given object.
+	ReConfigure(config *common.Config, register *Register) error // ReConfigure reconfigures the module with the new configuration object.
 }
 
 // BaseModule implements the Module interface.
@@ -96,13 +97,37 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
 }
 
-func (m *BaseModule) Reconfigure(config *common.Config) error {
-	newM, err := newBaseModuleFromConfig(config)
+// ReConfigure re-configures the module with the given raw configuration
+func (m *BaseModule) ReConfigure(config *common.Config, register *Register) error {
+	var c struct {
+		Module string `config:"module"`
+	}
+
+	if err := config.Unpack(&c); err != nil {
+		return errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	// Don't allow module name change
+	if c.Module != "" && c.Module != m.Name() {
+		return fmt.Errorf("cannot change module name from %v to %v", m.Name(), c.Module)
+	}
+
+	if err := config.SetString("module", -1, m.Name()); err != nil {
+		return errors.New("could not set existing module name in new configuration")
+	}
+
+	// Calling NewModule ensures that the proper validation checks and other initialization are
+	// performed again with the new configuration.
+	newM, _, err := NewModule(config, register)
 	if err != nil {
 		return errors.Wrapf(err, "could not reconfigure module %v", m.Name())
 	}
 
-	*m = newM
+	bm, ok := newM.(*BaseModule)
+	if !ok {
+		return errors.New("new configuration does not create a BaseModule")
+	}
+	*m = *bm
 	return nil
 }
 
