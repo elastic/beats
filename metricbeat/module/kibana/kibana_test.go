@@ -20,6 +20,8 @@ package kibana_test
 import (
 	"testing"
 
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
