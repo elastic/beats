@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -35,19 +37,13 @@ func init() {
 	}
 }
 
-// NewModule creates a new module after performing validation.
+// NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := reconfigure(&base); err != nil {
-		return nil, err
+	if err := elastic.ConfigureModule(&base, []string{"state", "stats"}, mb.Registry); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
 	}
 
 	return &base, nil
-}
-
-// ReConfigure module with required metricsets if xpack.enabled = true.
-func reconfigure(base *mb.BaseModule) error {
-	metricSets := []string{"state", "stats"}
-	return elastic.ReConfigureXPackEnabledMetricSets(base, metricSets, mb.Registry)
 }
 
 // ModuleName is the name of this module.

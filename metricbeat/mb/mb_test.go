@@ -465,16 +465,20 @@ func TestModuleReConfigure(t *testing.T) {
 			require.NoError(t, err)
 
 			err = m.ReConfigure(common.MustNewConfigFrom(test.newConfig), mockRegistry)
+
+			var expectedNewConfig metricSetConfig
 			if test.expectedErrMsg == "" {
 				require.NoError(t, err)
-
-				var actualNewConfig metricSetConfig
-				err = m.UnpackConfig(&actualNewConfig)
-				require.NoError(t, err)
-				require.Equal(t, test.expectedConfig, actualNewConfig)
+				expectedNewConfig = test.expectedConfig
 			} else {
 				require.Equal(t, test.expectedErrMsg, err.Error())
+				expectedNewConfig = initConfig
 			}
+
+			var actualNewConfig metricSetConfig
+			err = m.UnpackConfig(&actualNewConfig)
+			require.NoError(t, err)
+			require.Equal(t, expectedNewConfig, actualNewConfig)
 
 		})
 	}

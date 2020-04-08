@@ -63,7 +63,7 @@ func TestGetVertexClusterUUID(t *testing.T) {
 	}
 }
 
-func TestXPackEnabledMetricsets(t *testing.T) {
+func TestXPackEnabledMetricSets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        logstash.ModuleName,
 		"hosts":         []string{"foobar:9600"},

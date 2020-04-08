@@ -194,7 +194,7 @@ func TestReconfigureXPackEnabledMetricSets(t *testing.T) {
 			m, _, err := mb.NewModule(cfg, mockRegistry)
 			require.NoError(t, err)
 
-			err = ReConfigureXPackEnabledMetricSets(m, test.xpackEnabledMetricsets, mockRegistry)
+			err = ConfigureModule(m, test.xpackEnabledMetricsets, mockRegistry)
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

@@ -106,35 +106,39 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 
 // ReConfigure re-configures the module with the given raw configuration
 func (m *BaseModule) ReConfigure(config *common.Config, register *Register) error {
-	var c struct {
+	currName := m.name
+	currConfig := m.config
+	currRawConfig := m.rawConfig
+
+	var chkConfig struct {
 		Module string `config:"module"`
 	}
-
-	if err := config.Unpack(&c); err != nil {
+	if err := config.Unpack(&chkConfig); err != nil {
 		return errors.Wrap(err, "error parsing new module configuration")
 	}
 
 	// Don't allow module name change
-	if c.Module != "" && c.Module != m.Name() {
-		return fmt.Errorf("cannot change module name from %v to %v", m.Name(), c.Module)
+	if chkConfig.Module != "" && chkConfig.Module != currName {
+		return fmt.Errorf("cannot change module name from %v to %v", currName, chkConfig.Module)
 	}
 
-	if err := config.SetString("module", -1, m.Name()); err != nil {
-		return errors.New("could not set existing module name in new configuration")
+	if err := config.SetString("module", -1, currName); err != nil {
+		return errors.Wrap(err, "unable to set existing module name in new configuration")
 	}
 
-	// Calling NewModule ensures that the proper validation checks and other initialization are
-	// performed again with the new configuration.
-	newM, _, err := NewModule(config, register)
-	if err != nil {
-		return errors.Wrapf(err, "could not reconfigure module %v", m.Name())
+	if err := config.Unpack(&m.config); err != nil {
+		return errors.Wrap(err, "error parsing new module configuration")
+	}
+	m.rawConfig = config
+
+	// Calling initMetricSets ensures proper validation checks
+	if _, err := initMetricSets(register, m); err != nil {
+		m.name = currName
+		m.config = currConfig
+		m.rawConfig = currRawConfig
+		return errors.Wrapf(err, "could not reconfigure module %v", m.name)
 	}
 
-	bm, ok := newM.(*BaseModule)
-	if !ok {
-		return errors.New("new configuration does not create a BaseModule")
-	}
-	*m = *bm
 	return nil
 }
 
