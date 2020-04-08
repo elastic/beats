@@ -163,7 +163,7 @@ func TestMakeClientWorkerAndClose(t *testing.T) {
 				return waitUntilTrue(timeout, func() bool {
 					return numEvents.Load() == publishedFirst.Load()+publishedLater.Load()
 				})
-			}, &quick.Config{MaxCount: 50})
+			}, &quick.Config{MaxCount: 25})
 
 			if err != nil {
 				t.Error(err)
