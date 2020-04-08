@@ -41,31 +41,9 @@ func init() {
 	}
 }
 
-// NewModule creates a new module after performing validation.
+// NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := validateXPackMetricsets(base); err != nil {
-		return nil, err
-	}
-
-	return &base, nil
-}
-
-// Validate that correct metricsets have been specified if xpack.enabled = true.
-func validateXPackMetricsets(base mb.BaseModule) error {
-	config := struct {
-		Metricsets   []string `config:"metricsets"`
-		XPackEnabled bool     `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return err
-	}
-
-	// Nothing to validate if xpack.enabled != true
-	if !config.XPackEnabled {
-		return nil
-	}
-
-	expectedXPackMetricsets := []string{
+	xpackEnabledMetricSets := []string{
 		"ccr",
 		"enrich",
 		"cluster_stats",
@@ -76,12 +54,11 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 		"node_stats",
 		"shard",
 	}
-
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, mb.Registry); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
 	}
 
-	return nil
+	return &base, nil
 }
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.

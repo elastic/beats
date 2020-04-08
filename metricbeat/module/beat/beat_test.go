@@ -24,6 +24,8 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/beat"
+
+	// Make sure metricsets are registered in mb.Registry
 	_ "github.com/elastic/beats/v7/metricbeat/module/beat/state"
 	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
 )
@@ -40,8 +42,7 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 	for _, ms := range metricSets {
 		name := ms.Name()
 		switch name {
-		case "state":
-		case "stats":
+		case "state", "stats":
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}

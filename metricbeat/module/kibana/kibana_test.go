@@ -20,12 +20,13 @@ package kibana_test
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+
+	// Make sure metricsets are registered in mb.Registry
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 )
 
