@@ -25,7 +25,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 			return nil, err
 		}
 
-		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
+		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone)
 		if gcpService == nil {
 			metadataService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(ts)
 		}
