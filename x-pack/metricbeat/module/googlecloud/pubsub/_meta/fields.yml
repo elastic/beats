@@ -82,12 +82,6 @@
         - name: retained_acked_bytes_by_region
           type: long
           description: Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
-        - name: num_retained_acked_messages
-          type: long
-          description: Number of acknowledged messages retained in a subscription.
-        - name: num_retained_acked_messages_by_region
-          type: long
-          description: Number of acknowledged messages retained in a subscription, broken down by Cloud region.
         - name: seek_request_count
           type: long
           description: Cumulative count of seek attempts, grouped by result.
@@ -106,9 +100,6 @@
         - name: unacked_bytes_by_region
           type: long
           description: Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
-        - name: num_unacked_messages_by_region
-          type: long
-          description: Number of unacknowledged messages in a subscription, broken down by Cloud region.
     - name: topic
       type: group
       description: Topic related metrics
@@ -131,9 +122,6 @@
         - name: retained_acked_bytes_by_region
           type: long
           description: Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
-        - name: num_retained_acked_messages_by_region
-          type: long
-          description: Number of acknowledged messages retained in a topic, broken down by Cloud region.
         - name: byte_cost
           type: long
           description: Cost of operations, measured in bytes. This is used to measure utilization for quotas.
@@ -143,9 +131,6 @@
         - name: unacked_bytes_by_region
           type: long
           description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
-        - name: num_unacked_messages_by_region
-          type: long
-          description: Number of unacknowledged messages in a topic, broken down by Cloud region.
     - name: snapshot
       type: group
       description: Snapshot related metrics

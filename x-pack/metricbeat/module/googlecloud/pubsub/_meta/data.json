@@ -13,9 +13,6 @@
     },
     "googlecloud": {
         "labels": {
-            "metrics": {
-                "region": "us-west1"
-            },
             "resource": {
                 "subscription_id": "test-ks"
             }
@@ -26,28 +23,23 @@
                 "backlog_bytes_by_region": 19,
                 "num_messages": 4,
                 "num_messages_by_region": 4,
-                "oldest_message_age": 389,
-                "oldest_message_age_by_region": 389
+                "oldest_message_age": 69319,
+                "oldest_message_age_by_region": 69319
             },
             "subscription": {
                 "backlog_bytes": 0,
-                "num_retained_acked_messages": 0,
-                "num_retained_acked_messages_by_region": 0,
-                "num_unacked_messages_by_region": 4,
                 "num_undelivered_messages": 0,
                 "oldest_retained_acked_message_age": 0,
                 "oldest_retained_acked_message_age_by_region": 0,
                 "oldest_unacked_message_age": 0,
-                "oldest_unacked_message_age_by_region": 362,
+                "oldest_unacked_message_age_by_region": 69277,
                 "retained_acked_bytes": 0,
                 "retained_acked_bytes_by_region": 0,
                 "unacked_bytes_by_region": 19
             },
             "topic": {
-                "num_retained_acked_messages_by_region": 0,
-                "num_unacked_messages_by_region": 16,
                 "oldest_retained_acked_message_age_by_region": 0,
-                "oldest_unacked_message_age_by_region": 389,
+                "oldest_unacked_message_age_by_region": 69319,
                 "retained_acked_bytes_by_region": 0,
                 "unacked_bytes_by_region": 76
             }
