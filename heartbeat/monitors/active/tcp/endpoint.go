@@ -22,7 +22,8 @@ import (
 	"net"
 	"net/url"
 	"strconv"
-	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // endpoint configures a host with all port numbers to be monitored by a dialer
@@ -49,43 +50,55 @@ func (e endpoint) perPortURLs() (urls []*url.URL) {
 // Set `defaultScheme` to choose which scheme is used if not explicit in the host config.
 func makeEndpoints(hosts []string, ports []uint16, defaultScheme string) (endpoints []endpoint, err error) {
 	for _, h := range hosts {
-		scheme := defaultScheme
-		host := ""
 		u, err := url.Parse(h)
 
-		if err != nil || u.Host == "" {
-			host = h
-		} else {
-			scheme = u.Scheme
-			host = u.Host
-		}
-		debugf("Add tcp endpoint '%v://%v'.", scheme, host)
-
-		switch scheme {
-		case "tcp", "plain", "tls", "ssl":
-		default:
-			err := fmt.Errorf("'%v' is not a supported connection scheme in '%v'", scheme, h)
-			return nil, err
-		}
-
-		pair := strings.SplitN(host, ":", 2)
-		if len(pair) == 2 {
-			port, err := strconv.ParseUint(pair[1], 10, 16)
+		// If h is just a bare hostname like 'localhost' it will be parsed as the URL path, and host will
+		// be blank
+		var ep endpoint
+		if err == nil && u.Host != "" {
+			ep, err = makeURLEndpoint(u, ports)
 			if err != nil {
-				return nil, fmt.Errorf("'%v' is no valid port number in '%v'", pair[1], h)
+				return nil, err
 			}
-
-			ports = []uint16{uint16(port)}
-			host = pair[0]
-		} else if len(ports) == 0 {
-			return nil, fmt.Errorf("host '%v' missing port number", h)
+		} else {
+			u := &url.URL{Scheme: defaultScheme, Host: h}
+			ep, err = makeURLEndpoint(u, ports)
+			if err != nil {
+				return nil, err
+			}
 		}
-
-		endpoints = append(endpoints, endpoint{
-			Scheme:   scheme,
-			Hostname: host,
-			Ports:    ports,
-		})
+		endpoints = append(endpoints, ep)
 	}
 	return endpoints, nil
+}
+
+func makeURLEndpoint(u *url.URL, ports []uint16) (endpoint, error) {
+	switch u.Scheme {
+	case "tcp", "plain", "tls", "ssl":
+	default:
+		err := fmt.Errorf("'%s' is not a supported connection scheme in '%s'", u.Scheme, u)
+		return endpoint{}, err
+	}
+
+	if u.Port() != "" {
+		pUint, err := strconv.ParseUint(u.Port(), 10, 16)
+		if err != nil {
+			return endpoint{}, errors.Wrapf(err, "no port(s) defined for TCP endpoint %s", u)
+		}
+		ports = []uint16{uint16(pUint)}
+	}
+
+	if len(ports) == 0 {
+		return endpoint{}, fmt.Errorf("host '%s' missing port number", u)
+	}
+
+	if u.Hostname() == "" || u.Hostname() == ":" {
+		return endpoint{}, fmt.Errorf("could not parse tcp host '%s'", u)
+	}
+
+	return endpoint{
+		Scheme:   u.Scheme,
+		Hostname: u.Hostname(),
+		Ports:    ports,
+	}, nil
 }

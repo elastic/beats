@@ -79,11 +79,8 @@ func TestSocks5Job(t *testing.T) {
 					hbtest.RespondingTCPChecks(),
 					hbtest.SimpleURLChecks(t, "tcp", host, port),
 					hbtest.SummaryChecks(1, 0),
+					hbtest.ResolveChecks(ip),
 					lookslike.MustCompile(map[string]interface{}{
-						"resolve": map[string]interface{}{
-							"ip":     ip,
-							"rtt.us": isdef.IsDuration,
-						},
 						"tcp": map[string]interface{}{
 							"rtt.validate.us": isdef.IsDuration,
 						},

@@ -20,9 +20,13 @@ package tcp
 import (
 	"fmt"
 	"net"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strconv"
 	"testing"
+
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
 
@@ -44,31 +48,66 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	return testTCPConfigCheck(t, config, host, port)
 }
 
+// TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
 func TestUpEndpointJob(t *testing.T) {
-	server, port := setupServer(t, newLocalhostTestServer)
-	defer server.Close()
+	// Test with domain, IPv4 and IPv6
+	scenarios := []struct {
+		name       string
+		hostname   string
+		isIp       bool
+		expectedIp string
+	}{
+		{
+			name:       "localhost",
+			hostname:       "localhost",
+			isIp:       false,
+			expectedIp: "127.0.0.1",
+		},
+		{
+			name:       "ipv4",
+			hostname:   "127.0.0.1",
+			isIp:       true,
+			expectedIp: "127.0.0.1",
+		},
+		{
+			name:     "ipv6",
+			hostname: "::1",
+			isIp:     true,
+		},
+	}
 
-	serverURL, err := url.Parse(server.URL)
-	require.NoError(t, err)
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			server, port := setupServer(t, func(handler http.Handler) *httptest.Server {
+				return newHostTestServer(handler, scenario.hostname)
+			})
+			defer server.Close()
 
-	event := testTCPCheck(t, "localhost", port)
+			hostURL := &url.URL{Scheme: "tcp", Host: net.JoinHostPort(scenario.hostname, strconv.Itoa(int(port)))}
 
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks(serverURL.Hostname(), "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
-			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
-			hbtest.RespondingTCPChecks(),
-			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     serverURL.Hostname(),
-					"rtt.us": isdef.IsDuration,
-				},
-			}),
-		)),
-		event.Fields,
-	)
+			serverURL, err := url.Parse(server.URL)
+			require.NoError(t, err)
+
+			event := testTCPCheck(t, hostURL.String(), port)
+
+			validators := []validator.Validator{
+				hbtest.BaseChecks(serverURL.Hostname(), "up", "tcp"),
+				hbtest.SummaryChecks(1, 0),
+				hbtest.URLChecks(t, hostURL),
+				hbtest.RespondingTCPChecks(),
+			}
+
+			if !scenario.isIp {
+				validators = append(validators, hbtest.ResolveChecks(scenario.expectedIp))
+			}
+
+			testslike.Test(
+				t,
+				lookslike.Strict(lookslike.Compose(validators...)),
+				event.Fields,
+			)
+		})
+	}
 }
 
 func TestConnectionRefusedEndpointJob(t *testing.T) {
@@ -164,11 +203,8 @@ func TestCheckDown(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(0, 1),
+			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     ip,
-					"rtt.us": isdef.IsDuration,
-				},
 				"tcp": map[string]interface{}{
 					"rtt.validate.us": isdef.IsDuration,
 				},

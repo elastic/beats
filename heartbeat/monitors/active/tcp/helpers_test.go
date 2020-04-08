@@ -61,11 +61,11 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server
 	return server, port
 }
 
-// newLocalhostTestServer starts a server listening on the IP resolved from `localhost`
+// newHostTestServer starts a server listening on the IP resolved from the host arg
 // httptest.NewServer() binds explicitly on 127.0.0.1 (or [::1] if ipv4 is not available).
 // The IP resolved from `localhost` can be a different one, like 127.0.1.1.
-func newLocalhostTestServer(handler http.Handler) *httptest.Server {
-	listener, err := net.Listen("tcp", "localhost:0")
+func newHostTestServer(handler http.Handler, host string) *httptest.Server {
+	listener, err := net.Listen("tcp", net.JoinHostPort(host, "0"))
 	if err != nil {
 		panic("failed to listen on localhost: " + err.Error())
 	}
