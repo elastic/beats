@@ -16,6 +16,7 @@
 - Fixed tests on windows {pull}16922[16922]
 - Fixed installers for SNAPSHOTs and windows {pull}17077[17077]
 - Fixed merge of config {pull}17399[17399]
+- Handle abs paths on windows correctly {pull}17461[17461]
 
 ==== New features
 
