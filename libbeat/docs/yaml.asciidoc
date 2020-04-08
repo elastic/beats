@@ -96,11 +96,11 @@ or wrap the values in single quotation marks.
 
 [float]
 [[dollar-sign-strings]]
-== Avoid accidental template variable resolution
+=== Avoid accidental template variable resolution
 
-The templating engine that allows the beat config to resolve data from environment 
-variables can result in errors in strings wtih `$` characters. For example, if a 
-passord field contains `$$`, the engine will resolve this to `$`. To work around this,
+The templating engine that allows the config to resolve data from environment 
+variables can result in errors in strings with `$` characters. For example, if a 
+password field contains `$$`, the engine will resolve this to `$`. To work around this,
 either use the
 ifndef::standalone[]
 {filebeat-ref}/keystore.html[keystore]
