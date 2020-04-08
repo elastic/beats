@@ -94,6 +94,8 @@ github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6 h1:2Gl9Tray0NEjP
 github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d h1:g0M6kedfjDpyAAuxqBvJzMNjFzlrQ7Av6LCDFqWierk=
 github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d/go.mod h1:VykaKG/ofkKje+MSvqjrDsz1wfyHIvEVFljhq2EOZ4g=
+github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41 h1:9OmEpkkO4vm8Wz+JKWHDLZdzYrqXr4dovxIJDkTltKE=
+github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41/go.mod h1:UdDNZ1OO62aGYVnPhxT1U6aI7ukYtA/kB8vaU0diBUM=
 github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc h1:9iW/Fbn/R/nyUOiqo6AgwBe8uirqUIoTGF3vKG8qjoc=
 github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc/go.mod h1:zj8LBEnWBDOVEIJt8LvaRvDG5ARAoa5dBeHaB472NRc=
 github.com/akavel/rsrc v0.8.0 h1:zjWn7ukO9Kc5Q62DOJCcxGpXC18RawVtYAGdz2aLlfw=
@@ -343,8 +345,6 @@ github.com/google/gofuzz v0.0.0-20161122191042-44d81051d367/go.mod h1:HP5RmnzzSN
 github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf/go.mod h1:HP5RmnzzSNb993RKQDq4+1A4ia9nllfqcQFTQJedwGI=
 github.com/google/gofuzz v1.0.0 h1:A8PeW59pxE9IoFRqBp37U+mSNaQoZ46F1f0f863XSXw=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
-github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34 h1:/wV+gZsAEt7vP+fJkT1AltOejfLS3uonB4RTOdXWjVk=
-github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34/go.mod h1:UdDNZ1OO62aGYVnPhxT1U6aI7ukYtA/kB8vaU0diBUM=
 github.com/google/martian v2.1.0+incompatible h1:/CP5g8u/VJHijgedC/Legn3BAbAaWPgecwXBIDzw5no=
 github.com/google/martian v2.1.0+incompatible/go.mod h1:9I4somxYTbIHy5NJKHRl3wXiIaQGbYVAs8BPL6v8lEs=
 github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=

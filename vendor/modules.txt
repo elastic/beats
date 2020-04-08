@@ -553,7 +553,7 @@ github.com/google/go-github/v29/github
 github.com/google/go-querystring/query
 # github.com/google/gofuzz v1.0.0
 github.com/google/gofuzz
-# github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
+# github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34 => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41
 github.com/google/gopacket
 github.com/google/gopacket/afpacket
 github.com/google/gopacket/layers
