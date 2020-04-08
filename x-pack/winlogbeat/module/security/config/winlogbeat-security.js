@@ -1357,7 +1357,7 @@ var security = (function () {
         if (eventActionDescription) {
             evt.AppendTo("event.category", eventActionTypes[code][0]);
             evt.AppendTo("event.type", eventActionTypes[code][1]);
-            evt.AppendTo("event.action", eventActionTypes[code][2]);
+            evt.Put("event.action", eventActionTypes[code][2]);
         }
     };
 

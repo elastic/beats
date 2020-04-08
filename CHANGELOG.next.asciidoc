@@ -165,6 +165,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fixed event.actions for events 1102,4731 and 4647 {pull}17517[17517]
+- Fixed winlog.logon.id for event 4625 and 4648 {pull}17517[17517]
+- Fixed event.outcome for event 4672 {pull}17517[17517]
+- Add ECS 1.5 allowed values for event.category, event.type and event.outcome {pull}17517[17517]
 
 *Functionbeat*
 
@@ -335,6 +339,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 - Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
+- Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 
 ==== Deprecated
 
