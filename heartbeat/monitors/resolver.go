@@ -71,9 +71,9 @@ func (s staticResolver) Add(hostname string, ip string) error {
 
 	if found, ok := s.mapping[hostname]; ok {
 		s.mapping[hostname] = append(found, parsed)
+	} else {
+		s.mapping[hostname] = []net.IP{parsed}
 	}
-
-	s.mapping[hostname] = []net.IP{parsed}
 
 	return nil
 }
@@ -90,10 +90,13 @@ func (s staticResolver) LookupIP(host string) ([]net.IP, error) {
 	if found, ok := s.mapping[host]; ok {
 		return found, nil
 	} else {
-		err := &net.DNSError{
-			IsNotFound: true,
-			Err:        fmt.Sprintf("Hostname %s found in static resolver", host),
-		}
-		return nil, err
+		return nil, makeStaticNXDomainErr(host)
+	}
+}
+
+func makeStaticNXDomainErr(host string) *net.DNSError {
+	return &net.DNSError{
+		IsNotFound: true,
+		Err:        fmt.Sprintf("Hostname '%s' not found in static resolver", host),
 	}
 }
