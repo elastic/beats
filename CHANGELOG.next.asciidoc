@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix aws.s3.bucket.name terms_field in s3 overview dashboard. {pull}17542[17542]
 - Fix Unix socket path in memcached. {pull}17512[17512]
 - Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
+- Fix azure storage dashboards. {pull}17590[17590]
 - Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
 - Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
 
