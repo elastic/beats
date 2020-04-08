@@ -113,6 +113,12 @@ func localConfigDefault() *localConfig {
 type FleetAgentConfig struct {
 	API       *APIAccess    `config:"api" yaml:"api"`
 	Reporting *LogReporting `config:"reporting" yaml:"reporting"`
+	Info      *AgentInfo    `config:"agent_info" yaml:"agent_info"`
+}
+
+// AgentInfo is a set of agent information.
+type AgentInfo struct {
+	ID string `json:"ID" yaml:"ID" config:"ID"`
 }
 
 // APIAccess contains the required details to connect to the Kibana endpoint.
@@ -146,15 +152,17 @@ func defaultFleetAgentConfig() *FleetAgentConfig {
 			Log:   logreporter.DefaultLogConfig(),
 			Fleet: fleetreporter.DefaultFleetManagementConfig(),
 		},
+		Info: &AgentInfo{},
 	}
 }
 
-func createFleetConfigFromEnroll(access *APIAccess) (*FleetAgentConfig, error) {
+func createFleetConfigFromEnroll(agentID string, access *APIAccess) (*FleetAgentConfig, error) {
 	if err := access.Validate(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
 
 	cfg := defaultFleetAgentConfig()
 	cfg.API = access
+	cfg.Info.ID = agentID
 	return cfg, nil
 }
