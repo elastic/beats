@@ -821,6 +821,8 @@ def reportCoverage(){
   }
 }
 
+// isChanged treats the patterns as regular expressions. In order to check if
+// any file in a directoy is modified use `^<path to dir>/.*`.
 def isChanged(patterns){
   return (
     params.runAllStages
@@ -830,23 +832,25 @@ def isChanged(patterns){
 
 def isChangedOSSCode(patterns) {
   def always = [
-    "Jenkinsfile",
-    "^vendor/*",
-    "^libbeat/*",
-    "^testing/*",
-    "^dev-tools/*",
+    "^Jenkinsfile",
+    "^vendor/.*",
+    "^libbeat/.*",
+    "^testing/.*",
+    "^dev-tools/.*",
+    "^\\.ci/.*",
   ]
   return isChanged(always + patterns)
 }
 
 def isChangedXPackCode(patterns) {
   def always = [
-    "Jenkinsfile",
-    "^vendor/*",
-    "^libbeat/*",
-    "^dev-tools/*",
-    "^testing/*",
+    "^Jenkinsfile",
+    "^vendor/.*",
+    "^libbeat/.*",
+    "^dev-tools/.*",
+    "^testing/.*",
     "^x-pack/libbeat/.*",
+    "^\\.ci/.*",
   ]
   return isChanged(always + patterns)
 }
@@ -932,7 +936,7 @@ def loadConfigEnvVars(){
   // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
   // if the deployment scripts have been updated. No Beats specific testing is
   // involved.
-  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
   env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
 

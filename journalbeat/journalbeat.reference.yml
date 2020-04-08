@@ -316,6 +316,16 @@ setup.template.settings:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -734,7 +744,7 @@ output.elasticsearch:
   # The service principal name.
   #kerberos.service_name: HTTP/my-service@realm
 
-  # Name of the Kerberos user. It is used when auth_type is set to password.
+  # Name of the Kerberos user.
   #kerberos.username: elastic
 
   # Password of the Kerberos user. It is used when auth_type is set to password.
