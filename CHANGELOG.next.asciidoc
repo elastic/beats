@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
+- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 
 *Filebeat*
 
@@ -243,7 +244,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
 - Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
-- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}XXXXX[XXXXX]
+- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
+- Release Google Cloud module as GA. {pull}17511[17511]
 
 *Heartbeat*
 
