@@ -5,7 +5,6 @@
 
 == Google Cloud module
 
-beta[]
 
 This is a module for Google Cloud logs. It supports reading VPC flow
 and firewall logs that have been exported from Stackdriver to a
