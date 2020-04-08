@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetVertexClusterUUID(t *testing.T) {
@@ -59,7 +58,7 @@ func TestGetVertexClusterUUID(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, test.expectedClusterUUID, logstash.GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
+			require.Equal(t, test.expectedClusterUUID, logstash.GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
 		})
 	}
 }
