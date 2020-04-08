@@ -122,9 +122,7 @@ func TestMakeClientWorkerAndClose(t *testing.T) {
 				blockingPublishFn := func(batch publisher.Batch) error {
 					// Emulate blocking
 					if publishedFirst.Load() >= publishLimit {
-						batch.Retry()
 						<-blockCtrl
-						return nil
 					}
 
 					publishedFirst.Add(uint(len(batch.Events())))
