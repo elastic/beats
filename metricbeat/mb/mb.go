@@ -27,6 +27,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -92,6 +94,16 @@ func (m *BaseModule) Config() ModuleConfig { return m.config }
 // UnpackConfig unpacks the raw module config to the given object.
 func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
+}
+
+func (m *BaseModule) Reconfigure(config *common.Config) error {
+	newM, err := newBaseModuleFromConfig(config)
+	if err != nil {
+		return errors.Wrapf(err, "could not reconfigure module %v", m.Name())
+	}
+
+	*m = newM
+	return nil
 }
 
 // MetricSet interfaces
