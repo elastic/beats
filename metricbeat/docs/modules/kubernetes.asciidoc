@@ -14,11 +14,13 @@ This module fetches metrics from Kubernetes several components:
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[scheduler]
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[proxy]
 
-All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
-service within the cluster, while the rest should be pointed to kubelet service. Check the
-example configuration on how to do it.
+The default metricsets are `container`, `node`, `pod`, `system` and `volume`, which should point to the kubelet service of the node.
 
-The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
+All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
+service within the cluster, while the rest should be pointed to other services, usually identified by its name. Check the
+example configuration above and the individual metricsets documents for more details.
+
+For a complete reference on how to configure and run this module in Kubernetes as part of a `DaemonSet` and a `Deployment`, there's a complete example manifest available in <<running-on-kubernetes,Running Metricbeat on Kubernetes>> document.
 
 [float]
 === Kubernetes RBAC
@@ -88,7 +90,6 @@ roleRef:
   kind: ClusterRole
   name: metricbeat
   apiGroup: rbac.authorization.k8s.io
-[source,yaml]
 ----
 
 
@@ -316,4 +317,3 @@ include::kubernetes/state_storageclass.asciidoc[]
 include::kubernetes/system.asciidoc[]
 
 include::kubernetes/volume.asciidoc[]
-
