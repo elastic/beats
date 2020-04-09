@@ -70,8 +70,17 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 	return c
 }
 
+func (w *worker) close() {
+	close(w.done)
+
+	// Cancel in-flight batches so they may be retried
+	for batch := range w.qu {
+		batch.Cancelled()
+	}
+}
+
 func (w *clientWorker) Close() error {
-	close(w.worker.done)
+	w.worker.close()
 	return w.client.Close()
 }
 
@@ -95,7 +104,7 @@ func (w *clientWorker) run() {
 }
 
 func (w *netClientWorker) Close() error {
-	close(w.worker.done)
+	w.worker.close()
 	return w.client.Close()
 }
 
