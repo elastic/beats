@@ -43,6 +43,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+	logger := logp.NewLogger(ModuleName)
 	xpackEnabledMetricSets := []string{
 		"ccr",
 		"enrich",
