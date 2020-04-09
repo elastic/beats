@@ -105,8 +105,6 @@ func (r *intervalRotator) initialize(log Logger, rotateOnStartup bool, filename 
 		}
 		r.lastRotate = fi.ModTime()
 	}
-
-	return
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
