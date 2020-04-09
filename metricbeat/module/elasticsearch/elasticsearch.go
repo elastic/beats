@@ -43,7 +43,6 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	logger := logp.NewLogger(ModuleName)
 	xpackEnabledMetricSets := []string{
 		"ccr",
 		"enrich",
@@ -55,11 +54,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, logger); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
-	}
-
-	return &base, nil
+	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.

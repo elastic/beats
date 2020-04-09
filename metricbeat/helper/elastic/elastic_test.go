@@ -201,11 +201,11 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			err = ConfigureModule(bm, test.xpackEnabledMetricsets, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, logp.L())
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig
-			err = bm.UnpackConfig(&newConfig)
+			err = newM.UnpackConfig(&newConfig)
 			require.NoError(t, err)
 			require.Equal(t, test.newConfig, newConfig)
 		})

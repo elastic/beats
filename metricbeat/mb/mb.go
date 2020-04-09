@@ -96,32 +96,38 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
 }
 
-// Reconfigure re-configures the module with the given raw configuration. Intended to
-// be called from module factories. Note that if metricsets are specified in the new
-// configuration, those metricsets must already be registered with mb.Registry.
-func (m *BaseModule) Reconfigure(config *common.Config) error {
+// WithConfig re-configures the module with the given raw configuration and returns a
+// copy of the module.
+// Intended to be called from module factories. Note that if metricsets are specified
+// in the new configuration, those metricsets must already be registered with
+// mb.Registry.
+func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
 	var chkConfig struct {
 		Module string `config:"module"`
 	}
 	if err := config.Unpack(&chkConfig); err != nil {
-		return errors.Wrap(err, "error parsing new module configuration")
+		return nil, errors.Wrap(err, "error parsing new module configuration")
 	}
 
 	// Don't allow module name change
 	if chkConfig.Module != "" && chkConfig.Module != m.name {
-		return fmt.Errorf("cannot change module name from %v to %v", m.name, chkConfig.Module)
+		return nil, fmt.Errorf("cannot change module name from %v to %v", m.name, chkConfig.Module)
 	}
 
 	if err := config.SetString("module", -1, m.name); err != nil {
-		return errors.Wrap(err, "unable to set existing module name in new configuration")
+		return nil, errors.Wrap(err, "unable to set existing module name in new configuration")
 	}
 
-	if err := config.Unpack(&m.config); err != nil {
-		return errors.Wrap(err, "error parsing new module configuration")
+	newBM := &BaseModule{
+		name:      m.name,
+		rawConfig: &config,
 	}
 
-	m.rawConfig = config
-	return nil
+	if err := config.Unpack(&newBM.config); err != nil {
+		return nil, errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	return newBM, nil
 }
 
 // MetricSet interfaces

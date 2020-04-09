@@ -40,12 +40,7 @@ func init() {
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	logger := logp.NewLogger(ModuleName)
-	if err := elastic.ConfigureModule(&base, []string{"node", "node_stats"}, logger); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
-	}
-
-	return &base, nil
+	return elastic.NewModule(&base, []string{"node", "node_stats"}, logp.NewLogger(ModuleName))
 }
 
 // ModuleName is the name of this module.
