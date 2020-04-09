@@ -107,7 +107,8 @@ class Test(metricbeat.BaseTest, KindMixin):
         if metricbeat.INTEGRATION_TESTS and cls.kind_available():
             try:
                 cls.kind_kubectl(cls.build_path, ["apply", "-f", "-"], input=KUBE_STATE_METRICS_MANIFEST)
-                cls.kind_kubectl(cls.build_path, ["wait", "--timeout=300s", "--for=condition=available", "deployment/kube-state-metrics"])
+                cls.kind_kubectl(cls.build_path, ["wait", "--timeout=300s",
+                                                  "--for=condition=available", "deployment/kube-state-metrics"])
             except:
                 cls.kind_delete_cluster(cls.build_path)
                 raise

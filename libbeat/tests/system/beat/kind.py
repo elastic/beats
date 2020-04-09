@@ -30,7 +30,7 @@ class KindMixin(object):
 
     # List extra port mappings.
     KIND_EXTRA_PORT_MAPPINGS = []
-    
+
     @staticmethod
     def kind_available():
         """
