@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -133,7 +135,7 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 		XPackEnabled bool `config:"xpack.enabled"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return err
+		return errors.Wrapf(err, "could not unpack configuration for module %v", base.Name())
 	}
 
 	// No special configuration is needed if xpack.enabled != true
@@ -143,7 +145,7 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 
 	var raw common.MapStr
 	if err := base.UnpackConfig(&raw); err != nil {
-		return err
+		return errors.Wrapf(err, "could not unpack configuration for module %v", base.Name())
 	}
 
 	// These metricsets are exactly the ones required if xpack.enabled == true
@@ -151,11 +153,11 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 
 	newConfig, err := common.NewConfigFrom(raw)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "could not create new configuration for module %v", base.Name())
 	}
 
 	if err := base.ReConfigure(newConfig, register); err != nil {
-		return err
+		return errors.Wrapf(err, "could not reconfigure module %v", base.Name())
 	}
 
 	return nil
