@@ -2,7 +2,7 @@ This is the `apiserver` metricset of the Kubernetes module, in charge of retriev
 
 This metricset needs access to the `apiserver` component of Kubernetes, accessible typically by any POD via the `kubernetes.default` service or via environment variables (`KUBERNETES_SERVICE_HOST` and `KUBERNETES_SERVICE_PORT`).
 
-When the API uses https, the pod will need to authenticate using its default token and trust the server using the appropiate CA file. 
+When the API uses https, the pod will need to authenticate using its default token and trust the server using the appropiate CA file.
 
 Configuration example using https and token based authentication:
 
@@ -19,7 +19,7 @@ Configuration example using https and token based authentication:
       period: 30s
 ```
 
-In order to access the `/metrics` path of the API service, the following permission needs to be available by the service account running Metricbeat:
+In order to access the `/metrics` path of the API service, some Kubernetes environments might require the following permission to be added to a ClusterRole.
 
 ```yaml
 rules:
@@ -29,4 +29,4 @@ rules:
   - get
 ```
 
-The previous configuration and RBAC requirement is available in the complete example manifest proposed for `Running Metricbeat on Kubernetes` (link to main page or to the complete manifest?)
+The previous configuration and RBAC requirement is available in the complete example manifest proposed in <<running-on-kubernetes,Running Metricbeat on Kubernetes>> document.
