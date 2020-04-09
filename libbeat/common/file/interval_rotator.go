@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -102,35 +103,43 @@ func (r *intervalRotator) initialize(log Logger, rotateOnStartup bool, filename 
 	if !rotateOnStartup {
 		logsDir := filepath.Dir(filename)
 		logfiles, err := ioutil.ReadDir(logsDir)
-		if err != nil && log != nil {
-			log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
-			return
-		}
-
-		r.lastRotate = time.Time{}
-		if len(logfiles) == 1 && logfiles[0].Name() == filename {
+		if err != nil {
 			if log != nil {
-				log.Debugw("Setting last rotated time to the last modification time of the log")
+				log.Debugw("Not attempting to find last rotated time, configured logs dir cannot be opened: %v", err)
 			}
-
-			r.lastRotate = logfiles[0].ModTime()
 			return
 		}
-		basenamePrefix := filepath.Base(filename) + "-"
-		for _, fi := range logfiles {
-			if strings.HasPrefix(fi.Name(), basenamePrefix) {
-				if fi.ModTime().After(r.lastRotate) {
-					r.lastRotate = fi.ModTime()
-				}
-			}
-		}
-
-		if log != nil {
-			log.Debugw("Set last rotated time to", r.lastRotate)
-		}
+		r.lastRotate = determineTimeOfLastRotation(log, filename, logfiles)
 	}
 
 	return
+}
+
+func determineTimeOfLastRotation(log Logger, filename string, logfiles []os.FileInfo) time.Time {
+	if len(logfiles) == 1 && logfiles[0].Name() == filename {
+		if log != nil {
+			log.Debugw("Setting last rotated time to the last modification time of the log")
+		}
+
+		return logfiles[0].ModTime()
+	}
+	lastRotate := time.Time{}
+	basenamePrefix := filepath.Base(filename) + "-"
+	for _, fi := range logfiles {
+		if fi.Name() == filepath.Base(filename) {
+			return fi.ModTime()
+		}
+		if strings.HasPrefix(fi.Name(), basenamePrefix) {
+			if fi.ModTime().After(lastRotate) {
+				lastRotate = fi.ModTime()
+			}
+		}
+	}
+
+	if log != nil {
+		log.Debugw("Set last rotated time to", lastRotate)
+	}
+	return lastRotate
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
