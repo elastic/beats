@@ -20,6 +20,7 @@ package tcp
 import (
 	"crypto/x509"
 	"net"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
@@ -111,7 +112,10 @@ func TestTLSInvalidCert(t *testing.T) {
 
 func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certificate, certFile *os.File, teardown func()) {
 	// Start up a TLS Server
-	server, port := setupServer(t, httptest.NewTLSServer)
+	server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
+		return httptest.NewTLSServer(handler), nil
+	})
+	require.NoError(t, err)
 
 	// Parse its URL
 	serverURL, err := url.Parse(server.URL)

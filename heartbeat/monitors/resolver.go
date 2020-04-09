@@ -45,10 +45,6 @@ func (s stdResolver) LookupIP(host string) ([]net.IP, error) {
 	return net.LookupIP(host)
 }
 
-type InvalidIPStringError struct {
-	ipString string
-}
-
 // staticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names
 // and zones.
 type staticResolver struct {
@@ -59,14 +55,10 @@ func CreateStaticResolver() staticResolver {
 	return staticResolver{mapping: map[string][]net.IP{}}
 }
 
-func (i InvalidIPStringError) Error() string {
-	return fmt.Sprintf("Could not parse IP from string %s", i.ipString)
-}
-
 func (s staticResolver) Add(hostname string, ip string) error {
 	parsed := net.ParseIP(ip)
 	if parsed == nil {
-		return InvalidIPStringError{ip}
+		return fmt.Errorf("could not parse IP from string %s", ip)
 	}
 
 	if found, ok := s.mapping[hostname]; ok {

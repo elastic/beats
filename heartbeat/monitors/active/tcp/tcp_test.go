@@ -54,33 +54,40 @@ func TestUpEndpointJob(t *testing.T) {
 	scenarios := []struct {
 		name       string
 		hostname   string
-		isIp       bool
-		expectedIp string
+		isIP       bool
+		expectedIP string
 	}{
 		{
 			name:       "localhost",
 			hostname:   "localhost",
-			isIp:       false,
-			expectedIp: "127.0.0.1",
+			isIP:       false,
+			expectedIP: "127.0.0.1",
 		},
 		{
 			name:       "ipv4",
 			hostname:   "127.0.0.1",
-			isIp:       true,
-			expectedIp: "127.0.0.1",
+			isIP:       true,
+			expectedIP: "127.0.0.1",
 		},
 		{
 			name:     "ipv6",
 			hostname: "::1",
-			isIp:     true,
+			isIP:     true,
 		},
 	}
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			server, port := setupServer(t, func(handler http.Handler) *httptest.Server {
+			server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
 				return newHostTestServer(handler, scenario.hostname)
 			})
+			// Some machines don't have ipv6 setup correctly, so we ignore the test
+			// if we can't bind to the port / setup the server.
+			if err != nil && scenario.hostname == "::1" {
+				return
+			}
+			require.NoError(t, err)
+
 			defer server.Close()
 
 			hostURL := &url.URL{Scheme: "tcp", Host: net.JoinHostPort(scenario.hostname, strconv.Itoa(int(port)))}
@@ -97,8 +104,8 @@ func TestUpEndpointJob(t *testing.T) {
 				hbtest.RespondingTCPChecks(),
 			}
 
-			if !scenario.isIp {
-				validators = append(validators, hbtest.ResolveChecks(scenario.expectedIp))
+			if !scenario.isIP {
+				validators = append(validators, hbtest.ResolveChecks(scenario.expectedIP))
 			}
 
 			testslike.Test(

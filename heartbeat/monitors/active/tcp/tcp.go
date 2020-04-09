@@ -80,9 +80,9 @@ type jobFactory struct {
 	resolver      monitors.Resolver
 }
 
-func makeJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (jf *jobFactory, err error) {
-	jf = &jobFactory{config: DefaultConfig, resolver: resolver}
-	err = jf.loadConfig(commonCfg)
+func makeJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFactory, error) {
+	jf := &jobFactory{config: DefaultConfig, resolver: resolver}
+	err := jf.loadConfig(commonCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func makeJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (jf *j
 
 // loadConfig parses the YAML config and populates the jobFactory fields.
 func (jf *jobFactory) loadConfig(commonCfg *common.Config) (err error) {
-	if err := commonCfg.Unpack(&jf.config); err != nil {
+	if err = commonCfg.Unpack(&jf.config); err != nil {
 		return err
 	}
 

@@ -24,6 +24,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -52,22 +54,27 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	return event
 }
 
-func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server) (*httptest.Server, uint16) {
-	server := serverCreator(hbtest.HelloWorldHandler(200))
+func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
+	server, err := serverCreator(hbtest.HelloWorldHandler(200))
+	if err != nil {
+		return nil, 0, err
+	}
 
 	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	return server, port
+	return server, port, nil
 }
 
 // newHostTestServer starts a server listening on the IP resolved from the host arg
 // httptest.NewServer() binds explicitly on 127.0.0.1 (or [::1] if ipv4 is not available).
 // The IP resolved from `localhost` can be a different one, like 127.0.1.1.
-func newHostTestServer(handler http.Handler, host string) *httptest.Server {
+func newHostTestServer(handler http.Handler, host string) (*httptest.Server, error) {
 	listener, err := net.Listen("tcp", net.JoinHostPort(host, "0"))
 	if err != nil {
-		panic("failed to listen on localhost: " + err.Error())
+		return nil, errors.Wrapf(err, "failed to listen on host '%s'", host)
 	}
 
 	server := &httptest.Server{
@@ -76,5 +83,5 @@ func newHostTestServer(handler http.Handler, host string) *httptest.Server {
 	}
 	server.Start()
 
-	return server
+	return server, nil
 }
