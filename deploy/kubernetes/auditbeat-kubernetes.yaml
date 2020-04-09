@@ -111,7 +111,7 @@ spec:
       - name: auditbeat
         image: docker.elastic.co/beats/auditbeat:7.8.0
         args: [
-          "-c", "/etc/auditbeat.yml"
+          "-c", "/etc/auditbeat.yml",
           "-e",
         ]
         env:
