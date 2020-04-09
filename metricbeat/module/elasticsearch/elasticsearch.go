@@ -55,7 +55,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, mb.Registry, logger); err != nil {
+	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, logger); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
 	}
 

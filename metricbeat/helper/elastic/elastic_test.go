@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -199,7 +201,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			err = ConfigureModule(bm, test.xpackEnabledMetricsets, mockRegistry)
+			err = ConfigureModule(bm, test.xpackEnabledMetricsets, logp.L())
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

@@ -130,7 +130,7 @@ func FixTimestampField(m common.MapStr, field string) error {
 	return nil
 }
 
-func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, register *mb.Register, logger *logp.Logger) error {
+func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) error {
 	moduleName := base.Name()
 
 	config := struct {
@@ -158,7 +158,7 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 		return errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
 	}
 
-	if err := base.Reconfigure(newConfig, register); err != nil {
+	if err := base.Reconfigure(newConfig); err != nil {
 		return errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
 
