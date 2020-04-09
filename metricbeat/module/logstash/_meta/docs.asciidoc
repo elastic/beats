@@ -1,8 +1,12 @@
-This is the Logstash module.
+There are two modules that collect metrics about {ls}:
 
-The default metricsets are `node` and `node_stats`.
+* The `logstash` module tracks only the high-level metrics. The default metricsets in
+this module are `node` and `node_stats`.
+* The `logstash-xpack` module enables you to monitor more {ls} metrics with our
+{stack} {monitor-features}. The metricsets automatically configured by this module
+are `node` and `node_stats`.
 
 [float]
 === Compatibility
 
-The Logstash module works with Logstash 7.3.0 and later.
+Both modules work with {ls} 7.3.0 and later.

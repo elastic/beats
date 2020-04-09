@@ -5,20 +5,20 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-elasticsearch]]
 == Elasticsearch module
 
-There are two modules that collect metrics about {es}: 
+There are two modules that collect metrics about {es}:
 
-* The Elasticsearch module contains a minimal set of metrics to enable
+* The `elasticsearch` module contains a minimal set of metrics to enable
 monitoring of Elasticsearch across multiple versions. The default metricsets in
 this module are `node` and `node_stats`.
-* The Elasticsearch X-Pack module enables you to monitor more Elasticsearch
-metrics with our {stack} {monitor-features}. The default metricsets in this
-module are `ccr`, `cluster_stats`, `enrich`, ``index`, `index_recovery`,
-`index_summary`, `ml_job`, `node_stats`, and `shard`.
+* The `elasticsearch-xpack` module enables you to monitor more {es}
+metrics with our {stack} {monitor-features}. The metricsets automatically
+configured by this module are `ccr`, `cluster_stats`, `enrich`, ``index`,
+`index_recovery`, `index_summary`, `ml_job`, `node_stats`, and `shard`.
 
 [float]
 === Compatibility
 
-The Elasticsearch module works with Elasticsearch 6.7.0 and later.
+Both modules work with {es} 6.7.0 and later.
 
 
 [float]

@@ -5,17 +5,18 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-kibana]]
 == Kibana module
 
-There are two modules that collect metrics about {kib}: 
+There are two modules that collect metrics about {kib}:
 
-* The Kibana module tracks only the high-level metrics. The default metricset in
+* The `kibana` module tracks only the high-level metrics. The default metricset in
 this module is `status`.
-* The Kibana X-Pack module enables you to monitor more Kibana metrics with our
-{stack} {monitor-features}. The default metricset in this module is `stats`.
+* The `kibana-xpack` module enables you to monitor more {kib} metrics with our
+{stack} {monitor-features}. The metricset automatically configured by this module is
+`stats`.
 
 [float]
 === Compatibility
 
-The Kibana module works with Kibana 6.7.0 and later.
+Both modules work with {kib} 6.7.0 and later.
 
 
 [float]
