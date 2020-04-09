@@ -407,6 +407,48 @@
         },
         "istio": {
             "pilot": {
+                "type": "cds",
+                "xds": {
+                    "push": {
+                        "time": {
+                            "ms": {
+                                "bucket": {
+                                    "+Inf": 7,
+                                    "10": 7,
+                                    "100": 7,
+                                    "1000": 7,
+                                    "10000": 7,
+                                    "20000": 7,
+                                    "3000": 7,
+                                    "30000": 7,
+                                    "5000": 7
+                                },
+                                "count": 7,
+                                "sum": 5.687964999999999
+                            }
+                        }
+                    },
+                    "pushes": 250
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
                 "cluster": "outbound_.9901_._.istio-galley.istio-system.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -857,6 +899,48 @@
         },
         "istio": {
             "pilot": {
+                "type": "lds",
+                "xds": {
+                    "push": {
+                        "time": {
+                            "ms": {
+                                "bucket": {
+                                    "+Inf": 7,
+                                    "10": 7,
+                                    "100": 7,
+                                    "1000": 7,
+                                    "10000": 7,
+                                    "20000": 7,
+                                    "3000": 7,
+                                    "30000": 7,
+                                    "5000": 7
+                                },
+                                "count": 7,
+                                "sum": 3.6923069999999996
+                            }
+                        }
+                    },
+                    "pushes": 248
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
                 "cluster": "outbound_.443_._.kubernetes.default.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -1055,29 +1139,6 @@
         },
         "istio": {
             "pilot": {
-                "type": "lds",
-                "xds": {
-                    "pushes": 248
-                }
-            }
-        },
-        "metricset": {
-            "name": "pilot",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.pilot",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "pilot": {
                 "cluster": "outbound_.9080_._.ratings.default.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -1133,29 +1194,6 @@
                     "eds": {
                         "instances": 1
                     }
-                }
-            }
-        },
-        "metricset": {
-            "name": "pilot",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.pilot",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "pilot": {
-                "type": "eds",
-                "xds": {
-                    "pushes": 309
                 }
             }
         },
@@ -1729,29 +1767,6 @@
         },
         "istio": {
             "pilot": {
-                "type": "rds",
-                "xds": {
-                    "pushes": 181
-                }
-            }
-        },
-        "metricset": {
-            "name": "pilot",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.pilot",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "pilot": {
                 "cluster": "outbound_.15014_._.istio-telemetry.istio-system.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -1857,29 +1872,6 @@
                     "eds": {
                         "instances": 1
                     }
-                }
-            }
-        },
-        "metricset": {
-            "name": "pilot",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.pilot",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "pilot": {
-                "type": "cds",
-                "xds": {
-                    "pushes": 250
                 }
             }
         },
@@ -2075,6 +2067,48 @@
         },
         "istio": {
             "pilot": {
+                "type": "rds",
+                "xds": {
+                    "push": {
+                        "time": {
+                            "ms": {
+                                "bucket": {
+                                    "+Inf": 3,
+                                    "10": 3,
+                                    "100": 3,
+                                    "1000": 3,
+                                    "10000": 3,
+                                    "20000": 3,
+                                    "3000": 3,
+                                    "30000": 3,
+                                    "5000": 3
+                                },
+                                "count": 3,
+                                "sum": 0.4121740000000001
+                            }
+                        }
+                    },
+                    "pushes": 181
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
                 "cluster": "outbound|9080||details.default.svc.cluster.local",
                 "xds": {
                     "eds": {
@@ -2205,6 +2239,48 @@
                     "eds": {
                         "instances": 1
                     }
+                }
+            }
+        },
+        "metricset": {
+            "name": "pilot",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.pilot",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "pilot": {
+                "type": "eds",
+                "xds": {
+                    "push": {
+                        "time": {
+                            "ms": {
+                                "bucket": {
+                                    "+Inf": 7,
+                                    "10": 7,
+                                    "100": 7,
+                                    "1000": 7,
+                                    "10000": 7,
+                                    "20000": 7,
+                                    "3000": 7,
+                                    "30000": 7,
+                                    "5000": 7
+                                },
+                                "count": 7,
+                                "sum": 17.07105
+                            }
+                        }
+                    },
+                    "pushes": 309
                 }
             }
         },

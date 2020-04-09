@@ -67,6 +67,13 @@ func (w *clientWorker) Close() error {
 func (w *clientWorker) run() {
 	for !w.closed.Load() {
 		for batch := range w.qu {
+			if w.closed.Load() {
+				if batch != nil {
+					batch.Cancelled()
+				}
+				return
+			}
+
 			w.observer.outBatchSend(len(batch.events))
 
 			if err := w.client.Publish(batch); err != nil {

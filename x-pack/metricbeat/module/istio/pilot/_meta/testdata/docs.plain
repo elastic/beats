@@ -290,6 +290,52 @@ pilot_xds_eds_instances{cluster="outbound|9091||istio-telemetry.istio-system.svc
 pilot_xds_eds_instances{cluster="outbound|9153||kube-dns.kube-system.svc.cluster.local"} 2
 pilot_xds_eds_instances{cluster="outbound|9411||zipkin.istio-system.svc.cluster.local"} 1
 pilot_xds_eds_instances{cluster="outbound|9901||istio-galley.istio-system.svc.cluster.local"} 1
+# HELP pilot_xds_push_time Total time in seconds Pilot takes to push lds, rds, cds and eds.
+# TYPE pilot_xds_push_time histogram
+pilot_xds_push_time_bucket{type="cds",le="0.01"} 7
+pilot_xds_push_time_bucket{type="cds",le="0.1"} 7
+pilot_xds_push_time_bucket{type="cds",le="1"} 7
+pilot_xds_push_time_bucket{type="cds",le="3"} 7
+pilot_xds_push_time_bucket{type="cds",le="5"} 7
+pilot_xds_push_time_bucket{type="cds",le="10"} 7
+pilot_xds_push_time_bucket{type="cds",le="20"} 7
+pilot_xds_push_time_bucket{type="cds",le="30"} 7
+pilot_xds_push_time_bucket{type="cds",le="+Inf"} 7
+pilot_xds_push_time_sum{type="cds"} 0.005687965
+pilot_xds_push_time_count{type="cds"} 7
+pilot_xds_push_time_bucket{type="eds",le="0.01"} 7
+pilot_xds_push_time_bucket{type="eds",le="0.1"} 7
+pilot_xds_push_time_bucket{type="eds",le="1"} 7
+pilot_xds_push_time_bucket{type="eds",le="3"} 7
+pilot_xds_push_time_bucket{type="eds",le="5"} 7
+pilot_xds_push_time_bucket{type="eds",le="10"} 7
+pilot_xds_push_time_bucket{type="eds",le="20"} 7
+pilot_xds_push_time_bucket{type="eds",le="30"} 7
+pilot_xds_push_time_bucket{type="eds",le="+Inf"} 7
+pilot_xds_push_time_sum{type="eds"} 0.01707105
+pilot_xds_push_time_count{type="eds"} 7
+pilot_xds_push_time_bucket{type="lds",le="0.01"} 7
+pilot_xds_push_time_bucket{type="lds",le="0.1"} 7
+pilot_xds_push_time_bucket{type="lds",le="1"} 7
+pilot_xds_push_time_bucket{type="lds",le="3"} 7
+pilot_xds_push_time_bucket{type="lds",le="5"} 7
+pilot_xds_push_time_bucket{type="lds",le="10"} 7
+pilot_xds_push_time_bucket{type="lds",le="20"} 7
+pilot_xds_push_time_bucket{type="lds",le="30"} 7
+pilot_xds_push_time_bucket{type="lds",le="+Inf"} 7
+pilot_xds_push_time_sum{type="lds"} 0.0036923069999999997
+pilot_xds_push_time_count{type="lds"} 7
+pilot_xds_push_time_bucket{type="rds",le="0.01"} 3
+pilot_xds_push_time_bucket{type="rds",le="0.1"} 3
+pilot_xds_push_time_bucket{type="rds",le="1"} 3
+pilot_xds_push_time_bucket{type="rds",le="3"} 3
+pilot_xds_push_time_bucket{type="rds",le="5"} 3
+pilot_xds_push_time_bucket{type="rds",le="10"} 3
+pilot_xds_push_time_bucket{type="rds",le="20"} 3
+pilot_xds_push_time_bucket{type="rds",le="30"} 3
+pilot_xds_push_time_bucket{type="rds",le="+Inf"} 3
+pilot_xds_push_time_sum{type="rds"} 0.00041217400000000007
+pilot_xds_push_time_count{type="rds"} 3
 # HELP pilot_xds_push_context_errors Number of errors (timeouts) initiating push context.
 # TYPE pilot_xds_push_context_errors counter
 pilot_xds_push_context_errors 0

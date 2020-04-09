@@ -148,6 +148,11 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 }
 
 func (c *config) Validate() error {
+	// storage metricset does not require region or zone config parameter.
+	if c.ServiceName == "storage" {
+		return nil
+	}
+
 	if c.Region == "" && c.Zone == "" {
 		return errors.New("region and zone in Google Cloud config file cannot both be empty")
 	}
