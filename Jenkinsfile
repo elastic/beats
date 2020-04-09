@@ -812,54 +812,83 @@ def isChangedXPackCode(patterns) {
 }
 
 def loadConfigEnvVars(){
-  env.BUILD_AUDITBEAT = isChanged([
+
+  // Libbeat is the core framework of Beats. It has no additional dependencies
+  // on other projects in the Beats repository.
+  env.BUILD_LIBBEAT = isChangedOSSCode([])
+  env.BUILD_LIBBEAT_XPACK = env.BUILD_LIBBEAT || isChangedXPackCode([])
+
+  // Auditbeat depends on metricbeat as framework, but does not include any of
+  // the modules from Metricbeat.
+  // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
+  env.BUILD_AUDITBEAT = isChangedOSSCode([
     "^metricbeat/.*",
     "^auditbeat/.*",
   ])
-  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode([
-    "^metricbeat/.*",
-    "^auditbeat/.*",
+  env.BUILD_AUDITBEAT_XPACK = env.BUILD_AUDITBEAT || isChangedXPackCode([
     "^x-pack/auditbeat/.*",
   ])
+
+  // Dockerlogbeat is a standalone Beat that only relies on libbeat.
   env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode([
     "^x-pack/dockerlogbeat/.*",
   ])
+
+  // Filebeat depends on libbeat only.
+  // The Filebeat x-pack build contains all functionality from OSS Filebeat.
   env.BUILD_FILEBEAT = isChangedOSSCode(["^filebeat/.*"])
-  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode([
-    "^filebeat/.*",
+  env.BUILD_FILEBEAT_XPACK = env.BUILD_FILEBEAT || isChangedXPackCode([
     "^x-pack/filebeat/.*",
   ])
+
+  // Metricbeat depends on libbeat only.
+  // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
+  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = env.BUILD_METRICBEAT || isChangedXPackCode([
+    "^x-pack/metricbeat/.*",
+  ])
+
+  // Functionbeat is a standalone beat that depends on libbeat only.
+  // Functionbeat is available as x-pack build only.
   env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode([
     "^x-pack/functionbeat/.*",
   ])
-  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+
+  // Heartbeat depends on libbeat only.
+  // The Heartbeat x-pack build contains all functionality from OSS Heartbeat.
   env.BUILD_HEARTBEAT = isChangedOSSCode(["^heartbeat/.*"])
-  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode([
-    "^heartbeat/.*",
+  env.BUILD_HEARTBEAT_XPACK = env.BUILD_HEARTBEAT || isChangedXPackCode([
     "^x-pack/heartbeat/.*",
   ])
+
+
+  // Journalbeat depends on libbeat only.
+  // The Journalbeat x-pack build contains all functionality from OSS Journalbeat.
   env.BUILD_JOURNALBEAT = isChangedOSSCode(["^journalbeat/.*"])
-  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode([
-    "^journalbeat/.*",
+  env.BUILD_JOURNALBEAT_XPACK = env.BUILD_JOURNALBEAT || isChangedXPackCode([
     "^x-pack/journalbeat/.*",
   ])
-  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
-  env.BUILD_LIBBEAT = isChangedOSSCode([])
-  env.BUILD_LIBBEAT_XPACK = isChangedXPackCode([])
-  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
-  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode([
-    "^metricbeat/.*",
-    "^x-pack/metricbeat/.*",
-  ])
+
+  // Packetbeat depends on libbeat only.
+  // The Packetbeat x-pack build contains all functionality from OSS Packetbeat.
   env.BUILD_PACKETBEAT = isChangedOSSCode(["^packetbeat/.*"])
-  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode([
-    "^packetbeat/.*",
+  env.BUILD_PACKETBEAT_XPACK = env.BUILD_PACKETBEAT || isChangedXPackCode([
     "^x-pack/packetbeat/.*",
   ])
+
+  // Winlogbeat depends on libbeat only.
+  // The Winlogbeat x-pack build contains all functionality from OSS Winlogbeat.
   env.BUILD_WINLOGBEAT = isChangedOSSCode(["^winlogbeat/.*"])
-  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode([
-    "^winlogbeat/.*",
+  env.BUILD_WINLOGBEAT_XPACK = env.BUILD_WINLOGBEAT || isChangedXPackCode([
     "^x-pack/winlogbeat/.*",
   ])
+
+  // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
+  // if the deployment scripts have been updated. No Beats specific testing is
+  // involved.
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+
+  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+
   env.GO_VERSION = readFile(".go-version").trim()
 }
