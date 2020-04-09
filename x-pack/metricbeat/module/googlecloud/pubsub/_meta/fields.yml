@@ -55,6 +55,51 @@
         - name: streaming_pull_response_count
           type: long
           description: Cumulative count of streaming pull responses, grouped by result.
+        - name: dead_letter_message_count
+          type: long
+          description: Cumulative count of messages published to dead letter topic, grouped by result.
+        - name: mod_ack_deadline_message_count
+          type: long
+          description: Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
+        - name: mod_ack_deadline_message_operation_count
+          type: long
+          description: Cumulative count of ModifyAckDeadline message operations, grouped by result.
+        - name: mod_ack_deadline_request_count
+          type: long
+          description: Cumulative count of ModifyAckDeadline requests, grouped by result.
+        - name: oldest_retained_acked_message_age
+          type: long
+          description: Age (in seconds) of the oldest acknowledged message retained in a subscription.
+        - name: oldest_retained_acked_message_age_by_region
+          type: long
+          description: Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
+        - name: oldest_unacked_message_age_by_region
+          type: long
+          description: Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
+        - name: retained_acked_bytes
+          type: long
+          description: Total byte size of the acknowledged messages retained in a subscription.
+        - name: retained_acked_bytes_by_region
+          type: long
+          description: Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
+        - name: seek_request_count
+          type: long
+          description: Cumulative count of seek attempts, grouped by result.
+        - name: streaming_pull_mod_ack_deadline_message_operation_count
+          type: long
+          description: Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
+        - name: streaming_pull_mod_ack_deadline_request_count
+          type: long
+          description: Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
+        - name: byte_cost
+          type: long
+          description: Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
+        - name: config_updates_count
+          type: long
+          description: Cumulative count of configuration changes for each subscription, grouped by operation type and result.
+        - name: unacked_bytes_by_region
+          type: long
+          description: Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
     - name: topic
       type: group
       description: Topic related metrics
@@ -68,3 +113,46 @@
         - name: send_request_count
           type: long
           description: Cumulative count of publish requests, grouped by result.
+        - name: oldest_retained_acked_message_age_by_region
+          type: long
+          description: Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
+        - name: oldest_unacked_message_age_by_region
+          type: long
+          description: Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
+        - name: retained_acked_bytes_by_region
+          type: long
+          description: Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
+        - name: byte_cost
+          type: long
+          description: Cost of operations, measured in bytes. This is used to measure utilization for quotas.
+        - name: config_updates_count
+          type: long
+          description: Cumulative count of configuration changes, grouped by operation type and result.
+        - name: unacked_bytes_by_region
+          type: long
+          description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
+    - name: snapshot
+      type: group
+      description: Snapshot related metrics
+      fields:
+        - name: oldest_message_age
+          type: long
+          description: Age (in seconds) of the oldest message retained in a snapshot.
+        - name: oldest_message_age_by_region
+          type: long
+          description: Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
+        - name: backlog_bytes
+          type: long
+          description: Total byte size of the messages retained in a snapshot.
+        - name: backlog_bytes_by_region
+          type: long
+          description: Total byte size of the messages retained in a snapshot, broken down by Cloud region.
+        - name: num_messages
+          type: long
+          description: Number of messages retained in a snapshot.
+        - name: num_messages_by_region
+          type: long
+          description: Number of messages retained in a snapshot, broken down by Cloud region.
+        - name: config_updates_count
+          type: long
+          description: Cumulative count of configuration changes, grouped by operation type and result.
