@@ -194,11 +194,16 @@ func TestReconfigureXPackEnabledMetricSets(t *testing.T) {
 			m, _, err := mb.NewModule(cfg, mockRegistry)
 			require.NoError(t, err)
 
-			err = ConfigureModule(m, test.xpackEnabledMetricsets, mockRegistry)
+			bm, ok := m.(*mb.BaseModule)
+			if !ok {
+				require.Fail(t, "expecting module to be base module")
+			}
+
+			err = ConfigureModule(bm, test.xpackEnabledMetricsets, mockRegistry)
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig
-			err = m.UnpackConfig(&newConfig)
+			err = bm.UnpackConfig(&newConfig)
 			require.NoError(t, err)
 			require.Equal(t, test.newConfig, newConfig)
 		})

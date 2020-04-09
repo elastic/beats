@@ -128,7 +128,7 @@ func FixTimestampField(m common.MapStr, field string) error {
 	return nil
 }
 
-func ConfigureModule(base mb.Module, xpackEnabledMetricsets []string, register *mb.Register) error {
+func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, register *mb.Register) error {
 	config := struct {
 		XPackEnabled bool `config:"xpack.enabled"`
 	}{}
