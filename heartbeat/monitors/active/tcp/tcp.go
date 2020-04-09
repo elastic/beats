@@ -200,11 +200,7 @@ func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url
 	// If we're using TLS we need to add a fake layer so that the TLS layer knows the hostname we're connecting to
 	// So, the canonical URL is fixed via a ConstAddrLayer to override the TLS layer's x509 logic so it doesn't
 	// try and directly match the IP from the prior ConstAddrLayer to the cert.
-	isTLS := true
-	if canonicalURL.Scheme == "tcp" || canonicalURL.Scheme == "plain" {
-		isTLS = false
-	}
-	if isTLS {
+	if canonicalURL.Scheme != "tcp" && canonicalURL.Scheme != "plain" {
 		dc.AddLayer(dialchain.TLSLayer(jf.tlsConfig, jf.config.Timeout))
 		dc.AddLayer(dialchain.ConstAddrLayer(canonicalURL.Host))
 	}

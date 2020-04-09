@@ -59,7 +59,7 @@ func TestUpEndpointJob(t *testing.T) {
 	}{
 		{
 			name:       "localhost",
-			hostname:       "localhost",
+			hostname:   "localhost",
 			isIp:       false,
 			expectedIp: "127.0.0.1",
 		},

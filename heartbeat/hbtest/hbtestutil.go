@@ -153,6 +153,7 @@ func SummaryChecks(up int, down int) validator.Validator {
 	})
 }
 
+// ResolveChecks returns a lookslike matcher for the 'resolve' fields.
 func ResolveChecks(ip string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"resolve": map[string]interface{}{
