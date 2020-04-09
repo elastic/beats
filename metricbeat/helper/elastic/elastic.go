@@ -158,7 +158,7 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 		return errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
 	}
 
-	if err := base.ReConfigure(newConfig, register); err != nil {
+	if err := base.Reconfigure(newConfig, register); err != nil {
 		return errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
 

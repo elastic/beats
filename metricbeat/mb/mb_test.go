@@ -409,7 +409,7 @@ func TestModuleConfigQueryParams(t *testing.T) {
 	assert.NotEqual(t, "&", res[len(res)-1])
 }
 
-func TestModuleReConfigure(t *testing.T) {
+func TestModuleReconfigure(t *testing.T) {
 	mockRegistry := NewRegister()
 
 	const moduleName = "test_module"
@@ -464,7 +464,7 @@ func TestModuleReConfigure(t *testing.T) {
 			m, _, err := NewModule(common.MustNewConfigFrom(initConfig), mockRegistry)
 			require.NoError(t, err)
 
-			err = m.ReConfigure(common.MustNewConfigFrom(test.newConfig), mockRegistry)
+			err = m.Reconfigure(common.MustNewConfigFrom(test.newConfig), mockRegistry)
 
 			var expectedNewConfig metricSetConfig
 			if test.expectedErrMsg == "" {
