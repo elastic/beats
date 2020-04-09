@@ -143,7 +143,7 @@ func TestFixTimestampField(t *testing.T) {
 	}
 }
 
-func TestReconfigureXPackEnabledMetricSets(t *testing.T) {
+func TestConfigureModule(t *testing.T) {
 	mockRegistry := mb.NewRegister()
 
 	const moduleName = "test_module"
