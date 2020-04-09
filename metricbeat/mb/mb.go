@@ -96,7 +96,8 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
 }
 
-// ReConfigure re-configures the module with the given raw configuration
+// ReConfigure re-configures the module with the given raw configuration. Intended to
+// be called from module factories.
 func (m *BaseModule) ReConfigure(config *common.Config, register *Register) error {
 	currName := m.name
 	currConfig := m.config
