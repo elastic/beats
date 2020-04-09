@@ -334,7 +334,7 @@ var security = (function () {
         "0CCE9242-69AE-11D9-BED3-505054503030":["Kerberos Authentication Service","Account Logon"],
     };
 
-    
+
     // Descriptions of failure status codes.
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625
    //  https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4776
@@ -1494,7 +1494,7 @@ var security = (function () {
         var tkt_result = [];
         var tkt_code_len=tkt_code.length;
         for (var i=tkt_code_len; i>=0; i--) {
-            if (tkt_code[i] == 1) { 
+            if (tkt_code[i] == 1) {
                 tkt_result.push(ticketOptions[(32-tkt_code_len)+i]);
             }
         }
@@ -1729,7 +1729,7 @@ var security = (function () {
         .Add(addEventOutcome)
         .Build();
 
-    // Handles both 4624 
+    // Handles both 4624
     var logonSuccess = new processor.Chain()
         .Add(copyTargetUser)
         .Add(copyTargetUserLogonId)
