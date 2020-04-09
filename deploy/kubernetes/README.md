@@ -7,5 +7,6 @@ them in Kubernetes:
 
 Beat | Description
 ---- | ----
+[auditbeat](auditbeat) | Ship audit information from Kubernetes to Elasticsearch
 [filebeat](filebeat) | Tails and ships logs
 [metricbeat](metricbeat) | Fetches sets of metrics from the operating system and services
