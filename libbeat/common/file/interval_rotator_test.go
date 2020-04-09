@@ -18,7 +18,6 @@
 package file
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -268,81 +267,6 @@ func TestZeroIntervalIsNil(t *testing.T) {
 	}
 	assert.True(t, a == nil)
 }
-
-func TestSelectingLastRotateTime(t *testing.T) {
-	const oldestTsSec = 1586434581
-	cases := map[string]struct {
-		logfiles           []os.FileInfo
-		expectedRotateTime time.Time
-	}{
-		"one file unrotated file": {
-			logfiles: []os.FileInfo{
-				fileInf{
-					name:    "foo",
-					modTime: time.Unix(oldestTsSec, 0),
-				},
-			},
-			expectedRotateTime: time.Unix(oldestTsSec, 0),
-		},
-		"one file unrotated file, several rotated files": {
-			logfiles: []os.FileInfo{
-				fileInf{
-					name:    "foo",
-					modTime: time.Unix(oldestTsSec+4*60, 0),
-				},
-				fileInf{
-					name:    "foo-01",
-					modTime: time.Unix(oldestTsSec+3*60, 0),
-				},
-				fileInf{
-					name:    "foo-02",
-					modTime: time.Unix(oldestTsSec+2*60, 0),
-				},
-				fileInf{
-					name:    "foo-03",
-					modTime: time.Unix(oldestTsSec+1*60, 0),
-				},
-			},
-			expectedRotateTime: time.Unix(oldestTsSec+4*60, 0),
-		},
-		"several rotated files": {
-			logfiles: []os.FileInfo{
-				fileInf{
-					name:    "foo-01",
-					modTime: time.Unix(oldestTsSec+3*60, 0),
-				},
-				fileInf{
-					name:    "foo-02",
-					modTime: time.Unix(oldestTsSec+2*60, 0),
-				},
-				fileInf{
-					name:    "foo-03",
-					modTime: time.Unix(oldestTsSec+1*60, 0),
-				},
-			},
-			expectedRotateTime: time.Unix(oldestTsSec+3*60, 0),
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			rotatedTime := determineTimeOfLastRotation(nil, "foo", test.logfiles)
-			assert.Equal(t, rotatedTime.Sub(test.expectedRotateTime), time.Duration(0))
-		})
-	}
-}
-
-type fileInf struct {
-	name    string
-	modTime time.Time
-}
-
-func (f fileInf) Name() string       { return f.name }
-func (f fileInf) ModTime() time.Time { return f.modTime }
-func (f fileInf) Size() int64        { return 0 }
-func (f fileInf) Mode() os.FileMode  { return 0666 }
-func (f fileInf) IsDir() bool        { return false }
-func (f fileInf) Sys() interface{}   { return nil }
 
 type testClock struct {
 	time time.Time
