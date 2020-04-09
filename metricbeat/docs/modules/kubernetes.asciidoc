@@ -5,7 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
 
-This module fetches metrics from Kubernetes several components:
+As one of the main pieces provided for Kubernetes monitoring, this module is capable of fetching metrics from several components:
 
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/[kubelet]
 - https://github.com/kubernetes/kube-state-metrics[kube-state-metrics]
@@ -14,13 +14,38 @@ This module fetches metrics from Kubernetes several components:
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[scheduler]
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[proxy]
 
-The default metricsets are `container`, `node`, `pod`, `system` and `volume`, which require `hosts` field pointing to the kubelet service of the node.
-
-All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
-service within the cluster, while the rest should be pointing to other services, usually identified by its name. Check the
-example configuration below and the individual metricsets documents for more details.
+Some of the previous components are running in each of the Kubernetes nodes (like `kubelet` or `proxy`) while others provide a single cluster-wide endpoint. This is important to determine the optimal configuration and run strategy for the metricsets.
 
 For a complete reference on how to configure and run this module on Kubernetes as part of a `DaemonSet` and a `Deployment`, there's a complete example manifest available in <<running-on-kubernetes,Running Metricbeat on Kubernetes>> document.
+
+[float]
+=== Kubernetes endpoints and metricsets
+
+Kubernetes module is a bit complex as its internal metricsets require access to a wide variety of endpoints.
+
+This section highlights some groups of metricsets with similar endpoint access needs. For metricsets not mentioned in this section please access individual metricsets documents for more details (***include LINK here to the end of the page***)
+
+==== node / system / pod / container / module
+
+The default metricsets are `container`, `node`, `pod`, `system` and `volume`, and require access to the Kubelet endpoint in each of the nodes.
+
+Depending on the version and configuration of Kubernetes nodes, `kubelet` might provide a read only http port (typically 10255), which is used in some configuration examples. But in general, and lately, this endpoint requires SSL / https access (to port 10250 by default) and authentication via token.
+
+==== state_* and event
+
+All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
+service within the cluster.
+
+Kube-state-metrics is not installed by default in Kubernetes, so for this metricsets to work it should be installed (*** add link ***).
+
+==== apiserver
+pending
+
+==== proxy
+pending
+
+==== scheduler and controllermanager
+pending
 
 [float]
 === Kubernetes RBAC
