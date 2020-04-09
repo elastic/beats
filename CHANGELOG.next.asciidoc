@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 - Fix bug with `monitoring.cluster_uuid` setting not always being exposed via GET /state Beats API. {issue}16732[16732] {pull}17420[17420]
 - Fix building on FreeBSD by removing build flags from `add_cloudfoundry_metadata` processor. {pull}17486[17486]
+- Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
 
 *Auditbeat*
 
