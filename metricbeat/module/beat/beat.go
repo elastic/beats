@@ -24,9 +24,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -39,7 +39,8 @@ func init() {
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := elastic.ConfigureModule(&base, []string{"state", "stats"}, mb.Registry); err != nil {
+	logger := logp.NewLogger(ModuleName)
+	if err := elastic.ConfigureModule(&base, []string{"state", "stats"}, mb.Registry, logger); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
 	}
 

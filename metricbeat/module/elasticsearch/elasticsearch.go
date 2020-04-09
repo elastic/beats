@@ -25,13 +25,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -43,6 +43,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+	logger := logp.NewLogger(ModuleName)
 	xpackEnabledMetricSets := []string{
 		"ccr",
 		"enrich",
@@ -54,7 +55,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, mb.Registry); err != nil {
+	if err := elastic.ConfigureModule(&base, xpackEnabledMetricSets, mb.Registry, logger); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("error configuring %v module", ModuleName))
 	}
 

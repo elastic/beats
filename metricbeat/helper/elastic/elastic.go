@@ -130,12 +130,14 @@ func FixTimestampField(m common.MapStr, field string) error {
 	return nil
 }
 
-func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, register *mb.Register) error {
+func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, register *mb.Register, logger *logp.Logger) error {
+	moduleName := base.Name()
+
 	config := struct {
 		XPackEnabled bool `config:"xpack.enabled"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return errors.Wrapf(err, "could not unpack configuration for module %v", base.Name())
+		return errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
 
 	// No special configuration is needed if xpack.enabled != true
@@ -145,7 +147,7 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 
 	var raw common.MapStr
 	if err := base.UnpackConfig(&raw); err != nil {
-		return errors.Wrapf(err, "could not unpack configuration for module %v", base.Name())
+		return errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
 
 	// These metricsets are exactly the ones required if xpack.enabled == true
@@ -153,12 +155,14 @@ func ConfigureModule(base *mb.BaseModule, xpackEnabledMetricsets []string, regis
 
 	newConfig, err := common.NewConfigFrom(raw)
 	if err != nil {
-		return errors.Wrapf(err, "could not create new configuration for module %v", base.Name())
+		return errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
 	}
 
 	if err := base.ReConfigure(newConfig, register); err != nil {
-		return errors.Wrapf(err, "could not reconfigure module %v", base.Name())
+		return errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
+
+	logger.Debugf("configuration for module %v modified because xpack.enabled was set to true", moduleName)
 
 	return nil
 }
