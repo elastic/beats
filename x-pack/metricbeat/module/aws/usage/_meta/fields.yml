@@ -4,3 +4,9 @@
     `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
   release: beta
   fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: CallCount.sum
+          type: long
+          description: The number of specified operations performed in your account.

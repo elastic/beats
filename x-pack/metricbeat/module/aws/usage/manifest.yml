@@ -6,3 +6,5 @@ input:
     metrics:
       - namespace: AWS/Usage
         statistic: ["Sum"]
+        name:
+          - CallCount
