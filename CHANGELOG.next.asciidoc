@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
 - Add privileged option so as mb to access data dir in Openshift. {pull}17606[17606]
 - Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
+- Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 
 *Packetbeat*
 
