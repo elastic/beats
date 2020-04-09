@@ -20,8 +20,6 @@ UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `met
 from the module's configuration. Alternatively, run `metricbeat modules disable beat` and
 metricbeat modules enable beat-xpack`.
 
-
-
 [float]
 === Example configuration
 
