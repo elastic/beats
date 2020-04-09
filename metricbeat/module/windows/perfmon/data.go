@@ -67,20 +67,20 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 				if val.Instance != "" && hasCounter {
 					//will ignore instance counter
 					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceLabel, match)
+						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, match)
 					} else {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceLabel, val.Instance)
+						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, val.Instance)
 					}
 				}
 			}
 			event := eventMap[eventKey]
 			if val.Measurement != nil {
-				event.MetricSetFields.Put(counter.MeasurementLabel, val.Measurement)
+				event.MetricSetFields.Put(counter.QueryField, val.Measurement)
 			} else {
-				event.MetricSetFields.Put(counter.MeasurementLabel, 0)
+				event.MetricSetFields.Put(counter.QueryField, 0)
 			}
 			if re.config.MetricFormat {
-				event.MetricSetFields.Put("object", counter.Object)
+				event.MetricSetFields.Put(counter.ObjectField, counter.ObjectName)
 			}
 		}
 	}
@@ -114,12 +114,12 @@ func (re *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event 
 			default:
 				counterVal = val.Measurement.(float64)
 			}
-			if _, ok := measurements[readerCounter.MeasurementLabel]; !ok {
-				measurements[readerCounter.MeasurementLabel] = counterVal
-				measurements[readerCounter.MeasurementLabel+instanceCountLabel] = 1
+			if _, ok := measurements[readerCounter.QueryField]; !ok {
+				measurements[readerCounter.QueryField] = counterVal
+				measurements[readerCounter.QueryField+instanceCountLabel] = 1
 			} else {
-				measurements[readerCounter.MeasurementLabel+instanceCountLabel] = measurements[readerCounter.MeasurementLabel+instanceCountLabel] + 1
-				measurements[readerCounter.MeasurementLabel] = measurements[readerCounter.MeasurementLabel] + counterVal
+				measurements[readerCounter.QueryField+instanceCountLabel] = measurements[readerCounter.QueryField+instanceCountLabel] + 1
+				measurements[readerCounter.QueryField] = measurements[readerCounter.QueryField] + counterVal
 			}
 		}
 	}

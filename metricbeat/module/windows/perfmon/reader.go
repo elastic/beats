@@ -20,7 +20,10 @@
 package perfmon
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
@@ -38,6 +41,18 @@ type Reader struct {
 	executed bool         // Indicates if the query has been executed.
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
+	counters []PerfCounter
+}
+
+type PerfCounter struct {
+	InstanceField string
+	InstanceName  string
+	QueryField    string
+	Query         string
+	Format        string
+	ObjectName    string
+	ObjectField   string
+	ChildQueries  []string
 }
 
 // NewReader creates a new instance of Reader.
@@ -50,8 +65,9 @@ func NewReader(config Config) (*Reader, error) {
 		query: query,
 		log:   logp.NewLogger("perfmon"),
 	}
-	for i, counter := range config.Counters {
-		config.Counters[i].ChildQueries = []string{}
+	r.mapCounters(config)
+	for i, counter := range r.counters {
+		r.counters[i].ChildQueries = []string{}
 		childQueries, err := query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
@@ -81,7 +97,7 @@ func NewReader(config Config) (*Reader, error) {
 			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
-			config.Counters[i].ChildQueries = append(config.Counters[i].ChildQueries, v)
+			r.counters[i].ChildQueries = append(r.counters[i].ChildQueries, v)
 		}
 	}
 	r.config = config
@@ -91,8 +107,8 @@ func NewReader(config Config) (*Reader, error) {
 // RefreshCounterPaths will recheck for any new instances and add them to the counter list
 func (re *Reader) RefreshCounterPaths() error {
 	var newCounters []string
-	for i, counter := range re.config.Counters {
-		re.config.Counters[i].ChildQueries = []string{}
+	for i, counter := range re.counters {
+		re.counters[i].ChildQueries = []string{}
 		childQueries, err := re.query.GetCounterPaths(counter.Query)
 		if err != nil {
 			if re.config.IgnoreNECounters {
@@ -114,7 +130,7 @@ func (re *Reader) RefreshCounterPaths() error {
 				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
 					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
 				}
-				re.config.Counters[i].ChildQueries = append(re.config.Counters[i].ChildQueries, v)
+				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
 			}
 		}
 	}
@@ -154,4 +170,130 @@ func (re *Reader) Read() ([]mb.Event, error) {
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
 	return re.query.Close()
+}
+
+func (re *Reader) getCounter(query string) (bool, PerfCounter) {
+	for _, counter := range re.counters {
+		for _, childQuery := range counter.ChildQueries {
+			if childQuery == query {
+				return true, counter
+			}
+		}
+	}
+	return false, PerfCounter{}
+}
+
+func (re *Reader) mapCounters(config Config) {
+	re.counters = []PerfCounter{}
+	if len(config.Counters) > 0 {
+		for _, counter := range config.Counters {
+			re.counters = append(re.counters, PerfCounter{
+				InstanceField: counter.InstanceLabel,
+				InstanceName:  counter.InstanceName,
+				QueryField:    counter.MeasurementLabel,
+				Query:         counter.Query,
+				Format:        counter.Format,
+				ChildQueries:  nil,
+			})
+		}
+	}
+	if len(config.Queries) > 0 {
+		for _, query := range config.Queries {
+			for _, counter := range query.Counters {
+				if len(query.Instance) == 0 {
+					re.counters = append(re.counters, PerfCounter{
+						InstanceField: "instance",
+						InstanceName:  "",
+						QueryField:    "metrics." + mapCounterPathLabel(counter.Field, counter.Name),
+						Query:         mapQuery(query.Name, "", counter.Name),
+						Format:        counter.Format,
+						ObjectName:    query.Name,
+					})
+				} else {
+					for _, instance := range query.Instance {
+						re.counters = append(re.counters, PerfCounter{
+							InstanceField: "instance",
+							InstanceName:  instance,
+							QueryField:    "metrics." + mapCounterPathLabel(counter.Field, counter.Name),
+							Query:         mapQuery(query.Name, instance, counter.Name),
+							Format:        counter.Format,
+							ObjectName:    query.Name,
+							ObjectField:   "object",
+						})
+					}
+				}
+
+			}
+
+		}
+	}
+}
+
+func mapQuery(obj string, instance string, path string) string {
+	var query string
+	if strings.HasPrefix(obj, "\\") {
+		query = obj
+	} else {
+		query = fmt.Sprintf("\\%s", obj)
+	}
+	if instance != "" {
+		query += fmt.Sprintf("(%s)", instance)
+	}
+	if strings.HasPrefix(path, "\\") {
+		query += path
+	} else {
+		query += fmt.Sprintf("\\%s", path)
+	}
+	return query
+}
+
+func mapCounterPathLabel(label string, path string) string {
+	var resultMetricName string
+	if label != "" {
+		resultMetricName = label
+	} else {
+		resultMetricName = path
+	}
+	// replace spaces with underscores
+	resultMetricName = strings.Replace(resultMetricName, " ", "_", -1)
+	// replace backslashes with "per"
+	resultMetricName = strings.Replace(resultMetricName, "/sec", "_per_sec", -1)
+	resultMetricName = strings.Replace(resultMetricName, "/_sec", "_per_sec", -1)
+	resultMetricName = strings.Replace(resultMetricName, "\\", "_", -1)
+	// replace actual percentage symbol with the smbol "pct"
+	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
+	// create an object in case of ":"
+	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
+	// create an object in case of ":"
+	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	// replace uppercases with underscores
+	resultMetricName = replaceUpperCase(resultMetricName)
+
+	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
+	obj := strings.Split(resultMetricName, ".")
+	for index := range obj {
+		// in some cases a trailing "_" is found
+		obj[index] = strings.TrimPrefix(obj[index], "_")
+		obj[index] = strings.TrimSuffix(obj[index], "_")
+	}
+	resultMetricName = strings.ToLower(strings.Join(obj, "_"))
+
+	return resultMetricName
+}
+
+// replaceUpperCase func will replace upper case with '_'
+func replaceUpperCase(src string) string {
+	replaceUpperCaseRegexp := regexp.MustCompile(replaceUpperCaseRegex)
+	return replaceUpperCaseRegexp.ReplaceAllStringFunc(src, func(str string) string {
+		var newStr string
+		for _, r := range str {
+			// split into fields based on class of unicode character
+			if unicode.IsUpper(r) {
+				newStr += "_" + strings.ToLower(string(r))
+			} else {
+				newStr += string(r)
+			}
+		}
+		return newStr
+	})
 }
