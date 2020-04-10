@@ -22,15 +22,18 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
+  name: "MY THING"
+  hosts: ["https://elastic.co"]
+  ssl.verification_mode: none
+  schedule: "@every 5s"
+  timeout: 5s
+  check.response.status: [200, 302, 400, 401, 403, 404]
 
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-
-  # Configure task schedule
-  schedule: '@every 10s'
-
-  # Total test connection and data exchange timeout
-  #timeout: 16s
+processors:
+  - add_observer_metadata: 
+      geo: 
+        name: "${GEO_NAME}"
+        location: "37.926868, -78.024902"
 
 #==================== Elasticsearch template setting ==========================
 
@@ -55,6 +58,18 @@ setup.template.settings:
 #  env: staging
 
 
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here or by using the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -74,7 +89,7 @@ setup.kibana:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -89,19 +104,8 @@ setup.kibana:
 
 # Configure what output to use when sending the data collected by the beat.
 
-#-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
 
-  # Protocol - either `http` (default) or `https`.
-  #protocol: "https"
-
-  # Authentication credentials - either API key or username/password.
-  #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
-
+output.console: ~
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
@@ -119,16 +123,6 @@ output.elasticsearch:
 
 #================================ Processors =====================================
 
-processors:
-  - add_observer_metadata:
-  # Optional, but recommended geo settings for the location Heartbeat is running in
-  #geo:
-    # Token describing this location
-    #name: us-east-1a
-
-    # Lat, Lon "
-    #location: "37.926868, -78.024902"
-
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
@@ -140,18 +134,13 @@ processors:
 # "publish", "service".
 #logging.selectors: ["*"]
 
-#============================== X-Pack Monitoring ===============================
+#============================== Xpack Monitoring ===============================
 # heartbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
-
-# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Heartbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
-# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
-#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
