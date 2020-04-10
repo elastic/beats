@@ -22,17 +22,105 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-type diskQueue struct {
+// Settings contains the configuration fields to create a new disk queue.
+type Settings struct {
+	// The destination for log messages related to the disk queue.
+	Logger *logp.Logger
+
+	// A listener that receives ACKs when events are written to the queue's
+	// disk buffer.
+	WriteToDiskACKListener queue.ACKListener
+
+	// A listener that receives ACKs when events are removed from the queue
+	// and written to their output.
+	WriteToOutputACKListener queue.ACKListener
+
+	// The size in bytes of one data page in the on-disk buffer. To minimize
+	// data loss if there is an error, this should match the page size of the
+	// target filesystem.
+	PageSize uint32
+
+	// MaxBufferSize is the maximum number of bytes that the queue should
+	// ever occupy on disk. A value of 0 means the queue can grow until the
+	// disk is full.
+	MaxBufferSize uint64
 }
+
+type bufferPosition struct {
+	// The segment index of this position within the overall buffer.
+	segmentIndex uint64
+
+	// The page index of this position within its segment.
+	pageIndex uint64
+
+	// The byte index of this position within its page's data region.
+	byteIndex uint32
+}
+
+type diskQueueState struct {
+	// The page size of the queue. This is originally derived from
+	// Settings.PageSize, and the two must match during normal queue operation.
+	// They can only differ during data recovery / page size migration.
+	pageSize uint32
+
+	// The oldest position in the queue. This is advanced as we receive ACKs from
+	// downstream consumers indicating it is safe to remove old events.
+	firstPosition bufferPosition
+
+	// The position of the next (unwritten) byte in the queue buffer. When an
+	// event is added to the queue, this position is advanced to point to the
+	// first byte after its end.
+	lastPosition bufferPosition
+
+	// The maximum number of pages that can be used for the queue buffer.
+	// This is derived by dividing Settings.MaxBufferSize by pageSize and
+	// rounding down.
+	maxPageCount uint64
+
+	// The number of pages currently occupied by the queue buffer. This can't
+	// be derived from firstPosition and lastPosition because segment length
+	// varies with the size of their last event.
+	// This can be greater than maxPageCount if the maximum buffer size is
+	// reduced on an already-full queue.
+	allocatedPageCount uint64
+}
+
+// diskQueue is the internal type representing a disk-based implementation
+// of queue.Queue.
+type diskQueue struct {
+	settings Settings
+
+	// The persistent queue state. After a filesystem sync this should be
+	// identical to the queue's metadata file.
+	state diskQueueState
+
+	// The position of the next event to read from the queue. If this equals
+	// state.lastPosition, then there are no events left to read.
+	// This is initialized to state.firstPosition, but generally the two differ:
+	// readPosition is advanced when an event is read, but firstPosition is
+	// only advanced when the event has been read _and_ its consumer receives
+	// an acknowledgement (meaning it has been transmitted and can be removed
+	// from the queue).
+	// This is part of diskQueue and not diskQueueState since it represents
+	// in-memory state that should not persist through a restart.
+	readPosition bufferPosition
+}
+
+/*var _ = queue.Feature("disk", create,
+	feature.MakeDetails(
+		"Disk queue",
+		"Buffer events on disk before sending to the output.",
+		feature.Beta),
+)
+
+func init() {
+	queue.RegisterType("disk", create)
+}*/
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings.
-func NewQueue(
-	logger *logp.Logger,
-	ackListener queue.ACKListener,
-) queue.Queue {
-
-	return &diskQueue{}
+func NewQueue(settings Settings) queue.Queue {
+	return &diskQueue{settings: settings}
 }
 
 //
@@ -44,7 +132,7 @@ func (dq *diskQueue) Close() error {
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {
-	return queue.BufferConfig{Events: 0}
+	return queue.BufferConfig{MaxEvents: 0}
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
