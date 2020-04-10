@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
@@ -26,6 +28,7 @@ type worker struct {
 	observer outputObserver
 	qu       workQueue
 	done     chan struct{}
+	inFlight *Batch
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -71,14 +74,24 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 }
 
 func (w *worker) close() {
+	//fmt.Println("worker close called")
 	close(w.done)
+	//if w.inFlight != nil {
+	//	fmt.Println("Canceling in-flight batch before closing...")
+	//	w.inFlight.Cancelled()
+	//	w.inFlight = nil
+	//}
+	//return
+	//fmt.Println("done signal sent")
 
 	// Cancel in-flight batches so they may be retried
 	for {
 		select {
 		case batch := <-w.qu:
+			//fmt.Println("Canceling in-flight batch before closing...")
 			batch.Cancelled()
 		default:
+			fmt.Println("no inflight batches")
 			return
 		}
 	}
@@ -103,9 +116,12 @@ func (w *clientWorker) run() {
 				continue
 			}
 			w.observer.outBatchSend(len(batch.events))
+
+			w.worker.inFlight = batch
 			if err := w.client.Publish(batch); err != nil {
 				return
 			}
+			w.worker.inFlight = nil
 
 		}
 	}
@@ -159,11 +175,14 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
+			w.worker.inFlight = batch
+			fmt.Printf("about to publish %v events\n", len(batch.Events()))
 			if err := w.client.Publish(batch); err != nil {
 				w.logger.Errorf("Failed to publish events: %v", err)
 				// on error return to connect loop
 				connected = false
 			}
+			w.worker.inFlight = nil
 		}
 	}
 }
