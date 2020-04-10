@@ -1605,21 +1605,21 @@ type: keyword
 [float]
 === SuccessfulRequestLatency
 
-The latency average of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
+The latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
 
 
 
 *`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`*::
 +
 --
-type: long
+type: double
 
 --
 
 *`aws.dynamodb.metrics.SuccessfulRequestLatency.max`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -1629,7 +1629,7 @@ type: long
 The percentage of completion when a new global secondary index is being added to a table.
 
 
-type: long
+type: double
 
 --
 
@@ -1639,7 +1639,7 @@ type: long
 The number of provisioned write capacity units for a table or a global secondary index.
 
 
-type: long
+type: double
 
 --
 
@@ -1649,7 +1649,7 @@ type: long
 The number of provisioned read capacity units for a table or a global secondary index.
 
 
-type: long
+type: double
 
 --
 
@@ -1663,7 +1663,7 @@ The number of read capacity units consumed over the specified time period, so yo
 *`aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -1684,7 +1684,7 @@ The number of write capacity units consumed over the specified time period, so y
 *`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -1705,14 +1705,14 @@ The elapsed time between an updated item appearing in the DynamoDB stream for on
 *`aws.dynamodb.metrics.ReplicationLatency.avg`*::
 +
 --
-type: long
+type: double
 
 --
 
 *`aws.dynamodb.metrics.ReplicationLatency.max`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -1726,7 +1726,7 @@ Rejected item-level requests due to transactional conflicts between concurrent r
 *`aws.dynamodb.metrics.TransactionConflict.avg`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -1743,7 +1743,7 @@ type: long
 The average percentage of provisioned read capacity units utilized by the account.
 
 
-type: long
+type: double
 
 --
 
@@ -1753,7 +1753,7 @@ type: long
 The average percentage of provisioned write capacity units utilized by the account.
 
 
-type: long
+type: double
 
 --
 
@@ -1863,7 +1863,7 @@ type: long
 The percentage of provisioned read capacity units utilized by the highest provisioned read table or global secondary index of an account.
 
 
-type: long
+type: double
 
 --
 
@@ -1873,7 +1873,7 @@ type: long
 The percentage of provisioned write capacity utilized by the highest provisioned write table or global secondary index of an account.
 
 
-type: long
+type: double
 
 --
 
