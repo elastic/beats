@@ -8,6 +8,8 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 // ConfigAWS is a structure defined for AWS credentials
@@ -18,11 +20,13 @@ type ConfigAWS struct {
 	ProfileName          string `config:"credential_profile_name"`
 	SharedCredentialFile string `config:"shared_credential_file"`
 	Endpoint             string `config:"endpoint"`
+	RoleArn              string `config:"role_arn"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
 // If access_key_id and secret_access_key are given, then use them as credentials.
-// If not, then load from aws config file. If credential_profile_name is not
+// If role_arn is given, assume the IAM role instead.
+// If none of the above is given, then load from aws config file. If credential_profile_name is not
 // given, then load default profile from the aws config file.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
@@ -43,7 +47,19 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, nil
 	}
 
-	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		awsConfig, err := external.LoadDefaultAWSConfig()
+		if err != nil {
+			return awsConfig, err
+		}
+		stsSvc := sts.New(awsConfig)
+		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+		awsConfig.Credentials = stsCredProvider
+		return awsConfig, nil
+	}
+
+	// If accessKeyID, secretAccessKey or sessionToken is not given, iam_role is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
 	// If credential_profile_name is empty, then default profile is used.
