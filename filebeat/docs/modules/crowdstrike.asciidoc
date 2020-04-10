@@ -8,9 +8,9 @@ This file is generated! See scripts/docs_collector.py
 :modulename: crowdstrike
 :has-dashboards: true
 
-== Crowdstrike module
+== CrowdStrike module
 
-This is the filebeat module for the Crowdstrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
+This is the filebeat module for the CrowdStrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
 
 This module segments events forwarded by the Falcon SIEM connector into two datasets for endpoint data and Falcon platform audit data.
 
@@ -19,14 +19,14 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
+This input supports CrowdStrike Falcon SIEM-Connector-v2.0.
 
 include::../include/running-modules.asciidoc[]
 
 [float]
 === Dashboards
 
-The best way to view Crowdstrike events and alert data is in the SIEM. 
+The best way to view CrowdStrike events and alert data is in the SIEM. 
 
 [role="screenshot"]
 image::./images/siem-alerts-cs.jpg[]
@@ -38,7 +38,7 @@ For alerts, go to Detections -> External alerts.
 image::./images/siem-events-cs.jpg[]
 
 [float]
-And for all over event Crowdstrike Falcon event types, go to Host -> Events.
+And for all over event CrowdStrike Falcon event types, go to Host -> Events.
 
 include::../include/configuring-intro.asciidoc[]
 
