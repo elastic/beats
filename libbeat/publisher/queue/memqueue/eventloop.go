@@ -102,6 +102,7 @@ func (l *directEventLoop) run() {
 			return
 
 		case req := <-l.events: // producer pushing new event
+			//fmt.Println("producer pushing new event")
 			l.handleInsert(&req)
 
 		case req := <-l.pubCancel: // producer cancelling active events
@@ -202,6 +203,7 @@ func (l *directEventLoop) handleConsumer(req *getRequest) {
 	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.clients)
 	l.ackSeq++
 
+	fmt.Printf("returning %v events to consumer\n", len(buf))
 	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs

@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -76,6 +78,7 @@ func (w *clientWorker) run() {
 
 			w.observer.outBatchSend(len(batch.events))
 
+			fmt.Printf("in clientWorker, about to publish %v events\n", len(batch.events))
 			if err := w.client.Publish(batch); err != nil {
 				break
 			}

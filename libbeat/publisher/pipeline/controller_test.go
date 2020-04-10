@@ -36,8 +36,8 @@ import (
 
 func TestOutputReload(t *testing.T) {
 	tests := map[string]func(mockPublishFn) outputs.Client{
-		"client":         newMockClient,
-		"network_client": newMockNetworkClient,
+		"client": newMockClient,
+		//"network_client": newMockNetworkClient,
 	}
 
 	for name, ctor := range tests {
@@ -59,7 +59,7 @@ func TestOutputReload(t *testing.T) {
 			var publishedCount atomic.Uint
 			countingPublishFn := func(batch publisher.Batch) error {
 				publishedCount.Add(uint(len(batch.Events())))
-				fmt.Printf("published so far: %v\n", publishedCount.Load())
+				fmt.Printf("published now: %v, so far: %v\n", len(batch.Events()), publishedCount.Load())
 				return nil
 			}
 
