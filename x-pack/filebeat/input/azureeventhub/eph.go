@@ -23,7 +23,11 @@ func (a *azureInput) runWithEPH() error {
 	if err != nil {
 		return err
 	}
-	leaserCheckpointer, err := storage.NewStorageLeaserCheckpointer(cred, a.config.SAName, a.config.SAContainer, azure.PublicCloud)
+	env, err := getAzureEnvironment(a.config.OverrideEnvironment)
+	if err != nil {
+		return err
+	}
+	leaserCheckpointer, err := storage.NewStorageLeaserCheckpointer(cred, a.config.SAName, a.config.SAContainer, env)
 	if err != nil {
 		return err
 	}
@@ -73,4 +77,23 @@ func (a *azureInput) runWithEPH() error {
 		return err
 	}
 	return nil
+}
+
+func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
+	// if no overrride is set then the azure public cloud is used
+	if overrideResManager == "" {
+		return azure.PublicCloud, nil
+	}
+	// users can select from one of the already defined azure cloud envs
+	var environments = map[string]azure.Environment{
+		azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
+		azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
+		azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
+		azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
+	}
+	if env, ok := environments[overrideResManager]; ok {
+		return env, nil
+	}
+	// can retrieve hybrid env from the resource manager endpoint
+	return azure.EnvironmentFromURL(overrideResManager)
 }

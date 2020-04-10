@@ -28,6 +28,8 @@ Example configuration:
   storage_account: "azureeph"
   storage_account_key: "....."
   storage_account_container: ""
+  override_resource_manager_endpoint: ""
+
 ----
 
 ==== Configuration options
@@ -36,7 +38,7 @@ The `azure-eventhub` input supports the following configuration:
 
 ==== `eventhub`
 
-The name of the eventhub users would like to read from.
+The name of the eventhub users would like to read from, field required.
 
 ==== `consumer_group`
 
@@ -50,14 +52,17 @@ A Blob Storage account is required in order to store/retrieve/update the offset 
 
 ==== `storage_account`
 
-The name of the storage account.
+The name of the storage account. Required.
 
 ==== `storage_account_key`
 
-The storage account key, this key will be used to authorize access to data in your storage account.
+The storage account key, this key will be used to authorize access to data in your storage account, option is required.
 
 ==== `storage_account_container`
 
 Optional, the name of the storage account container you would like to store the offset information in.
 
+==== `override_resource_manager_endpoint`
+
+Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment.
 
