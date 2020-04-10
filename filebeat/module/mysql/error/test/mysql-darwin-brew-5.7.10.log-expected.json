@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2016-12-09T13:08:33.000-02:00",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 0,
@@ -12,9 +19,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.335Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -25,9 +39,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.335Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -38,9 +59,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.336Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -51,9 +79,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.345Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -64,9 +99,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -77,9 +119,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -90,9 +139,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -103,9 +159,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -116,9 +179,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.352Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -129,9 +199,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.354Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -142,9 +219,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.366Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -155,9 +239,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.379Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -168,9 +259,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.401Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -181,9 +279,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.402Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -194,9 +299,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.402Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -207,9 +319,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.402Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -220,9 +339,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.402Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -233,9 +359,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.402Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -246,9 +379,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.549Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -259,9 +399,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.549Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -272,9 +419,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.549Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -285,9 +439,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.585Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -298,9 +459,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.588Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -311,9 +479,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.588Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -324,9 +499,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.588Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -337,9 +519,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.641Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -350,9 +539,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.642Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -363,9 +559,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.642Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -376,9 +579,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.643Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -389,9 +599,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.652Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -402,9 +619,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.662Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -415,9 +639,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.662Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -428,9 +659,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.665Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -441,9 +679,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.665Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -454,9 +699,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.698Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -467,9 +719,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.699Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -480,9 +739,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.699Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -493,9 +759,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.699Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -506,9 +779,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.784Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -519,9 +799,16 @@
     },
     {
         "@timestamp": "2016-12-09T12:08:33.784Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.flags": [
@@ -535,9 +822,16 @@
     },
     {
         "@timestamp": "2016-12-09T22:21:02.443Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -548,9 +842,16 @@
     },
     {
         "@timestamp": "2016-12-09T22:36:49.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -561,9 +862,16 @@
     },
     {
         "@timestamp": "2016-12-09T23:37:34.021Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -574,9 +882,16 @@
     },
     {
         "@timestamp": "2016-12-10T00:17:54.198Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -587,9 +902,16 @@
     },
     {
         "@timestamp": "2016-12-10T01:18:38.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -600,9 +922,16 @@
     },
     {
         "@timestamp": "2016-12-10T01:39:00.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -613,9 +942,16 @@
     },
     {
         "@timestamp": "2016-12-10T02:39:45.021Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -626,9 +962,16 @@
     },
     {
         "@timestamp": "2016-12-10T02:49:08.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -639,9 +982,16 @@
     },
     {
         "@timestamp": "2016-12-10T03:24:15.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -652,9 +1002,16 @@
     },
     {
         "@timestamp": "2016-12-10T04:25:00.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -665,9 +1022,16 @@
     },
     {
         "@timestamp": "2016-12-10T04:34:24.021Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -678,9 +1042,16 @@
     },
     {
         "@timestamp": "2016-12-10T04:39:18.022Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -691,9 +1062,16 @@
     },
     {
         "@timestamp": "2016-12-10T05:40:03.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -704,9 +1082,16 @@
     },
     {
         "@timestamp": "2016-12-10T06:40:48.025Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -717,9 +1102,16 @@
     },
     {
         "@timestamp": "2016-12-10T06:45:55.018Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -730,9 +1122,16 @@
     },
     {
         "@timestamp": "2016-12-10T07:46:40.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -743,9 +1142,16 @@
     },
     {
         "@timestamp": "2016-12-10T07:56:04.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -756,9 +1162,16 @@
     },
     {
         "@timestamp": "2016-12-10T08:56:49.390Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -769,9 +1182,16 @@
     },
     {
         "@timestamp": "2016-12-10T09:06:11.019Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -782,9 +1202,16 @@
     },
     {
         "@timestamp": "2016-12-10T10:06:56.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -795,9 +1222,16 @@
     },
     {
         "@timestamp": "2016-12-10T10:16:18.022Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -808,9 +1242,16 @@
     },
     {
         "@timestamp": "2016-12-10T11:17:02.165Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -821,9 +1262,16 @@
     },
     {
         "@timestamp": "2016-12-10T11:30:44.018Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -834,9 +1282,16 @@
     },
     {
         "@timestamp": "2016-12-10T12:03:24.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -847,9 +1302,16 @@
     },
     {
         "@timestamp": "2016-12-10T12:06:40.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -860,9 +1322,16 @@
     },
     {
         "@timestamp": "2016-12-10T12:24:37.025Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -873,9 +1342,16 @@
     },
     {
         "@timestamp": "2016-12-10T13:25:22.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -886,9 +1362,16 @@
     },
     {
         "@timestamp": "2016-12-10T13:39:05.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -899,9 +1382,16 @@
     },
     {
         "@timestamp": "2016-12-10T14:39:50.178Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -912,9 +1402,16 @@
     },
     {
         "@timestamp": "2016-12-10T14:49:14.023Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -925,9 +1422,16 @@
     },
     {
         "@timestamp": "2016-12-10T15:49:59.022Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -938,9 +1442,16 @@
     },
     {
         "@timestamp": "2016-12-10T15:59:23.014Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -951,9 +1462,16 @@
     },
     {
         "@timestamp": "2016-12-10T17:00:08.019Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -964,9 +1482,16 @@
     },
     {
         "@timestamp": "2016-12-10T17:09:30.026Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -977,9 +1502,16 @@
     },
     {
         "@timestamp": "2016-12-10T17:48:20.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -990,9 +1522,16 @@
     },
     {
         "@timestamp": "2016-12-10T18:00:05.183Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1003,9 +1542,16 @@
     },
     {
         "@timestamp": "2016-12-10T18:54:13.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1016,9 +1562,16 @@
     },
     {
         "@timestamp": "2016-12-10T20:13:03.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1029,9 +1582,16 @@
     },
     {
         "@timestamp": "2016-12-10T20:50:11.201Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1042,9 +1602,16 @@
     },
     {
         "@timestamp": "2016-12-10T20:53:54.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1055,9 +1622,16 @@
     },
     {
         "@timestamp": "2016-12-10T21:03:18.023Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1068,9 +1642,16 @@
     },
     {
         "@timestamp": "2016-12-10T22:04:03.021Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1081,9 +1662,16 @@
     },
     {
         "@timestamp": "2016-12-10T22:13:57.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1094,9 +1682,16 @@
     },
     {
         "@timestamp": "2016-12-10T22:49:59.020Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1107,9 +1702,16 @@
     },
     {
         "@timestamp": "2016-12-10T23:12:12.023Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1120,9 +1722,16 @@
     },
     {
         "@timestamp": "2016-12-11T00:12:57.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1133,9 +1742,16 @@
     },
     {
         "@timestamp": "2016-12-11T00:26:41.053Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1146,9 +1762,16 @@
     },
     {
         "@timestamp": "2016-12-11T00:47:44.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1159,9 +1782,16 @@
     },
     {
         "@timestamp": "2016-12-11T00:49:50.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1172,9 +1802,16 @@
     },
     {
         "@timestamp": "2016-12-11T01:20:40.031Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1185,9 +1822,16 @@
     },
     {
         "@timestamp": "2016-12-11T02:21:24.021Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1198,9 +1842,16 @@
     },
     {
         "@timestamp": "2016-12-11T02:26:30.015Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1211,9 +1862,16 @@
     },
     {
         "@timestamp": "2016-12-11T03:18:55.018Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1224,9 +1882,16 @@
     },
     {
         "@timestamp": "2016-12-11T04:15:14.022Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1237,9 +1902,16 @@
     },
     {
         "@timestamp": "2016-12-11T04:20:52.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1250,9 +1922,16 @@
     },
     {
         "@timestamp": "2016-12-11T04:25:56.035Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1263,9 +1942,16 @@
     },
     {
         "@timestamp": "2016-12-11T05:26:41.020Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1276,9 +1962,16 @@
     },
     {
         "@timestamp": "2016-12-11T05:36:05.024Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
@@ -1289,9 +1982,16 @@
     },
     {
         "@timestamp": "2016-12-11T06:36:50.017Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",

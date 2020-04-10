@@ -166,7 +166,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
 	}
 	var err error
-	r.intervalRotator, err = newIntervalRotator(r.interval)
+	r.intervalRotator, err = newIntervalRotator(r.log, r.interval, r.rotateOnStartup, r.filename)
 	if err != nil {
 		return nil, err
 	}

@@ -58,7 +58,9 @@ type Queue interface {
 // but still dropping events, the pipeline can use the buffer information,
 // to define an upper bound of events being active in the pipeline.
 type BufferConfig struct {
-	Events int // can be <= 0, if queue can not determine limit
+	// MaxEvents is the maximum number of events the queue can hold at capacity.
+	// A value <= 0 means there is no fixed limit.
+	MaxEvents int
 }
 
 // ProducerConfig as used by the Pipeline to configure some custom callbacks

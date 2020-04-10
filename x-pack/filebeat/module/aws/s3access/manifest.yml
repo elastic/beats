@@ -9,6 +9,9 @@ var:
   - name: visibility_timeout
   - name: api_timeout
   - name: endpoint
+  - name: access_key_id
+  - name: secret_access_key
+  - name: session_token
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

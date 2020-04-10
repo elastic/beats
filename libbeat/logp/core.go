@@ -67,21 +67,10 @@ func Configure(cfg Config) error {
 	)
 
 	// Build a single output (stderr has priority if more than one are enabled).
-	switch {
-	case cfg.toObserver:
+	if cfg.toObserver {
 		sink, observedLogs = observer.New(cfg.Level.zapLevel())
-	case cfg.toIODiscard:
-		sink, err = makeDiscardOutput(cfg)
-	case cfg.ToStderr:
-		sink, err = makeStderrOutput(cfg)
-	case cfg.ToSyslog:
-		sink, err = makeSyslogOutput(cfg)
-	case cfg.ToEventLog:
-		sink, err = makeEventLogOutput(cfg)
-	case cfg.ToFiles:
-		fallthrough
-	default:
-		sink, err = makeFileOutput(cfg)
+	} else {
+		sink, err = createLogOutput(cfg)
 	}
 	if err != nil {
 		return errors.Wrap(err, "failed to build log output")
@@ -123,6 +112,30 @@ func Configure(cfg Config) error {
 		observedLogs: observedLogs,
 	})
 	return nil
+}
+
+func createLogOutput(cfg Config) (zapcore.Core, error) {
+	switch {
+	case cfg.toIODiscard:
+		return makeDiscardOutput(cfg)
+	case cfg.ToStderr:
+		return makeStderrOutput(cfg)
+	case cfg.ToSyslog:
+		return makeSyslogOutput(cfg)
+	case cfg.ToEventLog:
+		return makeEventLogOutput(cfg)
+	case cfg.ToFiles:
+		return makeFileOutput(cfg)
+	}
+
+	switch cfg.environment {
+	case SystemdEnvironment, ContainerEnvironment:
+		return makeStderrOutput(cfg)
+	case MacOSServiceEnvironment, WindowsServiceEnvironment:
+		fallthrough
+	default:
+		return makeFileOutput(cfg)
+	}
 }
 
 // DevelopmentSetup configures the logger in development mode at debug level.
