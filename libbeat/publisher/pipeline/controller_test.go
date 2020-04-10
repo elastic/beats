@@ -45,7 +45,7 @@ func TestOutputReload(t *testing.T) {
 			seedPRNG(t)
 
 			numEventsToPublish := uint(20000)
-			numOutputReloads := uint(50)
+			numOutputReloads := uint(500)
 
 			queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
 				return memqueue.NewQueue(
@@ -93,6 +93,8 @@ func TestOutputReload(t *testing.T) {
 				}
 				fmt.Println("reloading output...")
 				pipeline.output.Set(out)
+
+				//time.Sleep(4 * time.Millisecond)
 			}
 
 			wg.Wait()
