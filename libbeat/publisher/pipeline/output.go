@@ -74,8 +74,13 @@ func (w *worker) close() {
 	close(w.done)
 
 	// Cancel in-flight batches so they may be retried
-	for batch := range w.qu {
-		batch.Cancelled()
+	for {
+		select {
+		case batch := <-w.qu:
+			batch.Cancelled()
+		default:
+			return
+		}
 	}
 }
 
@@ -94,6 +99,9 @@ func (w *clientWorker) run() {
 			return
 
 		case batch := <-w.qu:
+			if batch == nil {
+				continue
+			}
 			w.observer.outBatchSend(len(batch.events))
 			if err := w.client.Publish(batch); err != nil {
 				return
@@ -123,6 +131,10 @@ func (w *netClientWorker) run() {
 			return
 
 		case batch := <-w.qu:
+			if batch == nil {
+				continue
+			}
+
 			// Try to (re)connect so we can publish batch
 			if !connected {
 				// Return batch to other output workers while we try to (re)connect
