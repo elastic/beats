@@ -48,12 +48,12 @@ The proxy metricset requires access to the proxy endpoint in each of Kubernetes 
 
 ==== scheduler and controllermanager
 
-These metricsets require access to the Kubernetes `controller manager` and `scheduler` endpoints. By default, these pods run only in the master node, and they are not exposed via a Service, but there are different strategies available for its configuration:
+These metricsets require access to the Kubernetes `controller-manager` and `scheduler` endpoints. By default, these pods run only in the master node, and they are not exposed via a Service, but there are different strategies available for its configuration:
 
 - Create `Kubernetes Services` to make `kube-controller-manager` and `kube-scheduler` available and configure the metricsets to point to these services as part of a Metricbeat `Deployment`.
 - Use `Autodiscovery` functionality as part of a Metricbeat DaemonSet and include the metricsets in a conditional template applied for the specific pods.
 
-Note: In some "As a Service" Kubernetes implementations, like `GKE`, the master nodes or even the pods running in the masters won't be visible. In these cases it won't be possible to use these metricsets.
+Note: In some "As a Service" Kubernetes implementations, like `GKE`, the master nodes or even the pods running in the masters won't be visible. In these cases it won't be possible to use `scheduler` nor `controllermanager` metricsets.
 
 [float]
 === Kubernetes RBAC
