@@ -490,7 +490,9 @@ func runAgent(env map[string]string) error {
 		}
 
 		// build docker image
-		sh.Run("docker", "build", "-t", tag, ".")
+		if err := sh.Run("docker", "build", "-t", tag, "."); err != nil {
+			return err
+		}
 	}
 
 	// prepare env variables
@@ -511,7 +513,7 @@ func runAgent(env map[string]string) error {
 		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
 	}
 
-	dockerCmdArgs = append(dockerCmdArgs, "elastic-agent")
+	dockerCmdArgs = append(dockerCmdArgs, tag)
 	return sh.Run("docker", dockerCmdArgs...)
 }
 
