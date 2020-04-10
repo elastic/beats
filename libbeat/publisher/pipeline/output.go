@@ -71,6 +71,7 @@ func (w *clientWorker) run() {
 		for batch := range w.qu {
 			if w.closed.Load() {
 				if batch != nil {
+					fmt.Printf("canceling batch of %v events\n", len(batch.events))
 					batch.Cancelled()
 				}
 				return
@@ -84,6 +85,7 @@ func (w *clientWorker) run() {
 			}
 		}
 	}
+	fmt.Println("clientWorker closed")
 }
 
 func (w *netClientWorker) Close() error {

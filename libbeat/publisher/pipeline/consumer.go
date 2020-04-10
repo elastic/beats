@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -156,7 +158,11 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		paused = c.paused()
 		if !paused && c.out != nil && batch != nil {
 			out = c.out.workQueue
+		} else if paused && c.out != nil && batch != nil {
+			fmt.Printf("paused but have batch of %v events\n", len(batch.events))
+			//batch.Cancelled()
 		} else {
+			//fmt.Printf("over here, batch empty? = %v\n", batch == nil)
 			out = nil
 		}
 	}
@@ -171,11 +177,13 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 				continue
 			}
 			if queueBatch != nil {
+				fmt.Printf("in event consumer: got batch of %v events\n", len(queueBatch.Events()))
 				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			}
 
 			paused = c.paused()
 			if paused || batch == nil {
+				fmt.Printf("in event consumer: paused: %v, batch size = %v\n", paused, len(batch.events))
 				out = nil
 			}
 		}
@@ -190,10 +198,13 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		select {
 		case <-c.done:
 			log.Debug("stop pipeline event consumer")
+			fmt.Println("stop pipeline event consumer")
 			return
 		case sig := <-c.sig:
+			fmt.Printf("in event consumer: handling signal %v\n", sig)
 			handleSignal(sig)
 		case out <- batch:
+			fmt.Printf("in event consumer: sent batch of %v events to output workQueue\n", len(batch.Events()))
 			batch = nil
 		}
 	}

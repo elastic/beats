@@ -203,7 +203,7 @@ func (l *directEventLoop) handleConsumer(req *getRequest) {
 	ackCH := newACKChan(l.ackSeq, start, count, l.buf.buf.clients)
 	l.ackSeq++
 
-	fmt.Printf("returning %v events to consumer\n", len(buf))
+	fmt.Printf("in memqueue eventloop: returning %v events to consumer\n", len(buf))
 	req.resp <- getResponse{ackCH, buf}
 	l.pendingACKs.append(ackCH)
 	l.schedACKS = l.broker.scheduledACKs
