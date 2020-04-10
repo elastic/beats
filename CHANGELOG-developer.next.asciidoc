@@ -34,6 +34,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
 - Require logger as first parameter for `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
 - Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
+- Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
 
 ==== Bugfixes
 

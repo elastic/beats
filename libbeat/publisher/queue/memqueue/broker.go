@@ -191,7 +191,7 @@ func (b *broker) Close() error {
 
 func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		Events: b.bufSize,
+		MaxEvents: b.bufSize,
 	}
 }
 
