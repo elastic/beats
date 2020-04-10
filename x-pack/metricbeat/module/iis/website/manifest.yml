@@ -10,37 +10,22 @@ input:
       instance: "*"
       counters:
       - name: 'Total Bytes Received'
-        field: total_bytes_received
       - name: 'Total Bytes Sent'
-        field: total_bytes_sent
       - name: "Bytes Sent/sec"
-        field: bytes_sent_per_sec
       - name: "Bytes Received/sec"
-        field: bytes_received_per_sec
       - name: "Current Connections"
-        field: current_connections
       - name: "Maximum Connections"
-        field: maximum_connections
       - name: "Total Connection Attempts (all instances)"
         field: total_connection_attempts
       - name: "Total Get Requests"
-        field: total_get_requests
       - name: "Get Requests/sec"
-        field: get_requests_per_sec
       - name: "Total Post Requests"
-        field: total_post_requests
       - name: "Post Requests/sec"
-        field: post_requests_per_sec
       - name: "Total Delete Requests"
-        field: total_delete_requests
       - name: "Delete Requests/sec"
-        field: delete_requests_per_sec
       - name: "Service Uptime"
-        field: service_uptime
       - name: "Total PUT Requests"
-        field: total_put_requests
       - name: "PUT Requests/sec"
-        field: put_requests_per_sec
 
 processors:
 - drop_event.when.equals:

@@ -79,7 +79,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			} else {
 				event.MetricSetFields.Put(counter.QueryField, 0)
 			}
-			if re.config.MetricFormat {
+			if counter.ObjectField != "" {
 				event.MetricSetFields.Put(counter.ObjectField, counter.ObjectName)
 			}
 		}

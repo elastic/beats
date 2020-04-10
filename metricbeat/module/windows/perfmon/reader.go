@@ -33,7 +33,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-const instanceCountLabel = ":count"
+const (
+	instanceCountLabel   = ":count"
+	defaultInstanceField = "instance"
+	defaultObjectField   = "object"
+)
 
 // Reader will contain the config options
 type Reader struct {
@@ -62,8 +66,9 @@ func NewReader(config Config) (*Reader, error) {
 		return nil, err
 	}
 	r := &Reader{
-		query: query,
-		log:   logp.NewLogger("perfmon"),
+		query:  query,
+		log:    logp.NewLogger("perfmon"),
+		config: config,
 	}
 	r.mapCounters(config)
 	for i, counter := range r.counters {
@@ -100,7 +105,6 @@ func NewReader(config Config) (*Reader, error) {
 			r.counters[i].ChildQueries = append(r.counters[i].ChildQueries, v)
 		}
 	}
-	r.config = config
 	return r, nil
 }
 
@@ -200,31 +204,31 @@ func (re *Reader) mapCounters(config Config) {
 	if len(config.Queries) > 0 {
 		for _, query := range config.Queries {
 			for _, counter := range query.Counters {
+				// counter paths can also not contain any instances
 				if len(query.Instance) == 0 {
 					re.counters = append(re.counters, PerfCounter{
-						InstanceField: "instance",
+						InstanceField: defaultInstanceField,
 						InstanceName:  "",
-						QueryField:    "metrics." + mapCounterPathLabel(counter.Field, counter.Name),
+						QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
 						Query:         mapQuery(query.Name, "", counter.Name),
 						Format:        counter.Format,
 						ObjectName:    query.Name,
+						ObjectField:   defaultObjectField,
 					})
 				} else {
 					for _, instance := range query.Instance {
 						re.counters = append(re.counters, PerfCounter{
-							InstanceField: "instance",
+							InstanceField: defaultInstanceField,
 							InstanceName:  instance,
-							QueryField:    "metrics." + mapCounterPathLabel(counter.Field, counter.Name),
+							QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
 							Query:         mapQuery(query.Name, instance, counter.Name),
 							Format:        counter.Format,
 							ObjectName:    query.Name,
-							ObjectField:   "object",
+							ObjectField:   defaultObjectField,
 						})
 					}
 				}
-
 			}
-
 		}
 	}
 }
@@ -248,37 +252,35 @@ func mapQuery(obj string, instance string, path string) string {
 }
 
 func mapCounterPathLabel(label string, path string) string {
-	var resultMetricName string
+	resultMetricName := "metrics."
 	if label != "" {
-		resultMetricName = label
-	} else {
-		resultMetricName = path
+		return resultMetricName + label
 	}
 	// replace spaces with underscores
-	resultMetricName = strings.Replace(resultMetricName, " ", "_", -1)
+	path = strings.Replace(path, " ", "_", -1)
 	// replace backslashes with "per"
-	resultMetricName = strings.Replace(resultMetricName, "/sec", "_per_sec", -1)
-	resultMetricName = strings.Replace(resultMetricName, "/_sec", "_per_sec", -1)
-	resultMetricName = strings.Replace(resultMetricName, "\\", "_", -1)
+	path = strings.Replace(path, "/sec", "_per_sec", -1)
+	path = strings.Replace(path, "/_sec", "_per_sec", -1)
+	path = strings.Replace(path, "\\", "_", -1)
 	// replace actual percentage symbol with the smbol "pct"
-	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
+	path = strings.Replace(path, "_%_", "_pct_", -1)
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
+	path = strings.Replace(path, ":", "_", -1)
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	path = strings.Replace(path, "_-_", "_", -1)
 	// replace uppercases with underscores
-	resultMetricName = replaceUpperCase(resultMetricName)
+	path = replaceUpperCase(path)
 
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
-	obj := strings.Split(resultMetricName, ".")
+	obj := strings.Split(path, ".")
 	for index := range obj {
 		// in some cases a trailing "_" is found
 		obj[index] = strings.TrimPrefix(obj[index], "_")
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
-	resultMetricName = strings.ToLower(strings.Join(obj, "_"))
+	path = strings.ToLower(strings.Join(obj, "_"))
 
-	return resultMetricName
+	return resultMetricName + path
 }
 
 // replaceUpperCase func will replace upper case with '_'

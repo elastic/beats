@@ -20,9 +20,11 @@
 package perfmon
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/pkg/errors"
 	"strings"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 const replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
@@ -34,7 +36,6 @@ type Config struct {
 	Counters           []Counter `config:"perfmon.counters"`
 	Queries            []Query   `config:"perfmon.queries"`
 	GroupAllCountersTo string    `config:"perfmon.group_all_counter"`
-	MetricFormat       bool
 }
 
 // Counter for the perfmon counters (old implementation deprecated).
@@ -69,10 +70,6 @@ func (conf *Config) ValidateConfig() error {
 		cfgwarn.Deprecate("8.0", "perfmon.counters configuration option is deprecated and will be remove in the future major version, we advise using the perfmon.queries configuration option instead")
 	}
 
-	if len(conf.Queries) > 0 {
-		conf.MetricFormat = true
-	}
-
 	// add default format in the config
 	for i, value := range conf.Counters {
 		form := strings.ToLower(value.Format)
@@ -99,7 +96,6 @@ func (conf *Config) ValidateConfig() error {
 					q.Format, q.Field)
 			}
 		}
-
 	}
 	return nil
 }
