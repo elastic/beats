@@ -1,3 +1,4 @@
+import contextlib
 import os
 import shutil
 import subprocess
@@ -92,6 +93,16 @@ class KindMixin(object):
         kubecfg_path = cls.kind_kubecfg_path(build_path)
         args = ["kubectl", "--kubeconfig", kubecfg_path] + args
         subprocess.run(args, check=check, input=input)
+
+    @classmethod
+    @contextlib.contextmanager
+    def kind_kubectl_with_manifest(cls, build_path, manifest):
+        """Runs with the manifest applied then deletes it."""
+        cls.kind_kubectl(cls.build_path, ["apply", "-f", "-"], input=manifest)
+        try:
+            yield
+        finally:
+            cls.kind_kubectl(cls.build_path, ["delete", "-f", "-"], input=manifest)
 
     @classmethod
     def kind_kubelet_hosts(cls):
