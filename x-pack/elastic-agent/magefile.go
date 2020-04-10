@@ -484,7 +484,7 @@ func runAgent(env map[string]string) error {
 			"linux-x86_64.tar.gz",
 		}, devtools.UseElasticAgentDemoPackaging)
 
-		dockerPackagePath := filepath.Join("build", "package", "agent", "agent-linux-amd64.docker", "docker-build")
+		dockerPackagePath := filepath.Join("build", "package", "elastic-agent", "elastic-agent-linux-amd64.docker", "docker-build")
 		if err := os.Chdir(dockerPackagePath); err != nil {
 			return err
 		}
