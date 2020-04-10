@@ -16,6 +16,14 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 )
 
+// users can select from one of the already defined azure cloud envs
+var environments = map[string]azure.Environment{
+	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
+	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
+	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
+	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
+}
+
 // runWithEPH will consume ingested events using the Event Processor Host (EPH) https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host
 func (a *azureInput) runWithEPH() error {
 	// create a new Azure Storage Leaser / Checkpointer
@@ -83,13 +91,6 @@ func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
 	// if no overrride is set then the azure public cloud is used
 	if overrideResManager == "" {
 		return azure.PublicCloud, nil
-	}
-	// users can select from one of the already defined azure cloud envs
-	var environments = map[string]azure.Environment{
-		azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
-		azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
-		azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
-		azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
 	}
 	if env, ok := environments[overrideResManager]; ok {
 		return env, nil
