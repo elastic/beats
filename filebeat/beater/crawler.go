@@ -21,12 +21,13 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/mitchellh/hashstructure"
 )
 
 type crawler struct {
