@@ -137,7 +137,7 @@
             "gridData": {
               "h": 11,
               "i": "0a588a08-997a-422f-a5db-e56728bc6702",
-              "w": 24,
+              "w": 17,
               "x": 0,
               "y": 19
             },
@@ -148,34 +148,34 @@
           },
           {
             "embeddableConfig": {
+              "title": "Write Throttle Events"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "897ae224-d367-4fe0-aa23-5bb13165cc67",
+              "w": 16,
+              "x": 17,
+              "y": 19
+            },
+            "panelIndex": "897ae224-d367-4fe0-aa23-5bb13165cc67",
+            "panelRefName": "panel_8",
+            "title": "Write Throttle Events",
+            "version": "7.6.2"
+          },
+          {
+            "embeddableConfig": {
               "title": "Account Provisioned Write Capacity Utilization"
             },
             "gridData": {
               "h": 11,
               "i": "e81e9817-c971-454b-881a-09cec10da0e9",
-              "w": 12,
-              "x": 24,
+              "w": 15,
+              "x": 33,
               "y": 19
             },
             "panelIndex": "e81e9817-c971-454b-881a-09cec10da0e9",
-            "panelRefName": "panel_8",
-            "title": "Account Provisioned Write Capacity Utilization",
-            "version": "7.6.2"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Account Provisioned Read Capacity Utilization"
-            },
-            "gridData": {
-              "h": 11,
-              "i": "f8cd1bce-7376-440a-9f5c-ce2596c9216c",
-              "w": 12,
-              "x": 36,
-              "y": 19
-            },
-            "panelIndex": "f8cd1bce-7376-440a-9f5c-ce2596c9216c",
             "panelRefName": "panel_9",
-            "title": "Account Provisioned Read Capacity Utilization",
+            "title": "Account Provisioned Write Capacity Utilization",
             "version": "7.6.2"
           }
         ],
@@ -229,19 +229,19 @@
           "type": "visualization"
         },
         {
-          "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+          "id": "b403f7b0-7b15-11ea-9bb4-e958b64b5685",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
+          "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
           "name": "panel_9",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-04-10T09:29:09.467Z",
-      "version": "WzQ3MTUsNV0="
+      "updated_at": "2020-04-10T10:32:31.580Z",
+      "version": "WzUwNTYsNV0="
     },
     {
       "attributes": {
@@ -318,8 +318,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-04-09T11:50:11.342Z",
-      "version": "WzQ1NzgsNF0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3ODcsNV0="
     },
     {
       "attributes": {
@@ -408,8 +408,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:23:54.841Z",
-      "version": "WzQ3MDYsNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3ODgsNV0="
     },
     {
       "attributes": {
@@ -498,8 +498,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:24:25.314Z",
-      "version": "WzQ3MDgsNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3ODksNV0="
     },
     {
       "attributes": {
@@ -740,8 +740,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-04-09T11:50:11.342Z",
-      "version": "WzQ1ODEsNF0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3OTAsNV0="
     },
     {
       "attributes": {
@@ -830,8 +830,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:25:57.198Z",
-      "version": "WzQ3MTIsNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3OTEsNV0="
     },
     {
       "attributes": {
@@ -894,8 +894,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:25:26.990Z",
-      "version": "WzQ3MTAsNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3OTMsNV0="
     },
     {
       "attributes": {
@@ -958,8 +958,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:24:54.209Z",
-      "version": "WzQ3MDksNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3OTQsNV0="
     },
     {
       "attributes": {
@@ -1022,8 +1022,72 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:19:02.800Z",
-      "version": "WzQ2OTQsNV0="
+      "updated_at": "2020-04-10T10:11:30.282Z",
+      "version": "WzQ3OTUsNV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "DynamoDB Write Throttle Events [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "\u003e=1m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0.1",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Write Throttle Events",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.dynamodb.metrics.WriteThrottleEvents.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.dimensions.TableName",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "DynamoDB Write Throttle Events [Metricbeat AWS]",
+          "type": "metrics"
+        }
+      },
+      "id": "b403f7b0-7b15-11ea-9bb4-e958b64b5685",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-04-10T10:26:13.291Z",
+      "version": "WzUwNTAsNV0="
     },
     {
       "attributes": {
@@ -1038,7 +1102,7 @@
             }
           }
         },
-        "title": "DynamoDB Account Provisioned Write Capacity Utilization [Metricbeat AWS]",
+        "title": "DynamoDB Account Provisioned Capacity Utilization [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1071,6 +1135,16 @@
               },
               "schema": "segment",
               "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Read Utilization",
+                "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg"
+              },
+              "schema": "metric",
+              "type": "max"
             }
           ],
           "params": {
@@ -1108,8 +1182,8 @@
                 "label": "@timestamp per 30 seconds",
                 "params": {
                   "bounds": {
-                    "max": "2020-04-10T09:01:54.362Z",
-                    "min": "2020-04-10T08:46:54.362Z"
+                    "max": "2020-04-10T10:29:58.462Z",
+                    "min": "2020-04-10T10:14:58.462Z"
                   },
                   "date": true,
                   "format": "HH:mm:ss",
@@ -1132,7 +1206,23 @@
                       }
                     }
                   },
-                  "label": "Account Provisioned Write Capacity Utilization",
+                  "label": "Write Utilization",
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "max",
+                  "format": {
+                    "id": "number",
+                    "params": {
+                      "parsedUrl": {
+                        "basePath": "",
+                        "origin": "http://localhost:5601",
+                        "pathname": "/app/kibana"
+                      }
+                    }
+                  },
+                  "label": "Read Utilization",
                   "params": {}
                 }
               ]
@@ -1147,6 +1237,18 @@
                 "data": {
                   "id": "1",
                   "label": "Write Utilization"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Read Utilization"
                 },
                 "drawLinesBetweenPoints": true,
                 "mode": "normal",
@@ -1189,7 +1291,7 @@
               }
             ]
           },
-          "title": "DynamoDB Account Provisioned Write Capacity Utilization [Metricbeat AWS]",
+          "title": "DynamoDB Account Provisioned Capacity Utilization [Metricbeat AWS]",
           "type": "line"
         }
       },
@@ -1205,191 +1307,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-04-10T09:02:12.550Z",
-      "version": "WzQ2ODEsNV0="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "DynamoDB Account Provisioned Read Capacity Utilization [Metricbeat AWS]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Read Utilization",
-                "field": "aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg"
-              },
-              "schema": "metric",
-              "type": "max"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "scaleMetricValues": false,
-                "timeRange": {
-                  "from": "now-15m",
-                  "to": "now"
-                },
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "dimensions": {
-              "x": {
-                "accessor": 0,
-                "aggType": "date_histogram",
-                "format": {
-                  "id": "date",
-                  "params": {
-                    "pattern": "HH:mm:ss"
-                  }
-                },
-                "label": "@timestamp per 30 seconds",
-                "params": {
-                  "bounds": {
-                    "max": "2020-04-10T09:00:03.564Z",
-                    "min": "2020-04-10T08:45:03.564Z"
-                  },
-                  "date": true,
-                  "format": "HH:mm:ss",
-                  "interval": "PT30S",
-                  "intervalESUnit": "s",
-                  "intervalESValue": 30
-                }
-              },
-              "y": [
-                {
-                  "accessor": 1,
-                  "aggType": "avg",
-                  "format": {
-                    "id": "number",
-                    "params": {
-                      "parsedUrl": {
-                        "basePath": "",
-                        "origin": "http://localhost:5601",
-                        "pathname": "/app/kibana"
-                      }
-                    }
-                  },
-                  "label": "Account Provisioned Read Capacity Utilization",
-                  "params": {}
-                }
-              ]
-            },
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {},
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Read Utilization"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": "true",
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#34130C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "line",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Read Utilization"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "DynamoDB Account Provisioned Read Capacity Utilization [Metricbeat AWS]",
-          "type": "line"
-        }
-      },
-      "id": "1a22a410-2003-11ea-8f72-2f8d21e50b0c",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-04-10T09:01:25.486Z",
-      "version": "WzQ2NzksNV0="
+      "updated_at": "2020-04-10T10:30:33.840Z",
+      "version": "WzUwNTQsNV0="
     }
   ],
   "version": "7.6.2"
