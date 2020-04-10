@@ -85,7 +85,7 @@ specify the following settings under `kubernetes.yml` in the `data` section:
         - volume
       period: 10s
       host: ${NODE_NAME}
-      hosts: ["https://${HOSTNAME}:10250"]
+      hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.certificate_authorities:
         - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
@@ -119,7 +119,7 @@ oc patch namespace kube-system -p \
 ----
 +
 This command sets the node selector for the project to an empty string. If you
-don't run this command, the default node selector will skip master nodes.  
+don't run this command, the default node selector will skip master nodes.
 
 [float]
 ==== Deploy
