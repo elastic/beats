@@ -18,12 +18,18 @@
 package pipeline
 
 import (
+	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+var _outputGroupID atomic.Uint
 
 // outputController manages the pipelines output capabilities, like:
 // - start
@@ -39,10 +45,13 @@ type outputController struct {
 	retryer  *retryer
 	consumer *eventConsumer
 	out      *outputGroup
+
+	setInProgress sync.Mutex
 }
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
+	id        uint
 	workQueue workQueue
 	outputs   []outputWorker
 
@@ -77,7 +86,7 @@ func newOutputController(
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
-	c.consumer.sigContinue()
+	c.continueConsumer()
 
 	return c
 }
@@ -98,6 +107,20 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	ln("set called...")
+	c.setInProgress.Lock()
+	defer c.setInProgress.Unlock()
+	ln("setting output...")
+
+	// update consumer and retryer
+	// close old group, so events are send to new workQueue via retryer
+	c.pauseConsumer()
+	if c.out != nil {
+		for range c.out.outputs {
+			c.retryer.sigOutputRemoved()
+		}
+	}
+
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
 	queue := makeWorkQueue()
@@ -106,19 +129,13 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		worker[i] = makeClientWorker(c.observer, queue, client)
 	}
 	grp := &outputGroup{
+		id:         _outputGroupID.Inc(),
 		workQueue:  queue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
 		batchSize:  outGrp.BatchSize,
 	}
 
-	// update consumer and retryer
-	c.consumer.sigPause()
-	if c.out != nil {
-		for range c.out.outputs {
-			c.retryer.sigOutputRemoved()
-		}
-	}
 	c.retryer.updOutput(queue)
 	for range clients {
 		c.retryer.sigOutputAdded()
@@ -130,12 +147,20 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		for _, w := range c.out.outputs {
 			w.Close()
 		}
+		for drained := false; !drained; {
+			select {
+			case b := <-c.out.workQueue:
+				queue <- b
+			default:
+				drained = true
+			}
+		}
 	}
 
 	c.out = grp
 
 	// restart consumer (potentially blocked by retryer)
-	c.consumer.sigContinue()
+	c.continueConsumer()
 
 	c.observer.updateOutputGroup()
 }
@@ -168,4 +193,14 @@ func (c *outputController) Reload(
 	c.Set(output)
 
 	return nil
+}
+
+func (c *outputController) pauseConsumer() {
+	ln("pausing consumer...")
+	c.consumer.sigPause()
+}
+
+func (c *outputController) continueConsumer() {
+	ln("continuing consumer...")
+	c.consumer.sigContinue()
 }

@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -43,6 +44,15 @@ type eventConsumer struct {
 	consumer queue.Consumer
 
 	out *outputGroup
+}
+
+func lf(msg string, v ...interface{}) {
+	now := time.Now().Format("15:04:05.00000")
+	fmt.Printf(now+" "+msg, v...)
+}
+
+func ln(msg string) {
+	lf(msg + "\n")
 }
 
 type consumerSignal struct {
@@ -116,8 +126,11 @@ func (c *eventConsumer) sigHint() {
 }
 
 func (c *eventConsumer) updOutput(grp *outputGroup) {
+	lf("in eventConsumer: updOutput: new output group ID = %v\n", grp.id)
 	// close consumer to break consumer worker from pipeline
-	c.consumer.Close()
+	if err := c.consumer.Close(); err != nil {
+		lf("in updGroup: consumer close error: %v\n", err)
+	}
 
 	// update output
 	c.sig <- consumerSignal{
@@ -139,6 +152,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	log.Debug("start pipeline event consumer")
 
 	var (
+		oid    uint
 		out    workQueue
 		batch  *Batch
 		paused = true
@@ -149,6 +163,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
+			lf("in eventConsumer: handling sigConsumerUpdateOutput: new output group ID = %v\n", sig.out.id)
 			c.out = sig.out
 
 		case sigConsumerUpdateInput:
@@ -158,11 +173,12 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		paused = c.paused()
 		if !paused && c.out != nil && batch != nil {
 			out = c.out.workQueue
+			oid = c.out.id
 		} else if paused && c.out != nil && batch != nil {
-			fmt.Printf("paused but have batch of %v events\n", len(batch.events))
+			lf("paused but have batch of %v events\n", len(batch.events))
 			//batch.Cancelled()
 		} else {
-			//fmt.Printf("over here, batch empty? = %v\n", batch == nil)
+			//lf("over here, batch empty? = %v\n", batch == nil)
 			out = nil
 		}
 	}
@@ -170,6 +186,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	for {
 		if !paused && c.out != nil && consumer != nil && batch == nil {
 			out = c.out.workQueue
+			oid = c.out.id
 			queueBatch, err := consumer.Get(c.out.batchSize)
 			if err != nil {
 				out = nil
@@ -177,19 +194,20 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 				continue
 			}
 			if queueBatch != nil {
-				fmt.Printf("in event consumer: got batch of %v events\n", len(queueBatch.Events()))
+				lf("in event consumer: got batch of %v events\n", len(queueBatch.Events()))
 				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			}
 
 			paused = c.paused()
 			if paused || batch == nil {
-				fmt.Printf("in event consumer: paused: %v, batch size = %v\n", paused, len(batch.events))
+				lf("in event consumer: paused: %v, batch size = %v\n", paused, len(batch.events))
 				out = nil
 			}
 		}
 
 		select {
 		case sig := <-c.sig:
+			lf("in event consumer: 1st select: handling signal %v\n", sig)
 			handleSignal(sig)
 			continue
 		default:
@@ -198,13 +216,15 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		select {
 		case <-c.done:
 			log.Debug("stop pipeline event consumer")
-			fmt.Println("stop pipeline event consumer")
+			ln("stop pipeline event consumer")
 			return
 		case sig := <-c.sig:
-			fmt.Printf("in event consumer: handling signal %v\n", sig)
+			lf("in event consumer: 2nd select: handling signal %v\n", sig)
 			handleSignal(sig)
 		case out <- batch:
-			fmt.Printf("in event consumer: sent batch of %v events to output workQueue\n", len(batch.Events()))
+			if batch != nil {
+				lf("in event consumer: sent batch of %v events to output workQueue (worker ID = %v)\n", len(batch.Events()), oid)
+			}
 			batch = nil
 		}
 	}

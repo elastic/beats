@@ -59,7 +59,7 @@ func TestOutputReload(t *testing.T) {
 			var publishedCount atomic.Uint
 			countingPublishFn := func(batch publisher.Batch) error {
 				publishedCount.Add(uint(len(batch.Events())))
-				fmt.Printf("published now: %v, so far: %v\n", len(batch.Events()), publishedCount.Load())
+				lf("in test: published now: %v, so far: %v\n", len(batch.Events()), publishedCount.Load())
 				return nil
 			}
 
@@ -91,10 +91,10 @@ func TestOutputReload(t *testing.T) {
 				out := outputs.Group{
 					Clients: []outputs.Client{outputClient},
 				}
-				fmt.Println("reloading output...")
+				ln("in test code: reloading output...")
 				pipeline.output.Set(out)
 
-				//time.Sleep(4 * time.Millisecond)
+				//time.Sleep(1 * time.Millisecond)
 			}
 
 			wg.Wait()

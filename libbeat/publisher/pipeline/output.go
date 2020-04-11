@@ -18,27 +18,41 @@
 package pipeline
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
-// clientWorker manages output client of type outputs.Client, not supporting reconnect.
-type clientWorker struct {
+var _workerID atomic.Uint
+
+func (w *worker) lf(msg string, v ...interface{}) {
+	lf("[worker "+strconv.Itoa(int(w.id))+"] "+msg, v...)
+}
+
+func (w *worker) ln(msg string) {
+	w.lf(msg + "\n")
+}
+
+type worker struct {
+	id       uint
 	observer outputObserver
 	qu       workQueue
-	client   outputs.Client
 	closed   atomic.Bool
+	inflight chan struct{}
+}
+
+// clientWorker manages output client of type outputs.Client, not supporting reconnect.
+type clientWorker struct {
+	worker
+	client outputs.Client
 }
 
 // netClientWorker manages reconnectable output clients of type outputs.NetworkClient.
 type netClientWorker struct {
-	observer outputObserver
-	qu       workQueue
-	client   outputs.NetworkClient
-	closed   atomic.Bool
+	worker
+	client outputs.NetworkClient
 
 	batchSize  int
 	batchSizer func() int
@@ -46,23 +60,45 @@ type netClientWorker struct {
 }
 
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
+	worker := worker{
+		observer: observer,
+		qu:       qu,
+	}
+
+	worker.id = _workerID.Inc()
+
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{
-			observer: observer,
-			qu:       qu,
-			client:   nc,
-			logger:   logp.NewLogger("publisher_pipeline_output"),
+			worker: worker,
+			client: nc,
+			logger: logp.NewLogger("publisher_pipeline_output"),
 		}
 		go c.run()
 		return c
 	}
-	c := &clientWorker{observer: observer, qu: qu, client: client}
+	c := &clientWorker{
+		worker: worker,
+		client: client,
+	}
+
+	worker.ln("running client worker...")
 	go c.run()
 	return c
 }
 
-func (w *clientWorker) Close() error {
+func (w *worker) close() {
+	w.ln("worker asked to close")
 	w.closed.Store(true)
+	w.lf("w.inflight == nil: %#v\n", w.inflight == nil)
+	if w.inflight != nil {
+		w.ln("waiting for inflight events to drain")
+		<-w.inflight
+		w.ln("inflight events drained")
+	}
+}
+
+func (w *clientWorker) Close() error {
+	w.close()
 	return w.client.Close()
 }
 
@@ -71,25 +107,32 @@ func (w *clientWorker) run() {
 		for batch := range w.qu {
 			if w.closed.Load() {
 				if batch != nil {
-					fmt.Printf("canceling batch of %v events\n", len(batch.events))
+					w.lf("canceling batch of %v events\n", len(batch.events))
 					batch.Cancelled()
 				}
 				return
 			}
 
+			if batch == nil {
+				continue
+			}
+
 			w.observer.outBatchSend(len(batch.events))
 
-			fmt.Printf("in clientWorker, about to publish %v events\n", len(batch.events))
+			w.lf("in clientWorker, about to publish %v events\n", len(batch.events))
+			w.inflight = make(chan struct{})
 			if err := w.client.Publish(batch); err != nil {
+				close(w.inflight)
 				break
 			}
+			close(w.inflight)
 		}
 	}
-	fmt.Println("clientWorker closed")
+	w.ln("clientWorker closed")
 }
 
 func (w *netClientWorker) Close() error {
-	w.closed.Store(true)
+	w.close()
 	return w.client.Close()
 }
 
@@ -134,12 +177,15 @@ func (w *netClientWorker) run() {
 				return
 			}
 
+			w.inflight = make(chan struct{})
 			err := w.client.Publish(batch)
 			if err != nil {
+				close(w.inflight)
 				w.logger.Errorf("Failed to publish events: %v", err)
 				// on error return to connect loop
 				break
 			}
+			close(w.inflight)
 		}
 	}
 }
