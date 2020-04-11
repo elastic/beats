@@ -42,7 +42,7 @@ func TestOutputReload(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			//seedPRNG(t)
 
 			numEventsToPublish := uint(20000)
 			numOutputReloads := uint(500)
@@ -93,8 +93,6 @@ func TestOutputReload(t *testing.T) {
 				}
 				ln("in test code: reloading output...")
 				pipeline.output.Set(out)
-
-				//time.Sleep(1 * time.Millisecond)
 			}
 
 			wg.Wait()

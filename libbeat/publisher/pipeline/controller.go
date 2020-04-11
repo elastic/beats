@@ -150,8 +150,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		for drained := false; !drained; {
 			select {
 			case b := <-c.out.workQueue:
+				ln("draining batches from old workqueue to new workqueue...")
 				queue <- b
 			default:
+				ln("workqueue is already drained")
 				drained = true
 			}
 		}

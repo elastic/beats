@@ -91,9 +91,9 @@ func (w *worker) close() {
 	w.closed.Store(true)
 	w.lf("w.inflight == nil: %#v\n", w.inflight == nil)
 	if w.inflight != nil {
-		w.ln("waiting for inflight events to drain")
+		w.ln("waiting for inflight events to publish")
 		<-w.inflight
-		w.ln("inflight events drained")
+		w.ln("inflight events published")
 	}
 }
 
@@ -103,6 +103,9 @@ func (w *clientWorker) Close() error {
 }
 
 func (w *clientWorker) run() {
+	defer func() {
+		w.ln("clientWorker closed")
+	}()
 	for !w.closed.Load() {
 		for batch := range w.qu {
 			if w.closed.Load() {
@@ -128,7 +131,6 @@ func (w *clientWorker) run() {
 			close(w.inflight)
 		}
 	}
-	w.ln("clientWorker closed")
 }
 
 func (w *netClientWorker) Close() error {
