@@ -152,7 +152,6 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	log.Debug("start pipeline event consumer")
 
 	var (
-		oid    uint
 		out    workQueue
 		batch  *Batch
 		paused = true
@@ -173,7 +172,6 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		paused = c.paused()
 		if !paused && c.out != nil && batch != nil {
 			out = c.out.workQueue
-			oid = c.out.id
 		} else if paused && c.out != nil && batch != nil {
 			lf("paused but have batch of %v events\n", len(batch.events))
 			//batch.Cancelled()
@@ -186,7 +184,6 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	for {
 		if !paused && c.out != nil && consumer != nil && batch == nil {
 			out = c.out.workQueue
-			oid = c.out.id
 			queueBatch, err := consumer.Get(c.out.batchSize)
 			if err != nil {
 				out = nil
@@ -223,7 +220,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 			handleSignal(sig)
 		case out <- batch:
 			if batch != nil {
-				lf("in event consumer: sent batch of %v events to output workQueue (worker ID = %v)\n", len(batch.Events()), oid)
+				lf("in event consumer: sent batch of %v events to output workQueue\n", len(batch.Events()))
 			}
 			batch = nil
 		}

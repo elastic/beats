@@ -86,8 +86,8 @@ func newOutputController(
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
-	c.continueConsumer()
-
+	ln("starting consumer...")
+	c.consumer.sigContinue()
 	return c
 }
 
@@ -114,12 +114,13 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	// update consumer and retryer
 	// close old group, so events are send to new workQueue via retryer
-	c.pauseConsumer()
-	if c.out != nil {
-		for range c.out.outputs {
-			c.retryer.sigOutputRemoved()
-		}
-	}
+	ln("pausing consumer...")
+	c.consumer.sigPause()
+	//if c.out != nil {
+	//	for range c.out.outputs {
+	//		c.retryer.sigOutputRemoved()
+	//	}
+	//}
 
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
@@ -135,12 +136,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		timeToLive: outGrp.Retry + 1,
 		batchSize:  outGrp.BatchSize,
 	}
-
-	c.retryer.updOutput(queue)
-	for range clients {
-		c.retryer.sigOutputAdded()
-	}
-	c.consumer.updOutput(grp)
 
 	// close old group, so events are send to new workQueue via retryer
 	if c.out != nil {
@@ -159,10 +154,26 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		}
 	}
 
+	// update consumer and retryer
+	//ln("pausing consumer...")
+	//c.consumer.sigPause()
+	if c.out != nil {
+		for range c.out.outputs {
+			c.retryer.sigOutputRemoved()
+		}
+	}
+
+	c.retryer.updOutput(queue)
+	for range clients {
+		c.retryer.sigOutputAdded()
+	}
+	c.consumer.updOutput(grp)
+
 	c.out = grp
 
 	// restart consumer (potentially blocked by retryer)
-	c.continueConsumer()
+	ln("continuing consumer...")
+	c.consumer.sigContinue()
 
 	c.observer.updateOutputGroup()
 }
@@ -195,14 +206,4 @@ func (c *outputController) Reload(
 	c.Set(output)
 
 	return nil
-}
-
-func (c *outputController) pauseConsumer() {
-	ln("pausing consumer...")
-	c.consumer.sigPause()
-}
-
-func (c *outputController) continueConsumer() {
-	ln("continuing consumer...")
-	c.consumer.sigContinue()
 }

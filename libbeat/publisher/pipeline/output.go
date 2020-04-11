@@ -108,16 +108,17 @@ func (w *clientWorker) run() {
 	}()
 	for !w.closed.Load() {
 		for batch := range w.qu {
+			if batch == nil {
+				continue
+			}
+
+			w.lf("received batch of %v events\n", len(batch.events))
 			if w.closed.Load() {
 				if batch != nil {
 					w.lf("canceling batch of %v events\n", len(batch.events))
 					batch.Cancelled()
 				}
 				return
-			}
-
-			if batch == nil {
-				continue
 			}
 
 			w.observer.outBatchSend(len(batch.events))

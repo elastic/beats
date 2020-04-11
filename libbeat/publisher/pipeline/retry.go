@@ -213,7 +213,11 @@ func (r *retryer) loop() {
 }
 
 func blockConsumer(numOutputs, numBatches int) bool {
-	return numBatches/3 >= numOutputs
+	block := numBatches/3 >= numOutputs
+	if block {
+		lf("in retry: blocking consumer: numBatches/3 = %v, numOutputs = %v\n", numBatches/3, numOutputs)
+	}
+	return block
 }
 
 func decBatch(batch *Batch) {
