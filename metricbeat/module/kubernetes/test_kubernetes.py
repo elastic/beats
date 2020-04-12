@@ -90,36 +90,6 @@ spec:
       nodePort: 30808
 """
 
-RESOURCE_QUOTA_MANIFEST = """\
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: object-counts
-spec:
-  hard:
-    configmaps: "99"
-"""
-
-CRONJOB_MANIFEST = """\
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: basic-cronjob
-spec:
-  schedule: "* * * * *"
-  jobTemplate:
-    spec:
-      template:
-        metadata:
-          name: basic-job
-        spec:
-          containers:
-          - name: hello
-            image: alpine:3
-            command: ["sh", "-c", "echo Hello!"]
-          restartPolicy: Never
-"""
-
 STS_MANIFEST = """\
 apiVersion: apps/v1
 kind: StatefulSet
@@ -155,6 +125,58 @@ spec:
           storage: 1Mi 
 """
 
+DEPLOYMENT_MANIFEST = """\
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-deployment
+  labels:
+    app: basic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: basic-deployment
+  template:
+    metadata:
+      labels:
+        app: basic-deployment
+    spec:
+      containers:
+      - name: sh
+        image: alpine:3
+        command: ["sh", "-c", "sleep infinity"]
+"""
+
+CRONJOB_MANIFEST = """\
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: basic-cronjob
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: basic-job
+        spec:
+          containers:
+          - name: hello
+            image: alpine:3
+            command: ["sh", "-c", "echo Hello!"]
+          restartPolicy: Never
+"""
+
+RESOURCE_QUOTA_MANIFEST = """\
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+spec:
+  hard:
+    configmaps: "99"
+"""
 
 class Test(metricbeat.BaseTest, KindMixin):
 
@@ -176,7 +198,8 @@ class Test(metricbeat.BaseTest, KindMixin):
                 cls.kind_kubectl(cls.build_path, ["apply", "-f", "-"], input=STS_MANIFEST)
                 cls.kind_kubectl(cls.build_path, ["wait", "--timeout=300s",
                                                   "--for=condition=available", "deployment/kube-state-metrics"])
-                cls.kind_kubectl(cls.build_path, ["rollout", "status", "--timeout=300s", "sts/basic-sts"])
+                cls.kind_kubectl(cls.build_path, ["wait", "--timeout=300s",
+                                                  "--for=condition=ready", "pod/basic-sts-0"])
             except:
                 cls.kind_delete_cluster(cls.build_path)
                 raise
@@ -208,11 +231,40 @@ class Test(metricbeat.BaseTest, KindMixin):
         """ Kubernetes kubelet controllermanager metricset tests """
         self._test_metricset('controllermanager', KUBERNETES_FIELDS, self.kind_kubelet_hosts())
 
-    # Still not working.
-    # @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
-    # def test_kubelet_event(self):
+    # TODO: Get working.
+    #@unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
+    #def test_kubelet_event(self):
     #    """ Kubernetes kubelet event metricset tests """
-    #    self._test_metricset('event', KUBERNETES_FIELDS, self.kind_kubelet_hosts())
+    #    # This test needs to create some events after starting metricbeat, as it will only capture events
+    #    # that occur from the point in time that it was started.
+    #    self.render_config_template(modules=[{
+    #        "name": "kubernetes",
+    #        "enabled": "true",
+    #        "metricsets": ["event"],
+    #        "hosts": self.kind_kubelet_hosts(),
+    #        "period": "5s",
+    #        "extras": {
+    #            "kube_config": self.kind_kubecfg_path(self.build_path),
+    #            "add_metadata": "false",
+    #        },
+    #    }])
+    #    proc = self.start_beat()
+
+    #    # Add the cronjob to create events and wait until an event is captured.
+    #    with self.kind_kubectl_with_manifest(self.build_path, DEPLOYMENT_MANIFEST):
+    #        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
+    #        proc.check_kill_and_wait()
+
+    #    # Ensure no errors or warnings exist in the log.
+    #    self.assert_no_logged_warnings()
+
+    #    output = self.read_output_json()
+    #    self.assertTrue(len(output) > 0)
+    #    evt = output[0]
+
+    #    self.assertCountEqual(self.de_dot(KUBERNETES_FIELDS), evt.keys(), evt)
+
+    #    self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
     def test_kubelet_node(self):
@@ -239,11 +291,11 @@ class Test(metricbeat.BaseTest, KindMixin):
         """ Kubernetes kubelet system metricset tests """
         self._test_metricset('system', KUBERNETES_FIELDS, self.kind_kubelet_hosts())
 
-    # Still not working.
-    # @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
-    # def test_kubelet_volume(self):
-    #    """ Kubernetes kubelet volume metricset tests """
-    #    self._test_metricset('volume', KUBERNETES_FIELDS, self.kind_kubelet_hosts())
+    @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_kubelet_volume(self):
+       """ Kubernetes kubelet volume metricset tests """
+       # Default timeout of 10s is too short for notice of volumes.
+       self._test_metricset('volume', KUBERNETES_FIELDS, self.kind_kubelet_hosts(), max_timeout=25)
 
     @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
     def test_state_container(self):
@@ -286,12 +338,11 @@ class Test(metricbeat.BaseTest, KindMixin):
         """ Kubernetes state replicaset metricset tests """
         self._test_metricset('state_replicaset', KUBERNETES_FIELDS, self.kube_state_metrics_hosts())
 
-    # Still not working.
-    # @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
-    # def test_state_resourcequote(self):
-    #    """ Kubernetes state resourcequote metricset tests """
-    #    with self.kind_kubectl_with_manifest(self.build_path, RESOURCE_QUOTA_MANIFEST):
-    #        self._test_metricset('state_resourcequote', KUBERNETES_FIELDS, self.kube_state_metrics_hosts())
+    @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_state_resourcequota(self):
+       """ Kubernetes state resourcequota metricset tests """
+       with self.kind_kubectl_with_manifest(self.build_path, RESOURCE_QUOTA_MANIFEST):
+           self._test_metricset('state_resourcequota', KUBERNETES_FIELDS, self.kube_state_metrics_hosts())
 
     @unittest.skipUnless(KindMixin.kind_available() and metricbeat.INTEGRATION_TESTS, "integration test")
     def test_state_service(self):
@@ -308,7 +359,7 @@ class Test(metricbeat.BaseTest, KindMixin):
         """ Kubernetes state storageclass metricset tests """
         self._test_metricset('state_storageclass', KUBERNETES_FIELDS, self.kube_state_metrics_hosts())
 
-    def _test_metricset(self, metricset, fields, hosts):
+    def _test_metricset(self, metricset, fields, hosts, max_timeout=10):
         self.render_config_template(modules=[{
             "name": "kubernetes",
             "enabled": "true",
@@ -317,11 +368,11 @@ class Test(metricbeat.BaseTest, KindMixin):
             "period": "5s",
             "extras": {
                 "add_metadata": "false",
-            }
+            },
         }])
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=max_timeout)
         proc.check_kill_and_wait()
 
         # Ensure no errors or warnings exist in the log.

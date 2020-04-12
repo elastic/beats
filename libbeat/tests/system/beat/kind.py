@@ -86,18 +86,22 @@ class KindMixin(object):
         return os.path.join(workdir, "kubecfg")
 
     @classmethod
-    def kind_kubectl(cls, build_path, args, check=True, input=None):
-        """Execute kubectl against the kind cluster."""
+    def kind_kubectl(cls, build_path, args, capture_output=False, check=True, input=None):
+        """
+        Execute kubectl against the kind cluster.
+        """
         if input is not None:
             input = input.encode("utf-8")
         kubecfg_path = cls.kind_kubecfg_path(build_path)
         args = ["kubectl", "--kubeconfig", kubecfg_path] + args
-        subprocess.run(args, check=check, input=input)
+        return subprocess.run(args, capture_output=capture_output, check=check, input=input)
 
     @classmethod
     @contextlib.contextmanager
     def kind_kubectl_with_manifest(cls, build_path, manifest):
-        """Runs with the manifest applied then deletes it."""
+        """
+        Runs with the manifest applied then deletes it.
+        """
         cls.kind_kubectl(cls.build_path, ["apply", "-f", "-"], input=manifest)
         try:
             yield
