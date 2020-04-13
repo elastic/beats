@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"testing/quick"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,72 +43,78 @@ func TestOutputReload(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			//seedPRNG(t)
+			seedPRNG(t)
 
-			numEventsToPublish := uint(20000)
-			numOutputReloads := uint(500)
+			err := quick.Check(func(q uint) bool {
+				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
+				numOutputReloads := 350 + (q % 150)     // 350 to 499
 
-			queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-				return memqueue.NewQueue(
-					logp.L(),
-					memqueue.Settings{
-						ACKListener: ackListener,
-						Events:      int(numEventsToPublish),
-					}), nil
-			}
-
-			var publishedCount atomic.Uint
-			countingPublishFn := func(batch publisher.Batch) error {
-				publishedCount.Add(uint(len(batch.Events())))
-				lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
-				return nil
-			}
-
-			pipeline, err := New(
-				beat.Info{},
-				Monitors{},
-				queueFactory,
-				outputs.Group{},
-				Settings{},
-			)
-			require.NoError(t, err)
-			defer pipeline.Close()
-
-			pipelineClient, err := pipeline.Connect()
-			require.NoError(t, err)
-			defer pipelineClient.Close()
-
-			var wg sync.WaitGroup
-			wg.Add(1)
-			go func() {
-				for i := uint(0); i < numEventsToPublish; i++ {
-					pipelineClient.Publish(beat.Event{})
+				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+					return memqueue.NewQueue(
+						logp.L(),
+						memqueue.Settings{
+							ACKListener: ackListener,
+							Events:      int(numEventsToPublish),
+						}), nil
 				}
-				wg.Done()
-			}()
 
-			for i := uint(0); i < numOutputReloads; i++ {
-				outputClient := ctor(countingPublishFn)
-				out := outputs.Group{
-					Clients: []outputs.Client{outputClient},
+				var publishedCount atomic.Uint
+				countingPublishFn := func(batch publisher.Batch) error {
+					publishedCount.Add(uint(len(batch.Events())))
+					lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
+					return nil
 				}
-				lf("in test code: reloading output...")
-				pipeline.output.Set(out)
-			}
 
-			wg.Wait()
-
-			timeout := 5 * time.Second
-			success := waitUntilTrue(timeout, func() bool {
-				return uint(numEventsToPublish) == publishedCount.Load()
-			})
-			if !success {
-				fmt.Printf(
-					"numOutputReloads = %v, numEventsToPublish = %v, publishedCounted = %v\n",
-					numOutputReloads, numEventsToPublish, publishedCount.Load(),
+				pipeline, err := New(
+					beat.Info{},
+					Monitors{},
+					queueFactory,
+					outputs.Group{},
+					Settings{},
 				)
+				require.NoError(t, err)
+				defer pipeline.Close()
+
+				pipelineClient, err := pipeline.Connect()
+				require.NoError(t, err)
+				defer pipelineClient.Close()
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				go func() {
+					for i := uint(0); i < numEventsToPublish; i++ {
+						pipelineClient.Publish(beat.Event{})
+					}
+					wg.Done()
+				}()
+
+				for i := uint(0); i < numOutputReloads; i++ {
+					outputClient := ctor(countingPublishFn)
+					out := outputs.Group{
+						Clients: []outputs.Client{outputClient},
+					}
+					lf("in test code: reloading output...")
+					pipeline.output.Set(out)
+				}
+
+				wg.Wait()
+
+				timeout := 20 * time.Second
+				success := waitUntilTrue(timeout, func() bool {
+					return uint(numEventsToPublish) == publishedCount.Load()
+				})
+				if !success {
+					fmt.Printf(
+						"numOutputReloads = %v, numEventsToPublish = %v, publishedCounted = %v\n",
+						numOutputReloads, numEventsToPublish, publishedCount.Load(),
+					)
+				}
+				return success
+			}, &quick.Config{MaxCount: 25})
+
+			if err != nil {
+				t.Error(err)
 			}
-			require.True(t, success)
 		})
 	}
 }
