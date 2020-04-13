@@ -18,19 +18,88 @@
 package dialchain
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"math/big"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// Tests for the non-cert fields
 func TestAddTLSMetadata(t *testing.T) {
+	// We always test with this one cert because addCertificateMetadata
+	// is tested in detail elsewhere
+	certs := []*x509.Certificate{parseCert(t, elasticCert)}
+	certMetadata := common.MapStr{}
+	addCertMetadata(certMetadata, certs)
 
+	scenarios := []struct {
+		name      string
+		connState tls.ConnectionState
+		duration  time.Duration
+		expected  common.MapStr
+	}{
+		{
+			"simple TLSv1.1",
+			tls.ConnectionState{
+				Version:           tls.VersionTLS11,
+				HandshakeComplete: true,
+				PeerCertificates:  certs,
+				CipherSuite:       tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+				ServerName:        "example.net",
+			},
+			time.Duration(1),
+			common.MapStr{
+				"established":      true,
+				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"version_protocol": "tls",
+				"version":          "1.1",
+				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
+			},
+		},
+		{
+			"TLSv1.2 with next_protocol",
+			tls.ConnectionState{
+				Version:            tls.VersionTLS12,
+				HandshakeComplete:  true,
+				PeerCertificates:   certs,
+				CipherSuite:        tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+				ServerName:         "example.net",
+				NegotiatedProtocol: "h2",
+			},
+			time.Duration(1),
+			common.MapStr{
+				"established":      true,
+				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"version_protocol": "tls",
+				"version":          "1.2",
+				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
+				"next_protocol":    "h2",
+			},
+		},
+	}
+
+	for _, s := range scenarios {
+		t.Run(s.name, func(t *testing.T) {
+			// Nest under the TLS namespace to match actual output
+			expected := common.MapStr{"tls": s.expected}
+
+			// Always add in the cert metadata since we test that in other test funcs, not here
+			expected.DeepUpdate(certMetadata)
+
+			fields := common.MapStr{}
+			addTLSMetadata(fields, s.connState, s.duration)
+			require.Equal(t, expected, fields)
+		})
+	}
 }
 
 func TestAddCertMetadata(t *testing.T) {
@@ -56,8 +125,8 @@ func TestAddCertMetadata(t *testing.T) {
 		},
 	}
 
-	scenarios := []struct{
-		name string
+	scenarios := []struct {
+		name  string
 		certs []*x509.Certificate
 	}{
 		{

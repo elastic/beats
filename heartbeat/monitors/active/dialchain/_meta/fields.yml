@@ -34,10 +34,12 @@
       fields:
         - name: certificate_not_valid_before
           type: date
-          description: Earliest time at which the connection's certificates are valid.
+          deprecated: 7.8.0
+          description: Deprecated in favor of `tls.server.not_before`. Earliest time at which the connection's certificates are valid.
         - name: certificate_not_valid_after
+          deprecated: 7.8.0
           type: date
-          description: Latest time at which the connection's certificates are valid.
+          description: Deprecated in favor of `tls.server.not_after`. Latest time at which the connection's certificates are valid.
         - name: rtt
           type: group
           description: >

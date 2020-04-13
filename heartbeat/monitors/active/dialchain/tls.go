@@ -23,9 +23,10 @@ import (
 	cryptoTLS "crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/look"
 	"net"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/look"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
