@@ -76,7 +76,7 @@ processors:
           - name: deviceExternalId
             to: observer.type
 
-            # Product Family
+            # Product Family (override deviceExternalId if present).
           - name: deviceFacility
             to: observer.type
             convert:
@@ -140,7 +140,7 @@ processors:
           - name: deviceCustomNumber1
             labels:
               payload: network.bytes
-              elapsed time in seconds: host.uptime
+              elapsed time in seconds: event.duration
               email recipients number: checkpoint.email_recipients_num
 
           - name: deviceCustomNumber2
@@ -176,7 +176,7 @@ processors:
 
           - name: deviceCustomString6
             labels:
-              application name: process.name
+              application name: network.application
               virus name: checkpoint.virus_name
               malware name: checkpoint.spyware_name
               malware family: checkpoint.malware_family
