@@ -180,7 +180,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
 - Add Storage metricsets to GCP module. {pull}15598[15598]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
-- Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
+- Add PubSub metricset to Google Cloud Platform module. {pull}15536[15536]
 
 *Winlogbeat*
 
