@@ -5472,6 +5472,26 @@ type: long
 
 --
 
+*`checkpoint.sys_message`*::
++
+--
+System messages
+
+
+type: keyword
+
+--
+
+*`checkpoint.logid`*::
++
+--
+System messages
+
+
+type: keyword
+
+--
+
 *`checkpoint.failure_impact`*::
 +
 --
@@ -5832,6 +5852,46 @@ type: keyword
 
 --
 
+*`checkpoint.audit_status`*::
++
+--
+Audit Status. Can be Success or Failure.
+
+
+type: keyword
+
+--
+
+*`checkpoint.objecttable`*::
++
+--
+Table of affected objects.
+
+
+type: keyword
+
+--
+
+*`checkpoint.objecttype`*::
++
+--
+The type of the affected object.
+
+
+type: keyword
+
+--
+
+*`checkpoint.operation_number`*::
++
+--
+The operation nuber.
+
+
+type: keyword
+
+--
+
 *`checkpoint.email_recipients_num`*::
 +
 --
@@ -5868,7 +5928,7 @@ type: keyword
 Ok/Warning/Error.
 
 
-type: integer
+type: keyword
 
 --
 
@@ -7258,7 +7318,7 @@ type: keyword
 HTTP session-id.
 
 
-type: integer
+type: keyword
 
 --
 

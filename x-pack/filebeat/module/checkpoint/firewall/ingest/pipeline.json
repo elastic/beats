@@ -40,12 +40,18 @@
           "syslog5424_msgid",
           "syslog5424_pri",
           "syslog5424_proc",
-          "syslog5424_ts",
           "syslog5424_ver",
           "message",
           "host"
         ],
         "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "@timestamp",
+        "value": "{{syslog5424_ts}}",
+        "if": "ctx.checkpoint?.time == null"
       }
     },
     {
@@ -950,7 +956,7 @@
           "checkpoint.product", "checkpoint.uid", "checkpoint.administrator", 
           "checkpoint.dst", "checkpoint.src", "checkpoint.service", "checkpoint.s_port", 
           "checkpoint.ifname", "checkpoint.xlatesrc", "checkpoint.xlatedst", "checkpoint.xlatedport",
-          "checkpoint.xlatesport", "checkpoint.client_ip"
+          "checkpoint.xlatesport", "checkpoint.client_ip", "syslog5424_ts"
         ],
         "ignore_missing": true
       }

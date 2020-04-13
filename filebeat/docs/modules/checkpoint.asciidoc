@@ -50,6 +50,14 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
 
+[float]
+==== Check Point devices
+
+This module will parse Check Point Syslog data as documented in:
+https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk144192[Checkpoint Log Fields Description.]
+
+Check Point Syslog extensions are mapped as follows:
+[options="header"]
 
 :modulename!:
 
