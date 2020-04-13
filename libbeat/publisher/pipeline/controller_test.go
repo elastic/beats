@@ -36,8 +36,8 @@ import (
 
 func TestOutputReload(t *testing.T) {
 	tests := map[string]func(mockPublishFn) outputs.Client{
-		"client": newMockClient,
-		//"network_client": newMockNetworkClient,
+		"client":         newMockClient,
+		"network_client": newMockNetworkClient,
 	}
 
 	for name, ctor := range tests {
