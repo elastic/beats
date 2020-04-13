@@ -1,0 +1,61 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-checkpoint]]
+[role="xpack"]
+
+
+:modulename: checkpoint
+:has-dashboards: false
+
+== Checkpoint module
+
+This is a module for Checkpoint firewall logs. It supports logs from the Log Exporter in the Syslog format.
+
+include::../include/gs-link.asciidoc[]
+
+
+[float]
+=== Compatibility
+
+This module has been tested against Checkpoint Log Exporter on R80.X but should also work with R77.30.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: firewall
+
+include::../include/config-option-intro.asciidoc[]
+
+==== `firewall` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: checkpoint
+  firewall:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9001.
+
+
+:modulename!:
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-checkpoint,exported fields>> section.
+
