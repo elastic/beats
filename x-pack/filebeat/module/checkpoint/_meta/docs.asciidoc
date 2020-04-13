@@ -23,6 +23,7 @@ include::../include/configuring-intro.asciidoc[]
 
 include::../include/config-option-intro.asciidoc[]
 
+[float]
 ==== `firewall` fileset settings
 
 Example config:
