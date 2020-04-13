@@ -18,6 +18,7 @@
 package dissect
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -231,4 +232,69 @@ func TestErrorFlagging(t *testing.T) {
 		_, err = event.GetValue(beat.FlagField)
 		assert.Error(t, err)
 	})
+}
+
+func TestIgnoreFailure(t *testing.T) {
+	tests := []struct {
+		name  string
+		c     map[string]interface{}
+		msg   string
+		err   error
+		flags bool
+	}{
+		{
+			name:  "default is to fail",
+			c:     map[string]interface{}{"tokenizer": "hello %{key}"},
+			msg:   "something completely different",
+			err:   errors.New("could not find beginning delimiter: `hello ` in remaining: `something completely different`, (offset: 0)"),
+			flags: true,
+		},
+		{
+			name: "ignore_failure is a noop on success",
+			c:    map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			msg:  "hello world",
+		},
+		{
+			name:  "ignore_failure hides the error but maintains flags",
+			c:     map[string]interface{}{"tokenizer": "hello %{key}", "ignore_failure": true},
+			msg:   "something completely different",
+			flags: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: common.MapStr{"message": test.msg}}
+			event, err := processor.Run(&e)
+			if test.err == nil {
+				if !assert.NoError(t, err) {
+					return
+				}
+			} else {
+				if !assert.EqualError(t, err, test.err.Error()) {
+					return
+				}
+			}
+			flags, err := event.GetValue(beat.FlagField)
+			if test.flags {
+				if !assert.NoError(t, err) || !assert.Contains(t, flags, flagParsingError) {
+					return
+				}
+			} else {
+				if !assert.Error(t, err) {
+					return
+				}
+			}
+		})
+	}
 }

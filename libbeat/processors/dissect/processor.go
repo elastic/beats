@@ -72,7 +72,9 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		); err != nil {
 			return event, errors.Wrap(err, "cannot add new flag the event")
 		}
-
+		if p.config.IgnoreFailure {
+			return event, nil
+		}
 		return event, err
 	}
 

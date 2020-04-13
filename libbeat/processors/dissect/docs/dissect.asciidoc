@@ -14,6 +14,7 @@ processors:
       tokenizer: "%{key1} %{key2}"
       field: "message"
       target_prefix: "dissect"
+      ignore_failure: false
 -------
 
 The `dissect` processor has the following configuration settings:
@@ -26,6 +27,11 @@ The `dissect` processor has the following configuration settings:
 string is defined, the processor will create the keys at the root of the event. Default is
 `dissect`. When the target key already exists in the event, the processor won't replace it and log
 an error; you need to either drop or rename the key before using dissect.
+
+`ignore_failure`:: (Optional) Flag to control whether the processor returns an error if the
+tokenizer fails to match the message field. If set to true, the processor will silently restore
+the original event, allowing execution of subsequent processors (if any). If set to false
+(default), the processor will log an error, preventing execution of other processors.
 
 For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
 found an error will be logged and no modification is done on the original event.
