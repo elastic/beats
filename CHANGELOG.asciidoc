@@ -109,7 +109,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 - Add Filebeat Okta module. {pull}16362[16362]
-- Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
+- Improve AWS cloudtrail field mappings. {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 
 *Heartbeat*
 
