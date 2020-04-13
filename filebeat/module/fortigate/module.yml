@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-fortigate-fortios-Dashboard
+  file: Filebeat-fortigate-fortios.json

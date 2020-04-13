@@ -1,0 +1,9 @@
+- key: fortigate
+  title: "fortigate"
+  description: >
+    fortigate Module
+  fields:
+    - name: fortigate
+      type: group
+      description: >
+      fields:

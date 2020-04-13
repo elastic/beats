@@ -1,0 +1,300 @@
+description: "Pipeline for parsing fortigate fortios logs"
+processors:
+
+# keep message as log.original.
+ - rename:
+     field: message
+     target_field: log.original
+     ignore_missing: true
+
+# KV Filter for Fortios logs
+ - kv:
+    field: dissect.orgmessage
+    field_split : " "
+    value_split : "="
+    target_field: "_temp"
+    exclude_keys:
+          - dstcountry
+          - srccountry
+    trim_value: "\""
+    ignore_failure: true
+
+# Set @timestamp to the time when the entry was generated.
+ # FortiOS older version use logtime
+ - date:
+     if: "ctx._temp?.logtime != null"
+     field: "_temp.logtime"
+     formats:
+       - "UNIX"
+     ignore_failure: true
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+  # Some FortiOS use eventtime (Need to parse with js due to nano seconds)
+  #
+  # Process the flow duration "hh:mm:ss" present in some messages
+  # This will fill event.start, event.end and event.duration
+  #
+# - script:
+#     lang: painless
+#     if: 'ctx?.event?.sequence !=null'
+#     source: >
+#        ctx._temp.eventtimems = ctx.event.sequence / 100000;
+#     ignore_failure: true
+# Newer version of FortiOS Use Eventtime 
+ - date:
+     if: "ctx._temp?.eventtime != null"
+     field: "_temp.eventtime"
+     formats:
+       - "UNIX"
+     ignore_failure: true
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+
+# Remove System Events
+ - drop:
+     if: "ctx._temp?.subtype == 'system'"
+
+# Rename into ECS
+# for traffic log
+ - rename: { field: _temp.desc, ignore_missing: true, target_field: _temp.logdesc }
+ - rename: { field: _temp.dir, ignore_missing: true, target_field: _temp.direction } 
+ - rename: { field: _temp.date, ignore_missing: true, target_field: fortios.event.date }
+ - rename: { field: _temp.time, ignore_missing: true, target_field: fortios.event.time }
+ - rename: { field: _temp.logid, ignore_missing: true, target_field: event.id }
+ - rename: { field: _temp.type, ignore_missing: true, target_field: event.type }
+ - rename: { field: _temp.subtype, ignore_missing: true, target_field: event.category }
+ - rename: { field: _temp.level, ignore_missing: true, target_field: event.level }
+ - rename: { field: _temp.vd, ignore_missing: true, target_field: fortios.vd }
+ - rename: { field: _temp.eventtime, ignore_missing: true, target_field: event.sequence }
+ - rename: { field: _temp.srcip, ignore_missing: true, target_field: source.ip }
+ - rename: { field: _temp.srcport, ignore_missing: true, target_field: source.port }
+ - rename: { field: _temp.srcintf, ignore_missing: true, target_field: fortios.source.interface }
+ - rename: { field: _temp.srcintfrole, ignore_missing: true, target_field: fortios.source.interface_role }
+ - rename: { field: _temp.dstip, ignore_missing: true, target_field: destination.ip }
+ - rename: { field: _temp.dstport, ignore_missing: true, target_field: destination.port }
+ - rename: { field: _temp.dstintf, ignore_missing: true, target_field: fortios.destination.interface }
+ - rename: { field: _temp.dstintfrole, ignore_missing: true, target_field: fortios.destination.interface_role }
+ - rename: { field: _temp.srcuuid, ignore_missing: true, target_field: fortios.source.uuid }
+ - rename: { field: _temp.dstuuid, ignore_missing: true, target_field: fortios.destination.uuid }
+ - rename: { field: _temp.poluuid, ignore_missing: true, target_field: fortios.policy.uuid }
+ - rename: { field: _temp.sessionid, ignore_missing: true, target_field: event.sessionid }
+ - rename: { field: _temp.proto, ignore_missing: true, target_field: network.protocol_number }
+ - rename: { field: _temp.action, ignore_missing: true, target_field: event.action }
+ - rename: { field: _temp.policyid, ignore_missing: true, target_field: fortios.policy.id }
+ - rename: { field: _temp.policytype, ignore_missing: true, target_field: fortios.policy.type }
+ - rename: { field: _temp.service, ignore_missing: true, target_field: fortios.service }
+ - rename: { field: _temp.trandisp, ignore_missing: true, target_field: fortios.network.translation_type }
+ - rename: { field: _temp.transip, ignore_missing: true, target_field: source.nat.ip }
+ - rename: { field: _temp.transport, ignore_missing: true, target_field: source.nat.port }
+ - rename: { field: _temp.appid, ignore_missing: true, target_field: fortios.application.id }
+ - rename: { field: _temp.app, ignore_missing: true, target_field: fortios.application.name }
+ - rename: { field: _temp.appcat, ignore_missing: true, target_field: fortios.application.category }
+ - rename: { field: _temp.apprisk, ignore_missing: true, target_field: fortios.application.risk }
+ - rename: { field: _temp.applist, ignore_missing: true, target_field: fortios.application.list }
+ - rename: { field: _temp.duration, ignore_missing: true, target_field: event.duration }
+ - rename: { field: _temp.sentbyte, ignore_missing: true, target_field: source.bytes }
+ - rename: { field: _temp.rcvdbyte, ignore_missing: true, target_field: destination.bytes }
+ - rename: { field: _temp.sentpkt, ignore_missing: true, target_field: source.packets }
+ - rename: { field: _temp.rcvdpkt, ignore_missing: true, target_field: destination.packets }
+ - rename: { field: _temp.utmaction, ignore_missing: true, target_field: fortios.utm.action }
+ - rename: { field: _temp.countapp, ignore_missing: true, target_field: fortios.application.count }
+ - rename: { field: _temp.osname, ignore_missing: true, target_field: fortios.source.os }
+ - rename: { field: _temp.mastersrcmac, ignore_missing: true, target_field: fortios.master.source.mac }
+ - rename: { field: _temp.srcmac, ignore_missing: true, target_field: source.mac }
+ - rename: { field: _temp.srcserver, ignore_missing: true, target_field: fortios.source.server }
+ - rename: { field: _temp.utmref, ignore_missing: true, target_field: fortios.utm.reference }
+ - rename: { field: _temp.crscore, ignore_missing: true, target_field: fortios.client_reputation.score }
+ - rename: { field: _temp.craction, ignore_missing: true, target_field: fortios.client_reputation.action }
+ - rename: { field: _temp.sentdelta, ignore_missing: true, target_field: fortios.sentdelta }
+ - rename: { field: _temp.rcvddelta, ignore_missing: true, target_field: fortios.rcvddelta }
+ - rename: { field: _temp.logdesc, ignore_missing: true, target_field: fortios.log_description }
+ - rename: { field: _temp.sn, ignore_missing: true, target_field: fortios.serial_number }
+ - rename: { field: _temp.user, ignore_missing: true, target_field: fortios.user.name }
+ - rename: { field: _temp.ui, ignore_missing: true, target_field: fortios.user.interface }
+ - rename: { field: _temp.method, ignore_missing: true, target_field: fortios.method }
+ - rename: { field: _temp.status, ignore_missing: true, target_field: fortios.status }
+ - rename: { field: _temp.reason, ignore_missing: true, target_field: fortios.reason }
+ - rename: { field: _temp.profile, ignore_missing: true, target_field: fortios.profile }
+ - rename: { field: _temp.msg, ignore_missing: true, target_field: fortios.message }
+ - rename: { field: _temp.remip, ignore_missing: true, target_field: fortios.remote.ip }
+ - rename: { field: _temp.locip, ignore_missing: true, target_field: fortios.local.ip }
+ - rename: { field: _temp.remport, ignore_missing: true, target_field: fortios.remote.port }
+ - rename: { field: _temp.locport, ignore_missing: true, target_field: fortios.local.port } 
+ - rename: { field: _temp.outintf, ignore_missing: true, target_field: fortios.out_interface }
+ - rename: { field: _temp.cookies, ignore_missing: true, target_field: fortios.cookies }
+ - rename: { field: _temp.group, ignore_missing: true, target_field: fortios.user.group }
+ - rename: { field: _temp.xauthuser, ignore_missing: true, target_field: fortios.xauth.user }
+ - rename: { field: _temp.xauthgroup, ignore_missing: true, target_field: fortios.xauth.group }
+ - rename: { field: _temp.assignip, ignore_missing: true, target_field: fortios.assign.ip }
+ - rename: { field: _temp.vpntunnel, ignore_missing: true, target_field: fortios.vpn.tunnel }
+ - rename: { field: _temp.init, ignore_missing: true, target_field: fortios.init }
+ - rename: { field: _temp.mode, ignore_missing: true, target_field: fortios.mode }
+ - rename: { field: _temp.direction, ignore_missing: true, target_field: fortios.direction }
+ - rename: { field: _temp.stage, ignore_missing: true, target_field: fortios.stage }
+ - rename: { field: _temp.role, ignore_missing: true, target_field: fortios.role }
+ - rename: { field: _temp.result, ignore_missing: true, target_field: fortios.result }
+ - rename: { field: _temp.interface, ignore_missing: true, target_field: fortios.interface }
+ - rename: { field: _temp.authproto, ignore_missing: true, target_field: fortios.authproto }
+ - rename: { field: _temp.license_limit, ignore_missing: true, target_field: fortios.license_limit }
+ - rename: { field: _temp.used_for_type, ignore_missing: true, target_field: fortios.used_for_type }
+ - rename: { field: _temp.connection_type, ignore_missing: true, target_field: fortios.connection_type }
+ - rename: { field: _temp.ip, ignore_missing: true, target_field: fortios.ip }
+ - rename: { field: _temp.name, ignore_missing: true, target_field: fortios.name }
+ - rename: { field: _temp.fctuid, ignore_missing: true, target_field: fortios.fctuid }
+ - rename: { field: _temp.ha_role, ignore_missing: true, target_field: fortios.ha.role }
+ - rename: { field: _temp.vcluster, ignore_missing: true, target_field: fortios.vcluster.id }
+ - rename: { field: _temp.vcluster_state, ignore_missing: true, target_field: fortios.vcluster.state }
+ - rename: { field: _temp.vcluster_member, ignore_missing: true, target_field: fortios.vcluster.member }
+ - rename: { field: _temp.hostname, ignore_missing: true, target_field: fortios.hostname }
+ - rename: { field: _temp.ha_group, ignore_missing: true, target_field: fortios.ha.group }
+ - rename: { field: _temp.auditid, ignore_missing: true, target_field: fortios.audit.id }
+ - rename: { field: _temp.audittime, ignore_missing: true, target_field: fortios.audit.time }
+ - rename: { field: _temp.auditscore, ignore_missing: true, target_field: fortios.audit.score }
+ - rename: { field: _temp.criticalcount, ignore_missing: true, target_field: fortios.count.critical }
+ - rename: { field: _temp.highcount, ignore_missing: true, target_field: fortios.count.high }
+ - rename: { field: _temp.mediumcount, ignore_missing: true, target_field: fortios.count.medium }
+ - rename: { field: _temp.lowcount, ignore_missing: true, target_field: fortios.count.low }
+ - rename: { field: _temp.passedcount, ignore_missing: true, target_field: fortios.count.pass }
+ - rename: { field: _temp.alert, ignore_missing: true, target_field: fortios.alert }
+ - rename: { field: _temp.desc, ignore_missing: true, target_field: fortios.ssid }
+ - rename: { field: _temp.bssid, ignore_missing: true, target_field: fortios.bssid }
+ - rename: { field: _temp.aptype, ignore_missing: true, target_field: fortios.ap.type }
+ - rename: { field: _temp.rate, ignore_missing: true, target_field: fortios.rate }
+ - rename: { field: _temp.radioband, ignore_missing: true, target_field: fortios.radio_band }
+ - rename: { field: _temp.channel, ignore_missing: true, target_field: fortios.channel }
+ - rename: { field: _temp.manuf, ignore_missing: true, target_field: fortios.manufacturer_name }
+ - rename: { field: _temp.security, ignore_missing: true, target_field: fortios.security }
+ - rename: { field: _temp.encryption, ignore_missing: true, target_field: fortios.encryption_method }
+ - rename: { field: _temp.signal, ignore_missing: true, target_field: fortios.signal }
+ - rename: { field: _temp.noise, ignore_missing: true, target_field: fortios.noise }
+ - rename: { field: _temp.live, ignore_missing: true, target_field: fortios.live }
+ - rename: { field: _temp.age, ignore_missing: true, target_field: fortios.age }
+ - rename: { field: _temp.onwire, ignore_missing: true, target_field: fortios.onwire }
+ - rename: { field: _temp.detectionmethod, ignore_missing: true, target_field: fortios.detection_method }
+ - rename: { field: _temp.stamac, ignore_missing: true, target_field: fortios.stamac }
+ - rename: { field: _temp.apscan, ignore_missing: true, target_field: fortios.ap.scan }
+ - rename: { field: _temp.sndetected, ignore_missing: true, target_field: fortios.ap.sn.detected }
+ - rename: { field: _temp.radioiddetected, ignore_missing: true, target_field: fortios.ap.radioid.detected }
+ - rename: { field: _temp.stacount, ignore_missing: true, target_field: fortios.station_count }
+ - rename: { field: _temp.snclosest, ignore_missing: true, target_field: fortios.ap.sn.closest }
+ - rename: { field: _temp.radioidclosest, ignore_missing: true, target_field: fortios.ap.radioid.closest }
+ - rename: { field: _temp.apstatus, ignore_missing: true, target_field: fortios.ap.status }
+ - rename: { field: _temp.cfgobj, ignore_missing: true, target_field: fortios.cfgobj }
+ - rename: { field: _temp.addr, ignore_missing: true, target_field: fortios.address }
+ - rename: { field: _temp.cldobjid, ignore_missing: true, target_field: fortios.cldobjid }
+ - rename: { field: _temp.netid, ignore_missing: true, target_field: fortios.netid }
+ - rename: { field: _temp.imei, ignore_missing: true, target_field: fortios.imei }
+ - rename: { field: _temp.imsi, ignore_missing: true, target_field: fortios.imsi }
+ - rename: { field: _temp.iccid, ignore_missing: true, target_field: fortios.iccid }
+ - rename: { field: _temp.phonenumber, ignore_missing: true, target_field: fortios.phonenumber }
+ - rename: { field: _temp.carrier, ignore_missing: true, target_field: fortios.carrier }
+ - rename: { field: _temp.plan, ignore_missing: true, target_field: fortios.plan }
+ - rename: { field: _temp.apn, ignore_missing: true, target_field: fortios.apn }
+ - rename: { field: _temp.sinr, ignore_missing: true, target_field: fortios.sinr }
+ - rename: { field: _temp.rsrp, ignore_missing: true, target_field: fortios.rsrp }
+ - rename: { field: _temp.rsrq, ignore_missing: true, target_field: fortios.rsrq }
+ - rename: { field: _temp.signalstrength, ignore_missing: true, target_field: fortios.signal_trength }
+ - rename: { field: _temp.rssi, ignore_missing: true, target_field: fortios.rssi }
+ - rename: { field: _temp.temperature, ignore_missing: true, target_field: fortios.temperature }
+ - rename: { field: _temp.incidentserialno, ignore_missing: true, target_field: fortios.incident_serial_no }
+ - rename: { field: _temp.url, ignore_missing: true, target_field: url.original }
+ - rename: { field: _temp.attack, ignore_missing: true, target_field: fortios.attack.type }
+ - rename: { field: _temp.icmpid, ignore_missing: true, target_field: fortios.icmp.id }
+ - rename: { field: _temp.icmptype, ignore_missing: true, target_field: fortios.icmp.type }
+ - rename: { field: _temp.icmpcode, ignore_missing: true, target_field: fortios.icmp.code }
+ - rename: { field: _temp.attackid, ignore_missing: true, target_field: fortios.attack.id }
+ - rename: { field: _temp.ref, ignore_missing: true, target_field: http.request.referrer }
+ - rename: { field: _temp.countips, ignore_missing: true, target_field: fortios.count.ips }
+ - rename: { field: _temp.devtype, ignore_missing: true, target_field: fortios.device.type }
+ - rename: { field: _temp.devcategory, ignore_missing: true, target_field: fortios.device.category }
+ - rename: { field: _temp.filetype, ignore_missing: true, target_field: fortios.file.type }
+ - rename: { field: _temp.filename, ignore_missing: true, target_field: fortios.file.name }
+ - rename: { field: _temp.agent, ignore_missing: true, target_field: user_agent.original }
+ - rename: { field: _temp.filesize, ignore_missing: true, target_field: fortios.file.size }
+ - rename: { field: _temp.channeltype, ignore_missing: true, target_field: fortios.channel_type }
+ - rename: { field: _temp.countssh, ignore_missing: true, target_field: fortios.count.ssh }
+ - rename: { field: _temp.login, ignore_missing: true, target_field: fortios.login }
+ - rename: { field: _temp.filtername, ignore_missing: true, target_field: fortios.filter_name }
+ - rename: { field: _temp.certhash, ignore_missing: true, target_field: fortios.cert.hash }
+ - rename: { field: _temp.ipaddr, ignore_missing: true, target_field: fortios.ipaddress }
+
+
+# convert integer fields.
+ - convert: { type: long, ignore_missing: true, field: client.bytes }
+ - convert: { type: long, ignore_missing: true, field: client.packets }
+ - convert: { type: long, ignore_missing: true, field: client.port }
+ - convert: { type: long, ignore_missing: true, field: server.bytes }
+ - convert: { type: long, ignore_missing: true, field: server.packets }
+ - convert: { type: long, ignore_missing: true, field: server.port }
+ - convert: { type: long, ignore_missing: true, field: source.bytes }
+ - convert: { type: long, ignore_missing: true, field: source.packets }
+ - convert: { type: long, ignore_missing: true, field: source.port }
+ - convert: { type: long, ignore_missing: true, field: destination.bytes }
+ - convert: { type: long, ignore_missing: true, field: destination.packets }
+ - convert: { type: long, ignore_missing: true, field: destination.port }
+ - convert: { type: long, ignore_missing: true, field: network.bytes }
+ - convert: { type: long, ignore_missing: true, field: network.packets }
+ - convert: { type: long, ignore_missing: true, field: event.duration }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
+
+# User agent enrichment
+ - user_agent:
+    field: user_agent.original
+    ignore_missing: true
+# Geolocation for source.
+ - geoip:
+     if: 'ctx?.source?.ip != null'
+     field: source.ip
+     target_field: source.geo
+
+# Geolocation for destination.
+ - geoip:
+     if: 'ctx?.destination?.ip != null'
+     field: destination.ip
+     target_field: destination.geo
+
+# IP Autonomous System (AS) Lookup
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: source.ip
+     target_field: source.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: destination.ip
+     target_field: destination.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - rename:
+     field: source.as.asn
+     target_field: source.as.number
+     ignore_missing: true
+ - rename:
+     field: source.as.organization_name
+     target_field: source.as.organization.name
+     ignore_missing: true
+ - rename:
+     field: destination.as.asn
+     target_field: destination.as.number
+     ignore_missing: true
+ - rename:
+     field: destination.as.organization_name
+     target_field: destination.as.organization.name
+     ignore_missing: true
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"
+#Remove temp fields
+  - remove:
+      field:
+        - dissect.orgmessage
+        - log.original
+        - user_agent.original
+        # - _temp
+      ignore_missing: true

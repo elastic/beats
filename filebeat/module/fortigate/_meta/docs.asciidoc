@@ -1,0 +1,66 @@
+:modulename: fortigate
+:has-dashboards: true
+
+== Fortigate Firewall module
+
+This is a module for Fortinet Foritgate fortios firewall monitoring logs received
+over Syslog.
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+Tested on 5.6 To 6.4.0
+include::../include/configuring-intro.asciidoc[]
+
+The {plugins}/ingest-geoip.html[ingest-geoip]
+Elasticsearch plugin is required to run this module.
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via udp on port 9001. =
+
+:fileset_ex: fortios
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `fortios` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+  panos:
+    var.udp_host: 0.0.0.0
+    var.udp_port: 514
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.udp_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.udp_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9001`
+
+NOTE: Ports below 1024 require {beatname_uc} to run as root.
+
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

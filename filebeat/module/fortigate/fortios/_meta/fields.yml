@@ -1,0 +1,689 @@
+ - name: fortios
+   type: group
+   description: >
+     Fields for the Forigate FortiOS logs.
+   fields:
+    - name: event
+      type: group
+      description: >
+        Fortios Event Field.
+      fields:
+        - name: date
+          type: keyword
+          description: >
+            FortiOS Event Date.
+        - name: time
+          type: keyword
+          description: >
+            FortiOS Event Time.
+    - name: source
+      type: group
+      description: >
+        Fields to extend the top-level source object.
+      fields:
+        - name: interface
+          type: keyword
+          description: >
+            Source interface for this session.
+        - name: interface_role
+          type: keyword
+          description: >
+            Name of the source interface.
+        - name: uuid
+          type: keyword
+          description: >
+            UUID of the Source IP Address.
+        - name: os
+          type: keyword
+          description: >
+            OS of the source.
+        - name: server
+          type: keyword
+          description: >
+            Server of the source.         
+    - name: destination
+      type: group
+      description: >
+        Fields to extend the top-level destination object.
+      fields:
+        - name: interface
+          type: keyword
+          description: >
+            Destination interface for this session.
+        - name: interface_role
+          type: keyword
+          description: >
+            Name of the destination interface.
+        - name: uuid
+          type: keyword
+          description: >
+            UUID of the destination IP Address. 
+    - name: network
+      type: group
+      description: >
+        Fields to extend the top-level network object.
+      fields:
+        - name: translation_type
+          type: keyword
+          description: >
+            Protocol Tanslation Type.
+    - name: policy
+      type: group
+      description: >
+        Fields to extend the top-level policy object.
+      fields:
+        - name: uuid
+          type: keyword
+          description: >
+            UUID for the firewall policy.
+        - name: id
+          type: keyword
+          description: >
+            Name of the firewall policy governing the traffic which caused the log message.
+        - name: type
+          type: keyword
+          description: >
+            Policy Type.
+    - name: application
+      type: group
+      description: >
+        Fields to extend the top-level application object.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ID of the application. 
+        - name: name
+          type: keyword
+          description: >
+            Name of the application.
+        - name: category
+          type: keyword
+          description: >
+            Category of the application.
+        - name: risk
+          type: keyword
+          description: >
+            Risk level of the application.
+        - name: list
+          type: keyword
+          description: >
+            App List.
+        - name: count
+          type: keyword
+          description: >
+            Number of App Ctrl logs associated with the session.
+    - name: utm
+      type: group
+      description: >
+        Fields to extend the top-level utm object.
+      fields:
+        - name: action
+          type: keyword
+          description: >
+            Security action performed by UTM. 
+        - name: reference
+          type: keyword
+          description: >
+            UTM reference number.
+    - name: master
+      type: group
+      description: >
+        Fields to extend the top-level master object.
+      fields:
+        - name: source
+          type: group
+          description: >
+            Fields to extend the top-level master.source object.
+          fields:
+            - name: mac
+              type: keyword
+              description: >
+                The master MAC address for a host that has multiple network interfaces.
+    - name: client_reputation
+      type: group
+      description: >
+        Fields to extend the top-level client_reputation object.
+      fields:
+        - name: score
+          type: keyword
+          description: >
+            Client Reputation score. 
+        - name: action
+          type: keyword
+          description: >
+            Action performed by Client Reputation.
+    - name: user
+      type: group
+      description: >
+        Fields to extend the top-level user object.
+      fields:
+        - name: name  
+          type: keyword
+          description: >
+            User name. 
+        - name: interface
+          type: keyword
+          description: >
+            User Interface.
+        - name: group
+          type: keyword
+          description: >
+            User group.
+    - name: remote
+      type: group
+      description: >
+        Fields to extend the top-level remote object.
+      fields:
+        - name: ip  
+          type: ip
+          description: >
+            Remote IP. 
+        - name: port
+          type: long
+          description: >
+            Remote Port.
+    - name: local
+      type: group
+      description: >
+        Fields to extend the top-level local object.
+      fields:
+        - name: ip  
+          type: ip
+          description: >
+            Local IP. 
+        - name: port
+          type: long
+          description: >
+            Local Port.
+    - name: xauth
+      type: group
+      description: >
+        Fields to extend the top-level xauth object.
+      fields:
+        - name: user  
+          type: keyword
+          description: >
+            XAuth User Name. 
+        - name: group
+          type: keyword
+          description: >
+            XAuth Group Name.
+    - name: assign
+      type: group
+      description: >
+        Fields to extend the top-level assign object.
+      fields:
+        - name: user  
+          type: keyword
+          description: >
+            Assigned IP Address.
+    - name: vpn
+      type: group
+      description: >
+        Fields to extend the top-level vpn object.
+      fields:
+        - name: tunnel  
+          type: keyword
+          description: >
+            IPsec Vpn Tunnel Name.
+    - name: ha
+      type: group
+      description: >
+        Fields to extend the top-level ha object.
+      fields:
+        - name: role
+          type: keyword
+          description: >
+            The HA role in the cluster. 
+        - name: group
+          type: long
+          description: >
+            HA Group Number - can be 1 - 256. 
+    - name: audit
+      type: group
+      description: >
+        Fields to extend the top-level audit object.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Audit ID.
+        - name: time
+          type: keyword
+          description: >
+            Audit time.
+        - name: score
+          type: keyword
+          description: >
+            Audit score.
+    - name: count
+      type: group
+      description: >
+        Fields to extend the top-level count object.
+      fields:
+        - name: critical
+          type: keyword
+          description: >
+            Critical count.
+        - name: high
+          type: keyword
+          description: >
+            high count.
+        - name: medium
+          type: keyword
+          description: >
+            medium count.  
+        - name: low
+          type: keyword
+          description: >
+            low count.
+        - name: pass
+          type: keyword
+          description: >
+            pass count.
+        - name: ips
+          type: keyword
+          description: >
+            ips count.  
+        - name: ssh
+          type: keyword
+          description: >
+            ssh count.
+    - name: ap
+      type: group
+      description: >
+        Fields to extend the top-level ap object.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            AP Type.
+        - name: scan
+          type: keyword
+          description: >
+            The name of the AP, which scanned and detected the rogue AP.
+        - name: status
+          type: keyword
+          description: >
+            Access Point Status.  
+        - name: sn
+          type: group
+          description: >
+            Fields to extend the top-level sn object.
+          fields:
+            - name: detected
+              type: keyword
+              description: >
+                SN of the AP which detected the rogue AP.
+            - name: closest
+              type: keyword
+              description: >
+                SN of the AP closest to the rogue AP.  
+        - name: radioid
+          type: group
+          description: >
+            Fields to extend the top-level radioid object.
+          fields:
+            - name: detected
+              type: keyword
+              description: >
+                Radio ID on the AP which detected the rogue AP.
+            - name: closest
+              type: keyword
+              description: >
+                Radio ID on the AP closest the rogue AP.
+    - name: attack
+      type: group
+      description: >
+        Fields to extend the top-level attack object.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Attack ID.
+        - name: type
+          type: keyword
+          description: >
+            Attack type.
+    - name: icmp
+      type: group
+      description: >
+        Fields to extend the top-level icmp object.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ICMP ID.
+        - name: type
+          type: keyword
+          description: >
+            ICMP Type.
+        - name: code
+          type: keyword
+          description: >
+            ICMP code.
+    - name: device
+      type: group
+      description: >
+        Fields to extend the top-level device object.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            Device type.
+        - name: category
+          type: keyword
+          description: >
+            Device category.
+    - name: file
+      type: group
+      description: >
+        Fields to extend the top-level file object.
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            File type.
+        - name: name
+          type: keyword
+          description: >
+            File name.
+        - name: size
+          type: keyword
+          description: >
+            File size.
+    - name: vcluster
+      type: group
+      description: >
+        Fields to extend the top-level vcluster object.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            virtual cluster id.
+        - name: state
+          type: keyword
+          description: >
+             virtual cluster state.
+        - name: member
+          type: keyword
+          description: >
+            virtual cluster member.
+    - name: cert
+      type: group
+      description: >
+        Fields to extend the top-level cert object.
+      fields:
+        - name: hash
+          type: keyword
+          description: >
+            Certificate Hash.
+    - name: vd
+      type: keyword
+      description: >
+        Virtual Domain Name.
+    - name: service
+      type: keyword
+      description: >
+        Name of the service.
+    - name: sentdelta
+      type: keyword
+      description: >
+        sentdelta.
+    - name: rcvddelta
+      type: keyword
+      description: >
+        rcvddelta
+    - name: log_description
+      type: keyword
+      description: >
+        Log Description.  
+    - name: serial_number
+      type: keyword
+      description: >
+        Serial Number.
+    - name: method
+      type: keyword
+      description: >
+        Method.
+    - name: status
+      type: keyword
+      description: >
+        Status.
+    - name: reason
+      type: keyword
+      description: >
+        Reason.
+    - name: profile
+      type: keyword
+      description: >
+        Profile.
+    - name: message
+      type: keyword
+      description: >
+        Log Message
+    - name: out_interface
+      type: keyword
+      description: >
+        Out interface
+    - name: cookies
+      type: keyword
+      description: >
+        Cookie
+    - name: init
+      type: keyword
+      description: >
+        Init.
+    - name: mode
+      type: keyword
+      description: >
+        Mode.
+    - name: direction
+      type: keyword
+      description: >
+        Indicates message/packets direction.
+    - name: stage
+      type: keyword
+      description: >
+        Stage.
+    - name: role
+      type: keyword
+      description: >
+        Role.
+    - name: result
+      type: keyword
+      description: >
+        Result.
+    - name: interface
+      type: keyword
+      description: >
+        Interface.
+    - name: authproto
+      type: keyword
+      description: >
+        The protocol that initiated the authentication.
+    - name: license_limit
+      type: keyword
+      description: >
+        Maximum Number of FortiClients for the License.
+    - name: used_for_type
+      type: keyword
+      description: >
+        Connection for the type.
+    - name: connection_type
+      type: keyword
+      description: >
+        FortiClient Connection Type.
+    - name: ip
+      type: ip
+      description: >
+        IP.
+    - name: name
+      type: keyword
+      description: >
+        Name.
+    - name: fctuid
+      type: keyword
+      description: >
+        fctuid.
+    - name: hostname
+      type: keyword
+      description: >
+        hostname.
+    - name: alert
+      type: keyword
+      description: >
+        Alert.
+    - name: ssid
+      type: keyword
+      description: >
+        Service Set ID.
+    - name: bssid
+      type: keyword
+      description: >
+        Base Service Set ID.
+    - name: rate
+      type: keyword
+      description: >
+        Rate.
+    - name: radio_band
+      type: keyword
+      description: >
+        Radio Band.
+    - name: channel
+      type: keyword
+      description: >
+        Channel.
+    - name: manufacturer_name
+      type: keyword
+      description: >
+        Manufacturer name.
+    - name: security
+      type: keyword
+      description: >
+        Security.
+    - name: encryption_method
+      type: keyword
+      description: >
+        Encryption Method.
+    - name: signal
+      type: keyword
+      description: >
+        Signal.
+    - name: noise
+      type: keyword
+      description: >
+        Noise.
+    - name: live
+      type: keyword
+      description: >
+        time in seconds.
+    - name: age
+      type: keyword
+      description: >
+        time in seconds - time passed since last seen.
+    - name: onwire
+      type: keyword
+      description: >
+        A flag to indicate if the AP is onwire or not.
+    - name: detection_method
+      type: keyword
+      description: >
+        Detection Method.
+    - name: stamac
+      type: keyword
+      description: >
+        stamac.
+    - name: station_count
+      type: keyword
+      description: >
+        Number of stations/clients.
+    - name: cfgobj
+      type: keyword
+      description: >
+        configuration object.
+    - name: address
+      type: ip
+      description: >
+        IP Address.
+    - name: cldobjid
+      type: keyword
+      description: >
+        cldobjid.
+    - name: netid
+      type: keyword
+      description: >
+        netid.
+    - name: imei
+      type: keyword
+      description: >
+        International Mobile Equipment Identity.
+    - name: imsi
+      type: keyword
+      description: >
+        International mobile subscriber ID.
+    - name: iccid
+      type: keyword
+      description: >
+        Integrated Circuit Card Identifier.
+    - name: phonenumber
+      type: keyword
+      description: >
+        Phone number.
+    - name: carrier
+      type: keyword
+      description: >
+        The Carrier.
+    - name: plan
+      type: keyword
+      description: >
+        Plan.
+    - name: apn
+      type: keyword
+      description: >
+        Access Point Name.
+    - name: sinr
+      type: keyword
+      description: >
+        Signal-to-interference-plus-noise ratio.
+    - name: rsrp
+      type: keyword
+      description: >
+        Reference Signal Receive Power.
+    - name: rsrq
+      type: keyword
+      description: >
+        Reference Signal Received Quality.
+    - name: signal_trength
+      type: keyword
+      description: >
+        Signal strength.
+    - name: rssi
+      type: keyword
+      description: >
+        Received Signal Strength Indicator.
+    - name: temperature
+      type: keyword
+      description: >
+        temperature.
+    - name: incident_serial_no
+      type: keyword
+      description: >
+        Incident serial number.
+    - name: channel_type
+      type: keyword
+      description: >
+        Channel type.
+    - name: login
+      type: keyword
+      description: >
+        login.
+    - name: filter_name
+      type: keyword
+      description: >
+        DLP rule name.
+    - name: ipaddress
+      type: keyword
+      description: >
+        IP addresses from DNS response answer section.
