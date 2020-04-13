@@ -660,6 +660,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     deleteDir()
     unstash 'source'
     dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    // FIXME workaround untill we fix the packer cache
     sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
