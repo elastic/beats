@@ -887,7 +887,8 @@
       "rename" : {
         "field": "checkpoint.resource",
         "target_field": "url.original",
-        "ignore_missing": true
+        "ignore_missing": true,
+        "if": "ctx.url?.original == null"
       }
     },
     {
