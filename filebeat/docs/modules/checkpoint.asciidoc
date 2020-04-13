@@ -5,11 +5,12 @@ This file is generated! See scripts/docs_collector.py
 [[filebeat-module-checkpoint]]
 [role="xpack"]
 
-
 :modulename: checkpoint
 :has-dashboards: false
 
+
 == Checkpoint module
+beta[]
 
 This is a module for Checkpoint firewall logs. It supports logs from the Log Exporter in the Syslog format.
 
@@ -58,6 +59,27 @@ https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewso
 
 Check Point Syslog extensions are mapped as follows:
 [options="header"]
+|=======================================================================================================================
+| Check Point Fields         | CEF Label value             | ECS Fields               | Non-ECS Field                  |
+| cp_app_risk                | -                           | event.risk_score         | checkpoint.app_risk            |
+| cp_severity                | -                           | event.severity           | checkpoint.severity            |
+| baseEventCount             | -                           | -                        | checkpoint.event_count         |
+| deviceExternalId           | -                           | observer.type            | -                              |
+| deviceFacility             | -                           | observer.type            | -                              |
+| deviceInboundInterface     | -                           | observer.ingress.interface.name | -                       |
+| deviceOutboundInterface    | -                           | observer.egress.interface.name | -                        |
+| externalId                 | -                           | -                        | checkpoint.uuid                |
+| fileHash                   | -                           | file.hash.{md5,sha1}     | -                              |
+| reason                     | -                           | -                        | checkpoint.termination_reason  |
+| requestCookies             | -                           | -                        | checkpoint.cookie              |
+| sourceNtDomain             | -                           | dns.question.name        | -                              |
+| Signature                  | -                           | vulnerability.id         | -                              |
+| Recipient                  | -                           | destination.user.email   | -                              |
+| Sender                     | -                           | source.user.email        | -                              |
+| deviceCustomFloatingPoint1 | update version              | observer.version         | -                              |
+| deviceCustomIPv6Address2   | source ipv6 address         | source.ip                | -                              |
+| deviceCustomIPv6Address3   | destination ipv6 address    | destination.ip           | -                              |
+|=======================================================================================================================
 
 :modulename!:
 
