@@ -21,8 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -33,6 +31,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -113,12 +114,12 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
 	expected := common.MapStr{}
 	// This function is well tested independently, so we just test that things match up here.
-	dialchain.AddTLSMetadata(expected, tls.ConnectionState{
+	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
 		Version:           tls.VersionTLS13,
 		HandshakeComplete: true,
 		CipherSuite:       tls.TLS_AES_128_GCM_SHA256,
 		ServerName:        certificate.Subject.CommonName,
-		PeerCertificates: []*x509.Certificate{certificate},
+		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
 	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
