@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 )
 
 const (

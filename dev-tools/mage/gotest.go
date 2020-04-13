@@ -135,8 +135,15 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // This method executes integration tests for a single module at a time.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	return RunIntegTest("goIntegTest", func() error {
+		module := EnvOr("MODULE", "")
+		if module != "" {
+			err := GoTest(ctx, GoTestIntegrationArgsForModule(module))
+			return errors.Wrapf(err, "integration tests failed for module %s", module)
+		}
+
 		modulesFileInfo, err := ioutil.ReadDir("./module")
 		if err != nil {
 			return err
@@ -200,8 +207,13 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = io.MultiWriter(output, os.Stdout)
-	goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	goTest.Stdout = output
+	goTest.Stderr = output
+
+	if mg.Verbose() {
+		goTest.Stdout = io.MultiWriter(output, os.Stdout)
+		goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	}
 
 	// Execute 'go test' and measure duration.
 	start := time.Now()

@@ -21,10 +21,15 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
@@ -33,7 +38,7 @@ func init() {
 // Aliases provides compatibility with CI while we transition all Beats
 // to having common testing targets.
 var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
+	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -130,25 +135,6 @@ func Update() {
 		devtools.GenerateModuleIncludeListGo)
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-// Use TEST_TAGS=tag1,tag2 to add additional build tags.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
@@ -160,6 +146,7 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }

@@ -229,7 +229,12 @@ metricbeat.modules:
     - key: "dept"
       value: "eng"
   metricsets:
+    - elb
+    - natgateway
     - rds
+    - transitgateway
+    - usage
+    - vpn
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -333,11 +338,25 @@ metricbeat.modules:
   #xpack.enabled: false
 
 #--------------------------------- Ceph Module ---------------------------------
+# Metricsets depending on the Ceph REST API (default port: 5000)
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+# Metricsets depending on the Ceph Manager Daemon (default port: 8003)
+- module: ceph
+  metricsets:
+    - mgr_cluster_disk
+    - mgr_osd_perf
+    - mgr_pool_disk
+    - mgr_osd_pool_stats
+    - mgr_osd_tree
+  period: 1m
+  hosts: [ "https://localhost:8003" ]
+  #username: "user"
+  #password: "secret"
 
 #----------------------------- Cloudfoundry Module -----------------------------
 - module: cloudfoundry
@@ -482,6 +501,14 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
+
+- module: googlecloud
+  metricsets:
+    - storage
   region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -713,7 +740,7 @@ metricbeat.modules:
     - volume
   period: 10s
   enabled: true
-  hosts: ["https://${HOSTNAME}:10250"]
+  hosts: ["https://${NODE_NAME}:10250"]
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.verification_mode: "none"
   #ssl.certificate_authorities:
@@ -991,6 +1018,65 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
+#----------------------- Prometheus Typed Metrics Module -----------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  #use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  #rate_counters: true
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
+
 #------------------------------ Prometheus Module ------------------------------
 # Metrics collected from a Prometheus endpoint
 - module: prometheus
@@ -1009,15 +1095,42 @@ metricbeat.modules:
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+
 # Metrics sent by a Prometheus server using remote_write option
-- module: prometheus
-  metricsets: ["remote_write"]
-  host: "localhost"
-  port: "9201"
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
 
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
@@ -1423,6 +1536,16 @@ metricbeat.modules:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1841,7 +1964,7 @@ output.elasticsearch:
   # The service principal name.
   #kerberos.service_name: HTTP/my-service@realm
 
-  # Name of the Kerberos user. It is used when auth_type is set to password.
+  # Name of the Kerberos user.
   #kerberos.username: elastic
 
   # Password of the Kerberos user. It is used when auth_type is set to password.

@@ -119,6 +119,11 @@ See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
 
+[[cloudfoundry]]
+*cloudfoundry:*
+
+See <<running-on-cloudfoundry, Running on Cloud Foundry>> for deploying with Cloud Foundry.
+
 [[win]]
 *win:*
 

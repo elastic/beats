@@ -20,6 +20,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :ignores_max_retries:
 :has_docker_label_ex:
 :has_modules_command:
+:has_kubernetes_logs_path_matcher:
 :has_registry:
 :deb_os:
 :rpm_os:
@@ -27,6 +28,8 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :docker_platform:
 :win_os:
+
+:kubernetes_default_indexers: {docdir}/kubernetes-default-indexers-matchers.asciidoc
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 

@@ -66,6 +66,7 @@ grouped in the following categories:
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-prometheus>>
+* <<exported-fields-prometheus-xpack>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
@@ -1973,6 +1974,12 @@ type: integer
 
 
 [float]
+=== natgateway
+
+`natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
+
+
+[float]
 === rds
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
@@ -3083,15 +3090,21 @@ type: keyword
 --
 
 [float]
+=== transitgateway
+
+`transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
+
+
+[float]
 === usage
 
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
 
 [float]
-=== vpc
+=== vpn
 
-`vpc` contains the metrics from Cloudwatch to track usage of VPC related resources.
+`vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
 
 
 [[exported-fields-azure]]
@@ -19286,13 +19299,13 @@ type: long
 
 --
 
-*`istio.mixer.handler`*::
+*`istio.mixer.handler.name`*::
 +
 --
 The name of the daemon  handler
 
 
-type: long
+type: keyword
 
 --
 
@@ -19302,7 +19315,7 @@ type: long
 The name of the variety
 
 
-type: long
+type: keyword
 
 --
 
@@ -19319,7 +19332,7 @@ Contains statistics related to the Istio pilot service
 Count of concurrent xDS client connections for Pilot.
 
 
-type: integer
+type: long
 
 --
 
@@ -19329,14 +19342,34 @@ type: integer
 Count of xDS messages sent, as well as errors building or sending xDS messages for lds, rds, cds and eds.
 
 
-type: integer
+type: long
 
 --
 
-*`istio.pilot.xds.push.time.sec`*::
+*`istio.pilot.xds.push.time.ms.bucket.*`*::
 +
 --
-Total time in seconds Pilot takes to push lds, rds, cds and eds.
+Total time Pilot takes to push lds, rds, cds and eds, histogram buckets in milliseconds.
+
+
+type: object
+
+--
+
+*`istio.pilot.xds.push.time.ms.sum`*::
++
+--
+Total time Pilot takes to push lds, rds, cds and eds, histogram sum of times in milliseconds.
+
+
+type: long
+
+--
+
+*`istio.pilot.xds.push.time.ms.count`*::
++
+--
+Total time Pilot takes to push lds, rds, cds and eds, histogram count of times.
 
 
 type: long
@@ -19349,7 +19382,7 @@ type: long
 Instances for each cluster, as of last push. Zero instances is an error.
 
 
-type: object
+type: long
 
 --
 
@@ -19359,7 +19392,7 @@ type: object
 Number of errors (timeouts) initiating push context.
 
 
-type: integer
+type: long
 
 --
 
@@ -19369,7 +19402,7 @@ type: integer
 Total number of internal XDS errors in pilot.
 
 
-type: integer
+type: long
 
 --
 
@@ -19379,7 +19412,7 @@ type: integer
 Number of conflicting inbound listeners.
 
 
-type: integer
+type: long
 
 --
 
@@ -19389,7 +19422,7 @@ type: integer
 Number of conflicting wildcard http listeners with current wildcard tcp listener.
 
 
-type: integer
+type: long
 
 --
 
@@ -19399,7 +19432,7 @@ type: integer
 Number of conflicting HTTP listeners with well known HTTPS ports.
 
 
-type: integer
+type: long
 
 --
 
@@ -19409,7 +19442,7 @@ type: integer
 Number of conflicting wildcard tcp listeners with current wildcard http listener.
 
 
-type: integer
+type: long
 
 --
 
@@ -19419,7 +19452,7 @@ type: integer
 Number of conflicting tcp listeners with current tcp listener.
 
 
-type: integer
+type: long
 
 --
 
@@ -19443,6 +19476,16 @@ type: long
 
 --
 
+*`istio.pilot.proxy.conv.ms.count`*::
++
+--
+Time needed by Pilot to push Envoy configurations, histogram count of times.
+
+
+type: long
+
+--
+
 *`istio.pilot.services`*::
 +
 --
@@ -19459,16 +19502,6 @@ type: integer
 Total virtual services known to pilot.
 
 
-type: integer
-
---
-
-*`istio.pilot.proxy.conv.ms.count`*::
-+
---
-Time needed by Pilot to push Envoy configurations, histogram count of times.
-
-
 type: long
 
 --
@@ -19479,7 +19512,7 @@ type: long
 Pods not found in the endpoint table, possibly invalid.
 
 
-type: object
+type: long
 
 --
 
@@ -21968,6 +22001,33 @@ type: keyword
 +
 --
 Type of the given event
+
+
+type: keyword
+
+--
+
+[float]
+=== source
+
+The component reporting this event
+
+
+
+*`kubernetes.event.source.component`*::
++
+--
+Component from which the event is generated
+
+
+type: keyword
+
+--
+
+*`kubernetes.event.source.host`*::
++
+--
+Node name on which the event is generated
 
 
 type: keyword
@@ -31605,11 +31665,74 @@ type: object
 
 --
 
+*`prometheus.query.*`*::
++
+--
+Prometheus value resulted from PromQL
+
+
+type: object
+
+--
+
+[float]
+=== query
+
+query metricset
+
+
 [float]
 === remote_write
 
 remote write metrics from Prometheus server
 
+
+[[exported-fields-prometheus-xpack]]
+== Prometheus typed metrics fields
+
+Stats scraped from a Prometheus endpoint.
+
+
+
+*`prometheus.*.value`*::
++
+--
+Prometheus gauge metric
+
+
+type: object
+
+--
+
+*`prometheus.*.counter`*::
++
+--
+Prometheus counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.rate`*::
++
+--
+Prometheus rated counter metric
+
+
+type: object
+
+--
+
+*`prometheus.*.histogram`*::
++
+--
+Prometheus histogram metric - release: ga
+
+
+type: object
+
+--
 
 [[exported-fields-rabbitmq]]
 == RabbitMQ fields
@@ -36001,7 +36124,7 @@ Memory-specific statistics per process.
 *`system.process.memory.size`*::
 +
 --
-The total virtual memory the process has.
+The total virtual memory the process has. On Windows this represents the Commit Charge (the total amount of memory that the memory manager has committed for a running process) value in bytes for this process.
 
 
 type: long
@@ -36013,7 +36136,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
 
 
 type: long

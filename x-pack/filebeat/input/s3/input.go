@@ -202,7 +202,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 				continue
 			}
-			p.logger.Error("failed to receive message from SQS: ", err)
+			p.logger.Error("SQS ReceiveMessageRequest failed: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
 		}
@@ -278,7 +278,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				p.logger.Warn("Processing message failed, updating visibility timeout")
 				err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
-					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 				}
 				p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
@@ -299,7 +299,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 			// still ongoing, then change visibility timeout.
 			err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
-				p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 			}
 			p.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
 		}
@@ -411,7 +411,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = errors.Wrap(err, "GetObject request canceled")
+				err = errors.Wrap(err, "S3 GetObjectRequest canceled")
 				p.logger.Error(err)
 				return err
 			}
@@ -421,12 +421,19 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 				return nil
 			}
 		}
-		return errors.Wrap(err, "s3 get object request failed")
+		return errors.Wrap(err, "S3 GetObjectRequest failed")
 	}
 
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
+
+	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
+		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
+		p.logger.Error(err)
+		return err
+	}
 
 	// Decode JSON documents when expand_event_list_from_field is given in config
 	if p.config.ExpandEventListFromField != "" {
@@ -440,7 +447,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 		return nil
 	}
 
-	// Check content-type
+	// Check content-type = "application/x-gzip" or filename ends with ".gz"
 	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
 		gzipReader, err := gzip.NewReader(resp.Body)
 		if err != nil {
@@ -581,7 +588,7 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 			return nil
 		}
-		return errors.Wrap(err, "DeleteMessageRequest failed")
+		return errors.Wrap(err, "SQS DeleteMessageRequest failed")
 	}
 	return nil
 }

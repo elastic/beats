@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  vsphere:
+    image: docker.elastic.co/integrations-ci/beats-vsphere:${VSPHERE_GOLANG_VERSION:-1.14}-1
+    build:
+      context: ./_meta
+      args:
+        VSPHERE_GOLANG_VERSION: ${VSPHERE_GOLANG_VERSION:-1.14}
+    ports:
+      - 8989
