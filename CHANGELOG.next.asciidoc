@@ -12,18 +12,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
-- Allow Metricbeat's beat module to read monitoring information over a named pipe or unix domain socket. {pull}14558[14558]
-- Remove version information from default ILM policy for improved upgrade experience on custom policies. {pull}14745[14745]
-- Running `setup` cmd respects `setup.ilm.overwrite` setting for improved support of custom policies. {pull}14741[14741]
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
-- Users can now specify `monitoring.cloud.*` to override `monitoring.elasticsearch.*` settings. {issue}14399[14399] {pull}15254[15254]
 - Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
-- Update to ECS 1.4.0. {pull}14844[14844]
-- The document id fields has been renamed from @metadata.id to @metadata._id {pull}15859[15859]
-- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
-- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
-- Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 
 *Auditbeat*
 
@@ -31,30 +22,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
-- CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 
 *Heartbeat*
 
 
 *Journalbeat*
 
-- Remove broken dashboard. {pull}15288[15288]
-- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
 
 
 *Metricbeat*
 
-- Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
-- Update cloudwatch metricset mapping for both metrics and dimensions. {pull}15245[15245]
-- Make use of secure port when accessing Kubelet API {pull}16063[16063]
 
 *Packetbeat*
 
-- TLS: Fields have been changed to adapt to ECS. {pull}15497[15497]
-- TLS: The behavior of send_certificates and include_raw_certificates options has changed. {pull}15497[15497]
-- Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
-- Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
 
 *Winlogbeat*
 
@@ -143,9 +124,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
-- Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
-- Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 
 *Journalbeat*
 
@@ -153,7 +131,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
-- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {issue}14541[14541] {pull}14591[14591]
 - Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
 - Fix regular expression to detect instance name in perfmon metricset. {issue}14273[14273] {pull}14666[14666]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
@@ -202,51 +179,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-- Enable setting promiscuous mode automatically. {pull}11366[11366]
 
 *Winlogbeat*
 
 
 *Functionbeat*
 
-- Fix timeout option of GCP functions. {issue}16282[16282] {pull}16287[16287]
 
 ==== Added
 
 *Affecting all Beats*
 
-- Add a friendly log message when a request to docker has exceeded the deadline. {pull}15336[15336]
 - Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring cluster. {pull}9260[9260]
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}11394[11394]
 - add_host_metadata is no GA. {pull}13148[13148]
 - Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
-- GA the `script` processor. {pull}14325[14325]
-- Add `fingerprint` processor. {issue}11173[11173] {pull}14205[14205]
-- Add support for API keys in Elasticsearch outputs. {pull}14324[14324]
 - Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
-- Add consumer_lag in Kafka consumergroup metricset {pull}14822[14822]
-- Make use of consumer_lag in Kafka dashboard {pull}14863[14863]
-- Refactor kubernetes autodiscover to enable different resource based discovery {pull}14738[14738]
-- Add `add_id` processor. {pull}14524[14524]
-- Enable TLS 1.3 in all beats. {pull}12973[12973]
-- Spooling to disk creates a lockfile on each platform. {pull}15338[15338]
 - Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
-- Enable DEP (Data Execution Protection) for Windows packages. {pull}15149[15149]
-- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
-- Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
-- Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
-- Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
-- Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
-- Add support for Histogram type in fields.yml {pull}16570[16570]
-- Windows .exe files now have embedded file version info. {issue}15232[15232]t
-- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
-- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
-- Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
-- Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
-- Add capability of enrich `container.id` with process id in `add_process_metadata` processor {pull}15947[15947]
-- Update RPM packages contained in Beat Docker images. {issue}17035[17035]
-- Add Kerberos support to Kafka input and output. {pull}16781[16781]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 
 *Auditbeat*
@@ -259,7 +209,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Add dashboard for AWS ELB fileset. {pull}15804[15804]
 
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
@@ -321,7 +270,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- Allow a list of status codes for HTTP checks. {pull}15587[15587]
 
 
 *Heartbeat*
@@ -398,14 +346,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Add monitoring info about triggered functions. {pull}14876[14876]
-- Add Google Cloud Platform support. {pull}13598[13598]
 
 *Winlogbeat*
 
-- Add more DNS error codes to the Sysmon module. {issue}15685[15685]
-- Add Audit and Log Management, Computer Object Management, and Distribution Group related events to the Security module. {pull}15217[15217]
-- Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
 
 ==== Deprecated
 
