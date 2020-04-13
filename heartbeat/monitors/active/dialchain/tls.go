@@ -23,10 +23,10 @@ import (
 	cryptoTLS "crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/look"
 	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
@@ -34,14 +34,8 @@ import (
 )
 
 // TLSLayer configures the TLS layer in a DialerChain.
-//
-// The layer will update the active event with:
-//
-//  {
-//    "tls": {
-//        "rtt": { "handshake": { "us": ... }}
-//    }
-//  }
+// The layer will update the active event with the TLS RTT and
+// crypto/cert details.
 func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
@@ -61,32 +55,35 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 				panic(fmt.Sprintf("TLS afterDial received a non-tls connection %t. This should never happen", conn))
 			}
 			connState := tlsConn.ConnectionState()
-			event.PutValue("tls.established", true)
-
 			timer.stop()
-			event.PutValue("tls.rtt.handshake", look.RTT(timer.duration()))
 
-			versionDetails := tlscommon.TLSVersion(connState.Version).Details()
-			// The only situation in which versionDetails would be nil is if an unknown TLS version were to be
-			// encountered. Not filling the fields here makes sense, since there's no standard 'unknown' value.
-			if versionDetails != nil {
-				event.PutValue("tls.version_protocol", versionDetails.Protocol)
-				event.PutValue("tls.version", versionDetails.Version)
-			}
-
-			if connState.NegotiatedProtocol != "" {
-				event.PutValue("tls.next_protocol", connState.NegotiatedProtocol)
-			}
-			event.PutValue("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
-
-			addCertMetdata(event.Fields, connState.PeerCertificates)
+			addTLSMetadata(event.Fields, connState, timer.duration())
 
 			return conn, nil
 		}), nil
 	}
 }
 
-func addCertMetdata(fields common.MapStr, certs []*x509.Certificate) {
+func addTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
+	fields.Put("tls.established", true)
+	fields.Put("tls.rtt.handshake", look.RTT(duration))
+	versionDetails := tlscommon.TLSVersion(connState.Version).Details()
+	// The only situation in which versionDetails would be nil is if an unknown TLS version were to be
+	// encountered. Not filling the fields here makes sense, since there's no standard 'unknown' value.
+	if versionDetails != nil {
+		fields.Put("tls.version_protocol", versionDetails.Protocol)
+		fields.Put("tls.version", versionDetails.Version)
+	}
+
+	if connState.NegotiatedProtocol != "" {
+		fields.Put("tls.next_protocol", connState.NegotiatedProtocol)
+	}
+	fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
+
+	addCertMetadata(fields, connState.PeerCertificates)
+}
+
+func addCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
 	// Why might we do this?
 	// The root cause is that the x509.Certificate type uses time.Time for these fields instead of *time.Time
@@ -130,7 +127,7 @@ func addCertMetdata(fields common.MapStr, certs []*x509.Certificate) {
 		// Legacy non-ECS field
 		fields.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
 		// New ECS compatible field
-		fields.Put("tls.server.not_after", chainNotValidBefore)
+		fields.Put("tls.server.not_after", *chainNotValidAfter)
 	}
 
 	hostCert := certs[0]
