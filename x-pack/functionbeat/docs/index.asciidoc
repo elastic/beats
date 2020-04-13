@@ -33,6 +33,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_decode_csv_fields_processor:
 :no_script_processor:
 :no_timestamp_processor:
+:no_keystore:
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
