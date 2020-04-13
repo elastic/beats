@@ -79,7 +79,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Filebeat*
 
-- Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
+- Add ECS tls fields to the smtp, rdp and ssl filesets in the zeek module and the s3access and elb filesets in the aws module. {issue}15757[15757] {pull}15935[15936]
 - Add Nginx `ingress_controller` fileset. {pull}16197[16197]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
