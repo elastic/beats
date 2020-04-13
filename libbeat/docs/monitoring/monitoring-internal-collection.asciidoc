@@ -109,9 +109,9 @@ monitoring:
 --------------------
 +
 You must specify the `username` as `""` explicitly so that
-{beatname_uc} does not attempt to authentication using a
-username and password (HTTP basic authentication) and relies
-on PKI authentication using the client certificate. See
+{beatname_uc} does not attempt to authenticate using a
+username and password (HTTP basic authentication) and instead
+relies on PKI authentication using the client certificate. See
 <<configuration-ssl>> for more information about SSL settings.
 
 ifndef::serverless[]
