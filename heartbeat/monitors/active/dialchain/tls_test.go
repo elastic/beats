@@ -39,7 +39,7 @@ func TestAddTLSMetadata(t *testing.T) {
 	// is tested in detail elsewhere
 	certs := []*x509.Certificate{parseCert(t, elasticCert)}
 	certMetadata := common.MapStr{}
-	addCertMetadata(certMetadata, certs)
+	AddCertMetadata(certMetadata, certs)
 
 	scenarios := []struct {
 		name      string
@@ -96,7 +96,7 @@ func TestAddTLSMetadata(t *testing.T) {
 			expected.DeepUpdate(certMetadata)
 
 			fields := common.MapStr{}
-			addTLSMetadata(fields, s.connState, s.duration)
+			AddTLSMetadata(fields, s.connState, s.duration)
 			require.Equal(t, expected, fields)
 		})
 	}
@@ -142,7 +142,7 @@ func TestAddCertMetadata(t *testing.T) {
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
 			fields := common.MapStr{}
-			addCertMetadata(fields, scenario.certs)
+			AddCertMetadata(fields, scenario.certs)
 			tls, err := fields.GetValue("tls")
 			require.NoError(t, err)
 			require.Equal(t, expectedFields, tls)
@@ -204,7 +204,7 @@ func TestCertExpirationMetadata(t *testing.T) {
 	// notBefore is intentionally not a pointer type because go certificates don't have nullable time types
 	// we cheat a bit and make not after nullable because there's no valid reason to create a cert with go's zero
 	// time.
-	// see the addCertMetadata function for more info on this.
+	// see the AddCertMetadata function for more info on this.
 	type expected struct {
 		notBefore time.Time
 		notAfter  *time.Time
@@ -248,7 +248,7 @@ func TestCertExpirationMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			event := common.MapStr{}
-			addCertMetadata(event, tt.certs)
+			AddCertMetadata(event, tt.certs)
 			v, err := event.GetValue("tls.server.not_before")
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expected.notBefore, v)

@@ -18,8 +18,11 @@
 package hbtest
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,6 +32,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -107,13 +111,19 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"tls": map[string]interface{}{
-			"rtt.handshake.us":             isdef.IsDuration,
-			"certificate_not_valid_before": certificate.NotBefore,
-			"certificate_not_valid_after":  certificate.NotAfter,
-		},
-	})
+	expected := common.MapStr{}
+	// This function is well tested independently, so we just test that things match up here.
+	dialchain.AddTLSMetadata(expected, tls.ConnectionState{
+		Version:           tls.VersionTLS13,
+		HandshakeComplete: true,
+		CipherSuite:       tls.TLS_AES_128_GCM_SHA256,
+		ServerName:        certificate.Subject.CommonName,
+		PeerCertificates: []*x509.Certificate{certificate},
+	}, time.Duration(1))
+
+	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	return lookslike.MustCompile(expected)
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present

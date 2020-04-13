@@ -58,14 +58,14 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 			connState := tlsConn.ConnectionState()
 			timer.stop()
 
-			addTLSMetadata(event.Fields, connState, timer.duration())
+			AddTLSMetadata(event.Fields, connState, timer.duration())
 
 			return conn, nil
 		}), nil
 	}
 }
 
-func addTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
+func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
 	fields.Put("tls.established", true)
 	fields.Put("tls.rtt.handshake", look.RTT(duration))
 	versionDetails := tlscommon.TLSVersion(connState.Version).Details()
@@ -81,10 +81,10 @@ func addTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, d
 	}
 	fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
 
-	addCertMetadata(fields, connState.PeerCertificates)
+	AddCertMetadata(fields, connState.PeerCertificates)
 }
 
-func addCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
+func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
 	// Why might we do this?
 	// The root cause is that the x509.Certificate type uses time.Time for these fields instead of *time.Time
