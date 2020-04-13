@@ -197,6 +197,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix pubsub metricset to collect all GA stage metrics from gcp stackdriver. {issue}17154[17154] {pull}17600[17600]
 - Add privileged option so as mb to access data dir in Openshift. {pull}17606[17606]
 - Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
+- Add privileged option for Auditbeat in Openshift {pull}17637[17637]
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 
 *Packetbeat*
