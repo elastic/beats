@@ -37,7 +37,7 @@
       description: Category.
 
     - name: confidence_level
-      type: long
+      type: integer
       description: Confidence level determined.
 
     - name: connectivity_state
