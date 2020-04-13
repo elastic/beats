@@ -9,6 +9,12 @@ beta[]
 
 This is a module for Checkpoint firewall logs. It supports logs from the Log Exporter in the Syslog format.
 
+To configure a Log Exporter, please refer to the documentation by https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk122323[Check Point].
+
+Example below:
+
+`cp_log_export add name testdestination target-server 192.168.1.1 target-port 9001 protocol udp format syslog`
+
 include::../include/gs-link.asciidoc[]
 
 
