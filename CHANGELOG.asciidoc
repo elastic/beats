@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 *Packetbeat*
 
 - Add `redact_headers` configuration option to allow HTTP request headers to be redacted whilst keeping the header field included in the Beat. {pull}15353[15353]
-- Add `dns.question.subdomain` and `dns.question.top_level_domain` fields. {pull}14578[14578]
 
 ==== Bugfixes
 
@@ -181,6 +180,10 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Add Storage metricsets to GCP module. {pull}15598[15598]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add PubSub metricset to Google Cloud Platform module. {pull}15536[15536]
+
+*Packetbeat*
+
+- Add `dns.question.subdomain` and `dns.question.top_level_domain` fields. {pull}14578[14578]
 
 *Winlogbeat*
 
