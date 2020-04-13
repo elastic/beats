@@ -38,7 +38,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Fix loading processors from annotation hints. {pull}16348[16348]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` to the list of supported TLS options. This option allows you to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
-- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
+- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. No longer requires the user to have `labels.dedot: true` in the configuration as it is now properly default. {pull}16857[16857]
 - Improve logging messages for the `add_kubernetes_metadata` processor. {pull}16866{16866}
 - Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
