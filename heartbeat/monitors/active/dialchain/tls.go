@@ -18,6 +18,8 @@
 package dialchain
 
 import (
+	"crypto/sha1"
+	"crypto/sha256"
 	cryptoTLS "crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -58,12 +60,26 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 			if !ok {
 				panic(fmt.Sprintf("TLS afterDial received a non-tls connection %t. This should never happen", conn))
 			}
+			connState := tlsConn.ConnectionState()
+			event.PutValue("tls.established", true)
 
-			// TODO: extract TLS connection parameters from connection object.
 			timer.stop()
 			event.PutValue("tls.rtt.handshake", look.RTT(timer.duration()))
 
-			addCertMetdata(event.Fields, tlsConn.ConnectionState().PeerCertificates)
+			versionDetails := tlscommon.TLSVersion(connState.Version).Details()
+			// The only situation in which versionDetails would be nil is if an unknown TLS version were to be
+			// encountered. Not filling the fields here makes sense, since there's no standard 'unknown' value.
+			if versionDetails != nil {
+				event.PutValue("tls.version_protocol", versionDetails.Protocol)
+				event.PutValue("tls.version", versionDetails.Version)
+			}
+
+			if connState.NegotiatedProtocol != "" {
+				event.PutValue("tls.next_protocol", connState.NegotiatedProtocol)
+			}
+			event.PutValue("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
+
+			addCertMetdata(event.Fields, connState.PeerCertificates)
 
 			return conn, nil
 		}), nil
@@ -105,9 +121,21 @@ func addCertMetdata(fields common.MapStr, certs []*x509.Certificate) {
 		}
 	}
 
+	// Legacy non-ECS field
 	fields.Put("tls.certificate_not_valid_before", chainNotValidBefore)
+	// New ECS compatible field
+	fields.Put("tls.server.not_before", chainNotValidBefore)
 
 	if chainNotValidAfter != nil {
+		// Legacy non-ECS field
 		fields.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
+		// New ECS compatible field
+		fields.Put("tls.server.not_after", chainNotValidBefore)
 	}
+
+	hostCert := certs[0]
+	fields.Put("tls.server.issuer", hostCert.Issuer.String())
+	fields.Put("tls.server.subject", hostCert.Subject.String())
+	fields.Put("tls.server.hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
+	fields.Put("tls.server.hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
 }

@@ -19,7 +19,9 @@
 
 package tlscommon
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+)
 
 // Define all the possible TLS version.
 const (
@@ -61,10 +63,22 @@ var tlsProtocolVersions = map[string]TLSVersion{
 	"TLSv1.3": TLSVersion13,
 }
 
-var tlsProtocolVersionsInverse = map[TLSVersion]string{
-	TLSVersionSSL30: "SSLv3",
-	TLSVersion10:    "TLSv1.0",
-	TLSVersion11:    "TLSv1.1",
-	TLSVersion12:    "TLSv1.2",
-	TLSVersion13:    "TLSv1.3",
+// Intended for ECS's tls.version_protocol_field, which does not include
+// numeric version and should be lower case
+type protocolAndVersion struct {
+	Version string
+	Protocol string
+	Combined string
+}
+
+func (pv protocolAndVersion) String() string {
+	return pv.Combined
+}
+
+var tlsInverseLookup = map [TLSVersion]protocolAndVersion{
+	TLSVersionSSL30: protocolAndVersion{Version: "3.0", Protocol: "ssl", Combined: "SSLv3"},
+	TLSVersion10:    protocolAndVersion{Version: "1.0", Protocol: "tls", Combined: "TLSv1.0"},
+	TLSVersion11:    protocolAndVersion{Version: "1.1", Protocol: "tls", Combined: "TLSv1.1"},
+	TLSVersion12:    protocolAndVersion{Version: "1.2", Protocol: "tls", Combined: "TLSv1.2"},
+	TLSVersion13:    protocolAndVersion{Version: "1.3", Protocol: "tls", Combined: "TLSv1.3"},
 }
