@@ -86,7 +86,7 @@ func newOutputController(
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
-	ln("starting consumer...")
+	lf("starting consumer...")
 	c.consumer.sigContinue()
 	return c
 }
@@ -107,20 +107,10 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
-	ln("set called...")
+	lf("set called...")
 	c.setInProgress.Lock()
 	defer c.setInProgress.Unlock()
-	ln("setting output...")
-
-	// update consumer and retryer
-	// close old group, so events are send to new workQueue via retryer
-	ln("pausing consumer...")
-	c.consumer.sigPause()
-	//if c.out != nil {
-	//	for range c.out.outputs {
-	//		c.retryer.sigOutputRemoved()
-	//	}
-	//}
+	lf("setting output...")
 
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
@@ -137,26 +127,9 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		batchSize:  outGrp.BatchSize,
 	}
 
-	// close old group, so events are send to new workQueue via retryer
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-		}
-		for drained := false; !drained; {
-			select {
-			case b := <-c.out.workQueue:
-				ln("draining batches from old workqueue to new workqueue...")
-				queue <- b
-			default:
-				ln("workqueue is already drained")
-				drained = true
-			}
-		}
-	}
-
 	// update consumer and retryer
-	//ln("pausing consumer...")
-	//c.consumer.sigPause()
+	lf("pausing consumer...")
+	c.consumer.sigPause()
 	if c.out != nil {
 		for range c.out.outputs {
 			c.retryer.sigOutputRemoved()
@@ -169,10 +142,28 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	}
 	c.consumer.updOutput(grp)
 
+	// close old group, so events are send to new workQueue via retryer
+	if c.out != nil {
+		for _, w := range c.out.outputs {
+			w.Close()
+		}
+		for drained := false; !drained; {
+			select {
+			case b := <-c.out.workQueue:
+				lf("draining batches from old workqueue to new workqueue...")
+				queue <- b
+			default:
+				lf("workqueue is already drained")
+				drained = true
+			}
+		}
+	}
+
 	c.out = grp
 
 	// restart consumer (potentially blocked by retryer)
-	ln("continuing consumer...")
+	lf("continuing consumer...")
+	c.consumer.sigUnWait()
 	c.consumer.sigContinue()
 
 	c.observer.updateOutputGroup()

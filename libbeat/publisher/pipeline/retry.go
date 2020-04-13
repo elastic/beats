@@ -171,8 +171,10 @@ func (r *retryer) loop() {
 					consumerBlocked = blockConsumer(numOutputs, len(buffer))
 					if consumerBlocked {
 						log.Info("retryer: send wait signal to consumer")
+						lf("retryer: send wait signal to consumer")
 						r.consumer.sigWait()
 						log.Info("  done")
+						lf("  done")
 					}
 				}
 			}
@@ -194,8 +196,10 @@ func (r *retryer) loop() {
 				consumerBlocked = blockConsumer(numOutputs, len(buffer))
 				if !consumerBlocked {
 					log.Info("retryer: send unwait-signal to consumer")
+					lf("retryer: send unwait-signal to consumer")
 					r.consumer.sigUnWait()
 					log.Info("  done")
+					lf("  done")
 				}
 			}
 
@@ -215,7 +219,7 @@ func (r *retryer) loop() {
 func blockConsumer(numOutputs, numBatches int) bool {
 	block := numBatches/3 >= numOutputs
 	if block {
-		lf("in retry: blocking consumer: numBatches/3 = %v, numOutputs = %v\n", numBatches/3, numOutputs)
+		lf("in retry: blocking consumer: numBatches/3 = %v, numOutputs = %v", numBatches/3, numOutputs)
 	}
 	return block
 }
