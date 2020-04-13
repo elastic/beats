@@ -35,7 +35,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Remove superfluous use of `number_of_routing_shards` setting from the default template. {pull}16038[16038]
 - Automatically convert index names to lowercase. {pull}16081[16081]
 - Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
-- Fix loading processors from annotation hints. {pull}16348[16348]
+- Fix loading processor annotation hints, allowing the value to be a full configuration section. {pull}16348[16348]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` to the list of supported TLS options. This option allows you to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. No longer requires the user to have `labels.dedot: true` in the configuration as it is now properly default. {pull}16857[16857]
