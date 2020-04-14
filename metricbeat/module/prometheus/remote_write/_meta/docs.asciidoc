@@ -7,16 +7,19 @@ remote_write:
   - url: "http://localhost:9201/write"
 ------------------------------------------------------------------------------
 
-TIP: It is recommended to carefully choose the https://prometheus.io/docs/practices/remote_write/#parameters[parameters]
-of remote_write configuration so as to tune the queue according to each specific case and system's characteristics. More
-specifically, `max_shards` option sets the max number of parallelism with which Prometheus will try to send metrics to
-the remote storage. The default value of this is `1000`, which means that in case of Prometheus falls behind the
-remote storage the number of shards will be increased up to `1000` to increase thoughput. This can happen in cases
-of network delays for instance where the whole queue faces issues to consume metrics and finally send metrics to Elasticsearch.
-However increasing the number of parallelism, means that we increase the number of parallel connections from Prometheus
-to Metricbeat. This can lead to resource saturation if the system on which Metricbeat runs has a limit in `fd` (file descriptors)
-which is lower than `max_shards`. This can be resolved either by setting a higher `fd` limit in the system with `ulimit -n 2048`
-or by setting a lower value for `max_shards`.
+
+TIP: In order to assure the health of the whole queue the following two configuration
+ https://prometheus.io/docs/practices/remote_write/#parameters[parameters] should be considered:
+
+- `max_shards`: Sets the maximum number of paralelism with which Prometheus will try to send samples to Metricbeat.
+It is recomended that this setting should be equal to the number of cores of the machine where Metricbeat runs.
+Metricbeat can handle connections in parallel and hence setting `max_shards` to the number of paralelism that
+Metricbeat can actually achieve is the optimal queue configuration.
+- `max_samples_per_send`: Sets the number of samples to batch together for each send. Recomended values are
+between 100 (default) and 1000. Having a bigger batch can lead to improved throughput and in more efficient
+storage since Metricbeat groups metrics with the same labels into same event documents.
+However this will increase the memory usage of Metricbeat.
+- `capacity`: 3 to 5 times the `max_samples_per_send`.
 
 
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
