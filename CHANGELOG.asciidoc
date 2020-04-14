@@ -196,7 +196,7 @@ configure the auditd module and use processors to enrich events with metadata.
 - Add PubSub metricset to Google Cloud Platform module. {pull}15536[15536]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
-- Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
+- Make the azure module GA. {pull}17319[17319]
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
 - Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 
