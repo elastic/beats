@@ -5066,7 +5066,7 @@ type: ip
 --
 Protection performance impact.
 
-type: long
+type: integer
 
 --
 
