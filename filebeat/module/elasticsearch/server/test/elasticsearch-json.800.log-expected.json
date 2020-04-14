@@ -1,0 +1,24 @@
+[
+    {
+        "@timestamp": "2020-04-14T14:05:58.019Z",
+        "elasticsearch.cluster.name": "elasticsearch",
+        "elasticsearch.cluster.uuid": "ECEBF2VPQuCF9tbBKaLqXQ",
+        "elasticsearch.node.id": "suOYiQwuRvialOY-c0wHLA",
+        "elasticsearch.node.name": "CBR-MBP.local",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.server",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.type": "info",
+        "fileset.name": "server",
+        "host.id": "suOYiQwuRvialOY-c0wHLA",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "org.elasticsearch.cluster.metadata.MetaDataIndexTemplateService",
+        "log.offset": 0,
+        "message": "adding template [.management-beats] for index patterns [.management-beats]",
+        "process.thread.name": "elasticsearch[CBR-MBP.local][masterService#updateTask][T#1]",
+        "service.name": "ES_ECS",
+        "service.type": "elasticsearch"
+    }
+]
