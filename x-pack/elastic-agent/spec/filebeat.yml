@@ -6,6 +6,10 @@ rules:
 - inject_index:
     type: logs
 
+- inject_stream_processor:
+    on_conflict: insert_after
+    type: logs
+
 - extract_list_items:
     path: datasources
     item: inputs
@@ -16,8 +20,13 @@ rules:
     rules:
     - copy_all_to_list:
         to: streams
-        overwrite: false
-        except: ["streams", "id", "enabled", "title", "package", "namespace", "constraints", "use_output"]
+        on_conflict: noop
+        except: ["streams", "id", "enabled", "processors"]
+    - copy_to_list:
+        item: processors
+        to: streams
+        on_conflict: insert_before
+
 
 - extract_list_items:
     path: inputsstreams
