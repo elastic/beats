@@ -92,7 +92,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 	return events
 }
 
-func (re *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event {
+func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.Event {
 	event := mb.Event{
 		MetricSetFields: common.MapStr{},
 	}
@@ -111,6 +111,8 @@ func (re *Reader) groupToEvent(counters map[string][]pdh.CounterValue) mb.Event 
 			switch val.Measurement.(type) {
 			case int64:
 				counterVal = float64(val.Measurement.(int64))
+			case int:
+				counterVal = float64(val.Measurement.(int))
 			default:
 				counterVal = val.Measurement.(float64)
 			}

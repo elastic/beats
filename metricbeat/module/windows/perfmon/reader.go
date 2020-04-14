@@ -52,7 +52,7 @@ type PerfCounter struct {
 	InstanceField string
 	InstanceName  string
 	QueryField    string
-	Query         string
+	QueryName     string
 	Format        string
 	ObjectName    string
 	ObjectField   string
@@ -73,34 +73,34 @@ func NewReader(config Config) (*Reader, error) {
 	r.mapCounters(config)
 	for i, counter := range r.counters {
 		r.counters[i].ChildQueries = []string{}
-		childQueries, err := query.GetCounterPaths(counter.Query)
+		childQueries, err := query.GetCounterPaths(counter.QueryName)
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
 				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
 					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					r.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.Query)
+						logp.Namespace("perfmon"), "query", counter.QueryName)
 					continue
 				}
 			} else {
 				query.Close()
-				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
 			}
 		}
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
 		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
 			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
 			if config.IgnoreNECounters {
-				r.log.Infow("Ignoring non existent counter", "initial query", counter.Query,
+				r.log.Infow("Ignoring non existent counter", "initial query", counter.QueryName,
 					logp.Namespace("perfmon"), "expanded query", childQueries)
 				continue
 			}
-			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
+			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.QueryName)
 		}
 		for _, v := range childQueries {
 			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
-				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
+				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.QueryName)
 			}
 			r.counters[i].ChildQueries = append(r.counters[i].ChildQueries, v)
 		}
@@ -113,18 +113,18 @@ func (re *Reader) RefreshCounterPaths() error {
 	var newCounters []string
 	for i, counter := range re.counters {
 		re.counters[i].ChildQueries = []string{}
-		childQueries, err := re.query.GetCounterPaths(counter.Query)
+		childQueries, err := re.query.GetCounterPaths(counter.QueryName)
 		if err != nil {
 			if re.config.IgnoreNECounters {
 				switch err {
 				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
 					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					re.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.Query)
+						logp.Namespace("perfmon"), "query", counter.QueryName)
 					continue
 				}
 			} else {
-				return errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+				return errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
 			}
 		}
 		newCounters = append(newCounters, childQueries...)
@@ -132,7 +132,7 @@ func (re *Reader) RefreshCounterPaths() error {
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
 				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
-					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.Query)
+					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.QueryName)
 				}
 				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
 			}
@@ -162,7 +162,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	var events []mb.Event
 	// GroupAllCountersTo config option where counters for all instances are aggregated and instance count is added in the event under the string value provided by this option.
 	if re.config.GroupAllCountersTo != "" {
-		event := re.groupToEvent(values)
+		event := re.groupToSingleEvent(values)
 		events = append(events, event)
 	} else {
 		events = re.groupToEvents(values)
@@ -195,7 +195,7 @@ func (re *Reader) mapCounters(config Config) {
 				InstanceField: counter.InstanceLabel,
 				InstanceName:  counter.InstanceName,
 				QueryField:    counter.MeasurementLabel,
-				Query:         counter.Query,
+				QueryName:     counter.Query,
 				Format:        counter.Format,
 				ChildQueries:  nil,
 			})
@@ -210,10 +210,10 @@ func (re *Reader) mapCounters(config Config) {
 						InstanceField: defaultInstanceField,
 						InstanceName:  "",
 						QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
-						Query:         mapQuery(query.Name, "", counter.Name),
+						QueryName:     mapQuery(query.Name, "", counter.Name),
 						Format:        counter.Format,
 						ObjectName:    query.Name,
-						ObjectField:   defaultObjectField,
+						ObjectField:   mapObjectName(query.Field),
 					})
 				} else {
 					for _, instance := range query.Instance {
@@ -221,10 +221,10 @@ func (re *Reader) mapCounters(config Config) {
 							InstanceField: defaultInstanceField,
 							InstanceName:  instance,
 							QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
-							Query:         mapQuery(query.Name, instance, counter.Name),
+							QueryName:     mapQuery(query.Name, instance, counter.Name),
 							Format:        counter.Format,
 							ObjectName:    query.Name,
-							ObjectField:   defaultObjectField,
+							ObjectField:   mapObjectName(query.Field),
 						})
 					}
 				}
@@ -233,16 +233,27 @@ func (re *Reader) mapCounters(config Config) {
 	}
 }
 
+func mapObjectName(objectField string) string {
+	if objectField != "" {
+		return objectField
+	}
+	return defaultObjectField
+}
+
 func mapQuery(obj string, instance string, path string) string {
 	var query string
-	if strings.HasPrefix(obj, "\\") {
-		query = obj
-	} else {
-		query = fmt.Sprintf("\\%s", obj)
-	}
+	// trim object
+	obj = strings.TrimPrefix(obj, "\\")
+	obj = strings.TrimSuffix(obj, "\\")
+	query = fmt.Sprintf("\\%s", obj)
+
 	if instance != "" {
+		// trim instance
+		instance = strings.TrimPrefix(instance, "(")
+		instance = strings.TrimSuffix(instance, ")")
 		query += fmt.Sprintf("(%s)", instance)
 	}
+
 	if strings.HasPrefix(path, "\\") {
 		query += path
 	} else {
@@ -280,6 +291,8 @@ func mapCounterPathLabel(label string, path string) string {
 	}
 	path = strings.ToLower(strings.Join(obj, "_"))
 
+	//  avoid cases as this "logicaldisk_avg__disk_sec_per_transfer"
+	path = strings.Replace(path, "__", "_", -1)
 	return resultMetricName + path
 }
 

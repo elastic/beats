@@ -18,3 +18,36 @@
 // +build windows
 
 package perfmon
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestValidateConfig(t *testing.T) {
+	config := Config{}
+	err := config.ValidateConfig()
+	assert.Error(t, err, "no perfmon counters or queries have been configured")
+	config.Counters = []Counter{
+		{
+			MeasurementLabel: "processor.time.total.pct",
+			Query:            `UDPv4\Datagrams Sent/sec`,
+		},
+	}
+	config.Queries = []Query{
+		{
+			Name: "UDPv4",
+			Counters: []QueryCounter{
+				{
+					Name: "Datagrams Sent/sec",
+				},
+			},
+		},
+	}
+	err = config.ValidateConfig()
+	assert.NoError(t, err)
+	assert.Equal(t, config.Counters[0].Format, "float")
+	assert.Equal(t, config.Queries[0].Counters[0].Format, "float")
+
+}
