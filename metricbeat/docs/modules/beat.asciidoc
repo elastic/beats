@@ -5,18 +5,21 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-beat]]
 == Beat module
 
-There are two modules that collect metrics about any Beat or other software based on libbeat:
-
-* The `beat` module tracks only the high-level metrics. The default metricsets in
-this module are `state` and `stats`.
-* The `beat-xpack` module enables you to monitor more Beat metrics with our
-{stack} {monitor-features}. The metricsets automatically configured by this module
-are `state` and `stats`.
+The `beat` module collects metrics about any Beat or other software based on libbeat.
 
 [float]
 === Compatibility
 
-Both modules work with {ls} 7.3.0 and later.
+The `beat` module work with {beats} 7.3.0 and later.
+
+[float]
+=== Usage for Stack Monitoring
+
+The `beat` module can be used to collect metrics shown in our {stack} {monitor-features}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable beat` and
+metricbeat modules enable beat-xpack`.
+
 
 
 [float]
