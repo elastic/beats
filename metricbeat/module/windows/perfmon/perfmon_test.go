@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
 // +build windows
 
 package perfmon
@@ -27,8 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -39,6 +36,37 @@ import (
 const processorTimeCounter = `\Processor Information(_Total)\% Processor Time`
 
 func TestData(t *testing.T) {
+	config := map[string]interface{}{
+		"module":     "windows",
+		"metricsets": []string{"perfmon"},
+		"perfmon.queries": []map[string]interface{}{
+			{
+				"object":   "Processor Information",
+				"instance": []string{"_Total"},
+				"counters": []map[string]interface{}{
+					{
+						"name":  "% Processor Time",
+						"field": "processor.time.total.pct",
+					},
+					{
+						"name": "% User Time",
+					},
+				},
+			},
+		},
+	}
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	mbtest.ReportingFetchV2Error(ms)
+	time.Sleep(60 * time.Millisecond)
+
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, "/"); err != nil {
+		t.Fatal("write", err)
+	}
+
+}
+
+func TestDataOld(t *testing.T) {
 	config := map[string]interface{}{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
@@ -81,12 +109,14 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 	config := map[string]interface{}{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
-		"perfmon.counters": []map[string]string{
+		"perfmon.queries": []map[string]interface{}{
 			{
-				"instance_label":    "processor.name",
-				"measurement_label": "processor.time.total.pct",
-				"query":             `\UDPv4\Datagrams Sent/sec`,
-				//"query":             `\UDPv4\Verzonden datagrammen per seconde`,
+				"object": "UDPv4",
+				"counters": []map[string]interface{}{
+					{
+						"name": "Datagrams Sent/sec",
+					},
+				},
 			},
 		},
 	}
@@ -102,9 +132,10 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 	if len(events) == 0 {
 		t.Fatal("no events received")
 	}
-	process := events[0].MetricSetFields["processor"].(common.MapStr)
+	val, err := events[0].MetricSetFields.GetValue("object")
+	assert.NoError(t, err)
 	// Check values
-	assert.EqualValues(t, "UDPv4", process["name"])
+	assert.EqualValues(t, "UDPv4", val)
 
 }
 
@@ -115,12 +146,11 @@ func TestQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer q.Close()
-	counter := Counter{Format: "float", InstanceName: "TestInstanceName"}
 	path, err := q.GetCounterPaths(processorTimeCounter)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = q.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = q.AddCounter(path[0], "TestInstanceName", "float", false)
 	if err != nil {
 		t.Fatal(err)
 	}
