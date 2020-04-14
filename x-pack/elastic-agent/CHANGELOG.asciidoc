@@ -24,4 +24,5 @@
 - OS agnostic default configuration {pull}17016[17016]
 - Introduced post install hooks {pull}17241[17241]
 - Support for config constraints {pull}17112[17112]
+- Introduced `mage demo` command {pull}17312[17312]
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
