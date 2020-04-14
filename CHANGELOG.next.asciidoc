@@ -117,11 +117,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
 - Fix `elasticsearch.gc` fileset to not collect _all_ logs when Elasticsearch is running in Docker. {issue}13164[13164] {issue}16583[16583] {pull}17164[17164]
 - Fixed a mapping exception when ingesting CEF logs that used the spriv or dpriv extensions. {issue}17216[17216] {pull}17220[17220]
-- Fixed a mapping exception when ingesting Logstash plain logs (7.4+) with pipeline ids containing non alphanumeric chars. {issue}17242[17242] {pull}17243[17243]
-- Fixed MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
-- Fix `elasticsearch.audit` data ingest pipeline to be more forgiving with date formats found in Elasticsearch audit logs. {pull}17406[17406]
-- CEF: Fixed decoding errors caused by trailing spaces in messages. {pull}17253[17253]
-- Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
 
 *Heartbeat*
 
@@ -160,16 +155,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
 - Check if CCR feature is available on Elasticsearch cluster before attempting to call CCR APIs from `elasticsearch/ccr` metricset. {issue}16511[16511] {pull}17073[17073]
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
-- Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
-- Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 - Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
-- Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
-- Fix how we filter services by name in system/service {pull}17400[17400]
-- Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
-- check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
-- Fix aws.s3.bucket.name terms_field in s3 overview dashboard. {pull}17542[17542]
-- Fix Unix socket path in memcached. {pull}17512[17512]
-- Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
 - Fix azure storage dashboards. {pull}17590[17590]
 - Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
 - Fix pubsub metricset to collect all GA stage metrics from gcp stackdriver. {issue}17154[17154] {pull}17600[17600]
@@ -198,15 +184,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
 - Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
 - Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
-- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
-
-*Auditbeat*
-
-- Reference kubernetes manifests include configuration for auditd and enrichment with kubernetes metadata. {pull}17431[17431]
-- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
-- Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
-- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
-- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
@@ -263,9 +240,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 - Add Filebeat Okta module. {pull}16362[16362]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
-- Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
-- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
-- Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
 - Release Google Cloud module as GA. {pull}17511[17511]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
 
@@ -337,10 +311,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Storage metricsets to GCP module {pull}15598[15598]
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add PubSub metricset to Google Cloud Platform module {pull}15536[15536]
-- Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
-- Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
-- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
-- Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
 

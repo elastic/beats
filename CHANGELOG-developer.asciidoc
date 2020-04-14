@@ -15,6 +15,22 @@ Note: This changelog was only started after the 6.3 release.
 === Beats version 7.7.0
 https://github.com/elastic/beats/compare/v7.6.2..v7.7.0[Check the HEAD diff]
 
+==== Breaking changes
+- Python 3 is required now to run python tests and tools. {pull}14798[14798]
+- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
+- The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
+- `queue.Eventer` has been renamed to `queue.ACKListener`. {pull}16691[16691]
+- Require logger as first parameter for outputs.elasticsearch.client#BulkReadItemStatus. {pull}16761[16761]
+- Extract Elasticsearch client logic from outputs/elasticsearch package into new esclientleg package. {pull}16150[16150]
+
+==== Bugfixes
+
+- Remove `mage:import` from magefiles used by community beats. Prior to this fix, the vendorized beats directory was ignored for some mage targets, which caused inconsistencies and compilation problems if the version of the code in the GOPATH was different from the vendored version. Using `mage:import` will be unsupported in custom beats until beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
+
+==== Added
+
+- Add support for a TEST_TAGS environment variable to add tags for tests selection following go build tags semantics. This environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (@beat.tag('sometag')). {pull}16937[16937] {pull}17075[17075]
+
 === Beats version 7.6.2
 https://github.com/elastic/beats/compare/v7.6.1..v7.6.2[Check the HEAD diff]
 
