@@ -136,10 +136,10 @@ AWS credential profile name.
 *`var.access_key_id`*::
 First part of access key.
 
-*`var.access_key_id`*::
+*`var.secret_access_key`*::
 Second part of access key.
 
-*`var.access_key_id`*::
+*`var.session_token`*::
 Required when using temporary security credentials.
 
 [float]
