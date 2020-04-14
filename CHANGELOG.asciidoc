@@ -98,7 +98,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 - Add examples to the kubernetes manifests to show how to
 configure the auditd module and use processors to enrich events with metadata.
-- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500
