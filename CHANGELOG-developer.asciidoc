@@ -25,7 +25,7 @@ https://github.com/elastic/beats/compare/v7.6.2..v7.7.0[Check the HEAD diff]
 
 ==== Bugfixes
 
-- Stop using mage:import in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of mage:import will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
+- Remove `mage:import` from magefiles used by community beats. Prior to this fix, the vendorized beats directory was ignored for some mage targets, which caused inconsistencies and compilation problems if the version of the code in the GOPATH was different from the vendored version. Using `mage:import` will be unsupported in custom beats until beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 
 ==== Added
 
