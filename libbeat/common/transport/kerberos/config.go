@@ -17,7 +17,10 @@
 
 package kerberos
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type AuthType uint
 
@@ -30,6 +33,8 @@ const (
 )
 
 var (
+	InvalidAuthType = errors.New("invalid authentication type")
+
 	authTypes = map[string]AuthType{
 		authPassword:  AUTH_PASSWORD,
 		authKeytabStr: AUTH_KEYTAB,
@@ -59,19 +64,21 @@ func (t *AuthType) Unpack(value string) error {
 }
 
 func (c *Config) Validate() error {
-	if c.AuthType == AUTH_PASSWORD {
+	switch c.AuthType {
+	case AUTH_PASSWORD:
 		if c.Username == "" {
 			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
 		}
 		if c.Password == "" {
 			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
 		}
-	}
 
-	if c.AuthType == AUTH_KEYTAB {
+	case AUTH_KEYTAB:
 		if c.KeyTabPath == "" {
 			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
 		}
+	default:
+		return InvalidAuthType
 	}
 
 	return nil
