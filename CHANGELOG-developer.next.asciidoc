@@ -38,6 +38,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The `libbeat/outputs/tls.go` file has been removed. All exported symbols in that file (`libbeat/outputs.*`) are now available as `libbeat/common/tlscommon.*`. {pull}16734[16734]
 - The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
 - Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
+- Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
 
 ==== Bugfixes
 
