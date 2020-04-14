@@ -198,7 +198,7 @@ configure the auditd module and use processors to enrich events with metadata.
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Make the azure module GA. {pull}17319[17319]
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
-- Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
+- In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
 
