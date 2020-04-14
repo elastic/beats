@@ -10,6 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // ConfigAWS is a structure defined for AWS credentials
@@ -29,8 +32,11 @@ type ConfigAWS struct {
 // If none of the above is given, then load from aws config file. If credential_profile_name is not
 // given, then load default profile from the aws config file.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
+	logger := logp.NewLogger("GetAWSCredentials")
+
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
+		logger.Debug("Using access_key_id, secret_access_key and/or session_token for AWS credential")
 		awsConfig := defaults.Config()
 		awsCredentials := awssdk.Credentials{
 			AccessKeyID:     config.AccessKeyID,
@@ -49,9 +55,10 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
+		logger.Debug("Using role_arn for AWS credential")
 		awsConfig, err := external.LoadDefaultAWSConfig()
 		if err != nil {
-			return awsConfig, err
+			return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed when using role_arn")
 		}
 		stsSvc := sts.New(awsConfig)
 		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
@@ -63,10 +70,12 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
 	// If credential_profile_name is empty, then default profile is used.
+	logger.Debug("Using shared credential profile for AWS credential")
 	var options []external.Config
 	if config.ProfileName != "" {
 		options = append(options, external.WithSharedConfigProfile(config.ProfileName))
 	}
+
 	// If shared_credential_file is empty, then external.LoadDefaultAWSConfig
 	// function will load AWS config from current user's home directory.
 	// Linux/OSX: "$HOME/.aws/credentials"
@@ -77,7 +86,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
-		return awsConfig, err
+		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed when using shared credential profile")
 	}
 	return awsConfig, nil
 }
