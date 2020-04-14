@@ -854,13 +854,14 @@ output.elasticsearch:
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/path/config
+  #kerberos.config_path: /etc/krb5.conf
 
-  # The service principal name.
-  #kerberos.service_name: HTTP/my-service@realm
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
 
   # Name of the Kerberos user.
   #kerberos.username: elastic
