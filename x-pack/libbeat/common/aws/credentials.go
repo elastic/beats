@@ -32,7 +32,7 @@ type ConfigAWS struct {
 // If none of the above is given, then load from aws config file. If credential_profile_name is not
 // given, then load default profile from the aws config file.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
-	logger := logp.NewLogger("GetAWSCredentials")
+	logger := logp.NewLogger("get_aws_credentials")
 
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
