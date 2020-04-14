@@ -1,0 +1,156 @@
+{
+  "_index": "filebeat-8.0.0-2020.04.11-000001",
+  "_type": "_doc",
+  "_id": "cQ0Zc3EB7k3KgkskrloU",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "fortios": {
+      "application": {
+        "category": "unscanned"
+      },
+      "service": "HTTPS",
+      "destination": {
+        "interface_role": "undefined",
+        "interface": "port2"
+      },
+      "source": {
+        "interface_role": "undefined",
+        "interface": "port1"
+      },
+      "event": {
+        "date": "2020-04-13",
+        "time": "03:33:30"
+      },
+      "vd": "root",
+      "client_reputation": {
+        "score": "5",
+        "action": "262144"
+      },
+      "policy": {
+        "id": "1",
+        "type": "policy",
+        "uuid": "97557660-794f-51ea-553a-b250a5d9d734"
+      }
+    },
+    "agent": {
+      "hostname": "localhost.localdomain",
+      "id": "fcec9584-f42b-425a-b077-e55ad0b015c1",
+      "type": "filebeat",
+      "ephemeral_id": "395e5228-0187-4330-a726-d5aeb07e6af0",
+      "version": "8.0.0"
+    },
+    "_temp": {
+      "devid": "FGVMEVNSJXZ9NN06",
+      "crlevel": "low",
+      "devname": "FortiGate-VM64",
+      "logtime": "1586774010"
+    },
+    "log": {
+      "original": "<188>date=2020-04-13 time=03:33:30 devname=FortiGate-VM64 devid=FGVMEVNSJXZ9NN06 logid=\"0000000011\" type=\"traffic\" subtype=\"forward\" level=\"warning\" vd=\"root\" logtime=1586774010 srcip=192.168.1.106 srcport=64234 srcintf=\"port1\" srcintfrole=\"undefined\" dstip=157.245.223.76 dstport=443 dstintf=\"port2\" dstintfrole=\"undefined\" poluuid=\"97557660-794f-51ea-553a-b250a5d9d734\" sessionid=541602 proto=6 action=\"ip-conn\" policyid=1 policytype=\"policy\" service=\"HTTPS\" appcat=\"unscanned\" crscore=5 craction=262144 crlevel=\"low\"",
+      "source": {
+        "address": "192.168.1.233:18206"
+      }
+    },
+    "destination": {
+      "geo": {
+        "continent_name": "North America",
+        "region_iso_code": "US-NJ",
+        "city_name": "Clifton",
+        "country_iso_code": "US",
+        "region_name": "New Jersey",
+        "location": {
+          "lon": -74.1403,
+          "lat": 40.8364
+        }
+      },
+      "as": {
+        "number": 14061,
+        "organization": {
+          "name": "DigitalOcean, LLC"
+        }
+      },
+      "port": 443,
+      "ip": "157.245.223.76"
+    },
+    "source": {
+      "port": 64234,
+      "ip": "192.168.1.106"
+    },
+    "fileset": {
+      "name": "fortios"
+    },
+    "tags": [
+      "forti-os"
+    ],
+    "network": {
+      "protocol_number": "6"
+    },
+    "input": {
+      "type": "udp"
+    },
+    "@timestamp": "2020-04-13T10:33:30.000Z",
+    "ecs": {
+      "version": "1.5.0"
+    },
+    "service": {
+      "type": "fortigate"
+    },
+    "dissect": {
+      "orgmessage": "date=2020-04-13 time=03:33:30 devname=FortiGate-VM64 devid=FGVMEVNSJXZ9NN06 logid=\"0000000011\" type=\"traffic\" subtype=\"forward\" level=\"warning\" vd=\"root\" logtime=1586774010 srcip=192.168.1.106 srcport=64234 srcintf=\"port1\" srcintfrole=\"undefined\" dstip=157.245.223.76 dstport=443 dstintf=\"port2\" dstintfrole=\"undefined\" poluuid=\"97557660-794f-51ea-553a-b250a5d9d734\" sessionid=541602 proto=6 action=\"ip-conn\" policyid=1 policytype=\"policy\" service=\"HTTPS\" appcat=\"unscanned\" crscore=5 craction=262144 crlevel=\"low\"",
+      "syslog": {
+        "pri": "188"
+      }
+    },
+    "host": {
+      "hostname": "localhost.localdomain",
+      "os": {
+        "kernel": "3.10.0-1062.18.1.el7.x86_64",
+        "codename": "Core",
+        "name": "CentOS Linux",
+        "family": "redhat",
+        "version": "7 (Core)",
+        "platform": "centos"
+      },
+      "containerized": false,
+      "ip": [
+        "192.168.1.145",
+        "fe80::2f9d:f1be:85c0:1df1",
+        "172.18.0.1",
+        "fe80::42:6bff:fe19:7b08",
+        "172.17.0.1",
+        "fe80::b8f2:67ff:fe0b:7a61",
+        "fe80::b80d:2ff:feeb:c0ed"
+      ],
+      "name": "localhost.localdomain",
+      "id": "a02c956359404162b3d1167a534b7572",
+      "mac": [
+        "00:0c:29:b0:ce:6b",
+        "02:42:6b:19:7b:08",
+        "02:42:76:b4:36:09",
+        "ba:f2:67:0b:7a:61",
+        "ba:0d:02:eb:c0:ed"
+      ],
+      "architecture": "x86_64"
+    },
+    "event": {
+      "level": "warning",
+      "timezone": "+06:30",
+      "module": "fortigate",
+      "action": "ip-conn",
+      "id": "0000000011",
+      "sessionid": "541602",
+      "type": "traffic",
+      "category": "forward",
+      "dataset": "fortigate.fortios"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2020-04-13T10:33:30.000Z"
+    ]
+  },
+  "sort": [
+    1586774010000
+  ]
+}
