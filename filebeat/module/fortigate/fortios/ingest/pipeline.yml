@@ -328,6 +328,12 @@ processors:
       }
   - rename:
       {
+        field: _temp.crlevel,
+        ignore_missing: true,
+        target_field: fortios.client_reputation.level,
+      }
+  - rename:
+      {
         field: _temp.craction,
         ignore_missing: true,
         target_field: fortios.client_reputation.action,
@@ -841,6 +847,18 @@ processors:
       }
   - rename:
       {
+        field: _temp.devid,
+        ignore_missing: true,
+        target_field: fortios.device.id,
+      }
+  - rename:
+      {
+        field: _temp.devname,
+        ignore_missing: true,
+        target_field: fortios.device.name,
+      }
+  - rename:
+      {
         field: _temp.filetype,
         ignore_missing: true,
         target_field: fortios.file.type,
@@ -894,6 +912,12 @@ processors:
         field: _temp.ipaddr,
         ignore_missing: true,
         target_field: fortios.ipaddress,
+      }
+  - rename:
+      {
+        field: _temp.logtime,
+        ignore_missing: true,
+        target_field: fortios.log_time,
       }
 
   # convert integer fields.

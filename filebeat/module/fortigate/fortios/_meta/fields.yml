@@ -152,7 +152,11 @@
         - name: action
           type: keyword
           description: >
-            Action performed by Client Reputation.
+            Action performed by Client Reputation. 
+        - name: level
+          type: keyword
+          description: >
+            Client Reputation Level.
     - name: user
       type: group
       description: >
@@ -376,6 +380,14 @@
           type: keyword
           description: >
             Device category.
+        - name: id
+          type: keyword
+          description: >
+            Serial number of the device for the traffic's origin.
+        - name: name
+          type: keyword
+          description: >
+            Device name.
     - name: file
       type: group
       description: >
@@ -687,3 +699,7 @@
       type: keyword
       description: >
         IP addresses from DNS response answer section.
+    - name: log_time
+      type: keyword
+      description: >
+        Fortigate old version timestamp field.
