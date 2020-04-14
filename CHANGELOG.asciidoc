@@ -92,7 +92,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Add ability to enrich the `container.id` with the process id by using the `add_process_metadata` processor. {pull}15947[15947]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Add Kerberos support to Kafka input and output. {pull}16781[16781]
-- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 
 *Auditbeat*
 
@@ -100,7 +99,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 configure the auditd module and use processors to enrich events with metadata.
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when using kubernetes manifests. {pull}17443[174443]
-- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500
 
 *Filebeat*
@@ -137,7 +135,6 @@ configure the auditd module and use processors to enrich events with metadata.
 - Add Filebeat Okta module. {pull}16362[16362]
 - Improve AWS cloudtrail field mappings. {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 - Make the `azure-eventhub` input GA. {issue}15671[15671] {pull}17313[17313]
-- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 - Added `access_key_id`, `secret_access_key`, and `session_token` to the aws module config. {pull}17456[17456]
 
 *Heartbeat*
@@ -197,7 +194,6 @@ configure the auditd module and use processors to enrich events with metadata.
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Make the azure module GA. {pull}17319[17319]
-- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
