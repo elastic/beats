@@ -73,7 +73,7 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Fix problem where `cloudwatch` metricset was not collecting tags correctly. {issue}17419[17419] {pull}17424[17424]
 - check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 - Fix `aws.s3.bucket.name` terms_field in s3 overview dashboard. {pull}17542[17542]
-- Fix Unix socket path in memcached. {pull}17512[17512]
+- Fix Unix socket path in memcached module. {pull}17512[17512]
 - Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
 
 ==== Added
