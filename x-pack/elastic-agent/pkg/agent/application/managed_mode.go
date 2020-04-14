@@ -195,8 +195,8 @@ func (m *Managed) Start() error {
 // Stop stops a managed elastic-agent.
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
-	m.gateway.Stop()
 	m.cancelCtxFn()
+	m.gateway.Stop()
 	return nil
 }
 
