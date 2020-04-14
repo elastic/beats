@@ -3,6 +3,7 @@
   metricsets:
     - "pageinfo"
     # - ksm
+    # - conntrack
   enabled: true
   #hostfs: /hostfs
 
