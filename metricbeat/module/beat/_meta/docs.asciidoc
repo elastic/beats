@@ -11,4 +11,4 @@ The `beat` module work with {beats} 7.3.0 and later.
 The `beat` module can be used to collect metrics shown in our {stack} {monitor-features}
 UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
 from the module's configuration. Alternatively, run `metricbeat modules disable beat` and
-metricbeat modules enable beat-xpack`.
+`metricbeat modules enable beat-xpack`.
