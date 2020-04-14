@@ -1,0 +1,27 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+
+[[release-notes-8.0.0]]
+=== Agent version 8.0.0
+
+
+==== Breaking changes
+- Rename agent to elastic-agent {pull}17391[17391]
+
+==== Bugfixes
+
+- Fixed tests on windows {pull}16922[16922]
+- Fixed installers for SNAPSHOTs and windows {pull}17077[17077]
+- Fixed merge of config {pull}17399[17399]
+- Handle abs paths on windows correctly {pull}17461[17461]
+
+==== New features
+
+- Generate index name in a format type-dataset-namespace {pull}16903[16903]
+- OS agnostic default configuration {pull}17016[17016]
+- Display the stability of the agent at enroll and start.  {pull}17336[17336]
+- Support for config constraints {pull}17112[17112]
+- Introduced post install hooks {pull}17241[17241]

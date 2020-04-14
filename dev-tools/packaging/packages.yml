@@ -35,11 +35,11 @@ shared:
         content: >
           {{ commit }}
         mode: 0644
-      /etc/{{.BeatName}}/agent.reference.yml:
-        source: 'agent.reference.yml'
+      /etc/{{.BeatName}}/elastic-agent.reference.yml:
+        source: 'elastic-agent.reference.yml'
         mode: 0644
-      /etc/{{.BeatName}}/agent.yml:
-        source: 'agent.yml'
+      /etc/{{.BeatName}}/elastic-agent.yml:
+        source: 'elastic-agent.yml'
         mode: 0600
         config: true
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
@@ -90,11 +90,11 @@ shared:
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/{{.identifier}}.plist:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/launchd-daemon.plist.tmpl'
         mode: 0644
-      /etc/{{.BeatName}}/agent.reference.yml:
-        source: 'agent.reference.yml'
+      /etc/{{.BeatName}}/elastic-agent.reference.yml:
+        source: 'elastic-agent.reference.yml'
         mode: 0644
-      /etc/{{.BeatName}}/agent.yml:
-        source: 'agent.yml'
+      /etc/{{.BeatName}}/elastic-agent.yml:
+        source: 'elastic-agent.yml'
         mode: 0600
         config: true
       /etc/{{.BeatName}}/data/downloads/filebeat-{{ beat_version }}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
@@ -118,11 +118,11 @@ shared:
       content: >
         {{ commit }}
       mode: 0644
-    'agent.reference.yml':
-      source: 'agent.reference.yml'
+    'elastic-agent.reference.yml':
+      source: 'elastic-agent.reference.yml'
       mode: 0644
-    'agent.yml':
-      source: 'agent.yml'
+    'elastic-agent.yml':
+      source: 'elastic-agent.yml'
       mode: 0600
       config: true
 
@@ -163,8 +163,8 @@ shared:
       user: 'root'
       linux_capabilities: ''
     files:
-      'agent.yml':
-        source: 'agent.docker.yml'
+      'elastic-agent.yml':
+        source: 'elastic-agent.docker.yml'
         mode: 0600
         config: true
 

@@ -55,6 +55,48 @@ pipeline {
     stage('Build and Test'){
       failFast false
       parallel {
+        stage('Elastic Agent x-pack'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false"
+            }
+          }
+          steps {
+            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+          }
+        }
+
+        stage('Elastic Agent x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
+          }
+        }
+
+        stage('Elastic Agent Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
+          }
+        }
+
         stage('Filebeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -891,6 +933,10 @@ def loadConfigEnvVars(){
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
   env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+
+  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode([
+    "^x-pack/elastic-agent/.*",
+  ])
 
   env.GO_VERSION = readFile(".go-version").trim()
 }
