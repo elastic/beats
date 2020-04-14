@@ -46,8 +46,8 @@ func UseElasticAgentPackaging() {
 	MustUsePackaging("elastic_beat_agent_binaries", packageSpecFile)
 }
 
-// UseElasticAgentPackaging configures the package target to build packages for
-// an Elastic Agent.
+// UseElasticAgentDemoPackaging configures the package target to build packages for
+// an Elastic Agent demo purposes.
 func UseElasticAgentDemoPackaging() {
 	// Prepare binaries so they can be packed into agent
 	MustUsePackaging("elastic_beat_agent_demo_binaries", packageSpecFile)
