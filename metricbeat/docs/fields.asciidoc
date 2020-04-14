@@ -1600,6 +1600,283 @@ type: keyword
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
 
 
+
+
+[float]
+=== SuccessfulRequestLatency
+
+The latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
+
+
+
+*`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.SuccessfulRequestLatency.max`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.OnlineIndexPercentageProgress.avg`*::
++
+--
+The percentage of completion when a new global secondary index is being added to a table.
+
+
+type: double
+
+--
+
+*`aws.dynamodb.metrics.ProvisionedWriteCapacityUnits.avg`*::
++
+--
+The number of provisioned write capacity units for a table or a global secondary index.
+
+
+type: double
+
+--
+
+*`aws.dynamodb.metrics.ProvisionedReadCapacityUnits.avg`*::
++
+--
+The number of provisioned read capacity units for a table or a global secondary index.
+
+
+type: double
+
+--
+
+[float]
+=== ConsumedReadCapacityUnits
+
+The number of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
+
+*`aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum`*::
++
+--
+type: long
+
+--
+
+[float]
+=== ConsumedWriteCapacityUnits
+
+The number of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
+
+*`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.sum`*::
++
+--
+type: long
+
+--
+
+[float]
+=== ReplicationLatency
+
+The elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
+
+
+
+*`aws.dynamodb.metrics.ReplicationLatency.avg`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.ReplicationLatency.max`*::
++
+--
+type: double
+
+--
+
+[float]
+=== TransactionConflict
+
+Rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
+
+
+
+*`aws.dynamodb.metrics.TransactionConflict.avg`*::
++
+--
+type: double
+
+--
+
+*`aws.dynamodb.metrics.TransactionConflict.sum`*::
++
+--
+type: long
+
+--
+
+*`aws.dynamodb.metrics.AccountProvisionedReadCapacityUtilization.avg`*::
++
+--
+The average percentage of provisioned read capacity units utilized by the account.
+
+
+type: double
+
+--
+
+*`aws.dynamodb.metrics.AccountProvisionedWriteCapacityUtilization.avg`*::
++
+--
+The average percentage of provisioned write capacity units utilized by the account.
+
+
+type: double
+
+--
+
+*`aws.dynamodb.metrics.SystemErrors.sum`*::
++
+--
+The requests to DynamoDB or Amazon DynamoDB Streams that generate an HTTP 500 status code during the specified time period.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.ConditionalCheckFailedRequests.sum`*::
++
+--
+The number of failed attempts to perform conditional writes.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.PendingReplicationCount.sum`*::
++
+--
+The number of item updates that are written to one replica table, but that have not yet been written to another replica in the global table.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.ReadThrottleEvents.sum`*::
++
+--
+Requests to DynamoDB that exceed the provisioned read capacity units for a table or a global secondary index.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.ThrottledRequests.sum`*::
++
+--
+Requests to DynamoDB that exceed the provisioned throughput limits on a resource (such as a table or an index).
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.WriteThrottleEvents.sum`*::
++
+--
+Requests to DynamoDB that exceed the provisioned write capacity units for a table or a global secondary index.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.AccountMaxReads.max`*::
++
+--
+The maximum number of read capacity units that can be used by an account. This limit does not apply to on-demand tables or global secondary indexes.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.AccountMaxTableLevelReads.max`*::
++
+--
+The maximum number of read capacity units that can be used by a table or global secondary index of an account. For on-demand tables this limit caps the maximum read request units a table or a global secondary index can use.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.AccountMaxTableLevelWrites.max`*::
++
+--
+The maximum number of write capacity units that can be used by a table or global secondary index of an account. For on-demand tables this limit caps the maximum write request units a table or a global secondary index can use.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.AccountMaxWrites.max`*::
++
+--
+The maximum number of write capacity units that can be used by an account. This limit does not apply to on-demand tables or global secondary indexes.
+
+
+type: long
+
+--
+
+*`aws.dynamodb.metrics.MaxProvisionedTableReadCapacityUtilization.max`*::
++
+--
+The percentage of provisioned read capacity units utilized by the highest provisioned read table or global secondary index of an account.
+
+
+type: double
+
+--
+
+*`aws.dynamodb.metrics.MaxProvisionedTableWriteCapacityUtilization.max`*::
++
+--
+The percentage of provisioned write capacity utilized by the highest provisioned write table or global secondary index of an account.
+
+
+type: double
+
+--
+
 [float]
 === ebs
 
