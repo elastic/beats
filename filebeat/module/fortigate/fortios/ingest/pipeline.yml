@@ -28,21 +28,25 @@ processors:
        - "UNIX"
      ignore_failure: true
      on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
-  # Some FortiOS use eventtime (Need to parse with js due to nano seconds)
-  #
-  # Process the flow duration "hh:mm:ss" present in some messages
-  # This will fill event.start, event.end and event.duration
-  #
-# - script:
-#     lang: painless
-#     if: 'ctx?.event?.sequence !=null'
-#     source: >
-#        ctx._temp.eventtimems = ctx.event.sequence / 100000;
-#     ignore_failure: true
-# Newer version of FortiOS Use Eventtime 
+# Some FortiOS use eventtime in Unix MS
+
  - date:
-     if: "ctx._temp?.eventtime != null"
+     if: "ctx._temp?.eventtime != null && ctx._temp?.eventtime.length() < 11"
      field: "_temp.eventtime"
+     formats:
+       - "UNIX"
+     ignore_failure: true
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+#Some FortiOS use eventtime in Unix NS
+ - script:
+     lang: painless
+     if: 'ctx._temp?.eventtime != null && ctx._temp?.eventtime.length() > 10'
+     source: >
+        ctx._temp.eventtimeunix = ctx._temp?.eventtime.substring(0,10);
+     ignore_failure: true
+ - date:
+     if: "ctx._temp?.eventtimeunix != null "
+     field: "_temp.eventtimeunix"
      formats:
        - "UNIX"
      ignore_failure: true
