@@ -476,7 +476,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 			}
 
 			var actualNewConfig metricSetConfig
-			err = m.UnpackConfig(&actualNewConfig)
+			err = newBM.UnpackConfig(&actualNewConfig)
 			require.NoError(t, err)
 			require.Equal(t, expectedNewConfig, actualNewConfig)
 
