@@ -4894,7 +4894,7 @@ type: keyword
 --
 Confidence level determined.
 
-type: keyword
+type: integer
 
 --
 
@@ -4988,15 +4988,6 @@ type: long
 
 --
 
-*`checkpoint.file_hash`*::
-+
---
-File hash (SHA1 or MD5).
-
-type: keyword
-
---
-
 *`checkpoint.frequency`*::
 +
 --
@@ -5051,6 +5042,15 @@ type: keyword
 
 --
 
+*`checkpoint.malware_family`*::
++
+--
+Malware family.
+
+type: keyword
+
+--
+
 *`checkpoint.peer_gateway`*::
 +
 --
@@ -5065,7 +5065,7 @@ type: ip
 --
 Protection performance impact.
 
-type: keyword
+type: integer
 
 --
 
@@ -5123,16 +5123,25 @@ type: keyword
 
 --
 
-*`checkpoint.malware_status`*::
+*`checkpoint.spyware_name`*::
 +
 --
-Malware status.
+Spyware name.
 
 type: keyword
 
 --
 
-*`checkpoint.subscription_expiration`*::
+*`checkpoint.spyware_status`*::
++
+--
+Spyware status.
+
+type: keyword
+
+--
+
+*`checkpoint.subs_exp`*::
 +
 --
 The expiration date of the subscription.
@@ -5190,24 +5199,6 @@ type: keyword
 +
 --
 Virus name.
-
-type: keyword
-
---
-
-*`checkpoint.malware_name`*::
-+
---
-Malware name.
-
-type: keyword
-
---
-
-*`checkpoint.malware_family`*::
-+
---
-Malware family.
 
 type: keyword
 
