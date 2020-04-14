@@ -72,11 +72,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
 - Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
+- Fix bug with `monitoring.cluster_uuid` setting not always being exposed via GET /state Beats API. {issue}16732[16732] {pull}17420[17420]
+- Fix building on FreeBSD by removing build flags from `add_cloudfoundry_metadata` processor. {pull}17486[17486]
+- Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
 
 *Auditbeat*
 
 - system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
+- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 
 *Filebeat*
 
@@ -98,11 +102,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Elasticsearch `_id` field set by S3 and Google Pub/Sub inputs. {pull}17026[17026]
 - Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 - Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
-- Re-obtain AWS credentials if they expired in s3 input. {pull}17205[17205]
 - Fix `elasticsearch.gc` fileset to not collect _all_ logs when Elasticsearch is running in Docker. {issue}13164[13164] {issue}16583[16583] {pull}17164[17164]
 - Fixed a mapping exception when ingesting CEF logs that used the spriv or dpriv extensions. {issue}17216[17216] {pull}17220[17220]
 - CEF: Fixed decoding errors caused by trailing spaces in messages. {pull}17253[17253]
 - Fixed a mapping exception when ingesting Logstash plain logs (7.4+) with pipeline ids containing non alphanumeric chars. {issue}17242[17242] {pull}17243[17243]
+- Fixed MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
+- Fix `elasticsearch.audit` data ingest pipeline to be more forgiving with date formats found in Elasticsearch audit logs. {pull}17406[17406]
+- Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
+- Remove migrationVersion map 7.7.0 reference from Kibana dashboard file to fix backward compatibility issues. {pull}17425[17425]
 
 *Heartbeat*
 
@@ -135,6 +142,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Further revise check for bad data in docker/memory. {pull}17400[17400]
+- Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
+- Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
+- Fix how we filter services by name in system/service {pull}17400[17400]
+- Fix cloudwatch metricset missing tags collection. {issue}17419[17419] {pull}17424[17424]
+- check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
+- Fix aws.s3.bucket.name terms_field in s3 overview dashboard. {pull}17542[17542]
+- Fix Unix socket path in memcached. {pull}17512[17512]
+- Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
+- Fix azure storage dashboards. {pull}17590[17590]
+- Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
+- Fix pubsub metricset to collect all GA stage metrics from gcp stackdriver. {issue}17154[17154] {pull}17600[17600]
+- Add privileged option so as mb to access data dir in Openshift. {pull}17606[17606]
+- Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
+- Add privileged option for Auditbeat in Openshift {pull}17637[17637]
+- Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 
 *Packetbeat*
 
@@ -168,9 +191,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
 - Update supported versions of `redis` output. {pull}17198[17198]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
+- Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
+- Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
 
 *Auditbeat*
 
+- Reference kubernetes manifests include configuration for auditd and enrichment with kubernetes metadata. {pull}17431[17431]
+- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
+- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
@@ -214,8 +244,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
 - Add source field in k8s events {pull}17209[17209]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
+- Added new module `crowdstrike` for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
 - Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
+- Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
+- Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
+- Added access_key_id, secret_access_key and session_token into aws module config. {pull}17456[17456]
+- Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
+- Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
+- Release Google Cloud module as GA. {pull}17511[17511]
 
 *Heartbeat*
 
@@ -274,6 +311,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
 - Add support for CouchDB v2 {issue}16352[16352] {pull}16455[16455]
+- Add dashboard for pubsub metricset in googlecloud module. {pull}17161[17161]
 - Add dashboards for the azure container metricsets. {pull}17194[17194]
 - Replace vpc metricset into vpn, transitgateway and natgateway metricsets. {pull}16892[16892]
 - Use Elasticsearch histogram type to store Prometheus histograms {pull}17061[17061]
@@ -282,7 +320,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add Storage metricsets to GCP module {pull}15598[15598]
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
+- Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
+- Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
 
