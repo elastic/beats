@@ -5,6 +5,7 @@
 package tokenbucket
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -24,12 +25,13 @@ type Bucket struct {
 // size: total size of the bucket
 // dropAmount: amount which is dropped per every specified interval
 // dropRate: specified interval when drop will happen
-func NewTokenBucket(size, dropAmount int, dropRate time.Duration) (*Bucket, error) {
+func NewTokenBucket(ctx context.Context, size, dropAmount int, dropRate time.Duration) (*Bucket, error) {
 	s := scheduler.NewPeriodic(dropRate)
-	return newTokenBucketWithScheduler(size, dropAmount, s)
+	return newTokenBucketWithScheduler(ctx, size, dropAmount, s)
 }
 
 func newTokenBucketWithScheduler(
+	ctx context.Context,
 	size, dropAmount int,
 	s scheduler.Scheduler,
 ) (*Bucket, error) {
@@ -47,7 +49,7 @@ func newTokenBucketWithScheduler(
 		closeChan:  make(chan struct{}),
 		scheduler:  s,
 	}
-	go b.run()
+	go b.run(ctx)
 
 	return b, nil
 }
@@ -65,7 +67,7 @@ func (b *Bucket) Close() {
 }
 
 // run runs basic loop and consumes configured tokens per every configured period.
-func (b *Bucket) run() {
+func (b *Bucket) run(ctx context.Context) {
 	for {
 		select {
 		case <-b.scheduler.WaitTick():
@@ -76,6 +78,8 @@ func (b *Bucket) run() {
 				}
 			}
 		case <-b.closeChan:
+			return
+		case <-ctx.Done():
 			return
 		}
 	}

@@ -16,6 +16,8 @@
 - Fixed tests on windows {pull}16922[16922]
 - Fixed installers for SNAPSHOTs and windows {pull}17077[17077]
 - Fixed merge of config {pull}17399[17399]
+- Handle abs paths on windows correctly {pull}17461[17461]
+- Improved cancellation of agent {pull}17318[17318]
 
 ==== New features
 
@@ -23,4 +25,6 @@
 - OS agnostic default configuration {pull}17016[17016]
 - Introduced post install hooks {pull}17241[17241]
 - Support for config constraints {pull}17112[17112]
+- Introduced `mage demo` command {pull}17312[17312]
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
+- Expose stream.* variables in events {pull}17468[17468]

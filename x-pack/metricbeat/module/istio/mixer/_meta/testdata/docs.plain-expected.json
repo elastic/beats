@@ -8,7 +8,8 @@
         "istio": {
             "mixer": {
                 "handler": {
-                    "daemons": 1
+                    "daemons": 1,
+                    "name": "prometheus.istio-system"
                 }
             }
         },
@@ -31,6 +32,29 @@
             "mixer": {
                 "dispatcher_destinations_per_variety_total": 1,
                 "variety": "TEMPLATE_VARIETY_ATTRIBUTE_GENERATOR"
+            }
+        },
+        "metricset": {
+            "name": "mixer",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.mixer",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "istio": {
+            "mixer": {
+                "handler": {
+                    "daemons": 4,
+                    "name": "kubernetesenv.istio-system"
+                }
             }
         },
         "metricset": {
@@ -106,28 +130,6 @@
                             "acks": 1
                         }
                     }
-                }
-            }
-        },
-        "metricset": {
-            "name": "mixer",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.mixer",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "istio": {
-            "mixer": {
-                "handler": {
-                    "daemons": 4
                 }
             }
         },

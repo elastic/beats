@@ -8,6 +8,8 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKER_REGISTRY = 'docker.elastic.co'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -657,6 +659,9 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
+    dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    // FIXME workaround untill we fix the packer cache
+    sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
@@ -821,6 +826,8 @@ def reportCoverage(){
   }
 }
 
+// isChanged treats the patterns as regular expressions. In order to check if
+// any file in a directoy is modified use `^<path to dir>/.*`.
 def isChanged(patterns){
   return (
     params.runAllStages
@@ -830,25 +837,25 @@ def isChanged(patterns){
 
 def isChangedOSSCode(patterns) {
   def always = [
-    "Jenkinsfile",
-    "^vendor/*",
-    "^libbeat/*",
-    "^testing/*",
-    "^dev-tools/*",
-    "^\\.ci/*",
+    "^Jenkinsfile",
+    "^vendor/.*",
+    "^libbeat/.*",
+    "^testing/.*",
+    "^dev-tools/.*",
+    "^\\.ci/.*",
   ]
   return isChanged(always + patterns)
 }
 
 def isChangedXPackCode(patterns) {
   def always = [
-    "Jenkinsfile",
-    "^vendor/*",
-    "^libbeat/*",
-    "^dev-tools/*",
-    "^testing/*",
+    "^Jenkinsfile",
+    "^vendor/.*",
+    "^libbeat/.*",
+    "^dev-tools/.*",
+    "^testing/.*",
     "^x-pack/libbeat/.*",
-    "^\\.ci/*",
+    "^\\.ci/.*",
   ]
   return isChanged(always + patterns)
 }
@@ -934,7 +941,7 @@ def loadConfigEnvVars(){
   // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
   // if the deployment scripts have been updated. No Beats specific testing is
   // involved.
-  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/*"])
+  env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
   env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
 
