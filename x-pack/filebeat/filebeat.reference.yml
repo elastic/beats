@@ -127,6 +127,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   cloudwatch:
     enabled: false
 
@@ -157,6 +160,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   ec2:
     enabled: false
@@ -189,6 +195,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   elb:
     enabled: false
 
@@ -219,6 +228,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   s3access:
     enabled: false
@@ -251,6 +263,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   vpcflow:
     enabled: false
 
@@ -281,6 +296,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
