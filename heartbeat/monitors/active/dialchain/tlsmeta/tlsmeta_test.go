@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -262,26 +261,13 @@ func TestCertExpirationMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			event := common.MapStr{}
-			AddCertMetadata(event, tt.certs)
+			notBefore, notAfter := calculateCertTimestamps(tt.certs)
 
-			validateNotBefore := lookslike.MustCompile(map[string]interface{}{
-				"tls.certificate_not_valid_before": tt.expected.notBefore,
-				"tls.server.x509.not_before":       tt.expected.notBefore,
-			})
-			testslike.Test(t, validateNotBefore, event)
-
+			require.Equal(t, tt.expected.notBefore, notBefore)
 			if tt.expected.notAfter != nil {
-				validateNotAfter := lookslike.MustCompile(map[string]interface{}{
-					"tls.certificate_not_valid_after": *tt.expected.notAfter,
-					"tls.server.x509.not_after":       *tt.expected.notAfter,
-				})
-				testslike.Test(t, validateNotAfter, event)
+				require.Equal(t, tt.expected.notAfter, notAfter)
 			} else {
-				ok, _ := event.HasKey("tls.certificate_not_valid_after")
-				assert.False(t, ok, "event should not have not after %v", event)
-				ok, _ = event.HasKey("tls.server.x509.not_after")
-				assert.False(t, ok, "event should not have not after %v", event)
+				require.Nil(t, notAfter)
 			}
 		})
 	}

@@ -52,40 +52,6 @@ func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, d
 }
 
 func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
-	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
-	// Why might we do this?
-	// The root cause is that the x509.Certificate type uses time.Time for these tlsFields instead of *time.Time
-	// so we have no way to know if the user actually set these tlsFields. The x509 RFC says that only one of the
-	// two tlsFields must be set. Most tools (including openssl and go's certgen) always set both. BECAUSE WHY NOT
-	//
-	// In the wild, however, there are certs missing one of these two tlsFields.
-	// So, what's the correct behavior here? We cannot know if a field was omitted due to the lack of nullability.
-	// So, in this case, we try to do what people will want 99.99999999999999999% of the time.
-	// People might set notBefore to go's zero date intentionally when creating certs. So, we always set that
-	// field, even if we find a zero value.
-	// However, it would be weird to set notAfter to the zero value. That could invalidate a cert that was intended
-	// to be valid forever. So, in that case, we treat the zero value as non-existent.
-	// This is why notBefore is a time.Time and notAfter is a *time.Time
-	var chainNotValidBefore time.Time
-	var chainNotValidAfter *time.Time
-
-	// We need the zero date later
-	var zeroTime time.Time
-
-	// Here we compute the minimal bounds during which this certificate chain is valid
-	// To do this correctly, we take the maximum NotBefore and the minimum NotAfter.
-	// This *should* always wind up being the terminal cert in the chain, but we should
-	// compute this correctly.
-	for _, cert := range certs {
-		if chainNotValidBefore.Before(cert.NotBefore) {
-			chainNotValidBefore = cert.NotBefore
-		}
-
-		if cert.NotAfter != zeroTime && (chainNotValidAfter == nil || chainNotValidAfter.After(cert.NotAfter)) {
-			chainNotValidAfter = &cert.NotAfter
-		}
-	}
-
 	hostCert := certs[0]
 
 	x509Fields := common.MapStr{}
@@ -105,22 +71,57 @@ func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
 		sizeInBits := rsaKey.Size() * 8
 		x509Fields.Put("public_key_size", sizeInBits)
+	} else if hostCert.PublicKeyAlgorithm == x509.DSA {
+		x509Fields.Put("public_key_size", 1024)
 	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
 		x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
 	}
 
-	// Handle expiration / age, this is a bit weird since we actually use the age of the whole chain
+	chainNotBefore, chainNotAfter := calculateCertTimestamps(certs)
 	// Legacy non-ECS field
-	tlsFields.Put("certificate_not_valid_before", chainNotValidBefore)
-	// New ECS compatible field
-	x509Fields.Put("not_before", chainNotValidBefore)
-
-	if chainNotValidAfter != nil {
+	tlsFields.Put("certificate_not_valid_before", chainNotBefore)
+	x509Fields.Put("not_before", chainNotBefore)
+	if chainNotAfter != nil {
 		// Legacy non-ECS field
-		tlsFields.Put("certificate_not_valid_after", *chainNotValidAfter)
-		// New ECS compatible field
-		x509Fields.Put("not_after", *chainNotValidAfter)
+		tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
+		x509Fields.Put("not_after", *chainNotAfter)
 	}
 
 	fields.DeepUpdate(common.MapStr{"tls": tlsFields})
+}
+
+func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Time, chainNotAfter *time.Time) {
+	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
+	// Why might we do this?
+	// The root cause is that the x509.Certificate type uses time.Time for these tlsFields instead of *time.Time
+	// so we have no way to know if the user actually set these tlsFields. The x509 RFC says that only one of the
+	// two tlsFields must be set. Most tools (including openssl and go's certgen) always set both. BECAUSE WHY NOT
+	//
+	// In the wild, however, there are certs missing one of these two tlsFields.
+	// So, what's the correct behavior here? We cannot know if a field was omitted due to the lack of nullability.
+	// So, in this case, we try to do what people will want 99.99999999999999999% of the time.
+	// People might set notBefore to go's zero date intentionally when creating certs. So, we always set that
+	// field, even if we find a zero value.
+	// However, it would be weird to set notAfter to the zero value. That could invalidate a cert that was intended
+	// to be valid forever. So, in that case, we treat the zero value as non-existent.
+	// This is why notBefore is a time.Time and notAfter is a *time.Time
+
+	// We need the zero date later
+	var zeroTime time.Time
+
+	// Here we compute the minimal bounds during which this certificate chain is valid
+	// To do this correctly, we take the maximum NotBefore and the minimum NotAfter.
+	// This *should* always wind up being the terminal cert in the chain, but we should
+	// compute this correctly.
+	for _, cert := range certs {
+		if chainNotBefore.Before(cert.NotBefore) {
+			chainNotBefore = cert.NotBefore
+		}
+
+		if cert.NotAfter != zeroTime && (chainNotAfter == nil || chainNotAfter.After(cert.NotAfter)) {
+			chainNotAfter = &cert.NotAfter
+		}
+	}
+
+	return
 }
