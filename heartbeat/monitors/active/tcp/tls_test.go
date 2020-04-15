@@ -138,8 +138,9 @@ func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certif
 	require.NoError(t, certFile.Close())
 
 	return ip, port, cert, certFile, func() {
-		os.Remove(certFile.Name())
-		server.Close()
+		defer server.Close()
+		err := os.Remove(certFile.Name())
+		require.NoError(t, err)
 	}
 }
 
