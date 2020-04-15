@@ -95,7 +95,7 @@ func newHTTPMonitorIPsJob(
 	}
 
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.StdResolver, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.CreateStdResolver(), pingFactory)
 
 	return job, err
 }

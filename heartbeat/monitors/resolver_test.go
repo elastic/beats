@@ -25,11 +25,10 @@ import (
 )
 
 func TestEmptyStaticResolver(t *testing.T) {
-	r := CreateStaticResolver()
-
 	host := "foo"
-
+	r := CreateStaticResolver(map[string][]net.IP{})
 	ip, err := r.ResolveIPAddr("ip", host)
+
 	require.Nil(t, ip)
 	require.Equal(t, makeStaticNXDomainErr(host), err)
 
@@ -39,11 +38,13 @@ func TestEmptyStaticResolver(t *testing.T) {
 }
 
 func TestStaticResolver(t *testing.T) {
-	r := CreateStaticResolver()
-
 	host := "foo"
 	expectedIp := net.ParseIP("123.123.123.123")
-	r.Add(host, expectedIp.String())
+	r := CreateStaticResolver(
+		map[string][]net.IP{
+			host: {expectedIp},
+		},
+		)
 
 	ipAddr, err := r.ResolveIPAddr("ip", host)
 	require.Equal(t, &net.IPAddr{IP: expectedIp}, ipAddr)
@@ -62,24 +63,19 @@ func TestStaticResolver(t *testing.T) {
 }
 
 func TestStaticResolverMulti(t *testing.T) {
-	r := CreateStaticResolver()
-
 	host := "foo"
-	expectedIps := []net.IP{
+	ips := []net.IP{
 		net.ParseIP("123.123.123.123"),
 		net.ParseIP("1.2.3.4"),
 		net.ParseIP("5.6.7.8"),
 	}
-
-	for _, ip := range expectedIps {
-		r.Add(host, ip.String())
-	}
+	r := CreateStaticResolver(map[string][]net.IP{host: ips})
 
 	ipAddr, err := r.ResolveIPAddr("ip", host)
-	require.Equal(t, &net.IPAddr{IP: expectedIps[0]}, ipAddr)
+	require.Equal(t, &net.IPAddr{IP: ips[0]}, ipAddr)
 	require.Nil(t, err)
 
-	ips, err := r.LookupIP(host)
-	require.Equal(t, expectedIps, ips)
+	foundIP, err := r.LookupIP(host)
+	require.Equal(t, foundIP, ips)
 	require.Nil(t, err)
 }

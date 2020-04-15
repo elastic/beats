@@ -31,46 +31,32 @@ type Resolver interface {
 	LookupIP(host string) ([]net.IP, error)
 }
 
-// stdResolver uses the go std library to perform DNS resolution.
-type stdResolver struct{}
+// StdResolver uses the go std library to perform DNS resolution.
+type StdResolver struct{}
 
-// We only ever need one instance of this
-var StdResolver = stdResolver{}
+func CreateStdResolver() StdResolver {
+	return StdResolver{}
+}
 
-func (s stdResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
+func (s StdResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
 	return net.ResolveIPAddr(network, host)
 }
 
-func (s stdResolver) LookupIP(host string) ([]net.IP, error) {
+func (s StdResolver) LookupIP(host string) ([]net.IP, error) {
 	return net.LookupIP(host)
 }
 
-// staticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names
+// StaticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names
 // and zones.
-type staticResolver struct {
+type StaticResolver struct {
 	mapping map[string][]net.IP
 }
 
-func CreateStaticResolver() staticResolver {
-	return staticResolver{mapping: map[string][]net.IP{}}
+func CreateStaticResolver(mapping map[string][]net.IP) StaticResolver {
+	return StaticResolver{mapping}
 }
 
-func (s staticResolver) Add(hostname string, ip string) error {
-	parsed := net.ParseIP(ip)
-	if parsed == nil {
-		return fmt.Errorf("could not parse IP from string %s", ip)
-	}
-
-	if found, ok := s.mapping[hostname]; ok {
-		s.mapping[hostname] = append(found, parsed)
-	} else {
-		s.mapping[hostname] = []net.IP{parsed}
-	}
-
-	return nil
-}
-
-func (s staticResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
+func (s StaticResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
 	found, err := s.LookupIP(host)
 	if err != nil {
 		return nil, err
@@ -78,7 +64,7 @@ func (s staticResolver) ResolveIPAddr(network string, host string) (*net.IPAddr,
 	return &net.IPAddr{IP: found[0]}, nil
 }
 
-func (s staticResolver) LookupIP(host string) ([]net.IP, error) {
+func (s StaticResolver) LookupIP(host string) ([]net.IP, error) {
 	if found, ok := s.mapping[host]; ok {
 		return found, nil
 	} else {
