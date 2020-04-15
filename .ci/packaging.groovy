@@ -139,11 +139,24 @@ def withBeatsEnv(Closure body) {
     unstash 'source'
     dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
       //dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       //sh(label: 'workaround packer cache', '.ci/packer_cache.sh')
       body()
     }
   }
+}
+
+def goos(){
+  def labels = env.NODE_LABELS
+
+  if (labels.contains('linux')) {
+    return 'linux'
+  } else if (labels.contains('windows')) {
+    return 'windows'
+  } else if (labels.contains('darwin')) {
+    return 'darwin'
+  }
+
+  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
