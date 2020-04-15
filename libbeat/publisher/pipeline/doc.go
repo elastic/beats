@@ -16,9 +16,10 @@
 // under the License.
 
 /*
-Package pipeline implements publishing pipelines used in libbeat.
-A pipeline consists of several components acting in concert with each other. The
-main ones are described below.
+Package pipeline implements event publishing pipelines used in libbeat. These pipelines
+are used to publish events from a source (e.g. an input in Filebeat) all the way to an output
+(e.g. Elasticsearch), via processors and a queue. A pipeline encapsulates all these components
+and abstracts over some key internal components as well to make event publishing possible.
 
 The main component, of course, is a *pipeline* itself. When a new pipeline is created
 a *client* is returned. Users of the pipeline can use this client to publish
