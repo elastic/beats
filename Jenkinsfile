@@ -722,7 +722,7 @@ def goos(){
     return 'darwin'
   }
 
-  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
+  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
 
 def dumpMage(){
