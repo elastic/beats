@@ -577,7 +577,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     fields.append(newName + ".counts")
                     fields.append(newName + ".values")
 
-
                 if field.get("type") == "alias":
                     aliases.append(newName)
 
