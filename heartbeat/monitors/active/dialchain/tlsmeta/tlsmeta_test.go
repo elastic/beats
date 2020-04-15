@@ -134,7 +134,8 @@ func TestAddCertMetadata(t *testing.T) {
 				"serial_number":        "26610543540289562361990401194",
 				"signature_algorithm":  "SHA256-RSA",
 				"public_key_algorithm": "RSA",
-				"public_key_size":      2049,
+				"public_key_size":      2048,
+				"public_key_exponent":  65537,
 			},
 		},
 	}))
