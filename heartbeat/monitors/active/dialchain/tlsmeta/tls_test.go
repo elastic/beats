@@ -26,6 +26,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -110,7 +113,7 @@ func TestAddCertMetadata(t *testing.T) {
 	certNotAfter, err := time.Parse(time.RFC3339, "2020-07-16T03:15:39Z")
 	require.NoError(t, err)
 
-	expectedFields := common.MapStr{
+	expectedFields := lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
 		"certificate_not_valid_after":  certNotAfter,
 		"certificate_not_valid_before": certNotBefore,
 		"server": common.MapStr{
@@ -118,12 +121,24 @@ func TestAddCertMetadata(t *testing.T) {
 				"sha1":   "b7b4b89ef0d0caf39d223736f0fdbb03c7b426f1",
 				"sha256": "12b00d04db0db8caa302bfde043e88f95baceb91e86ac143e93830b4bbec726d",
 			},
-			"issuer":     "CN=GlobalSign CloudSSL CA - SHA256 - G3,O=GlobalSign nv-sa,C=BE",
-			"not_after":  certNotAfter,
-			"not_before": certNotBefore,
-			"subject":    "CN=r2.shared.global.fastly.net,O=Fastly\\, Inc.,L=San Francisco,ST=California,C=US",
+			"x509": common.MapStr{
+				"issuer": common.MapStr{
+					"common_name":        "GlobalSign CloudSSL CA - SHA256 - G3",
+					"distinguished_name": "CN=GlobalSign CloudSSL CA - SHA256 - G3,O=GlobalSign nv-sa,C=BE",
+				},
+				"subject": common.MapStr{
+					"common_name":        "r2.shared.global.fastly.net",
+					"distinguished_name": "CN=r2.shared.global.fastly.net,O=Fastly\\, Inc.,L=San Francisco,ST=California,C=US",
+				},
+				"not_after":            certNotAfter,
+				"not_before":           certNotBefore,
+				"serial_number":        "26610543540289562361990401194",
+				"signature_algorithm":  "SHA256-RSA",
+				"public_key_algorithm": "RSA",
+				"public_key_size":      2048,
+			},
 		},
-	}
+	}))
 
 	scenarios := []struct {
 		name  string
@@ -145,7 +160,7 @@ func TestAddCertMetadata(t *testing.T) {
 			AddCertMetadata(fields, scenario.certs)
 			tls, err := fields.GetValue("tls")
 			require.NoError(t, err)
-			require.Equal(t, expectedFields, tls)
+			testslike.Test(t, expectedFields, tls)
 		})
 	}
 }
@@ -249,25 +264,23 @@ func TestCertExpirationMetadata(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := common.MapStr{}
 			AddCertMetadata(event, tt.certs)
-			v, err := event.GetValue("tls.server.not_before")
-			assert.NoError(t, err)
-			assert.Equal(t, tt.expected.notBefore, v)
 
-			legacyV, err := event.GetValue("tls.certificate_not_valid_before")
-			assert.NoError(t, err)
-			assert.Equal(t, legacyV, v)
+			validateNotBefore := lookslike.MustCompile(map[string]interface{}{
+				"tls.certificate_not_valid_before": tt.expected.notBefore,
+				"tls.server.x509.not_before":       tt.expected.notBefore,
+			})
+			testslike.Test(t, validateNotBefore, event)
 
 			if tt.expected.notAfter != nil {
-				v, err := event.GetValue("tls.server.not_after")
-				assert.NoError(t, err)
-				assert.Equal(t, *tt.expected.notAfter, v)
-
-				legacyV, err := event.GetValue("tls.certificate_not_valid_after")
-				assert.NoError(t, err)
-
-				assert.Equal(t, v, legacyV)
+				validateNotAfter := lookslike.MustCompile(map[string]interface{}{
+					"tls.certificate_not_valid_after": *tt.expected.notAfter,
+					"tls.server.x509.not_after":       *tt.expected.notAfter,
+				})
+				testslike.Test(t, validateNotAfter, event)
 			} else {
 				ok, _ := event.HasKey("tls.certificate_not_valid_after")
+				assert.False(t, ok, "event should not have not after %v", event)
+				ok, _ = event.HasKey("tls.server.x509.not_after")
 				assert.False(t, ok, "event should not have not after %v", event)
 			}
 		})

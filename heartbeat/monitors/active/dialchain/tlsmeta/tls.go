@@ -18,6 +18,8 @@
 package tlsmeta
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/sha256"
 	cryptoTLS "crypto/tls"
@@ -52,11 +54,11 @@ func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, d
 func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 	// The behavior here might seem strange. We *always* set a notBefore, but only optionally set a notAfter.
 	// Why might we do this?
-	// The root cause is that the x509.Certificate type uses time.Time for these fields instead of *time.Time
-	// so we have no way to know if the user actually set these fields. The x509 RFC says that only one of the
-	// two fields must be set. Most tools (including openssl and go's certgen) always set both. BECAUSE WHY NOT
+	// The root cause is that the x509.Certificate type uses time.Time for these tlsFields instead of *time.Time
+	// so we have no way to know if the user actually set these tlsFields. The x509 RFC says that only one of the
+	// two tlsFields must be set. Most tools (including openssl and go's certgen) always set both. BECAUSE WHY NOT
 	//
-	// In the wild, however, there are certs missing one of these two fields.
+	// In the wild, however, there are certs missing one of these two tlsFields.
 	// So, what's the correct behavior here? We cannot know if a field was omitted due to the lack of nullability.
 	// So, in this case, we try to do what people will want 99.99999999999999999% of the time.
 	// People might set notBefore to go's zero date intentionally when creating certs. So, we always set that
@@ -84,21 +86,41 @@ func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 		}
 	}
 
+	hostCert := certs[0]
+
+	x509Fields := common.MapStr{}
+	serverFields := common.MapStr{"x509": x509Fields}
+	tlsFields := common.MapStr{"server": serverFields}
+
+	serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
+	serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
+
+	x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
+	x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
+	x509Fields.Put("subject.common_name", hostCert.Subject.CommonName)
+	x509Fields.Put("subject.distinguished_name", hostCert.Subject.String())
+	x509Fields.Put("serial_number", hostCert.SerialNumber.String())
+	x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
+	x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
+	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
+		sizeInBits := rsaKey.Size() * 8
+		x509Fields.Put("public_key_size", sizeInBits)
+	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
+		x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
+	}
+
+	// Handle expiration / age, this is a bit weird since we actually use the age of the whole chain
 	// Legacy non-ECS field
-	fields.Put("tls.certificate_not_valid_before", chainNotValidBefore)
+	tlsFields.Put("certificate_not_valid_before", chainNotValidBefore)
 	// New ECS compatible field
-	fields.Put("tls.server.not_before", chainNotValidBefore)
+	x509Fields.Put("not_before", chainNotValidBefore)
 
 	if chainNotValidAfter != nil {
 		// Legacy non-ECS field
-		fields.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
+		tlsFields.Put("certificate_not_valid_after", *chainNotValidAfter)
 		// New ECS compatible field
-		fields.Put("tls.server.not_after", *chainNotValidAfter)
+		x509Fields.Put("not_after", *chainNotValidAfter)
 	}
 
-	hostCert := certs[0]
-	fields.Put("tls.server.issuer", hostCert.Issuer.String())
-	fields.Put("tls.server.subject", hostCert.Subject.String())
-	fields.Put("tls.server.hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
-	fields.Put("tls.server.hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
+	fields.DeepUpdate(common.MapStr{"tls": tlsFields})
 }
