@@ -18,6 +18,7 @@
 package tlsmeta
 
 import (
+	dsa2 "crypto/dsa"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -71,8 +72,12 @@ func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
 	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
 		sizeInBits := rsaKey.Size() * 8
 		x509Fields.Put("public_key_size", sizeInBits)
-	} else if hostCert.PublicKeyAlgorithm == x509.DSA {
-		x509Fields.Put("public_key_size", 1024)
+	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
+		if dsaKey.Parameters.P != nil {
+			x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+		} else {
+			x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+		}
 	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
 		x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
 	}
