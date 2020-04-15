@@ -4,3 +4,4 @@ input:
   metricset: collector
   defaults:
     metrics_path: /_status/vars
+    use_types: true
