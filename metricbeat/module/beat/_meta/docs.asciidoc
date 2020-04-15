@@ -3,7 +3,7 @@ The `beat` module collects metrics about any Beat or other software based on lib
 [float]
 === Compatibility
 
-The `beat` module work with {beats} 7.3.0 and later.
+The `beat` module works with {beats} 7.3.0 and later.
 
 [float]
 === Usage for Stack Monitoring
