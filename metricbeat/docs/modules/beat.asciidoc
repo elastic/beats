@@ -57,4 +57,3 @@ The following metricsets are available:
 include::beat/state.asciidoc[]
 
 include::beat/stats.asciidoc[]
-
