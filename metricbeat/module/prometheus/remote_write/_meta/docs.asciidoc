@@ -20,7 +20,7 @@ between 100 (default) and 1000. Having a bigger batch can lead to improved throu
 storage since Metricbeat groups metrics with the same labels into same event documents.
 However this will increase the memory usage of Metricbeat.
 - `capacity`: It is recommended to set capacity to 3-5 times `max_samples_per_send`.
-Capacity sets the number samples that are queued in memory per shard, and hence capacity should be high enough so as to
+Capacity sets the number of samples that are queued in memory per shard, and hence capacity should be high enough so as to
 be able to cover `max_samples_per_send`.
 
 
