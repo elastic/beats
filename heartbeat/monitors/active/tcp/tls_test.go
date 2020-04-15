@@ -87,10 +87,10 @@ func TestTLSInvalidCert(t *testing.T) {
 	mismatchedHostname := "notadomain.elastic.co"
 	resolver := monitors.NewStaticResolver(
 		map[string][]net.IP{
-			cert.DNSNames[0]: {net.ParseIP(ip)},
+			cert.DNSNames[0]:   {net.ParseIP(ip)},
 			mismatchedHostname: {net.ParseIP(ip)},
 		},
-		)
+	)
 	event := testTLSTCPCheck(t, mismatchedHostname, port, certFile.Name(), resolver)
 
 	testslike.Test(

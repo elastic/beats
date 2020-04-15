@@ -44,7 +44,7 @@ func TestStaticResolver(t *testing.T) {
 		map[string][]net.IP{
 			host: {expectedIp},
 		},
-		)
+	)
 
 	ipAddr, err := r.ResolveIPAddr("ip", host)
 	require.Equal(t, &net.IPAddr{IP: expectedIp}, ipAddr)
