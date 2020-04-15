@@ -67,7 +67,7 @@ func TestData(t *testing.T) {
 
 }
 
-func TestDataOld(t *testing.T) {
+func TestDataDeprecated(t *testing.T) {
 	config := map[string]interface{}{
 		"module":     "windows",
 		"metricsets": []string{"perfmon"},
@@ -181,6 +181,30 @@ func TestQuery(t *testing.T) {
 
 func TestExistingCounter(t *testing.T) {
 	config := Config{
+		Queries: make([]Query, 1),
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
+	}
+	handle, err := NewReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, err := handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(values)
+}
+
+func TestExistingCounterDeprecated(t *testing.T) {
+	config := Config{
 		Counters: make([]Counter, 1),
 	}
 	config.Counters[0].InstanceLabel = "processor.name"
@@ -203,6 +227,28 @@ func TestExistingCounter(t *testing.T) {
 
 func TestNonExistingCounter(t *testing.T) {
 	config := Config{
+		Queries: make([]Query, 1),
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time time",
+		},
+	}
+	handle, err := NewReader(config)
+	if assert.Error(t, err) {
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
+	}
+
+	if handle != nil {
+		err = handle.query.Close()
+		assert.NoError(t, err)
+	}
+}
+
+func TestNonExistingCounterDeprecated(t *testing.T) {
+	config := Config{
 		Counters: make([]Counter, 1),
 	}
 	config.Counters[0].InstanceLabel = "processor.name"
@@ -221,6 +267,34 @@ func TestNonExistingCounter(t *testing.T) {
 }
 
 func TestIgnoreNonExistentCounter(t *testing.T) {
+	config := Config{
+		Queries:          make([]Query, 1),
+		IgnoreNECounters: true,
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time time",
+		},
+	}
+	handle, err := NewReader(config)
+
+	values, err := handle.Read()
+
+	if assert.Error(t, err) {
+		assert.EqualValues(t, pdh.PDH_NO_DATA, errors.Cause(err))
+	}
+
+	if handle != nil {
+		err = handle.query.Close()
+		assert.NoError(t, err)
+	}
+
+	t.Log(values)
+}
+
+func TestIgnoreNonExistentCounterDeprecated(t *testing.T) {
 	config := Config{
 		Counters:         make([]Counter, 1),
 		IgnoreNECounters: true,
@@ -247,6 +321,28 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 
 func TestNonExistingObject(t *testing.T) {
 	config := Config{
+		Queries: make([]Query, 1),
+	}
+	config.Queries[0].Name = "Processor MisInformation"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
+	}
+	handle, err := NewReader(config)
+	if assert.Error(t, err) {
+		assert.EqualValues(t, pdh.PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
+	}
+
+	if handle != nil {
+		err = handle.query.Close()
+		assert.NoError(t, err)
+	}
+}
+
+func TestNonExistingObjectDeprecated(t *testing.T) {
+	config := Config{
 		Counters: make([]Counter, 1),
 	}
 	config.Counters[0].InstanceLabel = "processor.name"
@@ -271,13 +367,12 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer query.Close()
-	counter := Counter{Format: "long"}
 	path, err := query.GetCounterPaths(processorTimeCounter)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = query.AddCounter(path[0], "", "long", false)
 	if err != nil && err != pdh.PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -311,13 +406,12 @@ func TestFloatOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer query.Close()
-	counter := Counter{Format: "float"}
 	path, err := query.GetCounterPaths(processorTimeCounter)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(path))
-	err = query.AddCounter(path[0], counter.InstanceName, counter.Format, false)
+	err = query.AddCounter(path[0], "", "float", false)
 	if err != nil && err != pdh.PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -346,13 +440,15 @@ func TestFloatOutputFormat(t *testing.T) {
 
 func TestWildcardQuery(t *testing.T) {
 	config := Config{
-		Counters: make([]Counter, 1),
+		Queries: make([]Query, 1),
 	}
-	config.Counters[0].InstanceLabel = "processor.name"
-	config.Counters[0].InstanceName = "TestInstanceName"
-	config.Counters[0].MeasurementLabel = "processor.time.pct"
-	config.Counters[0].Query = `\Processor Information(*)\% Processor Time`
-	config.Counters[0].Format = "float"
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"*"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
+	}
 	handle, err := NewReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -368,28 +464,26 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(values))
-	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
+	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.True(t, pctKey)
-
-	pct, err := values[0].MetricSetFields.GetValue("processor.name")
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.NotEqual(t, "TestInstanceName", pct)
-
 	t.Log(values)
 }
 
 func TestWildcardQueryNoInstanceName(t *testing.T) {
 	config := Config{
-		Counters: make([]Counter, 1),
+		Queries: make([]Query, 1),
 	}
-	config.Counters[0].InstanceLabel = "process_private_bytes"
-	config.Counters[0].MeasurementLabel = "process.private.bytes"
-	config.Counters[0].Query = `\Process(*)\Private Bytes`
+	config.Queries[0].Name = "Process"
+	config.Queries[0].Instance = []string{"*"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "Private Bytes",
+		},
+	}
+
 	handle, err := NewReader(config)
 	if err != nil {
 		t.Fatal(err)
@@ -405,24 +499,81 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotZero(t, len(values))
-	pctKey, err := values[0].MetricSetFields.HasKey("process.private.bytes")
+	pctKey, err := values[0].MetricSetFields.HasKey("metrics.private_bytes")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.True(t, pctKey)
 
 	for _, s := range values {
-		pct, err := s.MetricSetFields.GetValue("process_private_bytes")
+		instance, err := s.MetricSetFields.GetValue("instance")
 		if err != nil {
 			t.Fatal(err)
 		}
-		assert.False(t, strings.Contains(pct.(string), "*"))
+		assert.False(t, strings.Contains(instance.(string), "*"))
 	}
 
 	t.Log(values)
 }
 
 func TestGroupByInstance(t *testing.T) {
+	config := Config{
+		Queries:           make([]Query, 1),
+		GroupMeasurements: true,
+	}
+	config.Queries[0].Name = "Processor Information"
+	config.Queries[0].Instance = []string{"_Total"}
+	config.Queries[0].Counters = []QueryCounter{
+		{
+			Name: "% Processor Time",
+		},
+		{
+			Name: "% User Time",
+		},
+		{
+			Name: "% Privileged Time",
+		},
+	}
+	handle, err := NewReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, _ := handle.Read()
+
+	time.Sleep(time.Millisecond * 1000)
+
+	values, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, 1, len(values)) // Assert all metrics have been grouped into a single event
+
+	// Test all keys exist in the event
+	pctKey, err := values[0].MetricSetFields.HasKey("metrics.%_processor_time")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("metrics.%_user_time")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("metrics.%_privileged_time")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	t.Log(values)
+}
+
+func TestGroupByInstanceDeprecated(t *testing.T) {
 	config := Config{
 		Counters:          make([]Counter, 3),
 		GroupMeasurements: true,

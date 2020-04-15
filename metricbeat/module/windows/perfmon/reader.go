@@ -96,7 +96,7 @@ func NewReader(config Config) (*Reader, error) {
 					logp.Namespace("perfmon"), "expanded query", childQueries)
 				continue
 			}
-			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.QueryName)
+			return nil, errors.Errorf(`failed to expand counter (query="%v"), no error returned`, counter.QueryName)
 		}
 		for _, v := range childQueries {
 			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
@@ -209,7 +209,7 @@ func (re *Reader) mapCounters(config Config) {
 					re.counters = append(re.counters, PerfCounter{
 						InstanceField: defaultInstanceField,
 						InstanceName:  "",
-						QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
+						QueryField:    mapCounterPathLabel(query.Namespace, counter.Field, counter.Name),
 						QueryName:     mapQuery(query.Name, "", counter.Name),
 						Format:        counter.Format,
 						ObjectName:    query.Name,
@@ -220,7 +220,7 @@ func (re *Reader) mapCounters(config Config) {
 						re.counters = append(re.counters, PerfCounter{
 							InstanceField: defaultInstanceField,
 							InstanceName:  instance,
-							QueryField:    mapCounterPathLabel(counter.Field, counter.Name),
+							QueryField:    mapCounterPathLabel(query.Namespace, counter.Field, counter.Name),
 							QueryName:     mapQuery(query.Name, instance, counter.Name),
 							Format:        counter.Format,
 							ObjectName:    query.Name,
@@ -262,10 +262,9 @@ func mapQuery(obj string, instance string, path string) string {
 	return query
 }
 
-func mapCounterPathLabel(label string, path string) string {
-	resultMetricName := "metrics."
+func mapCounterPathLabel(namespace string, label string, path string) string {
 	if label != "" {
-		return resultMetricName + label
+		return namespace + "." + label
 	}
 	// replace spaces with underscores
 	path = strings.Replace(path, " ", "_", -1)
@@ -293,7 +292,7 @@ func mapCounterPathLabel(label string, path string) string {
 
 	//  avoid cases as this "logicaldisk_avg__disk_sec_per_transfer"
 	path = strings.Replace(path, "__", "_", -1)
-	return resultMetricName + path
+	return namespace + "." + path
 }
 
 // replaceUpperCase func will replace upper case with '_'

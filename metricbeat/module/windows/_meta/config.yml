@@ -1,6 +1,6 @@
 - module: windows
-  #metricsets:
-  #  - service
+  metricsets:
+    - service
   period: 1m
 
 #- module: windows

@@ -49,10 +49,11 @@ type Counter struct {
 
 // QueryConfig for perfmon queries. This will be used as the new configuration format
 type Query struct {
-	Name     string         `config:"object" validate:"required"`
-	Field    string         `config:"field"`
-	Instance []string       `config:"instance"`
-	Counters []QueryCounter `config:"counters" validate:"required"`
+	Name      string         `config:"object" validate:"required"`
+	Field     string         `config:"field"`
+	Instance  []string       `config:"instance"`
+	Counters  []QueryCounter `config:"counters" validate:"required"`
+	Namespace string         `config:"namespace"`
 }
 
 // QueryConfigCounter for perfmon queries. This will be used as the new configuration format
@@ -83,12 +84,15 @@ func (conf *Config) ValidateConfig() error {
 				value.Format, value.InstanceLabel)
 		}
 	}
-	for _, value := range conf.Queries {
-		for i, q := range value.Counters {
+	for i, value := range conf.Queries {
+		if value.Namespace == "" {
+			conf.Queries[i].Namespace = "metrics"
+		}
+		for j, q := range value.Counters {
 			form := strings.ToLower(q.Format)
 			switch form {
 			case "", "float":
-				value.Counters[i].Format = "float"
+				value.Counters[j].Format = "float"
 			case "long", "large":
 			default:
 				return errors.Errorf("initialization failed: format '%s' "+

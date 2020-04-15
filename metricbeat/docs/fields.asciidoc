@@ -18292,20 +18292,13 @@ type: object
 
 --
 
-[float]
-=== website
-
+*`iis.website.*.*`*::
++
+--
 website
 
 
-
-*`iis.website.name`*::
-+
---
-website name
-
-
-type: keyword
+type: object
 
 --
 

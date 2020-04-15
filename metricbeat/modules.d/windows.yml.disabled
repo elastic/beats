@@ -2,8 +2,8 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-windows.html
 
 - module: windows
-  #metricsets:
-  #  - service
+  metricsets:
+    - service
   period: 1m
 
 #- module: windows

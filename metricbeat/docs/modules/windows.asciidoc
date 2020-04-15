@@ -5,8 +5,13 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-windows]]
 == Windows module
 
-This is the Windows module. It collects metrics from Windows systems,
-by default metricset `service` is enabled.
+This is the Windows module which collects metrics from Windows systems.
+The module contains the `service` metricset, which is set up by default when the windows module is enabled.
+The `service` metricset will retrieve status information of the services on the Windows machines. The other windows
+metricset is `perfmon` which collects windows performance counter values.
+
+
+
 
 
 [float]
