@@ -467,19 +467,12 @@ func TestBaseModuleWithConfig(t *testing.T) {
 			if err == nil {
 				var actualNewConfig metricSetConfig
 				err = newBM.UnpackConfig(&actualNewConfig)
-
 				require.NoError(t, err)
-				expectedNewConfig = test.expectedConfig
+				require.Equal(t, test.expectedConfig, actualNewConfig)
 			} else {
 				require.Equal(t, test.expectedErrMsg, err.Error())
 				require.Nil(t, newBM)
 			}
-
-			var actualNewConfig metricSetConfig
-			err = newBM.UnpackConfig(&actualNewConfig)
-			require.NoError(t, err)
-			require.Equal(t, expectedNewConfig, actualNewConfig)
-
 		})
 	}
 }
