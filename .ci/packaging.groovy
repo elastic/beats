@@ -50,9 +50,9 @@ pipeline {
               '+linux/ppc64le',
               '+linux/s390x',
               '+linux/mips64',
-              'darwin',
-              'windows/386',
-              'windows/amd64'
+              '+darwin',
+              '+windows/386',
+              '+windows/amd64'
             )
             axis {
               name 'BEATS_FOLDER'
@@ -74,6 +74,7 @@ pipeline {
                 'x-pack/winlogbeat'
               )
             }
+          }
         }
         stages {
           stage('Package'){
@@ -132,6 +133,7 @@ def withBeatsEnv(Closure body) {
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
     "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
     "PYTHON_ENV=${WORKSPACE}/python-env",
+    "PLATFORMS=!defaults ${env.PLATFORMS}"
   ]) {
     deleteDir()
     unstash 'source'
@@ -139,8 +141,8 @@ def withBeatsEnv(Closure body) {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      sh(label: 'workaround packer cache', '.ci/packer_cache.sh')
+      //dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      //sh(label: 'workaround packer cache', '.ci/packer_cache.sh')
       body()
     }
   }
