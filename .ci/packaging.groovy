@@ -38,7 +38,7 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
-    stage('Linux'){
+    stage('Build Packages'){
       options { skipDefaultCheckout() }
       matrix {
         agent { label 'ubuntu && immutable' }
@@ -54,26 +54,26 @@ pipeline {
               '+windows/386',
               '+windows/amd64'
             )
-            axis {
-              name 'BEATS_FOLDER'
-              values (
-                'auditbeat',
-                'filebeat',
-                'heartbeat',
-                'journalbeat',
-                'metricbeat',
-                'packetbeat',
-                'winlogbeat',
-                'x-pack/auditbeat',
-                'x-pack/filebeat',
-                'x-pack/functionbeat',
-                'x-pack/heartbeat',
-                'x-pack/journalbeat',
-                'x-pack/metricbeat',
-                'x-pack/packetbeat',
-                'x-pack/winlogbeat'
-              )
-            }
+          }
+          axis {
+            name 'BEATS_FOLDER'
+            values (
+              'auditbeat',
+              'filebeat',
+              'heartbeat',
+              'journalbeat',
+              'metricbeat',
+              'packetbeat',
+              'winlogbeat',
+              'x-pack/auditbeat',
+              'x-pack/filebeat',
+              'x-pack/functionbeat',
+              'x-pack/heartbeat',
+              'x-pack/journalbeat',
+              'x-pack/metricbeat',
+              'x-pack/packetbeat',
+              'x-pack/winlogbeat'
+            )
           }
         }
         stages {
