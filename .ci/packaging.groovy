@@ -8,9 +8,10 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    SNAPSHOT = "true"
   }
   options {
-    timeout(time: 2, unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -35,52 +36,45 @@ pipeline {
       }
     }
     stage('Linux'){
-      agent { label 'ubuntu && immutable' }
       options { skipDefaultCheckout() }
-      when {
-        beforeAgent true
-        expression { return params.linux }
-      }
-      environment {
-        SNAPSHOT = "true"
-        PLATFORMS = "+linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
-        HOME = "${env.WORKSPACE}"
-      }
-      steps {
-        deleteDir()
-        unstash 'source'
-        dir("${BASE_DIR}"){
-          sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
+      matrix {
+        agent { label 'ubuntu && immutable' }
+        axes {
+          axis {
+            name 'PLATFORMS'
+            values '+linux/armv7', '+linux/ppc64le', '+linux/s390x', '+linux/mips64', 'darwin'
+          }
         }
-        publishPackages()
+        stages {
+          stage('Package'){
+            environment {
+              HOME = "${env.WORKSPACE}"
+            }
+            steps {
+              deleteDir()
+              unstash 'source'
+              release()
+              publishPackages()
+            }
+          }
+        }
       }
     }
-    stage('Mac OS'){
-      agent { label 'macosx' }
-      options { skipDefaultCheckout() }
-      when {
-        beforeAgent true
-        expression { return params.linux }
+  }
+}
+
+def release(){
+  dir("${BASE_DIR}"){
+    if(env.PLATFORMS == 'darwin' && params.macos){
+      withMaskEnv( vars: [
+          [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
+          [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
+          [var: "APPLE_SIGNING_ENABLED", password: "true"],
+      ]){
+        sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
       }
-      environment {
-        KEYCHAIN = "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"
-        SNAPSHOT = "true"
-        PLATFORMS = "darwin"
-        APPLE_SIGNING_ENABLED = "true"
-        HOME = "${env.WORKSPACE}"
-      }
-      steps {
-        deleteDir()
-        unstash 'source'
-        withMaskEnv( vars: [
-            [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
-        ]){
-          dir("${BASE_DIR}"){
-            sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
-          }
-          publishPackages()
-        }
-      }
+    } else if (params.linux){
+      sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
     }
   }
 }
