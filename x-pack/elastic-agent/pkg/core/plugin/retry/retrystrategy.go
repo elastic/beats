@@ -5,6 +5,7 @@
 package retry
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
@@ -31,12 +32,16 @@ func DoWithBackoff(config *Config, b backoff.Backoff, fn func() error, fatalErro
 }
 
 // Do runs provided function in a manner specified in retry configuration
-func Do(config *Config, fn func() error, fatalErrors ...error) error {
+func Do(ctx context.Context, config *Config, fn func(ctx context.Context) error, fatalErrors ...error) error {
 	retryCount := getRetryCount(config)
 	var err error
 
 	for retryNo := 0; retryNo <= retryCount; retryNo++ {
-		err = fn()
+		if ctx.Err() != nil {
+			break
+		}
+
+		err = fn(ctx)
 		if err == nil {
 			return nil
 		}
@@ -46,7 +51,11 @@ func Do(config *Config, fn func() error, fatalErrors ...error) error {
 		}
 
 		if retryNo < retryCount {
-			<-time.After(getDelayDuration(config, retryNo))
+			select {
+			case <-time.After(getDelayDuration(config, retryNo)):
+			case <-ctx.Done():
+				break
+			}
 		}
 	}
 
