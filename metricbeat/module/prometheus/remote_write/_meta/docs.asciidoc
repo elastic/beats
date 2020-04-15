@@ -8,7 +8,7 @@ remote_write:
 ------------------------------------------------------------------------------
 
 
-TIP: In order to assure the health of the whole queue the following two configuration
+TIP: In order to assure the health of the whole queue, the following two configuration
  https://prometheus.io/docs/practices/remote_write/#parameters[parameters] should be considered:
 
 - `max_shards`: Sets the maximum number of paralelism with which Prometheus will try to send samples to Metricbeat.
@@ -19,7 +19,7 @@ Metricbeat can actually achieve is the optimal queue configuration.
 between 100 (default) and 1000. Having a bigger batch can lead to improved throughput and in more efficient
 storage since Metricbeat groups metrics with the same labels into same event documents.
 However this will increase the memory usage of Metricbeat.
-- `capacity`: 3 to 5 times the `max_samples_per_send`.
+- `capacity`: 3-5 times the value of `max_samples_per_send`.
 
 
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
