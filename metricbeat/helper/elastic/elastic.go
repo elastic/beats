@@ -164,7 +164,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
 
-	logger.Debugf("configuration for module %v modified because xpack.enabled was set to true", moduleName)
+	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)
 
 	return newModule, nil
 }
