@@ -29,7 +29,7 @@ import (
 
 type onCreateFactory struct {
 	factory cfgfile.RunnerFactory
-	create    onCreateWrapper
+	create  onCreateWrapper
 }
 
 type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config, *common.MapStrPointer) (cfgfile.Runner, error)
