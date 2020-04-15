@@ -39,9 +39,7 @@ pipeline {
       }
     }
     stage('Build Packages'){
-      options { skipDefaultCheckout() }
       matrix {
-        agent { label 'ubuntu && immutable' }
         axes {
           axis {
             name 'PLATFORMS'
@@ -78,6 +76,8 @@ pipeline {
         }
         stages {
           stage('Package'){
+            agent { label 'ubuntu && immutable' }
+            options { skipDefaultCheckout() }
             environment {
               HOME = "${env.WORKSPACE}"
             }
