@@ -203,7 +203,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_conns",
+                    "field": "prometheus.sql_conns.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -274,7 +274,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_select_count",
+                    "field": "prometheus.sql_select_count.counter",
                     "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
                     "type": "sum"
                   },
@@ -311,7 +311,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_insert_count",
+                    "field": "prometheus.sql_insert_count.counter",
                     "id": "02d89101-9761-11e9-b3d5-07b0ab7d6354",
                     "type": "sum"
                   },
@@ -345,7 +345,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_update_count",
+                    "field": "prometheus.sql_update_count.counter",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   },
@@ -380,7 +380,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_delete_count",
+                    "field": "prometheus.sql_delete_count.counter",
                     "id": "03f6d241-9761-11e9-b3d5-07b0ab7d6354",
                     "type": "sum"
                   },
@@ -458,7 +458,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.replicas",
+                    "field": "prometheus.replicas.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -528,7 +528,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.replicas_leaseholders",
+                    "field": "prometheus.replicas_leaseholders.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -596,7 +596,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.ranges_underreplicated",
+                    "field": "prometheus.ranges_underreplicated.value",
                     "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
                   }
@@ -618,7 +618,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.ranges_overreplicated",
+                    "field": "prometheus.ranges_overreplicated.value",
                     "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
                   }
@@ -640,7 +640,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.ranges_unavailable",
+                    "field": "prometheus.ranges_unavailable.value",
                     "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
                   }
@@ -662,7 +662,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.ranges",
+                    "field": "prometheus.ranges.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -731,46 +731,11 @@
                 "metrics": [
                   {
                     "agg_with": "avg",
-                    "field": "prometheus.metrics.raft_process_logcommit_latency_count",
+                    "field": "prometheus.raft_process_logcommit_latency.histogram",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "order": "desc",
                     "size": 1,
                     "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
-                    "type": "derivative",
-                    "unit": ""
-                  },
-                  {
-                    "field": "prometheus.metrics.raft_process_logcommit_latency_sum",
-                    "id": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
-                    "type": "max",
-                    "unit": ""
-                  },
-                  {
-                    "field": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
-                    "id": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
-                    "type": "derivative",
-                    "unit": ""
-                  },
-                  {
-                    "id": "6574b730-9770-11e9-b3d5-07b0ab7d6354",
-                    "script": "params.sum / params.count",
-                    "type": "calculation",
-                    "variables": [
-                      {
-                        "field": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
-                        "id": "6fbb54b0-9770-11e9-b3d5-07b0ab7d6354",
-                        "name": "sum"
-                      },
-                      {
-                        "field": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
-                        "id": "76cc90c0-9770-11e9-b3d5-07b0ab7d6354",
-                        "name": "count"
-                      }
-                    ]
                   }
                 ],
                 "point_size": 1,
@@ -839,46 +804,11 @@
                 "metrics": [
                   {
                     "agg_with": "avg",
-                    "field": "prometheus.metrics.raft_process_commandcommit_latency_count",
+                    "field": "prometheus.raft_process_commandcommit_latency.histogram",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "order": "desc",
                     "size": 1,
                     "type": "max"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
-                    "type": "derivative",
-                    "unit": ""
-                  },
-                  {
-                    "field": "prometheus.metrics.raft_process_commandcommit_latency_sum",
-                    "id": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
-                    "type": "max",
-                    "unit": ""
-                  },
-                  {
-                    "field": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
-                    "id": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
-                    "type": "derivative",
-                    "unit": ""
-                  },
-                  {
-                    "id": "6574b730-9770-11e9-b3d5-07b0ab7d6354",
-                    "script": "params.sum / params.count",
-                    "type": "calculation",
-                    "variables": [
-                      {
-                        "field": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
-                        "id": "6fbb54b0-9770-11e9-b3d5-07b0ab7d6354",
-                        "name": "sum"
-                      },
-                      {
-                        "field": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
-                        "id": "76cc90c0-9770-11e9-b3d5-07b0ab7d6354",
-                        "name": "count"
-                      }
-                    ]
                   }
                 ],
                 "point_size": 1,
