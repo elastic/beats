@@ -445,13 +445,6 @@ func TestBaseModuleWithConfig(t *testing.T) {
 			metricSetConfig{},
 			fmt.Sprintf("cannot change module name from %v to %v", moduleName, "new_test_module"),
 		},
-		"unregistered_metricsets": {
-			metricSetConfig{
-				MetricSets: []string{"invalid", "foo"},
-			},
-			metricSetConfig{},
-			"could not reconfigure module test_module: 1 error: metricset 'test_module/invalid' not found",
-		},
 	}
 
 	for name, test := range tests {
@@ -469,21 +462,17 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newBM, err := bm.WithConfig(common.MustNewConfigFrom(test.newConfig), mockRegistry)
+			newBM, err := bm.WithConfig(*common.MustNewConfigFrom(test.newConfig))
 
-			var expectedNewConfig metricSetConfig
-			if test.expectedErrMsg == "" {
+			if err == nil {
+				var actualNewConfig metricSetConfig
+				err = newBM.UnpackConfig(&actualNewConfig)
 				require.NoError(t, err)
-				expectedNewConfig = test.expectedConfig
+				require.Equal(t, test.expectedConfig, actualNewConfig)
 			} else {
 				require.Equal(t, test.expectedErrMsg, err.Error())
-				expectedNewConfig = initConfig
+				require.Nil(t, newBM)
 			}
-
-			var actualNewConfig metricSetConfig
-			err = newBM.UnpackConfig(&actualNewConfig)
-			require.NoError(t, err)
-			require.Equal(t, expectedNewConfig, actualNewConfig)
 
 		})
 	}
