@@ -29,7 +29,7 @@ import (
 
 type onCreateFactory struct {
 	factory cfgfile.RunnerFactory
-	edit    onCreateWrapper
+	create    onCreateWrapper
 }
 
 type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *common.Config, *common.MapStrPointer) (cfgfile.Runner, error)
@@ -64,7 +64,7 @@ func (f *onCreateFactory) Create(
 	cfg *common.Config,
 	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
-	return f.edit(f.factory, pipeline, cfg, meta)
+	return f.create(f.factory, pipeline, cfg, meta)
 }
 
 // RunnerFactoryWithCommonInputSettings wraps a runner factory, such that all runners
@@ -101,7 +101,7 @@ func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactor
 }
 
 func wrapRunnerCreate(f cfgfile.RunnerFactory, edit onCreateWrapper) cfgfile.RunnerFactory {
-	return &onCreateFactory{factory: f, edit: edit}
+	return &onCreateFactory{factory: f, create: edit}
 }
 
 // withClientConfig reads common Beat input instance configurations from the
