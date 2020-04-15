@@ -1084,6 +1084,16 @@ filebeat.inputs:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1494,13 +1504,14 @@ output.elasticsearch:
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/path/config
+  #kerberos.config_path: /etc/krb5.conf
 
-  # The service principal name.
-  #kerberos.service_name: HTTP/my-service@realm
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
 
   # Name of the Kerberos user.
   #kerberos.username: elastic

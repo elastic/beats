@@ -33,3 +33,7 @@ secret_access_key: {{ .secret_access_key }}
 {{ if .session_token }}
 session_token: {{ .session_token }}
 {{ end }}
+
+{{ if .role_arn }}
+role_arn: {{ .role_arn }}
+{{ end }}

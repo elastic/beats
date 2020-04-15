@@ -3,7 +3,11 @@
 # this file is run daily to generate worker packer images
 #
 
+# shellcheck disable=SC1091
 source /usr/local/bin/bash_standard_lib.sh
+
+# shellcheck disable=SC1091
+source ./script/common.bash
 
 # Docker images used on Dockerfiles 2019-07-12
 # aerospike:3.9.0
@@ -18,13 +22,6 @@ source /usr/local/bin/bash_standard_lib.sh
 # debian:latest
 # debian:stretch
 # docker.elastic.co/beats-dev/fpm:1.11.0
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-arm
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-darwin
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-main
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-main-debian7
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-mips
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-ppc
-# docker.elastic.co/beats-dev/golang-crossbuild:1.12.4-s390x
 # docker.elastic.co/beats/metricbeat:6.5.4
 # docker.elastic.co/beats/metricbeat:7.2.0
 # docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -33,10 +30,6 @@ source /usr/local/bin/bash_standard_lib.sh
 # docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
 # envoyproxy/envoy:v1.7.0
 # exekias/localkube-image
-# golang:1.10.3
-# golang:1.11.5
-# golang:1.12.1
-# golang:1.12.4
 # haproxy:1.8
 # httpd:2.4.20
 # java:8-jdk-alpine
@@ -62,12 +55,24 @@ source /usr/local/bin/bash_standard_lib.sh
 # ubuntu:16.04
 # ubuntu:trusty
 
-DOCKER_IMAGES="docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
-docker.elastic.co/observability-ci/database-enterprise:12.2.0.1"
+get_go_version
 
-for di in ${DOCKER_IMAGES}
+DOCKER_IMAGES="docker.elastic.co/observability-ci/database-instantclient:12.2.0.1
+docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-arm
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-darwin
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian7
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main-debian8
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-mips
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-ppc
+docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-s390x
+golang:${GO_VERSION}
+"
+
+for image in ${DOCKER_IMAGES}
 do
-(retry 2 docker pull ${di}) || echo "Error pulling ${di} Docker image, we continue"
+(retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image, we continue"
 done
 
 docker tag \

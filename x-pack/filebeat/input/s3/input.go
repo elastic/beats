@@ -178,47 +178,31 @@ func (p *s3Input) Run() {
 		if err != nil {
 			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
 		}
-		p.awsConfig.Region = regionName
+
+		awsConfig := p.awsConfig.Copy()
+		awsConfig.Region = regionName
+
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
 
 		p.workerWg.Add(1)
-		go p.run(visibilityTimeout)
+		go p.run(svcSQS, svcS3, visibilityTimeout)
 		p.workerWg.Done()
 	})
 }
 
-func (p *s3Input) run(visibilityTimeout int64) {
+func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
-	svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
-
 	for p.context.Err() == nil {
 		// receive messages from sqs
 		output, err := p.receiveMessage(svcSQS, visibilityTimeout)
 		if err != nil {
-			if awsErr, ok := err.(awserr.Error); ok {
-				if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-					continue
-				}
-
-				// When AWS credentials are expired, re-obtain AWS credentials again
-				if awssdk.IsErrorExpiredCreds(awsErr) {
-					p.logger.Warn(errors.Wrap(err, "credentials are expired, please update the credentials"))
-
-					awsConfig, err := awscommon.GetAWSCredentials(p.config.AwsConfig)
-					if err != nil {
-						p.logger.Error(errors.Wrap(err, "getAWSCredentials failed"))
-						continue
-					}
-
-					awsConfig.Region = p.awsConfig.Region
-					p.awsConfig = awsConfig
-					svcSQS = sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", p.awsConfig.Region, p.awsConfig))
-					continue
-				}
+			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+				continue
 			}
-
-			p.logger.Error("failed to receive message from SQS: ", err)
+			p.logger.Error("SQS ReceiveMessageRequest failed: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
 		}
@@ -229,7 +213,6 @@ func (p *s3Input) run(visibilityTimeout int64) {
 		}
 
 		// process messages received from sqs, get logs from s3 and create events
-		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", p.awsConfig.Region, p.awsConfig))
 		p.processor(p.config.QueueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
 	}
 }
@@ -295,7 +278,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				p.logger.Warn("Processing message failed, updating visibility timeout")
 				err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
-					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 				}
 				p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
@@ -316,7 +299,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 			// still ongoing, then change visibility timeout.
 			err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
-				p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 			}
 			p.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
 		}
@@ -428,7 +411,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = errors.Wrap(err, "GetObject request canceled")
+				err = errors.Wrap(err, "S3 GetObjectRequest canceled")
 				p.logger.Error(err)
 				return err
 			}
@@ -438,7 +421,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 				return nil
 			}
 		}
-		return errors.Wrap(err, "s3 get object request failed")
+		return errors.Wrap(err, "S3 GetObjectRequest failed")
 	}
 
 	defer resp.Body.Close()
@@ -605,7 +588,7 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 			return nil
 		}
-		return errors.Wrap(err, "DeleteMessageRequest failed")
+		return errors.Wrap(err, "SQS DeleteMessageRequest failed")
 	}
 	return nil
 }

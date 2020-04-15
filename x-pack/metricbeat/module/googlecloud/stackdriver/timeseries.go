@@ -17,28 +17,29 @@ import (
 func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googlecloud.MetadataService, tss []*monitoringpb.TimeSeries, e *incomingFieldExtractor) (map[string][]KeyValuePoint, error) {
 	eventGroups := make(map[string][]KeyValuePoint)
 
-	for _, ts := range tss {
-		if gcpService == nil {
-			gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(ts)
-		}
+	metadataService := gcpService
 
+	for _, ts := range tss {
 		keyValues, err := e.extractTimeSeriesMetricValues(ts)
 		if err != nil {
 			return nil, err
 		}
 
 		sdCollectorInputData := googlecloud.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
+		if gcpService == nil {
+			metadataService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(ts)
+		}
 
 		for i := range keyValues {
 			sdCollectorInputData.Timestamp = &keyValues[i].Timestamp
 
-			id, err := gcpService.ID(ctx, sdCollectorInputData)
+			id, err := metadataService.ID(ctx, sdCollectorInputData)
 			if err != nil {
 				m.Logger().Errorf("error trying to retrieve ID from metric event '%v'", err)
 				continue
 			}
 
-			metadataCollectorData, err := gcpService.Metadata(ctx, sdCollectorInputData.TimeSeries)
+			metadataCollectorData, err := metadataService.Metadata(ctx, sdCollectorInputData.TimeSeries)
 			if err != nil {
 				m.Logger().Error("error trying to retrieve labels from metric event")
 				continue
