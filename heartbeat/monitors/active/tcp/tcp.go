@@ -47,7 +47,7 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	return createWithResolver(cfg, monitors.CreateStdResolver())
+	return createWithResolver(cfg, monitors.NewStdResolver())
 }
 
 // Custom resolver is useful for tests against hostnames locally where we don't want to depend on any

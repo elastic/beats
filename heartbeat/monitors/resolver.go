@@ -34,7 +34,7 @@ type Resolver interface {
 // StdResolver uses the go std library to perform DNS resolution.
 type StdResolver struct{}
 
-func CreateStdResolver() StdResolver {
+func NewStdResolver() StdResolver {
 	return StdResolver{}
 }
 
@@ -52,7 +52,7 @@ type StaticResolver struct {
 	mapping map[string][]net.IP
 }
 
-func CreateStaticResolver(mapping map[string][]net.IP) StaticResolver {
+func NewStaticResolver(mapping map[string][]net.IP) StaticResolver {
 	return StaticResolver{mapping}
 }
 

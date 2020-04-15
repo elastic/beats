@@ -26,7 +26,7 @@ import (
 
 func TestEmptyStaticResolver(t *testing.T) {
 	host := "foo"
-	r := CreateStaticResolver(map[string][]net.IP{})
+	r := NewStaticResolver(map[string][]net.IP{})
 	ip, err := r.ResolveIPAddr("ip", host)
 
 	require.Nil(t, ip)
@@ -40,7 +40,7 @@ func TestEmptyStaticResolver(t *testing.T) {
 func TestStaticResolver(t *testing.T) {
 	host := "foo"
 	expectedIp := net.ParseIP("123.123.123.123")
-	r := CreateStaticResolver(
+	r := NewStaticResolver(
 		map[string][]net.IP{
 			host: {expectedIp},
 		},
@@ -69,7 +69,7 @@ func TestStaticResolverMulti(t *testing.T) {
 		net.ParseIP("1.2.3.4"),
 		net.ParseIP("5.6.7.8"),
 	}
-	r := CreateStaticResolver(map[string][]net.IP{host: ips})
+	r := NewStaticResolver(map[string][]net.IP{host: ips})
 
 	ipAddr, err := r.ResolveIPAddr("ip", host)
 	require.Equal(t, &net.IPAddr{IP: ips[0]}, ipAddr)

@@ -45,7 +45,7 @@ func TestTLSSANIPConnection(t *testing.T) {
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()
 
-	event := testTLSTCPCheck(t, ip, port, certFile.Name(), monitors.CreateStdResolver())
+	event := testTLSTCPCheck(t, ip, port, certFile.Name(), monitors.NewStdResolver())
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
@@ -64,7 +64,7 @@ func TestTLSHostname(t *testing.T) {
 	defer teardown()
 
 	hostname := cert.DNSNames[0] // Should be example.com
-	resolver := monitors.CreateStaticResolver(map[string][]net.IP{hostname: []net.IP{net.ParseIP(ip)}})
+	resolver := monitors.NewStaticResolver(map[string][]net.IP{hostname: []net.IP{net.ParseIP(ip)}})
 	event := testTLSTCPCheck(t, hostname, port, certFile.Name(), resolver)
 	testslike.Test(
 		t,
@@ -85,7 +85,7 @@ func TestTLSInvalidCert(t *testing.T) {
 	defer teardown()
 
 	mismatchedHostname := "notadomain.elastic.co"
-	resolver := monitors.CreateStaticResolver(
+	resolver := monitors.NewStaticResolver(
 		map[string][]net.IP{
 			cert.DNSNames[0]: {net.ParseIP(ip)},
 			mismatchedHostname: {net.ParseIP(ip)},
