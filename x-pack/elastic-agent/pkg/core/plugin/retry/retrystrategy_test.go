@@ -5,6 +5,7 @@
 package retry
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -14,7 +15,7 @@ import (
 
 func TestRetry(t *testing.T) {
 	type testCase struct {
-		Fn                 func() error
+		Fn                 func(context.Context) error
 		ExpectedExecutions int64
 		IsErrExpected      bool
 		Enabled            bool
@@ -25,19 +26,19 @@ func TestRetry(t *testing.T) {
 	var executions int64
 
 	testCases := map[string]testCase{
-		"not-failing":        testCase{Fn: func() error { executions++; return nil }, ExpectedExecutions: 1, Enabled: true},
-		"failing":            testCase{Fn: func() error { executions++; return errors.New("fail") }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
-		"fatal-by-enum":      testCase{Fn: func() error { executions++; return errFatal }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
-		"fatal-by-iface":     testCase{Fn: func() error { executions++; return ErrFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
-		"not-fatal-by-iface": testCase{Fn: func() error { executions++; return ErrNotFatal{} }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
+		"not-failing":        testCase{Fn: func(_ context.Context) error { executions++; return nil }, ExpectedExecutions: 1, Enabled: true},
+		"failing":            testCase{Fn: func(_ context.Context) error { executions++; return errors.New("fail") }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
+		"fatal-by-enum":      testCase{Fn: func(_ context.Context) error { executions++; return errFatal }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
+		"fatal-by-iface":     testCase{Fn: func(_ context.Context) error { executions++; return ErrFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
+		"not-fatal-by-iface": testCase{Fn: func(_ context.Context) error { executions++; return ErrNotFatal{} }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
 
-		"dis-not-failing":        testCase{Fn: func() error { executions++; return nil }, ExpectedExecutions: 1, Enabled: false},
-		"dis-failing":            testCase{Fn: func() error { executions++; return errors.New("fail") }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
-		"dis-fatal-by-enum":      testCase{Fn: func() error { executions++; return errFatal }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
-		"dis-fatal-by-iface":     testCase{Fn: func() error { executions++; return ErrFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
-		"dis-not-fatal-by-iface": testCase{Fn: func() error { executions++; return ErrNotFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
+		"dis-not-failing":        testCase{Fn: func(_ context.Context) error { executions++; return nil }, ExpectedExecutions: 1, Enabled: false},
+		"dis-failing":            testCase{Fn: func(_ context.Context) error { executions++; return errors.New("fail") }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
+		"dis-fatal-by-enum":      testCase{Fn: func(_ context.Context) error { executions++; return errFatal }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
+		"dis-fatal-by-iface":     testCase{Fn: func(_ context.Context) error { executions++; return ErrFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
+		"dis-not-fatal-by-iface": testCase{Fn: func(_ context.Context) error { executions++; return ErrNotFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: false},
 
-		"failing-exp": testCase{Fn: func() error { executions++; return errors.New("fail") }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true, Exponential: true},
+		"failing-exp": testCase{Fn: func(_ context.Context) error { executions++; return errors.New("fail") }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true, Exponential: true},
 	}
 
 	config := &Config{
@@ -52,7 +53,7 @@ func TestRetry(t *testing.T) {
 		config.Exponential = tc.Exponential
 
 		startTime := time.Now()
-		err := Do(config, testFn, errFatal)
+		err := Do(context.Background(), config, testFn, errFatal)
 
 		executionTime := time.Since(startTime)
 		minExecutionTime := getMinExecutionTime(config.Delay, tc.ExpectedExecutions, tc.Exponential)
