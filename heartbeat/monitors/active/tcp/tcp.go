@@ -56,7 +56,7 @@ func createWithResolver(
 	cfg *common.Config,
 	resolver monitors.Resolver,
 ) (jobs []jobs.Job, endpoints int, err error) {
-	jc, err := makeJobFactory(cfg, resolver)
+	jc, err := newJobFactory(cfg, resolver)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -72,7 +72,7 @@ func createWithResolver(
 // jobFactory is where most of the logic here lives. It provides a common context around
 // the complex logic of executing a TCP check.
 type jobFactory struct {
-	config        Config
+	config        config
 	tlsConfig     *tlscommon.TLSConfig
 	defaultScheme string
 	endpoints     []endpoint
@@ -80,8 +80,8 @@ type jobFactory struct {
 	resolver      monitors.Resolver
 }
 
-func makeJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFactory, error) {
-	jf := &jobFactory{config: DefaultConfig, resolver: resolver}
+func newJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFactory, error) {
+	jf := &jobFactory{config: defaultConfig(), resolver: resolver}
 	err := jf.loadConfig(commonCfg)
 	if err != nil {
 		return nil, err

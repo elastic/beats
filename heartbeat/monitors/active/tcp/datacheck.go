@@ -36,7 +36,7 @@ func (c dataCheck) Check(conn net.Conn) error {
 	return c(conn)
 }
 
-func makeDataCheck(config *Config) dataCheck {
+func makeDataCheck(config *config) dataCheck {
 	send := config.SendString
 	recv := config.ReceiveString
 
