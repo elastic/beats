@@ -21,10 +21,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,9 +31,9 @@ import (
 )
 
 type crawler struct {
-	inputs          map[uint64]*input.Runner
+	log             *logp.Logger
+	inputs          map[uint64]cfgfile.Runner
 	inputConfigs    []*common.Config
-	out             channel.Factory
 	wg              sync.WaitGroup
 	inputsFactory   cfgfile.RunnerFactory
 	modulesFactory  cfgfile.RunnerFactory
@@ -46,14 +45,13 @@ type crawler struct {
 
 func newCrawler(
 	inputFactory, module cfgfile.RunnerFactory,
-	out channel.Factory,
 	inputConfigs []*common.Config,
 	beatDone chan struct{},
 	once bool,
 ) (*crawler, error) {
 	return &crawler{
-		out:            out,
-		inputs:         map[uint64]*input.Runner{},
+		log:            logp.NewLogger("crawler"),
+		inputs:         map[uint64]cfgfile.Runner{},
 		inputsFactory:  inputFactory,
 		modulesFactory: module,
 		inputConfigs:   inputConfigs,
@@ -65,16 +63,16 @@ func newCrawler(
 // Start starts the crawler with all inputs
 func (c *crawler) Start(
 	pipeline beat.Pipeline,
-	r *registrar.Registrar,
 	configInputs *common.Config,
 	configModules *common.Config,
 ) error {
+	log := c.log
 
-	logp.Info("Loading Inputs: %v", len(c.inputConfigs))
+	log.Infof("Loading Inputs: %v", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
-		err := c.startInput(pipeline, inputConfig, r.GetStates())
+		err := c.startInput(pipeline, inputConfig)
 		if err != nil {
 			return err
 		}
@@ -102,7 +100,7 @@ func (c *crawler) Start(
 		}()
 	}
 
-	logp.Info("Loading and starting Inputs completed. Enabled inputs: %v", len(c.inputs))
+	log.Infof("Loading and starting Inputs completed. Enabled inputs: %v", len(c.inputs))
 
 	return nil
 }
@@ -110,26 +108,33 @@ func (c *crawler) Start(
 func (c *crawler) startInput(
 	pipeline beat.Pipeline,
 	config *common.Config,
-	states []file.State,
 ) error {
 	if !config.Enabled() {
 		return nil
 	}
 
-	connector := c.out(pipeline)
-	p, err := input.New(config, connector, c.beatDone, states, nil)
+	var h map[string]interface{}
+	config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
-		return fmt.Errorf("Error while initializing input: %s", err)
+		return fmt.Errorf("can not compute id from configuration: %v", err)
 	}
-	p.Once = c.once
-
-	if _, ok := c.inputs[p.ID]; ok {
-		return fmt.Errorf("Input with same ID already exists: %d", p.ID)
+	if _, ok := c.inputs[id]; ok {
+		return fmt.Errorf("input with same ID already exists: %v", id)
 	}
 
-	c.inputs[p.ID] = p
+	runner, err := c.inputsFactory.Create(pipeline, config, nil)
+	if err != nil {
+		return fmt.Errorf("Error while initializing input: %+v", err)
+	}
+	if inputRunner, ok := runner.(*input.Runner); ok {
+		inputRunner.Once = c.once
+	}
 
-	p.Start()
+	c.inputs[id] = runner
+
+	c.log.Info("Starting input (ID: %d)", id)
+	runner.Start()
 
 	return nil
 }
@@ -146,9 +151,13 @@ func (c *crawler) Stop() {
 	}
 
 	logp.Info("Stopping %v inputs", len(c.inputs))
-	for _, p := range c.inputs {
-		// Stop inputs in parallel
-		asyncWaitStop(p.Stop)
+	// Stop inputs in parallel
+	for id, p := range c.inputs {
+		id, p := id, p
+		asyncWaitStop(func() {
+			c.log.Infof("Stopping input: %d", id)
+			p.Stop()
+		})
 	}
 
 	if c.inputReloader != nil {
