@@ -51,9 +51,15 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 		}
 
 		// take count for this period (rate) + deacumulate
-		count := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount()) - sumCount
-		counts = append(counts, count)
-		sumCount += count
+		count := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount())
+
+		if count == 0 {
+			counts = append(counts, count)
+			continue
+		}
+
+		counts = append(counts, count-sumCount)
+		sumCount = count
 	}
 
 	res := common.MapStr{
