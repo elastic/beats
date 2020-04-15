@@ -30,20 +30,19 @@ the *processors* that the event must be passed through, the *queue* implementati
 or spool-to-disk) to use, and the *group of outputs* to which the pipeline should
 ultimately send the processed events.
 
-For managing the group of outputs, the pipeline internally creates an *output controller*.
-The output controller creates a *consumer* for the queue. It also creates a *retryer*
-to retry failed or cancelled batches of events. Finally, it creates *output workers*
-that wrap the functionality of publishing events to the configured set of outputs.
-
-All output workers share an internal *work queue*. The output workers dequeue batches of events
-from this work queue and send them to the output for publishing. If publishing is unsuccessful
-for some reason, either the output worker or the output *cancels* the batch (depending
-on where the failure occurred).
-
-Cancelling a batch sends it to the retryer. When the retryer receives a batch of cancelled
-events, it enqueues them onto an internal retry queue. Ultimately, the retryer's job is to
-dequeue batches from this internal retry queue and enqueue them back onto the work queue that's
-shared by output workers. This ensures that the output workers try to publish these batches again.
+For managing the group of outputs, the pipeline internally creates an *output controller*. The
+output controller creates three main entities:
+- a group of *output workers*. Each output worker manages one output and tries to publish events
+to it.
+- a *consumer* whose job is to dequeue events from the Beat's queue and enqueue them to an
+internal *work queue*. This work queue is shared amongst all output workers. Each worker dequeues
+batches of events from the work queue and tries to publish them to its underlying output.
+- a *retryer* whose job is to retry *cancelled* batches of events. If an output worker or its
+underlying output fails to publish a batch of events, that batch is cancelled. Cancelling a batch
+sends it to the retryer. When the retryer receives a batch of cancelled events, it enqueues them to
+an internal retry queue. The retryer's job is to dequeue batches from the retry queue and enqueue them
+to the work queue that's shared by output workers. This ensures that the output workers try to publish
+these batches again.
 
 TODO: write about ACK handling
 TODO: write about signaling from output controller -> consumer
