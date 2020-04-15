@@ -140,8 +140,8 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
-	if d.Seconds() < 300 {
-		return errors.New("period in Google Cloud config file cannot be set to less than 300 seconds")
+	if d.Seconds() < googlecloud.MonitoringMetricsSamplingRate {
+		return errors.Errorf("period in Google Cloud config file cannot be set to less than %s seconds", googlecloud.MonitoringMetricsSamplingRate)
 	}
 
 	return nil

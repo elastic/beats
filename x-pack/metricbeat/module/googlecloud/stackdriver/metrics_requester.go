@@ -149,8 +149,8 @@ func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, erro
 	var startTime, endTime time.Time
 
 	if windowTime > 0 {
-		endTime = time.Now().UTC()
-		startTime = time.Now().UTC().Add(-windowTime)
+		endTime = time.Now().UTC().Add(-googlecloud.MonitoringMetricsLatency * time.Minute)
+		startTime = endTime.Add(-googlecloud.MonitoringMetricsSamplingRate * time.Second)
 	}
 
 	if windowTime.Minutes() < googlecloud.MinTimeIntervalDataWindowMinutes {

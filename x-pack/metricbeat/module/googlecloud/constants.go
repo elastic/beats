@@ -10,10 +10,18 @@ const (
 
 	// MinTimeIntervalDataWindowMinutes is the minimum time in minutes that we allow the user to specify when requesting past metrics. Less than 5 minutes
 	// usually return no results.
-	MinTimeIntervalDataWindowMinutes = 5
+	MinTimeIntervalDataWindowMinutes = 1
 
 	// MaxTimeIntervalDataWindowMinutes is the max time in minutes that we allow the user to specify when requesting past metrics.
 	MaxTimeIntervalDataWindowMinutes = 60
+
+	// MonitoringMetricsLatency (in minute) refers to how long it takes before a new metric data point is available in Monitoring after it is written.
+	// Monitoring collects one measurement each minute (the sampling rate), but it can take up to 4 minutes before you can retrieve the data (latency).
+	// So, the time stamp recording the collection time might be up to 4 minutes old.
+	MonitoringMetricsLatency = 4
+
+	// MonitoringMetricsSamplingRate (in second) refers to how frequent monitoring collects measurement in GCP.
+	MonitoringMetricsSamplingRate = 60
 )
 
 // Metricsets / GCP services names
