@@ -53,7 +53,7 @@ func TestData(t *testing.T) {
 }
 
 func TestReadService(t *testing.T) {
-	reader, err := NewServiceReader()
+	reader, err := NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
