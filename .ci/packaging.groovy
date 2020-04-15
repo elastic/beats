@@ -53,14 +53,6 @@ pipeline {
             )
           }
         }
-        excludes {
-          exclude {
-            axis {
-              name 'PLATFORM'
-              values 'darwin'
-            }
-          }
-        }
         stages {
           stage('Package'){
             environment {
