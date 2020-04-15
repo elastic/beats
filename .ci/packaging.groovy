@@ -42,7 +42,23 @@ pipeline {
         axes {
           axis {
             name 'PLATFORMS'
-            values '+linux/armv7', '+linux/ppc64le', '+linux/s390x', '+linux/mips64', 'darwin'
+            values (
+              '+linux/armv7',
+              '+linux/ppc64le',
+              '+linux/s390x',
+              '+linux/mips64',
+              'darwin',
+              'windows/386',
+              'windows/amd64'
+            )
+          }
+        }
+        excludes {
+          exclude {
+            axis {
+              name 'PLATFORM'
+              values 'darwin'
+            }
           }
         }
         stages {
@@ -71,10 +87,12 @@ def release(){
           [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
           [var: "APPLE_SIGNING_ENABLED", password: "true"],
       ]){
-        sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
+        sh(label: "Release ${env.PLATFORMS}", script: './dev-tools/jenkins_release.sh')
       }
-    } else if (params.linux){
-      sh(label: 'Release', script: './dev-tools/jenkins_release.sh')
+    } else if (env.PLATFORMS != 'darwin' && params.linux){
+      sh(label: "Release ${env.PLATFORMS}", script: './dev-tools/jenkins_release.sh')
+    } else {
+      unstable("Release for ${env.PLATFORMS} Not executed")
     }
   }
 }
