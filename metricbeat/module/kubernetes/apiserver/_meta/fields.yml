@@ -147,7 +147,7 @@
         - name: duration.us.count
           type: long
           description: Request duration, number of operations
-        - name: duration.us.bucket.*
+        - name: duration.bucket.us.*
           type: object
           object_type: long
           description: Request duration, histogram buckets

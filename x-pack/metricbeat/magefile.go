@@ -135,7 +135,7 @@ func Update() {
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
+	defer devtools.StopIntegTestEnv(devtools.NewIntegrationEnvFromDir("."))
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -160,7 +160,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
+	return devtools.RunIntegTest(devtools.NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, devtools.ListMatchingEnvVars("NOSE_")...)

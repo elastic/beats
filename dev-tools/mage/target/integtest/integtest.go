@@ -54,7 +54,7 @@ func WhitelistEnvVar(key ...string) {
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
+	defer devtools.StopIntegTestEnv(devtools.NewIntegrationEnvFromDir("."))
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -65,7 +65,7 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(goTestDeps...)
 	}
-	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "goIntegTest", func() error {
+	return devtools.RunIntegTest(devtools.NewIntegrationEnvFromDir("."), "goIntegTest", func() error {
 		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	}, whitelistedEnvVars...)
 }
@@ -79,7 +79,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)
 	}
-	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
+	return devtools.RunIntegTest(devtools.NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, append(whitelistedEnvVars, devtools.ListMatchingEnvVars("NOSE_")...)...)

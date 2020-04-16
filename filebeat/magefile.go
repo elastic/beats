@@ -177,7 +177,7 @@ func ExportDashboard() error {
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
+	defer devtools.StopIntegTestEnv(devtools.NewIntegrationEnvFromDir("."))
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -198,7 +198,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
+	return devtools.RunIntegTest(devtools.NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
