@@ -39,6 +39,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
 - Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
 - Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
+- Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
 
 ==== Bugfixes
 
