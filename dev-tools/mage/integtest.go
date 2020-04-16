@@ -460,6 +460,13 @@ func haveIntegTestEnvRequirements(testEnv *IntegrationEnv) error {
 // skipIntegTest returns true if integ tests should be skipped.
 func skipIntegTest(testEnv *IntegrationEnv) (reason string, skip bool) {
 	if IsInIntegTestEnv() {
+		// When test should run under kubernetes we need to ensure we are actually
+		// inside of a kubernetes.
+		_, insideK8s := os.LookupEnv("KUBERNETES_SERVICE_HOST")
+		if testEnv.HasType(TestingEnvKubernetes) && !insideK8s {
+			return "not inside of kubernetes", true
+		}
+
 		return "", false
 	}
 
