@@ -22,11 +22,13 @@ type CounterCache interface {
 	Stop()
 
 	// RateUint64 returns, for a given counter name, the difference between the given value
-	// and the value that was given in a previous call. It will return 0 on the first call
+	// and the value that was given in a previous call, and true if a previous value existed.
+	// It will return 0 and false on the first call.
 	RateUint64(counterName string, value uint64) (uint64, bool)
 
 	// RateFloat64 returns, for a given counter name, the difference between the given value
-	// and the value that was given in a previous call. It will return 0.0 on the first call
+	// and the value that was given in a previous call, and true if a previous value existed.
+	// It will return 0 and false on the first call.
 	RateFloat64(counterName string, value float64) (float64, bool)
 }
 
@@ -47,7 +49,8 @@ func NewCounterCache(timeout time.Duration) CounterCache {
 }
 
 // RateUint64 returns, for a given counter name, the difference between the given value
-// and the value that was given in a previous call. It will return 0 on the first call
+// and the value that was given in a previous call, and true if a previous value existed.
+// It will return 0 and false on the first call.
 func (c *counterCache) RateUint64(counterName string, value uint64) (uint64, bool) {
 	prev := c.ints.PutWithTimeout(counterName, value, c.timeout)
 	if prev != nil {
@@ -63,7 +66,8 @@ func (c *counterCache) RateUint64(counterName string, value uint64) (uint64, boo
 }
 
 // RateFloat64 returns, for a given counter name, the difference between the given value
-// and the value that was given in a previous call. It will return 0.0 on the first call
+// and the value that was given in a previous call, and true if a previous value existed.
+// It will return 0 and false on the first call.
 func (c *counterCache) RateFloat64(counterName string, value float64) (float64, bool) {
 	prev := c.floats.PutWithTimeout(counterName, value, c.timeout)
 	if prev != nil {
