@@ -36,6 +36,7 @@ GROUPLOOP:
 			continue GROUPLOOP
 		}
 
+		monitoringFound := false
 		for _, p := range newPtr {
 			if p.Spec.Name != monitoringName {
 				continue
@@ -78,6 +79,10 @@ GROUPLOOP:
 				t.Errorf("output.elasticsearch.username has incorrect value expected '%s', got '%s for %s", "monitoring-uname", uname, group)
 				continue GROUPLOOP
 			}
+		}
+
+		if !monitoringFound {
+			t.Errorf("No monitoring in group: %v", group)
 		}
 	}
 }
@@ -135,7 +140,16 @@ var inputConfigMap = map[string]interface{}{
 		map[string]interface{}{
 			"inputs": []map[string]interface{}{
 				map[string]interface{}{
-					"type": "metrics/system",
+					"type": "system/metrics",
+					"streams": []map[string]interface{}{
+						map[string]interface{}{
+							"id":      "system/metrics-system.core",
+							"enabled": true,
+							"dataset": "system.core",
+							"period":  "10s",
+							"metrics": []string{"percentages"},
+						},
+					},
 				},
 			},
 			"use_output": "infosec1",
