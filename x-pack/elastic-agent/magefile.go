@@ -277,7 +277,9 @@ func Package() {
 		"linux-x86_64.tar.gz",
 		"windows-x86.zip",
 		"windows-x86_64.zip",
+		"linux-arm64.tar.gz",
 	}, devtools.UseElasticAgentPackaging)
+
 }
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
