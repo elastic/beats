@@ -31,12 +31,11 @@ GROUPLOOP:
 			continue GROUPLOOP
 		}
 
-		if programsCount == len(newPtr) {
+		if programsCount+1 != len(newPtr) {
 			t.Errorf("incorrect programs to run count, expected: %d, got %d", programsCount+1, len(newPtr))
 			continue GROUPLOOP
 		}
 
-		monitoringFound := false
 		for _, p := range newPtr {
 			if p.Spec.Name != monitoringName {
 				continue
@@ -79,10 +78,6 @@ GROUPLOOP:
 				t.Errorf("output.elasticsearch.username has incorrect value expected '%s', got '%s for %s", "monitoring-uname", uname, group)
 				continue GROUPLOOP
 			}
-		}
-
-		if !monitoringFound {
-			t.Errorf("No monitoring in group: %v", group)
 		}
 	}
 }
