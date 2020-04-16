@@ -135,6 +135,12 @@ func queueFactory(
 	if err != nil {
 		return nil, err
 	}
+	settings.Logger = logger
+	// For now, incoming messages are acked when they are written to disk
+	// (rather than transmitted to the output, as with the memory queue). This
+	// can produce unexpected behavior in some contexts and we might want to
+	// make it configurable later.
+	settings.WriteToDiskACKListener = ackListener
 	return NewQueue(settings)
 }
 
