@@ -13,7 +13,6 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
@@ -21,40 +20,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
-func newStackdriverMetricsRequester(ctx context.Context, c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
-	interval, err := getTimeInterval(window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error trying to get time window")
-	}
-
-	client, err := monitoring.NewMetricClient(ctx, c.opt...)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating Stackdriver client")
-	}
-
-	return &stackdriverMetricsRequester{
-		config:   c,
-		client:   client,
-		logger:   logger,
-		interval: interval,
-	}, nil
-}
-
 type stackdriverMetricsRequester struct {
 	config config
 
-	client   *monitoring.MetricClient
-	interval *monitoringpb.TimeInterval
+	client *monitoring.MetricClient
 
 	logger *logp.Logger
 }
 
-func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
+func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, timeInterval *monitoringpb.TimeInterval) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
-		Interval: r.interval,
+		Interval: timeInterval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
 		Filter:   r.getFilterForMetric(m),
 	}
@@ -89,23 +68,27 @@ func constructFilter(m string, region string, zone string) string {
 	return filter
 }
 
-func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) ([]*monitoringpb.TimeSeries, error) {
+func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, metricTypes []string, metricsMeta map[string]metricMeta) ([]*monitoringpb.TimeSeries, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]*monitoringpb.TimeSeries, 0)
 
-	for _, metric := range ms {
+	for _, mt := range metricTypes {
+		metricType := mt
 		wg.Add(1)
 
-		go func(m string) {
+		go func(metricType string) {
 			defer wg.Done()
 
-			ts := r.Metric(ctx, m)
+			metricMeta := metricsMeta[metricType]
+			interval := getTimeInterval(metricMeta.ingestDelay, metricMeta.samplePeriod)
+
+			ts := r.Metric(ctx, metricType, interval)
 
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts...)
-		}(metric)
+		}(metricType)
 	}
 
 	wg.Wait()
@@ -144,22 +127,12 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	return
 }
 
-// Returns a GCP TimeInterval based on the provided config
-func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, error) {
+// Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
+func getTimeInterval(ingestDelay time.Duration, samplePeriod time.Duration) *monitoringpb.TimeInterval {
 	var startTime, endTime time.Time
 
-	if windowTime > 0 {
-		endTime = time.Now().UTC().Add(-googlecloud.MonitoringMetricsLatency * time.Minute)
-		startTime = endTime.Add(-googlecloud.MonitoringMetricsSamplingRate * time.Second)
-	}
-
-	if windowTime.Minutes() < googlecloud.MinTimeIntervalDataWindowMinutes {
-		return nil, errors.Errorf("the provided window time is too small. No less than %d minutes can be fetched", googlecloud.MinTimeIntervalDataWindowMinutes)
-	}
-
-	if windowTime.Minutes() >= googlecloud.MaxTimeIntervalDataWindowMinutes {
-		return nil, errors.Errorf("the provided window time is too big. No more than %d minutes can be fetched", googlecloud.MaxTimeIntervalDataWindowMinutes)
-	}
+	endTime = time.Now().UTC().Add(-ingestDelay * time.Second)
+	startTime = endTime.Add(-samplePeriod * time.Second)
 
 	interval := &monitoringpb.TimeInterval{
 		StartTime: &timestamp.Timestamp{
@@ -170,5 +143,5 @@ func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, erro
 		},
 	}
 
-	return interval, nil
+	return interval
 }

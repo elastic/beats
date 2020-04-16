@@ -6,7 +6,10 @@ package stackdriver
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	monitoring "cloud.google.com/go/monitoring/apiv3"
 
 	"github.com/pkg/errors"
 
@@ -38,7 +41,14 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config
+	config      config
+	metricsMeta map[string]metricMeta
+	requester   *stackdriverMetricsRequester
+}
+
+type metricMeta struct {
+	samplePeriod time.Duration
+	ingestDelay  time.Duration
 }
 
 type config struct {
@@ -70,6 +80,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	// Get ingest delay and sample period for each metric type
+	ctx := context.Background()
+	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating Stackdriver client")
+	}
+
+	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.config.Metrics)
+	if err != nil {
+		return nil, errors.Wrap(err, "error calling metricDescriptor function")
+	}
+
+	m.requester = &stackdriverMetricsRequester{
+		config: m.config,
+		client: client,
+		logger: m.Logger(),
+	}
 	return m, nil
 }
 
@@ -77,12 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
-	if err != nil {
-		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
-	}
-
-	responses, err := reqs.Metrics(ctx, m.config.Metrics)
+	responses, err := m.requester.Metrics(ctx, m.config.Metrics, m.metricsMeta)
 	if err != nil {
 		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
@@ -141,7 +163,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
 	if d.Seconds() < googlecloud.MonitoringMetricsSamplingRate {
-		return errors.Errorf("period in Google Cloud config file cannot be set to less than %s seconds", googlecloud.MonitoringMetricsSamplingRate)
+		return errors.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", googlecloud.MonitoringMetricsSamplingRate)
 	}
 
 	return nil
@@ -157,4 +179,30 @@ func (c *config) Validate() error {
 		return errors.New("region and zone in Google Cloud config file cannot both be empty")
 	}
 	return nil
+}
+
+// metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
+// (sample period and ingest delay) of each given metric type
+func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, metricTypes []string) (map[string]metricMeta, error) {
+	metricsWithMeta := make(map[string]metricMeta, 0)
+
+	for _, mt := range metricTypes {
+		req := &monitoringpb.ListMetricDescriptorsRequest{
+			Name:   "projects/" + projectID,
+			Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
+		}
+
+		it := client.ListMetricDescriptors(ctx, req)
+		out, err := it.Next()
+		if err != nil {
+			return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
+		}
+
+		metricsWithMeta[mt] = metricMeta{
+			samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds),
+			ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds),
+		}
+	}
+
+	return metricsWithMeta, nil
 }
