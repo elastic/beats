@@ -271,3 +271,36 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 
 	return "localhost", uint16(portUint64), ip, listener.Close, nil
 }
+
+// StaticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names
+// and zones.
+type StaticResolver struct {
+	mapping map[string][]net.IP
+}
+
+func NewStaticResolver(mapping map[string][]net.IP) StaticResolver {
+	return StaticResolver{mapping}
+}
+
+func (s StaticResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
+	found, err := s.LookupIP(host)
+	if err != nil {
+		return nil, err
+	}
+	return &net.IPAddr{IP: found[0]}, nil
+}
+
+func (s StaticResolver) LookupIP(host string) ([]net.IP, error) {
+	if found, ok := s.mapping[host]; ok {
+		return found, nil
+	} else {
+		return nil, makeStaticNXDomainErr(host)
+	}
+}
+
+func makeStaticNXDomainErr(host string) *net.DNSError {
+	return &net.DNSError{
+		IsNotFound: true,
+		Err:        fmt.Sprintf("Hostname '%s' not found in static resolver", host),
+	}
+}
