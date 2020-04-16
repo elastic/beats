@@ -106,7 +106,7 @@ func moduleFieldsGo() error {
 	return devtools.GenerateModuleFieldsGo("module")
 }
 
-// fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
+// fieldsYML generates a fields.yml based on metricbeat + x-pack/metricbeat/modules.
 func fieldsYML() error {
 	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module")
 }
