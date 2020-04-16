@@ -53,6 +53,7 @@ pipeline {
               'winlogbeat',
               'x-pack/auditbeat',
               'x-pack/elastic-agent',
+              'x-pack/dockerlogbeat',
               'x-pack/filebeat',
               'x-pack/functionbeat',
               // 'x-pack/heartbeat',
@@ -75,10 +76,11 @@ pipeline {
             }
             environment {
               HOME = "${env.WORKSPACE}"
-              PLATFORMS = "+linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
+              PLATFORMS = "!darwin +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
             }
             steps {
               release()
+              pushCIDockerImages()
             }
           }
           stage('Package Mac OS'){
@@ -92,7 +94,7 @@ pipeline {
             }
             environment {
               HOME = "${env.WORKSPACE}"
-              PLATFORMS = "!defaults +darwin/amd64 +darwin"
+              PLATFORMS = "!defaults +darwin/amd64"
             }
             steps {
               withMacOSEnv(){
@@ -106,13 +108,20 @@ pipeline {
   }
 }
 
+def pushCIDockerImages(){
+  sh(label: 'Push Docker image', acript: '''
+    if [ command -v docker ]; then
+      docker images | grep 'docker.elastic.co/beats/'
+    if
+  ''')
+}
+
 def release(){
   withBeatsEnv(){
     dir("${env.BEATS_FOLDER}") {
       sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
     }
     publishPackages("${env.BEATS_FOLDER}")
-    publishPackages(".")
   }
 }
 
