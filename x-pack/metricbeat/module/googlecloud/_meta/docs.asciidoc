@@ -7,10 +7,21 @@ Note: extra GCP charges on Stackdriver Monitoring API requests will be generated
 This is a list of the possible module parameters you can tune:
 
 * *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
+
 * *region*: A single string with the region you want to monitor like "us-central1". This will enable monitoring for all zones under this region.
+
 * *project_id*: A single string with your GCP Project ID
+
 * *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
+
 * *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
+
+* *period*: A single time duration specified for this module collection frequency.
+
+* *perSeriesAligner*: A single string with which operation need to be applied onto time series data for aggregation.
+If it's not given and sample period of a specific metric type is larger or equal than module collection period, default perSeriesAligner is set to be `ALIGN_NONE`.
+If it's not given and sample period of a specific metric type is smaller than module collection period, default perSeriesAligner is set to be `ALIGN_MEAN`.
+Sample period of each metric type is obtained from making https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list [ListMetricDescriptors API] call.
 
 [float]
 == Authentication, authorization and permissions.
@@ -52,7 +63,9 @@ Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics
 
 If you also want to *extract service labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
 
-A recommended `period` value between fetches is between 5 and 10 minutes, depending on how granular you want your metrics. GCP restricts information for less than 5 minutes.
+If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
+GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
+In googlecloud module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
 [float]
 === Rough estimation of the number of API Calls
