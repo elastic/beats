@@ -65,7 +65,15 @@ type bulkResultStats struct {
 
 const (
 	defaultEventType = "doc"
+	opTypeCreate     = "create"
+	opTypeDelete     = "delete"
+	opTypeIndex      = "index"
 )
+
+// opTypeKey defines the metadata key name for event operation type.
+// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, the event will be `create`d if the ID
+// is known, and `index`ed otherwise.
+const opTypeKey = "@metadata.op_type"
 
 // NewClient instantiates a new client.
 func NewClient(
@@ -253,20 +261,6 @@ func (client *Client) publishEvents(
 	return nil, nil
 }
 
-func eventMetaValue(event *beat.Event, key string) string {
-	var val string
-	if m := event.Meta; m != nil {
-		if tmp := m[key]; tmp != nil {
-			if s, ok := tmp.(string); ok {
-				val = s
-			} else {
-				logp.Err("Event[%s] '%v' is no string value", key, val)
-			}
-		}
-	}
-	return val
-}
-
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
 func bulkEncodePublishRequest(
@@ -286,8 +280,7 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		opType := eventMetaValue(event, "op_type")
-		if opType == "delete" {
+		if opType, err := event.GetMetaStringValue(opTypeKey); err == nil && opType == opTypeDelete {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta, nil)
 		} else {
@@ -322,8 +315,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	id := eventMetaValue(event, "id")
-	opType := eventMetaValue(event, "op_type")
+	id, _ := event.GetMetaStringValue("_id")
+	opType, _ := event.GetMetaStringValue(opTypeKey)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
@@ -332,12 +325,14 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
+	if id != "" && opType == opTypeDelete {
+		return eslegclient.BulkDeleteAction{Delete: meta}, nil
+	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		if opType == "" || opType == "create" {
-			return eslegclient.BulkCreateAction{Create: meta}, nil
-		} else if opType == "delete" {
-			return eslegclient.BulkDeleteAction{Delete: meta}, nil
+		if opType == opTypeIndex {
+			return eslegclient.BulkIndexAction{Index: meta}, nil
 		}
+		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
