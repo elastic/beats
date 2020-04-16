@@ -65,9 +65,9 @@ Check Point CEF extensions are mapped as follows:
 | deviceInboundInterface     | -                           | observer.ingress.interface.name | -                       |
 | deviceOutboundInterface    | -                           | observer.egress.interface.name | -                        |
 | externalId                 | -                           | -                        | checkpoint.uuid                |
-| fileHash                   | -                           | file.hash.{md5,sha1}     | checkpoint.file_hash           |
+| fileHash                   | -                           | file.hash.{md5,sha1}     | -                              |
 | reason                     | -                           | -                        | checkpoint.termination_reason  |
-| checkrequestCookies        | -                           | -                        | checkpoint.cookie              |
+| requestCookies             | -                           | -                        | checkpoint.cookie              |
 | sourceNtDomain             | -                           | dns.question.name        | -                              |
 | Signature                  | -                           | vulnerability.id         | -                              |
 | Recipient                  | -                           | destination.user.email   | -                              |
@@ -75,7 +75,7 @@ Check Point CEF extensions are mapped as follows:
 | deviceCustomFloatingPoint1 | update version              | observer.version         | -                              |
 | deviceCustomIPv6Address2   | source ipv6 address         | source.ip                | -                              |
 | deviceCustomIPv6Address3   | destination ipv6 address    | destination.ip           | -                              |
-.3+| deviceCustomNumber1     | elapsed time in seconds     | host.uptime              | -                              |
+.3+| deviceCustomNumber1     | elapsed time in seconds     | event.duration           | -                              |
                              | email recipients number     | -                        | checkpoint.email_recipients_num |
                              | payload                     | network.bytes            | -                              |
 .2+| deviceCustomNumber2     | icmp type                   | -                        | checkpoint.icmp_type           |
@@ -95,9 +95,9 @@ Check Point CEF extensions are mapped as follows:
                              | update status               | -                        | checkpoint.update_status       |
                              | peer gateway                | -                        | checkpoint.peer_gateway        |
                              | categories                  | rule.category            | -                              |
-.4+| deviceCustomString6     | application name            | process.name             | -                              |
+.4+| deviceCustomString6     | application name            | network.application      | -                              |
                              | virus name                  | -                        | checkpoint.virus_name          |
-                             | malware name                | -                        | checkpoint.malware_name        |
+                             | malware name                | -                        | checkpoint.spyware_name        |
                              | malware family              | -                        | checkpoint.malware_family      |
 .5+| deviceCustomString3     | user group                  | group.name               | -                              |
                              | incident extension          | -                        | checkpoint.incident_extension  |
@@ -117,15 +117,15 @@ Check Point CEF extensions are mapped as follows:
                              | vlan id                     | network.vlan.id          | -                              |
                              | authentication method       | -                        | checkpoint.auth_method         |
                              | email session id            | -                        | checkpoint.email_session_id    |
-| deviceCustomDate2          | subscription expiration     | -                        | checkpoint.subscription_expiration |
+| deviceCustomDate2          | subscription expiration     | -                        | checkpoint.subs_exp            |
 | deviceFlexNumber1          | confidence                  | -                        | checkpoint.confidence_level    |
 .2+| deviceFlexNumber2       | performance impact          | -                        | checkpoint.performance_impact  |
                              | destination phone number    | -                        | checkpoint.dst_phone_number    |
 | flexString1                | application signature id    | -                        | checkpoint.app_sig_id          |
-.2+| flexString2             | malware action              | event.action             | -                              |
+.2+| flexString2             | malware action              | rule.description         | -                              |
                              | attack information          | event.action             | -                              |
 | rule_uid                   | -                           | rule.uuid                | -                              |
-| ifname                     | -                           | observer.ingress.interface.name | -                              |
+| ifname                     | -                           | observer.ingress.interface.name | -                       |
 | inzone                     | -                           | observer.ingress.zone    | -                              |
 | outzone                    | -                           | observer.egress.zone     | -                              |
 | product                    | -                           | observer.product         | -                              |

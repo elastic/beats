@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash_test
+package elasticsearch_test
 
 import (
 	"testing"
@@ -23,61 +23,34 @@ import (
 	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 
 	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 )
 
-func TestGetVertexClusterUUID(t *testing.T) {
-	tests := map[string]struct {
-		vertex              map[string]interface{}
-		overrideClusterUUID string
-		expectedClusterUUID string
-	}{
-		"vertex_and_override": {
-			map[string]interface{}{
-				"cluster_uuid": "v",
-			},
-			"o",
-			"v",
-		},
-		"vertex_only": {
-			vertex: map[string]interface{}{
-				"cluster_uuid": "v",
-			},
-			expectedClusterUUID: "v",
-		},
-		"override_only": {
-			overrideClusterUUID: "o",
-			expectedClusterUUID: "o",
-		},
-		"none": {
-			expectedClusterUUID: "",
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			require.Equal(t, test.expectedClusterUUID, logstash.GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
-		})
-	}
-}
-
-func TestXPackEnabledMetricSets(t *testing.T) {
+func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"hosts":         []string{"foobar:9600"},
+		"module":        elasticsearch.ModuleName,
+		"hosts":         []string{"foobar:9200"},
 		"xpack.enabled": true,
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 2)
+	require.Len(t, metricSets, 9)
 	for _, ms := range metricSets {
 		name := ms.Name()
 		switch name {
-		case "node", "node_stats":
+		case "ccr", "enrich", "cluster_stats", "index", "index_recovery",
+			"index_summary", "ml_job", "node_stats", "shard":
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}

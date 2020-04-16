@@ -127,6 +127,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   cloudwatch:
     enabled: false
 
@@ -157,6 +160,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   ec2:
     enabled: false
@@ -189,6 +195,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   elb:
     enabled: false
 
@@ -219,6 +228,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   s3access:
     enabled: false
@@ -251,6 +263,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
   vpcflow:
     enabled: false
 
@@ -281,6 +296,9 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -2224,13 +2242,14 @@ output.elasticsearch:
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/path/config
+  #kerberos.config_path: /etc/krb5.conf
 
-  # The service principal name.
-  #kerberos.service_name: HTTP/my-service@realm
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
 
   # Name of the Kerberos user.
   #kerberos.username: elastic
