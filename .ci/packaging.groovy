@@ -55,10 +55,10 @@ pipeline {
               'x-pack/elastic-agent',
               'x-pack/filebeat',
               'x-pack/functionbeat',
-              'x-pack/heartbeat',
-              'x-pack/journalbeat',
+              // 'x-pack/heartbeat',
+              // 'x-pack/journalbeat',
               'x-pack/metricbeat',
-              'x-pack/packetbeat',
+              // 'x-pack/packetbeat',
               'x-pack/winlogbeat'
             )
           }
@@ -112,6 +112,7 @@ def release(){
       sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
     }
     publishPackages("${env.BEATS_FOLDER}")
+    publishPackages(".")
   }
 }
 
