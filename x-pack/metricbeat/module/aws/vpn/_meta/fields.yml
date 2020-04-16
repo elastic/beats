@@ -8,7 +8,7 @@
       type: group
       fields:
         - name: TunnelState.avg
-          type: integer
+          type: double
           description: The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.
         - name: TunnelDataIn.sum
           type: double
