@@ -87,9 +87,6 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	// of the beat with same data path fails to start
 	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 
-	// on windows wd is set to agents wd
-	spec.Args = injectConfigPath(spec.Args, spec.BinaryPath)
-
 	a.state.ProcessInfo, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
@@ -221,11 +218,6 @@ func injectDataPath(args []string, pipelineID, id string) []string {
 	dataPath := filepath.Join(wd, "data", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }
-
-func injectConfigPath(args []string, binaryPath string) []string {
-	return append(args, "-c", binaryPath + ".yml")
-}
-
 
 func generateCA(configurable string) (*authority.CertificateAuthority, error) {
 	if !isGrpcConfigurable(configurable) {

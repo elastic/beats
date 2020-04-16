@@ -18,6 +18,7 @@ func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg 
 	cmd := exec.Command(path, arg...)
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	cmd.Env = append(cmd.Env, env...)
+	cmd.Dir = filepath.Dir(path)
 
 	return cmd
 }
