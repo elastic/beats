@@ -2,7 +2,9 @@
     {
         "@timestamp": "2020-03-29T13:19:20Z",
         "checkpoint.sys_message": ":\"The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a059,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -26,7 +28,9 @@
     {
         "@timestamp": "2020-03-29T13:19:20Z",
         "checkpoint.sys_message": ":\"The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a059,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -50,7 +54,9 @@
     {
         "@timestamp": "2020-03-29T13:19:21Z",
         "checkpoint.sys_message": ":\"installed Standard",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a059,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -82,7 +88,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -90,6 +98,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 960,
@@ -103,6 +115,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -126,7 +143,9 @@
         "destination.ip": "194.29.39.10",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -134,6 +153,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 1739,
@@ -147,6 +170,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "194.29.39.10",
+            "194.29.39.10"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.10",
         "server.port": "443",
@@ -169,7 +197,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -177,6 +207,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 2630,
@@ -190,6 +224,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -213,7 +252,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x1,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -221,6 +262,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 3409,
@@ -234,6 +279,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -256,7 +306,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -264,6 +316,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 4302,
@@ -277,6 +333,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -300,7 +361,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x2,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -308,6 +371,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 5080,
@@ -321,6 +388,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -343,7 +415,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x1,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -351,6 +425,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 5972,
@@ -364,6 +442,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -387,7 +470,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x3,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -395,6 +480,10 @@
         "event.outcome": "success",
         "event.sequence": "8",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 6751,
@@ -408,6 +497,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -430,7 +524,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -438,6 +534,10 @@
         "event.outcome": "success",
         "event.sequence": "9",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 7643,
@@ -451,6 +551,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -474,7 +579,9 @@
         "destination.ip": "104.81.142.43",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -482,6 +589,10 @@
         "event.outcome": "success",
         "event.sequence": "11",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 8421,
@@ -495,6 +606,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.81.142.43",
+            "104.81.142.43"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
         "server.port": "443",
@@ -517,7 +633,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x4,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -525,6 +643,10 @@
         "event.outcome": "success",
         "event.sequence": "12",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 9314,
@@ -538,6 +660,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -561,7 +688,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x5,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -569,6 +698,10 @@
         "event.outcome": "success",
         "event.sequence": "13",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 10093,
@@ -582,6 +715,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -604,7 +742,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x4,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -612,6 +752,10 @@
         "event.outcome": "success",
         "event.sequence": "14",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 10985,
@@ -625,6 +769,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -648,7 +797,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x6,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -656,6 +807,10 @@
         "event.outcome": "success",
         "event.sequence": "15",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 11765,
@@ -669,6 +824,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -691,7 +851,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x5,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -699,6 +861,10 @@
         "event.outcome": "success",
         "event.sequence": "16",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 12657,
@@ -712,6 +878,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -735,7 +906,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x7,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -743,6 +916,10 @@
         "event.outcome": "success",
         "event.sequence": "17",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 13437,
@@ -756,6 +933,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -778,7 +960,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x2,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -786,6 +970,10 @@
         "event.outcome": "success",
         "event.sequence": "18",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 14330,
@@ -799,6 +987,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -822,7 +1015,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x6,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -830,6 +1025,10 @@
         "event.outcome": "success",
         "event.sequence": "19",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 15110,
@@ -843,6 +1042,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -865,7 +1069,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x7,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -873,6 +1079,10 @@
         "event.outcome": "success",
         "event.sequence": "20",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 16003,
@@ -886,6 +1096,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -909,7 +1124,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05a,0x8,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -917,6 +1134,10 @@
         "event.outcome": "success",
         "event.sequence": "21",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 16783,
@@ -930,6 +1151,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -952,7 +1178,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -960,6 +1188,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 17676,
@@ -973,6 +1205,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -996,7 +1233,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1004,6 +1243,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 18454,
@@ -1017,6 +1260,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -1039,7 +1287,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1047,6 +1297,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 19346,
@@ -1060,6 +1314,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1083,7 +1342,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x1,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1091,6 +1352,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 20125,
@@ -1104,6 +1369,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -1126,7 +1396,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1134,6 +1406,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 21017,
@@ -1147,6 +1423,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1170,7 +1451,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1178,6 +1461,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 21795,
@@ -1191,6 +1478,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -1213,7 +1505,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x1,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1221,6 +1515,10 @@
         "event.outcome": "success",
         "event.sequence": "8",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 22687,
@@ -1234,6 +1532,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1257,7 +1560,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x2,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1265,6 +1570,10 @@
         "event.outcome": "success",
         "event.sequence": "9",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 23466,
@@ -1278,6 +1587,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -1300,7 +1614,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x3,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1308,6 +1624,10 @@
         "event.outcome": "success",
         "event.sequence": "10",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 24358,
@@ -1321,6 +1641,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1344,7 +1669,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x4,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1352,6 +1679,10 @@
         "event.outcome": "success",
         "event.sequence": "11",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 25138,
@@ -1365,6 +1696,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -1387,7 +1723,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x2,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1395,6 +1733,10 @@
         "event.outcome": "success",
         "event.sequence": "12",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 26031,
@@ -1408,6 +1750,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1431,7 +1778,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x5,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1439,6 +1788,10 @@
         "event.outcome": "success",
         "event.sequence": "13",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 26811,
@@ -1452,6 +1805,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -1474,7 +1832,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1482,6 +1842,10 @@
         "event.outcome": "success",
         "event.sequence": "15",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 27705,
@@ -1495,6 +1859,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1518,7 +1887,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x3,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1526,6 +1897,10 @@
         "event.outcome": "success",
         "event.sequence": "16",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 28484,
@@ -1539,6 +1914,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -1561,7 +1941,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x4,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1569,6 +1951,10 @@
         "event.outcome": "success",
         "event.sequence": "17",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 29377,
@@ -1582,6 +1968,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1605,7 +1996,9 @@
         "client.user.id": "{FF0154DE-7D18-4396-B0C2-7E8951B393A4}",
         "client.user.name": "admin",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05c,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -1622,6 +2015,9 @@
         "observer.product": "SmartConsole",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.117"
+        ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.117",
@@ -1644,7 +2040,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a05b,0x5,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1652,6 +2050,10 @@
         "event.outcome": "success",
         "event.sequence": "18",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 30757,
@@ -1665,6 +2067,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -1680,7 +2087,9 @@
         "@timestamp": "2020-03-29T13:20:26Z",
         "checkpoint.blade_name": "Anti Bot & Anti Virus",
         "checkpoint.information": "policy installation for blade Anti Bot & Anti Virus completed successfully",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -1713,7 +2122,9 @@
         "destination.ip": "194.29.39.47",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09b,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1721,6 +2132,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 32184,
@@ -1734,6 +2149,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "194.29.39.47",
+            "194.29.39.47"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.47",
         "server.port": "443",
@@ -1756,7 +2176,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09b,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1764,6 +2186,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 33075,
@@ -1777,6 +2203,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1798,7 +2229,9 @@
         "destination.ip": "192.168.1.153",
         "destination.port": "514",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -1806,6 +2239,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 33854,
@@ -1819,6 +2256,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.153",
+            "192.168.1.153"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.153",
         "server.port": "514",
@@ -1840,7 +2282,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -1848,6 +2292,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 34632,
@@ -1861,6 +2309,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1884,7 +2337,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1892,6 +2347,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 35411,
@@ -1905,6 +2364,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -1927,7 +2391,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1935,6 +2401,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 36302,
@@ -1948,6 +2418,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -1971,7 +2446,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09c,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -1979,6 +2456,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 37080,
@@ -1992,6 +2473,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -2014,7 +2500,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2022,6 +2510,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 37971,
@@ -2035,6 +2527,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2058,7 +2555,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -2066,6 +2565,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 38750,
@@ -2079,6 +2582,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -2101,7 +2609,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x1,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2109,6 +2619,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 39643,
@@ -2122,6 +2636,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2145,7 +2664,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2153,6 +2674,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 40422,
@@ -2166,6 +2691,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -2188,7 +2718,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2196,6 +2728,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 41313,
@@ -2209,6 +2745,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2232,7 +2773,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2240,6 +2783,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 42091,
@@ -2253,6 +2800,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -2275,7 +2827,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2283,6 +2837,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 42982,
@@ -2296,6 +2854,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2319,7 +2882,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x4,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2327,6 +2892,10 @@
         "event.outcome": "success",
         "event.sequence": "8",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 43760,
@@ -2340,6 +2909,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -2364,7 +2938,9 @@
         "client.user.id": "{597182F7-E1BA-460F-B6E0-D4996295B5CC}",
         "client.user.name": "admin",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -2381,6 +2957,9 @@
         "observer.product": "SmartConsole",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.117"
+        ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.117",
@@ -2401,7 +2980,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x1,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -2409,6 +2990,10 @@
         "event.outcome": "success",
         "event.sequence": "10",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 45262,
@@ -2422,6 +3007,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2445,7 +3035,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x5,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2453,6 +3045,10 @@
         "event.outcome": "success",
         "event.sequence": "11",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 46042,
@@ -2466,6 +3062,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -2488,7 +3089,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x6,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2496,6 +3099,10 @@
         "event.outcome": "success",
         "event.sequence": "12",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 46934,
@@ -2509,6 +3116,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2532,7 +3144,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09d,0x7,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2540,6 +3154,10 @@
         "event.outcome": "success",
         "event.sequence": "13",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 47713,
@@ -2553,6 +3171,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -2575,7 +3198,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2583,6 +3208,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 48605,
@@ -2596,6 +3225,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2619,7 +3253,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -2627,6 +3263,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 49384,
@@ -2640,6 +3280,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -2662,7 +3307,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2670,6 +3317,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 50277,
@@ -2683,6 +3334,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2706,7 +3362,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x1,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2714,6 +3372,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 51055,
@@ -2727,6 +3389,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -2749,7 +3416,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2757,6 +3426,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 51947,
@@ -2770,6 +3443,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2793,7 +3471,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09e,0x2,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2801,6 +3481,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 52725,
@@ -2814,6 +3498,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -2838,7 +3527,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -2846,6 +3537,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 53617,
@@ -2859,6 +3554,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -2881,7 +3581,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2889,6 +3591,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 54510,
@@ -2902,6 +3608,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2923,7 +3634,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2931,6 +3644,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 55288,
@@ -2944,6 +3661,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -2967,7 +3689,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -2975,6 +3699,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 56066,
@@ -2988,6 +3716,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -3010,7 +3743,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3018,6 +3753,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 56957,
@@ -3031,6 +3770,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3054,7 +3798,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a09f,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -3062,6 +3808,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 57735,
@@ -3075,6 +3825,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -3089,7 +3844,9 @@
     {
         "@timestamp": "2020-03-29T13:20:46Z",
         "checkpoint.sys_message": ":\"The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -3113,7 +3870,9 @@
     {
         "@timestamp": "2020-03-29T13:20:46Z",
         "checkpoint.sys_message": ":\"The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -3137,7 +3896,9 @@
     {
         "@timestamp": "2020-03-29T13:20:46Z",
         "checkpoint.sys_message": ":\"installed Standard",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
@@ -3171,7 +3932,9 @@
         "destination.ip": "194.29.39.10",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -3179,6 +3942,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 59587,
@@ -3192,6 +3959,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "194.29.39.10",
+            "194.29.39.10"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.10",
         "server.port": "443",
@@ -3214,7 +3986,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3222,6 +3996,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 60479,
@@ -3235,6 +4013,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3256,7 +4039,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3264,6 +4049,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 61257,
@@ -3277,6 +4066,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3300,7 +4094,9 @@
         "destination.ip": "104.81.142.43",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3308,6 +4104,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 62035,
@@ -3321,6 +4121,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.81.142.43",
+            "104.81.142.43"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
         "server.port": "443",
@@ -3343,7 +4148,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3351,6 +4158,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 62927,
@@ -3364,6 +4175,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3387,7 +4203,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x4,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3395,6 +4213,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 63705,
@@ -3408,6 +4230,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -3430,7 +4257,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x5,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3438,6 +4267,10 @@
         "event.outcome": "success",
         "event.sequence": "7",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 64596,
@@ -3451,6 +4284,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3474,7 +4312,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x6,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3482,6 +4322,10 @@
         "event.outcome": "success",
         "event.sequence": "8",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 65374,
@@ -3495,6 +4339,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -3517,7 +4366,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -3525,6 +4376,10 @@
         "event.outcome": "success",
         "event.sequence": "9",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 66265,
@@ -3538,6 +4393,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3561,7 +4421,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0af,0x1,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -3569,6 +4431,10 @@
         "event.outcome": "success",
         "event.sequence": "10",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 67044,
@@ -3582,6 +4448,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -3604,7 +4475,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3612,6 +4485,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 67938,
@@ -3625,6 +4502,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3648,7 +4530,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -3656,6 +4540,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 68716,
@@ -3669,6 +4557,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -3691,7 +4584,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x0,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -3699,6 +4594,10 @@
         "event.outcome": "success",
         "event.sequence": "3",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 69608,
@@ -3712,6 +4611,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3735,7 +4639,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x1,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3743,6 +4649,10 @@
         "event.outcome": "success",
         "event.sequence": "4",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 70387,
@@ -3756,6 +4666,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",
@@ -3778,7 +4693,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x1,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -3786,6 +4703,10 @@
         "event.outcome": "success",
         "event.sequence": "5",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 71278,
@@ -3799,6 +4720,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3822,7 +4748,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x2,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3830,6 +4758,10 @@
         "event.outcome": "success",
         "event.sequence": "6",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 72057,
@@ -3843,6 +4775,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -3865,7 +4802,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x2,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -3873,6 +4812,10 @@
         "event.outcome": "success",
         "event.sequence": "8",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 72949,
@@ -3886,6 +4829,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3909,7 +4857,9 @@
         "destination.ip": "192.124.249.41",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x1,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -3917,6 +4867,10 @@
         "event.outcome": "success",
         "event.sequence": "9",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 73728,
@@ -3930,6 +4884,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.41",
+            "192.124.249.41"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
         "server.port": "80",
@@ -3952,7 +4911,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x3,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -3960,6 +4921,10 @@
         "event.outcome": "success",
         "event.sequence": "10",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 74620,
@@ -3973,6 +4938,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -3996,7 +4966,9 @@
         "destination.ip": "192.124.249.36",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x2,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -4004,6 +4976,10 @@
         "event.outcome": "success",
         "event.sequence": "11",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 75399,
@@ -4017,6 +4993,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.36",
+            "192.124.249.36"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
         "server.port": "80",
@@ -4039,7 +5020,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x3,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -4047,6 +5030,10 @@
         "event.outcome": "success",
         "event.sequence": "12",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 76292,
@@ -4060,6 +5047,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -4083,7 +5075,9 @@
         "destination.ip": "104.99.234.45",
         "destination.port": "443",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b0,0x3,0x60e0fe3b,0xda019994}",
         "event.kind": "event",
@@ -4091,6 +5085,10 @@
         "event.outcome": "success",
         "event.sequence": "13",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 77072,
@@ -4104,6 +5102,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "104.99.234.45",
+            "104.99.234.45"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
         "server.port": "443",
@@ -4126,7 +5129,9 @@
         "destination.ip": "192.168.1.1",
         "destination.port": "53",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b1,0x0,0xbba3afa,0xd2c10858}",
         "event.kind": "event",
@@ -4134,6 +5139,10 @@
         "event.outcome": "success",
         "event.sequence": "1",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 77966,
@@ -4147,6 +5156,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.168.1.1",
+            "192.168.1.1"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
         "server.port": "53",
@@ -4170,7 +5184,9 @@
         "destination.ip": "192.124.249.31",
         "destination.port": "80",
         "event.action": "Accept",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "checkpoint.firewall",
         "event.id": "{0x5e80a0b1,0x0,0x1cae0484,0xf99c33e9}",
         "event.kind": "event",
@@ -4178,6 +5194,10 @@
         "event.outcome": "success",
         "event.sequence": "2",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 78744,
@@ -4191,6 +5211,11 @@
         "observer.product": "VPN-1 & FireWall-1",
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "192.168.1.100",
+            "192.124.249.31",
+            "192.124.249.31"
+        ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
         "server.port": "80",

@@ -63,7 +63,8 @@
     {
       "set": {
         "field": "event.category",
-        "value": "network"
+        "value": ["network"],
+        "if": "ctx.checkpoint?.operation != 'Log In'"
       }
     },
     {
@@ -243,7 +244,7 @@
     {
       "set": {
         "field": "event.category",
-        "value": "authentication",
+        "value": ["authentication"],
         "if": "ctx.checkpoint?.operation == 'Log In'"
       }
     },
@@ -270,6 +271,13 @@
     },
     {
       "set" : {
+        "field": "event.type",
+        "value": ["allowed", "connection"],
+        "if": "['Accept', 'Allow'].contains(ctx.checkpoint?.rule_action)"
+      }
+    },
+    {
+      "set" : {
         "field": "event.outcome",
         "value": "success",
         "if": "ctx.checkpoint?.audit_status == 'Success'"
@@ -285,8 +293,71 @@
     {
       "set" : {
         "field": "event.outcome",
-        "value": "failure",
+        "value": "success",
         "if": "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+      }
+    },
+    {
+      "set" : {
+        "field": "event.type",
+        "value": ["connection", "denied"],
+        "if": "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+      }
+    },
+    {
+      "append": {
+        "field": "event.category",
+        "value": "malware",
+        "if": "ctx.checkpoint?.malware_action != null"
+      }
+    },
+        {
+      "append": {
+        "field": "event.category",
+        "value": "intrusion_detection",
+        "if": "['Detect', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "value": "{{destination.ip}}",
+        "if": "ctx.destination?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "value": "{{destination.ip}}",
+        "if": "ctx.destination?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hash",
+        "value": "{{checkpoint.file_md5}}",
+        "if": "ctx.checkpoint?.file_md5 != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hash",
+        "value": "{{checkpoint.file_sha1}}",
+        "if": "ctx.checkpoint?.file_sha1 != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.hash",
+        "value": "{{checkpoint.file_sha256}}",
+        "if": "ctx.checkpoint?.file_sha256 != null"
       }
     },
     {
