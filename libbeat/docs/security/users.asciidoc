@@ -29,7 +29,7 @@ strategy.
 
 IMPORTANT: Setting up {beatname_uc} is an admin-level task that requires extra
 privileges. As a best practice, grant the setup role to administrators only, and
-use a less restrictive role for event publishing.
+use a more restrictive role for event publishing.
 
 Administrators who set up {beatname_uc} typically need to load mappings,
 dashboards, and other objects used to index data into {es} and visualize it in
