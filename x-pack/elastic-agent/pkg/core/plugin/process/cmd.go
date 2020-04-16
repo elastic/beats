@@ -10,6 +10,7 @@ package process
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
