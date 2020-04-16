@@ -14,7 +14,7 @@ include::../include/gs-link.asciidoc[]
 === Compatibility
 
 The +{modulename}+ module was tested with logs from versions 9.5 on Ubuntu, 9.6
-on Debian and 10.11 on Arch Linux.
+on Debian, and finally 10.11, 11.4 and 12.2 on Arch Linux 9.3.
 
 include::../include/configuring-intro.asciidoc[]
 
