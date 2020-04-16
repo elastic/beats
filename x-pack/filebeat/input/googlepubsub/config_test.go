@@ -15,7 +15,7 @@ import (
 const googleApplicationCredentialsVar = "GOOGLE_APPLICATION_CREDENTIALS"
 
 func TestConfigValidateGoogleAppDefaultCreds(t *testing.T) {
-	// Return the environment variables to their oringal state.
+	// Return the environment variables to their original state.
 	original, found := os.LookupEnv(googleApplicationCredentialsVar)
 	defer func() {
 		if found {
