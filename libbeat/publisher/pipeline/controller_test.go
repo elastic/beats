@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"testing/quick"
 	"time"
@@ -37,7 +38,7 @@ import (
 
 func TestOutputReload(t *testing.T) {
 	tests := map[string]func(mockPublishFn) outputs.Client{
-		//"client":         newMockClient,
+		"client":         newMockClient,
 		"network_client": newMockNetworkClient,
 	}
 
@@ -49,10 +50,8 @@ func TestOutputReload(t *testing.T) {
 			defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
-				//numEventsToPublish := 500 + (q % 1000) // 500 to 1499
-				//numOutputReloads := 5 + (q % 10)       // 5 to 14
-				numEventsToPublish := uint(20000)
-				numOutputReloads := uint(15)
+				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
+				numOutputReloads := 350 + (q % 150)     // 350 to 499
 
 				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
 					return memqueue.NewQueue(
@@ -66,7 +65,7 @@ func TestOutputReload(t *testing.T) {
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
 					publishedCount.Add(uint(len(batch.Events())))
-					fmt.Printf("published so far: %v\n", publishedCount.Load())
+					lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
 					return nil
 				}
 
@@ -84,10 +83,13 @@ func TestOutputReload(t *testing.T) {
 				require.NoError(t, err)
 				defer pipelineClient.Close()
 
+				var wg sync.WaitGroup
+				wg.Add(1)
 				go func() {
 					for i := uint(0); i < numEventsToPublish; i++ {
 						pipelineClient.Publish(beat.Event{})
 					}
+					wg.Done()
 				}()
 
 				for i := uint(0); i < numOutputReloads; i++ {
@@ -95,11 +97,13 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					fmt.Println("reloading output...")
+					lf("in test: reloading output...")
 					pipeline.output.Set(out)
 				}
 
-				timeout := 5 * time.Second
+				wg.Wait()
+
+				timeout := 20 * time.Second
 				success := waitUntilTrue(timeout, func() bool {
 					return uint(numEventsToPublish) == publishedCount.Load()
 				})
@@ -110,11 +114,16 @@ func TestOutputReload(t *testing.T) {
 					)
 				}
 				return success
-			}, &quick.Config{MaxCount: 1})
+			}, &quick.Config{MaxCount: 25})
 
 			if err != nil {
 				t.Error(err)
 			}
 		})
 	}
+}
+
+func lf(msg string, v ...interface{}) {
+	now := time.Now().Format("15:04:05.00000")
+	fmt.Printf(now+" "+msg+"\n", v...)
 }
