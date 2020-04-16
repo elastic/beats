@@ -60,12 +60,6 @@ func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
-}
-
 //CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)

@@ -421,11 +421,6 @@ func combineErr(errors ...error) error {
 	return e
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // UnitTest performs unit test on agent.
 func UnitTest() {
 	mg.Deps(Test.All)
@@ -445,11 +440,6 @@ func BuildFleetCfg() error {
 
 	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
-}
-
-// Fields placeholder methods to fix the windows build.
-func Fields() error {
-	return nil
 }
 
 // Enroll runs agent which enrolls before running.

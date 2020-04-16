@@ -116,13 +116,6 @@ func Fields() error {
 	return devtools.GenerateFieldsYAML()
 }
 
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
 // -----------------------------------------------------------------------------
 // Customizations specific to Journalbeat.
 // - Install required headers on builders for different architectures.

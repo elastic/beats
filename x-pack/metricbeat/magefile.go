@@ -22,8 +22,6 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
@@ -33,12 +31,6 @@ func init() {
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.

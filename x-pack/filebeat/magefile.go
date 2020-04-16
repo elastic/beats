@@ -21,8 +21,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -33,12 +32,6 @@ func init() {
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.

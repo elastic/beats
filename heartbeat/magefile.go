@@ -124,13 +124,6 @@ func Imports() error {
 	return devtools.GenerateIncludeListGo(options)
 }
 
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
 func customizePackaging() {
 	monitorsDTarget := "monitors.d"
 	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
