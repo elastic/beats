@@ -44,7 +44,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "LOCKOUT",
           "NORMAL_ACCOUNT"
         ],
@@ -136,7 +136,7 @@
         "HomeDirectory": "%%1793",
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
-        "NewUacList": [
+        "NewUACList": [
           "LOCKOUT",
           "NORMAL_ACCOUNT"
         ],

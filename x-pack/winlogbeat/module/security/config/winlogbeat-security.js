@@ -30,29 +30,29 @@ var security = (function () {
 
     // User Account Control Attributes Table
     // https://support.microsoft.com/es-us/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties
-    var uacFlags = [
-        [0x0001, "SCRIPT"],
-        [0x0002, "ACCOUNTDISABLE"],
-        [0x0008, "HOMEDIR_REQUIRED"],
-        [0x0010, "LOCKOUT"],
-        [0x0020, "PASSWD_NOTREQD"],
-        [0x0040, "PASSWD_CANT_CHANGE"],
-        [0x0080, "ENCRYPTED_TEXT_PWD_ALLOWED"],
-        [0x0100, "TEMP_DUPLICATE_ACCOUNT"],
-        [0x0200, "NORMAL_ACCOUNT"],
-        [0x0800, "INTERDOMAIN_TRUST_ACCOUNT"],
-        [0x1000, "WORKSTATION_TRUST_ACCOUNT"],
-        [0x2000, "SERVER_TRUST_ACCOUNT"],
-        [0x10000, "DONT_EXPIRE_PASSWORD"],
-        [0x20000, "MNS_LOGON_ACCOUNT"],
-        [0x40000, "SMARTCARD_REQUIRED"],
-        [0x80000, "TRUSTED_FOR_DELEGATION"],
-        [0x100000, "NOT_DELEGATED"],
-        [0x200000, "USE_DES_KEY_ONLY"],
-        [0x400000, "DONT_REQ_PREAUTH"],
-        [0x800000, "PASSWORD_EXPIRED"],
-        [0x1000000, "TRUSTED_TO_AUTH_FOR_DELEGATION"],
-        [0x4000000, "PARTIAL_SECRETS_ACCOUNT"],
+    var uac_flags = [
+        [0x0001, 'SCRIPT'],
+        [0x0002, 'ACCOUNTDISABLE'],
+        [0x0008, 'HOMEDIR_REQUIRED'],
+        [0x0010, 'LOCKOUT'],
+        [0x0020, 'PASSWD_NOTREQD'],
+        [0x0040, 'PASSWD_CANT_CHANGE'],
+        [0x0080, 'ENCRYPTED_TEXT_PWD_ALLOWED'],
+        [0x0100, 'TEMP_DUPLICATE_ACCOUNT'],
+        [0x0200, 'NORMAL_ACCOUNT'],
+        [0x0800, 'INTERDOMAIN_TRUST_ACCOUNT'],
+        [0x1000, 'WORKSTATION_TRUST_ACCOUNT'],
+        [0x2000, 'SERVER_TRUST_ACCOUNT'],
+        [0x10000, 'DONT_EXPIRE_PASSWORD'],
+        [0x20000, 'MNS_LOGON_ACCOUNT'],
+        [0x40000, 'SMARTCARD_REQUIRED'],
+        [0x80000, 'TRUSTED_FOR_DELEGATION'],
+        [0x100000, 'NOT_DELEGATED'],
+        [0x200000, 'USE_DES_KEY_ONLY'],
+        [0x400000, 'DONT_REQ_PREAUTH'],
+        [0x800000, 'PASSWORD_EXPIRED'],
+        [0x1000000, 'TRUSTED_TO_AUTH_FOR_DELEGATION'],
+        [0x04000000, 'PARTIAL_SECRETS_ACCOUNT'],
     ];
 
     // Kerberos TGT and TGS Ticket Options
@@ -1417,54 +1417,27 @@ var security = (function () {
         evt.Put("winlog.logon.failure.sub_status", descriptiveFailureStatus);
     };
 
-    var addUACDescription = function (evt) {
+    var addUACDescription = function(evt) {
         var code = evt.Get("winlog.event_data.NewUacValue");
         if (!code) {
             return;
         }
-        var uacCode = parseInt(code);
-        if (isNaN(uacCode)) {
-            return;
-        }
-        var uacResult = [];
-        for (var i = 0; i < uacFlags.length; i++) {
-            if ((uacCode | uacFlags[i][0]) === uacCode) {
-                uacResult.push(uacFlags[i][1]);
+        var uac_code=parseInt(code);
+        var uac_result = [];
+        for (var i=0; i<uac_flags.length; i++) {
+            if ((uac_code | uac_flags[i][0]) === uac_code) {
+                uac_result.push(uac_flags[i][1]);
             }
         }
-        if (uacResult.length > 0) {
-            evt.Put("winlog.event_data.NewUacList", uacResult);
+        if (uac_result) {
+            evt.Put("winlog.event_data.NewUACList",uac_result);
         }
-
-        // Parse list of values like "%%2080 %%2082 %%2084".
-        var uacList = evt.Get("winlog.event_data.UserAccountControl");
-        if (!uacList) {
+        var uac_list=evt.Get("winlog.event_data.UserAccountControl").replace(/\s/g,'').split("%%").filter(String);
+        if (! uac_list) {
             return;
         }
-        uacList = uacList.replace(/\s/g, "").split("%%").filter(String);
-        if (uacList.length > 0) {
-            evt.Put("winlog.event_data.UserAccountControl", uacList);
-        }
-    };
-
-    var addAuditInfo = function (evt) {
-        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{", "").replace("}", "").toUpperCase();
-        if (!subcategoryGuid) {
-            return;
-        }
-        if (!auditDescription[subcategoryGuid]) {
-            return;
-        }
-        evt.Put("winlog.event_data.Category", auditDescription[subcategoryGuid][1]);
-        evt.Put("winlog.event_data.SubCategory", auditDescription[subcategoryGuid][0]);
-        var coded_actions = evt.Get("winlog.event_data.AuditPolicyChanges").split(",");
-        var action_results = [];
-        for (var j = 0; j < coded_actions.length; j++) {
-            var action_code = coded_actions[j].replace("%%", "").replace(" ", "");
-            action_results.push(auditActions[action_code]);
-        }
-        evt.Put("winlog.event_data.AuditPolicyChangesDescription", action_results);
-    };
+        evt.Put("winlog.event_data.UserAccountControl",uac_list);
+      };
 
     var addAuditInfo = function(evt) {
         var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{",'').replace("}",'').toUpperCase();
@@ -1664,7 +1637,7 @@ var security = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
-        .Add(function (evt) {
+        .Add(function(evt) {
             var name = evt.Get("process.name");
             if (name) {
                 return;
@@ -1688,7 +1661,7 @@ var security = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
-        .Add(function (evt) {
+        .Add(function(evt) {
             var name = evt.Get("process.name");
             if (name) {
                 return;
@@ -1699,7 +1672,7 @@ var security = (function () {
             }
             evt.Put("process.name", path.basename(exe));
         })
-        .Add(function (evt) {
+        .Add(function(evt) {
             var name = evt.Get("process.parent.name");
             if (name) {
                 return;
@@ -1710,7 +1683,7 @@ var security = (function () {
             }
             evt.Put("process.parent.name", path.basename(exe));
         })
-        .Add(function (evt) {
+        .Add(function(evt) {
             var cl = evt.Get("winlog.event_data.CommandLine");
             if (!cl) {
                 return;
@@ -1781,7 +1754,7 @@ var security = (function () {
     var event4672 = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
-        .Add(function (evt) {
+        .Add(function(evt) {
             var privs = evt.Get("winlog.event_data.PrivilegeList");
             if (!privs) {
                 return;
@@ -1804,10 +1777,6 @@ var security = (function () {
                 if (!res) {
                     evt.AppendTo('related.user',user);
                 }
-        })
-        .Add(function (evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            evt.AppendTo("related.user", user);
         })
         .Build();
 
@@ -2002,42 +1971,6 @@ var security = (function () {
                 mask_results.push(description);
             }
             evt.Put("winlog.event_data.AccessMaskDescription",mask_results);
-        })
-        .Build();
-
-    var auditLogCleared = new processor.Chain()
-        .Add(copySubjectUserFromUserData)
-        .Add(copySubjectUserLogonIdFromUserData)
-        .Add(renameCommonAuthFields)
-        .Add(addActionDesc)
-        .Build();
-
-    var auditChanged = new processor.Chain()
-        .Add(copySubjectUser)
-        .Add(copySubjectUserLogonId)
-        .Add(renameCommonAuthFields)
-        .Add(addAuditInfo)
-        .Add(addActionDesc)
-        .Build();
-
-    var auditLogMgmt = new processor.Chain()
-        .Add(renameCommonAuthFields)
-        .Add(addActionDesc)
-        .Build();
-
-    var computerMgmtEvts = new processor.Chain()
-        .Add(copySubjectUser)
-        .Add(copySubjectUserLogonId)
-        .Add(copyTargetUserToComputerObject)
-        .Add(renameCommonAuthFields)
-        .Add(addActionDesc)
-        .Add(addUACDescription)
-        .Add(function (evt) {
-            var privs = evt.Get("winlog.event_data.PrivilegeList");
-            if (!privs) {
-                return;
-            }
-            evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
         .Build();
 
