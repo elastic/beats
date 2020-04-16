@@ -224,7 +224,7 @@ func (r *KubeRemote) waitForPod(wait time.Duration, condition watchtools.Conditi
 	ev, err := watchtools.UntilWithoutRetry(ctx, w, func(ev watch.Event) (bool, error) {
 		return condition(ev)
 	})
-	if ev != nil {		
+	if ev != nil {
 		return ev.Object.(*apiv1.Pod), err
 	}
 	return nil, err
@@ -332,7 +332,7 @@ func getFreePort() (uint16, error) {
 }
 
 // createSecretManifest creates the secret object to create in the cluster.
-// 
+//
 // This is the public key that the sshd uses as the authorized key.
 func createSecretManifest(name string, publicKey []byte) *apiv1.Secret {
 	return &apiv1.Secret{
@@ -373,7 +373,6 @@ func createClusterRoleManifest(name string) *rbacv1.ClusterRole {
 				NonResourceURLs: []string{"*"},
 			},
 		},
-
 	}
 }
 
