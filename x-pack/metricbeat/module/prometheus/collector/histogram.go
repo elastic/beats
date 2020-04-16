@@ -33,7 +33,7 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 
 	// calculate centroids and rated counts
 	var lastUpper, prevUpper float64
-	var sumCount uint64
+	var sumCount, prevCount uint64
 	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
 		if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
@@ -50,10 +50,19 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 			lastUpper = bucket.GetUpperBound()
 		}
 
-		// take count for this period (rate) + deacumulate
-		count := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount()) - sumCount
-		counts = append(counts, count)
-		sumCount += count
+		// Take count for this period (rate)
+		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount())
+
+		if !found {
+			// This is a new bucket, consider it zero by now
+			counts = append(counts, 0)
+			sumCount += bucket.GetCumulativeCount() - prevCount
+		} else {
+			// Store the deaccumulated cont
+			counts = append(counts, countRate-sumCount)
+			sumCount = countRate
+		}
+		prevCount = bucket.GetCumulativeCount()
 	}
 
 	res := common.MapStr{
