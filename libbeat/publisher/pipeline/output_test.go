@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"flag"
 	"math"
 	"sync"
 	"testing"
@@ -30,10 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-)
-
-var (
-	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
 func TestMakeClientWorker(t *testing.T) {

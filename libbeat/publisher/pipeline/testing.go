@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"flag"
 	"math/rand"
 	"testing"
 	"time"
@@ -26,6 +27,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+)
+
+var (
+	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
 )
 
 type mockPublishFn func(publisher.Batch) error
