@@ -188,7 +188,7 @@ func (info *DockerInfo) IsBoot2Docker() bool {
 // HaveDocker returns an error if docker is unavailable.
 func HaveDocker() error {
 	if _, err := GetDockerInfo(); err != nil {
-		return errors.Wrap(err, "docker is not available")
+		return fmt.Errorf("docker is not available")
 	}
 	return nil
 }
@@ -220,19 +220,28 @@ func dockerInfo() (*DockerInfo, error) {
 // PATH.
 func HaveDockerCompose() error {
 	_, err := exec.LookPath("docker-compose")
-	return errors.Wrap(err, "docker-compose was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("docker-compose is not available")
+	}
+	return nil
 }
 
 // HaveKind returns an error if kind is not found on the PATH.
 func HaveKind() error {
 	_, err := exec.LookPath("kind")
-	return errors.Wrap(err, "kind was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("kind is not available")
+	}
+	return nil
 }
 
 // HaveKubectl returns an error if kind is not found on the PATH.
 func HaveKubectl() error {
 	_, err := exec.LookPath("kubectl")
-	return errors.Wrap(err, "kubectl was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("kubectl is not available")
+	}
+	return nil
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the

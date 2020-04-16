@@ -483,7 +483,7 @@ func skipIntegTest(testEnv *IntegrationEnv) (reason string, skip bool) {
 	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
 		// Skip if we don't meet the requirements.
 		log.Println("Skipping integ test because:", err)
-		return "docker is not available", true
+		return err.Error(), true
 	}
 
 	return "", false
