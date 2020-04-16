@@ -38,6 +38,10 @@ datasources:
     use_output: default
     inputs:
       - type: apache/metrics
+        processors:
+          - add_fields:
+              fields:
+                should_be: first
         streams:
           - enabled: true
             metricset: info
