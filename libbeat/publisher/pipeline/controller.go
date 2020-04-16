@@ -103,7 +103,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Pause consumer
 	c.consumer.sigPause()
 
-	// close old group, so events are send to new workQueue via retryer
+	// close old output group's workers and "remove" them from the retryer
+	// so it temporarily stops processing the retry queue
 	if c.out != nil {
 		for _, w := range c.out.outputs {
 			w.Close()
@@ -111,7 +112,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		}
 	}
 
-	// create new outputGroup with shared work queue
+	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
