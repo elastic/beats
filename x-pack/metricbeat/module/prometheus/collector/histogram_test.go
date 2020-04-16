@@ -17,8 +17,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// TestPromHistogramToES tests that caling promHistogramToES produces
-// the expected results
+// TestPromHistogramToES tests that calling promHistogramToES multiple
+// times with the same cache produces each time the expected results.
 func TestPromHistogramToES(t *testing.T) {
 	type sample struct {
 		histogram dto.Histogram

@@ -64,7 +64,7 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 			// prometheus response. Handle it to avoid overflowing when deaccumulating.
 			counts = append(counts, 0)
 		default:
-			// Store the deaccumulated cont
+			// Store the deaccumulated count.
 			counts = append(counts, countRate-sumCount)
 			sumCount = countRate
 		}
