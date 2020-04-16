@@ -34,7 +34,8 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queue queue.Queue
+	queue     queue.Queue
+	workQueue workQueue
 
 	retryer  *retryer
 	consumer *eventConsumer
@@ -65,15 +66,16 @@ func newOutputController(
 	b queue.Queue,
 ) *outputController {
 	c := &outputController{
-		beat:     beat,
-		monitors: monitors,
-		observer: observer,
-		queue:    b,
+		beat:      beat,
+		monitors:  monitors,
+		observer:  observer,
+		queue:     b,
+		workQueue: makeWorkQueue(),
 	}
 
 	ctx := &batchContext{}
 	c.consumer = newEventConsumer(monitors.Logger, b, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, nil, c.consumer)
+	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer)
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
@@ -86,56 +88,60 @@ func (c *outputController) Close() error {
 	c.consumer.sigPause()
 	c.consumer.close()
 	c.retryer.close()
+	close(c.workQueue)
 
 	if c.out != nil {
 		for _, out := range c.out.outputs {
 			out.Close()
 		}
-		close(c.out.workQueue)
 	}
 
 	return nil
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	//lf("Set() called")
+	c.consumer.sigPause()
+
+	// close old group, so events are send to new workQueue via retryer
+	if c.out != nil {
+		for _, w := range c.out.outputs {
+			w.Close()
+			c.retryer.sigOutputRemoved()
+		}
+	}
+
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
-	queue := makeWorkQueue()
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(c.observer, queue, client)
+		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
 	}
 	grp := &outputGroup{
-		workQueue:  queue,
+		workQueue:  c.workQueue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
 		batchSize:  outGrp.BatchSize,
 	}
 
 	// update consumer and retryer
-	c.consumer.sigPause()
-	if c.out != nil {
-		for range c.out.outputs {
-			c.retryer.sigOutputRemoved()
-		}
-	}
-	c.retryer.updOutput(queue)
+	//c.consumer.sigPause()
+	//if c.out != nil {
+	//	for range c.out.outputs {
+	//		c.retryer.sigOutputRemoved()
+	//	}
+	//}
+	//c.retryer.updOutput(queue)
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}
 	c.consumer.updOutput(grp)
 
-	// close old group, so events are send to new workQueue via retryer
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-		}
-	}
-
 	c.out = grp
 
 	// restart consumer (potentially blocked by retryer)
 	c.consumer.sigContinue()
+	c.consumer.sigUnWait()
 
 	c.observer.updateOutputGroup()
 }

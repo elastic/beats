@@ -19,12 +19,19 @@ package memqueue
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+func lf(msg string, v ...interface{}) {
+	now := time.Now().Format("15:04:05.00000")
+	fmt.Printf(now+" "+msg+"\n", v...)
+}
 
 type consumer struct {
 	broker *broker
@@ -70,6 +77,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
+	lf("in memqueue Get(): about to return batch of %v events", len(resp.buf))
 	return &batch{
 		consumer: c,
 		events:   resp.buf,
