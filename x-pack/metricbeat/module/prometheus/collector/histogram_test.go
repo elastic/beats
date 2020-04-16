@@ -17,14 +17,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type sample struct {
-	histogram dto.Histogram
-	expected  common.MapStr
-}
-
 // TestPromHistogramToES tests that caling promHistogramToES produces
 // the expected results
 func TestPromHistogramToES(t *testing.T) {
+	type sample struct {
+		histogram dto.Histogram
+		expected  common.MapStr
+	}
+
 	cases := map[string]struct {
 		samples []sample
 	}{
@@ -242,6 +242,103 @@ func TestPromHistogramToES(t *testing.T) {
 					expected: common.MapStr{
 						"counts": []uint64{1, 0},
 						"values": []float64{0.045, 0.54},
+					},
+				},
+			},
+		},
+		"new bucket between two other buckets on the go": {
+			samples: []sample{
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(10),
+						SampleSum:   proto.Float64(10),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(0),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(10),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{0, 0},
+						"values": []float64{0.045, 0.54},
+					},
+				},
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(13),
+						SampleSum:   proto.Float64(15.23),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(1),
+							},
+							// New bucket
+							{
+								UpperBound:      proto.Float64(0.49),
+								CumulativeCount: proto.Uint64(2),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(13),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{1, 0, 1},
+						"values": []float64{0.045, 0.29000000000000004, 0.74},
+					},
+				},
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(16),
+						SampleSum:   proto.Float64(16.33),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(2),
+							},
+							{
+								UpperBound:      proto.Float64(0.49),
+								CumulativeCount: proto.Uint64(4),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(16),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{1, 1, 1},
+						"values": []float64{0.045, 0.29000000000000004, 0.74},
+					},
+				},
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(18),
+						SampleSum:   proto.Float64(16.33),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(3),
+							},
+							{
+								UpperBound:      proto.Float64(0.49),
+								CumulativeCount: proto.Uint64(5),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(18),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{1, 0, 1},
+						"values": []float64{0.045, 0.29000000000000004, 0.74},
 					},
 				},
 			},
