@@ -31,6 +31,7 @@ type Settings struct {
 	// The path on disk of the queue's main metadata file.
 	// Paths for data segment files are created by appending ".{segmentIndex}" to
 	// this path.
+	// If blank, the default is "queue.dat" within the beat's data directory.
 	Path string
 
 	// The size in bytes of one data page in the on-disk buffer. To minimize
@@ -125,10 +126,16 @@ func init() {
 			feature.Beta))
 }
 
+// queueFactory matches the queue.Factory type, and is used to add the disk
+// queue to the registry.
 func queueFactory(
 	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
 ) (queue.Queue, error) {
-	return nil, nil
+	settings, err := SettingsForUserConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return NewQueue(settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger

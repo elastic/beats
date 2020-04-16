@@ -19,17 +19,33 @@ package diskqueue
 
 import (
 	"errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type config struct {
+// userConfig holds the parameters for a disk queue that are configurable
+// by the end user in the beats yml file.
+type userConfig struct {
+	PageSize uint32 `config:"page_size" validate:"min=128"`
 }
 
-var defaultConfig = config{}
-
-func (c *config) Validate() error {
+func (c *userConfig) Validate() error {
 	if false {
 		return errors.New("something is wrong")
 	}
 
 	return nil
+}
+
+// SettingsForUserConfig returns a Settings struct initialized with the
+// end-user-configurable settings in the given config tree.
+func SettingsForUserConfig(config *common.Config) (Settings, error) {
+	userConfig := userConfig{}
+	if err := config.Unpack(&userConfig); err != nil {
+		return Settings{}, err
+	}
+
+	return Settings{
+		PageSize: userConfig.PageSize,
+	}, nil
 }
