@@ -77,7 +77,7 @@ func (c *consumer) Get(sz int) (queue.Batch, error) {
 
 	// if request has been send, we do have to wait for a response
 	resp := <-c.resp
-	lf("in memqueue Get(): about to return batch of %v events", len(resp.buf))
+	//lf("in memqueue Get(): about to return batch of %v events", len(resp.buf))
 	return &batch{
 		consumer: c,
 		events:   resp.buf,

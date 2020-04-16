@@ -129,6 +129,8 @@ func (c *eventConsumer) updOutput(grp *outputGroup) {
 		tag:      sigConsumerUpdateInput,
 		consumer: c.consumer,
 	}
+
+	//lf("consumer: updated output group to id = %v", grp.id)
 }
 
 func (c *eventConsumer) loop(consumer queue.Consumer) {
@@ -157,7 +159,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		}
 
 		paused = c.paused()
-		if !paused && c.out != nil && batch != nil {
+		if c.out != nil && batch != nil {
 			out = c.out.workQueue
 		} else {
 			out = nil
@@ -170,19 +172,19 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 			//lf("consuming from queue...")
 			queueBatch, err := consumer.Get(c.out.batchSize)
 			if err != nil {
-				lf("error consuming from queue")
+				//lf("error consuming from queue")
 				out = nil
 				consumer = nil
 				continue
 			}
 			if queueBatch != nil {
-				lf("consumed batch of %v events from queue", len(queueBatch.Events()))
+				//lf("consumed batch of %v events from queue", len(queueBatch.Events()))
 				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			}
 
 			paused = c.paused()
 			if paused || batch == nil {
-				lf("paused: %v, batch == nil? = %v; setting out to nil", paused, batch == nil)
+				//lf("paused: %v, batch == nil? = %v; setting out to nil", paused, batch == nil)
 				out = nil
 			}
 			//} else {
@@ -197,26 +199,26 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		default:
 		}
 
-		if out == nil && batch != nil {
-			lf("out == nil and batch != nil")
-		}
+		//if out == nil && batch != nil {
+		//	lf("out == nil but have batch with %v events", len(batch.Events()))
+		//}
 
 		select {
 		case <-c.done:
-			lf("consumer done")
+			//lf("consumer done")
 			log.Debug("stop pipeline event consumer")
 			return
 		case sig := <-c.sig:
 			if out == nil && batch != nil {
-				lf("in second select; handled sig %v", sig.tag)
+				//lf("in second select; handled sig %v", sig.tag)
 			}
 			handleSignal(sig)
 		case out <- batch:
-			numEvents := 0
-			if batch != nil {
-				numEvents = len(batch.Events())
-			}
-			lf("in consumer: sent batch of %v events to workqueue", numEvents)
+			//numEvents := 0
+			//if batch != nil {
+			//	numEvents = len(batch.Events())
+			//}
+			//lf("in consumer: sent batch of %v events to workqueue", numEvents)
 			batch = nil
 		}
 	}

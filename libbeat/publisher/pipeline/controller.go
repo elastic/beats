@@ -20,10 +20,13 @@ package pipeline
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
+
+var _grpID atomic.Uint
 
 // outputController manages the pipelines output capabilities, like:
 // - start
@@ -44,6 +47,7 @@ type outputController struct {
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
+	id        uint
 	workQueue workQueue
 	outputs   []outputWorker
 
@@ -118,6 +122,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
 	}
 	grp := &outputGroup{
+		id:         _workerID.Inc(),
 		workQueue:  c.workQueue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,

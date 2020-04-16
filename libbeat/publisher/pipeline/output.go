@@ -154,7 +154,7 @@ func (w *netClientWorker) run() {
 
 		case batch, ok := <-w.qu:
 			if !ok {
-				w.lf("workqueue closed")
+				//w.lf("workqueue closed")
 			}
 			if batch == nil {
 				continue
@@ -185,7 +185,7 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			w.lf("about to publish %v events", len(batch.Events()))
+			//w.lf("about to publish %v events", len(batch.Events()))
 			w.inFlight = make(chan struct{})
 			if err := w.client.Publish(batch); err != nil {
 				close(w.inFlight)
