@@ -117,11 +117,13 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 	// what the inner types are (MapStr, map[string]interface{} or interface{}).
 	// Also ensures that the inner types are not modified after replacement.
 	tests := []struct {
+		title    string
 		input    common.MapStr
 		index    string
 		expected common.MapStr
 	}{
 		{
+			title: "Replace in []interface(map).map",
 			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
@@ -139,6 +141,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 				}}}},
 		},
 		{
+			title: "Replace in []interface(map).mapstr",
 			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
@@ -156,6 +159,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 				}}}},
 		},
 		{
+			title: "Replace in []map.mapstr",
 			input: common.MapStr{"objects": []map[string]interface{}{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
@@ -173,6 +177,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 				}}}},
 		},
 		{
+			title: "Replace in []mapstr.mapstr",
 			input: common.MapStr{"objects": []common.MapStr{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
@@ -190,6 +195,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 				}}}},
 		},
 		{
+			title: "Replace in []mapstr.interface(mapstr)",
 			input: common.MapStr{"objects": []common.MapStr{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
@@ -206,11 +212,36 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				})}}},
 		},
+		{
+			title: "Do not create missing attributes",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+			}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+			}}},
+		},
+		{
+			title: "Create missing id",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"type": "index-pattern",
+			}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+			}}},
+		},
 	}
 
 	for _, test := range tests {
-		err := ReplaceIndexInIndexPattern(test.index, test.input)
-		assert.NoError(t, err)
-		assert.Equal(t, test.expected, test.input)
+		t.Run(test.title, func(t *testing.T) {
+			err := ReplaceIndexInIndexPattern(test.index, test.input)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, test.input)
+		})
 	}
 }

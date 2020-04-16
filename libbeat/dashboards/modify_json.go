@@ -57,7 +57,10 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error)
 		// This uses Put instead of DeepUpdate to avoid modifying types for
 		// inner objects. (DeepUpdate will replace maps with MapStr).
 		obj.Put("id", index)
-		obj.Put("attributes.title", index)
+		// Only overwrite title if it exists.
+		if _, err := obj.GetValue("attributes.title"); err == nil {
+			obj.Put("attributes.title", index)
+		}
 	}
 
 	switch v := list.(type) {
