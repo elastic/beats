@@ -6,7 +6,9 @@ package stackdriver
 
 import (
 	"testing"
+	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -100,6 +102,96 @@ func TestGetFilterForMetric(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			filter := c.r.getFilterForMetric(c.m)
 			assert.Equal(t, c.expectedFilter, filter)
+		})
+	}
+}
+
+func TestConstructAggregation(t *testing.T) {
+	cases := []struct {
+		title                    string
+		period                   duration.Duration
+		perSeriesAligner         string
+		needsAggregation         bool
+		expectedPerSeriesAligner string
+	}{
+		{
+			"test no aggregation",
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"",
+			false,
+			"ALIGN_NONE",
+		},
+		{
+			"test needs aggregation with no perSeriesAligner config parameter",
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"",
+			true,
+			"ALIGN_MEAN",
+		},
+		{
+			"test needs aggregation with perSeriesAligner configured",
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"ALIGN_MAX",
+			true,
+			"ALIGN_MAX",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			aggregation := constructAggregation(c.period, c.perSeriesAligner, c.needsAggregation)
+			assert.Equal(t, c.expectedPerSeriesAligner, aggregation.PerSeriesAligner.String())
+		})
+	}
+}
+
+func TestGetTimeInterval(t *testing.T) {
+	cases := []struct {
+		title                    string
+		ingestDelay              time.Duration
+		samplePeriod             time.Duration
+		collectionPeriod         duration.Duration
+		expectedNeedsAggregation bool
+	}{
+		{
+			"test collectionPeriod equals to samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			false,
+		},
+		{
+			"test collectionPeriod larger than samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(300),
+			},
+			true,
+		},
+		{
+			"test collectionPeriod smaller than samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(30),
+			},
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			_, needsAggregation := getTimeInterval(c.ingestDelay, c.samplePeriod, c.collectionPeriod)
+			assert.Equal(t, c.expectedNeedsAggregation, needsAggregation)
 		})
 	}
 }

@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
+
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 
 	"github.com/pkg/errors"
@@ -59,8 +61,10 @@ type config struct {
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
+	PerSeriesAligner    string   `config:"perSeriesAligner"`
 
-	opt []option.ClientOption
+	opt    []option.ClientOption
+	period duration.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -75,6 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	m.config.period.Seconds = int64(m.Module().Config().Period.Seconds())
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
 		return nil, err
@@ -121,7 +126,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSeries) ([]mb.Event, error) {
+func (m *MetricSet) eventMapping(ctx context.Context, tss []OutputWithAligner) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger())
 
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
@@ -178,6 +183,18 @@ func (c *config) Validate() error {
 	if c.Region == "" && c.Zone == "" {
 		return errors.New("region and zone in Google Cloud config file cannot both be empty")
 	}
+
+	gcpAlignerNames := make([]string, 0)
+	for k := range googlecloud.AlignersMapToGCP {
+		gcpAlignerNames = append(gcpAlignerNames, k)
+	}
+
+	if c.PerSeriesAligner != "" {
+		if _, ok := googlecloud.AlignersMapToGCP[c.PerSeriesAligner]; !ok {
+			return errors.Errorf("the given perSeriesAligner is not supported, please specify one of %s as perSeriesAligner", gcpAlignerNames)
+		}
+	}
+
 	return nil
 }
 
@@ -199,8 +216,8 @@ func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, proj
 		}
 
 		metricsWithMeta[mt] = metricMeta{
-			samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds),
-			ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds),
+			samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
+			ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
 		}
 	}
 

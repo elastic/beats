@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
+
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
@@ -28,14 +30,15 @@ type stackdriverMetricsRequester struct {
 	logger *logp.Logger
 }
 
-func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, timeInterval *monitoringpb.TimeInterval) (out []*monitoringpb.TimeSeries) {
+func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, timeInterval *monitoringpb.TimeInterval, needsAggregation bool) (out []*monitoringpb.TimeSeries) {
 	out = make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
-		Name:     "projects/" + r.config.ProjectID,
-		Interval: timeInterval,
-		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   r.getFilterForMetric(m),
+		Name:        "projects/" + r.config.ProjectID,
+		Interval:    timeInterval,
+		View:        monitoringpb.ListTimeSeriesRequest_FULL,
+		Filter:      r.getFilterForMetric(m),
+		Aggregation: constructAggregation(r.config.period, r.config.PerSeriesAligner, needsAggregation),
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
@@ -81,9 +84,8 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, metricTypes [
 			defer wg.Done()
 
 			metricMeta := metricsMeta[metricType]
-			interval := getTimeInterval(metricMeta.ingestDelay, metricMeta.samplePeriod)
-
-			ts := r.Metric(ctx, metricType, interval)
+			interval, needsAggregation := getTimeInterval(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period)
+			ts := r.Metric(ctx, metricType, interval, needsAggregation)
 
 			lock.Lock()
 			defer lock.Unlock()
@@ -128,11 +130,28 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeInterval(ingestDelay time.Duration, samplePeriod time.Duration) *monitoringpb.TimeInterval {
-	var startTime, endTime time.Time
+func getTimeInterval(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod duration.Duration) (*monitoringpb.TimeInterval, bool) {
+	var startTime, endTime, currentTime time.Time
+	var needsAggregation bool
+	currentTime = time.Now().UTC()
 
-	endTime = time.Now().UTC().Add(-ingestDelay * time.Second)
-	startTime = endTime.Add(-samplePeriod * time.Second)
+	// When samplePeriod < collectionPeriod, aggregation will be done in ListTimeSeriesRequest.
+	// For example, samplePeriod = 60s, collectionPeriod = 300s, if perSeriesAligner is not given,
+	// ALIGN_MEAN will be used by default.
+	if int64(samplePeriod.Seconds()) < collectionPeriod.Seconds {
+		endTime = currentTime.Add(-ingestDelay)
+		startTime = endTime.Add(-time.Duration(collectionPeriod.Seconds) * time.Second)
+		needsAggregation = true
+	}
+
+	// When samplePeriod == collectionPeriod, aggregation is not needed
+	// When samplePeriod > collectionPeriod, aggregation is not needed, use sample period
+	// to determine startTime and endTime to make sure there will be data point in this time range.
+	if int64(samplePeriod.Seconds()) >= collectionPeriod.Seconds {
+		endTime = time.Now().UTC().Add(-ingestDelay)
+		startTime = endTime.Add(-samplePeriod)
+		needsAggregation = false
+	}
 
 	interval := &monitoringpb.TimeInterval{
 		StartTime: &timestamp.Timestamp{
@@ -143,5 +162,22 @@ func getTimeInterval(ingestDelay time.Duration, samplePeriod time.Duration) *mon
 		},
 	}
 
-	return interval
+	return interval, needsAggregation
+}
+
+func constructAggregation(period duration.Duration, perSeriesAligner string, needsAggregation bool) *monitoringpb.Aggregation {
+	aligner := "ALIGN_NONE"
+	if needsAggregation {
+		aligner = perSeriesAligner
+		if perSeriesAligner == "" {
+			// set to default aggregation ALIGN_MEAN
+			aligner = "ALIGN_MEAN"
+		}
+	}
+
+	aggregation := &monitoringpb.Aggregation{
+		PerSeriesAligner: googlecloud.AlignersMapToGCP[aligner],
+		AlignmentPeriod:  &period,
+	}
+	return aggregation
 }

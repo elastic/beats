@@ -4,6 +4,8 @@
 
 package googlecloud
 
+import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+
 const (
 	// ModuleName in Metricbeat
 	ModuleName = "googlecloud"
@@ -69,3 +71,26 @@ const (
 	LabelUser     = "user"
 	LabelMetadata = "metadata"
 )
+
+// Available perSeriesAligner map
+var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
+	"ALIGN_NONE":           monitoringpb.Aggregation_ALIGN_NONE,
+	"ALIGN_DELTA":          monitoringpb.Aggregation_ALIGN_DELTA,
+	"ALIGN_RATE":           monitoringpb.Aggregation_ALIGN_RATE,
+	"ALIGN_INTERPOLATE":    monitoringpb.Aggregation_ALIGN_INTERPOLATE,
+	"ALIGN_NEXT_OLDER":     monitoringpb.Aggregation_ALIGN_NEXT_OLDER,
+	"ALIGN_MIN":            monitoringpb.Aggregation_ALIGN_MIN,
+	"ALIGN_MAX":            monitoringpb.Aggregation_ALIGN_MAX,
+	"ALIGN_MEAN":           monitoringpb.Aggregation_ALIGN_MEAN,
+	"ALIGN_COUNT":          monitoringpb.Aggregation_ALIGN_COUNT,
+	"ALIGN_SUM":            monitoringpb.Aggregation_ALIGN_SUM,
+	"ALIGN_STDDEV":         monitoringpb.Aggregation_ALIGN_STDDEV,
+	"ALIGN_COUNT_TRUE":     monitoringpb.Aggregation_ALIGN_COUNT_TRUE,
+	"ALIGN_COUNT_FALSE":    monitoringpb.Aggregation_ALIGN_COUNT_FALSE,
+	"ALIGN_FRACTION_TRUE":  monitoringpb.Aggregation_ALIGN_FRACTION_TRUE,
+	"ALIGN_PERCENTILE_99":  monitoringpb.Aggregation_ALIGN_PERCENTILE_99,
+	"ALIGN_PERCENTILE_95":  monitoringpb.Aggregation_ALIGN_PERCENTILE_95,
+	"ALIGN_PERCENTILE_50":  monitoringpb.Aggregation_ALIGN_PERCENTILE_50,
+	"ALIGN_PERCENTILE_05":  monitoringpb.Aggregation_ALIGN_PERCENTILE_05,
+	"ALIGN_PERCENT_CHANGE": monitoringpb.Aggregation_ALIGN_PERCENT_CHANGE,
+}
