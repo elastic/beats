@@ -8,33 +8,46 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 var (
-	homePath string
-	dataPath string
+	homePath   string
+	dataPath   string
+	overwrites *common.Config
 )
 
 func init() {
 	homePath = retrieveExecutablePath()
 	dataPath = retrieveDataPath()
+	overwrites = common.SettingFlag(nil, "E", "Configuration overwrite")
+	common.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Agent root path")
+	common.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path, agent usually look for beats here")
 }
 
 // InjectAgentConfig injects config to a provided configuration.
 func InjectAgentConfig(c *config.Config) error {
-	globalConfig := AgentGlobalConfig()
+	globalConfig := agentGlobalConfig()
 	if err := c.Merge(globalConfig); err != nil {
 		return errors.New("failed to inject agent global config", err, errors.TypeConfig)
+	}
+
+	return injectOverwrites(c)
+}
+
+func injectOverwrites(c *config.Config) error {
+	if err := c.Merge(overwrites); err != nil {
+		return errors.New("failed to inject agent overwrites", err, errors.TypeConfig)
 	}
 
 	return nil
 }
 
-// AgentGlobalConfig gets global config used for resolution of variables inside configuration
+// agentGlobalConfig gets global config used for resolution of variables inside configuration
 // such as ${path.data}.
-func AgentGlobalConfig() map[string]interface{} {
+func agentGlobalConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"path": map[string]interface{}{
 			"data": dataPath,
