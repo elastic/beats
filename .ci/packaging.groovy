@@ -75,7 +75,7 @@ pipeline {
             }
             environment {
               HOME = "${env.WORKSPACE}"
-              PLATFORMS = "defaults +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
+              PLATFORMS = "+linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
             }
             steps {
               release()
