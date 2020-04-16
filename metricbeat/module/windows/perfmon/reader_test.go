@@ -135,16 +135,16 @@ func TestMapQuery(t *testing.T) {
 }
 
 func TestMapCounterPathLabel(t *testing.T) {
-	result := mapCounterPathLabel("", `WININET: Bytes from server`)
+	result := mapCounterPathLabel("metrics", "", `WININET: Bytes from server`)
 	assert.Equal(t, result, "metrics.wininet_bytes_from_server")
-	result = mapCounterPathLabel("", `RSC Coalesced Packet Bucket 5 (16To31)`)
+	result = mapCounterPathLabel("metrics", "", `RSC Coalesced Packet Bucket 5 (16To31)`)
 	assert.Equal(t, result, "metrics.rsc_coalesced_packet_bucket_5_(16_to31)")
-	result = mapCounterPathLabel("", `Total Memory Usage --- Non-Paged Pool`)
+	result = mapCounterPathLabel("metrics", "", `Total Memory Usage --- Non-Paged Pool`)
 	assert.Equal(t, result, "metrics.total_memory_usage_---_non-paged_pool")
-	result = mapCounterPathLabel("", `IPv6 NBLs/sec indicated with low-resource flag`)
+	result = mapCounterPathLabel("metrics", "", `IPv6 NBLs/sec indicated with low-resource flag`)
 	assert.Equal(t, result, "metrics.ipv6_nbls_per_sec_indicated_with_low-resource_flag")
-	result = mapCounterPathLabel("", `Queued Poison Messages Per Second`)
+	result = mapCounterPathLabel("metrics", "", `Queued Poison Messages Per Second`)
 	assert.Equal(t, result, "metrics.queued_poison_messages_per_second")
-	result = mapCounterPathLabel("", `I/O Log Writes Average Latency`)
+	result = mapCounterPathLabel("metrics", "", `I/O Log Writes Average Latency`)
 	assert.Equal(t, result, "metrics.i/o_log_writes_average_latency")
 }
