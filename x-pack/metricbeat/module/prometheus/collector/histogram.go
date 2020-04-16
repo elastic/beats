@@ -53,11 +53,17 @@ func promHistogramToES(cc CounterCache, name string, labels common.MapStr, histo
 		// Take count for this period (rate)
 		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount())
 
-		if !found {
-			// This is a new bucket, consider it zero by now
+		switch {
+		case !found:
+			// This is a new bucket, consider it zero by now, but still increase the
+			// sum to don't deviate following buckets that are not new.
 			counts = append(counts, 0)
 			sumCount += bucket.GetCumulativeCount() - prevCount
-		} else {
+		case countRate < sumCount:
+			// This should never happen, this means something is wrong in the
+			// prometheus response. Handle it to avoid overflowing when deaccumulating.
+			counts = append(counts, 0)
+		default:
 			// Store the deaccumulated cont
 			counts = append(counts, countRate-sumCount)
 			sumCount = countRate

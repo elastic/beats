@@ -343,6 +343,50 @@ func TestPromHistogramToES(t *testing.T) {
 				},
 			},
 		},
+		"wrong buckets": {
+			samples: []sample{
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(10),
+						SampleSum:   proto.Float64(10),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(10),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(8),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{0, 0},
+						"values": []float64{0.045, 0.54},
+					},
+				},
+				{
+					histogram: dto.Histogram{
+						SampleCount: proto.Uint64(12),
+						SampleSum:   proto.Float64(10.45),
+						Bucket: []*dto.Bucket{
+							{
+								UpperBound:      proto.Float64(0.09),
+								CumulativeCount: proto.Uint64(12),
+							},
+							{
+								UpperBound:      proto.Float64(0.99),
+								CumulativeCount: proto.Uint64(8),
+							},
+						},
+					},
+					expected: common.MapStr{
+						"counts": []uint64{2, 0},
+						"values": []float64{0.045, 0.54},
+					},
+				},
+			},
+		},
 	}
 
 	metricName := "somemetric"
