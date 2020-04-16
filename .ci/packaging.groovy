@@ -41,18 +41,19 @@ pipeline {
     stage('Build Packages'){
       matrix {
         axes {
-          axis {
-            name 'PLATFORMS'
-            values (
-              '+linux/armv7',
-              '+linux/ppc64le',
-              '+linux/s390x',
-              '+linux/mips64',
-              '+darwin',
-              '+windows/386',
-              '+windows/amd64'
-            )
-          }
+          // axis {
+          //   name 'PLATFORMS'
+          //   values (
+          //     '+linux/armv7',
+          //     '+linux/ppc64le',
+          //     '+linux/s390x',
+          //     '+linux/mips64',
+          //     '+darwin',
+          //     '+darwin/amd64',
+          //     '+windows/386',
+          //     '+windows/amd64'
+          //   )
+          // }
           axis {
             name 'BEATS_FOLDER'
             values (
@@ -133,7 +134,8 @@ def withBeatsEnv(Closure body) {
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
     "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
     "PYTHON_ENV=${WORKSPACE}/python-env",
-    "PLATFORMS=!defaults ${env.PLATFORMS}"
+//    "PLATFORMS=!defaults ${env.PLATFORMS}"
+    "PLATFORMS=!defaults +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64 +windows/386 +windows/amd64"
   ]) {
     deleteDir()
     unstash 'source'
