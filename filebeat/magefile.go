@@ -198,7 +198,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")

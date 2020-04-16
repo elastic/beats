@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -137,33 +138,40 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	return RunIntegTest("goIntegTest", func() error {
-		module := EnvOr("MODULE", "")
-		if module != "" {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(module))
-			return errors.Wrapf(err, "integration tests failed for module %s", module)
-		}
+	module := EnvOr("MODULE", "")
+	modulesFileInfo, err := ioutil.ReadDir("./module")
+	if err != nil {
+		return err
+	}
 
-		modulesFileInfo, err := ioutil.ReadDir("./module")
+	foundModule := false
+	for _, fi := range modulesFileInfo {
+		if !fi.IsDir() {
+			continue
+		}
+		if module != "" && module != fi.Name() {
+			continue
+		}
+		foundModule = true
+		testEnv := NewIntegrationEnvFromDir(path.Join("./module", fi.Name()))
+
+		// Set MODULE because only want that modules tests to run inside the testing environment.
+		os.Setenv("MODULE", fi.Name())
+		err = RunIntegTest(testEnv, "goIntegTest", func() error {
+			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			if err != nil {
+				return errors.Wrapf(err, "integration tests failed for module %s", fi.Name())
+			}
+			return nil
+		})
 		if err != nil {
 			return err
 		}
-
-		var failed bool
-		for _, fi := range modulesFileInfo {
-			if !fi.IsDir() {
-				continue
-			}
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
-			if err != nil {
-				failed = true
-			}
-		}
-		if failed {
-			return errors.New("integration tests failed")
-		}
-		return nil
-	})
+	}
+	if module != "" && !foundModule {
+		return fmt.Errorf("no module %s", module)
+	}
+	return nil
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an

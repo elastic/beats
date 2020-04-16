@@ -65,7 +65,7 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(goTestDeps...)
 	}
-	return devtools.RunIntegTest("goIntegTest", func() error {
+	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "goIntegTest", func() error {
 		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	}, whitelistedEnvVars...)
 }
@@ -79,7 +79,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, append(whitelistedEnvVars, devtools.ListMatchingEnvVars("NOSE_")...)...)

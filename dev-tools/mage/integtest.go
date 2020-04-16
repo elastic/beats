@@ -35,6 +35,11 @@ import (
 )
 
 const (
+	// TestingEnvDocker when using docker-compose
+	TestingEnvDocker = "docker-compose"
+	// TestingEnvKubernetes when using kubernetes
+	TestingEnvKubernetes = "kubernetes"
+
 	// BEATS_DOCKER_INTEGRATION_TEST_ENV is used to indicate that we are inside
 	// of the Docker integration test environment (e.g. in a container).
 	beatsDockerIntegrationTestEnvVar = "BEATS_DOCKER_INTEGRATION_TEST_ENV"
@@ -77,7 +82,7 @@ func AddIntegTestUsage() {
 // StopIntegTestEnv will stop and removing the integration test environment
 // (e.g. docker-compose rm --stop --force) when there are no more users
 // of the environment.
-func StopIntegTestEnv() error {
+func StopIntegTestEnv(testEnv *IntegrationEnv) error {
 	if IsInIntegTestEnv() {
 		return nil
 	}
@@ -93,38 +98,71 @@ func StopIntegTestEnv() error {
 		return nil
 	}
 
-	if err := haveIntegTestEnvRequirements(); err != nil {
+	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
 		// Ignore error because it will be logged by RunIntegTest.
 		return nil
 	}
 
-	if _, skip := skipIntegTest(); skip {
+	if _, skip := skipIntegTest(testEnv); skip {
 		return nil
 	}
 
-	composeEnv, err := integTestDockerComposeEnvVars()
-	if err != nil {
-		return err
+	if testEnv.HasType(TestingEnvDocker) {
+		composeEnv, err := integTestDockerComposeEnvVars()
+		if err != nil {
+			return err
+		}
+
+		// Stop docker-compose.
+		if mg.Verbose() {
+			fmt.Println(">> Stopping Docker test environment...")
+		}
+
+		// Docker-compose rm is noisy. So only pass through stderr when in verbose.
+		out := ioutil.Discard
+		if mg.Verbose() {
+			out = os.Stderr
+		}
+
+		_, err = sh.Exec(
+			composeEnv,
+			ioutil.Discard,
+			out,
+			"docker-compose",
+			"-p", dockerComposeProjectName(),
+			"rm", "--stop", "--force",
+		)
+		if err != nil {
+			return err
+		}
 	}
+	_, keepUp := os.LookupEnv("KIND_SKIP_DELETE")
+	if testEnv.HasType(TestingEnvKubernetes) && os.Getenv("KUBECONFIG") == "" && !keepUp {
+		kindEnv, err := integTestKindEnvVars("")
+		if err != nil {
+			return err
+		}
 
-	// Stop docker-compose when reference count hits 0.
-	fmt.Println(">> Stopping Docker test environment...")
+		// Stop kind.
+		if mg.Verbose() {
+			fmt.Println(">> Stopping Kind test environment...")
+		}
 
-	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
-	out := ioutil.Discard
-	if mg.Verbose() {
-		out = os.Stderr
+		_, err = sh.Exec(
+			kindEnv,
+			os.Stdout,
+			os.Stderr,
+			"kind",
+			"delete",
+			"cluster",
+			"--name",
+			kindClusterName(),
+		)
+		if err != nil {
+			return err
+		}
 	}
-
-	_, err = sh.Exec(
-		composeEnv,
-		ioutil.Discard,
-		out,
-		"docker-compose",
-		"-p", dockerComposeProjectName(),
-		"rm", "--stop", "--force",
-	)
-	return err
+	return nil
 }
 
 // RunIntegTest executes the given target inside the integration testing
@@ -135,14 +173,14 @@ func StopIntegTestEnv() error {
 // to use (like snapshot (default), latest, 5x).
 //
 // Always use this with AddIntegTestUsage() and defer StopIntegTestEnv().
-func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...string) error {
-	if reason, skip := skipIntegTest(); skip {
+func RunIntegTest(testEnv *IntegrationEnv, mageTarget string, test func() error, passThroughEnvVars ...string) error {
+	if reason, skip := skipIntegTest(testEnv); skip {
 		fmt.Printf(">> %v: Skipping because %v\n", mageTarget, reason)
 		return nil
 	}
 
 	AddIntegTestUsage()
-	defer StopIntegTestEnv()
+	defer StopIntegTestEnv(testEnv)
 
 	env := []string{
 		"TEST_COVERAGE",
@@ -152,10 +190,10 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 		"MODULE",
 	}
 	env = append(env, passThroughEnvVars...)
-	return runInIntegTestEnv(mageTarget, test, env...)
+	return runInIntegTestEnv(testEnv, mageTarget, test, env...)
 }
 
-func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars ...string) error {
+func runInIntegTestEnv(testEnv *IntegrationEnv, mageTarget string, test func() error, passThroughEnvVars ...string) error {
 	if IsInIntegTestEnv() {
 		// Fix file permissions after test is done writing files as root.
 		if runtime.GOOS != "windows" {
@@ -164,14 +202,8 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		return test()
 	}
 
-	var err error
-	integTestBuildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
-	if err != nil {
-		return err
-	}
-
 	// Test that we actually have Docker and docker-compose.
-	if err := haveIntegTestEnvRequirements(); err != nil {
+	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
 		return errors.Wrapf(err, "failed to run %v target in integration environment", mageTarget)
 	}
 
@@ -186,53 +218,175 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	}
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
 
-	// Build docker-compose args.
-	args := []string{"-p", dockerComposeProjectName(), "run",
-		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
-		// Disable strict.perms because we moust host dirs inside containers
-		// and the UID/GID won't meet the strict requirements.
-		"-e", "BEAT_STRICT_PERMS=false",
-		// compose.EnsureUp needs to know the environment type.
-		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
-		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
-	}
-	if UseVendor {
-		args = append(args, "-e", "GOFLAGS=-mod=vendor")
-	}
-	args, err = addUidGidEnvArgs(args)
-	if err != nil {
-		return err
-	}
-	for _, envVar := range passThroughEnvVars {
-		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
-	}
-	if mg.Verbose() {
-		args = append(args, "-e", "MAGEFILE_VERBOSE=1")
-	}
-	args = append(args,
-		"-e", beatsDockerIntegrationTestEnvVar+"=true",
-		"beat", // Docker compose container name.
-		magePath,
-		mageTarget,
-	)
-
-	composeEnv, err := integTestDockerComposeEnvVars()
-	if err != nil {
-		return err
-	}
-
 	// Only allow one usage at a time.
 	integTestLock.Lock()
 	defer integTestLock.Unlock()
 
-	_, err = sh.Exec(
-		composeEnv,
-		os.Stdout,
-		os.Stderr,
-		"docker-compose",
-		args...,
-	)
-	return err
+	if testEnv.HasType(TestingEnvDocker) {
+		// Using docker build the images.
+		var err error
+		integTestBuildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+		if err != nil {
+			return err
+		}
+
+		// Execute the test inside of docker-compose.
+		args := []string{"-p", dockerComposeProjectName(), "run",
+			"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
+			// Disable strict.perms because we moust host dirs inside containers
+			// and the UID/GID won't meet the strict requirements.
+			"-e", "BEAT_STRICT_PERMS=false",
+			// compose.EnsureUp needs to know the environment type.
+			"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
+			"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
+		}
+		if UseVendor {
+			args = append(args, "-e", "GOFLAGS=-mod=vendor")
+		}
+		args, err = addUidGidEnvArgs(args)
+		if err != nil {
+			return err
+		}
+		for _, envVar := range passThroughEnvVars {
+			args = append(args, "-e", envVar+"="+os.Getenv(envVar))
+		}
+		if mg.Verbose() {
+			args = append(args, "-e", "MAGEFILE_VERBOSE=1")
+		}
+		args = append(args,
+			"-e", beatsDockerIntegrationTestEnvVar+"=true",
+			"beat", // Docker compose container name.
+			magePath,
+			mageTarget,
+		)
+
+		composeEnv, err := integTestDockerComposeEnvVars()
+		if err != nil {
+			return err
+		}
+
+		if mg.Verbose() {
+			fmt.Println(">> Starting docker test environment...")
+		}
+
+		_, err = sh.Exec(
+			composeEnv,
+			os.Stdout,
+			os.Stderr,
+			"docker-compose",
+			args...,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	if testEnv.HasType(TestingEnvKubernetes) {
+		clusterName := kindClusterName()
+		stdOut := ioutil.Discard
+		stdErr := ioutil.Discard
+		if mg.Verbose() {
+			stdOut = os.Stdout
+			stdErr = os.Stderr
+		}
+
+		kubeConfig := os.Getenv("KUBECONFIG")
+		if kubeConfig == "" {
+			// Create a kubernetes cluster with kind.
+			if mg.Verbose() {
+				fmt.Println(">> Starting Kind test environment...")
+			}
+
+			kubeCfgDir := filepath.Join("build", "kind", clusterName)
+			kubeCfgDir, err = filepath.Abs(kubeCfgDir)
+			if err != nil {
+				return err
+			}
+			kubeConfig = filepath.Join(kubeCfgDir, "kubecfg")
+			if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
+				return err
+			}
+
+			args := []string{
+				"create",
+				"cluster",
+				"--name",
+				kindClusterName(),
+				"--kubeconfig", kubeConfig,
+				"--wait",
+				"300s",
+			}
+			kubeVersion := os.Getenv("K8S_VERSION")
+			if kubeVersion != "" {
+				args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
+			}
+
+			_, err = sh.Exec(
+				map[string]string{},
+				stdOut,
+				stdErr,
+				"kind",
+				args...,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		manifestPath, _ := testEnv.GetTypeSource(TestingEnvKubernetes)
+		kubeEnv, err := integTestKindEnvVars(kubeConfig)
+		if err != nil {
+			return err
+		}
+
+		if mg.Verbose() {
+			fmt.Println(">> Applying module manifest to cluster...")
+		}
+
+		// Apply the manifest from the module. Module uses the manifest as the
+		// base for running inside the cluster.
+		if err := KubectlApply(kubeEnv, stdOut, stdErr, manifestPath); err != nil {
+			return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
+		}
+		defer func() {
+			if mg.Verbose() {
+				fmt.Println(">> Deleting module manifest from cluster...")
+			}
+			if err := KubectlDelete(kubeEnv, stdOut, stdErr, manifestPath); err != nil {
+				log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
+			}
+		}()
+
+		// Execute the test inside of kubernetes.
+		remoteEnv := map[string]string{
+			beatsDockerIntegrationTestEnvVar: "true",
+			"BEAT_STRICT_PERMS":              "false",
+		}
+		if UseVendor {
+			remoteEnv["GOFLAGS"] = "-mod=vendor"
+		}
+		for _, envVar := range passThroughEnvVars {
+			remoteEnv[envVar] = os.Getenv(envVar)
+		}
+		if mg.Verbose() {
+			remoteEnv["MAGEFILE_VERBOSE"] = "1"
+		}
+		if mg.Verbose() {
+			fmt.Println(">> Executing tests inside of cluster...")
+		}
+
+		destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
+		workDir := filepath.Join(destDir, repo.SubDir)
+		remote, err := NewKubeRemote(kubeConfig, "default", clusterName, workDir, destDir, repo.RootDir)
+		if err != nil {
+			return err
+		}
+		// Uses `os.Stdout` directly as its output should always be shown.
+		err = remote.Run(remoteEnv, os.Stdout, stdErr, magePath, mageTarget)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // IsInIntegTestEnv return true if executing inside the integration test
@@ -242,18 +396,69 @@ func IsInIntegTestEnv() bool {
 	return found
 }
 
-func haveIntegTestEnvRequirements() error {
-	if err := HaveDockerCompose(); err != nil {
-		return err
+// IntegrationEnv represents the types of integrations environment the dir needs.
+type IntegrationEnv struct {
+	types map[string]string
+}
+
+// NewIntegrationEnvFromDir gets the integration environment for the dir.
+func NewIntegrationEnvFromDir(dir string) *IntegrationEnv {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
 	}
-	if err := HaveDocker(); err != nil {
-		return err
+	types := map[string]string{}
+	dockerFile := filepath.Join(cwd, dir, "docker-compose.yml")
+	if _, err := os.Stat(dockerFile); !os.IsNotExist(err) {
+		types[TestingEnvDocker] = dockerFile
+	}
+	kubeFile := filepath.Join(cwd, dir, "kubernetes.yml")
+	if _, err := os.Stat(kubeFile); !os.IsNotExist(err) {
+		types[TestingEnvKubernetes] = kubeFile
+	}
+	return &IntegrationEnv{types}
+}
+
+// HasType returns true if the intergration type has that type.
+func (i *IntegrationEnv) HasType(t string) bool {
+	_, ok := i.types[t]
+	return ok
+}
+
+// GetTypeSource returns the source file that determined that type.
+func (i *IntegrationEnv) GetTypeSource(t string) (string, bool) {
+	source, ok := i.types[t]
+	return source, ok
+}
+
+func haveIntegTestEnvRequirements(testEnv *IntegrationEnv) error {
+	if testEnv.HasType(TestingEnvDocker) || testEnv.HasType(TestingEnvKubernetes) {
+		if err := HaveDocker(); err != nil {
+			return err
+		}
+	}
+	if testEnv.HasType(TestingEnvDocker) {
+		if err := HaveDockerCompose(); err != nil {
+			return err
+		}
+	}
+	if testEnv.HasType(TestingEnvKubernetes) {
+		if err := HaveKubectl(); err != nil {
+			return err
+		}
+		// kind is only required when KUBECONFIG is not already set
+		kubecfg := os.Getenv("KUBECONFIG")
+		if kubecfg == "" {
+			if err := HaveKind(); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
 
 // skipIntegTest returns true if integ tests should be skipped.
-func skipIntegTest() (reason string, skip bool) {
+func skipIntegTest(testEnv *IntegrationEnv) (reason string, skip bool) {
 	if IsInIntegTestEnv() {
 		return "", false
 	}
@@ -268,7 +473,7 @@ func skipIntegTest() (reason string, skip bool) {
 	}
 
 	// Otherwise skip if we don't have all the right dependencies.
-	if err := haveIntegTestEnvRequirements(); err != nil {
+	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
 		// Skip if we don't meet the requirements.
 		log.Println("Skipping integ test because:", err)
 		return "docker is not available", true
@@ -291,6 +496,14 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 		"STACK_ENVIRONMENT": StackEnvironment,
 		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).
 		"TESTING_ENVIRONMENT": StackEnvironment,
+	}, nil
+}
+
+// integTestKindEnvVars returns the environment variables used for
+// executing kind (not the variables passed into the containers).
+func integTestKindEnvVars(kubeConfig string) (map[string]string, error) {
+	return map[string]string{
+		"KUBECONFIG": kubeConfig,
 	}, nil
 }
 
@@ -317,6 +530,30 @@ func dockerComposeProjectName() string {
 		"Version":          version,
 	})
 	return projectName
+}
+
+// kindClusterName returns the cluster name to use with kind.
+// It is passed to kind. And is passed to our Go and Python testing libraries
+// through the KIND_CLUSTER_NAME environment variable.
+func kindClusterName() string {
+	commit, err := CommitHash()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct kind cluster name"))
+	}
+
+	version, err := BeatQualifiedVersion()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct kind cluster name"))
+	}
+	version = strings.NewReplacer(".", "_").Replace(version)
+
+	clusterName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
+	clusterName = MustExpand(clusterName, map[string]interface{}{
+		"StackEnvironment": StackEnvironment,
+		"ShortCommit":      commit[:10],
+		"Version":          version,
+	})
+	return clusterName
 }
 
 // dockerComposeBuildImages builds all images in the docker-compose.yml file.

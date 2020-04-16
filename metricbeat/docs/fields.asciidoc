@@ -22784,7 +22784,7 @@ type: long
 
 --
 
-*`kubernetes.apiserver.request.duration.us.bucket.*`*::
+*`kubernetes.apiserver.request.duration.bucket.us.*`*::
 +
 --
 Request duration, histogram buckets

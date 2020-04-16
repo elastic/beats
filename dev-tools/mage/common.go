@@ -223,6 +223,18 @@ func HaveDockerCompose() error {
 	return errors.Wrap(err, "docker-compose was not found on the PATH")
 }
 
+// HaveKind returns an error if kind is not found on the PATH.
+func HaveKind() error {
+	_, err := exec.LookPath("kind")
+	return errors.Wrap(err, "kind was not found on the PATH")
+}
+
+// HaveKubectl returns an error if kind is not found on the PATH.
+func HaveKubectl() error {
+	_, err := exec.LookPath("kubectl")
+	return errors.Wrap(err, "kubectl was not found on the PATH")
+}
+
 // FindReplace reads a file, performs a find/replace operation, then writes the
 // output to the same file path.
 func FindReplace(file string, re *regexp.Regexp, repl string) error {

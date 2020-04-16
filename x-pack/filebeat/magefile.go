@@ -157,7 +157,7 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
+	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "goIntegTest", func() error {
 		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	})
 }
@@ -170,7 +170,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	return devtools.RunIntegTest(NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
