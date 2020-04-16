@@ -189,7 +189,8 @@ class Test(BaseTest):
 
         beat.check_wait(exit_code=1)
 
-        assert self.log_contains("error exporting dashboard: Saved object [dashboard/{}] not found".format(dashboard_id)) is True
+        expected_error = "error exporting dashboard: Saved object [dashboard/{}] not found".format(dashboard_id)
+        assert self.log_contains(expected_error)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
