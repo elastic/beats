@@ -41,19 +41,6 @@ pipeline {
     stage('Build Packages'){
       matrix {
         axes {
-          // axis {
-          //   name 'PLATFORMS'
-          //   values (
-          //     '+linux/armv7',
-          //     '+linux/ppc64le',
-          //     '+linux/s390x',
-          //     '+linux/mips64',
-          //     '+darwin',
-          //     '+darwin/amd64',
-          //     '+windows/386',
-          //     '+windows/amd64'
-          //   )
-          // }
           axis {
             name 'BEATS_FOLDER'
             values (
@@ -65,6 +52,7 @@ pipeline {
               'packetbeat',
               'winlogbeat',
               'x-pack/auditbeat',
+              'x-pack/elastic-agent',
               'x-pack/filebeat',
               'x-pack/functionbeat',
               'x-pack/heartbeat',
@@ -76,17 +64,40 @@ pipeline {
           }
         }
         stages {
-          stage('Package'){
+          stage('Package Linux'){
             agent { label 'ubuntu && immutable' }
             options { skipDefaultCheckout() }
+            when {
+              beforeAgent true
+              expression {
+                return params.linux
+              }
+            }
             environment {
               HOME = "${env.WORKSPACE}"
+              PLATFORMS = "!defaults +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64 +windows/386 +windows/amd64"
             }
             steps {
-              deleteDir()
-              unstash 'source'
               release()
-              publishPackages()
+            }
+          }
+          stage('Package Mac OS'){
+            agent { label 'macosx' }
+            options { skipDefaultCheckout() }
+            when {
+              beforeAgent true
+              expression {
+                return params.macos
+              }
+            }
+            environment {
+              HOME = "${env.WORKSPACE}"
+              PLATFORMS = "!defaults +darwin/amd64 +darwin"
+            }
+            steps {
+              withMacOSEnv(){
+                release()
+              }
             }
           }
         }
@@ -97,27 +108,28 @@ pipeline {
 
 def release(){
   withBeatsEnv(){
-    if(env.PLATFORMS == 'darwin' && params.macos){
-      withMaskEnv( vars: [
-          [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
-          [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
-          [var: "APPLE_SIGNING_ENABLED", password: "true"],
-      ]){
-        sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
-      }
-    } else if (env.PLATFORMS != 'darwin' && params.linux){
+    dir("${env.BEATS_FOLDER}") {
       sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
-    } else {
-      unstable("Release for ${env.BEATS_FOLDER} ${env.PLATFORMS} Not executed")
     }
+    publishPackages("${env.BEATS_FOLDER}")
   }
 }
 
-def publishPackages(){
+def withMacOSEnv(Closure body){
+  withMaskEnv( vars: [
+      [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
+      [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
+      [var: "APPLE_SIGNING_ENABLED", password: "true"],
+  ]){
+    body()
+  }
+}
+
+def publishPackages(baseDir){
   googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/snapshots",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${BASE_DIR}/build/distributions/",
-    pattern: "${BASE_DIR}/build/distributions/**/*",
+    pathPrefix: "${baseDir}/build/distributions/",
+    pattern: "${baseDir}/build/distributions/**/*",
     sharedPublicly: true,
     showInline: true
   )
@@ -133,19 +145,13 @@ def withBeatsEnv(Closure body) {
     "GOROOT=${goRoot}",
     "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
     "MAGEFILE_CACHE=${WORKSPACE}/.magefile",
-    "PYTHON_ENV=${WORKSPACE}/python-env",
-//    "PLATFORMS=!defaults ${env.PLATFORMS}"
-    "PLATFORMS=!defaults +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64 +windows/386 +windows/amd64"
+    "PYTHON_ENV=${WORKSPACE}/python-env"
   ]) {
     deleteDir()
     unstash 'source'
     dir("${env.BASE_DIR}"){
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install Mage", script: "make mage")
-      //dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      //sh(label: 'workaround packer cache', '.ci/packer_cache.sh')
-    }
-    dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
       body()
     }
   }
