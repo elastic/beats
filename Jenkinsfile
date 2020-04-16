@@ -9,8 +9,6 @@ pipeline {
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
     PIPELINE_LOG_LEVEL = "INFO"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
-    DOCKER_REGISTRY = 'docker.elastic.co'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
