@@ -4,10 +4,25 @@ metricbeat:
     metricsets: [status]
     index: metrics-docker.status-default
     hosts: ["http://127.0.0.1:8080"]
+    processors:
+    - add_fields:
+        fields:
+          stream.type: metrics
+          stream.dataset: docker.status
+          stream.namespace: default
   - module: apache
     metricsets: [info]
     index: metrics-generic-testing
     hosts: ["http://apache.remote"]
+    processors:
+      - add_fields:
+          fields:
+            should_be: first
+      - add_fields:
+          fields:
+            stream.type: metrics
+            stream.dataset: generic
+            stream.namespace: testing
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]

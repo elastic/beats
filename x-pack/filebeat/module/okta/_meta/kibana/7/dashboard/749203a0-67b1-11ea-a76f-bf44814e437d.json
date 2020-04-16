@@ -189,9 +189,6 @@
         }
       },
       "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "map": "7.7.0"
-      },
       "references": [
         {
           "id": "filebeat-*",
