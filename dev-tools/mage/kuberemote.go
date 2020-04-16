@@ -205,7 +205,7 @@ func (r *KubeRemote) syncServiceAccount() error {
 // createPod creates the pod.
 func (r *KubeRemote) createPod(env map[string]string, cmd ...string) (*apiv1.Pod, error) {
 	r.deletePod() // ensure it doesn't already exist
-	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, "golang:1.14", env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
+	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, "golang:1.13.9", env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
 }
 
 // deletePod deletes the pod.
