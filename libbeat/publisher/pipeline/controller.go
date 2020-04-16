@@ -20,13 +20,10 @@ package pipeline
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
-
-var _grpID atomic.Uint
 
 // outputController manages the pipelines output capabilities, like:
 // - start
@@ -47,7 +44,6 @@ type outputController struct {
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
-	id        uint
 	workQueue workQueue
 	outputs   []outputWorker
 
@@ -104,7 +100,7 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
-	//lf("Set() called")
+	// Pause consumer
 	c.consumer.sigPause()
 
 	// close old group, so events are send to new workQueue via retryer
@@ -122,7 +118,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
 	}
 	grp := &outputGroup{
-		id:         _workerID.Inc(),
 		workQueue:  c.workQueue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
@@ -130,13 +125,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	}
 
 	// update consumer and retryer
-	//c.consumer.sigPause()
-	//if c.out != nil {
-	//	for range c.out.outputs {
-	//		c.retryer.sigOutputRemoved()
-	//	}
-	//}
-	//c.retryer.updOutput(queue)
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}
@@ -144,7 +132,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	c.out = grp
 
-	// restart consumer (potentially blocked by retryer)
+	// restart consumer (potentially blocked by retryer as well)
 	c.consumer.sigContinue()
 	c.consumer.sigUnWait()
 

@@ -49,11 +49,8 @@ func TestOutputReload(t *testing.T) {
 			defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
-				//lf("*** Starting new test ***")
 				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
 				numOutputReloads := 350 + (q % 150)     // 350 to 499
-				//numEventsToPublish := uint(19999)
-				//numOutputReloads := uint(499)
 
 				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
 					return memqueue.NewQueue(
@@ -67,7 +64,6 @@ func TestOutputReload(t *testing.T) {
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
 					publishedCount.Add(uint(len(batch.Events())))
-					//lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
 					return nil
 				}
 
@@ -99,23 +95,15 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					//lf("in test: reloading output...")
 					pipeline.output.Set(out)
 				}
 
 				wg.Wait()
 
 				timeout := 20 * time.Second
-				success := waitUntilTrue(timeout, func() bool {
+				return waitUntilTrue(timeout, func() bool {
 					return uint(numEventsToPublish) == publishedCount.Load()
 				})
-				if !success {
-					lf(
-						"*** test result: numOutputReloads = %v, numEventsToPublish = %v, publishedCounted = %v ***",
-						numOutputReloads, numEventsToPublish, publishedCount.Load(),
-					)
-				}
-				return success
 			}, &quick.Config{MaxCount: 25})
 
 			if err != nil {

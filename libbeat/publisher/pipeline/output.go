@@ -18,26 +18,9 @@
 package pipeline
 
 import (
-	"fmt"
-	"strconv"
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
-
-var _workerID atomic.Uint
-
-func lf(msg string, v ...interface{}) {
-	now := time.Now().Format("15:04:05.00000")
-	fmt.Printf(now+" "+msg+"\n", v...)
-}
-
-func (w *worker) lf(msg string, v ...interface{}) {
-	lf("[worker "+strconv.Itoa(int(w.id))+"] "+msg, v...)
-}
 
 type worker struct {
 	id       uint
@@ -68,7 +51,6 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		observer: observer,
 		qu:       qu,
 		done:     make(chan struct{}),
-		id:       _workerID.Inc(),
 	}
 
 	var c interface {
@@ -86,20 +68,15 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		c = &clientWorker{worker: w, client: client}
 	}
 
-	//w.lf("starting...")
 	go c.run()
 	return c
 }
 
 func (w *worker) close() {
 	close(w.done)
-	//lf("w.inFlight == nil: %#v", w.inFlight == nil)
 	if w.inFlight != nil {
-		//lf("waiting for inflight events to publish")
 		<-w.inFlight
-		//lf("inflight events published")
 	}
-	//w.lf("closed")
 }
 
 func (w *clientWorker) Close() error {
@@ -149,13 +126,9 @@ func (w *netClientWorker) run() {
 		select {
 
 		case <-w.done:
-			//lf("got done signal")
 			return
 
-		case batch, ok := <-w.qu:
-			if !ok {
-				//w.lf("workqueue closed")
-			}
+		case batch := <-w.qu:
 			if batch == nil {
 				continue
 			}
@@ -163,7 +136,6 @@ func (w *netClientWorker) run() {
 			// Try to (re)connect so we can publish batch
 			if !connected {
 				// Return batch to other output workers while we try to (re)connect
-				//w.lf("canceling batch of %v events", len(batch.Events()))
 				batch.Cancelled()
 
 				if reconnectAttempts == 0 {
@@ -185,7 +157,6 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			//w.lf("about to publish %v events", len(batch.Events()))
 			w.inFlight = make(chan struct{})
 			if err := w.client.Publish(batch); err != nil {
 				close(w.inFlight)

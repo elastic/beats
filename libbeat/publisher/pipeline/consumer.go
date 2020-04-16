@@ -129,8 +129,6 @@ func (c *eventConsumer) updOutput(grp *outputGroup) {
 		tag:      sigConsumerUpdateInput,
 		consumer: c.consumer,
 	}
-
-	//lf("consumer: updated output group to id = %v", grp.id)
 }
 
 func (c *eventConsumer) loop(consumer queue.Consumer) {
@@ -149,9 +147,6 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
-			//if out == nil && batch != nil {
-			//	lf("handling sigConsumerUpdateOutput")
-			//}
 			c.out = sig.out
 
 		case sigConsumerUpdateInput:
@@ -169,27 +164,20 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	for {
 		if !paused && c.out != nil && consumer != nil && batch == nil {
 			out = c.out.workQueue
-			//lf("consuming from queue...")
 			queueBatch, err := consumer.Get(c.out.batchSize)
 			if err != nil {
-				//lf("error consuming from queue")
 				out = nil
 				consumer = nil
 				continue
 			}
 			if queueBatch != nil {
-				//lf("consumed batch of %v events from queue", len(queueBatch.Events()))
 				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			}
 
 			paused = c.paused()
 			if paused || batch == nil {
-				//lf("paused: %v, batch == nil? = %v; setting out to nil", paused, batch == nil)
 				out = nil
 			}
-			//} else {
-			//	lf("paused = %v, c.out == nil = %v, consumer == nil = %v, batch == nil? = %v",
-			//		paused, c.out == nil, consumer == nil, batch == nil)
 		}
 
 		select {
@@ -199,26 +187,13 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		default:
 		}
 
-		//if out == nil && batch != nil {
-		//	lf("out == nil but have batch with %v events", len(batch.Events()))
-		//}
-
 		select {
 		case <-c.done:
-			//lf("consumer done")
 			log.Debug("stop pipeline event consumer")
 			return
 		case sig := <-c.sig:
-			if out == nil && batch != nil {
-				//lf("in second select; handled sig %v", sig.tag)
-			}
 			handleSignal(sig)
 		case out <- batch:
-			//numEvents := 0
-			//if batch != nil {
-			//	numEvents = len(batch.Events())
-			//}
-			//lf("in consumer: sent batch of %v events to workqueue", numEvents)
 			batch = nil
 		}
 	}
