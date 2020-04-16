@@ -43,7 +43,7 @@ type JSONFormat struct {
 	Objects []JSONObject `json:"objects"`
 }
 
-func ReplaceIndexInIndexPattern(index string, content common.MapStr) error {
+func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error) {
 	if index == "" {
 		return nil
 	}
@@ -53,31 +53,32 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) error {
 		return errors.New("empty index pattern")
 	}
 
-	repl := common.MapStr{
-		"id": index,
-		"attributes": common.MapStr{
-			"title": index,
-		},
+	updateObject := func(obj common.MapStr) {
+		// This uses Put instead of DeepUpdate to avoid modifying types for
+		// inner objects. (DeepUpdate will replace maps with MapStr).
+		obj.Put("id", index)
+		obj.Put("attributes.title", index)
 	}
+
 	switch v := list.(type) {
 	case []interface{}:
 		for _, objIf := range v {
 			switch obj := objIf.(type) {
 			case common.MapStr:
-				obj.DeepUpdate(repl)
+				updateObject(obj)
 			case map[string]interface{}:
-				common.MapStr(obj).DeepUpdate(repl)
+				updateObject(obj)
 			default:
 				return errors.Errorf("index pattern object has unexpected type %T", v)
 			}
 		}
 	case []map[string]interface{}:
 		for _, obj := range v {
-			common.MapStr(obj).DeepUpdate(repl)
+			updateObject(obj)
 		}
 	case []common.MapStr:
 		for _, obj := range v {
-			obj.DeepUpdate(repl)
+			updateObject(obj)
 		}
 	default:
 		return errors.Errorf("index pattern objects have unexpected type %T", v)
