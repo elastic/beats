@@ -91,7 +91,7 @@ func newJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFa
 }
 
 // loadConfig parses the YAML config and populates the jobFactory fields.
-func (jf *jobFactory) loadConfig(commonCfg *common.Config) (error) {
+func (jf *jobFactory) loadConfig(commonCfg *common.Config) error {
 	var err error
 	if err = commonCfg.Unpack(&jf.config); err != nil {
 		return err
