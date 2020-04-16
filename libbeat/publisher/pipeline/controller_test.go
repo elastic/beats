@@ -38,8 +38,8 @@ import (
 
 func TestOutputReload(t *testing.T) {
 	tests := map[string]func(mockPublishFn) outputs.Client{
-		"client":         newMockClient,
-		"network_client": newMockNetworkClient,
+		"client": newMockClient,
+		//"network_client": newMockNetworkClient,
 	}
 
 	for name, ctor := range tests {
@@ -65,7 +65,7 @@ func TestOutputReload(t *testing.T) {
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
 					publishedCount.Add(uint(len(batch.Events())))
-					lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
+					//lf("in test: published now: %v, so far: %v", len(batch.Events()), publishedCount.Load())
 					return nil
 				}
 
@@ -97,7 +97,7 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					lf("in test: reloading output...")
+					//lf("in test: reloading output...")
 					pipeline.output.Set(out)
 				}
 
@@ -121,9 +121,4 @@ func TestOutputReload(t *testing.T) {
 			}
 		})
 	}
-}
-
-func lf(msg string, v ...interface{}) {
-	now := time.Now().Format("15:04:05.00000")
-	fmt.Printf(now+" "+msg+"\n", v...)
 }

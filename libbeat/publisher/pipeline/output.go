@@ -19,10 +19,16 @@ package pipeline
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
+
+func lf(msg string, v ...interface{}) {
+	now := time.Now().Format("15:04:05.00000")
+	fmt.Printf(now+" "+msg+"\n", v...)
+}
 
 type worker struct {
 	observer outputObserver
@@ -88,10 +94,10 @@ func (w *worker) close() {
 	for {
 		select {
 		case batch := <-w.qu:
-			//fmt.Println("Canceling in-flight batch before closing...")
+			//lf("Canceling in-flight batch before closing...")
 			batch.Cancelled()
 		default:
-			fmt.Println("no inflight batches")
+			//lf("no inflight batches")
 			return
 		}
 	}
