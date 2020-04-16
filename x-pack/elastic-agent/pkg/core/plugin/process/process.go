@@ -77,7 +77,7 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, cre
 	}
 
 	// create a command
-	cmd := getCmd(logger, path, env, uid, gid, arg...)	
+	cmd := getCmd(logger, path, env, uid, gid, arg...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
@@ -195,7 +195,7 @@ func pushCredentials(w io.Writer, c *Creds) error {
 	}
 
 	_, err = w.Write(credbytes)
-	if err != nil{
+	if err != nil {
 		return errors.New(err, "passing credentials failed")
 	}
 
