@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -114,20 +115,14 @@ type diskQueue struct {
 	readPosition bufferPosition
 }
 
-/*
 func init() {
 	queue.RegisterQueueType(
 		"disk",
-		create,
+		queueFactory,
 		feature.MakeDetails(
 			"Disk queue",
 			"Buffer events on disk before sending to the output.",
 			feature.Beta))
-}
-*/
-
-func init() {
-	queue.RegisterType("disk", queueFactory)
 }
 
 func queueFactory(
