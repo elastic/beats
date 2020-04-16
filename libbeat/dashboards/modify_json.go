@@ -22,6 +22,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -41,32 +43,46 @@ type JSONFormat struct {
 	Objects []JSONObject `json:"objects"`
 }
 
-func ReplaceIndexInIndexPattern(index string, content common.MapStr) common.MapStr {
+func ReplaceIndexInIndexPattern(index string, content common.MapStr) error {
 	if index == "" {
-		return content
+		return nil
 	}
 
-	objects, ok := content["objects"].([]interface{})
+	list, ok := content["objects"]
 	if !ok {
-		return content
+		return errors.New("empty index pattern")
 	}
 
-	// change index pattern name
-	for i, object := range objects {
-		objectMap, ok := object.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		objectMap["id"] = index
-		if attributes, ok := objectMap["attributes"].(map[string]interface{}); ok {
-			attributes["title"] = index
-		}
-		objects[i] = objectMap
+	repl := common.MapStr{
+		"id": index,
+		"attributes": common.MapStr{
+			"title": index,
+		},
 	}
-	content["objects"] = objects
-
-	return content
+	switch v := list.(type) {
+	case []interface{}:
+		for _, objIf := range v {
+			switch obj := objIf.(type) {
+			case common.MapStr:
+				obj.DeepUpdate(repl)
+			case map[string]interface{}:
+				common.MapStr(obj).DeepUpdate(repl)
+			default:
+				return errors.Errorf("index pattern object has unexpected type %T", v)
+			}
+		}
+	case []map[string]interface{}:
+		for _, obj := range v {
+			common.MapStr(obj).DeepUpdate(repl)
+		}
+	case []common.MapStr:
+		for _, obj := range v {
+			obj.DeepUpdate(repl)
+		}
+	default:
+		return errors.Errorf("index pattern objects have unexpected type %T", v)
+	}
+	return nil
 }
 
 func replaceIndexInSearchObject(index string, savedObject string) (string, error) {
