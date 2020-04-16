@@ -249,7 +249,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	inputLoader := input.NewRunnerFactory(pipelineConnector, registrar, fb.done)
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 
-	crawler, err := newCrawler(inputLoader, moduleLoader, pipelineConnector, config.Inputs, fb.done, *once)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -283,7 +283,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules)
+	err = crawler.Start(b.Publisher, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
 		return fmt.Errorf("Failed to start crawler: %+v", err)

@@ -481,7 +481,7 @@ inputs:
 `,
 			rule: &RuleList{
 				Rules: []Rule{
-					CopyToList("namespace", "inputs", false),
+					CopyToList("namespace", "inputs", "insert_after"),
 				},
 			},
 		},
@@ -561,8 +561,9 @@ func TestSerialization(t *testing.T) {
 		FilterValuesWithRegexp("inputs", "type", regexp.MustCompile("^metric/.*")),
 		ExtractListItem("path.p", "item", "target"),
 		InjectIndex("index-type"),
-		CopyToList("t1", "t2", false),
-		CopyAllToList("t2", false, "a", "b"),
+		InjectStreamProcessor("insert_after", "index-type"),
+		CopyToList("t1", "t2", "insert_after"),
+		CopyAllToList("t2", "insert_before", "a", "b"),
 	)
 
 	y := `- rename:
@@ -609,16 +610,19 @@ func TestSerialization(t *testing.T) {
     to: target
 - inject_index:
     type: index-type
+- inject_stream_processor:
+    type: index-type
+    on_conflict: insert_after
 - copy_to_list:
     item: t1
     to: t2
-    overwrite: false
+    on_conflict: insert_after
 - copy_all_to_list:
     to: t2
     except:
     - a
     - b
-    overwrite: false
+    on_conflict: insert_before
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

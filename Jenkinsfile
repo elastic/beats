@@ -27,7 +27,7 @@ pipeline {
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
-    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
   }
   stages {
