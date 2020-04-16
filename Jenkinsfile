@@ -296,7 +296,7 @@ pipeline {
             makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
-        stage('Metricbeat Unit tests'){
+        stage('Metricbeat OSS Unit tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -306,10 +306,10 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
           }
         }
-        stage('Metricbeat Integration tests'){
+        stage('Metricbeat OSS Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -319,20 +319,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
-          }
-        }
-        stage('Metricbeat System tests'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_METRICBEAT != "false"
-            }
-          }
-          steps {
-            makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
           }
         }
         stage('Metricbeat x-pack'){
@@ -345,7 +332,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "update build test")
+            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
           }
         }
         stage('Metricbeat crosscompile'){
@@ -371,7 +358,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
+            mageTarget("Metricbeat oss Mac OS X", "metricbeat", "unitTest")
           }
         }
         stage('Metricbeat Windows'){
