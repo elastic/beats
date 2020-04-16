@@ -18,22 +18,19 @@
 package diskqueue
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-// Settings contains the configuration fields to create a new disk queue.
+// Settings contains the configuration fields to create a new disk queue
+// or open an existing one.
 type Settings struct {
-	// The destination for log messages related to the disk queue.
-	Logger *logp.Logger
-
-	// A listener that receives ACKs when events are written to the queue's
-	// disk buffer.
-	WriteToDiskACKListener queue.ACKListener
-
-	// A listener that receives ACKs when events are removed from the queue
-	// and written to their output.
-	WriteToOutputACKListener queue.ACKListener
+	// The path on disk of the queue's main metadata file.
+	// Paths for data segment files are created by appending ".{segmentIndex}" to
+	// this path.
+	Path string
 
 	// The size in bytes of one data page in the on-disk buffer. To minimize
 	// data loss if there is an error, this should match the page size of the
@@ -44,6 +41,17 @@ type Settings struct {
 	// ever occupy on disk. A value of 0 means the queue can grow until the
 	// disk is full.
 	MaxBufferSize uint64
+
+	// The destination for log messages related to the disk queue.
+	Logger *logp.Logger
+
+	// A listener that receives ACKs when events are written to the queue's
+	// disk buffer.
+	WriteToDiskACKListener queue.ACKListener
+
+	// A listener that receives ACKs when events are removed from the queue
+	// and written to their output.
+	WriteToOutputACKListener queue.ACKListener
 }
 
 type bufferPosition struct {
@@ -106,21 +114,35 @@ type diskQueue struct {
 	readPosition bufferPosition
 }
 
-/*var _ = queue.Feature("disk", create,
-	feature.MakeDetails(
-		"Disk queue",
-		"Buffer events on disk before sending to the output.",
-		feature.Beta),
-)
+/*
+func init() {
+	queue.RegisterQueueType(
+		"disk",
+		create,
+		feature.MakeDetails(
+			"Disk queue",
+			"Buffer events on disk before sending to the output.",
+			feature.Beta))
+}
+*/
 
 func init() {
-	queue.RegisterType("disk", create)
-}*/
+	queue.RegisterType("disk", queueFactory)
+}
+
+func queueFactory(
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+) (queue.Queue, error) {
+	return nil, nil
+}
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings.
-func NewQueue(settings Settings) queue.Queue {
-	return &diskQueue{settings: settings}
+func NewQueue(settings Settings) (queue.Queue, error) {
+	if settings.Path == "" {
+		settings.Path = paths.Resolve(paths.Data, "queue.dat")
+	}
+	return &diskQueue{settings: settings}, nil
 }
 
 //
