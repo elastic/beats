@@ -139,11 +139,13 @@ def withBeatsEnv(Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
-    dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
+    dir("${env.BASE_DIR}"){
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install Mage", script: "make mage")
       //dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       //sh(label: 'workaround packer cache', '.ci/packer_cache.sh')
+    }
+    dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
       body()
     }
   }
