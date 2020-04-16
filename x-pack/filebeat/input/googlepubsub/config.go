@@ -36,30 +36,28 @@ type config struct {
 }
 
 func (c *config) Validate() error {
-	//ADC
-	ctx := context.Background()
-
-	if _, err := google.FindDefaultCredentials(ctx, pubsub.ScopePubSub); err != nil {
-		fmt.Printf("ADC authentication unavailable. Checking other authentication mechanisms.")
-	} else {
-		return nil
-	}
-
 	// credentials_file
 	if c.CredentialsFile != "" {
 		if _, err := os.Stat(c.CredentialsFile); os.IsNotExist(err) {
-			return fmt.Errorf("credentials_file is configured, but the file: %q cannot be found.", c.CredentialsFile)
+			return fmt.Errorf("credentials_file is configured, but the file %q cannot be found", c.CredentialsFile)
 		} else {
 			return nil
 		}
 	}
 
 	// credentials_json
-	if c.CredentialsJSON != nil {
+	if len(c.CredentialsJSON) > 0 {
 		return nil
 	}
 
-	return fmt.Errorf("None of the authentication mechanisms (ADC, credentials_file, credentials_json) is available.")
+	// Application Default Credentials (ADC)
+	ctx := context.Background()
+	if _, err := google.FindDefaultCredentials(ctx, pubsub.ScopePubSub); err == nil {
+		return nil
+	}
+
+	return fmt.Errorf("no authentication credentials were configured or detected " +
+		"(credentials_file, credentials_json, and application default credentials (ADC))")
 }
 
 func defaultConfig() config {
