@@ -326,7 +326,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
 - Release Google Cloud module as GA. {pull}17511[17511]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
-- Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
+- Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
 
 *Heartbeat*
 
