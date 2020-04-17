@@ -203,7 +203,7 @@ func defaultTestConfig() *common.Config {
 			"name":   emulatorSubscription,
 			"create": true,
 		},
-		"credentials_file": "NONE FOR EMULATOR TESTING",
+		"credentials_file": "testdata/fake.json",
 	})
 }
 
