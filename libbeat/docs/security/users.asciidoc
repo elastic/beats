@@ -306,13 +306,18 @@ the following privilege:
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
+
+| Spaces
+| `Read` or `All` on Dashboards, Visualize and Discover
+| Allow the user to view, edit, and create dashboards, as well as browse data.
+
+ifdef::beat_kib_app[]
+| Spaces
+| `Read` or `All` on {beat_kib_app}
+| Allow the use of {beat_kib_app}
+endif::[]
 |====
 
-. Add {kibana-ref}/kibana-privileges.html[{kib} privileges] for the {kib} apps
-the user will need to access within the appropriate {kib} spaces. This typically comprises the
-ifdef::beat_kib_app[]
-{beat_kib_app},
-endif::[]
 Dashboard, Visualize, and Discover apps.
 
 . Assign the *reader role*, along with the following built-in roles, to
