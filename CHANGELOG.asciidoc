@@ -15,14 +15,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Change `aws_elb` autodiscovery provider field name from `elb_listener.*` to `aws.elb.*`. {issue}16219[16219] {pull}16402[16402]
 - Remove support for using `add_docker_metadata` and `add_kubernetes_metadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 
-*Journalbeat*
-
-- Improve parsing of `syslog.pid` in Journalbeat to strip the username when present. {pull}16116[16116]
-
-*Metricbeat*
-
-- Add new dashboard for VSphere host cluster and virtual machine. {pull}14135[14135]
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -35,7 +27,6 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 - Remove superfluous use of `number_of_routing_shards` setting from the default template. {pull}16038[16038]
 - Automatically convert index names to lowercase. {pull}16081[16081]
 - Fix loading processor annotation hints, allowing the value to be a full configuration section. {pull}16348[16348]
-- Upgrade go-ucfg to latest v0.8.3. {pull}16450[16450]
 - Add `ssl.ca_sha256` to the list of supported TLS options. This option allows you to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. No longer requires the user to have `labels.dedot: true` in the configuration as it is now properly the default. {pull}16857[16857]
 - Improve logging messages for the `add_kubernetes_metadata` processor. {pull}16866[16866]
@@ -140,6 +131,11 @@ configure the auditd module and use processors to enrich events with metadata.
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 
+*Journalbeat*
+
+- Improve parsing of `syslog.pid` in Journalbeat to strip the username when
+present. {pull}16116[16116]
+
 *Metricbeat*
 
 - Add lambda metricset in aws module. {pull}15260[15260]
@@ -191,6 +187,7 @@ configure the auditd module and use processors to enrich events with metadata.
 - Release the vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add PubSub metricset to Google Cloud Platform module. {pull}15536[15536]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
+- Add dashboard for VSphere host cluster and virtual machine. {pull}14135[14135]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Release the azure module as GA. {pull}17319[17319]
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
