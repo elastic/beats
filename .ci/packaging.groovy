@@ -126,7 +126,7 @@ def release(){
 }
 
 def withMacOSEnv(Closure body){
-  withMaskEnv( vars: [
+  withEnvMask( vars: [
       [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
       [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
       [var: "APPLE_SIGNING_ENABLED", password: "true"],
