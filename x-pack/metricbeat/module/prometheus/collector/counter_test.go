@@ -50,13 +50,13 @@ func Test_CounterCache(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			for i, val := range tt.valuesUint64 {
 				want := tt.expectedUin64[i]
-				if got := tt.counterCache.RateUint64(tt.counterName, val); got != want {
+				if got, _ := tt.counterCache.RateUint64(tt.counterName, val); got != want {
 					t.Errorf("counterCache.RateUint64() = %v, want %v", got, want)
 				}
 			}
 			for i, val := range tt.valuesFloat64 {
 				want := tt.expectedFloat64[i]
-				if got := tt.counterCache.RateFloat64(tt.counterName, val); got != want {
+				if got, _ := tt.counterCache.RateFloat64(tt.counterName, val); got != want {
 					t.Errorf("counterCache.RateFloat64() = %v, want %v", got, want)
 				}
 			}
