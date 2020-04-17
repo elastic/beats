@@ -283,7 +283,10 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 		retryMax = 1000
 	}
 	k.Producer.Retry.Max = retryMax
-	// TODO: k.Producer.Retry.Backoff = ?
+
+	// Configure backoff function
+	b := backoff.NewEqualJitterBackoff(nil, config.Backoff.Init, config.Backoff.Max)
+	k.Producer.Retry.BackoffFunc = func(_, _ int) time.Duration { return b.WaitDuration() }
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
