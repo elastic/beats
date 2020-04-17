@@ -64,76 +64,6 @@ func (p *wrapClientPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 	return client, err
 }
 
-// countingClient adds and substracts from a counter when events have been
-// published, dropped or ACKed. The countingClient can be used to keep track of
-// inflight events for a beat.Client instance. The counter is updated after the
-// client has been disconnected from the publisher pipeline via 'Closed'.
-type countingClient struct {
-	counter eventCounter
-	client  beat.Client
-}
-
-type eventCounter interface {
-	Add(n int)
-	Done()
-}
-
-type countingEventer struct {
-	wgEvents eventCounter
-}
-
-type combinedEventer struct {
-	a, b beat.ClientEventer
-}
-
-func (c *countingClient) Publish(event beat.Event) {
-	c.counter.Add(1)
-	c.client.Publish(event)
-}
-
-func (c *countingClient) PublishAll(events []beat.Event) {
-	c.counter.Add(len(events))
-	c.client.PublishAll(events)
-}
-
-func (c *countingClient) Close() error {
-	return c.client.Close()
-}
-
-func (*countingEventer) Closing()   {}
-func (*countingEventer) Closed()    {}
-func (*countingEventer) Published() {}
-
-func (c *countingEventer) FilteredOut(_ beat.Event) {}
-func (c *countingEventer) DroppedOnPublish(_ beat.Event) {
-	c.wgEvents.Done()
-}
-
-func (c *combinedEventer) Closing() {
-	c.a.Closing()
-	c.b.Closing()
-}
-
-func (c *combinedEventer) Closed() {
-	c.a.Closed()
-	c.b.Closed()
-}
-
-func (c *combinedEventer) Published() {
-	c.a.Published()
-	c.b.Published()
-}
-
-func (c *combinedEventer) FilteredOut(event beat.Event) {
-	c.a.FilteredOut(event)
-	c.b.FilteredOut(event)
-}
-
-func (c *combinedEventer) DroppedOnPublish(event beat.Event) {
-	c.a.DroppedOnPublish(event)
-	c.b.DroppedOnPublish(event)
-}
-
 // WithClientConfigEdit creates a pipeline connector, that allows the
 // beat.ClientConfig to be modified before connecting to the underlying
 // pipeline.
@@ -158,28 +88,4 @@ func WithDefaultGuarantees(pipeline beat.PipelineConnector, mode beat.PublishMod
 // wrap the client to provide additional functionality.
 func WithClientWrapper(pipeline beat.PipelineConnector, wrap ClientWrapper) beat.PipelineConnector {
 	return &wrapClientPipeline{parent: pipeline, wrapper: wrap}
-}
-
-// WithPipelineEventCounter adds a counter to the pipeline that keeps track of
-// all events published, dropped and ACKed by any active client.
-// The type accepted by counter is compatible with sync.WaitGroup.
-func WithPipelineEventCounter(pipeline beat.PipelineConnector, counter eventCounter) beat.PipelineConnector {
-	counterListener := &countingEventer{counter}
-
-	pipeline = WithClientConfigEdit(pipeline, func(config beat.ClientConfig) (beat.ClientConfig, error) {
-		if evts := config.Events; evts != nil {
-			config.Events = &combinedEventer{evts, counterListener}
-		} else {
-			config.Events = counterListener
-		}
-		return config, nil
-	})
-
-	pipeline = WithClientWrapper(pipeline, func(client beat.Client) beat.Client {
-		return &countingClient{
-			counter: counter,
-			client:  client,
-		}
-	})
-	return pipeline
 }
