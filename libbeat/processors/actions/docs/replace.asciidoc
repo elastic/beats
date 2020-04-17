@@ -1,0 +1,47 @@
+[[replace-fields]]
+=== Replace fields from events
+
+++++
+<titleabbrev>replace</titleabbrev>
+++++
+
+The `replace` processor takes a list of fields to replace the field values 
+matching a pattern with replacement string. Under the `fields` key, each entry 
+contains a `field: field-name`, `pattern: regex-pattern` and 
+`replacement: replacement-string`, where:
+
+* `field` is the original field name
+* `pattern` is regex pattern to match field's value
+* `replacement` is the replacement string to use for updating the field's value
+
+The `replace` processor cannot be used to replace value with a completely new value. 
+
+TIP: You can replace fields values to truncate part of field value or replace 
+it with a new string. It can be used for masking PII information also.
+
+[source,yaml]
+-------
+processors:
+- replace:
+    fields:
+     - field: "file.path"
+       pattern: "/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/"
+       replacement: "/"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+The `replace` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be replaced is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the renaming of
+fields is stopped and the original event is returned. If set to false, renaming
+continues also if an error happened during renaming. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+You can specify multiple `ignore_missing` processors under the `processors`
+section.
+

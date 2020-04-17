@@ -19,8 +19,9 @@ package actions
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"regexp"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -36,14 +37,14 @@ type replaceString struct {
 
 type replaceStringConfig struct {
 	Fields        []replaceConfig `config:"fields"`
-	IgnoreMissing bool          `config:"ignore_missing"`
-	FailOnError   bool          `config:"fail_on_error"`
+	IgnoreMissing bool            `config:"ignore_missing"`
+	FailOnError   bool            `config:"fail_on_error"`
 }
 
 type replaceConfig struct {
-	Field   string `config:"field"`
-	Pattern *regexp.Regexp `config:"pattern"`
-	Replacement string `config:"replacement"`
+	Field       string         `config:"field"`
+	Pattern     *regexp.Regexp `config:"pattern"`
+	Replacement string         `config:"replacement"`
 }
 
 func init() {

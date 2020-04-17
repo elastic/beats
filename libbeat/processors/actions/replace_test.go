@@ -42,8 +42,8 @@ func TestReplaceRun(t *testing.T) {
 			description: "simple field replacing",
 			Fields: []replaceConfig{
 				{
-					Field:   "f",
-					Pattern: regexp.MustCompile(`a`),
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`a`),
 					Replacement: "b",
 				},
 			},
@@ -61,8 +61,8 @@ func TestReplaceRun(t *testing.T) {
 			description: "Add one more hierarchy to event",
 			Fields: []replaceConfig{
 				{
-					Field:   "f.b",
-					Pattern: regexp.MustCompile(`a`),
+					Field:       "f.b",
+					Pattern:     regexp.MustCompile(`a`),
 					Replacement: "b",
 				},
 			},
@@ -84,13 +84,13 @@ func TestReplaceRun(t *testing.T) {
 			description: "replace two fields at the same time.",
 			Fields: []replaceConfig{
 				{
-					Field:   "f",
-					Pattern: regexp.MustCompile(`a.*c`),
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`a.*c`),
 					Replacement: "cab",
 				},
 				{
-					Field:   "g",
-					Pattern: regexp.MustCompile(`ef`),
+					Field:       "g",
+					Pattern:     regexp.MustCompile(`ef`),
 					Replacement: "oor",
 				},
 			},
@@ -110,13 +110,13 @@ func TestReplaceRun(t *testing.T) {
 			description: "test missing fields",
 			Fields: []replaceConfig{
 				{
-					Field:   "f",
-					Pattern: regexp.MustCompile(`abc`),
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`abc`),
 					Replacement: "xyz",
 				},
 				{
-					Field:   "g",
-					Pattern: regexp.MustCompile(`def`),
+					Field:       "g",
+					Pattern:     regexp.MustCompile(`def`),
 					Replacement: "",
 				},
 			},
@@ -164,8 +164,8 @@ func TestReplaceRun(t *testing.T) {
 
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
-		Field     string
-		Pattern   *regexp.Regexp
+		Field         string
+		Pattern       *regexp.Regexp
 		Replacement   string
 		ignoreMissing bool
 		failOnError   bool
@@ -176,8 +176,8 @@ func TestReplaceField(t *testing.T) {
 	}{
 		{
 			description: "replace part of field value with another string",
-			Field:   "f",
-			Pattern: regexp.MustCompile(`a`),
+			Field:       "f",
+			Pattern:     regexp.MustCompile(`a`),
 			Replacement: "b",
 			Input: common.MapStr{
 				"f": "abc",
@@ -191,8 +191,8 @@ func TestReplaceField(t *testing.T) {
 		},
 		{
 			description: "Add hierarchy to event and replace",
-			Field:   "f.b",
-			Pattern: regexp.MustCompile(`a`),
+			Field:       "f.b",
+			Pattern:     regexp.MustCompile(`a`),
 			Replacement: "b",
 			Input: common.MapStr{
 				"f": common.MapStr{
@@ -210,8 +210,8 @@ func TestReplaceField(t *testing.T) {
 		},
 		{
 			description: "try replacing value of missing fields in event",
-			Field:   "f",
-			Pattern: regexp.MustCompile(`abc`),
+			Field:       "f",
+			Pattern:     regexp.MustCompile(`abc`),
 			Replacement: "xyz",
 			Input: common.MapStr{
 				"m": "abc",
