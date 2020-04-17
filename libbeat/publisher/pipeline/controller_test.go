@@ -104,7 +104,7 @@ func TestOutputReload(t *testing.T) {
 				return waitUntilTrue(timeout, func() bool {
 					return uint(numEventsToPublish) == publishedCount.Load()
 				})
-			}, &quick.Config{MaxCount: 10})
+			}, &quick.Config{MaxCount: 1})
 
 			if err != nil {
 				t.Error(err)
