@@ -20,7 +20,6 @@
 - Improved cancellation of agent {pull}17318[17318]
 - Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
 
-
 ==== New features
 
 - Generate index name in a format type-dataset-namespace {pull}16903[16903]
