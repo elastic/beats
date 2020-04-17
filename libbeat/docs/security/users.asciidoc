@@ -283,7 +283,7 @@ endif::apm-server[]
 . Assign the *writer role* to users who will index events into {es}.
 
 [[kibana-user-privileges]]
-==== Grant privileges and roles needed to read {beatname_uc} data from Kibana
+==== Grant privileges and roles needed to read {beatname_uc} data from {kib}
 
 {kib} users typically need to view dashboards and visualizations that contain
 {beatname_uc} data. These users might also need to create and edit dashboards
@@ -308,7 +308,7 @@ the following privilege:
 |Read data indexed by {beatname_uc}
 
 | Spaces
-| `Read` or `All` on Dashboards, Visualize and Discover
+| `Read` or `All` on Dashboards, Visualize, and Discover
 | Allow the user to view, edit, and create dashboards, as well as browse data.
 
 ifdef::beat_kib_app[]
@@ -326,7 +326,7 @@ users who need to read {beatname_uc} data:
 |Role | Purpose
 
 | `monitoring_user`
-| Allow users to monitor the health of the beat itself. Only assign this role to users who manage {beatname_uc}.
+| Allow users to monitor the health of {beatname_uc} itself. Only assign this role to users who manage {beatname_uc}.
 
 ifdef::has_central_config[]
 |`beats_admin`
