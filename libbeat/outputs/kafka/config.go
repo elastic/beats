@@ -284,7 +284,8 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	}
 	k.Producer.Retry.Max = retryMax
 
-	// Configure backoff function
+	// Configure backoff function. We use equal-jitter as it's the same strategy
+	// used by other outputs (elasticsearch, logstash, redis).
 	b := backoff.NewEqualJitterBackoff(nil, config.Backoff.Init, config.Backoff.Max)
 	k.Producer.Retry.BackoffFunc = func(_, _ int) time.Duration { return b.WaitDuration() }
 
