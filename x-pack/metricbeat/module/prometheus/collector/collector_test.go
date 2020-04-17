@@ -13,7 +13,7 @@ import (
 
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
 
-	// Import common fields
+	// Import common fields for validation
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 )
 

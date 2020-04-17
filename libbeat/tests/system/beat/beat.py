@@ -574,8 +574,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         dictfields.append(newName)
 
                 if field.get("type") == "object" and field.get("object_type") == "histogram":
-                    fields.append(newName + ".counts")
                     fields.append(newName + ".values")
+                    fields.append(newName + ".counts")
 
                 if field.get("type") == "alias":
                     aliases.append(newName)
