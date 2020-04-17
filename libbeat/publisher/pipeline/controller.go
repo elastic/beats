@@ -121,7 +121,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 			c.retryer.sigOutputRemoved()
 		}
 	}
-	c.retryer.updOutput(c.workQueue)
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}

@@ -112,13 +112,6 @@ func (r *retryer) sigOutputRemoved() {
 	r.sig <- retryerSignal{tag: sigRetryerOutputRemoved}
 }
 
-func (r *retryer) updOutput(ch workQueue) {
-	r.sig <- retryerSignal{
-		tag:     sigRetryerUpdateOutput,
-		channel: ch,
-	}
-}
-
 func (r *retryer) retry(b Batch) {
 	r.in <- batchEvent{tag: retryBatch, batch: b}
 }
@@ -212,8 +205,6 @@ func (r *retryer) loop() {
 
 		case sig := <-r.sig:
 			switch sig.tag {
-			case sigRetryerUpdateOutput:
-				r.out = sig.channel
 			case sigRetryerOutputAdded:
 				numOutputs++
 			case sigRetryerOutputRemoved:
