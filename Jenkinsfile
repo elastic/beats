@@ -673,6 +673,8 @@ def withBeatsEnv(boolean archive, Closure body) {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
+      // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+      // See https://github.com/elastic/beats/issues/17787.
       setGitConfig()
       try {
         if(!params.dry_run){
@@ -960,7 +962,7 @@ def getVendorPatterns(beatName){
 def setGitConfig(){
   sh(label: 'check git config', script: '''
     if [ -z "$(git config --get user.email)" ]; then
-      git config user.email "58790750+beatsmachine@users.noreply.github.com"
+      git config user.email "beatsmachine@users.noreply.github.com"
       git config user.name "beatsmachine"
     fi
   ''')
