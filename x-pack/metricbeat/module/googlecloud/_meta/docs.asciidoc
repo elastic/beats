@@ -86,6 +86,29 @@ metricbeat.modules:
   period: 10m
 ----
 
+* `compute` metricset is enabled to collect metrics from a specific zone
+`us-central1a` in `test-project`. Metric types collected by `compute` metricset
+usually have 240 seconds ingest delay time and 60 seconds sample period. With
+`period` specified as `5m` in the config below and given `perSeriesAligner: ALIGN_NONE`
+specified, Metricbeat will collect compute metrics from googlecloud every
+5-minute with `perSeriesAligner = ALIGN_NONE` aggregation, which means no aligner
+is applied. This way, Metricbeat will collect `compute` metrics every 5-minute and
+each collection will return 5 data points(one per sample period).
++
+[source,yaml]
+----
+metricbeat.modules:
+- module: googlecloud
+  metricsets:
+    - compute
+  zone: "us-central1a"
+  project_id: "test-project"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  perSeriesAligner: ALIGN_NONE
+  period: 5m
+----
+
 [float]
 == Authentication, authorization and permissions.
 Authentication and authorization in Google Cloud Platform can be achieved in many ways. For the current version of the Google Cloud Platform module for Metricbeat, the only supported method is using Service Account JSON files. A typical JSON with a private key looks like this:
