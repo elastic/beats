@@ -12,6 +12,9 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
+
+	// Import common fields for validation
+	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 )
 
 func TestData(t *testing.T) {
