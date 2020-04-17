@@ -195,6 +195,9 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 			handleSignal(sig)
 		case out <- batch:
 			batch = nil
+			if paused {
+				out = nil
+			}
 		}
 	}
 }
