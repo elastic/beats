@@ -30,9 +30,15 @@ type stackdriverMetricsRequester struct {
 	logger *logp.Logger
 }
 
-func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, timeInterval *monitoringpb.TimeInterval, needsAggregation bool) (out []*monitoringpb.TimeSeries) {
-	out = make([]*monitoringpb.TimeSeries, 0)
+type timeSeriesWithAligner struct {
+	timeSeries []*monitoringpb.TimeSeries
+	aligner    string
+}
 
+func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, timeInterval *monitoringpb.TimeInterval, needsAggregation bool) (out timeSeriesWithAligner) {
+	timeSeries := make([]*monitoringpb.TimeSeries, 0)
+
+	aggregation := constructAggregation(r.config.period, r.config.PerSeriesAligner, needsAggregation)
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:        "projects/" + r.config.ProjectID,
 		Interval:    timeInterval,
@@ -53,9 +59,11 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string, time
 			break
 		}
 
-		out = append(out, resp)
+		timeSeries = append(timeSeries, resp)
 	}
 
+	out.aligner = aggregation.PerSeriesAligner.String()
+	out.timeSeries = timeSeries
 	return
 }
 
@@ -71,10 +79,10 @@ func constructFilter(m string, region string, zone string) string {
 	return filter
 }
 
-func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, metricTypes []string, metricsMeta map[string]metricMeta) ([]*monitoringpb.TimeSeries, error) {
+func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, metricTypes []string, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
-	results := make([]*monitoringpb.TimeSeries, 0)
+	results := make([]timeSeriesWithAligner, 0)
 
 	for _, mt := range metricTypes {
 		metricType := mt
@@ -89,7 +97,7 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, metricTypes [
 
 			lock.Lock()
 			defer lock.Unlock()
-			results = append(results, ts...)
+			results = append(results, ts)
 		}(metricType)
 	}
 

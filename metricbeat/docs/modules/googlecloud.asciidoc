@@ -28,7 +28,7 @@ This is a list of the possible module parameters you can tune:
 
 * *period*: A single time duration specified for this module collection frequency.
 
-* *perSeriesAligner*: A single string with which operation need to be applied onto time series data for aggregation.
+* *perSeriesAligner*: A single string with which aggregation operation need to be applied onto time series data for ListTimeSeries API .
 If it's not given and sample period of a specific metric type is larger or equal than module collection period, default perSeriesAligner is set to be `ALIGN_NONE`.
 If it's not given and sample period of a specific metric type is smaller than module collection period, default perSeriesAligner is set to be `ALIGN_MEAN`.
 Sample period of each metric type is obtained from making https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list [ListMetricDescriptors API] call.

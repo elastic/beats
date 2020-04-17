@@ -15,3 +15,6 @@
           type: object
         - name: system.*
           type: object
+        - name: aggregation_aligner
+          type: keyword
+          description: Aggregation perSeriesAligner used for ListTimeSeries API.

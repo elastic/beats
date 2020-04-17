@@ -126,7 +126,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSeries) ([]mb.Event, error) {
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger())
 
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
