@@ -17,10 +17,13 @@
 
 package backoff
 
+import "time"
+
 // Backoff defines the interface for backoff strategies.
 type Backoff interface {
 	Wait() bool
 	Reset()
+	WaitDuration() time.Duration
 }
 
 // WaitOnError is a convenience method, if an error is received it will block, if not errors is
