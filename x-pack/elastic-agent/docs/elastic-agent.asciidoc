@@ -54,7 +54,7 @@ The Elastic Agent receive a configuration encoded as a JSON object.
 {
   "type": "UPGRADE",
   "id": "id1",
-  "to": "7.2.1"
+  "target_version": "7.2.1"
 }
 ------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ The Elastic Agent receive a configuration encoded as a JSON object.
 {
   "type": "DOWNGRADE",
   "id": "id1",
-  "to": "7.2.1"
+  "target_version": "7.2.1"
 }
 ------------------------------------------------------------------------------
 
