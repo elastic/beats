@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"fmt"
 	"math"
 	"sync"
 	"testing"
@@ -56,27 +55,18 @@ func TestMakeClientWorker(t *testing.T) {
 				publishFn := func(batch publisher.Batch) error {
 					batchCount++
 					published.Add(uint(len(batch.Events())))
-					fmt.Printf("received batch %p of size: %d -> events: %d/%d, batches: %d/%d\n",
-						batch, len(batch.Events()),
-						published.Load(), numEvents.Load(),
-						batchCount, numBatches,
-					)
 					return nil
 				}
 
 				client := ctor(publishFn)
 
 				worker := makeClientWorker(nilObserver, wqu, client)
-				defer func() {
-					fmt.Println("shut down client worker")
-					worker.Close()
-				}()
+				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
 					batch := randomBatch(50, 150).withRetryer(retryer)
 					numEvents.Add(uint(len(batch.Events())))
 					wqu <- batch
-					fmt.Printf("send batch %p of size: %d\n", batch, len(batch.Events()))
 				}
 
 				// Give some time for events to be published
@@ -111,9 +101,6 @@ func TestReplaceClientWorker(t *testing.T) {
 			err := quick.Check(func(i uint) bool {
 				numBatches := 10000 + (i % 100) // between 1000 and 1099
 
-				fmt.Printf("Starting test with numBatch: %d\n", numBatches)
-				defer fmt.Printf("Finished test with numBatch: %d\n", numBatches)
-
 				wqu := makeWorkQueue()
 				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
 				defer retryer.close()
@@ -129,13 +116,9 @@ func TestReplaceClientWorker(t *testing.T) {
 				var wg sync.WaitGroup
 				wg.Add(1)
 				go func() {
-					fmt.Println("start forwarding batches")
-					defer fmt.Println("stopped forwarding batches")
-
 					defer wg.Done()
 					for _, batch := range batches {
 						wqu <- batch
-						// fmt.Printf("send batch %p of size: %d\n", batch, len(batch.Events()))
 					}
 				}()
 
@@ -147,26 +130,13 @@ func TestReplaceClientWorker(t *testing.T) {
 				var batchCount int
 				blockingPublishFn := func(batch publisher.Batch) error {
 					batchCount++
-					// fmt.Printf("(blocking) received batch %p of size: %d -> events: %d/%d, batches: %d/%d\n",
-					// 	batch, len(batch.Events()),
-					// 	publishedFirst.Load(), numEvents,
-					// 	batchCount, numBatches,
-					// )
-
 					// Emulate blocking. Upon unblocking the in-flight batch that was
 					// blocked is published.
 					if publishedFirst.Load() >= publishLimit {
-						// fmt.Printf("(blocking) blocking processing waiting for signal. count=%v, limit=%v\n",
-						// 	publishedFirst.Load(),
-						// 	publishLimit,
-						// )
 						<-blockCtrl
 					}
 
 					publishedFirst.Add(uint(len(batch.Events())))
-					// if publishedFirst.Load() >= publishLimit {
-					// 	time.Sleep(500 * time.Millisecond)
-					// }
 					return nil
 				}
 
@@ -176,24 +146,16 @@ func TestReplaceClientWorker(t *testing.T) {
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
 				progress := waitUntilTrue(timeout, func() bool {
-					// fmt.Printf("waiting progress: count=%d, limit=%d\n",
-					// 	publishedFirst.Load(),
-					// 	publishLimit,
-					// )
 					return publishedFirst.Load() >= publishLimit
 				})
 				if !progress {
 					return false
 				}
-				fmt.Println("progress detected")
 
 				// Close worker before all batches have had time to be published
-				fmt.Println("closing worker")
 				err := worker.Close()
 				require.NoError(t, err)
-				fmt.Println("worker closed")
 
-				fmt.Println("unblock output")
 				close(blockCtrl)
 
 				// Start new worker to drain work queue
