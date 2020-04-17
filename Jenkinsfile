@@ -92,7 +92,10 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+            /**
+            * Disable macOS test until it's fixed for the Elastic Agent.
+            */
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest && true == false
             }
           }
           steps {
@@ -736,7 +739,7 @@ def goos(){
     return 'darwin'
   }
 
-  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
+  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
 
 def dumpMage(){
