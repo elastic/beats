@@ -7,7 +7,7 @@
 source /usr/local/bin/bash_standard_lib.sh
 
 # shellcheck disable=SC1091
-source ./script/common.bash
+source ./dev-tools/common.bash
 
 # Docker images used on Dockerfiles 2019-07-12
 # aerospike:3.9.0
