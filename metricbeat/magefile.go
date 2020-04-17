@@ -157,6 +157,11 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.

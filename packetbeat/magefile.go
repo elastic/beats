@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"regexp"
@@ -37,7 +36,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -184,24 +183,6 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
-}
-
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------
