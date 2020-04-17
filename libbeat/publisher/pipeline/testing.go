@@ -127,11 +127,14 @@ func (b *mockBatch) Len() int {
 }
 
 func (b *mockBatch) withRetryer(r *retryer) *mockBatch {
-	tmp := &mockBatch{}
-	*tmp = *b
-	tmp.onRetry = func() { r.retry(b) }
-	tmp.onCancelled = func() { r.cancelled(b) }
-	return tmp
+	return &mockBatch{
+		events:      b.events,
+		onACK:       b.onACK,
+		onDrop:      b.onDrop,
+		onRetry:     func() { r.retry(b) },
+		onCancelled: func() { r.cancelled(b) },
+		onReduceTTL: b.onReduceTTL,
+	}
 }
 
 func signalFn(fn func()) {
