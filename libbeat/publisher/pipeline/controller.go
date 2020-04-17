@@ -100,18 +100,6 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
-	// Pause consumer
-	c.consumer.sigPause()
-
-	// close old output group's workers and "remove" them from the retryer
-	// so it temporarily stops processing the retry queue
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-			c.retryer.sigOutputRemoved()
-		}
-	}
-
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
@@ -126,14 +114,28 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	}
 
 	// update consumer and retryer
+	c.consumer.sigPause()
+	if c.out != nil {
+		for range c.out.outputs {
+			c.retryer.sigOutputRemoved()
+		}
+	}
+	c.retryer.updOutput(c.workQueue)
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}
 	c.consumer.updOutput(grp)
 
+	// close old group, so events are send to new workQueue via retryer
+	if c.out != nil {
+		for _, w := range c.out.outputs {
+			w.Close()
+		}
+	}
+
 	c.out = grp
 
-	// restart consumer (potentially blocked by retryer as well)
+	// restart consumer (potentially blocked by retryer)
 	c.consumer.sigContinue()
 	c.consumer.sigUnWait()
 
