@@ -76,14 +76,14 @@ func TestHTTPClient(t *testing.T) {
 		},
 	))
 
-	t.Run("Fleet user agent", withServer(
+	t.Run("Elastic Agent User-Agent string", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, msg)
-				require.Equal(t, r.Header.Get("User-Agent"), "Beat Agent v8.0.0")
+				require.Equal(t, r.Header.Get("User-Agent"), "Elastic Agent v8.0.0")
 			})
 			return mux
 		}, func(t *testing.T, host string) {
