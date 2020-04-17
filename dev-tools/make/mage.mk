@@ -11,7 +11,7 @@ PWD           := $(CURDIR)
 #
 # Includes
 #
-include $(ES_BEATS)/dev-tools/make/mage.mk
+include $(ES_BEATS)/dev-tools/make/mage-install.mk
 
 #
 # Targets (alphabetically sorted).

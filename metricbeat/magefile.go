@@ -196,7 +196,7 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest(devtools.NewIntegrationEnvFromDir("."), "pythonIntegTest", func() error {
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, devtools.ListMatchingEnvVars("NOSE_")...)
