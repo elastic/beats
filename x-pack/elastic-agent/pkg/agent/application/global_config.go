@@ -27,6 +27,24 @@ func init() {
 	common.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path, agent usually look for beats here")
 }
 
+// HomePath returns home path where.
+func HomePath() string {
+	if val, err := overwrites.String("path.home", -1); err == nil {
+		return val
+	}
+
+	return homePath
+}
+
+// DataPath returns data path where.
+func DataPath() string {
+	if val, err := overwrites.String("path.data", -1); err == nil {
+		return val
+	}
+
+	return dataPath
+}
+
 // InjectAgentConfig injects config to a provided configuration.
 func InjectAgentConfig(c *config.Config) error {
 	globalConfig := agentGlobalConfig()
