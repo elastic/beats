@@ -660,13 +660,13 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
-    if(os == 'linux'){
+    if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       // FIXME workaround until we fix the packer cache
       // Retry to avoid DDoS detection from the server
       retry(3) {
         sleep randomNumber(min: 2, max: 5)
-        sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
+        //sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
       }
     }
     dir("${env.BASE_DIR}") {
@@ -966,4 +966,8 @@ def setGitConfig(){
       git config user.name "beatsmachine"
     fi
   ''')
+}
+
+def isDockerInstalled(){
+  return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
 }
