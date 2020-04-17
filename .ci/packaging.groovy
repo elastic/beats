@@ -111,7 +111,7 @@ pipeline {
 def pushCIDockerImages(){
   sh(label: 'Push Docker image', script: '''
     if [ -n "$(command -v docker)" ]; then
-      docker images | grep 'docker.elastic.co/beats/' || true
+      docker images || true
     fi
   ''')
 }
