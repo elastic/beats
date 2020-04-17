@@ -761,7 +761,7 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
-    if(os == 'linux'){
+    if(os == 'linux' && arch == 'amd64'){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       // FIXME workaround until we fix the packer cache
       // Retry to avoid DDoS detection from the server
