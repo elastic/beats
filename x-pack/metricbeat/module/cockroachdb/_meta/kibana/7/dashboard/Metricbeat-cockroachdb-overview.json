@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Number of SQL connections"
+            },
             "gridData": {
               "h": 11,
               "i": "1",
@@ -30,10 +32,12 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "7.1.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "SQL queries"
+            },
             "gridData": {
               "h": 11,
               "i": "2",
@@ -44,10 +48,12 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "SQL queries",
-            "version": "7.1.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Replicas per Store"
+            },
             "gridData": {
               "h": 9,
               "i": "3",
@@ -58,10 +64,12 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Replicas per Store",
-            "version": "7.1.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Replica leaseholders"
+            },
             "gridData": {
               "h": 9,
               "i": "4",
@@ -72,10 +80,12 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Replica leaseholders",
-            "version": "7.1.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "Ranges"
+            },
             "gridData": {
               "h": 9,
               "i": "5",
@@ -86,35 +96,39 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Ranges",
-            "version": "7.1.0"
+            "version": "7.7.0"
           },
           {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 10,
-              "i": "6",
-              "w": 24,
-              "x": 0,
-              "y": 20
+            "embeddableConfig": {
+              "title": "Transaction duration"
             },
-            "panelIndex": "6",
-            "panelRefName": "panel_5",
-            "title": "Average log commit latency",
-            "version": "7.1.0"
-          },
-          {
-            "embeddableConfig": {},
             "gridData": {
               "h": 10,
-              "i": "7",
+              "i": "3f3f5af0-70f9-4ae7-97d8-4b967adaba0b",
               "w": 24,
               "x": 24,
               "y": 20
             },
-            "panelIndex": "7",
+            "panelIndex": "3f3f5af0-70f9-4ae7-97d8-4b967adaba0b",
+            "panelRefName": "panel_5",
+            "title": "Transaction duration",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "SQL service latency"
+            },
+            "gridData": {
+              "h": 10,
+              "i": "d90babce-4a35-49f5-8c79-6b20b632ada0",
+              "w": 24,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "d90babce-4a35-49f5-8c79-6b20b632ada0",
             "panelRefName": "panel_6",
-            "title": "Average command commit latency",
-            "version": "7.1.0"
+            "title": "SQL service latency",
+            "version": "7.7.0"
           }
         ],
         "timeRestore": false,
@@ -123,7 +137,7 @@
       },
       "id": "e3ba0c30-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -152,19 +166,19 @@
           "type": "visualization"
         },
         {
-          "id": "74cf44b0-9771-11e9-9eea-6f554992ec1f",
+          "id": "1a441d60-80bc-11ea-a7c9-d1992452caad",
           "name": "panel_5",
           "type": "visualization"
         },
         {
-          "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
+          "id": "cec58d20-80c4-11ea-a7c9-d1992452caad",
           "name": "panel_6",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-06-25T19:17:43.667Z",
-      "version": "WzU0LDFd"
+      "updated_at": "2020-04-17T16:12:53.718Z",
+      "version": "WzE0NjMsMV0="
     },
     {
       "attributes": {
@@ -229,12 +243,12 @@
       },
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:10:30.316Z",
-      "version": "WzUxLDFd"
+      "updated_at": "2020-04-17T13:14:14.169Z",
+      "version": "WzM2NCwxXQ=="
     },
     {
       "attributes": {
@@ -414,12 +428,12 @@
       },
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:41:34.934Z",
-      "version": "WzQ0LDFd"
+      "updated_at": "2020-04-17T13:14:14.169Z",
+      "version": "WzM2NSwxXQ=="
     },
     {
       "attributes": {
@@ -484,12 +498,12 @@
       },
       "id": "bad285b0-9769-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:06:30.737Z",
-      "version": "WzQ4LDFd"
+      "updated_at": "2020-04-17T13:14:14.169Z",
+      "version": "WzM2NiwxXQ=="
     },
     {
       "attributes": {
@@ -552,12 +566,12 @@
       },
       "id": "8add0960-976a-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:34:03.281Z",
-      "version": "WzQwLDFd"
+      "updated_at": "2020-04-17T13:14:14.169Z",
+      "version": "WzM2NywxXQ=="
     },
     {
       "attributes": {
@@ -581,9 +595,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -599,13 +615,20 @@
                     "field": "prometheus.ranges_underreplicated.value",
                     "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
+                  },
+                  {
+                    "function": "sum",
+                    "id": "9276aad0-80c3-11ea-892e-3376e69b9c9c",
+                    "type": "series_agg"
                   }
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
-                "split_mode": "everything",
+                "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null
+                "terms_field": "service.address",
+                "terms_size": "100",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -621,13 +644,20 @@
                     "field": "prometheus.ranges_overreplicated.value",
                     "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
+                  },
+                  {
+                    "function": "sum",
+                    "id": "c3f5b7e0-80c3-11ea-892e-3376e69b9c9c",
+                    "type": "series_agg"
                   }
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
-                "split_mode": "everything",
+                "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null
+                "terms_field": "service.address",
+                "terms_size": "100",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -641,15 +671,22 @@
                 "metrics": [
                   {
                     "field": "prometheus.ranges_unavailable.value",
-                    "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
+                    "id": "57745040-80c3-11ea-892e-3376e69b9c9c",
                     "type": "max"
+                  },
+                  {
+                    "function": "sum",
+                    "id": "6b4455c0-80c3-11ea-892e-3376e69b9c9c",
+                    "type": "series_agg"
                   }
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
-                "split_mode": "everything",
+                "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null
+                "terms_field": "service.address",
+                "terms_size": "100",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -657,6 +694,7 @@
                 "color": "rgba(204,204,204,1)",
                 "fill": 0.5,
                 "formatter": "number",
+                "hidden": false,
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Total",
                 "line_width": 1,
@@ -665,13 +703,22 @@
                     "field": "prometheus.ranges.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "function": "sum",
+                    "id": "f7793cf0-80c2-11ea-892e-3376e69b9c9c",
+                    "sigma": "",
+                    "type": "series_agg"
                   }
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
-                "split_mode": "everything",
+                "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": null
+                "terms_field": "service.address",
+                "terms_size": "100",
+                "type": "timeseries"
               }
             ],
             "show_grid": 1,
@@ -685,12 +732,12 @@
       },
       "id": "2af19b90-976c-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:38:28.645Z",
-      "version": "WzQyLDFd"
+      "updated_at": "2020-04-17T15:56:34.610Z",
+      "version": "WzE0MTgsMV0="
     },
     {
       "attributes": {
@@ -698,72 +745,161 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Log commit latency [Metricbeat CockroachDB]",
+        "title": "Transaction duration [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [],
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "99th percentile, ns",
+                "field": "prometheus.txn_durations.histogram",
+                "percents": [
+                  99
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "service.address",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
           "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "auto",
-            "series": [
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
               {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(104,188,0,1)",
-                "fill": 0.5,
-                "filter": "",
-                "formatter": "ns,ms,2",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Average log commit latency",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "agg_with": "avg",
-                    "field": "prometheus.raft_process_logcommit_latency.histogram",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "order": "desc",
-                    "size": 1,
-                    "type": "max"
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_color_mode": "rainbow",
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "service.address",
-                "value_template": "{{value}}ms"
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
               }
             ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "@timestamp",
-            "type": "timeseries"
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "99th percentile, ns"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "lineWidth": 2,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "99th percentile, ns"
+                },
+                "type": "value"
+              }
+            ]
           },
-          "title": "Log commit latency [Metricbeat CockroachDB]",
-          "type": "metrics"
+          "title": "Transaction duration [Metricbeat CockroachDB]",
+          "type": "line"
         }
       },
-      "id": "74cf44b0-9771-11e9-9eea-6f554992ec1f",
+      "id": "1a441d60-80bc-11ea-a7c9-d1992452caad",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
-      "references": [],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:08:05.279Z",
-      "version": "WzQ5LDFd"
+      "updated_at": "2020-04-17T16:12:16.354Z",
+      "version": "WzE0NTksMV0="
     },
     {
       "attributes": {
@@ -771,73 +907,162 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Command commit latency [Metricbeat CockroachDB]",
+        "title": "SQL service latency [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [],
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "99th percentile, ns",
+                "field": "prometheus.sql_service_latency.histogram",
+                "percents": [
+                  99
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "scaleMetricValues": false,
+                "timeRange": {
+                  "from": "now-15m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "service.address",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
           "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "auto",
-            "series": [
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
               {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "rgba(104,188,0,1)",
-                "fill": 0.5,
-                "filter": "",
-                "formatter": "ns,ms,2",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Average command commit latency",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "agg_with": "avg",
-                    "field": "prometheus.raft_process_commandcommit_latency.histogram",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "order": "desc",
-                    "size": 1,
-                    "type": "max"
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_color_mode": "rainbow",
-                "split_mode": "terms",
-                "stacked": "none",
-                "terms_field": "service.address",
-                "value_template": "{{value}}ms"
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
               }
             ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "@timestamp",
-            "type": "timeseries"
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {},
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "99th percentile, ns"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "lineWidth": 2,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "99th percentile, ns"
+                },
+                "type": "value"
+              }
+            ]
           },
-          "title": "Command commit latency [Metricbeat CockroachDB]",
-          "type": "metrics"
+          "title": "SQL service latency [Metricbeat CockroachDB]",
+          "type": "line"
         }
       },
-      "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
+      "id": "cec58d20-80c4-11ea-a7c9-d1992452caad",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.7.0"
       },
-      "references": [],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:08:47.407Z",
-      "version": "WzUwLDFd"
+      "updated_at": "2020-04-17T16:10:09.757Z",
+      "version": "WzE0NTYsMV0="
     }
   ],
-  "version": "7.1.0"
+  "version": "7.7.0"
 }
