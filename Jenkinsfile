@@ -673,6 +673,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
+      setGitConfig()
       try {
         if(!params.dry_run){
           body()
@@ -954,4 +955,13 @@ def getVendorPatterns(beatName){
     """)
   }
   return output?.split('\n').collect{ item -> item as String }
+}
+
+def setGitConfig(){
+  sh(label: 'check git config', script: '''
+    if [ -z "$(git config --get user.email)" ]; then
+      git config user.email "58790750+beatsmachine@users.noreply.github.com"
+      git config user.name "beatsmachine"
+    fi
+  ''')
 }
