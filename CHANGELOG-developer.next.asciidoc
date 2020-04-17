@@ -28,16 +28,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
 - Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
-- Python 3 is required now to run python tests and tools. {pull}14798[14798]
-- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
-- The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
-- `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
-- Require logger as first parameter for `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
-- Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
 
 ==== Bugfixes
-
-- Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 
 ==== Added
 
@@ -68,4 +60,3 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
 - Added a `default_field` option to fields in fields.yml to offer a way to exclude fields from the default_field list. {issue}14262[14262] {pull}14341[14341]
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
-- Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
