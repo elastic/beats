@@ -26,6 +26,7 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
@@ -36,6 +37,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
+
+type backoffConfig struct {
+	Init time.Duration
+	Max  time.Duration
+}
 
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
@@ -55,6 +61,7 @@ type kafkaConfig struct {
 	BulkMaxSize        int                       `config:"bulk_max_size"`
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
 	Username           string                    `config:"username"`
@@ -122,10 +129,14 @@ func defaultConfig() kafkaConfig {
 		CompressionLevel: 4,
 		Version:          kafka.Version("1.0.0"),
 		MaxRetries:       3,
-		ClientID:         "beats",
-		ChanBufferSize:   256,
-		Username:         "",
-		Password:         "",
+		Backoff: backoffConfig{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
+		ClientID:       "beats",
+		ChanBufferSize: 256,
+		Username:       "",
+		Password:       "",
 	}
 }
 
