@@ -662,7 +662,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     unstash 'source'
     if(os == 'linux'){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      // FIXME workaround untill we fix the packer cache
+      // FIXME workaround until we fix the packer cache
       // Retry to avoid DDoS detection from the server
       retry(3) {
         sleep randomNumber(min: 2, max: 5)
