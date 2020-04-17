@@ -120,7 +120,7 @@ output.elasticsearch:
 #================================ Processors =====================================
 
 processors:
-  - add_observer_metadata:
+- add_observer_metadata:
   # Optional, but recommended geo settings for the location Heartbeat is running in
   #geo:
     # Token describing this location
