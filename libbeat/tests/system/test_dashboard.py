@@ -177,7 +177,6 @@ class Test(BaseTest):
         """
         Test testbeat export dashboard fails gracefully when dashboard with unknown ID is requested
         """
-        dashboard_id = 'No-such-dashboard'
         self.render_config_template()
         beat = self.start_beat(
             logging_args=["-e", "-d", "*"],
@@ -186,7 +185,7 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
-                        "-id", dashboard_id]
+                        "-id", "No-such-dashboard"]
         )
 
         beat.check_wait(exit_code=1)
