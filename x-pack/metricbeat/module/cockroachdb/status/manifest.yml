@@ -5,3 +5,15 @@ input:
   defaults:
     metrics_path: /_status/vars
     use_types: true
+processors:
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        # These metrics are duplicated in the Prometheus response and produce
+        # histograms with wrong counts and rates.
+        # XXX: Create an issue as follow-up of this
+        - prometheus.sql_mem_sql_max
+        - prometheus.sql_mem_sql_session
+        - prometheus.sql_mem_sql_session_max
+        - prometheus.sql_mem_sql_txn
+        - prometheus.sql_mem_sql_txn_max
