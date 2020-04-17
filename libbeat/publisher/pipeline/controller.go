@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -51,7 +52,7 @@ type outputGroup struct {
 	timeToLive int // event lifetime
 }
 
-type workQueue chan *Batch
+type workQueue chan publisher.Batch
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
 // instances.
@@ -143,7 +144,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 }
 
 func makeWorkQueue() workQueue {
-	return workQueue(make(chan *Batch, 0))
+	return workQueue(make(chan publisher.Batch, 0))
 }
 
 // Reload the output

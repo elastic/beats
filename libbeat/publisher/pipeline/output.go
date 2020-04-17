@@ -27,7 +27,6 @@ type worker struct {
 	observer outputObserver
 	qu       workQueue
 	done     chan struct{}
-	inFlight chan struct{}
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -74,9 +73,6 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 
 func (w *worker) close() {
 	close(w.done)
-	if w.inFlight != nil {
-		<-w.inFlight
-	}
 }
 
 func (w *clientWorker) Close() error {
@@ -97,14 +93,11 @@ func (w *clientWorker) run() {
 			if batch == nil {
 				continue
 			}
-			w.observer.outBatchSend(len(batch.events))
+			w.observer.outBatchSend(len(batch.Events()))
 
-			w.inFlight = make(chan struct{})
 			if err := w.client.Publish(batch); err != nil {
-				close(w.inFlight)
 				return
 			}
-			close(w.inFlight)
 		}
 	}
 }
@@ -157,14 +150,11 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			w.inFlight = make(chan struct{})
 			if err := w.client.Publish(batch); err != nil {
-				close(w.inFlight)
 				w.logger.Errorf("Failed to publish events: %v", err)
 				// on error return to connect loop
 				connected = false
 			}
-			close(w.inFlight)
 		}
 	}
 }

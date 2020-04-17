@@ -20,10 +20,10 @@ package pipeline
 import (
 	"flag"
 	"math/rand"
+	"sync"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -74,9 +74,79 @@ func (p mockProducer) Cancel() int                           { return 0 }
 
 type mockConsumer struct{}
 
-func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &Batch{}, nil }
+func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &batch{}, nil }
 func (c mockConsumer) Close() error                            { return nil }
 
+type mockBatch struct {
+	mu     sync.Mutex
+	events []publisher.Event
+
+	onEvents    func()
+	onACK       func()
+	onDrop      func()
+	onRetry     func()
+	onCancelled func()
+	onReduceTTL func() bool
+}
+
+func (b *mockBatch) Events() []publisher.Event {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	signalFn(b.onEvents)
+	return b.events
+}
+
+func (b *mockBatch) ACK()                                 { signalFn(b.onACK) }
+func (b *mockBatch) Drop()                                { signalFn(b.onDrop) }
+func (b *mockBatch) Retry()                               { signalFn(b.onRetry) }
+func (b *mockBatch) Cancelled()                           { signalFn(b.onCancelled) }
+func (b *mockBatch) RetryEvents(events []publisher.Event) { b.updateEvents(events); signalFn(b.onRetry) }
+
+func (b *mockBatch) reduceTTL() bool {
+	if b.onReduceTTL != nil {
+		return b.onReduceTTL()
+	}
+	return true
+}
+
+func (b *mockBatch) CancelledEvents(events []publisher.Event) {
+	b.updateEvents(events)
+	signalFn(b.onCancelled)
+}
+
+func (b *mockBatch) updateEvents(events []publisher.Event) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.events = events
+}
+
+func (b *mockBatch) Len() int {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return len(b.events)
+}
+
+func (b *mockBatch) withRetryer(r *retryer) *mockBatch {
+	tmp := &mockBatch{}
+	*tmp = *b
+	tmp.onRetry = func() { r.retry(b) }
+	tmp.onCancelled = func() { r.cancelled(b) }
+	return tmp
+}
+
+func signalFn(fn func()) {
+	if fn != nil {
+		fn()
+	}
+}
+
+func randomBatch(min, max int) *mockBatch {
+	return &mockBatch{
+		events: make([]publisher.Event, randIntBetween(min, max)),
+	}
+}
+
+/*
 func randomBatch(min, max int, wqu workQueue) *Batch {
 	numEvents := randIntBetween(min, max)
 	events := make([]publisher.Event, numEvents)
@@ -94,6 +164,7 @@ func randomBatch(min, max int, wqu workQueue) *Batch {
 
 	return &batch
 }
+*/
 
 // randIntBetween returns a random integer in [min, max)
 func randIntBetween(min, max int) int {

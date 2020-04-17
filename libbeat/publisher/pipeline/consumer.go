@@ -138,7 +138,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 	var (
 		out    workQueue
-		batch  *Batch
+		batch  Batch
 		paused = true
 	)
 
