@@ -318,8 +318,6 @@ ifdef::beat_kib_app[]
 endif::[]
 |====
 
-Dashboard, Visualize, and Discover apps.
-
 . Assign the *reader role*, along with the following built-in roles, to
 users who need to read {beatname_uc} data:
 +
