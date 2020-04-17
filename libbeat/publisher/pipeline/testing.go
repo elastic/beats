@@ -149,26 +149,6 @@ func randomBatch(min, max int) *mockBatch {
 	}
 }
 
-/*
-func randomBatch(min, max int, wqu workQueue) *Batch {
-	numEvents := randIntBetween(min, max)
-	events := make([]publisher.Event, numEvents)
-
-	consumer := newEventConsumer(logp.L(), mockQueue{}, &batchContext{})
-	retryer := newRetryer(logp.L(), nilObserver, wqu, consumer)
-
-	batch := Batch{
-		events: events,
-		ctx: &batchContext{
-			observer: nilObserver,
-			retryer:  retryer,
-		},
-	}
-
-	return &batch
-}
-*/
-
 // randIntBetween returns a random integer in [min, max)
 func randIntBetween(min, max int) int {
 	return rand.Intn(max-min) + min
