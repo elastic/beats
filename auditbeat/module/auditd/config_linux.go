@@ -98,11 +98,16 @@ var defaultConfig = Config{
 	ReassemblerTimeout:     2 * time.Second,
 	StreamBufferQueueSize:  8192,
 	StreamBufferConsumers:  0,
+	Reload: Reload{
+		Period:  10 * time.Second,
+		Enabled: true,
+	},
 }
 
-// IsEnabled returns true if the enable field is set to true in the config.
+// IsEnabled returns true if the enable field is set to true and the period is
+// not zero in the config.
 func (r *Reload) IsEnabled() bool {
-	return r != nil && (r.Enabled == true || r.Period != 0)
+	return r.Enabled == true && r.Period != 0
 }
 
 // Validate validates the rules specified in the config.
