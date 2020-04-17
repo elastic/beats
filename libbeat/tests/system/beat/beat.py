@@ -573,6 +573,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
 
+                if field.get("type") == "object" and field.get("object_type") == "histogram":
+                    fields.append(newName + ".values")
+                    fields.append(newName + ".counts")
+
                 if field.get("type") == "alias":
                     aliases.append(newName)
 
