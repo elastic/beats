@@ -103,6 +103,7 @@ func (er *Errors) IsEmpty() bool {
 	return len(*er) == 0
 }
 
-func newConfigError(err error) *Error {
+// NewConfigError wraps an error to be a management error of a specific ConfigError Type
+func NewConfigError(err error) *Error {
 	return &Error{Type: ConfigError, Err: err}
 }
