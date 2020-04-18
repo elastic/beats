@@ -73,7 +73,7 @@ const (
 // opTypeKey defines the metadata key name for event operation type.
 // The key's value can be an empty string, `create`, `index`, or `delete`. If empty, the event will be `create`d if the ID
 // is known, and `index`ed otherwise.
-const opTypeKey = "@metadata.op_type"
+const opTypeKey = "op_type"
 
 // NewClient instantiates a new client.
 func NewClient(
