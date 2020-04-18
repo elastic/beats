@@ -5,6 +5,8 @@
 package grpc
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
@@ -23,4 +25,8 @@ func (b *NoopBackoff) Reset() {}
 // Wait block until either the timer is completed or channel is done.
 func (b *NoopBackoff) Wait() bool {
 	return true
+}
+
+func (b *NoopBackoff) WaitDuration() time.Duration {
+	return 0
 }
