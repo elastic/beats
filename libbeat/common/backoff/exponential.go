@@ -60,6 +60,7 @@ func (b *ExpBackoff) Wait() bool {
 	}
 }
 
+// WaitDuration returns the duration to backoff for before trying again.
 func (b *ExpBackoff) WaitDuration() time.Duration {
 	backoff := b.duration
 	b.duration *= 2

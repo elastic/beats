@@ -62,6 +62,7 @@ func (b *EqualJitterBackoff) Wait() bool {
 	}
 }
 
+// WaitDuration returns the duration to backoff for before trying again.
 func (b *EqualJitterBackoff) WaitDuration() time.Duration {
 	// Make sure we have always some minimal back off and jitter.
 	temp := int64(b.duration / 2)

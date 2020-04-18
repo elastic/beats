@@ -27,6 +27,7 @@ func (b *NoopBackoff) Wait() bool {
 	return true
 }
 
+// WaitDuration returns the duration to backoff for before trying again.
 func (b *NoopBackoff) WaitDuration() time.Duration {
 	return 0
 }
