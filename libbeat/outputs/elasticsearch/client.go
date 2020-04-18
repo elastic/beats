@@ -282,7 +282,7 @@ func bulkEncodePublishRequest(
 		}
 		if opType, err := event.GetMetaStringValue(opTypeKey); err == nil && opType == opTypeDelete {
 			// We don't include the event source in a bulk DELETE
-			bulkItems = append(bulkItems, meta, nil)
+			bulkItems = append(bulkItems, meta)
 		} else {
 			bulkItems = append(bulkItems, meta, event)
 		}
