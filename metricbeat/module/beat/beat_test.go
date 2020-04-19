@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash_test
+package beat_test
 
 import (
 	"testing"
@@ -23,52 +23,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/beats/v7/metricbeat/module/beat"
 
 	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
-	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/beat/state"
+	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
 )
 
-func TestGetVertexClusterUUID(t *testing.T) {
-	tests := map[string]struct {
-		vertex              map[string]interface{}
-		overrideClusterUUID string
-		expectedClusterUUID string
-	}{
-		"vertex_and_override": {
-			map[string]interface{}{
-				"cluster_uuid": "v",
-			},
-			"o",
-			"v",
-		},
-		"vertex_only": {
-			vertex: map[string]interface{}{
-				"cluster_uuid": "v",
-			},
-			expectedClusterUUID: "v",
-		},
-		"override_only": {
-			overrideClusterUUID: "o",
-			expectedClusterUUID: "o",
-		},
-		"none": {
-			expectedClusterUUID: "",
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			require.Equal(t, test.expectedClusterUUID, logstash.GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
-		})
-	}
-}
-
-func TestXPackEnabledMetricSets(t *testing.T) {
+func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"hosts":         []string{"foobar:9600"},
+		"module":        beat.ModuleName,
+		"hosts":         []string{"foobar:5066"},
 		"xpack.enabled": true,
 	}
 
@@ -77,7 +42,7 @@ func TestXPackEnabledMetricSets(t *testing.T) {
 	for _, ms := range metricSets {
 		name := ms.Name()
 		switch name {
-		case "node", "node_stats":
+		case "state", "stats":
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}
