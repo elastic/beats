@@ -22,6 +22,7 @@ type config struct {
 	Field         string     `config:"field"`
 	TargetPrefix  string     `config:"target_prefix"`
 	IgnoreFailure bool       `config:"ignore_failure"`
+	OverwriteKeys bool       `config:"overwrite_keys"`
 }
 
 var defaultConfig = config{

@@ -298,3 +298,69 @@ func TestIgnoreFailure(t *testing.T) {
 		})
 	}
 }
+
+func TestOverwriteKeys(t *testing.T) {
+	tests := []struct {
+		name   string
+		c      map[string]interface{}
+		fields common.MapStr
+		values common.MapStr
+		err    error
+	}{
+		{
+			name:   "fail by default if key exists",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": ""},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": 42},
+			err:    errors.New("cannot override existing key with `key`"),
+		},
+		{
+			name:   "fail if key exists and overwrite disabled",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": false},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": 42},
+			err:    errors.New("cannot override existing key with `key`"),
+		},
+		{
+			name:   "overwrite existing keys",
+			c:      map[string]interface{}{"tokenizer": "hello %{key}", "target_prefix": "", "overwrite_keys": true},
+			fields: common.MapStr{"message": "hello world", "key": 42},
+			values: common.MapStr{"message": "hello world", "key": "world"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := common.NewConfigFrom(test.c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			processor, err := NewProcessor(c)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			e := beat.Event{Fields: test.fields}
+			event, err := processor.Run(&e)
+			if test.err == nil {
+				if !assert.NoError(t, err) {
+					return
+				}
+			} else {
+				if !assert.EqualError(t, err, test.err.Error()) {
+					return
+				}
+			}
+
+			for field, value := range test.values {
+				v, err := event.GetValue(field)
+				if !assert.NoError(t, err) {
+					return
+				}
+
+				assert.Equal(t, value, v)
+			}
+		})
+	}
+}

@@ -96,7 +96,7 @@ func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, err
 	var prefixKey string
 	for k, v := range m {
 		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound {
+		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound || p.config.OverwriteKeys {
 			event.PutValue(prefixKey, v)
 		} else {
 			event.Fields = copy
