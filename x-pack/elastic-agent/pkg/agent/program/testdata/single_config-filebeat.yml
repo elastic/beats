@@ -7,6 +7,12 @@ filebeat:
     index: logs-generic-default
     vars:
       var: value
+    processors:
+      - add_fields:
+          fields:
+            stream.type: logs
+            stream.dataset: generic
+            stream.namespace: default
 output:
   elasticsearch:
     hosts:
