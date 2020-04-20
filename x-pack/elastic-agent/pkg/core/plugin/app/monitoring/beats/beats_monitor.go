@@ -24,7 +24,7 @@ type Monitor struct {
 	process            string
 	monitoringEndpoint string
 	loggingPath        string
-	logginFile         string
+	loggingFile        string
 
 	monitorLogs    bool
 	monitorMetrics bool
@@ -48,7 +48,7 @@ func NewMonitor(process, pipelineID string, downloadConfig *artifact.Config, mon
 		process:            process,
 		monitoringEndpoint: monitoringEndpoint,
 		loggingPath:        loggingPath,
-		logginFile:         loggingFile,
+		loggingFile:        loggingFile,
 		monitorLogs:        monitorLogs,
 		monitorMetrics:     monitorMetrics,
 	}
@@ -129,7 +129,7 @@ func (b *Monitor) LogPath() string {
 		return ""
 	}
 
-	return b.logginFile
+	return b.loggingFile
 }
 
 // MetricsPath describes a location where application exposes metrics
