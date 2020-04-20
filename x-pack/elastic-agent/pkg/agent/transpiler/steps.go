@@ -128,12 +128,16 @@ type DeleteFileStep struct {
 
 // Execute executes delete file step.
 func (r *DeleteFileStep) Execute(rootDir string) error {
-	path, isSubpath := joinPaths(rootDir, r.Path)
+	path, isSubpath, err := joinPaths(rootDir, r.Path)
+	if err != nil {
+		return err
+	}
+
 	if !isSubpath {
 		return fmt.Errorf("invalid path value for operation 'Delete': %s", path)
 	}
 
-	err := os.Remove(path)
+	err = os.Remove(path)
 
 	if os.IsNotExist(err) && r.FailOnMissing {
 		// is not found and should be reported
@@ -166,17 +170,25 @@ type MoveFileStep struct {
 
 // Execute executes move file step.
 func (r *MoveFileStep) Execute(rootDir string) error {
-	path, isSubpath := joinPaths(rootDir, r.Path)
+	path, isSubpath, err := joinPaths(rootDir, r.Path)
+	if err != nil {
+		return err
+	}
+
 	if !isSubpath {
 		return fmt.Errorf("invalid path value for operation 'Move': %s", path)
 	}
 
-	target, isSubpath := joinPaths(rootDir, r.Target)
+	target, isSubpath, err := joinPaths(rootDir, r.Target)
+	if err != nil {
+		return err
+	}
+
 	if !isSubpath {
 		return fmt.Errorf("invalid target value for operation 'Move': %s", target)
 	}
 
-	err := os.Rename(path, target)
+	err = os.Rename(path, target)
 
 	if os.IsNotExist(err) && r.FailOnMissing {
 		// is not found and should be reported
@@ -201,13 +213,28 @@ func MoveFile(path, target string, failOnMissing bool) *MoveFileStep {
 }
 
 // joinPaths joins paths and returns true if path is subpath of rootDir
-func joinPaths(rootDir, path string) (string, bool) {
+func joinPaths(rootDir, path string) (string, bool, error) {
+	rootDir = filepath.FromSlash(rootDir)
+	path = filepath.FromSlash(path)
+
+	if runtime.GOOS == "windows" {
+		// if is unix absolute fix to win absolute
+		if strings.HasPrefix(path, "\\") {
+			abs, err := filepath.Abs(rootDir) // get current volume
+			if err != nil {
+				return "", false, err
+			}
+			vol := filepath.VolumeName(abs)
+			path = filepath.Join(vol, path)
+		}
+	}
+
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(rootDir, path)
 	}
 
-	absRoot := filepath.Clean(filepath.FromSlash(rootDir))
-	absPath := filepath.Clean(filepath.FromSlash(path))
+	absRoot := filepath.Clean(rootDir)
+	absPath := filepath.Clean(path)
 
 	// path on windows are case insensitive
 	if !isFsCaseSensitive(rootDir) {
@@ -215,7 +242,7 @@ func joinPaths(rootDir, path string) (string, bool) {
 		absPath = strings.ToLower(absPath)
 	}
 
-	return absPath, strings.HasPrefix(absPath, absRoot)
+	return absPath, strings.HasPrefix(absPath, absRoot), nil
 }
 
 func isFsCaseSensitive(rootDir string) bool {

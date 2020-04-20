@@ -142,7 +142,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 		return
 	}
 
-	p.logger.Infof("Watcher Pod update: %+v", obj)
+	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(pod, "stop")
 	p.emit(pod, "start")
 }
