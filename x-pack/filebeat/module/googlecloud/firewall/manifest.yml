@@ -10,7 +10,7 @@ var:
   - name: subscription_name
     default: filebeat-googlecloud-firewall
   - name: credentials_file
-    default: googlecloud-firewall-reader-service-identity.json
+  - name: credentials_json
   - name: debug
     default: false
   - name: keep_original_message

@@ -188,13 +188,13 @@ jobs:
 
     # Agent
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat || travis_terminate 0
-      env: TARGETS="-C x-pack/agent testsuite"
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/elastic-agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
-      before_install: .ci/scripts/travis_has_changes.sh x-pack/agent libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/agent testsuite"
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 
