@@ -298,8 +298,6 @@ filebeat.modules:
       storage_account: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
-      # by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
-      override_resource_manager_endpoint: ""
 
   auditlogs:
     enabled: false
@@ -309,7 +307,6 @@ filebeat.modules:
  #     connection_string: ""
  #     storage_account: ""
  #     storage_account_key: ""
- #     override_resource_manager_endpoint: ""
   signinlogs:
     enabled: false
  #   var:
@@ -318,7 +315,6 @@ filebeat.modules:
  #     connection_string: ""
  #     storage_account: ""
  #     storage_account_key: ""
- #     override_resource_manager_endpoint: ""
 
 #--------------------------------- CEF Module ---------------------------------
 - module: cef

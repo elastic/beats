@@ -10,7 +10,7 @@ var:
   - name: connection_string
   - name: storage_account
   - name: storage_account_key
-  - name: override_resource_manager_endpoint
+  - name: resource_manager_endpoint
 
 ingest_pipeline:
   - ingest/pipeline.json
