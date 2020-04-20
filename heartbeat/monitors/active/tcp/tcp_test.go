@@ -26,8 +26,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/go-lookslike/validator"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -37,6 +35,7 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
