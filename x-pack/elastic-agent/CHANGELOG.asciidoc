@@ -18,6 +18,7 @@
 - Fixed merge of config {pull}17399[17399]
 - Handle abs paths on windows correctly {pull}17461[17461]
 - Improved cancellation of agent {pull}17318[17318]
+- Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
 
 ==== New features
 
