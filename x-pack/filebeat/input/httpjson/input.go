@@ -300,6 +300,12 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 		}
 		if msg.StatusCode != http.StatusOK {
 			in.log.Debugw("HTTP request failed", "http.response.status_code", msg.StatusCode, "http.response.body", string(responseData))
+			if msg.StatusCode == http.StatusTooManyRequests {
+				if err = in.applyRateLimit(ctx, header, in.config.RateLimit); err != nil {
+					return err
+				}
+				continue
+			}
 			return errors.Errorf("http request was unsuccessful with a status code %d", msg.StatusCode)
 		}
 		var m, v interface{}

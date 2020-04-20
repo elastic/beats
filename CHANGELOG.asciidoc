@@ -11,35 +11,25 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 
 *Affecting all Beats*
 
-- Environment variables can no longer reference other environment variables or objects. {pull}15937{15937}
-- Change `aws_elb` autodiscovery provider field name from `elb_listener.*` to `aws.elb.*`. {issue}16219[16219] {pull}16402{16402}
-- Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
-
-*Journalbeat*
-
-- Improve parsing of `syslog.pid` in Journalbeat to strip the username when present. {pull}16116[16116]
-
-*Metricbeat*
-
-- Add new dashboard for VSphere host cluster and virtual machine. {pull}14135[14135]
+- Environment variables can no longer reference other environment variables or objects. {pull}15937[15937]
+- Change `aws_elb` autodiscovery provider field name from `elb_listener.*` to `aws.elb.*`. {issue}16219[16219] {pull}16402[16402]
+- Remove support for using `add_docker_metadata` and `add_kubernetes_metadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data. {pull}17223[17223]
-- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
+- Fix `add_cloud_metadata` processor to better support modifying sub-fields with other processors. {pull}13808[13808]
 - Fix panic in the Logstash output when trying to send events to closed connection. {pull}15568[15568]
 - Fix logging target settings being ignored when Beats are started via systemd or docker. {issue}12024[12024] {pull}15422[15442]
 - Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
 - Remove superfluous use of `number_of_routing_shards` setting from the default template. {pull}16038[16038]
 - Automatically convert index names to lowercase. {pull}16081[16081]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
 - Fix loading processor annotation hints, allowing the value to be a full configuration section. {pull}16348[16348]
-- Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
 - Add `ssl.ca_sha256` to the list of supported TLS options. This option allows you to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
-- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. No longer requires the user to have `labels.dedot: true` in the configuration as it is now properly default. {pull}16857[16857]
-- Improve logging messages for the `add_kubernetes_metadata` processor. {pull}16866{16866}
+- Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. No longer requires the user to have `labels.dedot: true` in the configuration as it is now properly the default. {pull}16857[16857]
+- Improve logging messages for the `add_kubernetes_metadata` processor. {pull}16866[16866]
 - Fail to start if httpprof is used and it cannot be initialized. {pull}17028[17028]
 - Fix concurrency issues in convert processor when used in the global context. {pull}17032[17032]
 - Fix bug with `monitoring.cluster_uuid` setting not always being exposed via GET /state Beats API. {issue}16732[16732] {pull}17420[17420]
@@ -48,30 +38,30 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 *Filebeat*
 
 - Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
-- Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
+- Fix merging of fileset inputs to replace paths and append processors. {pull}16450[16450]
 - Fix Elasticsearch `_id` field set by S3 and Google Pub/Sub inputs. {pull}17026[17026]
-- Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
+- Fix various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 - Fix default index pattern in IBM MQ Filebeat dashboard. {pull}17146[17146]
-- Fixed a mapping exception when ingesting Logstash plain logs (7.4+) with pipeline ids containing non alphanumeric chars. {issue}17242[17242] {pull}17243[17243]
-- Fixed MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
+- Fix a mapping exception when ingesting Logstash plain logs (7.4+) with pipeline ids containing non alphanumeric chars. {issue}17242[17242] {pull}17243[17243]
+- Fix MySQL slowlog module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {issue}17086[17086] {pull}17156[17156]
 - Fix `elasticsearch.audit` data ingest pipeline to be more forgiving with date formats found in Elasticsearch audit logs. {pull}17406[17406]
 - Fix decoding errors caused by trailing spaces in CEF messages. {pull}17253[17253]
-- Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
+- Fix activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
 
 *Metricbeat*
 
 - Change `lookup_fields` setting from `metricset.host` to `service.address`. {pull}15883[15883]
-- Made `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
-- Improve metrics collection in the system/service metricset on older linux distributions. {pull}16902[16902]
+- Make `logstash-xpack` module once again have parity with internally-collected Logstash monitoring data. {pull}16198[16198]
+- Improve metrics collection in the `system/service` metricset on older linux distributions. {pull}16902[16902]
 - Use max in k8s apiserver dashboard aggregations. {pull}17018[17018]
 - Check if CCR feature is available on Elasticsearch cluster before attempting to call CCR APIs from `elasticsearch/ccr` metricset. {issue}16511[16511] {pull}17073[17073]
 - Use max in k8s overview dashboard aggregations. {pull}17015[17015]
 - Fix Disk Used and Disk Usage visualizations in the Metricbeat System dashboards. {issue}12435[12435] {pull}17272[17272]
 - Fix missing Accept header for Prometheus and OpenMetrics module. {issue}16870[16870] {pull}17291[17291]
 - Combine cloudwatch aggregated metrics into single event. {pull}17345[17345]
-- Fix how we filter services by name in system/service {pull}17400[17400]
+- Fix how we filter services by name in system/service. {pull}17400[17400]
 - Fix problem where `cloudwatch` metricset was not collecting tags correctly. {issue}17419[17419] {pull}17424[17424]
-- check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
+- Check if cpuOptions field is nil in DescribeInstances output in ec2 metricset. {pull}17418[17418]
 - Fix `aws.s3.bucket.name` terms_field in s3 overview dashboard. {pull}17542[17542]
 - Fix Unix socket path in memcached module. {pull}17512[17512]
 - Fix vsphere VM dashboard host aggregation visualizations. {pull}17555[17555]
@@ -99,15 +89,15 @@ https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
 configure the auditd module and use processors to enrich events with metadata.
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 - Log to stderr when using kubernetes manifests. {pull}17443[174443]
-- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 
 *Filebeat*
 
-- Add ECS tls fields to the smtp, rdp and ssl filesets in the zeek module and the s3access and elb filesets in the aws module. {issue}15757[15757] {pull}15935[15936]
+- Add ECS tls fields to the smtp, rdp, and ssl filesets in the zeek module, and the s3access and elb filesets in the aws module. {issue}15757[15757] {pull}15935[15936]
 - Add Nginx `ingress_controller` fileset. {pull}16197[16197]
 - Add ECS tls and categorization fields to apache module. {issue}16032[16032] {pull}16121[16121]
 - Add MQTT input. {issue}15602[15602] {pull}16204[16204]
-- Improve ECS categorization, container & process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
+- Improve ECS categorization, container, and process field mappings in auditd module. {issue}16153[16153] {pull}16280[16280]
 - Add ECS categorization fields to activemq module. {issue}16151[16151] {pull}16201[16201]
 - Improve ECS field mappings in aws module. {issue}16154[16154] {pull}16307[16307]
 - Improve ECS categorization field mappings in googlecloud module. {issue}16030[16030] {pull}16500[16500]
@@ -124,38 +114,43 @@ configure the auditd module and use processors to enrich events with metadata.
 - Improve ECS categorization field mappings in ibmmq module. {issue}16163[16163] {pull}16532[16532]
 - Add custom string mapping to CEF module to support Forcepoint NGFW. {issue}14663[14663] {pull}15910[15910]
 - Add ECS fields to CEF module. {issue}16157[16157] {pull}16338[16338]
-- Improve ECS categorization, host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
+- Improve ECS categorization and host field mappings in elasticsearch module. {issue}16160[16160] {pull}16469[16469]
 - Improve ECS categorization field mappings in suricata module. {issue}16181[16181] {pull}16843[16843]
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Improve ECS categorization field mappings in iptables module. {issue}16166[16166] {pull}16637[16637]
 - Add pattern for Cisco ASA / FTD Message 734001. {issue}16212[16212] {pull}16612[16612]
 - Add `o365audit` input type for consuming events from Office 365 Management Activity API. {issue}16196[16196] {pull}16244[16244]
 - Add custom string mapping to CEF module to support Check Point devices. {issue}16041[16041] {pull}16907[16907]
-- Added new module `o365` for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
-- Add Filebeat Okta module. {pull}16362[16362]
+- Add `o365` module for ingesting Office 365 management activity API events. {issue}16196[16196] {pull}16386[16386]
+- Add Okta module. {pull}16362[16362]
 - Improve AWS cloudtrail field mappings. {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 - Make the `azure-eventhub` input GA. {issue}15671[15671] {pull}17313[17313]
-- Added `access_key_id`, `secret_access_key`, and `session_token` to the aws module config. {pull}17456[17456]
+- Add `access_key_id`, `secret_access_key`, and `session_token` to the aws module config. {pull}17456[17456]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
+
+*Journalbeat*
+
+- Improve parsing of `syslog.pid` in Journalbeat to strip the username when
+present. {pull}16116[16116]
 
 *Metricbeat*
 
 - Add lambda metricset in aws module. {pull}15260[15260]
 - Add DynamoDB AWS light module. {pull}15097[15097]
 - Add IBM MQ light-weight module. {pull}15301[15301]
-- Add mixer metricset for Istio Metricbeat module {pull}15696[15696]
-- Add mesh metricset for Istio Metricbeat module{pull}15535[15535]
-- Add pilot metricset for Istio Metricbeat module {pull}15761[15761]
-- Add galley metricset for Istio Metricbeat module {pull}15857[15857]
-- Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
+- Add mixer metricset for Istio Metricbeat module. {pull}15696[15696]
+- Add mesh metricset for Istio Metricbeat module. {pull}15535[15535]
+- Add pilot metricset for Istio Metricbeat module. {pull}15761[15761]
+- Add galley metricset for Istio Metricbeat module. {pull}15857[15857]
+- Add `key/value` mode for SQL module. {issue}15770[15770] {pull}15845[15845]
 - Add support for Unix socket in Memcached module. {issue}13685[13685] {pull}15822[15822]
 - Make the `system/cpu` metricset collect normalized CPU metrics by default. {issue}15618[15618] {pull}15729[15729]
 - Add kubernetes storage class support via kube-state-metrics. {pull}16145[16145]
 - Add `up` metric to prometheus metrics collected from host. {pull}15948[15948]
-- Add citadel metricset for Istio Metricbeat module {pull}15990[15990]
+- Add citadel metricset for Istio Metricbeat module. {pull}15990[15990]
 - Add support for processors in light modules. {issue}14740[14740] {pull}15923[15923]
 - Add ability to collect AuroraDB metrics in rds metricset. {issue}14142[14142] {pull}16004[16004]
 - Reuse connections in SQL module. {pull}16001[16001]
@@ -184,16 +179,17 @@ configure the auditd module and use processors to enrich events with metadata.
 - Release ActiveMQ module as GA. {issue}17047[17047] {pull}17049[17049]
 - Add support for CouchDB v2. {issue}16352[16352] {pull}16455[16455]
 - Add dashboards for the azure container metricsets. {pull}17194[17194]
-- Separate the `vpc` metricset into three smaller metricsets: `vpn`, `transitgateway`, and `natgateway` {pull}16892[16892]
+- Separate the `vpc` metricset into three smaller metricsets: `vpn`, `transitgateway`, and `natgateway`. {pull}16892[16892]
 - Use Elasticsearch histogram type to store Prometheus histograms. {pull}17061[17061]
 - Allow to rate Prometheus counters when scraping them. {pull}17061[17061]
-- Release Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
+- Release the Oracle module as GA. {issue}14279[14279] {pull}16833[16833]
 - Add Storage metricsets to GCP module. {pull}15598[15598]
-- Release vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
+- Release the vsphere module as GA. {issue}15798[15798] {pull}17119[17119]
 - Add PubSub metricset to Google Cloud Platform module. {pull}15536[15536]
 - Add dashboard for `redisenterprise` module. {pull}16752[16752]
+- Add dashboard for VSphere host cluster and virtual machine. {pull}14135[14135]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
-- Make the azure module GA. {pull}17319[17319]
+- Release the azure module as GA. {pull}17319[17319]
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
 
 *Packetbeat*
