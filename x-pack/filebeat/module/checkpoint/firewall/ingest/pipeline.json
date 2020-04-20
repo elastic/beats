@@ -1021,6 +1021,14 @@
       }
     },
     {
+      "gsub" : {
+        "field": "checkpoint.sys_message",
+        "pattern": "^:\"",
+        "replacement": "",
+        "if": "ctx.checkpoint?.sys_message != null"
+      }
+    },
+    {
       "remove" : {
         "field": [
           "checkpoint.client_outbound_packets", "checkpoint.client_outbound_bytes", 
