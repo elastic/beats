@@ -16,11 +16,12 @@
 ====  Environment variables can no longer reference other environment variables
 
 Environment variables are still supported in the {beats} configuration.
-However, starting in Version 7.7.0, you can no longer reference an environment
-variable that references another environment variable.
+However, starting in Version 7.7.0, an environment variable cannot reference
+another environment variable or event in the configuration.
 
-For example, if you set `export NAME=${COMPANY_NAME}`, you cannot use
-`name: ${NAME}` in the configuration.
+For example, if you have `export VAR1=${VAR2}` and use `var: ${VAR1}` in
+the configuration, the configuration results in `var: "${VAR2}"`, where
+`${VAR2}` is not expanded.
 
 [float]
 ==== Docker and kubernetes processors no longer allowed in script processor
