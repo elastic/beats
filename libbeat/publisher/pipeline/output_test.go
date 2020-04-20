@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"flag"
 	"math"
 	"math/rand"
@@ -60,7 +61,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				wqu := makeWorkQueue()
 				client := ctor(publishFn)
-				makeClientWorker(nilObserver, wqu, client)
+				makeClientWorker(nilObserver, wqu, client, nil)
 
 				numEvents := atomic.MakeUint(0)
 				for batchIdx := uint(0); batchIdx <= numBatches; batchIdx++ {
@@ -131,7 +132,7 @@ func TestMakeClientWorkerAndClose(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(nilObserver, wqu, client)
+				worker := makeClientWorker(nilObserver, wqu, client, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -155,7 +156,7 @@ func TestMakeClientWorkerAndClose(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(nilObserver, wqu, client)
+				makeClientWorker(nilObserver, wqu, client, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
@@ -184,7 +185,7 @@ type mockClient struct {
 
 func (c *mockClient) String() string { return "mock_client" }
 func (c *mockClient) Close() error   { return nil }
-func (c *mockClient) Publish(batch publisher.Batch) error {
+func (c *mockClient) Publish(_ context.Context, batch publisher.Batch) error {
 	return c.publishFn(batch)
 }
 

@@ -138,10 +138,13 @@ func (w *netClientWorker) run() {
 			}
 
 			if err := func() error {
-				tx := w.tracer.StartTransaction("publish", "output")
-				defer tx.End()
-				tx.Context.SetLabel("worker", "netclient")
-				ctx := apm.ContextWithTransaction(context.Background(), tx)
+				ctx := context.Background()
+				if w.tracer != nil {
+					tx := w.tracer.StartTransaction("publish", "output")
+					defer tx.End()
+					tx.Context.SetLabel("worker", "netclient")
+					ctx = apm.ContextWithTransaction(ctx, tx)
+				}
 				err := w.client.Publish(ctx, batch)
 				if err != nil {
 					err = fmt.Errorf("failed to publish events: %w", err)
