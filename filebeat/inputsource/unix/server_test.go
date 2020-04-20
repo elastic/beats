@@ -226,7 +226,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := netcommon.SplitHandlerFactory, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
