@@ -100,7 +100,13 @@ func (c *outputController) Close() error {
 func (c *outputController) Set(outGrp outputs.Group) {
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
-	queue := makeWorkQueue()
+	var queue workQueue
+	if c.out == nil {
+		queue = makeWorkQueue()
+	} else {
+		// maybe reload, use original queue
+		queue = c.out.workQueue
+	}
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
 		worker[i] = makeClientWorker(c.observer, queue, client)
