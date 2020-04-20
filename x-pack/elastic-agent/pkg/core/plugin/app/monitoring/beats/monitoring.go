@@ -38,5 +38,5 @@ func getLoggingFile(program, operatingSystem, installPath, pipelineID string) st
 }
 
 func getLoggingFileDirectory(installPath, operatingSystem, pipelineID string) string {
-	return filepath.Base(getLoggingFile("program", operatingSystem, installPath, pipelineID))
+	return filepath.Dir(getLoggingFile("program", operatingSystem, installPath, pipelineID))
 }

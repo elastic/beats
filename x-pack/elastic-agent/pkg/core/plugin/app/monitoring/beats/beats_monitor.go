@@ -125,7 +125,7 @@ func (b *Monitor) LogPath() string {
 		return ""
 	}
 
-	return b.loggingPath
+	return filepath.Join(b.loggingPath, b.process)
 }
 
 // MetricsPath describes a location where application exposes metrics
