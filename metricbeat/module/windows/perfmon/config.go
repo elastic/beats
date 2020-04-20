@@ -87,6 +87,24 @@ func (counter *Counter) InitDefaults() {
 	}
 }
 
+func (counter *Counter) Validate() error {
+	if !isValidFormat(counter.Format) {
+		return errors.Errorf("initialization failed: format '%s' "+
+			"for counter '%s' is invalid (must be float, large or long)",
+			counter.Format, counter.InstanceLabel)
+	}
+	return nil
+}
+
+func (counter *QueryCounter) Validate() error {
+	if !isValidFormat(counter.Format) {
+		return errors.Errorf("initialization failed: format '%s' "+
+			"for counter '%s' is invalid (must be float, large or long)",
+			counter.Format, counter.Name)
+	}
+	return nil
+}
+
 func (conf *Config) Validate() error {
 	if len(conf.Counters) == 0 && len(conf.Queries) == 0 {
 		return errors.New("no perfmon counters or queries have been configured")
@@ -100,25 +118,6 @@ func (conf *Config) Validate() error {
 			if len(query.Counters) == 0 {
 				return errors.Errorf("no perfmon counters have been configured for object %s", query.Name)
 			}
-		}
-	}
-
-	for _, value := range conf.Counters {
-		if !isValidFormat(value.Format) {
-			return errors.Errorf("initialization failed: format '%s' "+
-				"for counter '%s' is invalid (must be float, large or long)",
-				value.Format, value.InstanceLabel)
-		}
-
-	}
-	for _, value := range conf.Queries {
-		for _, q := range value.Counters {
-			if !isValidFormat(q.Format) {
-				return errors.Errorf("initialization failed: format '%s' "+
-					"for counter '%s' is invalid (must be float, large or long)",
-					q.Format, q.Field)
-			}
-
 		}
 	}
 	return nil

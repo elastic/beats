@@ -87,7 +87,7 @@ the value for this configuration option will be `% Processor Time`.
 
 *`field`*:: The counter path value field/label. Not required, if not entered, it will be generated based on the counter path.
 
-*`format`*:: Format of the measurement value. The value can be either `float` or
+*`format`*:: Format of the measurement value. The value can be either `float`, `large` or
 `long`. The default is `float`.
 
 
@@ -125,6 +125,6 @@ Performance Data Helper (PDH) syntax. This field is required. For example
 place of an instance name to perform a wildcard query that generates an event
 for each counter instance (e.g. `\PhysicalDisk(*)\Disk Writes/sec`).
 
-*`format`*:: Format of the measurement value. The value can be either `float` or
+*`format`*:: Format of the measurement value. The value can be either `float`, `large` or
 `long`. The default is `float`.
 
