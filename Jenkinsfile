@@ -662,8 +662,6 @@ def withBeatsEnv(boolean archive, Closure body) {
     unstash 'source'
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      // FIXME workaround until we fix the packer cache
-      // Retry to avoid DDoS detection from the server
     }
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
