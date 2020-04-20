@@ -253,6 +253,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update supported versions of `redis` output. {pull}17198[17198]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
+- Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
 
 *Auditbeat*
 
