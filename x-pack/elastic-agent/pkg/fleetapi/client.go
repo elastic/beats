@@ -34,7 +34,6 @@ type clienter interface {
 
 var baseRoundTrippers = func(rt http.RoundTripper) (http.RoundTripper, error) {
 	rt = NewFleetUserAgentRoundTripper(rt, release.Version())
-	rt = kibana.NewEnforceKibanaVersionRoundTripper(rt, release.Version())
 	return rt, nil
 }
 
