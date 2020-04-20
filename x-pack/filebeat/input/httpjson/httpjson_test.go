@@ -27,9 +27,8 @@ import (
 )
 
 var (
-	once    sync.Once
-	url     string
-	isRetry bool
+	once sync.Once
+	url  string
 )
 
 func testSetup(t *testing.T) {
@@ -72,6 +71,7 @@ func createServer(newServer func(handler http.Handler) *httptest.Server) *httpte
 }
 
 func createCustomServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
+	var isRetry bool
 	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if !isRetry {
