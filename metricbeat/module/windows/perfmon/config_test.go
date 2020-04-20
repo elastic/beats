@@ -43,6 +43,16 @@ func TestValidate(t *testing.T) {
 	conf["perfmon.queries"] = []common.MapStr{
 		{
 			"object": "Process",
+		},
+	}
+	c, err = ucfg.NewFrom(conf)
+	assert.NoError(t, err)
+	err = c.Unpack(&config)
+	assert.Error(t, err, "missing required field accessing 'perfmon.queries.0.counters'")
+
+	conf["perfmon.queries"] = []common.MapStr{
+		{
+			"object": "Process",
 			"counters": []common.MapStr{
 				{
 					"name": "Thread Count",

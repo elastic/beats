@@ -54,7 +54,7 @@ type Query struct {
 	Name      string         `config:"object" validate:"required"`
 	Field     string         `config:"field"`
 	Instance  []string       `config:"instance"`
-	Counters  []QueryCounter `config:"counters" validate:"required"`
+	Counters  []QueryCounter `config:"counters" validate:"required,nonzero"`
 	Namespace string         `config:"namespace"`
 }
 
@@ -112,13 +112,6 @@ func (conf *Config) Validate() error {
 	if len(conf.Counters) > 0 {
 		cfgwarn.Deprecate("8.0", "perfmon.counters configuration option is deprecated and will be removed in the future major version, "+
 			"we advise using the perfmon.queries configuration option instead.")
-	}
-	if len(conf.Queries) > 0 {
-		for _, query := range conf.Queries {
-			if len(query.Counters) == 0 {
-				return errors.Errorf("no perfmon counters have been configured for object %s", query.Name)
-			}
-		}
 	}
 	return nil
 }
