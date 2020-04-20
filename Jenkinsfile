@@ -89,7 +89,10 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+            /**
+            * Disable macOS test until it's fixed for the Elastic Agent.
+            */
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest && true == false
             }
           }
           steps {
