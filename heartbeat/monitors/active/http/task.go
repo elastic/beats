@@ -20,10 +20,13 @@ package http
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -234,6 +237,12 @@ func execPing(
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req)
+	if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+		if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+		}
+	}
+
 
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
