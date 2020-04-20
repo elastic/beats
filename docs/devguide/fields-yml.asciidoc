@@ -53,9 +53,10 @@ multi-field mappings.
 `index`:: Whether or not the field should be indexed.
 `doc_values`:: Whether or not the field should have doc values generated.
 `copy_to`:: Which field to copy the field value into.
-`ignore_above`:: Ignore strings longer than the specified value. When this
-property value is missing or `0`, the `libbeat` default value of `1024` is
-used. If the value is `-1`, the {es} default value is used.
+`ignore_above`:: {es} ignores (does not index) strings that are longer than the
+specified value. When this property value is missing or `0`, the `libbeat`
+default value of `1024` characters is used. If the value is `-1`, the {es}
+default value is used.
 
 For example, you can use the `copy_to` mapping parameter to copy the
 `last_name` and `first_name` fields into the `full_name` field at index time:
