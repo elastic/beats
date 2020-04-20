@@ -29,6 +29,8 @@ import (
 
 const replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
 
+var allowedFormats = []string{"float", "large", "long"}
+
 // Config for the windows perfmon metricset.
 type Config struct {
 	IgnoreNECounters   bool      `config:"perfmon.ignore_non_existent_counters"`
@@ -63,43 +65,70 @@ type QueryCounter struct {
 	Format string `config:"format"`
 }
 
-func (conf *Config) ValidateConfig() error {
+func (query *Query) InitDefaults() {
+	query.Namespace = "metrics"
+}
+
+func (counter *QueryCounter) InitDefaults() {
+	form := strings.ToLower(counter.Format)
+	switch form {
+	case "", "float":
+		counter.Format = "float"
+	case "long", "large":
+	}
+}
+
+func (counter *Counter) InitDefaults() {
+	form := strings.ToLower(counter.Format)
+	switch form {
+	case "", "float":
+		counter.Format = "float"
+	case "long", "large":
+	}
+}
+
+func (conf *Config) Validate() error {
 	if len(conf.Counters) == 0 && len(conf.Queries) == 0 {
 		return errors.New("no perfmon counters or queries have been configured")
 	}
 	if len(conf.Counters) > 0 {
-		cfgwarn.Deprecate("8.0", "perfmon.counters configuration option is deprecated and will be remove in the future major version, we advise using the perfmon.queries configuration option instead")
+		cfgwarn.Deprecate("8.0", "perfmon.counters configuration option is deprecated and will be removed in the future major version, "+
+			"we advise using the perfmon.queries configuration option instead.")
+	}
+	if len(conf.Queries) > 0 {
+		for _, query := range conf.Queries {
+			if len(query.Counters) == 0 {
+				return errors.Errorf("no perfmon counters have been configured for object %s", query.Name)
+			}
+		}
 	}
 
-	// add default format in the config
-	for i, value := range conf.Counters {
-		form := strings.ToLower(value.Format)
-		switch form {
-		case "", "float":
-			conf.Counters[i].Format = "float"
-		case "long", "large":
-		default:
+	for _, value := range conf.Counters {
+		if !isValidFormat(value.Format) {
 			return errors.Errorf("initialization failed: format '%s' "+
 				"for counter '%s' is invalid (must be float, large or long)",
 				value.Format, value.InstanceLabel)
 		}
+
 	}
-	for i, value := range conf.Queries {
-		if value.Namespace == "" {
-			conf.Queries[i].Namespace = "metrics"
-		}
-		for j, q := range value.Counters {
-			form := strings.ToLower(q.Format)
-			switch form {
-			case "", "float":
-				value.Counters[j].Format = "float"
-			case "long", "large":
-			default:
+	for _, value := range conf.Queries {
+		for _, q := range value.Counters {
+			if !isValidFormat(q.Format) {
 				return errors.Errorf("initialization failed: format '%s' "+
 					"for counter '%s' is invalid (must be float, large or long)",
 					q.Format, q.Field)
 			}
+
 		}
 	}
 	return nil
+}
+
+func isValidFormat(format string) bool {
+	for _, form := range allowedFormats {
+		if form == format {
+			return true
+		}
+	}
+	return false
 }

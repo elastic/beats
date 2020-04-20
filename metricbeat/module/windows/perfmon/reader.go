@@ -263,36 +263,36 @@ func mapQuery(obj string, instance string, path string) string {
 }
 
 func mapCounterPathLabel(namespace string, label string, path string) string {
-	if label != "" {
-		return namespace + "." + label
+	if label == "" {
+		label = path
 	}
 	// replace spaces with underscores
-	path = strings.Replace(path, " ", "_", -1)
+	label = strings.Replace(label, " ", "_", -1)
 	// replace backslashes with "per"
-	path = strings.Replace(path, "/sec", "_per_sec", -1)
-	path = strings.Replace(path, "/_sec", "_per_sec", -1)
-	path = strings.Replace(path, "\\", "_", -1)
+	label = strings.Replace(label, "/sec", "_per_sec", -1)
+	label = strings.Replace(label, "/_sec", "_per_sec", -1)
+	label = strings.Replace(label, "\\", "_", -1)
 	// replace actual percentage symbol with the smbol "pct"
-	path = strings.Replace(path, "_%_", "_pct_", -1)
+	label = strings.Replace(label, "_%_", "_pct_", -1)
 	// create an object in case of ":"
-	path = strings.Replace(path, ":", "_", -1)
+	label = strings.Replace(label, ":", "_", -1)
 	// create an object in case of ":"
-	path = strings.Replace(path, "_-_", "_", -1)
+	label = strings.Replace(label, "_-_", "_", -1)
 	// replace uppercases with underscores
-	path = replaceUpperCase(path)
+	label = replaceUpperCase(label)
 
 	//  avoid cases as this "logicaldisk_avg._disk_sec_per_transfer"
-	obj := strings.Split(path, ".")
+	obj := strings.Split(label, ".")
 	for index := range obj {
 		// in some cases a trailing "_" is found
 		obj[index] = strings.TrimPrefix(obj[index], "_")
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
-	path = strings.ToLower(strings.Join(obj, "_"))
+	label = strings.ToLower(strings.Join(obj, "_"))
 
 	//  avoid cases as this "logicaldisk_avg__disk_sec_per_transfer"
-	path = strings.Replace(path, "__", "_", -1)
-	return namespace + "." + path
+	label = strings.Replace(label, "__", "_", -1)
+	return namespace + "." + label
 }
 
 // replaceUpperCase func will replace upper case with '_'

@@ -22,32 +22,42 @@ package perfmon
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/go-ucfg"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateConfig(t *testing.T) {
-	config := Config{}
-	err := config.ValidateConfig()
-	assert.Error(t, err, "no perfmon counters or queries have been configured")
-	config.Counters = []Counter{
-		{
-			MeasurementLabel: "processor.time.total.pct",
-			Query:            `UDPv4\Datagrams Sent/sec`,
-		},
+func TestValidate(t *testing.T) {
+	conf := common.MapStr{
+		"module":                                 "windows",
+		"period":                                 "10s",
+		"metricsets":                             []string{"perfmon"},
+		"perfmon.group_measurements_by_instance": true,
 	}
-	config.Queries = []Query{
+	c, err := ucfg.NewFrom(conf)
+	assert.NoError(t, err)
+	var config Config
+	err = c.Unpack(&config)
+	assert.Error(t, err, "no perfmon counters or queries have been configured")
+	conf["perfmon.queries"] = []common.MapStr{
 		{
-			Name: "UDPv4",
-			Counters: []QueryCounter{
+			"object": "Process",
+			"counters": []common.MapStr{
 				{
-					Name: "Datagrams Sent/sec",
+					"name": "Thread Count",
 				},
 			},
 		},
 	}
-	err = config.ValidateConfig()
+	c, err = ucfg.NewFrom(conf)
 	assert.NoError(t, err)
-	assert.Equal(t, config.Counters[0].Format, "float")
+	err = c.Unpack(&config)
+	assert.NoError(t, err)
 	assert.Equal(t, config.Queries[0].Counters[0].Format, "float")
+	assert.Equal(t, config.Queries[0].Namespace, "metrics")
+	assert.Equal(t, config.Queries[0].Name, "Process")
+	assert.Equal(t, config.Queries[0].Counters[0].Name, "Thread Count")
+	assert.True(t, config.GroupMeasurements)
 
 }

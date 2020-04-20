@@ -49,10 +49,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	if err := config.ValidateConfig(); err != nil {
-		return nil, err
-	}
-
 	reader, err := NewReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")

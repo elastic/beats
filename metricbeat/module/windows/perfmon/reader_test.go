@@ -65,8 +65,9 @@ func TestMapCounters(t *testing.T) {
 		},
 		Queries: []Query{
 			{
-				Name:     "Process",
-				Instance: []string{"svchost*"},
+				Name:      "Process",
+				Namespace: "metrics",
+				Instance:  []string{"svchost*"},
 				Counters: []QueryCounter{
 					{
 						Name:   "% Processor Time",
@@ -75,9 +76,10 @@ func TestMapCounters(t *testing.T) {
 				},
 			},
 			{
-				Name:     "Process",
-				Field:    "disk",
-				Instance: []string{"conhost*"},
+				Name:      "Process",
+				Field:     "disk",
+				Namespace: "metrics",
+				Instance:  []string{"conhost*"},
 				Counters: []QueryCounter{
 					{
 						Name:   "IO Read Operations/sec",
@@ -88,7 +90,6 @@ func TestMapCounters(t *testing.T) {
 			},
 		},
 	}
-
 	reader := Reader{}
 	reader.mapCounters(config)
 	assert.Equal(t, len(reader.counters), 3)
