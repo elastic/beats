@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type config struct {
@@ -92,7 +93,8 @@ func factory(
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, tcp.MetadataCallback, nf, splitFunc)
+		logger := logp.NewLogger("input.syslog.tcp").With("address", config.Config.Host)
+		factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logger, tcp.MetadataCallback, nf, splitFunc)
 
 		return tcp.New(&config.Config, factory)
 	case unix.Name:
@@ -106,7 +108,8 @@ func factory(
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, unix.MetadataCallback, nf, splitFunc)
+		logger := logp.NewLogger("input.syslog.unix").With("path", config.Config.Path)
+		factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logger, unix.MetadataCallback, nf, splitFunc)
 
 		return unix.New(&config.Config, factory)
 

@@ -37,7 +37,7 @@ type ConnectionHandler func(CloseRef, net.Conn) error
 type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
 
 // SplitHandlerFactory allows creation of a handler that has splitting capabilities.
-func SplitHandlerFactory(family Family, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
+func SplitHandlerFactory(family Family, logger *logp.Logger, metadataCallback MetadataFunc, callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
 	return func(config ListenerConfig) ConnectionHandler {
 		return ConnectionHandler(func(closer CloseRef, conn net.Conn) error {
 			metadata := metadataCallback(conn)
@@ -46,9 +46,9 @@ func SplitHandlerFactory(family Family, metadataCallback MetadataFunc, callback 
 			var log *logp.Logger
 			if family == FamilyUnix {
 				// unix sockets have an empty `RemoteAddr` value, so no need to capture it
-				log = logp.NewLogger("split_client")
+				log = logger.With("handler", "split_client")
 			} else {
-				log = logp.NewLogger("split_client").With("remote_addr", conn.RemoteAddr().String())
+				log = logger.With("handler", "split_client", "remote_addr", conn.RemoteAddr().String())
 			}
 
 			r := NewResetableLimitedReader(NewDeadlineReader(conn, config.Timeout), maxMessageSize)

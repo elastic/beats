@@ -27,8 +27,6 @@ import (
 // Name is the human readable name and identifier.
 const Name = "unix"
 
-type size uint64
-
 // Config exposes the unix configuration.
 type Config struct {
 	Path           string           `config:"path"`

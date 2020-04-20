@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var defaultConfig = Config{
@@ -173,7 +174,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, MetadataCallback, to, test.splitFunc)
+			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -225,7 +226,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, MetadataCallback, to, bufio.ScanLines)
+	factory := netcommon.SplitHandlerFactory, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {

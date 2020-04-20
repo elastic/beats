@@ -35,7 +35,7 @@ const (
 	// FamilyUnix represents a unix socket listener
 	FamilyUnix Family = "unix"
 	// FamilyTCP represents a tcp socket listener
-	FamilyTCP = "tcp"
+	FamilyTCP Family = "tcp"
 )
 
 func (f Family) String() string {

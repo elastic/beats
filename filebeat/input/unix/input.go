@@ -42,7 +42,7 @@ func init() {
 
 // Input for Unix socket connection
 type Input struct {
-	sync.Mutex
+	mutex   sync.Mutex
 	server  *unix.Server
 	started bool
 	outlet  channel.Outleter
@@ -88,7 +88,8 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, unix.MetadataCallback, cb, splitFunc)
+	logger := logp.NewLogger("input.unix").With("path", config.Config.Path)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logger, unix.MetadataCallback, cb, splitFunc)
 
 	server, err := unix.New(&config.Config, factory)
 	if err != nil {
@@ -100,14 +101,14 @@ func NewInput(
 		started: false,
 		outlet:  out,
 		config:  &config,
-		log:     logp.NewLogger("unix input").With("path", config.Config.Path),
+		log:     logger,
 	}, nil
 }
 
 // Run start a Unix socket input
 func (p *Input) Run() {
-	p.Lock()
-	defer p.Unlock()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
 	if !p.started {
 		p.log.Info("Starting Unix socket input")
@@ -122,8 +123,8 @@ func (p *Input) Run() {
 // Stop stops Unix socket server
 func (p *Input) Stop() {
 	defer p.outlet.Close()
-	p.Lock()
-	defer p.Unlock()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
 	p.log.Info("Stopping Unix socket input")
 	p.server.Stop()
