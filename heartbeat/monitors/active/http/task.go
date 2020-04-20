@@ -22,7 +22,6 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -31,6 +30,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -242,7 +243,6 @@ func execPing(
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 		}
 	}
-
 
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
