@@ -92,7 +92,10 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest
+            /**
+            * Disable macOS test until it's fixed for the Elastic Agent.
+            */
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.macosTest && true == false
             }
           }
           steps {
@@ -673,6 +676,9 @@ def withBeatsEnv(boolean archive, Closure body) {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
+      // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+      // See https://github.com/elastic/beats/issues/17787.
+      setGitConfig()
       try {
         if(!params.dry_run){
           body()
@@ -733,7 +739,7 @@ def goos(){
     return 'darwin'
   }
 
-  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
+  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
 
 def dumpMage(){
@@ -954,4 +960,13 @@ def getVendorPatterns(beatName){
     """)
   }
   return output?.split('\n').collect{ item -> item as String }
+}
+
+def setGitConfig(){
+  sh(label: 'check git config', script: '''
+    if [ -z "$(git config --get user.email)" ]; then
+      git config user.email "beatsmachine@users.noreply.github.com"
+      git config user.name "beatsmachine"
+    fi
+  ''')
 }
