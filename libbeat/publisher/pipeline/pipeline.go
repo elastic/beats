@@ -199,6 +199,7 @@ func New(
 	return p, nil
 }
 
+// SetTracer sets an APM tracer to instrument various publishing events
 func (p *Pipeline) SetTracer(tracer *apm.Tracer) error {
 	*p.monitors.Tracer = *tracer
 	return nil

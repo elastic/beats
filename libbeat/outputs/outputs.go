@@ -36,6 +36,7 @@ type Client interface {
 	// Using Retry/Cancelled a client can return a batch of unprocessed events to
 	// the publisher pipeline. The publisher pipeline (if configured by the output
 	// factory) will take care of retrying/dropping events.
+	// Context is intended for carrying request-scoped values, not for cancellation.
 	Publish(context.Context, publisher.Batch) error
 
 	// String identifies the client type and endpoint.
