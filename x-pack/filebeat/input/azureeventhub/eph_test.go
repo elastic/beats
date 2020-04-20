@@ -5,8 +5,9 @@
 package azureeventhub
 
 import (
-	"github.com/Azure/go-autorest/autorest/azure"
 	"testing"
+
+	"github.com/Azure/go-autorest/autorest/azure"
 
 	"github.com/stretchr/testify/assert"
 )
