@@ -22,6 +22,7 @@
 - Fix issues when running `mage package` for all the platforms. {pull}17767[17767]
 - Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
 - Fixed process spawning on Windows {pull}17751[17751]
+- Fixed injected log path to monitoring beat {pull}17833[17833]
 
 ==== New features
 
