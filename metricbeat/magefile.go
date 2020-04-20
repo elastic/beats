@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
@@ -200,4 +201,29 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, devtools.ListMatchingEnvVars("NOSE_")...)
+}
+
+// CreateMetricset creates a new metricset.
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * METRICSET: Name of the metricset
+func CreateMetricset(ctx context.Context) error {
+	ve, err := devtools.PythonVirtualenv()
+	if err != nil {
+		return err
+	}
+	path, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	pythonEnv := map[string]string{
+		"VIRTUAL_ENV": ve,
+	}
+	_, err = sh.Exec(
+		pythonEnv, os.Stdout, os.Stderr, "python3", "scripts/create_metricset.py",
+		"--path", path, "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
+	)
+	return err
 }
