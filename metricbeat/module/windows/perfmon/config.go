@@ -20,8 +20,6 @@
 package perfmon
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -70,21 +68,11 @@ func (query *Query) InitDefaults() {
 }
 
 func (counter *QueryCounter) InitDefaults() {
-	form := strings.ToLower(counter.Format)
-	switch form {
-	case "", "float":
-		counter.Format = "float"
-	case "long", "large":
-	}
+	counter.Format = "float"
 }
 
 func (counter *Counter) InitDefaults() {
-	form := strings.ToLower(counter.Format)
-	switch form {
-	case "", "float":
-		counter.Format = "float"
-	case "long", "large":
-	}
+	counter.Format = "float"
 }
 
 func (counter *Counter) Validate() error {
