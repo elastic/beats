@@ -5,6 +5,7 @@
 package azureeventhub
 
 import (
+	"github.com/Azure/go-autorest/autorest/azure"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,4 +26,18 @@ func TestRunWithEPH(t *testing.T) {
 	// decoding error when key is invalid
 	err := input.runWithEPH()
 	assert.Error(t, err, '7')
+}
+
+func TestGetAzureEnvironment(t *testing.T) {
+	resMan := ""
+	env, err := getAzureEnvironment(resMan)
+	assert.NoError(t, err)
+	assert.Equal(t, env, azure.PublicCloud)
+	resMan = "https://management.microsoftazure.de/"
+	env, err = getAzureEnvironment(resMan)
+	assert.NoError(t, err)
+	assert.Equal(t, env, azure.GermanCloud)
+	resMan = "http://management.invalidhybrid.com/"
+	env, err = getAzureEnvironment(resMan)
+	assert.Errorf(t, err, "invalid character 'F' looking for beginning of value")
 }
