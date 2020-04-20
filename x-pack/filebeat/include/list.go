@@ -19,6 +19,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/azure"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cef"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/checkpoint"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cisco"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/coredns"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/envoyproxy"
