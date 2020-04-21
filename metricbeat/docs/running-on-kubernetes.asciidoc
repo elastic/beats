@@ -85,6 +85,15 @@ spec:
 If you are using Red Hat OpenShift, you need to specify additional settings in
 the manifest file and enable the container to run as privileged.
 
+. Modify the `DaemonSet` container spec in the manifest file:
++
+[source,yaml]
+-----
+  securityContext:
+    runAsUser: 0
+    privileged: true
+-----
+
 . In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
 specify the following settings under `kubernetes.yml` in the `data` section:
 +
