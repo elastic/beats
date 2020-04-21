@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package common
 
 import (
 	"bufio"
@@ -97,7 +97,7 @@ func TestCustomDelimiter(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			buf := strings.NewReader(test.text)
 			scanner := bufio.NewScanner(buf)
-			scanner.Split(factoryDelimiter(test.delimiter))
+			scanner.Split(FactoryDelimiter(test.delimiter))
 			var elements []string
 			for scanner.Scan() {
 				elements = append(elements, scanner.Text())
