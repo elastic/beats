@@ -97,7 +97,7 @@ func TestReplaceClientWorker(t *testing.T) {
 			seedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
-				numBatches := 10000 + (i % 100) // between 1000 and 1099
+				numBatches := 1000 + (i % 100) // between 1000 and 1099
 
 				wqu := makeWorkQueue()
 				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
