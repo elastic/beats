@@ -112,6 +112,32 @@ func TestTLSInvalidCert(t *testing.T) {
 	)
 }
 
+func TestTLSExpiredCert(t *testing.T) {
+	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
+	defer teardown()
+
+	hostname := cert.DNSNames[0]
+	event := testTLSTCPCheck(t, hostname, port, certFile.Name(), monitors.NewStdResolver())
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "down", "tcp"),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.SimpleURLChecks(t, "ssl", hostname, port),
+			hbtest.ResolveChecks(ip),
+			lookslike.MustCompile(map[string]interface{}{
+				"error": map[string]interface{}{
+					"message": x509.HostnameError{Certificate: cert, Host: hostname}.Error(),
+					"type":    "io",
+				},
+			}),
+		)),
+		event.Fields,
+	)
+}
+
 func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certificate, certFile *os.File, teardown func()) {
 	// Start up a TLS Server
 	server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
