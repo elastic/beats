@@ -18,9 +18,9 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 	metadataService := gcpService
 
 	for _, tsa := range tsas {
-		// aligner := tsa.aligner
+		aligner := tsa.aligner
 		for _, ts := range tsa.timeSeries {
-			keyValues, err := e.extractTimeSeriesMetricValues(ts)
+			keyValues, err := e.extractTimeSeriesMetricValues(ts, aligner)
 			if err != nil {
 				return nil, err
 			}
@@ -48,9 +48,6 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService googleclou
 				if _, ok := eventGroups[id]; !ok {
 					eventGroups[id] = make([]KeyValuePoint, 0)
 				}
-
-				// Add aggregation aligner as a label into metadata
-				// metadataCollectorData.Labels.Put("aggregation_aligner", aligner)
 
 				keyValues[i].ECS = metadataCollectorData.ECS
 				keyValues[i].Labels = metadataCollectorData.Labels

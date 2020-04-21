@@ -18,7 +18,7 @@
               type: object
             - name: system.*
               type: object
-        - name: "*.*.*.*.*"
+        - name: "stackdriver.*.*.*.*"
           type: object
           object_type: double
           object_type_mapping_type: "*"

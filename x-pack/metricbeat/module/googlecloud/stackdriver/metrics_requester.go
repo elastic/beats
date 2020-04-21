@@ -87,6 +87,7 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, stackDriverCo
 	results := make([]timeSeriesWithAligner, 0)
 
 	for _, sdc := range stackDriverConfigs {
+		aligner := sdc.Aligner
 		for _, mt := range sdc.MetricTypes {
 			metricType := mt
 			wg.Add(1)
@@ -95,7 +96,7 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, stackDriverCo
 				defer wg.Done()
 
 				metricMeta := metricsMeta[metricType]
-				interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, sdc.Aligner)
+				interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
 				ts := r.Metric(ctx, metricType, interval, aligner)
 
 				lock.Lock()
@@ -176,7 +177,7 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 
 	// Default aligner for aggregation is ALIGN_NONE if it's not given
 	updatedAligner := googlecloud.DefaultAligner
-	if needsAggregation {
+	if needsAggregation && inputAligner != "" {
 		updatedAligner = inputAligner
 	}
 

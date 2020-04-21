@@ -99,3 +99,25 @@ var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
 const (
 	DefaultAligner = "ALIGN_NONE"
 )
+
+var AlignersMapToSuffix = map[string]string{
+	"ALIGN_NONE":           ".raw",
+	"ALIGN_DELTA":          ".delta",
+	"ALIGN_RATE":           ".rate",
+	"ALIGN_INTERPOLATE":    ".interpolate",
+	"ALIGN_NEXT_OLDER":     ".next_older",
+	"ALIGN_MIN":            ".min",
+	"ALIGN_MAX":            ".max",
+	"ALIGN_MEAN":           ".avg",
+	"ALIGN_COUNT":          ".count",
+	"ALIGN_SUM":            ".sum",
+	"ALIGN_STDDEV":         ".stddev",
+	"ALIGN_COUNT_TRUE":     ".count_true",
+	"ALIGN_COUNT_FALSE":    ".count_false",
+	"ALIGN_FRACTION_TRUE":  ".fraction_true",
+	"ALIGN_PERCENTILE_99":  ".percentile_99",
+	"ALIGN_PERCENTILE_95":  ".percentile_95",
+	"ALIGN_PERCENTILE_50":  ".percentile_50",
+	"ALIGN_PERCENTILE_05":  ".percentile_05",
+	"ALIGN_PERCENT_CHANGE": ".percent_change",
+}

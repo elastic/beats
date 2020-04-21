@@ -145,6 +145,16 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"ALIGN_MAX",
 			"ALIGN_NONE",
 		},
+		{
+			"test collectionPeriod equals to samplePeriod with given aligner",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"ALIGN_MEAN",
+			"ALIGN_NONE",
+		},
 	}
 
 	for _, c := range cases {

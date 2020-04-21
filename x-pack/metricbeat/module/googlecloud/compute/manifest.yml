@@ -7,9 +7,6 @@ input:
       service: compute
       metrics:
         - metric_types:
-            - "compute.googleapis.com/instance/cpu/usage_time"
-            - "compute.googleapis.com/instance/cpu/utilization"
-            - "compute.googleapis.com/instance/uptime"
             - "compute.googleapis.com/firewall/dropped_bytes_count"
             - "compute.googleapis.com/firewall/dropped_packets_count"
             - "compute.googleapis.com/instance/cpu/reserved_cores"

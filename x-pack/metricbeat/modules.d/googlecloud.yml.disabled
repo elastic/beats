@@ -8,7 +8,6 @@
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  perSeriesAligner: ALIGN_MAX
   period: 300s
 
 - module: googlecloud
