@@ -5,10 +5,11 @@
 package performance
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"net/url"
 	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/pkg/errors"

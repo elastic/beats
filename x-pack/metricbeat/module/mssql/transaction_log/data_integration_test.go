@@ -5,9 +5,10 @@
 package transaction_log
 
 import (
+	"testing"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
-	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	mtest "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/testing"
