@@ -25,9 +25,12 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
+	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type config struct {
@@ -54,6 +57,19 @@ var defaultTCP = syslogTCP{
 	LineDelimiter: "\n",
 }
 
+type syslogUnix struct {
+	unix.Config   `config:",inline"`
+	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+}
+
+var defaultUnix = syslogUnix{
+	Config: unix.Config{
+		Timeout:        time.Minute * 5,
+		MaxMessageSize: 20 * humanize.MiByte,
+	},
+	LineDelimiter: "\n",
+}
+
 var defaultUDP = udp.Config{
 	MaxMessageSize: 10 * humanize.KiByte,
 	Timeout:        time.Minute * 5,
@@ -72,14 +88,31 @@ func factory(
 			return nil, err
 		}
 
-		splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
+		splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
 		if splitFunc == nil {
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		factory := tcp.SplitHandlerFactory(nf, splitFunc)
+		logger := logp.NewLogger("input.syslog.tcp").With("address", config.Config.Host)
+		factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logger, tcp.MetadataCallback, nf, splitFunc)
 
 		return tcp.New(&config.Config, factory)
+	case unix.Name:
+		config := defaultUnix
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
+
+		splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
+		if splitFunc == nil {
+			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
+		}
+
+		logger := logp.NewLogger("input.syslog.unix").With("path", config.Config.Path)
+		factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logger, unix.MetadataCallback, nf, splitFunc)
+
+		return unix.New(&config.Config, factory)
+
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {

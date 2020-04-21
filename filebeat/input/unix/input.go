@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package unix
 
 import (
 	"fmt"
@@ -27,30 +27,30 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
-	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
+	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
-	err := input.Register("tcp", NewInput)
+	err := input.Register("unix", NewInput)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// Input for TCP connection
+// Input for Unix socket connection
 type Input struct {
 	mutex   sync.Mutex
-	server  *tcp.Server
+	server  *unix.Server
 	started bool
 	outlet  channel.Outleter
 	config  *config
 	log     *logp.Logger
 }
 
-// NewInput creates a new TCP input
+// NewInput creates a new Unix socket input
 func NewInput(
 	cfg *common.Config,
 	connector channel.Connector,
@@ -75,8 +75,12 @@ func NewInput(
 	}
 
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		event := createEvent(data, metadata)
-		forwarder.Send(event)
+		forwarder.Send(beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"message": string(data),
+			},
+		})
 	}
 
 	splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
@@ -84,10 +88,10 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
+	logger := logp.NewLogger("input.unix").With("path", config.Config.Path)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logger, unix.MetadataCallback, cb, splitFunc)
 
-	server, err := tcp.New(&config.Config, factory)
+	server, err := unix.New(&config.Config, factory)
 	if err != nil {
 		return nil, err
 	}
@@ -101,28 +105,28 @@ func NewInput(
 	}, nil
 }
 
-// Run start a TCP input
+// Run start a Unix socket input
 func (p *Input) Run() {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	if !p.started {
-		p.log.Info("Starting TCP input")
+		p.log.Info("Starting Unix socket input")
 		err := p.server.Start()
 		if err != nil {
-			p.log.Errorw("Error starting the TCP server", "error", err)
+			p.log.Errorw("Error starting the Unix socket server", "error", err)
 		}
 		p.started = true
 	}
 }
 
-// Stop stops TCP server
+// Stop stops Unix socket server
 func (p *Input) Stop() {
 	defer p.outlet.Close()
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	p.log.Info("Stopping TCP input")
+	p.log.Info("Stopping Unix socket input")
 	p.server.Stop()
 	p.started = false
 }
@@ -130,18 +134,4 @@ func (p *Input) Stop() {
 // Wait stop the current server
 func (p *Input) Wait() {
 	p.Stop()
-}
-
-func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"message": string(raw),
-			"log": common.MapStr{
-				"source": common.MapStr{
-					"address": metadata.RemoteAddr.String(),
-				},
-			},
-		},
-	}
 }
