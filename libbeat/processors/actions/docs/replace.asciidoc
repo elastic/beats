@@ -19,7 +19,7 @@ The `replace` processor cannot be used to replace value with a completely new va
 TIP: You can replace field value to truncate part of field value or replace 
 it with a new string. It can also be used for masking PII information.
 
-Following example changes will change path from /usr/bin to /usr/local/bin
+Following example will change path from /usr/bin to /usr/local/bin
 
 [source,yaml]
 -------
