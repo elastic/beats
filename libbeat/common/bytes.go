@@ -38,7 +38,6 @@ const (
 	replacementChar = '\uFFFD' // Unicode replacement character
 )
 
-
 // Byte order utilities
 
 func BytesNtohs(b []byte) uint16 {
