@@ -22,11 +22,12 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"io"
 	"reflect"
 	"runtime"
 	"syscall"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"golang.org/x/sys/windows"
 
