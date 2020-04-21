@@ -15,32 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package unix
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Name is the human readable name and identifier.
-const Name = "tcp"
+const Name = "unix"
 
-// Config exposes the tcp configuration.
+// Config exposes the unix configuration.
 type Config struct {
-	Host           string                  `config:"host"`
-	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
-	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
-	MaxConnections int                     `config:"max_connections"`
-	TLS            *tlscommon.ServerConfig `config:"ssl"`
+	Path           string           `config:"path"`
+	Timeout        time.Duration    `config:"timeout" validate:"nonzero,positive"`
+	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"nonzero,positive"`
+	MaxConnections int              `config:"max_connections"`
 }
 
-// Validate validates the Config option for the tcp input.
+// Validate validates the Config option for the unix input.
 func (c *Config) Validate() error {
-	if len(c.Host) == 0 {
-		return fmt.Errorf("need to specify the host using the `host:port` syntax")
+	if len(c.Path) == 0 {
+		return fmt.Errorf("need to specify the path to the unix socket")
 	}
 	return nil
 }

@@ -15,13 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package unix
 
 import (
 	"bufio"
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -163,7 +165,8 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			to := func(message []byte, mt inputsource.NetworkMetadata) {
 				ch <- &info{message: string(message), mt: mt}
 			}
-			test.cfg["host"] = "localhost:0"
+			path := filepath.Join(os.TempDir(), "test.sock")
+			test.cfg["path"] = path
 			cfg, _ := common.NewConfigFrom(test.cfg)
 			config := defaultConfig
 			err := cfg.Unpack(&config)
@@ -171,7 +174,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
+			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -182,7 +185,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 			defer server.Stop()
 
-			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
+			conn, err := net.Dial("unix", path)
 			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
@@ -199,7 +202,6 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 
 			for idx, e := range events {
 				assert.Equal(t, test.expectedMessages[idx], e.message)
-				assert.NotNil(t, e.mt.RemoteAddr)
 			}
 		})
 	}
@@ -208,12 +210,13 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 func TestReceiveNewEventsConcurrently(t *testing.T) {
 	workers := 4
 	eventsCount := 100
+	path := filepath.Join(os.TempDir(), "test.sock")
 	ch := make(chan *info, eventsCount*workers)
 	defer close(ch)
 	to := func(message []byte, mt inputsource.NetworkMetadata) {
 		ch <- &info{message: string(message), mt: mt}
 	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"host": ":0"})
+	cfg, err := common.NewConfigFrom(map[string]interface{}{"path": path})
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -223,7 +226,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
@@ -238,7 +241,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	samples := generateMessages(eventsCount, 1024)
 	for w := 0; w < workers; w++ {
 		go func() {
-			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
+			conn, err := net.Dial("unix", path)
 			defer conn.Close()
 			assert.NoError(t, err)
 			for _, sample := range samples {

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package common
 
 import (
 	"sync"
@@ -51,7 +51,7 @@ type Closer struct {
 }
 
 // Close closes the closes and propagates the close to any child, on close the close callback will
-// be called, this can be used for custom cleanup like closing a TCP socket.
+// be called, this can be used for custom cleanup like closing a socket.
 func (c *Closer) Close() {
 	c.mu.Lock()
 	if c.err != nil {
@@ -85,6 +85,12 @@ func (c *Closer) Close() {
 // the current node or any parent it may have.
 func (c *Closer) Done() <-chan struct{} {
 	return c.done
+}
+
+// SetCallback sets the underlying callback function invoked
+// when the Closer is Closed.
+func (c *Closer) SetCallback(callback CloserFunc) {
+	c.callback = callback
 }
 
 // Err returns an error if the Closer was already closed.
