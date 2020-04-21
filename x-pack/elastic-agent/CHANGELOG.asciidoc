@@ -22,6 +22,7 @@
 - Fix issues when running `mage package` for all the platforms. {pull}17767[17767]
 - Rename the User-Agent string from Beats Agent to Elastic Agent. {pull}17765[17765]
 - Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
+- Make sure that the Elastic Agent connect over TLS in cloud. {pull}17843[17843]
 
 ==== New features
 
