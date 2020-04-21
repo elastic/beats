@@ -9,7 +9,7 @@
   hosts: ["127.0.0.1:6379"]
 
   # Redis AUTH password. Empty by default.
-  password: test
+  password: ""
 
   # The duration to remain idle before closing connections
   idle_timeout: 20s
@@ -19,3 +19,11 @@
 
   # Max number of concurrent connections. Default: 10
   maxconn: 10
+
+- module: redis
+  metricsets:
+    - key
+  key:
+    patterns:
+      - pattern: '*'
+        limit: 20
