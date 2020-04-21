@@ -168,14 +168,7 @@ func (r *retryer) loop() {
 				active = buffer[0]
 				activeSize = len(active.Events())
 				if !consumerBlocked {
-					consumerBlocked = blockConsumer(numOutputs, len(buffer))
-					if consumerBlocked {
-						log.Info("retryer: send wait signal to consumer")
-						if r.consumer != nil {
-							r.consumer.sigWait()
-						}
-						log.Info("  done")
-					}
+					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
 				}
 			}
 
@@ -193,25 +186,47 @@ func (r *retryer) loop() {
 			}
 
 			if consumerBlocked {
-				consumerBlocked = blockConsumer(numOutputs, len(buffer))
-				if !consumerBlocked {
-					log.Info("retryer: send unwait-signal to consumer")
-					if r.consumer != nil {
-						r.consumer.sigUnWait()
-					}
-					log.Info("  done")
-				}
+				consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
 			}
 
 		case sig := <-r.sig:
 			switch sig.tag {
 			case sigRetryerOutputAdded:
 				numOutputs++
+				if consumerBlocked {
+					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
+				}
 			case sigRetryerOutputRemoved:
 				numOutputs--
+				if !consumerBlocked {
+					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
+				}
 			}
 		}
 	}
+}
+
+func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
+	consumerBlocked := blockConsumer(numOutputs, numBatches)
+	if r.consumer == nil {
+		return consumerBlocked
+	}
+
+	if consumerBlocked {
+		r.logger.Info("retryer: send wait signal to consumer")
+		if r.consumer != nil {
+			r.consumer.sigWait()
+		}
+		r.logger.Info("  done")
+	} else {
+		r.logger.Info("retryer: send unwait signal to consumer")
+		if r.consumer != nil {
+			r.consumer.sigUnWait()
+		}
+		r.logger.Info("  done")
+	}
+
+	return consumerBlocked
 }
 
 func blockConsumer(numOutputs, numBatches int) bool {

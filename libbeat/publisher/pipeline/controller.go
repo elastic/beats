@@ -137,7 +137,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	// restart consumer (potentially blocked by retryer)
 	c.consumer.sigContinue()
-	c.consumer.sigUnWait()
 
 	c.observer.updateOutputGroup()
 }
