@@ -54,7 +54,6 @@ type retryQueue chan batchEvent
 type retryerSignal struct {
 	tag     retryerEventTag
 	channel workQueue
-	done    chan struct{}
 }
 
 type batchEvent struct {
