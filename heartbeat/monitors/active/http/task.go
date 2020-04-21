@@ -22,7 +22,6 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -31,6 +30,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -97,10 +98,8 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
-
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(settings, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
 }
