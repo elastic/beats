@@ -4,17 +4,23 @@
   description: >
     GCP module
   fields:
-    - name: googlecloud.labels
-      type: object
+    - name: googlecloud
+      type: group
       fields:
-        - name: user.*
+        - name: labels
           type: object
-        - name: metadata.*
+          fields:
+            - name: user.*
+              type: object
+            - name: metadata.*
+              type: object
+            - name: metrics.*
+              type: object
+            - name: system.*
+              type: object
+        - name: "*.*.*.*.*"
           type: object
-        - name: metrics.*
-          type: object
-        - name: system.*
-          type: object
-        - name: aggregation_aligner
-          type: keyword
-          description: Aggregation perSeriesAligner used for ListTimeSeries API.
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Metrics that returned from StackDriver API query.
