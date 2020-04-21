@@ -20,7 +20,7 @@ package wineventlog
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // bufferPool contains a pool of byteBuffer objects.
@@ -104,7 +104,7 @@ func UTF16BytesToString(b []byte) (string, error) {
 	bb := newByteBuffer()
 	defer bb.free()
 
-	if err := sys.UTF16ToUTF8Bytes(b, bb); err != nil {
+	if err := common.UTF16ToUTF8Bytes(b, bb); err != nil {
 		return "", err
 	}
 
