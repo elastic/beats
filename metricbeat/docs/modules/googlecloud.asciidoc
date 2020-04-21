@@ -28,10 +28,10 @@ This is a list of the possible module parameters you can tune:
 
 * *period*: A single time duration specified for this module collection frequency.
 
-* *perSeriesAligner*: A single string with which aggregation operation need to be applied onto time series data for ListTimeSeries API .
-If it's not given and sample period of a specific metric type is larger or equal than module collection period, default perSeriesAligner is set to be `ALIGN_NONE`.
-If it's not given and sample period of a specific metric type is smaller than module collection period, default perSeriesAligner is set to be `ALIGN_MEAN`.
-Sample period of each metric type is obtained from making https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list [ListMetricDescriptors API] call.
+* *aligner*: A single string with which aggregation operation need to be applied
+onto time series data for ListTimeSeries API. If it's not given, default aligner
+is set to be `ALIGN_NONE`. Sample period of each metric type is obtained from
+making https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list [ListMetricDescriptors API] call.
 
 [float]
 === Example Configuration
@@ -58,9 +58,9 @@ metricbeat.modules:
 * `compute` metricset is enabled to collect metrics from a specific zone
 `us-central1a` in `test-project`. Metric types collected by `compute` metricset
 usually have 240 seconds ingest delay time and 60 seconds sample period. With
-`period` specified as `300s` in the config below and no `perSeriesAligner`
+`period` specified as `300s` in the config below and no `aligner`
 specified, Metricbeat will collect compute metrics from googlecloud every
-5-minute with default `perSeriesAligner = ALIGN_MEAN` aggregation.
+5-minute with default `aligner = ALIGN_MEAN` aggregation.
 +
 [source,yaml]
 ----
@@ -78,9 +78,9 @@ metricbeat.modules:
 * `compute` metricset is enabled to collect metrics from a specific zone
 `us-central1a` in `test-project`. Metric types collected by `compute` metricset
 usually have 240 seconds ingest delay time and 60 seconds sample period. With
-`period` specified as `10m` in the config below and given `perSeriesAligner: ALIGN_MAX`
+`period` specified as `10m` in the config below and given `aligner: ALIGN_MAX`
 specified, Metricbeat will collect compute metrics from googlecloud every
-10-minute with default `perSeriesAligner = ALIGN_MAX` aggregation.
+10-minute with default `aligner = ALIGN_MAX` aggregation.
 +
 [source,yaml]
 ----
@@ -99,9 +99,9 @@ metricbeat.modules:
 * `compute` metricset is enabled to collect metrics from a specific zone
 `us-central1a` in `test-project`. Metric types collected by `compute` metricset
 usually have 240 seconds ingest delay time and 60 seconds sample period. With
-`period` specified as `5m` in the config below and given `perSeriesAligner: ALIGN_NONE`
+`period` specified as `5m` in the config below and given `aligner: ALIGN_NONE`
 specified, Metricbeat will collect compute metrics from googlecloud every
-5-minute with `perSeriesAligner = ALIGN_NONE` aggregation, which means no aligner
+5-minute with `aligner = ALIGN_NONE` aggregation, which means no aligner
 is applied. This way, Metricbeat will collect `compute` metrics every 5-minute and
 each collection will return 5 data points(one per sample period).
 +
