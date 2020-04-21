@@ -16,10 +16,8 @@ include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all module dashboards
 .PHONY: kibana
-kibana:
-	@rm -rf _meta/kibana.generated
-	@mkdir -p _meta/kibana.generated
-	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
+kibana: mage
+	@mage dashboards
 
 # Collects all module docs
 .PHONY: collect-docs
