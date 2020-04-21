@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix recording of SSL cert metadata for Expired/Unvalidated x509 certs. {pull}13687[13687]
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
+- Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
 
 *Journalbeat*
 
@@ -322,6 +323,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Filebeat Okta module. {pull}16362[16362]
 - Add source field in k8s events {pull}17209[17209]
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
+- Added new module `crowdstrike` for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
 - Move azure-eventhub input to GA. {issue}15671[15671] {pull}17313[17313]
 - Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
@@ -331,6 +333,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Google Cloud module as GA. {pull}17511[17511]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
 - Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
+- Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
 - Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
 
 *Heartbeat*
