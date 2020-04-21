@@ -385,7 +385,7 @@ func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 		},
 		startTimestamp: time.Unix(0, *msg.StartTimestamp),
 		stopTimestamp:  time.Unix(0, *msg.StopTimestamp),
-		requestID:      msg.RequestId.String(),
+		requestID:      formatUUID(msg.RequestId),
 		peerType:       strings.ToLower(msg.PeerType.String()),
 		method:         msg.Method.String(),
 		uri:            *msg.Uri,
