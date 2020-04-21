@@ -33,7 +33,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
@@ -43,6 +43,7 @@ import (
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterPythonTestDeps(Fields)
+	integtest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
