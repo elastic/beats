@@ -106,58 +106,14 @@ func TestGetFilterForMetric(t *testing.T) {
 	}
 }
 
-func TestConstructAggregation(t *testing.T) {
+func TestGetTimeIntervalAligner(t *testing.T) {
 	cases := []struct {
-		title                    string
-		period                   duration.Duration
-		perSeriesAligner         string
-		needsAggregation         bool
-		expectedPerSeriesAligner string
-	}{
-		{
-			"test no aggregation",
-			duration.Duration{
-				Seconds: int64(60),
-			},
-			"",
-			false,
-			"ALIGN_NONE",
-		},
-		{
-			"test needs aggregation with no perSeriesAligner config parameter",
-			duration.Duration{
-				Seconds: int64(60),
-			},
-			"",
-			true,
-			"ALIGN_MEAN",
-		},
-		{
-			"test needs aggregation with perSeriesAligner configured",
-			duration.Duration{
-				Seconds: int64(60),
-			},
-			"ALIGN_MAX",
-			true,
-			"ALIGN_MAX",
-		},
-	}
-
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
-			aggregation := constructAggregation(c.period, c.perSeriesAligner, c.needsAggregation)
-			assert.Equal(t, c.expectedPerSeriesAligner, aggregation.PerSeriesAligner.String())
-		})
-	}
-}
-
-func TestGetTimeInterval(t *testing.T) {
-	cases := []struct {
-		title                    string
-		ingestDelay              time.Duration
-		samplePeriod             time.Duration
-		collectionPeriod         duration.Duration
-		expectedNeedsAggregation bool
+		title            string
+		ingestDelay      time.Duration
+		samplePeriod     time.Duration
+		collectionPeriod duration.Duration
+		inputAligner     string
+		expectedAligner  string
 	}{
 		{
 			"test collectionPeriod equals to samplePeriod",
@@ -166,7 +122,8 @@ func TestGetTimeInterval(t *testing.T) {
 			duration.Duration{
 				Seconds: int64(60),
 			},
-			false,
+			"",
+			"ALIGN_NONE",
 		},
 		{
 			"test collectionPeriod larger than samplePeriod",
@@ -175,7 +132,8 @@ func TestGetTimeInterval(t *testing.T) {
 			duration.Duration{
 				Seconds: int64(300),
 			},
-			true,
+			"ALIGN_MEAN",
+			"ALIGN_MEAN",
 		},
 		{
 			"test collectionPeriod smaller than samplePeriod",
@@ -184,14 +142,15 @@ func TestGetTimeInterval(t *testing.T) {
 			duration.Duration{
 				Seconds: int64(30),
 			},
-			false,
+			"ALIGN_MAX",
+			"ALIGN_NONE",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			_, needsAggregation := getTimeInterval(c.ingestDelay, c.samplePeriod, c.collectionPeriod)
-			assert.Equal(t, c.expectedNeedsAggregation, needsAggregation)
+			_, aligner := getTimeIntervalAligner(c.ingestDelay, c.samplePeriod, c.collectionPeriod, c.inputAligner)
+			assert.Equal(t, c.expectedAligner, aligner)
 		})
 	}
 }

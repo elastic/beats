@@ -43,9 +43,16 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config      config
-	metricsMeta map[string]metricMeta
-	requester   *stackdriverMetricsRequester
+	config            config
+	metricsMeta       map[string]metricMeta
+	requester         *stackdriverMetricsRequester
+	StackDriverConfig []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
+}
+
+//stackDriverConfig holds a configuration specific for stackdriver metricset.
+type stackDriverConfig struct {
+	MetricTypes []string `config:"metric_types" validate:"required"`
+	Aligner     string   `config:"aligner"`
 }
 
 type metricMeta struct {
@@ -54,14 +61,12 @@ type metricMeta struct {
 }
 
 type config struct {
-	Metrics             []string `config:"stackdriver.metrics" validate:"required"`
-	Zone                string   `config:"zone"`
-	Region              string   `config:"region"`
-	ProjectID           string   `config:"project_id" validate:"required"`
-	ExcludeLabels       bool     `config:"exclude_labels"`
-	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
-	CredentialsFilePath string   `config:"credentials_file_path"`
-	PerSeriesAligner    string   `config:"perSeriesAligner"`
+	Zone                string `config:"zone"`
+	Region              string `config:"region"`
+	ProjectID           string `config:"project_id" validate:"required"`
+	ExcludeLabels       bool   `config:"exclude_labels"`
+	ServiceName         string `config:"stackdriver.service"  validate:"required"`
+	CredentialsFilePath string `config:"credentials_file_path"`
 
 	opt    []option.ClientOption
 	period duration.Duration
@@ -78,6 +83,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	stackDriverConfigs := struct {
+		StackDriverMetrics []stackDriverConfig `config:"stackdriver.metrics" validate:"nonzero,required"`
+	}{}
+
+	if err := base.Module().UnpackConfig(&stackDriverConfigs); err != nil {
+		return nil, err
+	}
+
+	m.StackDriverConfig = stackDriverConfigs.StackDriverMetrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period.Seconds = int64(m.Module().Config().Period.Seconds())
 
@@ -92,7 +106,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
 
-	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.config.Metrics)
+	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.StackDriverConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error calling metricDescriptor function")
 	}
@@ -109,7 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	responses, err := m.requester.Metrics(ctx, m.config.Metrics, m.metricsMeta)
+	responses, err := m.requester.Metrics(ctx, m.StackDriverConfig, m.metricsMeta)
 	if err != nil {
 		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
@@ -174,6 +188,7 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 	return nil
 }
 
+// Validate googlecloud module config
 func (c *config) Validate() error {
 	// storage metricset does not require region or zone config parameter.
 	if c.ServiceName == "storage" {
@@ -183,41 +198,46 @@ func (c *config) Validate() error {
 	if c.Region == "" && c.Zone == "" {
 		return errors.New("region and zone in Google Cloud config file cannot both be empty")
 	}
+	return nil
+}
 
+// Validate stackdriver related config
+func (mc *stackDriverConfig) Validate() error {
 	gcpAlignerNames := make([]string, 0)
 	for k := range googlecloud.AlignersMapToGCP {
 		gcpAlignerNames = append(gcpAlignerNames, k)
 	}
 
-	if c.PerSeriesAligner != "" {
-		if _, ok := googlecloud.AlignersMapToGCP[c.PerSeriesAligner]; !ok {
-			return errors.Errorf("the given perSeriesAligner is not supported, please specify one of %s as perSeriesAligner", gcpAlignerNames)
+	if mc.Aligner != "" {
+		if _, ok := googlecloud.AlignersMapToGCP[mc.Aligner]; !ok {
+			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
 		}
 	}
-
 	return nil
 }
 
 // metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
 // (sample period and ingest delay) of each given metric type
-func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, metricTypes []string) (map[string]metricMeta, error) {
+func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, metricsConfigs []stackDriverConfig) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
 
-	for _, mt := range metricTypes {
-		req := &monitoringpb.ListMetricDescriptorsRequest{
-			Name:   "projects/" + projectID,
-			Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
-		}
+	for _, metricsC := range metricsConfigs {
+		for _, mt := range metricsC.MetricTypes {
+			req := &monitoringpb.ListMetricDescriptorsRequest{
+				Name:   "projects/" + projectID,
+				Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
+			}
 
-		it := client.ListMetricDescriptors(ctx, req)
-		out, err := it.Next()
-		if err != nil {
-			return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
-		}
+			it := client.ListMetricDescriptors(ctx, req)
+			out, err := it.Next()
+			if err != nil {
+				return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
+			}
 
-		metricsWithMeta[mt] = metricMeta{
-			samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
-			ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
+			metricsWithMeta[mt] = metricMeta{
+				samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
+				ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
+			}
 		}
 	}
 

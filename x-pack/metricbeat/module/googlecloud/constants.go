@@ -95,3 +95,7 @@ var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
 	"ALIGN_PERCENTILE_05":  monitoringpb.Aggregation_ALIGN_PERCENTILE_05,
 	"ALIGN_PERCENT_CHANGE": monitoringpb.Aggregation_ALIGN_PERCENT_CHANGE,
 }
+
+const (
+	DefaultAligner = "ALIGN_NONE"
+)
