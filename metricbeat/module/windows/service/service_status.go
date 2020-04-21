@@ -21,14 +21,13 @@ package service
 
 import (
 	"bytes"
-	"fmt"
-	"io"
 	"strconv"
 	"syscall"
 	"time"
 	"unicode/utf16"
-	"unicode/utf8"
 	"unsafe"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
@@ -66,14 +65,6 @@ const (
 	StartTypeAutomaticTriggered
 	StartTypeAutomaticDelayedTriggered
 	StartTypeManualTriggered
-
-	// 0xd800-0xdc00 encodes the high 10 bits of a pair.
-	// 0xdc00-0xe000 encodes the low 10 bits of a pair.
-	// the value is those 20 bits plus 0x10000.
-	surr1           = 0xd800
-	surr2           = 0xdc00
-	surr3           = 0xe000
-	replacementChar = '\uFFFD' // Unicode replacement character
 )
 
 var (
@@ -101,8 +92,6 @@ var (
 )
 
 type ConfigInformation uint32
-
-type Handle uintptr
 
 type Status struct {
 	DisplayName      string
@@ -137,7 +126,7 @@ func (state ServiceState) String() string {
 	return ""
 }
 
-func GetServiceStates(handle DatabaseHandle, state ServiceEnumState, protectedServices map[string]struct{}) ([]Status, error) {
+func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices map[string]struct{}) ([]Status, error) {
 	var servicesReturned uint32
 	var servicesBuffer []byte
 
@@ -183,7 +172,7 @@ func GetServiceStates(handle DatabaseHandle, state ServiceEnumState, protectedSe
 	return services, nil
 }
 
-func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle DatabaseHandle, protectedServices map[string]struct{}) (Status, error) {
+func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle Handle, protectedServices map[string]struct{}) (Status, error) {
 	service := Status{
 		PID: rawService.ServiceStatusProcess.DwProcessId,
 	}
@@ -193,13 +182,13 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	displayNameOffset := uintptr(unsafe.Pointer(rawService.LpDisplayName)) - (uintptr)(unsafe.Pointer(&servicesBuffer[0]))
 
 	strBuf := new(bytes.Buffer)
-	if err := UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:], strBuf); err != nil {
+	if err := common.UTF16ToUTF8Bytes(servicesBuffer[displayNameOffset:], strBuf); err != nil {
 		return service, err
 	}
 	service.DisplayName = strBuf.String()
 
 	strBuf.Reset()
-	if err := UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:], strBuf); err != nil {
+	if err := common.UTF16ToUTF8Bytes(servicesBuffer[serviceNameOffset:], strBuf); err != nil {
 		return service, err
 	}
 	service.ServiceName = strBuf.String()
@@ -224,7 +213,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 		return service, errors.Wrapf(err, "error while opening service %s", service.ServiceName)
 	}
 
-	defer closeServiceHandle(serviceHandle)
+	defer closeHandle(serviceHandle)
 
 	// Get detailed information
 	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
@@ -253,7 +242,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	return service, nil
 }
 
-func openServiceHandle(handle DatabaseHandle, serviceName string, desiredAccess ServiceAccessRight) (Handle, error) {
+func openServiceHandle(handle Handle, serviceName string, desiredAccess ServiceAccessRight) (Handle, error) {
 	var serviceNamePtr *uint16
 	if serviceName != "" {
 		var err error
@@ -269,14 +258,6 @@ func openServiceHandle(handle DatabaseHandle, serviceName string, desiredAccess 
 	}
 
 	return serviceHandle, nil
-}
-
-func closeServiceHandle(serviceHandle Handle) error {
-	if err := _CloseServiceHandle(uintptr(serviceHandle)); err != nil {
-		return ServiceErrno(err.(syscall.Errno))
-	}
-
-	return nil
 }
 
 func getAdditionalServiceInfo(serviceHandle Handle, service *Status) error {
@@ -303,13 +284,13 @@ func getAdditionalServiceInfo(serviceHandle Handle, service *Status) error {
 		binaryPathNameOffset := uintptr(unsafe.Pointer(serviceQueryConfig.LpBinaryPathName)) - (uintptr)(unsafe.Pointer(&buffer[0]))
 
 		strBuf := new(bytes.Buffer)
-		if err := UTF16ToUTF8Bytes(buffer[serviceStartNameOffset:], strBuf); err != nil {
+		if err := common.UTF16ToUTF8Bytes(buffer[serviceStartNameOffset:], strBuf); err != nil {
 			return err
 		}
 		service.ServiceStartName = strBuf.String()
 
 		strBuf.Reset()
-		if err := UTF16ToUTF8Bytes(buffer[binaryPathNameOffset:], strBuf); err != nil {
+		if err := common.UTF16ToUTF8Bytes(buffer[binaryPathNameOffset:], strBuf); err != nil {
 			return err
 		}
 		service.BinaryPathName = strBuf.String()
@@ -397,43 +378,6 @@ func getServiceUptime(processID uint32) (time.Duration, error) {
 	uptime := time.Since(time.Unix(0, int64(processCreationTime.StartTime)*int64(time.Millisecond)))
 
 	return uptime, nil
-}
-
-func UTF16ToUTF8Bytes(in []byte, out io.Writer) error {
-	if len(in)%2 != 0 {
-		return fmt.Errorf("input buffer must have an even length (length=%d)", len(in))
-	}
-
-	var runeBuf [4]byte
-	var v1, v2 uint16
-	for i := 0; i < len(in); i += 2 {
-		v1 = uint16(in[i]) | uint16(in[i+1])<<8
-		// Stop at null-terminator.
-		if v1 == 0 {
-			return nil
-		}
-
-		switch {
-		case v1 < surr1, surr3 <= v1:
-			n := utf8.EncodeRune(runeBuf[:], rune(v1))
-			out.Write(runeBuf[:n])
-		case surr1 <= v1 && v1 < surr2 && len(in) > i+2:
-			v2 = uint16(in[i+2]) | uint16(in[i+3])<<8
-			if surr2 <= v2 && v2 < surr3 {
-				// valid surrogate sequence
-				r := utf16.DecodeRune(rune(v1), rune(v2))
-				n := utf8.EncodeRune(runeBuf[:], r)
-				out.Write(runeBuf[:n])
-			}
-			i += 2
-		default:
-			// invalid surrogate sequence
-			n := utf8.EncodeRune(runeBuf[:], replacementChar)
-			out.Write(runeBuf[:n])
-		}
-	}
-
-	return nil
 }
 
 func (e ServiceErrno) Error() string {

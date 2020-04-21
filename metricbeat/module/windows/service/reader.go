@@ -37,13 +37,13 @@ var (
 	errorNames = map[uint32]string{
 		1077: "ERROR_SERVICE_NEVER_STARTED",
 	}
-	InvalidDatabaseHandle = ^DatabaseHandle(0)
+	InvalidDatabaseHandle = ^Handle(0)
 )
 
-type DatabaseHandle uintptr
+type Handle uintptr
 
 type Reader struct {
-	handle            DatabaseHandle
+	handle            Handle
 	state             ServiceEnumState
 	guid              string            // Host's MachineGuid value (a unique ID for the host).
 	ids               map[string]string // Cache of service IDs.
@@ -112,10 +112,10 @@ func (reader *Reader) Read() ([]common.MapStr, error) {
 }
 
 func (reader *Reader) Close() error {
-	return closeDatabaseHandle(reader.handle)
+	return closeHandle(reader.handle)
 }
 
-func openSCManager(machineName string, databaseName string, desiredAccess ServiceSCMAccessRight) (DatabaseHandle, error) {
+func openSCManager(machineName string, databaseName string, desiredAccess ServiceSCMAccessRight) (Handle, error) {
 	var machineNamePtr *uint16
 	if machineName != "" {
 		var err error
@@ -189,10 +189,9 @@ func getErrorCode(errno uint32) string {
 	return strconv.Itoa(int(errno))
 }
 
-func closeDatabaseHandle(handle DatabaseHandle) error {
+func closeHandle(handle Handle) error {
 	if err := _CloseServiceHandle(uintptr(handle)); err != nil {
 		return ServiceErrno(err.(syscall.Errno))
 	}
-
 	return nil
 }

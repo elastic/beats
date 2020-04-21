@@ -31,7 +31,6 @@ func TestNewReader(t *testing.T) {
 	assert.NotNil(t, reader)
 	defer reader.Close()
 	assert.NotNil(t, reader.handle)
-
 }
 
 func TestOpenSCManager(t *testing.T) {
@@ -46,7 +45,7 @@ func TestOpenSCManager(t *testing.T) {
 	handle, err = openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	closeDatabaseHandle(handle)
+	closeHandle(handle)
 }
 
 func TestGetMachineGUID(t *testing.T) {

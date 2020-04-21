@@ -22,6 +22,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"io"
 	"reflect"
 	"runtime"
@@ -414,7 +415,7 @@ func FormatEventString(
 
 	// This assumes there is only a single string value to read. This will
 	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
-	return sys.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
+	return common.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
 }
 
 // offset reads a pointer value from the reader then calculates an offset from
@@ -505,5 +506,5 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 			"to the buffer, but the buffer can only hold %d bytes",
 			bufferUsed, len(renderBuf))
 	}
-	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+	return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }

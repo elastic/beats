@@ -104,7 +104,7 @@ func UTF16BytesToString(b []byte) (string, error) {
 	bb := newByteBuffer()
 	defer bb.free()
 
-	if err := sys.UTF16ToUTF8Bytes(b, bb); err != nil {
+	if err := common.UTF16ToUTF8Bytes(b, bb); err != nil {
 		return "", err
 	}
 

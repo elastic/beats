@@ -20,10 +20,7 @@
 package service
 
 import (
-	"bytes"
-	"encoding/binary"
 	"testing"
-	"unicode/utf16"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -35,15 +32,5 @@ func TestGetServiceStates(t *testing.T) {
 	services, err := GetServiceStates(handle, ServiceStateAll, map[string]struct{}{})
 	assert.NoError(t, err)
 	assert.True(t, len(services) > 0)
-	closeDatabaseHandle(handle)
-}
-
-func TestUTF16ToUTF8(t *testing.T) {
-	input := "abc白鵬翔\u145A6"
-	buf := &bytes.Buffer{}
-	binary.Write(buf, binary.LittleEndian, utf16.Encode([]rune(input)))
-	outputBuf := &bytes.Buffer{}
-	err := UTF16ToUTF8Bytes(buf.Bytes(), outputBuf)
-	assert.NoError(t, err)
-	assert.Equal(t, []byte(input), outputBuf.Bytes())
+	closeHandle(handle)
 }
