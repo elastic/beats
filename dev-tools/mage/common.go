@@ -803,3 +803,31 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	patch, _ = strconv.Atoi(data["patch"])
 	return
 }
+
+// listModuleDir calls gotool.ListModuleVendorDir or
+// gotool.ListModuleCacheDir, depending on the value of
+// UseVendor.
+func listModuleDir(modpath string) (string, error) {
+	if UseVendor {
+		return gotool.ListModuleVendorDir(modpath)
+	}
+	return gotool.ListModuleCacheDir(modpath)
+}
+
+// ListMatchingEnvVars returns all of the environment variables names that begin
+// with prefix.
+func ListMatchingEnvVars(prefixes ...string) []string {
+	var vars []string
+	for _, v := range os.Environ() {
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(v, prefix) {
+				eqIdx := strings.Index(v, "=")
+				if eqIdx != -1 {
+					vars = append(vars, v[:eqIdx])
+				}
+				break
+			}
+		}
+	}
+	return vars
+}
