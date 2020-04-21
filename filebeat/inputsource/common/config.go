@@ -15,32 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package common
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-// Name is the human readable name and identifier.
-const Name = "tcp"
-
-// Config exposes the tcp configuration.
-type Config struct {
-	Host           string                  `config:"host"`
-	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
-	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
-	MaxConnections int                     `config:"max_connections"`
-	TLS            *tlscommon.ServerConfig `config:"ssl"`
-}
-
-// Validate validates the Config option for the tcp input.
-func (c *Config) Validate() error {
-	if len(c.Host) == 0 {
-		return fmt.Errorf("need to specify the host using the `host:port` syntax")
-	}
-	return nil
+// ListenerConfig exposes the shared listener configuration.
+type ListenerConfig struct {
+	Timeout        time.Duration
+	MaxMessageSize cfgtype.ByteSize
+	MaxConnections int
 }
