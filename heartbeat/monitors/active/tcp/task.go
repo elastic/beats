@@ -18,6 +18,8 @@
 package tcp
 
 import (
+	"crypto/x509"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -40,6 +42,9 @@ func pingHost(
 
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
+		if certErr, ok := err.(x509.CertificateInvalidError); ok {
+			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+		}
 		debugf("dial failed with: %v", err)
 		return reason.IOFailed(err)
 	}

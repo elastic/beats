@@ -19,7 +19,6 @@ package dialchain
 
 import (
 	cryptoTLS "crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"net"
 	"time"
@@ -43,9 +42,6 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 
 		dialer, err := transport.TLSDialer(next, cfg, to)
 		if err != nil {
-			if certErr, ok := err.(x509.CertificateInvalidError); ok {
-				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
-			}
 			return nil, err
 		}
 
