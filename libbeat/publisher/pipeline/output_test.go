@@ -51,9 +51,7 @@ func TestMakeClientWorker(t *testing.T) {
 				defer retryer.close()
 
 				var published atomic.Uint
-				var batchCount int
 				publishFn := func(batch publisher.Batch) error {
-					batchCount++
 					published.Add(uint(len(batch.Events())))
 					return nil
 				}
@@ -127,9 +125,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				var publishedFirst atomic.Uint
 				blockCtrl := make(chan struct{})
-				var batchCount int
 				blockingPublishFn := func(batch publisher.Batch) error {
-					batchCount++
 					// Emulate blocking. Upon unblocking the in-flight batch that was
 					// blocked is published.
 					if publishedFirst.Load() >= publishLimit {
