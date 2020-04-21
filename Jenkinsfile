@@ -68,7 +68,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
           }
         }
 
@@ -82,7 +82,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -96,7 +96,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
         }
 

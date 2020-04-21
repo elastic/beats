@@ -29,7 +29,7 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 const (
@@ -49,6 +49,7 @@ var Aliases = map[string]interface{}{
 
 func init() {
 	common.RegisterCheckDeps(Update, Check.All)
+	test.RegisterDeps(UnitTest)
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
