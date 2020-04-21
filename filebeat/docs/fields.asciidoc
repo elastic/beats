@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
+* <<exported-fields-crowdstrike>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
@@ -5992,6 +5993,504 @@ dnssec flag
 
 
 type: boolean
+
+--
+
+[[exported-fields-crowdstrike]]
+== Crowdstrike fields
+
+Module for collecting Crowdstrike events.
+
+
+
+[float]
+=== crowdstrike
+
+Fields for Crowdstrike Falcon event and alert data.
+
+
+
+[float]
+=== metadata
+
+Meta data fields for each event that include type and timestamp.
+
+
+
+*`crowdstrike.metadata.eventType`*::
++
+--
+DetectionSummaryEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
+
+
+type: keyword
+
+--
+
+*`crowdstrike.metadata.eventCreationTime`*::
++
+--
+The time this event occurred on the endpoint in UTC UNIX_MS format.
+
+
+type: date
+
+--
+
+*`crowdstrike.metadata.offset`*::
++
+--
+Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
+
+
+type: integer
+
+--
+
+*`crowdstrike.metadata.customerIDString`*::
++
+--
+Customer identifier
+
+
+type: keyword
+
+--
+
+*`crowdstrike.metadata.version`*::
++
+--
+Schema version
+
+
+type: keyword
+
+--
+
+[float]
+=== event
+
+Event data fields for each event and alert.
+
+
+
+*`crowdstrike.event.ProcessStartTime`*::
++
+--
+The process start time in UTC UNIX_MS format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.ProcessEndTime`*::
++
+--
+The process termination time in UTC UNIX_MS format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.ProcessId`*::
++
+--
+Process ID related to the detection.
+
+
+type: integer
+
+--
+
+*`crowdstrike.event.ParentProcessId`*::
++
+--
+Parent process ID related to the detection.
+
+
+type: integer
+
+--
+
+*`crowdstrike.event.ComputerName`*::
++
+--
+Name of the computer where the detection occurred.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.UserName`*::
++
+--
+User name associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.DetectName`*::
++
+--
+Name of the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.DetectDescription`*::
++
+--
+Description of the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Severity`*::
++
+--
+Severity score of the detection.
+
+
+type: integer
+
+--
+
+*`crowdstrike.event.SeverityName`*::
++
+--
+Severity score text.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.FileName`*::
++
+--
+File name of the associated process for the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.FilePath`*::
++
+--
+Path of the executable associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.CommandLine`*::
++
+--
+Executable path with command line arguments.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.SHA256String`*::
++
+--
+SHA256 sum of the executable associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.MD5String`*::
++
+--
+MD5 sum of the executable associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.MachineDomain`*::
++
+--
+Domain for the machine associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.FalconHostLink`*::
++
+--
+URL to view the detection in Falcon.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.SensorId`*::
++
+--
+Unique ID associated with the Falcon sensor.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.DetectId`*::
++
+--
+Unique ID associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.LocalIP`*::
++
+--
+IP address of the host associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.MACAddress`*::
++
+--
+MAC address of the host associated with the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Tactic`*::
++
+--
+MITRE tactic category of the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Technique`*::
++
+--
+MITRE technique category of the detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Objective`*::
++
+--
+Method of detection.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.PatternDispositionDescription`*::
++
+--
+Action taken by Falcon.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.PatternDispositionValue`*::
++
+--
+Unique ID associated with action taken.
+
+
+type: integer
+
+--
+
+*`crowdstrike.event.PatternDispositionFlags`*::
++
+--
+Flags indicating actions taken.
+
+
+type: object
+
+--
+
+*`crowdstrike.event.State`*::
++
+--
+Whether the incident summary is open and ongoing or closed.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.IncidentStartTime`*::
++
+--
+Start time for the incident in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.IncidentEndTime`*::
++
+--
+End time for the incident in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.FineScore`*::
++
+--
+Score for incident.
+
+
+type: float
+
+--
+
+*`crowdstrike.event.UserId`*::
++
+--
+Email address or user ID associated with the event.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.UserIp`*::
++
+--
+IP address associated with the user.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.OperationName`*::
++
+--
+Event subtype.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.ServiceName`*::
++
+--
+Service associated with this event.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.Success`*::
++
+--
+Indicator of whether or not this event was successful.
+
+
+type: boolean
+
+--
+
+*`crowdstrike.event.UTCTimestamp`*::
++
+--
+Timestamp associated with this event in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.AuditKeyValues`*::
++
+--
+Fields that were changed in this event.
+
+
+type: nested
+
+--
+
+*`crowdstrike.event.SessionId`*::
++
+--
+Session ID of the remote response session.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.HostnameField`*::
++
+--
+Host name of the machine for the remote session.
+
+
+type: keyword
+
+--
+
+*`crowdstrike.event.StartTimestamp`*::
++
+--
+Start time for the remote session in UTC UNIX format.
+
+
+type: date
+
+--
+
+*`crowdstrike.event.EndTimestamp`*::
++
+--
+End time for the remote session in UTC UNIX format.
+
+
+type: date
 
 --
 
