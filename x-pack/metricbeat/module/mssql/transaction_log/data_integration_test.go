@@ -5,6 +5,8 @@
 package transaction_log
 
 import (
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -12,9 +14,10 @@ import (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skipping `data.json` generation test")
+	logp.TestingSetup()
+	service := compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("transaction_log"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "transaction_log"))
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
