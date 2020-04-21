@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix building on FreeBSD by removing build flags from `add_cloudfoundry_metadata` processor. {pull}17486[17486]
 - Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
 - Fix `setup.dashboards.index` setting not working. {pull}17749[17749]
+- Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
 
 *Auditbeat*
 
