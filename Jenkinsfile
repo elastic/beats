@@ -345,7 +345,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
+            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -358,7 +358,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat oss Mac OS X", "metricbeat", "unitTest")
+            mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "unitTest")
           }
         }
         stage('Metricbeat Windows'){
