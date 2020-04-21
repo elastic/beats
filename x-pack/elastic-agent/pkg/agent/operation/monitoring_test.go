@@ -16,6 +16,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/beats"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
@@ -27,22 +29,22 @@ func TestGenerateSteps(t *testing.T) {
 
 	type testCase struct {
 		Name           string
-		Config         *monitoring.Config
+		Config         *monitoringConfig.MonitoringConfig
 		ExpectedSteps  int
 		FilebeatStep   bool
 		MetricbeatStep bool
 	}
 
 	testCases := []testCase{
-		testCase{"NO monitoring", &monitoring.Config{MonitorLogs: false, MonitorMetrics: false}, 0, false, false},
-		testCase{"FB monitoring", &monitoring.Config{MonitorLogs: true, MonitorMetrics: false}, 1, true, false},
-		testCase{"MB monitoring", &monitoring.Config{MonitorLogs: false, MonitorMetrics: true}, 1, false, true},
-		testCase{"ALL monitoring", &monitoring.Config{MonitorLogs: true, MonitorMetrics: true}, 2, true, true},
+		{"NO monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: false, MonitorMetrics: false}, 0, false, false},
+		{"FB monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: true, MonitorMetrics: false}, 1, true, false},
+		{"MB monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: false, MonitorMetrics: true}, 1, false, true},
+		{"ALL monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: true, MonitorMetrics: true}, 2, true, true},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			steps := operator.generateMonitoringSteps(tc.Config, "8.0", sampleOutput)
+			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
 			}
@@ -104,9 +106,6 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
-		MonitoringConfig: &monitoring.Config{
-			MonitorMetrics: true,
-		},
 	}
 
 	cfg, err := config.NewConfigFrom(operatorConfig)
@@ -124,12 +123,15 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 		t.Fatal(err)
 	}
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil)
+
+	// monitor := beats.NewMonitor("dummmy", "p1234", &artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"}, true, true)
+	monitor := beats.NewMonitor(&artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"})
+
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	monitor := beats.NewMonitor("dummmy", "p1234", &artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"}, true, true)
 	operator.apps["dummy"] = &testMonitorableApp{monitor: monitor}
 
 	return operator, operatorConfig
