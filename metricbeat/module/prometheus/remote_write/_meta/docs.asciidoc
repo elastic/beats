@@ -11,7 +11,7 @@ remote_write:
 TIP: In order to assure the health of the whole queue, the following two configuration
  https://prometheus.io/docs/practices/remote_write/#parameters[parameters] should be considered:
 
-- `max_shards`: Sets the maximum number of paralelism with which Prometheus will try to send samples to Metricbeat.
+- `max_shards`: Sets the maximum number of parallelism with which Prometheus will try to send samples to Metricbeat.
 It is recommended that this setting should be equal to the number of cores of the machine where Metricbeat runs.
 Metricbeat can handle connections in parallel and hence setting `max_shards` to the number of parallelism that
 Metricbeat can actually achieve is the optimal queue configuration.
