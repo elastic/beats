@@ -150,6 +150,11 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 		"TEST_TAGS",
 		"PYTHON_EXE",
 		"MODULE",
+
+		// XXX: Move these variables to some other place?
+		"AWS_SESSION_TOKEN",
+		"AWS_ACCESS_KEY_ID",
+		"AWS_SECRET_ACCESS_KEY",
 	}
 	env = append(env, passThroughEnvVars...)
 	return runInIntegTestEnv(mageTarget, test, env...)
@@ -204,7 +209,9 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		return err
 	}
 	for _, envVar := range passThroughEnvVars {
-		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
+		if value, ok := os.LookupEnv(envVar); ok {
+			args = append(args, "-e", envVar+"="+value)
+		}
 	}
 	if mg.Verbose() {
 		args = append(args, "-e", "MAGEFILE_VERBOSE=1")
