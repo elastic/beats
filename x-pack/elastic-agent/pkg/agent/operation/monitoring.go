@@ -14,8 +14,6 @@ import (
 
 const (
 	monitoringName          = "FLEET_MONITORING"
-	settingsKey             = "settings"
-	monitoringKey           = "monitoring"
 	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
 )
@@ -172,6 +170,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				map[string]interface{}{
 					"type":  "log",
 					"paths": paths,
+					"index": "logs-agent-default",
 				},
 			},
 		},
@@ -199,6 +198,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"metricsets": []string{"stats", "state"},
 					"period":     "10s",
 					"hosts":      hosts,
+					"index":      "metrics-agent-default",
 				},
 			},
 		},

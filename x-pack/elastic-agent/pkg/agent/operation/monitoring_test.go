@@ -124,7 +124,6 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 	}
 	ctx := context.Background()
 
-	// monitor := beats.NewMonitor("dummmy", "p1234", &artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"}, true, true)
 	monitor := beats.NewMonitor(&artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"})
 
 	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil, noop.NewMonitor())
