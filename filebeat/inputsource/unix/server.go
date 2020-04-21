@@ -15,46 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package unix
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-// Server represent a TCP server
+// Server represent a unix server
 type Server struct {
 	*common.Listener
 
-	config    *Config
-	tlsConfig *tlscommon.TLSConfig
+	config *Config
 }
 
-// New creates a new tcp server
+// New creates a new unix server
 func New(
 	config *Config,
 	factory common.HandlerFactory,
 ) (*Server, error) {
-	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
 	if factory == nil {
 		return nil, fmt.Errorf("HandlerFactory can't be empty")
 	}
 
 	server := &Server{
-		config:    config,
-		tlsConfig: tlsConfig,
+		config: config,
 	}
-	server.Listener = common.NewListener(common.FamilyTCP, config.Host, factory, server.createServer, &common.ListenerConfig{
+	server.Listener = common.NewListener(common.FamilyUnix, config.Path, factory, server.createServer, &common.ListenerConfig{
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
 		MaxConnections: config.MaxConnections,
@@ -64,19 +55,9 @@ func New(
 }
 
 func (s *Server) createServer() (net.Listener, error) {
-	var l net.Listener
-	var err error
-	if s.tlsConfig != nil {
-		t := s.tlsConfig.BuildModuleConfig(s.config.Host)
-		l, err = tls.Listen("tcp", s.config.Host, t)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		l, err = net.Listen("tcp", s.config.Host)
-		if err != nil {
-			return nil, err
-		}
+	l, err := net.Listen("unix", s.config.Path)
+	if err != nil {
+		return nil, err
 	}
 
 	if s.config.MaxConnections > 0 {
