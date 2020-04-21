@@ -848,11 +848,14 @@ metricbeat.modules:
   period: 10s
   perfmon.ignore_non_existent_counters: false
   perfmon.group_measurements_by_instance: false
-  perfmon.counters:
-  #  - instance_label: processor.name
-  #    instance_name: total
-  #    measurement_label: processor.time.total.pct
-  #    query: '\Processor Information(_Total)\% Processor Time'
+  perfmon.queries:
+#  - object: 'Process'
+#    instance: ["*"]
+#    counters:
+#    - name: 'Disk Writes/sec'
+#      field: physical_disk.write.per_sec
+#      format: "float"
+#    - name: "% Disk Write Time"
 
 - module: windows
   metricsets: ["service"]
