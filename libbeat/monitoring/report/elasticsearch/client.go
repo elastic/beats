@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.elastic.co/apm"
 	"net/http"
 	"time"
 
@@ -236,6 +237,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 	// interval params and X-Pack requires to send the interval param.
 	_, result, err := c.es.Bulk(ctx, getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
+		apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", err)).Send()
 		return err
 	}
 
