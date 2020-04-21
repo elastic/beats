@@ -25,8 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
-const replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
-
 var allowedFormats = []string{"float", "large", "long"}
 
 // Config for the windows perfmon metricset.

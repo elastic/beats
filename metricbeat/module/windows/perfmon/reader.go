@@ -34,9 +34,10 @@ import (
 )
 
 const (
-	instanceCountLabel   = ":count"
-	defaultInstanceField = "instance"
-	defaultObjectField   = "object"
+	instanceCountLabel    = ":count"
+	defaultInstanceField  = "instance"
+	defaultObjectField    = "object"
+	replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
 )
 
 // Reader will contain the config options
@@ -267,17 +268,10 @@ func mapCounterPathLabel(namespace string, label string, path string) string {
 		label = path
 	}
 	// replace spaces with underscores
-	label = strings.Replace(label, " ", "_", -1)
 	// replace backslashes with "per"
-	label = strings.Replace(label, "/sec", "_per_sec", -1)
-	label = strings.Replace(label, "/_sec", "_per_sec", -1)
-	label = strings.Replace(label, "\\", "_", -1)
-	// replace actual percentage symbol with the smbol "pct"
-	label = strings.Replace(label, "_%_", "_pct_", -1)
-	// create an object in case of ":"
-	label = strings.Replace(label, ":", "_", -1)
-	// create an object in case of ":"
-	label = strings.Replace(label, "_-_", "_", -1)
+	// replace actual percentage symbol with the symbol "pct"
+	r := strings.NewReplacer(" ", "_", "/sec", "_per_sec", "/_sec", "_per_sec", "\\", "_", "_%_", "_pct_", ":", "_", "_-_", "_")
+	label = r.Replace(label)
 	// replace uppercases with underscores
 	label = replaceUpperCase(label)
 
@@ -289,8 +283,6 @@ func mapCounterPathLabel(namespace string, label string, path string) string {
 		obj[index] = strings.TrimSuffix(obj[index], "_")
 	}
 	label = strings.ToLower(strings.Join(obj, "_"))
-
-	//  avoid cases as this "logicaldisk_avg__disk_sec_per_transfer"
 	label = strings.Replace(label, "__", "_", -1)
 	return namespace + "." + label
 }

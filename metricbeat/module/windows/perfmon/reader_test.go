@@ -148,4 +148,13 @@ func TestMapCounterPathLabel(t *testing.T) {
 	assert.Equal(t, result, "metrics.queued_poison_messages_per_second")
 	result = mapCounterPathLabel("metrics", "", `I/O Log Writes Average Latency`)
 	assert.Equal(t, result, "metrics.i/o_log_writes_average_latency")
+	result = mapCounterPathLabel("metrics", "io.logwrites.average latency", `I/O Log Writes Average Latency`)
+	assert.Equal(t, result, "metrics.io_logwrites_average_latency")
+
+	result = mapCounterPathLabel("metrics", "this.is__exceptional-test:case/sec", `RSC Coalesced Packet Bucket 5 (16To31)`)
+	assert.Equal(t, result, "metrics.this_is_exceptional-test_case_per_sec")
+
+	result = mapCounterPathLabel("metrics", "logicaldisk_avg._disk_sec_per_transfer", `RSC Coalesced Packet Bucket 5 (16To31)`)
+	assert.Equal(t, result, "metrics.logicaldisk_avg_disk_sec_per_transfer")
+
 }
