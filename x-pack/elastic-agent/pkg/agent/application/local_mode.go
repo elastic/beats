@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -50,7 +51,7 @@ func newLocal(
 	ctx context.Context,
 	log *logger.Logger,
 	pathConfigFile string,
-	config *config.Config,
+	rawConfig *config.Config,
 ) (*Local, error) {
 	var err error
 	if log == nil {
@@ -65,7 +66,7 @@ func newLocal(
 	}
 
 	c := localConfigDefault()
-	if err := config.Unpack(c); err != nil {
+	if err := rawConfig.Unpack(c); err != nil {
 		return nil, errors.New(err, "initialize local mode")
 	}
 
@@ -80,13 +81,18 @@ func newLocal(
 
 	reporter := reporting.NewReporter(localApplication.bgContext, log, localApplication.agentInfo, logR)
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, config, nil, reporter))
+	monitor, err := monitoring.NewMonitor(rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize monitoring")
+	}
+
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, rawConfig, nil, reporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
 	discover := discoverer(pathConfigFile, c.Management.Path)
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}})
+	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
 
 	var cfgSource source
 	if !c.Management.Reload.Enabled {

@@ -139,7 +139,7 @@ func (a *Application) Stop() {
 		}
 
 		// cleanup drops
-		a.monitor.Cleanup()
+		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
 }
 
@@ -199,7 +199,7 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 }
 
 func (a *Application) reportCrash(ctx context.Context) {
-	a.monitor.Cleanup()
+	a.monitor.Cleanup(a.name, a.pipelineID)
 
 	// TODO: reporting crash
 	if a.failureReporter != nil {

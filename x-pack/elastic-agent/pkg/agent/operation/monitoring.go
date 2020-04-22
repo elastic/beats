@@ -9,29 +9,18 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 )
 
 const (
 	monitoringName          = "FLEET_MONITORING"
-	settingsKey             = "settings"
-	monitoringKey           = "monitoring"
 	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
-	cfg, err := getConfigFromStep(s)
-	if err != nil {
-		return errors.New(err,
-			errors.TypeConfig,
-			"operator.handleStartSidecar failed to retrieve config from step")
-	}
-
 	// if monitoring is disabled and running stop it
-	if isEnabled := isMonitoringEnabled(o.logger, cfg); !isEnabled {
+	if !o.monitor.IsMonitoringEnabled() {
 		if o.isMonitoring {
 			o.logger.Info("operator.handleStartSidecar: monitoring is running and disabled, proceeding to stop")
 			return o.handleStopSidecar(s)
@@ -97,42 +86,6 @@ func monitoringTags() map[app.Tag]string {
 	}
 }
 
-func isMonitoringEnabled(logger *logger.Logger, cfg map[string]interface{}) bool {
-	settingsVal, found := cfg[settingsKey]
-	if !found {
-		logger.Error("operator.isMonitoringEnabled: settings not found in config")
-		return false
-	}
-
-	settingsMap, ok := settingsVal.(map[string]interface{})
-	if !ok {
-		logger.Error("operator.isMonitoringEnabled: settings not a map")
-		return false
-	}
-
-	monitoringVal, found := settingsMap[monitoringKey]
-	if !found {
-		logger.Error("operator.isMonitoringEnabled: settings.monitoring not found in config")
-		return false
-	}
-
-	monitoringMap, ok := monitoringVal.(map[string]interface{})
-	if !ok {
-		logger.Error("operator.isMonitoringEnabled: settings.monitoring not a map")
-		return false
-	}
-
-	enabledVal, found := monitoringMap[monitoringEnabledSubkey]
-	if !found {
-		logger.Infof("operator.isMonitoringEnabled: monitoring.enabled key not found: %v", monitoringMap)
-		return false
-	}
-
-	enabled, ok := enabledVal.(bool)
-
-	return enabled && ok
-}
-
 func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.Step {
 	// get output
 	config, err := getConfigFromStep(step)
@@ -159,13 +112,13 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	return o.generateMonitoringSteps(o.config.MonitoringConfig, step.Version, output)
+	return o.generateMonitoringSteps(step.Version, output)
 }
 
-func (o *Operator) generateMonitoringSteps(cfg *monitoring.Config, version string, output interface{}) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version string, output interface{}) []configrequest.Step {
 	var steps []configrequest.Step
 
-	if cfg.MonitorLogs {
+	if o.monitor.WatchLogs() {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -183,7 +136,7 @@ func (o *Operator) generateMonitoringSteps(cfg *monitoring.Config, version strin
 		steps = append(steps, filebeatStep)
 	}
 
-	if cfg.MonitorMetrics {
+	if o.monitor.WatchMetrics() {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -217,6 +170,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				map[string]interface{}{
 					"type":  "log",
 					"paths": paths,
+					"index": "logs-agent-default",
 				},
 			},
 		},
@@ -244,6 +198,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"metricsets": []string{"stats", "state"},
 					"period":     "10s",
 					"hosts":      hosts,
+					"index":      "metrics-agent-default",
 				},
 			},
 		},
@@ -264,7 +219,7 @@ func (o *Operator) getLogFilePaths() []string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		logPath := a.Monitor().LogPath()
+		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
 		if logPath != "" {
 			paths = append(paths, logPath)
 		}
@@ -280,7 +235,7 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		metricEndpoint := a.Monitor().MetricsPathPrefixed()
+		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
 		if metricEndpoint != "" {
 			endpoints = append(endpoints, metricEndpoint)
 		}
