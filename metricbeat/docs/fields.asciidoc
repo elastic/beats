@@ -17200,7 +17200,7 @@ Google Cloud Compute metrics
 
 
 
-*`googlecloud.compute.instance.firewall.dropped_bytes_count.raw`*::
+*`googlecloud.compute.instance.firewall.dropped_bytes_count.value`*::
 +
 --
 Incoming bytes dropped by the firewall
@@ -17209,7 +17209,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.firewall.dropped_packets_count.raw`*::
+*`googlecloud.compute.instance.firewall.dropped_packets_count.value`*::
 +
 --
 Incoming packets dropped by the firewall
@@ -17219,7 +17219,7 @@ type: long
 --
 
 
-*`googlecloud.compute.instance.cpu.reserved_cores.raw`*::
+*`googlecloud.compute.instance.cpu.reserved_cores.value`*::
 +
 --
 Number of cores reserved on the host of the instance
@@ -17228,7 +17228,7 @@ type: double
 
 --
 
-*`googlecloud.compute.instance.cpu.utilization.raw`*::
+*`googlecloud.compute.instance.cpu.utilization.value`*::
 +
 --
 The fraction of the allocated CPU that is currently in use on the instance
@@ -17237,7 +17237,7 @@ type: double
 
 --
 
-*`googlecloud.compute.instance.cpu.usage_time.raw`*::
+*`googlecloud.compute.instance.cpu.usage_time.value`*::
 +
 --
 Usage for all cores in seconds
@@ -17247,7 +17247,7 @@ type: double
 --
 
 
-*`googlecloud.compute.instance.disk.read_bytes_count.raw`*::
+*`googlecloud.compute.instance.disk.read_bytes_count.value`*::
 +
 --
 Count of bytes read from disk
@@ -17256,7 +17256,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.disk.read_ops_count.raw`*::
+*`googlecloud.compute.instance.disk.read_ops_count.value`*::
 +
 --
 Count of disk read IO operations
@@ -17265,7 +17265,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.disk.write_bytes_count.raw`*::
+*`googlecloud.compute.instance.disk.write_bytes_count.value`*::
 +
 --
 Count of bytes written to disk
@@ -17274,7 +17274,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.disk.write_ops_count.raw`*::
+*`googlecloud.compute.instance.disk.write_ops_count.value`*::
 +
 --
 Count of disk write IO operations
@@ -17283,7 +17283,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.uptime.raw`*::
+*`googlecloud.compute.instance.uptime.value`*::
 +
 --
 How long the VM has been running, in seconds
@@ -17293,7 +17293,7 @@ type: long
 --
 
 
-*`googlecloud.compute.instance.network.received_bytes_count.raw`*::
+*`googlecloud.compute.instance.network.received_bytes_count.value`*::
 +
 --
 Count of bytes received from the network
@@ -17302,7 +17302,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.network.received_packets_count.raw`*::
+*`googlecloud.compute.instance.network.received_packets_count.value`*::
 +
 --
 Count of packets received from the network
@@ -17311,7 +17311,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.network.sent_bytes_count.raw`*::
+*`googlecloud.compute.instance.network.sent_bytes_count.value`*::
 +
 --
 Count of bytes sent over the network
@@ -17320,7 +17320,7 @@ type: long
 
 --
 
-*`googlecloud.compute.instance.network.sent_packets_count.raw`*::
+*`googlecloud.compute.instance.network.sent_packets_count.value`*::
 +
 --
 Count of packets sent over the network
@@ -17347,21 +17347,21 @@ Google Cloud Load Balancing metrics
 A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
 
 
-*`googlecloud.loadbalancing.https.backend_latencies.count.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_latencies.mean.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.bucket_counts.value`*::
 +
 --
 type: long
@@ -17371,28 +17371,28 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.https.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_request_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.backend_request_bytes_count.value`*::
 +
 --
 The number of bytes sent as requests from HTTP/S load balancer to backends.
@@ -17401,7 +17401,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_request_count.raw`*::
+*`googlecloud.loadbalancing.https.backend_request_count.value`*::
 +
 --
 The number of requests served by backends of HTTP/S load balancer.
@@ -17410,7 +17410,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.backend_response_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.backend_response_bytes_count.value`*::
 +
 --
 The number of bytes sent as responses from backends (or cache) to HTTP/S load balancer.
@@ -17425,21 +17425,21 @@ type: long
 A distribution of the RTT measured for each connection between client and proxy.
 
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.count.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.mean.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_counts.value`*::
 +
 --
 type: long
@@ -17449,21 +17449,21 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.https.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
@@ -17477,21 +17477,21 @@ type: long
 A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
 
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.count.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.mean.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_counts.value`*::
 +
 --
 type: long
@@ -17501,28 +17501,28 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.https.internal.backend_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.request_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.internal.request_bytes_count.value`*::
 +
 --
 The number of bytes sent as requests from clients to HTTP/S load balancer.
@@ -17531,7 +17531,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.request_count.raw`*::
+*`googlecloud.loadbalancing.https.internal.request_count.value`*::
 +
 --
 The number of requests served by HTTP/S load balancer.
@@ -17540,7 +17540,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.response_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.internal.response_bytes_count.value`*::
 +
 --
 The number of bytes sent as responses from HTTP/S load balancer to clients.
@@ -17555,21 +17555,21 @@ type: long
 A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
 
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.count.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.mean.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_counts.value`*::
 +
 --
 type: long
@@ -17579,28 +17579,28 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.https.internal.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.request_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.request_bytes_count.value`*::
 +
 --
 The number of bytes sent as requests from clients to HTTP/S load balancer.
@@ -17609,7 +17609,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.request_count.raw`*::
+*`googlecloud.loadbalancing.https.request_count.value`*::
 +
 --
 The number of requests served by HTTP/S load balancer.
@@ -17618,7 +17618,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.https.response_bytes_count.raw`*::
+*`googlecloud.loadbalancing.https.response_bytes_count.value`*::
 +
 --
 The number of bytes sent as responses from HTTP/S load balancer to clients.
@@ -17633,21 +17633,21 @@ type: long
 A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
 
 
-*`googlecloud.loadbalancing.https.total_latencies.count.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.total_latencies.mean.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.total_latencies.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.bucket_counts.value`*::
 +
 --
 type: long
@@ -17657,21 +17657,21 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.https.total_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
@@ -17684,7 +17684,7 @@ type: long
 Google Cloud Load Balancing metrics
 
 
-*`googlecloud.loadbalancing.l3.internal.egress_bytes_count.raw`*::
+*`googlecloud.loadbalancing.l3.internal.egress_bytes_count.value`*::
 +
 --
 The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
@@ -17693,7 +17693,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.egress_packets_count.raw`*::
+*`googlecloud.loadbalancing.l3.internal.egress_packets_count.value`*::
 +
 --
 The number of packets sent from ILB backend to client of the flow.
@@ -17702,7 +17702,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.ingress_bytes_count.raw`*::
+*`googlecloud.loadbalancing.l3.internal.ingress_bytes_count.value`*::
 +
 --
 The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
@@ -17711,7 +17711,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.ingress_packets_count.raw`*::
+*`googlecloud.loadbalancing.l3.internal.ingress_packets_count.value`*::
 +
 --
 The number of packets sent from client to ILB backend.
@@ -17726,21 +17726,21 @@ type: long
 A distribution of RTT measured over TCP connections for ILB flows.
 
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.count.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.mean.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_counts.value`*::
 +
 --
 type: long
@@ -17750,21 +17750,21 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.l3.internal.rtt_latencies.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
@@ -17777,7 +17777,7 @@ type: long
 Google Cloud Load Balancing metrics
 
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.closed_connections.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.closed_connections.value`*::
 +
 --
 Number of connections that were terminated over TCP/SSL proxy.
@@ -17786,7 +17786,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.egress_bytes_count.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value`*::
 +
 --
 Number of bytes sent from VM to client using proxy.
@@ -17801,21 +17801,21 @@ type: long
 A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
 
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.count.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.count.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.mean.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.mean.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_counts.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_counts.value`*::
 +
 --
 type: long
@@ -17825,28 +17825,28 @@ type: long
 
 
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.growth_factor.value`*::
 +
 --
 type: double
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.scale.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value`*::
 +
 --
 type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value`*::
 +
 --
 Number of bytes sent from client to VM using proxy.
@@ -17855,7 +17855,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.new_connections.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.new_connections.value`*::
 +
 --
 Number of connections that were created over TCP/SSL proxy.
@@ -17864,7 +17864,7 @@ type: long
 
 --
 
-*`googlecloud.loadbalancing.tcp_ssl_proxy.open_connections.raw`*::
+*`googlecloud.loadbalancing.tcp_ssl_proxy.open_connections.value`*::
 +
 --
 Current number of outstanding connections through the TCP/SSL proxy.
@@ -17885,7 +17885,7 @@ Google Cloud PubSub metrics
 Suscription related metrics
 
 
-*`googlecloud.pubsub.subscription.ack_message_count.raw`*::
+*`googlecloud.pubsub.subscription.ack_message_count.value`*::
 +
 --
 Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
@@ -17894,7 +17894,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.backlog_bytes.raw`*::
+*`googlecloud.pubsub.subscription.backlog_bytes.value`*::
 +
 --
 Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
@@ -17903,7 +17903,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.num_outstanding_messages.raw`*::
+*`googlecloud.pubsub.subscription.num_outstanding_messages.value`*::
 +
 --
 Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
@@ -17912,7 +17912,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.num_undelivered_messages.raw`*::
+*`googlecloud.pubsub.subscription.num_undelivered_messages.value`*::
 +
 --
 Number of unacknowledged messages (a.k.a. backlog messages) in a subscription.
@@ -17921,7 +17921,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.oldest_unacked_message_age.raw`*::
+*`googlecloud.pubsub.subscription.oldest_unacked_message_age.value`*::
 +
 --
 Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
@@ -17930,7 +17930,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.pull_ack_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.pull_ack_message_operation_count.value`*::
 +
 --
 Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -17939,7 +17939,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.pull_ack_request_count.raw`*::
+*`googlecloud.pubsub.subscription.pull_ack_request_count.value`*::
 +
 --
 Cumulative count of acknowledge requests, grouped by result.
@@ -17948,7 +17948,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.pull_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.pull_message_operation_count.value`*::
 +
 --
 Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -17957,7 +17957,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.pull_request_count.raw`*::
+*`googlecloud.pubsub.subscription.pull_request_count.value`*::
 +
 --
 Cumulative count of pull requests, grouped by result.
@@ -17966,7 +17966,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.push_request_count.raw`*::
+*`googlecloud.pubsub.subscription.push_request_count.value`*::
 +
 --
 Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
@@ -17975,7 +17975,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.push_request_latencies.raw`*::
+*`googlecloud.pubsub.subscription.push_request_latencies.value`*::
 +
 --
 Distribution of push request latencies (in microseconds), grouped by result.
@@ -17984,7 +17984,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.sent_message_count.raw`*::
+*`googlecloud.pubsub.subscription.sent_message_count.value`*::
 +
 --
 Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
@@ -17993,7 +17993,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_ack_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_ack_message_operation_count.value`*::
 +
 --
 Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -18002,7 +18002,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_ack_request_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_ack_request_count.value`*::
 +
 --
 Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
@@ -18011,7 +18011,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_message_operation_count.value`*::
 +
 --
 Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
@@ -18020,7 +18020,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_response_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_response_count.value`*::
 +
 --
 Cumulative count of streaming pull responses, grouped by result.
@@ -18029,7 +18029,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.dead_letter_message_count.raw`*::
+*`googlecloud.pubsub.subscription.dead_letter_message_count.value`*::
 +
 --
 Cumulative count of messages published to dead letter topic, grouped by result.
@@ -18038,7 +18038,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.mod_ack_deadline_message_count.raw`*::
+*`googlecloud.pubsub.subscription.mod_ack_deadline_message_count.value`*::
 +
 --
 Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
@@ -18047,7 +18047,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.mod_ack_deadline_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.mod_ack_deadline_message_operation_count.value`*::
 +
 --
 Cumulative count of ModifyAckDeadline message operations, grouped by result.
@@ -18056,7 +18056,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.mod_ack_deadline_request_count.raw`*::
+*`googlecloud.pubsub.subscription.mod_ack_deadline_request_count.value`*::
 +
 --
 Cumulative count of ModifyAckDeadline requests, grouped by result.
@@ -18065,7 +18065,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age.raw`*::
+*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age.value`*::
 +
 --
 Age (in seconds) of the oldest acknowledged message retained in a subscription.
@@ -18074,7 +18074,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age_by_region.raw`*::
+*`googlecloud.pubsub.subscription.oldest_retained_acked_message_age_by_region.value`*::
 +
 --
 Age (in seconds) of the oldest acknowledged message retained in a subscription, broken down by Cloud region.
@@ -18083,7 +18083,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.oldest_unacked_message_age_by_region.raw`*::
+*`googlecloud.pubsub.subscription.oldest_unacked_message_age_by_region.value`*::
 +
 --
 Age (in seconds) of the oldest unacknowledged message in a subscription, broken down by Cloud region.
@@ -18092,7 +18092,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.retained_acked_bytes.raw`*::
+*`googlecloud.pubsub.subscription.retained_acked_bytes.value`*::
 +
 --
 Total byte size of the acknowledged messages retained in a subscription.
@@ -18101,7 +18101,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.retained_acked_bytes_by_region.raw`*::
+*`googlecloud.pubsub.subscription.retained_acked_bytes_by_region.value`*::
 +
 --
 Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
@@ -18110,7 +18110,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.seek_request_count.raw`*::
+*`googlecloud.pubsub.subscription.seek_request_count.value`*::
 +
 --
 Cumulative count of seek attempts, grouped by result.
@@ -18119,7 +18119,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation_count.value`*::
 +
 --
 Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
@@ -18128,7 +18128,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_request_count.raw`*::
+*`googlecloud.pubsub.subscription.streaming_pull_mod_ack_deadline_request_count.value`*::
 +
 --
 Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
@@ -18137,7 +18137,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.byte_cost.raw`*::
+*`googlecloud.pubsub.subscription.byte_cost.value`*::
 +
 --
 Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
@@ -18146,7 +18146,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.config_updates_count.raw`*::
+*`googlecloud.pubsub.subscription.config_updates_count.value`*::
 +
 --
 Cumulative count of configuration changes for each subscription, grouped by operation type and result.
@@ -18155,7 +18155,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.subscription.unacked_bytes_by_region.raw`*::
+*`googlecloud.pubsub.subscription.unacked_bytes_by_region.value`*::
 +
 --
 Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
@@ -18170,7 +18170,7 @@ type: long
 Topic related metrics
 
 
-*`googlecloud.pubsub.topic.streaming_pull_response_count.raw`*::
+*`googlecloud.pubsub.topic.streaming_pull_response_count.value`*::
 +
 --
 Cumulative count of streaming pull responses, grouped by result.
@@ -18179,7 +18179,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.send_message_operation_count.raw`*::
+*`googlecloud.pubsub.topic.send_message_operation_count.value`*::
 +
 --
 Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -18188,7 +18188,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.send_request_count.raw`*::
+*`googlecloud.pubsub.topic.send_request_count.value`*::
 +
 --
 Cumulative count of publish requests, grouped by result.
@@ -18197,7 +18197,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.raw`*::
+*`googlecloud.pubsub.topic.oldest_retained_acked_message_age_by_region.value`*::
 +
 --
 Age (in seconds) of the oldest acknowledged message retained in a topic, broken down by Cloud region.
@@ -18206,7 +18206,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.raw`*::
+*`googlecloud.pubsub.topic.oldest_unacked_message_age_by_region.value`*::
 +
 --
 Age (in seconds) of the oldest unacknowledged message in a topic, broken down by Cloud region.
@@ -18215,7 +18215,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.retained_acked_bytes_by_region.raw`*::
+*`googlecloud.pubsub.topic.retained_acked_bytes_by_region.value`*::
 +
 --
 Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
@@ -18224,7 +18224,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.byte_cost.raw`*::
+*`googlecloud.pubsub.topic.byte_cost.value`*::
 +
 --
 Cost of operations, measured in bytes. This is used to measure utilization for quotas.
@@ -18233,7 +18233,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.config_updates_count.raw`*::
+*`googlecloud.pubsub.topic.config_updates_count.value`*::
 +
 --
 Cumulative count of configuration changes, grouped by operation type and result.
@@ -18242,7 +18242,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.message_sizes.raw`*::
+*`googlecloud.pubsub.topic.message_sizes.value`*::
 +
 --
 Distribution of publish message sizes (in bytes)
@@ -18251,7 +18251,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.topic.unacked_bytes_by_region.raw`*::
+*`googlecloud.pubsub.topic.unacked_bytes_by_region.value`*::
 +
 --
 Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
@@ -18266,7 +18266,7 @@ type: long
 Snapshot related metrics
 
 
-*`googlecloud.pubsub.snapshot.oldest_message_age.raw`*::
+*`googlecloud.pubsub.snapshot.oldest_message_age.value`*::
 +
 --
 Age (in seconds) of the oldest message retained in a snapshot.
@@ -18275,7 +18275,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.oldest_message_age_by_region.raw`*::
+*`googlecloud.pubsub.snapshot.oldest_message_age_by_region.value`*::
 +
 --
 Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
@@ -18284,7 +18284,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.backlog_bytes.raw`*::
+*`googlecloud.pubsub.snapshot.backlog_bytes.value`*::
 +
 --
 Total byte size of the messages retained in a snapshot.
@@ -18293,7 +18293,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.backlog_bytes_by_region.raw`*::
+*`googlecloud.pubsub.snapshot.backlog_bytes_by_region.value`*::
 +
 --
 Total byte size of the messages retained in a snapshot, broken down by Cloud region.
@@ -18302,7 +18302,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.num_messages.raw`*::
+*`googlecloud.pubsub.snapshot.num_messages.value`*::
 +
 --
 Number of messages retained in a snapshot.
@@ -18311,7 +18311,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.num_messages_by_region.raw`*::
+*`googlecloud.pubsub.snapshot.num_messages_by_region.value`*::
 +
 --
 Number of messages retained in a snapshot, broken down by Cloud region.
@@ -18320,7 +18320,7 @@ type: long
 
 --
 
-*`googlecloud.pubsub.snapshot.config_updates_count.raw`*::
+*`googlecloud.pubsub.snapshot.config_updates_count.value`*::
 +
 --
 Cumulative count of configuration changes, grouped by operation type and result.
@@ -18336,7 +18336,7 @@ Google Cloud Storage metrics
 
 
 
-*`googlecloud.storage.api.request_count.raw`*::
+*`googlecloud.storage.api.request_count.value`*::
 +
 --
 Delta count of API calls, grouped by the API method name and response code.
@@ -18346,7 +18346,7 @@ type: long
 --
 
 
-*`googlecloud.storage.authz.acl_based_object_access_count.raw`*::
+*`googlecloud.storage.authz.acl_based_object_access_count.value`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
@@ -18355,7 +18355,7 @@ type: long
 
 --
 
-*`googlecloud.storage.authz.acl_operations_count.raw`*::
+*`googlecloud.storage.authz.acl_operations_count.value`*::
 +
 --
 Usage of ACL operations broken down by type.
@@ -18364,7 +18364,7 @@ type: long
 
 --
 
-*`googlecloud.storage.authz.object_specific_acl_mutation_count.raw`*::
+*`googlecloud.storage.authz.object_specific_acl_mutation_count.value`*::
 +
 --
 Delta count of changes made to object specific ACLs.
@@ -18374,7 +18374,7 @@ type: long
 --
 
 
-*`googlecloud.storage.network.received_bytes_count.raw`*::
+*`googlecloud.storage.network.received_bytes_count.value`*::
 +
 --
 Delta count of bytes received over the network, grouped by the API method name and response code.
@@ -18383,7 +18383,7 @@ type: long
 
 --
 
-*`googlecloud.storage.network.sent_bytes_count.raw`*::
+*`googlecloud.storage.network.sent_bytes_count.value`*::
 +
 --
 Delta count of bytes sent over the network, grouped by the API method name and response code.
@@ -18393,7 +18393,7 @@ type: long
 --
 
 
-*`googlecloud.storage.storage.object_count.raw`*::
+*`googlecloud.storage.storage.object_count.value`*::
 +
 --
 Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
@@ -18402,7 +18402,7 @@ type: long
 
 --
 
-*`googlecloud.storage.storage.total_byte_seconds.raw`*::
+*`googlecloud.storage.storage.total_byte_seconds.value`*::
 +
 --
 Delta count of bytes received over the network, grouped by the API method name and response code.
@@ -18411,7 +18411,7 @@ type: long
 
 --
 
-*`googlecloud.storage.storage.total_bytes.raw`*::
+*`googlecloud.storage.storage.total_bytes.value`*::
 +
 --
 Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
