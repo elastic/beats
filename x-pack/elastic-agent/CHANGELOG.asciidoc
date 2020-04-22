@@ -36,3 +36,4 @@
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
 - Expose stream.* variables in events {pull}17468[17468]
 - Monitoring configuration reloadable {pull}17855[17855]
+- Pack ECS metadata to request payload send to fleet {pull}17894[17894]
