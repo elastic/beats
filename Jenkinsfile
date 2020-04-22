@@ -8,6 +8,7 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    TERRAFORM_VERSION = "0.12.24"
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
@@ -363,9 +364,11 @@ pipeline {
                 }
               }
               steps {
-                echo "### TODO: provision AWS cloud test scenario"
-                // XXX: Run terraform or ansible to provision resources in AWS
-                // XXX: Parallelize at the script/mage level as cannot nest parallel blocks here
+                withCloudTestEnv() {
+                  withBeatsEnv(false) {
+                    terraformApply("x-pack/metricbeat/module/aws")
+                  }
+                }
               }
             }
             stage('Metricbeat x-pack'){
@@ -380,7 +383,7 @@ pipeline {
           }
           post {
             cleanup {
-              cleanupAWS()
+              terraformCleanup("x-pack/metricbeat")
             }
           }
         }
@@ -702,6 +705,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
+      sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh")
       sh(label: "Install Mage", script: "make mage")
       // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
       // See https://github.com/elastic/beats/issues/17787.
@@ -929,23 +933,42 @@ def withCloudTestEnv(Closure body) {
     ])
   }
 
-  withEnv(["TEST_TAGS=${testTags}"]) {
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
     withEnvMask(vars: maskedVars) {
       body()
     }
   }
 }
 
-def cleanupAWS() {
-  stage('Remove AWS cloud scenario'){
+def terraformInit(String directory) {
+  dir(directory) {
+    sh(label: "Terraform Init on ${directory}", script: "terraform init")
+  }
+}
+
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+// Looks for all terraform states in `directory` and runs `terraform destroy` for them
+def terraformCleanup(String directory) {
+  stage("Remove cloud scenarios in ${directory}"){
     when {
       expression {
         return params.runAllCloudTests || params.awsCloudTests
       }
     }
     steps {
-      echo "### TODO: cleanup AWS cloud test scenario"
-      // XXX: Run terraform or ansible to cleanup resources in AWS
+      withCloudTestEnv() {
+        withBeatsEnv(false) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh $directory")
+        }
+      }
     }
   }
 }
