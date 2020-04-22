@@ -35,6 +35,7 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	}
 
 	var config map[string]interface{}
+
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		config = make(map[string]interface{})
 		config[enabledKey] = false

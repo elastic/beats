@@ -135,7 +135,7 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 	for round := 1; round <= rounds; round++ {
 		for retry := 1; retry <= retries; retry++ {
-			c, cancelFn := context.WithTimeout(a.bgContext, retryTimeout)
+			c, cancelFn := context.WithTimeout(context.Background(), retryTimeout)
 			err := checkFn(c, a.state.ProcessInfo.Address)
 			if err == nil {
 				cancelFn()
@@ -145,21 +145,12 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 			// do not wait on last
 			if retry != retries {
-				select {
-				case <-time.After(retryTimeout):
-				case <-a.bgContext.Done():
-					return nil
-				}
+				<-time.After(retryTimeout)
 			}
 		}
-
 		// do not wait on last
 		if round != rounds {
-			select {
-			case <-time.After(time.Duration(round) * roundsTimeout):
-			case <-a.bgContext.Done():
-				return nil
-			}
+			time.After(time.Duration(round) * roundsTimeout)
 		}
 	}
 

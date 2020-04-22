@@ -45,7 +45,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		return errors.New(ErrAppNotRunning)
 	}
 
-	retryFn := func(ctx context.Context) error {
+	retryFn := func() error {
 		a.appLock.Lock()
 		defer a.appLock.Unlock()
 
@@ -79,5 +79,5 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		return retry.ErrorMakeFatal(err)
 	}
 
-	return retry.Do(ctx, a.retryConfig, retryFn)
+	return retry.Do(a.retryConfig, retryFn)
 }

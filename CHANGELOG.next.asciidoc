@@ -75,7 +75,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug with `monitoring.cluster_uuid` setting not always being exposed via GET /state Beats API. {issue}16732[16732] {pull}17420[17420]
 - Fix building on FreeBSD by removing build flags from `add_cloudfoundry_metadata` processor. {pull}17486[17486]
 - Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
-- Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
 
 *Auditbeat*
 
@@ -111,13 +110,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `elasticsearch.audit` data ingest pipeline to be more forgiving with date formats found in Elasticsearch audit logs. {pull}17406[17406]
 - Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
 - Remove migrationVersion map 7.7.0 reference from Kibana dashboard file to fix backward compatibility issues. {pull}17425[17425]
-- Fix issue 17734 to retry on rate-limit error in the Filebeat httpjson input. {issue}17734[17734] {pull}17735[17735]
-- Fixed `cloudfoundry.access` to have the correct `cloudfoundry.app.id` contents. {pull}17847[17847]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
-- Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
 
 *Journalbeat*
 
@@ -161,8 +157,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
 - Add privileged option for Auditbeat in Openshift {pull}17637[17637]
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
-- Add a switch to the driver definition on SQL module to use pretty names. {pull}17378[17378]
-- Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
 
 *Packetbeat*
 
@@ -198,7 +192,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
 - Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
-- Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
 
 *Auditbeat*
 
@@ -259,15 +252,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
 - Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
 - Release Google Cloud module as GA. {pull}17511[17511]
-- Add config option to select a different azure cloud env in the azure-eventhub input and azure module. {issue}17649[17649] {pull}17659[17659]
-- Added new Checkpoint Syslog filebeat module. {pull}17682[17682]
-- Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
-- Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
-- Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
-- Enhance `elasticsearch/deprecation` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17728[17728]
-- Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
-- Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
-- Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
 
 *Heartbeat*
 
@@ -337,10 +321,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
-- Refactor windows/perfmon metricset configuration options and event output. {pull}17596[17596]
 - Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
-- Add more detailed error messages, system tests and small refactoring to the service metricset in windows. {pull}17725[17725]
-- Stack Monitoring modules now auto-configure required metricsets when `xpack.enabled: true` is set. {issue}16471[[16471] {pull}17609[17609]
 
 *Packetbeat*
 

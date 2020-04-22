@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -42,7 +41,7 @@ func init() {
 
 // Input for TCP connection
 type Input struct {
-	mutex   sync.Mutex
+	sync.Mutex
 	server  *tcp.Server
 	started bool
 	outlet  channel.Outleter
@@ -79,13 +78,12 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	splitFunc := netcommon.SplitFunc([]byte(config.LineDelimiter))
+	splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
 	if splitFunc == nil {
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
+	factory := tcp.SplitHandlerFactory(cb, splitFunc)
 
 	server, err := tcp.New(&config.Config, factory)
 	if err != nil {
@@ -97,14 +95,14 @@ func NewInput(
 		started: false,
 		outlet:  out,
 		config:  &config,
-		log:     logger,
+		log:     logp.NewLogger("tcp input").With("address", config.Config.Host),
 	}, nil
 }
 
 // Run start a TCP input
 func (p *Input) Run() {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+	p.Lock()
+	defer p.Unlock()
 
 	if !p.started {
 		p.log.Info("Starting TCP input")
@@ -119,8 +117,8 @@ func (p *Input) Run() {
 // Stop stops TCP server
 func (p *Input) Stop() {
 	defer p.outlet.Close()
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+	p.Lock()
+	defer p.Unlock()
 
 	p.log.Info("Stopping TCP input")
 	p.server.Stop()

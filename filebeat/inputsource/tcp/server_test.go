@@ -31,9 +31,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var defaultConfig = Config{
@@ -69,76 +67,76 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		{
 			name:             "NewLine",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			splitFunc:        SplitFunc([]byte("\n")),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\n"),
 		},
 		{
 			name:             "NewLineWithCR",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\r\n")),
+			splitFunc:        SplitFunc([]byte("\r\n")),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\r\n"),
 		},
 		{
 			name:             "CustomDelimiter",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			splitFunc:        SplitFunc([]byte(";")),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, ";"),
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			splitFunc:        SplitFunc([]byte("<END>")),
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			splitFunc:        SplitFunc([]byte(";")),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			splitFunc:        SplitFunc([]byte("<END>")),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			splitFunc:        SplitFunc([]byte("\n")),
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			splitFunc:        SplitFunc([]byte("\n")),
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, "\n"),
 		},
 		{
 			name:             "CustomLargeMessagePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			splitFunc:        SplitFunc([]byte(";")),
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, ";"),
 		},
 		{
 			name:             "ReadRandomLargePayload",
 			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			splitFunc:        SplitFunc([]byte("\n")),
 			expectedMessages: []string{randomGeneratedText},
 			messageSent:      randomGeneratedText,
 		},
 		{
 			name:      "MaxReadBufferReachedUserConfigured",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			splitFunc: SplitFunc([]byte("\n")),
 			cfg: map[string]interface{}{
 				"max_message_size": 50000,
 			},
@@ -147,7 +145,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 		},
 		{
 			name:      "MaxBufferSizeSet",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			splitFunc: SplitFunc([]byte("\n")),
 			cfg: map[string]interface{}{
 				"max_message_size": 66 * 1024,
 			},
@@ -171,7 +169,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
+			factory := SplitHandlerFactory(to, test.splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -182,7 +180,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 			defer server.Stop()
 
-			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
+			conn, err := net.Dial("tcp", server.Listener.Addr().String())
 			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
@@ -223,7 +221,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
+	factory := SplitHandlerFactory(to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
@@ -238,7 +236,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	samples := generateMessages(eventsCount, 1024)
 	for w := 0; w < workers; w++ {
 		go func() {
-			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
+			conn, err := net.Dial("tcp", server.Listener.Addr().String())
 			defer conn.Close()
 			assert.NoError(t, err)
 			for _, sample := range samples {

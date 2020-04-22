@@ -14,7 +14,7 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -31,4 +31,10 @@ func Build() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML()
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }

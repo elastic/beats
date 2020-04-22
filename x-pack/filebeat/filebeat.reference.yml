@@ -127,9 +127,6 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   cloudwatch:
     enabled: false
 
@@ -160,9 +157,6 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   ec2:
     enabled: false
@@ -195,9 +189,6 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   elb:
     enabled: false
 
@@ -228,9 +219,6 @@ filebeat.modules:
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   s3access:
     enabled: false
@@ -263,9 +251,6 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   vpcflow:
     enabled: false
 
@@ -297,24 +282,21 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
   activitylogs:
     enabled: true
     var:
-      # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
       eventhub: "insights-operational-logs"
-      # consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
       consumer_group: "$Default"
       # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
       connection_string: ""
-      # the name of the storage account the state/offsets will be stored and updated
+      # the name of the storage account the state/offsets will be stored and updated.
       storage_account: ""
-      # the storage account key, this key will be used to authorize access to data in your storage account
+      #The storage account key, this key will be used to authorize access to data in your storage account.
       storage_account_key: ""
 
   auditlogs:
@@ -342,25 +324,6 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
-#------------------------------ Checkpoint Module ------------------------------
-- module: checkpoint
-  firewall:
-    enabled: true
-
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
-
-    # The interface to listen to UDP based syslog traffic. Defaults to
-    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
-    #var.syslog_host: localhost
-
-    # The UDP port to listen for syslog traffic. Defaults to 9001.
-    #var.syslog_port: 9001
-
-    # Set the log level from 1 (alerts only) to 7 (include all messages).
-    # Messages with a log level higher than the specified will be dropped.
-    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
-    #var.log_level: 7
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
@@ -2242,14 +2205,13 @@ output.elasticsearch:
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
+  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/krb5.conf
+  #kerberos.config_path: /etc/path/config
 
-  # The service name. Service principal name is contructed from
-  # service_name/hostname@realm.
-  #kerberos.service_name: kafka
+  # The service principal name.
+  #kerberos.service_name: HTTP/my-service@realm
 
   # Name of the Kerberos user.
   #kerberos.username: elastic

@@ -24,7 +24,6 @@ type Monitor struct {
 	process            string
 	monitoringEndpoint string
 	loggingPath        string
-	loggingFile        string
 
 	monitorLogs    bool
 	monitorMetrics bool
@@ -32,15 +31,13 @@ type Monitor struct {
 
 // NewMonitor creates a beats monitor.
 func NewMonitor(process, pipelineID string, downloadConfig *artifact.Config, monitorLogs, monitorMetrics bool) *Monitor {
-	var monitoringEndpoint, loggingPath, loggingFile string
+	var monitoringEndpoint, loggingPath string
 
 	if monitorMetrics {
 		monitoringEndpoint = getMonitoringEndpoint(process, downloadConfig.OS(), pipelineID)
 	}
 	if monitorLogs {
-		operatingSystem := downloadConfig.OS()
-		loggingFile = getLoggingFile(process, operatingSystem, downloadConfig.InstallPath, pipelineID)
-		loggingPath = filepath.Dir(loggingFile)
+		loggingPath = getLoggingFileDirectory(downloadConfig.InstallPath, downloadConfig.OS(), pipelineID)
 	}
 
 	return &Monitor{
@@ -48,7 +45,6 @@ func NewMonitor(process, pipelineID string, downloadConfig *artifact.Config, mon
 		process:            process,
 		monitoringEndpoint: monitoringEndpoint,
 		loggingPath:        loggingPath,
-		loggingFile:        loggingFile,
 		monitorLogs:        monitorLogs,
 		monitorMetrics:     monitorMetrics,
 	}
@@ -129,7 +125,7 @@ func (b *Monitor) LogPath() string {
 		return ""
 	}
 
-	return b.loggingFile
+	return b.loggingPath
 }
 
 // MetricsPath describes a location where application exposes metrics

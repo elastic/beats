@@ -5,7 +5,6 @@
 package cloudfoundry
 
 import (
-	"encoding/binary"
 	"fmt"
 	"net/url"
 	"strings"
@@ -378,14 +377,18 @@ func newEventBase(env *events.Envelope) eventBase {
 
 func newEventHttpAccess(env *events.Envelope) *EventHttpAccess {
 	msg := env.GetHttpStartStop()
+	appID := ""
+	if msg.ApplicationId != nil {
+		appID = msg.ApplicationId.String()
+	}
 	return &EventHttpAccess{
 		eventAppBase: eventAppBase{
 			eventBase: newEventBase(env),
-			appGuid:   formatUUID(msg.ApplicationId),
+			appGuid:   appID,
 		},
 		startTimestamp: time.Unix(0, *msg.StartTimestamp),
 		stopTimestamp:  time.Unix(0, *msg.StopTimestamp),
-		requestID:      formatUUID(msg.RequestId),
+		requestID:      msg.RequestId.String(),
 		peerType:       strings.ToLower(msg.PeerType.String()),
 		method:         msg.Method.String(),
 		uri:            *msg.Uri,
@@ -521,14 +524,4 @@ func urlMap(uri string) common.MapStr {
 		"path":     u.Path,
 		"domain":   u.Hostname(),
 	}
-}
-
-func formatUUID(uuid *events.UUID) string {
-	if uuid == nil {
-		return ""
-	}
-	var uuidBytes [16]byte
-	binary.LittleEndian.PutUint64(uuidBytes[:8], uuid.GetLow())
-	binary.LittleEndian.PutUint64(uuidBytes[8:], uuid.GetHigh())
-	return fmt.Sprintf("%x-%x-%x-%x-%x", uuidBytes[0:4], uuidBytes[4:6], uuidBytes[6:8], uuidBytes[8:10], uuidBytes[10:])
 }

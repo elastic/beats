@@ -30,9 +30,6 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   cloudwatch:
     enabled: false
 
@@ -63,9 +60,6 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   ec2:
     enabled: false
@@ -98,9 +92,6 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   elb:
     enabled: false
 
@@ -131,9 +122,6 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   s3access:
     enabled: false
@@ -166,9 +154,6 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
   vpcflow:
     enabled: false
 
@@ -199,6 +184,3 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb

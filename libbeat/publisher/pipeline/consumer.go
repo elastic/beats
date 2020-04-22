@@ -138,7 +138,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 	var (
 		out    workQueue
-		batch  Batch
+		batch  *Batch
 		paused = true
 	)
 
@@ -154,7 +154,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		}
 
 		paused = c.paused()
-		if c.out != nil && batch != nil {
+		if !paused && c.out != nil && batch != nil {
 			out = c.out.workQueue
 		} else {
 			out = nil
@@ -195,9 +195,6 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 			handleSignal(sig)
 		case out <- batch:
 			batch = nil
-			if paused {
-				out = nil
-			}
 		}
 	}
 }

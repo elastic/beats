@@ -24,13 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-type Batch interface {
-	publisher.Batch
-
-	reduceTTL() bool
-}
-
-type batch struct {
+type Batch struct {
 	original queue.Batch
 	ctx      *batchContext
 	ttl      int
@@ -44,17 +38,17 @@ type batchContext struct {
 
 var batchPool = sync.Pool{
 	New: func() interface{} {
-		return &batch{}
+		return &Batch{}
 	},
 }
 
-func newBatch(ctx *batchContext, original queue.Batch, ttl int) *batch {
+func newBatch(ctx *batchContext, original queue.Batch, ttl int) *Batch {
 	if original == nil {
 		panic("empty batch")
 	}
 
-	b := batchPool.Get().(*batch)
-	*b = batch{
+	b := batchPool.Get().(*Batch)
+	*b = Batch{
 		original: original,
 		ctx:      ctx,
 		ttl:      ttl,
@@ -63,47 +57,45 @@ func newBatch(ctx *batchContext, original queue.Batch, ttl int) *batch {
 	return b
 }
 
-func releaseBatch(b *batch) {
-	*b = batch{} // clear batch
+func releaseBatch(b *Batch) {
+	*b = Batch{} // clear batch
 	batchPool.Put(b)
 }
 
-func (b *batch) Events() []publisher.Event {
+func (b *Batch) Events() []publisher.Event {
 	return b.events
 }
 
-func (b *batch) ACK() {
-	if b.ctx != nil {
-		b.ctx.observer.outBatchACKed(len(b.events))
-	}
+func (b *Batch) ACK() {
+	b.ctx.observer.outBatchACKed(len(b.events))
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Drop() {
+func (b *Batch) Drop() {
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Retry() {
+func (b *Batch) Retry() {
 	b.ctx.retryer.retry(b)
 }
 
-func (b *batch) Cancelled() {
+func (b *Batch) Cancelled() {
 	b.ctx.retryer.cancelled(b)
 }
 
-func (b *batch) RetryEvents(events []publisher.Event) {
+func (b *Batch) RetryEvents(events []publisher.Event) {
 	b.updEvents(events)
 	b.Retry()
 }
 
-func (b *batch) CancelledEvents(events []publisher.Event) {
+func (b *Batch) CancelledEvents(events []publisher.Event) {
 	b.updEvents(events)
 	b.Cancelled()
 }
 
-func (b *batch) updEvents(events []publisher.Event) {
+func (b *Batch) updEvents(events []publisher.Event) {
 	l1 := len(b.events)
 	l2 := len(events)
 	if l1 > l2 {
@@ -112,34 +104,4 @@ func (b *batch) updEvents(events []publisher.Event) {
 	}
 
 	b.events = events
-}
-
-// reduceTTL reduces the time to live for all events that have no 'guaranteed'
-// sending requirements.  reduceTTL returns true if the batch is still alive.
-func (b *batch) reduceTTL() bool {
-	if b.ttl <= 0 {
-		return true
-	}
-
-	b.ttl--
-	if b.ttl > 0 {
-		return true
-	}
-
-	// filter for evens with guaranteed send flags
-	events := b.events[:0]
-	for _, event := range b.events {
-		if event.Guaranteed() {
-			events = append(events, event)
-		}
-	}
-	b.events = events
-
-	if len(b.events) > 0 {
-		b.ttl = -1 // we need infinite retry for all events left in this batch
-		return true
-	}
-
-	// all events have been dropped:
-	return false
 }

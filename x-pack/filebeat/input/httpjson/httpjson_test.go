@@ -12,10 +12,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
-	"strconv"
 	"sync"
 	"testing"
-	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -38,8 +36,14 @@ func testSetup(t *testing.T) {
 	})
 }
 
-func createServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
-	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func runTest(t *testing.T, isTLS bool, m map[string]interface{}, run func(input *HttpjsonInput, out *stubOutleter, t *testing.T)) {
+	testSetup(t)
+	// Create an http test server according to whether TLS is used
+	var newServer = httptest.NewServer
+	if isTLS {
+		newServer = httptest.NewTLSServer
+	}
+	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			req, err := ioutil.ReadAll(r.Body)
 			defer r.Body.Close()
@@ -68,44 +72,6 @@ func createServer(newServer func(handler http.Handler) *httptest.Server) *httpte
 			w.Write(b)
 		}
 	}))
-}
-
-func createCustomServer(newServer func(handler http.Handler) *httptest.Server) *httptest.Server {
-	var isRetry bool
-	return newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		if !isRetry {
-			w.Header().Set("X-Rate-Limit-Limit", "0")
-			w.Header().Set("X-Rate-Limit-Remaining", "0")
-			w.Header().Set("X-Rate-Limit-Reset", strconv.FormatInt(time.Now().Unix(), 10))
-			w.WriteHeader(http.StatusTooManyRequests)
-			w.Write([]byte{})
-			isRetry = true
-		} else {
-			message := map[string]interface{}{
-				"hello": "world",
-				"embedded": map[string]string{
-					"hello": "world",
-				},
-			}
-			b, _ := json.Marshal(message)
-			w.WriteHeader(http.StatusOK)
-			w.Write(b)
-		}
-	}))
-}
-
-func runTest(t *testing.T, isTLS bool, testRateLimitRetry bool, m map[string]interface{}, run func(input *HttpjsonInput, out *stubOutleter, t *testing.T)) {
-	testSetup(t)
-	// Create an http test server according to whether TLS is used
-	var newServer = httptest.NewServer
-	if isTLS {
-		newServer = httptest.NewTLSServer
-	}
-	ts := createServer(newServer)
-	if testRateLimitRetry {
-		ts = createCustomServer(newServer)
-	}
 	defer ts.Close()
 	m["url"] = ts.URL
 	cfg := common.MustNewConfigFrom(m)
@@ -371,7 +337,7 @@ func TestGET(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -393,28 +359,7 @@ func TestGetHTTPS(t *testing.T) {
 		"interval":              0,
 		"ssl.verification_mode": "none",
 	}
-	runTest(t, true, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
-		group, _ := errgroup.WithContext(context.Background())
-		group.Go(input.run)
-
-		events, ok := out.waitForEvents(1)
-		if !ok {
-			t.Fatalf("Expected 1 events, but got %d.", len(events))
-		}
-		input.Stop()
-
-		if err := group.Wait(); err != nil {
-			t.Fatal(err)
-		}
-	})
-}
-
-func TestRateLimitRetry(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"interval":    0,
-	}
-	runTest(t, false, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, true, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -436,7 +381,7 @@ func TestPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          0,
 	}
-	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -458,7 +403,7 @@ func TestRepeatedPOST(t *testing.T) {
 		"http_request_body": map[string]interface{}{"test": "abc", "testNested": map[string]interface{}{"testNested1": 123}},
 		"interval":          10 ^ 9,
 	}
-	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
@@ -479,7 +424,7 @@ func TestRunStop(t *testing.T) {
 		"http_method": "GET",
 		"interval":    0,
 	}
-	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		input.Run()
 		input.Stop()
 		input.Run()

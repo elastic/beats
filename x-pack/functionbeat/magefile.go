@@ -14,11 +14,10 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
-
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
@@ -27,6 +26,9 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
 )
 
 func init() {
@@ -149,6 +151,11 @@ func Package() {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
+}
+
+// GoTestUnit is an alias for goUnitTest.
+func GoTestUnit() {
+	mg.Deps(unittest.GoUnitTest)
 }
 
 // BuildPkgForFunctions creates a folder named pkg and adds functions to it.

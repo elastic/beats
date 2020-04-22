@@ -103,7 +103,7 @@ func TestDumpVariables(t *testing.T) {
 }
 
 func TestLoadSpecs(t *testing.T) {
-	pkgs, err := LoadSpecs("../packaging/packages.yml")
+	pkgs, err := LoadSpecs("files/packages.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

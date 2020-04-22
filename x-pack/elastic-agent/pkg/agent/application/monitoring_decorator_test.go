@@ -31,7 +31,7 @@ GROUPLOOP:
 			continue GROUPLOOP
 		}
 
-		if programsCount+1 != len(newPtr) {
+		if programsCount == len(newPtr) {
 			t.Errorf("incorrect programs to run count, expected: %d, got %d", programsCount+1, len(newPtr))
 			continue GROUPLOOP
 		}
@@ -135,16 +135,7 @@ var inputConfigMap = map[string]interface{}{
 		map[string]interface{}{
 			"inputs": []map[string]interface{}{
 				map[string]interface{}{
-					"type": "system/metrics",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{
-							"id":      "system/metrics-system.core",
-							"enabled": true,
-							"dataset": "system.core",
-							"period":  "10s",
-							"metrics": []string{"percentages"},
-						},
-					},
+					"type": "metrics/system",
 				},
 			},
 			"use_output": "infosec1",

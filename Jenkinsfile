@@ -8,9 +8,6 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
-    PIPELINE_LOG_LEVEL = "INFO"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
-    DOCKER_REGISTRY = 'docker.elastic.co'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -20,6 +17,7 @@ pipeline {
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
     disableConcurrentBuilds()
+//    checkoutToSubdirectory "${env.BASE_DIR}"
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
@@ -27,9 +25,8 @@ pipeline {
   parameters {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
-    booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
+    booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
-    booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
     /**
@@ -68,7 +65,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
+            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
           }
         }
 
@@ -82,7 +79,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
           }
         }
 
@@ -96,7 +93,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
+            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
           }
         }
 
@@ -136,7 +133,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
+            makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
           }
         }
         stage('Filebeat Windows'){
@@ -149,7 +146,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "unitTest")
           }
         }
         stage('Heartbeat'){
@@ -177,7 +174,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
+                makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
               }
             }
             stage('Heartbeat Windows'){
@@ -190,7 +187,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "unitTest")
               }
             }
           }
@@ -225,7 +222,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
+                makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
               }
             }
             stage('Auditbeat Windows'){
@@ -238,7 +235,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
+                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "unitTest")
               }
             }
           }
@@ -296,7 +293,7 @@ pipeline {
             makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
-        stage('Metricbeat OSS Unit tests'){
+        stage('Metricbeat Unit tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -306,10 +303,10 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
+            makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
           }
         }
-        stage('Metricbeat OSS Integration tests'){
+        stage('Metricbeat Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -319,7 +316,20 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
+            makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
+          }
+        }
+        stage('Metricbeat System tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false"
+            }
+          }
+          steps {
+            makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
           }
         }
         stage('Metricbeat x-pack'){
@@ -332,7 +342,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "update build test")
           }
         }
         stage('Metricbeat crosscompile'){
@@ -345,7 +355,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
+            makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -358,7 +368,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
+            makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
           }
         }
         stage('Metricbeat Windows'){
@@ -371,7 +381,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "unitTest")
           }
         }
         stage('Packetbeat'){
@@ -433,7 +443,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "unitTest")
               }
             }
           }
@@ -448,7 +458,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "unitTest")
           }
         }
         stage('Functionbeat'){
@@ -479,7 +489,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
+                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "update build test")
               }
             }
             stage('Functionbeat Windows'){
@@ -492,7 +502,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "unitTest")
               }
             }
           }
@@ -647,26 +657,12 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
-    if(os == 'linux'){
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      // FIXME workaround until we fix the packer cache
-      // Retry to avoid DDoS detection from the server
-      retry(3) {
-        sleep randomNumber(min: 2, max: 5)
-        sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
-      }
-    }
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
-      // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
-      // See https://github.com/elastic/beats/issues/17787.
-      setGitConfig()
       try {
-        if(!params.dry_run){
-          body()
-        }
+        body()
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -699,9 +695,7 @@ def withBeatsEnvWin(Closure body) {
     dir("${env.BASE_DIR}"){
       bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
       try {
-        if(!params.dry_run){
-          body()
-        }
+        body()
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
           junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
@@ -723,7 +717,7 @@ def goos(){
     return 'darwin'
   }
 
-  error("Unhandled OS name in NODE_LABELS: " + labels)
+  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
 }
 
 def dumpMage(){
@@ -837,7 +831,7 @@ def isChanged(patterns){
 }
 
 def isChangedOSSCode(patterns) {
-  def allPatterns = [
+  def always = [
     "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
@@ -845,13 +839,11 @@ def isChangedOSSCode(patterns) {
     "^dev-tools/.*",
     "^\\.ci/.*",
   ]
-  allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('libbeat'))
-  return isChanged(allPatterns)
+  return isChanged(always + patterns)
 }
 
 def isChangedXPackCode(patterns) {
-  def allPatterns = [
+  def always = [
     "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
@@ -860,97 +852,93 @@ def isChangedXPackCode(patterns) {
     "^x-pack/libbeat/.*",
     "^\\.ci/.*",
   ]
-  allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
-  return isChanged(allPatterns)
+  return isChanged(always + patterns)
 }
 
 def loadConfigEnvVars(){
-  def empty = []
-  env.GO_VERSION = readFile(".go-version").trim()
-
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
-  env.BUILD_LIBBEAT = isChangedOSSCode(empty)
-  env.BUILD_LIBBEAT_XPACK = isChangedXPackCode(empty)
+  env.BUILD_LIBBEAT = isChangedOSSCode([])
+  env.BUILD_LIBBEAT_XPACK = env.BUILD_LIBBEAT || isChangedXPackCode([])
 
   // Auditbeat depends on metricbeat as framework, but does not include any of
   // the modules from Metricbeat.
   // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
-  env.BUILD_AUDITBEAT = isChangedOSSCode(getVendorPatterns('auditbeat'))
-  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/auditbeat'))
+  env.BUILD_AUDITBEAT = isChangedOSSCode([
+    "^metricbeat/.*",
+    "^auditbeat/.*",
+  ])
+  env.BUILD_AUDITBEAT_XPACK = env.BUILD_AUDITBEAT || isChangedXPackCode([
+    "^x-pack/auditbeat/.*",
+  ])
 
   // Dockerlogbeat is a standalone Beat that only relies on libbeat.
-  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/dockerlogbeat'))
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode([
+    "^x-pack/dockerlogbeat/.*",
+  ])
 
   // Filebeat depends on libbeat only.
   // The Filebeat x-pack build contains all functionality from OSS Filebeat.
-  env.BUILD_FILEBEAT = isChangedOSSCode(getVendorPatterns('filebeat'))
-  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/filebeat'))
+  env.BUILD_FILEBEAT = isChangedOSSCode(["^filebeat/.*"])
+  env.BUILD_FILEBEAT_XPACK = env.BUILD_FILEBEAT || isChangedXPackCode([
+    "^x-pack/filebeat/.*",
+  ])
 
   // Metricbeat depends on libbeat only.
   // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
-  env.BUILD_METRICBEAT = isChangedOSSCode(getVendorPatterns('metricbeat'))
-  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/metricbeat'))
+  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
+  env.BUILD_METRICBEAT_XPACK = env.BUILD_METRICBEAT || isChangedXPackCode([
+    "^x-pack/metricbeat/.*",
+  ])
 
   // Functionbeat is a standalone beat that depends on libbeat only.
   // Functionbeat is available as x-pack build only.
-  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/functionbeat'))
+  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode([
+    "^x-pack/functionbeat/.*",
+  ])
 
   // Heartbeat depends on libbeat only.
   // The Heartbeat x-pack build contains all functionality from OSS Heartbeat.
-  env.BUILD_HEARTBEAT = isChangedOSSCode(getVendorPatterns('heartbeat'))
-  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/heartbeat'))
+  env.BUILD_HEARTBEAT = isChangedOSSCode(["^heartbeat/.*"])
+  env.BUILD_HEARTBEAT_XPACK = env.BUILD_HEARTBEAT || isChangedXPackCode([
+    "^x-pack/heartbeat/.*",
+  ])
+
 
   // Journalbeat depends on libbeat only.
   // The Journalbeat x-pack build contains all functionality from OSS Journalbeat.
-  env.BUILD_JOURNALBEAT = isChangedOSSCode(getVendorPatterns('journalbeat'))
-  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/journalbeat'))
+  env.BUILD_JOURNALBEAT = isChangedOSSCode(["^journalbeat/.*"])
+  env.BUILD_JOURNALBEAT_XPACK = env.BUILD_JOURNALBEAT || isChangedXPackCode([
+    "^x-pack/journalbeat/.*",
+  ])
 
   // Packetbeat depends on libbeat only.
   // The Packetbeat x-pack build contains all functionality from OSS Packetbeat.
-  env.BUILD_PACKETBEAT = isChangedOSSCode(getVendorPatterns('packetbeat'))
-  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/packetbeat'))
+  env.BUILD_PACKETBEAT = isChangedOSSCode(["^packetbeat/.*"])
+  env.BUILD_PACKETBEAT_XPACK = env.BUILD_PACKETBEAT || isChangedXPackCode([
+    "^x-pack/packetbeat/.*",
+  ])
 
   // Winlogbeat depends on libbeat only.
   // The Winlogbeat x-pack build contains all functionality from OSS Winlogbeat.
-  env.BUILD_WINLOGBEAT = isChangedOSSCode(getVendorPatterns('winlogbeat'))
-  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/winlogbeat'))
+  env.BUILD_WINLOGBEAT = isChangedOSSCode(["^winlogbeat/.*"])
+  env.BUILD_WINLOGBEAT_XPACK = env.BUILD_WINLOGBEAT || isChangedXPackCode([
+    "^x-pack/winlogbeat/.*",
+  ])
 
   // Elastic-agent is a self-contained product, that depends on libbeat only.
   // The agent acts as a supervisor for other Beats like Filebeat or Metricbeat.
   // The agent is available as x-pack build only.
-  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/elastic-agent'))
+  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode([
+    "^x-pack/elastic-agent/.*",
+  ])
 
   // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
   // if the deployment scripts have been updated. No Beats specific testing is
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(getVendorPatterns('generator'))
-}
+  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
 
-/**
-  This method grab the dependencies of a Go module and transform them on regexp
-*/
-def getVendorPatterns(beatName){
-  def output = ""
-  docker.image("golang:${GO_VERSION}").inside{
-    output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      export HOME=${WORKSPACE}/${BASE_DIR}
-      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
-        |awk '{print \$1"/.*"}'\
-        |sed -e "s#github.com/elastic/beats/v7/##g"
-    """)
-  }
-  return output?.split('\n').collect{ item -> item as String }
-}
-
-def setGitConfig(){
-  sh(label: 'check git config', script: '''
-    if [ -z "$(git config --get user.email)" ]; then
-      git config user.email "beatsmachine@users.noreply.github.com"
-      git config user.name "beatsmachine"
-    fi
-  ''')
+  env.GO_VERSION = readFile(".go-version").trim()
 }

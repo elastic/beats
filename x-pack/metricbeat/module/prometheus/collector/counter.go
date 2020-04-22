@@ -22,14 +22,12 @@ type CounterCache interface {
 	Stop()
 
 	// RateUint64 returns, for a given counter name, the difference between the given value
-	// and the value that was given in a previous call, and true if a previous value existed.
-	// It will return 0 and false on the first call.
-	RateUint64(counterName string, value uint64) (uint64, bool)
+	// and the value that was given in a previous call. It will return 0 on the first call
+	RateUint64(counterName string, value uint64) uint64
 
 	// RateFloat64 returns, for a given counter name, the difference between the given value
-	// and the value that was given in a previous call, and true if a previous value existed.
-	// It will return 0 and false on the first call.
-	RateFloat64(counterName string, value float64) (float64, bool)
+	// and the value that was given in a previous call. It will return 0.0 on the first call
+	RateFloat64(counterName string, value float64) float64
 }
 
 type counterCache struct {
@@ -49,37 +47,35 @@ func NewCounterCache(timeout time.Duration) CounterCache {
 }
 
 // RateUint64 returns, for a given counter name, the difference between the given value
-// and the value that was given in a previous call, and true if a previous value existed.
-// It will return 0 and false on the first call.
-func (c *counterCache) RateUint64(counterName string, value uint64) (uint64, bool) {
+// and the value that was given in a previous call. It will return 0 on the first call
+func (c *counterCache) RateUint64(counterName string, value uint64) uint64 {
 	prev := c.ints.PutWithTimeout(counterName, value, c.timeout)
 	if prev != nil {
 		if prev.(uint64) > value {
 			// counter reset
-			return 0, true
+			return 0
 		}
-		return value - prev.(uint64), true
+		return value - prev.(uint64)
 	}
 
 	// first put for this value, return rate of 0
-	return 0, false
+	return 0
 }
 
 // RateFloat64 returns, for a given counter name, the difference between the given value
-// and the value that was given in a previous call, and true if a previous value existed.
-// It will return 0 and false on the first call.
-func (c *counterCache) RateFloat64(counterName string, value float64) (float64, bool) {
+// and the value that was given in a previous call. It will return 0.0 on the first call
+func (c *counterCache) RateFloat64(counterName string, value float64) float64 {
 	prev := c.floats.PutWithTimeout(counterName, value, c.timeout)
 	if prev != nil {
 		if prev.(float64) > value {
 			// counter reset
-			return 0, true
+			return 0
 		}
-		return value - prev.(float64), true
+		return value - prev.(float64)
 	}
 
 	// first put for this value, return rate of 0
-	return 0, false
+	return 0
 }
 
 // Start the cache cleanup worker. It mus be called once before start using

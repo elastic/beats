@@ -87,7 +87,7 @@ retry:
   # Default is false
   exponential: false
 
-settings.monitoring:
+monitoring:
   # enabled turns on monitoring of running processes
   enabled: false
   # enables log monitoring

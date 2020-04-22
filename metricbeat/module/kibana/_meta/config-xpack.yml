@@ -1,7 +1,9 @@
 - module: kibana
-  xpack.enabled: true
+  metricsets:
+    - stats
   period: 10s
   hosts: ["localhost:5601"]
   #basepath: ""
   #username: "user"
   #password: "secret"
+  xpack.enabled: true

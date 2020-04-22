@@ -20,6 +20,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,17 +34,13 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
-	unittest.RegisterPythonTestDeps(Fields)
-	integtest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
@@ -125,6 +122,13 @@ func Imports() error {
 	options.Outfile = "monitors/defaults/default.go"
 	options.Pkg = "defaults"
 	return devtools.GenerateIncludeListGo(options)
+}
+
+// GoTestUnit executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoTestUnit(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 func customizePackaging() {

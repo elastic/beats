@@ -36,17 +36,12 @@ type retryer struct {
 
 	done chan struct{}
 
-	consumer interruptor
+	consumer *eventConsumer
 
 	sig        chan retryerSignal
 	out        workQueue
 	in         retryQueue
 	doneWaiter sync.WaitGroup
-}
-
-type interruptor interface {
-	sigWait()
-	sigUnWait()
 }
 
 type retryQueue chan batchEvent
@@ -58,7 +53,7 @@ type retryerSignal struct {
 
 type batchEvent struct {
 	tag   retryerBatchTag
-	batch Batch
+	batch *Batch
 }
 
 type retryerEventTag uint8
@@ -80,7 +75,7 @@ func newRetryer(
 	log *logp.Logger,
 	observer outputObserver,
 	out workQueue,
-	c interruptor,
+	c *eventConsumer,
 ) *retryer {
 	r := &retryer{
 		logger:     log,
@@ -111,11 +106,18 @@ func (r *retryer) sigOutputRemoved() {
 	r.sig <- retryerSignal{tag: sigRetryerOutputRemoved}
 }
 
-func (r *retryer) retry(b Batch) {
+func (r *retryer) updOutput(ch workQueue) {
+	r.sig <- retryerSignal{
+		tag:     sigRetryerUpdateOutput,
+		channel: ch,
+	}
+}
+
+func (r *retryer) retry(b *Batch) {
 	r.in <- batchEvent{tag: retryBatch, batch: b}
 }
 
-func (r *retryer) cancelled(b Batch) {
+func (r *retryer) cancelled(b *Batch) {
 	r.in <- batchEvent{tag: cancelledBatch, batch: b}
 }
 
@@ -125,9 +127,9 @@ func (r *retryer) loop() {
 		out             workQueue
 		consumerBlocked bool
 
-		active     Batch
+		active     *Batch
 		activeSize int
-		buffer     []Batch
+		buffer     []*Batch
 		numOutputs int
 
 		log = r.logger
@@ -142,22 +144,21 @@ func (r *retryer) loop() {
 				countFailed  int
 				countDropped int
 				batch        = evt.batch
-				countRetry   = len(batch.Events())
-				alive        = true
+				countRetry   = len(batch.events)
 			)
 
 			if evt.tag == retryBatch {
-				countFailed = len(batch.Events())
+				countFailed = len(batch.events)
 				r.observer.eventsFailed(countFailed)
 
-				alive = batch.reduceTTL()
+				decBatch(batch)
 
-				countRetry = len(batch.Events())
+				countRetry = len(batch.events)
 				countDropped = countFailed - countRetry
 				r.observer.eventsDropped(countDropped)
 			}
 
-			if !alive {
+			if len(batch.events) == 0 {
 				log.Info("Drop batch")
 				batch.Drop()
 			} else {
@@ -165,9 +166,14 @@ func (r *retryer) loop() {
 				buffer = append(buffer, batch)
 				out = r.out
 				active = buffer[0]
-				activeSize = len(active.Events())
+				activeSize = len(active.events)
 				if !consumerBlocked {
-					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
+					consumerBlocked = blockConsumer(numOutputs, len(buffer))
+					if consumerBlocked {
+						log.Info("retryer: send wait signal to consumer")
+						r.consumer.sigWait()
+						log.Info("  done")
+					}
 				}
 			}
 
@@ -181,53 +187,51 @@ func (r *retryer) loop() {
 				out = nil
 			} else {
 				active = buffer[0]
-				activeSize = len(active.Events())
+				activeSize = len(active.events)
 			}
 
 			if consumerBlocked {
-				consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
+				consumerBlocked = blockConsumer(numOutputs, len(buffer))
+				if !consumerBlocked {
+					log.Info("retryer: send unwait-signal to consumer")
+					r.consumer.sigUnWait()
+					log.Info("  done")
+				}
 			}
 
 		case sig := <-r.sig:
 			switch sig.tag {
+			case sigRetryerUpdateOutput:
+				r.out = sig.channel
 			case sigRetryerOutputAdded:
 				numOutputs++
-				if consumerBlocked {
-					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
-				}
 			case sigRetryerOutputRemoved:
 				numOutputs--
-				if !consumerBlocked {
-					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
-				}
 			}
 		}
 	}
 }
 
-func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
-	consumerBlocked := blockConsumer(numOutputs, numBatches)
-	if r.consumer == nil {
-		return consumerBlocked
-	}
-
-	if consumerBlocked {
-		r.logger.Info("retryer: send wait signal to consumer")
-		if r.consumer != nil {
-			r.consumer.sigWait()
-		}
-		r.logger.Info("  done")
-	} else {
-		r.logger.Info("retryer: send unwait signal to consumer")
-		if r.consumer != nil {
-			r.consumer.sigUnWait()
-		}
-		r.logger.Info("  done")
-	}
-
-	return consumerBlocked
-}
-
 func blockConsumer(numOutputs, numBatches int) bool {
 	return numBatches/3 >= numOutputs
+}
+
+func decBatch(batch *Batch) {
+	if batch.ttl <= 0 {
+		return
+	}
+
+	batch.ttl--
+	if batch.ttl > 0 {
+		return
+	}
+
+	// filter for evens with guaranteed send flags
+	events := batch.events[:0]
+	for _, event := range batch.events {
+		if event.Guaranteed() {
+			events = append(events, event)
+		}
+	}
+	batch.events = events
 }

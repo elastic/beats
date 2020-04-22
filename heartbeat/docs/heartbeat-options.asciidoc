@@ -24,23 +24,17 @@ and HTTP response verification:
 # heartbeat.yml
 heartbeat.monitors:
 - type: icmp
-  id: ping-myhost
-  name: My Host Ping
-  hosts: ["myhost"]
   schedule: '*/5 * * * * * *'
+  hosts: ["myhost"]
 - type: tcp
-  id: myhost-tcp-echo
-  name: My Host TCP Echo
-  hosts: ["myhost:777"]  # default TCP Echo Protocol
+  schedule: '@every 5s'
+  hosts: ["myhost:7"]  # default TCP Echo Protocol
   check.send: "Check"
   check.receive: "Check"
-  schedule: '@every 5s'
 - type: http
-  id: service-status
-  name: Service Status
+  schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
   check.response.status: [200]
-  schedule: '@every 5s'
 heartbeat.scheduler:
   limit: 10
 ----------------------------------------------------------------------
@@ -73,11 +67,9 @@ monitor definitions only, e.g. what is normally under the `heartbeat.monitors` s
 ----------------------------------------------------------------------
 # /path/to/my/monitors.d/localhost_service_check.yml
 - type: http
-  id: service-status
-  name: Service Status
+  schedule: '@every 5s'
   hosts: ["http://localhost:80/service/status"]
   check.response.status: [200]
-  schedule: '@every 5s'
 ----------------------------------------------------------------------
 
 [float]
@@ -299,21 +291,16 @@ system defaults are used (currently not supported on Windows).
 ==== `ports`
 
 A list of ports to ping if the host specified in <<monitor-tcp-hosts,`hosts`>>
-does not contain a port number. It is generally preferable to use a single value here,
-since each port will be monitored using a separate `id`, with the given `id` value,
-used as a prefix in the Heartbeat data, and the configured `name` shared across events
-sent via this check.
+does not contain a port number.
 
 Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: tcp
-  id: my-host-services
-  name: My Host Services
+  schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [80, 9200, 5044]
-  schedule: '@every 5s'
 -------------------------------------------------------------------------------
 
 [float]
@@ -332,13 +319,11 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: tcp
-  id: echo-service
-  name: Echo Service
+  schedule: '@every 5s'
   hosts: ["myhost"]
   ports: [7]
   check.send: 'Hello World'
   check.receive: 'Hello World'
-  schedule: '@every 5s'
 -------------------------------------------------------------------------------
 
 
@@ -384,11 +369,9 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: tcp
-  id: tls-mail
-  name: TLS Mail
-  hosts: ["mail.example.net"]
-  ports: [465]
   schedule: '@every 5s'
+  hosts: ["myhost"]
+  ports: [80, 9200, 5044]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
@@ -416,8 +399,6 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: myhost
-  name: My HTTP Host
   schedule: '@every 5s'
   hosts: ["http://myhost:80"]
 -------------------------------------------------------------------------------
@@ -470,14 +451,13 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: my-http-service
-  name: My HTTP Service
-  hosts: ["https://myhost:443"]
   schedule: '@every 5s'
+  hosts: ["https://myhost:443"]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
     supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 -------------------------------------------------------------------------------
+
 
 Also see <<configuration-ssl>> for a full description of the `ssl` options.
 
@@ -506,12 +486,10 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: my-http-host
-  name: My HTTP Service
+  schedule: '@every 5s'
   hosts: ["http://myhost:80"]
   check.request.method: HEAD
   check.response.status: [200]
-  schedule: '@every 5s'
 -------------------------------------------------------------------------------
 
 
@@ -530,8 +508,6 @@ to the endpoint `/demo/add`
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: demo-service
-  name: Demo Service
   schedule: '@every 5s'
   urls: ["http://localhost:8080/demo/add"]
   check.request:
@@ -561,8 +537,6 @@ response body for the strings `saved` or `Saved` and expects 200 or 201 status c
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: demo-service
-  name: Demo Service
   schedule: '@every 5s'
   urls: ["http://localhost:8080/demo/add"]
   check.request:
@@ -587,8 +561,6 @@ contains JSON:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: demo-service
-  name: Demo Service
   schedule: '@every 5s'
   hosts: ["https://myhost:80"]
   check.request:
@@ -610,8 +582,6 @@ patterns:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: demo-service
-  name: Demo Service
   schedule: '@every 5s'
   hosts: ["https://myhost:80"]
   check.request:
@@ -631,8 +601,6 @@ regex:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: http
-  id: demo-service
-  name: Demo Service
   schedule: '@every 5s'
   hosts: ["https://myhost:80"]
   check.request:
@@ -715,8 +683,6 @@ Example configuration:
 -------------------------------------------------------------------------------
 heartbeat.monitors:
 - type: tcp
-  id: demo-service
-  name: Demo Service
   schedule: '*/5 * * * * * *'
   hosts: ["myhost"]
   watch.poll_file:

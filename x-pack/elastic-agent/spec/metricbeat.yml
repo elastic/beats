@@ -10,10 +10,6 @@ rules:
 - inject_index:
     type: metrics
 
-- inject_stream_processor:
-    on_conflict: insert_after
-    type: metrics
-
 - extract_list_items:
     path: datasources
     item: inputs
@@ -24,17 +20,14 @@ rules:
     rules:
     - copy_all_to_list:
         to: streams
-        on_conflict: noop
-        except: ["streams", "id", "enabled", "processors"]
-    - copy_to_list:
-        item: processors
-        to: streams
-        on_conflict: insert_before
+        overwrite: false
+        except: ["streams", "id", "enabled"]
 
 - extract_list_items:
     path: inputsstreams
     item: streams
     to: inputs
+
 
 - filter_values_with_regexp:
     key: type

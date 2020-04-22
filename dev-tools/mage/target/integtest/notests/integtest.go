@@ -19,7 +19,7 @@ package notests
 
 import "fmt"
 
-// IntegTest executes integration tests (it uses Docker to run the tests).
+// IntegTest method fallbacks to GoIntegTest()
 func IntegTest() {
 	GoIntegTest()
 }

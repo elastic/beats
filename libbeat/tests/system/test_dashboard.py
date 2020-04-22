@@ -1,14 +1,12 @@
+from base import BaseTest
 import os
 import os.path
-import re
+import subprocess
+from nose.plugins.attrib import attr
+import unittest
+from unittest import SkipTest
 import requests
 import semver
-import subprocess
-import unittest
-
-from base import BaseTest
-from nose.plugins.attrib import attr
-from unittest import SkipTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -190,8 +188,7 @@ class Test(BaseTest):
 
         beat.check_wait(exit_code=1)
 
-        expected_error = re.compile("error exporting dashboard:.*not found", re.IGNORECASE)
-        assert self.log_contains(expected_error)
+        assert self.log_contains("error exporting dashboard: Not found") is True
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

@@ -27,14 +27,16 @@ import (
 	"github.com/elastic/go-txfile"
 )
 
+// Feature exposes a spooling to disk queue.
+var Feature = queue.Feature("spool", create,
+	feature.MakeDetails(
+		"Memory queue",
+		"Buffer events in memory before sending to the output.",
+		feature.Beta),
+)
+
 func init() {
-	queue.RegisterQueueType(
-		"spool",
-		create,
-		feature.MakeDetails(
-			"Disk spool",
-			"Buffer events in disk spool before sending to the output.",
-			feature.Beta))
+	queue.RegisterType("spool", create)
 }
 
 func create(

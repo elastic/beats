@@ -34,7 +34,7 @@ import (
 	// mage:import generate
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -44,6 +44,12 @@ func init() {
 	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -201,5 +207,5 @@ func PythonIntegTest(ctx context.Context) error {
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
 		return devtools.PythonNoseTest(args)
-	}, append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "NOSE_"), "GENERATE")...)
+	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
 }
