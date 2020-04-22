@@ -12,7 +12,7 @@ input:
       "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
-      "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
+      "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
                 "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT5M"
@@ -31,7 +31,7 @@ input:
                 "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
-                "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
+                "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
                 "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT5M"
