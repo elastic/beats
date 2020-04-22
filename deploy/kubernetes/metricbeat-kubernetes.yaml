@@ -83,9 +83,9 @@ data:
       # uncomment these settings:
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    # Currently `proxy` metricset is not supported on Openshift, comment out section.
     - module: kubernetes
       metricsets:
-        # Not supported on Openshift
         - proxy
       period: 10s
       host: ${NODE_NAME}
