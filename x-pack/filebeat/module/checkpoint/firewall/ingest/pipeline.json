@@ -63,7 +63,7 @@
     {
       "append": {
         "field": "event.category",
-        "value": ["network"],
+        "value": "network",
         "if": "ctx.checkpoint?.operation != 'Log In'"
       }
     },
@@ -244,7 +244,7 @@
     {
       "append": {
         "field": "event.category",
-        "value": ["authentication"],
+        "value": "authentication",
         "if": "ctx.checkpoint?.operation == 'Log In'"
       }
     },
@@ -307,56 +307,56 @@
     {
       "append": {
         "field": "event.category",
-        "value": ["malware"],
+        "value": "malware",
         "if": "ctx.checkpoint?.malware_action != null"
       }
     },
         {
       "append": {
         "field": "event.category",
-        "value": ["intrusion_detection"],
+        "value": "intrusion_detection",
         "if": "['Detect', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": ["{{source.ip}}"],
+        "value": "{{source.ip}}",
         "if": "ctx.source?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": ["{{destination.ip}}"],
+        "value": "{{destination.ip}}",
         "if": "ctx.destination?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": ["{{destination.ip}}"],
+        "value": "{{destination.ip}}",
         "if": "ctx.destination?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": ["{{checkpoint.file_md5}}"],
+        "value": "{{checkpoint.file_md5}}",
         "if": "ctx.checkpoint?.file_md5 != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": ["{{checkpoint.file_sha1}}"],
+        "value": "{{checkpoint.file_sha1}}",
         "if": "ctx.checkpoint?.file_sha1 != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": ["{{checkpoint.file_sha256}}"],
+        "value": "{{checkpoint.file_sha256}}",
         "if": "ctx.checkpoint?.file_sha256 != null"
       }
     },
