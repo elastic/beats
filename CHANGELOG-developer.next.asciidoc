@@ -71,3 +71,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
 - Add support for MODULE environment variable in `mage goIntegTest` in metricbeat to run integration tests for a single module. {pull}17147[17147]
 - Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
+- Add fields validation for histogram subfields. {pull}17759[17759]

@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration windows
+// +build integration
+// +build windows
 
 package service
 
@@ -53,7 +54,7 @@ func TestData(t *testing.T) {
 }
 
 func TestReadService(t *testing.T) {
-	reader, err := NewServiceReader()
+	reader, err := NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
