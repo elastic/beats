@@ -34,7 +34,7 @@ const (
 	hostNameKey = "host.name"
 )
 
-// AgentID returns an agent identifier.
+// ECSMetadata returns an agent ECS compliant metadata.
 func (i *AgentInfo) ECSMetadata() (map[string]interface{}, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
