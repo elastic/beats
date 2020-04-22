@@ -18,8 +18,6 @@
 package pipeline
 
 import (
-	"context"
-	"flag"
 	"go.elastic.co/apm/apmtest"
 	"math"
 	"sync"
@@ -184,27 +182,38 @@ func TestReplaceClientWorker(t *testing.T) {
 
 func TestMakeClientTracer(t *testing.T) {
 	seedPRNG(t)
+
 	numBatches := 10
+	numEvents := atomic.MakeUint(0)
+
+	wqu := makeWorkQueue()
+	retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+	defer retryer.close()
+
 	var published atomic.Uint
 	publishFn := func(batch publisher.Batch) error {
 		published.Add(uint(len(batch.Events())))
 		return nil
 	}
-	wqu := makeWorkQueue()
+
 	client := newMockNetworkClient(publishFn)
+
 	recorder := apmtest.NewRecordingTracer()
 	defer recorder.Close()
-	makeClientWorker(nilObserver, wqu, client, recorder.Tracer)
 
-	numEvents := atomic.MakeUint(0)
-	for batchIdx := 1; batchIdx <= numBatches; batchIdx++ {
-		batch := randomBatch(10, 15, wqu)
+	worker := makeClientWorker(nilObserver, wqu, client, recorder.Tracer)
+	defer worker.Close()
+
+	for i := 0; i < numBatches; i++ {
+		batch := randomBatch(10, 15).withRetryer(retryer)
 		numEvents.Add(uint(len(batch.Events())))
 		wqu <- batch
 	}
 
 	// Give some time for events to be published
 	timeout := 10 * time.Second
+
+	// Make sure that all events have eventually been published
 	matches := waitUntilTrue(timeout, func() bool {
 		return numEvents == published
 	})

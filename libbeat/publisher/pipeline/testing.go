@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"flag"
 	"math/rand"
 	"sync"
@@ -45,7 +46,7 @@ type mockClient struct {
 
 func (c *mockClient) String() string { return "mock_client" }
 func (c *mockClient) Close() error   { return nil }
-func (c *mockClient) Publish(batch publisher.Batch) error {
+func (c *mockClient) Publish(_ context.Context, batch publisher.Batch) error {
 	return c.publishFn(batch)
 }
 
