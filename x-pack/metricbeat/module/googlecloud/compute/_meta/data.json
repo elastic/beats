@@ -5,8 +5,8 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "8390997210852978465",
-            "name": "gke-observability-7--observability-7--3dd3e39b-0jm5"
+            "id": "6889336735612324102",
+            "name": "gke-dev-oblt-dev-oblt-pool-83a8831b-kd53"
         },
         "machine": {
             "type": "n1-standard-4"
@@ -24,23 +24,23 @@
             "instance": {
                 "disk": {
                     "read_bytes_count": {
-                        "raw": 0
+                        "value": 0
                     },
                     "read_ops_count": {
-                        "raw": 0
+                        "value": 0
                     },
                     "write_bytes_count": {
-                        "raw": 11951536
+                        "value": 0
                     },
                     "write_ops_count": {
-                        "raw": 264
+                        "value": 0
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "gke-observability-7-1--pvc-4193b085-82e1-11ea-8cd9-42010af0011c",
+                "device_name": "disk-4",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
             },

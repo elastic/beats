@@ -14,18 +14,19 @@
     "googlecloud": {
         "labels": {
             "metrics": {
-                "storage_class": "REGIONAL"
+                "method": "GetBucketMetadata",
+                "response_code": "OK"
             },
             "resource": {
-                "bucket_name": "elastic-vsphere-images",
-                "location": "us-east1"
+                "bucket_name": "ocp-be-c5kjr-image-registry-us-central1-dsoafnbgctvfimpavswkgn",
+                "location": "us-central1"
             }
         },
         "storage": {
-            "storage": {
-                "object_count": 3,
-                "total_byte_seconds": 58816542441472,
-                "total_bytes": 680747019
+            "network": {
+                "sent_bytes_count": {
+                    "value": 2637
+                }
             }
         }
     },

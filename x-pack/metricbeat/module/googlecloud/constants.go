@@ -101,7 +101,7 @@ const (
 )
 
 var AlignersMapToSuffix = map[string]string{
-	"ALIGN_NONE":           ".raw",
+	"ALIGN_NONE":           ".value",
 	"ALIGN_DELTA":          ".delta",
 	"ALIGN_RATE":           ".rate",
 	"ALIGN_INTERPOLATE":    ".interpolate",

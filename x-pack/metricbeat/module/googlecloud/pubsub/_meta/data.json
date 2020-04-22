@@ -14,13 +14,13 @@
     "googlecloud": {
         "labels": {
             "resource": {
-                "subscription_id": "test-subscription-1"
+                "subscription_id": "test-ks"
             }
         },
         "pubsub": {
             "subscription": {
-                "retained_acked_bytes": {
-                    "raw": 0
+                "oldest_unacked_message_age": {
+                    "value": 0
                 }
             }
         }

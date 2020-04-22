@@ -46,7 +46,7 @@ type MetricSet struct {
 	config            config
 	metricsMeta       map[string]metricMeta
 	requester         *stackdriverMetricsRequester
-	StackDriverConfig []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
+	stackDriverConfig []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
 }
 
 //stackDriverConfig holds a configuration specific for stackdriver metricset.
@@ -91,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m.StackDriverConfig = stackDriverConfigs.StackDriverMetrics
+	m.stackDriverConfig = stackDriverConfigs.StackDriverMetrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period.Seconds = int64(m.Module().Config().Period.Seconds())
 
@@ -106,7 +106,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
 
-	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.StackDriverConfig)
+	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.stackDriverConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error calling metricDescriptor function")
 	}
@@ -123,7 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	responses, err := m.requester.Metrics(ctx, m.StackDriverConfig, m.metricsMeta)
+	responses, err := m.requester.Metrics(ctx, m.stackDriverConfig, m.metricsMeta)
 	if err != nil {
 		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
@@ -218,11 +218,11 @@ func (mc *stackDriverConfig) Validate() error {
 
 // metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
 // (sample period and ingest delay) of each given metric type
-func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, metricsConfigs []stackDriverConfig) (map[string]metricMeta, error) {
+func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, stackDriverConfigs []stackDriverConfig) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
 
-	for _, metricsC := range metricsConfigs {
-		for _, mt := range metricsC.MetricTypes {
+	for _, sdc := range stackDriverConfigs {
+		for _, mt := range sdc.MetricTypes {
 			req := &monitoringpb.ListMetricDescriptorsRequest{
 				Name:   "projects/" + projectID,
 				Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
