@@ -63,8 +63,7 @@ func newManaged(
 
 	path := fleetAgentConfigPath()
 
-	// TODO(ph): Define the encryption password.
-	store := storage.NewEncryptedDiskStore(path, []byte(""))
+	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
 	if err != nil {
 		return nil, errors.New(err, "could not initialize config store",

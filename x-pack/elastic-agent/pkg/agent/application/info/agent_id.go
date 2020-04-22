@@ -43,7 +43,7 @@ func generateAgentID() (string, error) {
 }
 
 func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
-	s := storage.NewEncryptedDiskStore(AgentConfigFile, []byte(""))
+	s := storage.NewDiskStore(AgentConfigFile)
 
 	agentinfo, err := getInfoFromStore(s)
 	if err != nil {
