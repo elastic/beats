@@ -16,7 +16,7 @@
         - name: DeadLetterErrors.avg
           type: double
           description: For asynchronous invocation, the number of times Lambda attempts to send an event to a dead-letter queue but fails.
-        - name: DestinationDeliveryFailures
+        - name: DestinationDeliveryFailures.avg
           type: double
           description: For asynchronous invocation, the number of times Lambda attempts to send an event to a destination but fails.
         - name: Duration.avg

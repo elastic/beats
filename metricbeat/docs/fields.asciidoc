@@ -2734,7 +2734,7 @@ type: double
 
 --
 
-*`aws.networkelb.metrics.ActiveFlowCount_UDP`*::
+*`aws.networkelb.metrics.ActiveFlowCount_UDP.avg`*::
 +
 --
 The total number of concurrent UDP flows (or connections) from clients to targets.
@@ -2886,7 +2886,7 @@ type: double
 
 --
 
-*`aws.lambda.metrics.DestinationDeliveryFailures`*::
+*`aws.lambda.metrics.DestinationDeliveryFailures.avg`*::
 +
 --
 For asynchronous invocation, the number of times Lambda attempts to send an event to a destination but fails.

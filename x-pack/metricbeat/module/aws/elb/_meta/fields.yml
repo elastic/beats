@@ -145,7 +145,7 @@
         - name: ActiveFlowCount_TLS.avg
           type: double
           description: The total number of concurrent TLS flows (or connections) from clients to targets.
-        - name: ActiveFlowCount_UDP
+        - name: ActiveFlowCount_UDP.avg
           type: double
           description: The total number of concurrent UDP flows (or connections) from clients to targets.
         - name: ConsumedLCUs.avg
