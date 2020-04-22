@@ -23,8 +23,8 @@
             }
         },
         "storage": {
-            "api": {
-                "request_count": 0
+            "network": {
+                "received_bytes_count": 0
             }
         }
     },
