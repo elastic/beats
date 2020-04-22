@@ -79,13 +79,13 @@ type EnrollRequest struct {
 	EnrollAPIKey string     `json:"-"`
 	Type         EnrollType `json:"type"`
 	SharedID     string     `json:"sharedId,omitempty"`
-	Metadata     Metadata   `json:"metadata,omitempty"`
+	Metadata     Metadata   `json:"metadata"`
 }
 
 // Metadata is a all the metadata send or received from the elastic-agent.
 type Metadata struct {
 	Local        map[string]interface{} `json:"local,omitempty"`
-	UserProvided map[string]interface{} `json:"user_provided,omitempty"`
+	UserProvided map[string]interface{} `json:"user_provided"`
 }
 
 // Validate validates the enrollment request before sending it to the API.
