@@ -37,7 +37,7 @@ var testEventTime = time.Now().UTC()
 func testEvent() *Event {
 	return &Event{
 		Timestamp: testEventTime,
-		Path:      "/home/user",
+		Path:      "/home/user/file.txt",
 		Source:    SourceScan,
 		Action:    ConfigChange,
 		Info: &Metadata{
@@ -292,6 +292,7 @@ func TestBuildEvent(t *testing.T) {
 		assertHasKey(t, fields, "event.action")
 
 		assertHasKey(t, fields, "file.path")
+		assertHasKey(t, fields, "file.extension")
 		assertHasKey(t, fields, "file.target_path")
 		assertHasKey(t, fields, "file.inode")
 		assertHasKey(t, fields, "file.uid")
@@ -312,6 +313,23 @@ func TestBuildEvent(t *testing.T) {
 		assertHasKey(t, fields, "hash.sha1")
 		assertHasKey(t, fields, "hash.sha256")
 	})
+	if runtime.GOOS == "windows" {
+		t.Run("drive letter", func(t *testing.T) {
+			e := testEvent()
+			e.Path = "c:\\Documents"
+			fields := buildMetricbeatEvent(e, false).MetricSetFields
+			value, err := fields.GetValue("file.drive_letter")
+			assert.NoError(t, err)
+			assert.Equal(t, "C", value)
+		})
+		t.Run("no drive letter", func(t *testing.T) {
+			e := testEvent()
+			e.Path = "\\\\remote\\Documents"
+			fields := buildMetricbeatEvent(e, false).MetricSetFields
+			_, err := fields.GetValue("file.drive_letter")
+			assert.Error(t, err)
+		})
+	}
 	t.Run("no setuid/setgid", func(t *testing.T) {
 		e := testEvent()
 		e.Info.SetGID = false

@@ -31,6 +31,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cespare/xxhash/v2"
@@ -214,6 +215,17 @@ func NewEvent(
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
+func getDriveLetter(path string) string {
+	volume := filepath.VolumeName(path)
+	if len(volume) == 2 && volume[1] == ':' {
+		letter := path[0]
+		if (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') {
+			return strings.ToUpper(volume[:1])
+		}
+	}
+	return ""
+}
+
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	file := common.MapStr{
 		"path": e.Path,
@@ -237,6 +249,12 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file["ctime"] = info.CTime
 
 		if e.Info.Type == FileType {
+			if extension := filepath.Ext(e.Path); extension != "" {
+				file["extension"] = extension
+			}
+			if mimeType := getMimeType(e.Path); mimeType != "" {
+				file["mime_type"] = mimeType
+			}
 			file["size"] = info.Size
 		}
 
@@ -245,6 +263,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 
 		if runtime.GOOS == "windows" {
+			if drive := getDriveLetter(e.Path); drive != "" {
+				file["drive_letter"] = drive
+			}
 			if info.SID != "" {
 				file["uid"] = info.SID
 			}
