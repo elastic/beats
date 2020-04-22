@@ -50,13 +50,10 @@ The Filebeat `apache2` module is renamed to `apache` in 7.0.
 
 include::./field-name-changes.asciidoc[]
 
-//end::notable-breaking-changes[]
-
 [float]
-==== Auditbeat type changes
+==== Field type changes
 
-The Auditbeat JSON data types produced by the output have been changed to align
-with the data types used in the Elasticsearch index template.
+The following fields have type changes in 7.0.
 
 .Auditbeat Type Changes in 7.0
 [frame="topbot",options="header"]
@@ -68,3 +65,42 @@ with the data types used in the Elasticsearch index template.
 |`process.ppid` |string |number
 |======================
 
+.Filebeat Type Changes in 7.0
+[frame="topbot",options="header"]
+|====
+|Field                         |Old Type  | New Type
+|`auditd.log.pid`              | keyword  | long
+|`auditd.log.ppid`             | keyword  | long
+|`elasticsearch.audit.request` | keyword  | object
+|`error.code`                  | keyword  | long
+|`haproxy.destination.ip`      | keyword  | ip
+|`mysql.slowlog.ip`            | keyword  | ip
+|`read_timestamp`              | keyword  | date
+|`source`                      | keyword  | object
+|`system.auth.groupadd.gid`    | long     | keyword
+|`system.auth.timestamp`       | keyword  | date
+|`system.auth.useradd.gid`     | long     | keyword
+|`system.auth.useradd.uid`     | long     | keyword
+|`system.syslog.pid`           | keyword  | long
+|`system.syslog.timestamp`     | keyword  | date
+|`user_agent.device`           | keyword  | object
+|====
+
+.Packetbeat Type Changes in 7.0
+[frame="topbot",options="header"]
+|====
+|Field                         | Old Type | New Type
+|`error.code`                  | keyword  | long
+|`final`                       | keyword  | boolean
+|`http.request.body`           | text     | object
+|`http.response.body`          | text     | object
+|`http.response.code` (renamed `http.response.status_code`)  | keyword | long
+|`real_ip`                     | keyword  | ip
+|`server`                      | keyword  | object
+|`service`                     | keyword  | object
+|`source.ip`                   | keyword  | ip
+|`source.port`                 | keyword  | long
+|`vlan`                        | keyword  | long
+|====
+
+//end::notable-breaking-changes[]
