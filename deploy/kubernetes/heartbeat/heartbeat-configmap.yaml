@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heartbeat-deployment-config
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+data:
+  heartbeat.yml: |-
+    # TODO
+    #heartbeat.autodiscover:
+    #  providers:
+    #    - type: kubernetes
+    #      node: ${NODE_NAME}
+    #      hints.enabled: true
+
+    processors:
+      - add_cloud_metadata:
+
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
