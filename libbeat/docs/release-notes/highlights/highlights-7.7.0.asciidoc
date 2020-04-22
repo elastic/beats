@@ -81,7 +81,7 @@ for monitoring additional services:
 * The {metricbeat-ref}/metricbeat-metricset-googlecloud-pubsub.html[`pubsub`]
 metricset connects to the Stackdriver API and collects metrics for topics,
 subscriptions, and snapshots used by a specified account. 
-* The {metricbeat-ref}/metricbeat-metricset-googlecloud-loadbalancer.html[`loadbalancer`]
+* The {metricbeat-ref}/metricbeat-metricset-googlecloud-loadbalancing.html[`loadbalancing`]
 metricset captures load balancing performance metrics for HTTP(S), TCP, and UDP
 applications.
 
