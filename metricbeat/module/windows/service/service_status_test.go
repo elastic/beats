@@ -15,28 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build mage
+// +build windows
 
-package main
+package service
 
 import (
-	"context"
+	"testing"
 
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	test.RegisterDeps(GoUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) {
-	devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+func TestGetServiceStates(t *testing.T) {
+	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
+	assert.NoError(t, err)
+	assert.NotEqual(t, handle, InvalidDatabaseHandle)
+	services, err := GetServiceStates(handle, ServiceStateAll, map[string]struct{}{})
+	assert.NoError(t, err)
+	assert.True(t, len(services) > 0)
+	closeHandle(handle)
 }
