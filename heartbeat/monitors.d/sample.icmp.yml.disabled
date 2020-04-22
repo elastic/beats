@@ -8,7 +8,7 @@
   id: my-icmp-monitor
 
   # Human readable display name for this service in Uptime UI and elsewhere
-  name: my-icmp-monitor
+  name: My ICMP Monitor
 
   # Enable/Disable monitor
   #enabled: true
