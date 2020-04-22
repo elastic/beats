@@ -44,16 +44,16 @@ stop-environment:
 
 .PHONY: unit-tests
 unit-tests: mage
-	mage update unitTest
+	mage unitTest
 
 .PHONY: integration-tests
 integration-tests: mage
 	rm -f build/TEST-go-integration.out
-	mage update goIntegTest || ( cat build/TEST-go-integration.out && false )
+	mage goIntegTest || ( cat build/TEST-go-integration.out && false )
 
 .PHONY: system-tests
 system-tests: mage
-	mage update pythonIntegTest
+	mage pythonIntegTest
 
 .PHONY: testsuite
 testsuite: mage

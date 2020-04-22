@@ -147,15 +147,6 @@ func Update() {
 		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
 
-// ExportDashboard exports a dashboard and writes it into the correct directory
-//
-// Required ENV variables:
-// * MODULE: Name of the module
-// * ID: Dashboard id
-func ExportDashboard() error {
-	return devtools.ExportDashboard()
-}
-
 // FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
 func FieldsDocs() error {
@@ -192,7 +183,9 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
@@ -213,16 +206,17 @@ func CreateMetricset(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	python, err := devtools.LookVirtualenvPath(ve, "python")
+	if err != nil {
+		return err
+	}
 	path, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
-	pythonEnv := map[string]string{
-		"VIRTUAL_ENV": ve,
-	}
 	_, err = sh.Exec(
-		pythonEnv, os.Stdout, os.Stderr, "python3", "scripts/create_metricset.py",
+		map[string]string{}, os.Stdout, os.Stderr, python, "scripts/create_metricset.py",
 		"--path", path, "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
 	)
 	return err
