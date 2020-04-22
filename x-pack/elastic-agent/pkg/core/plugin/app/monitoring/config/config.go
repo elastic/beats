@@ -2,10 +2,11 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package monitoring
+package config
 
-// Config describes a configuration of a monitoring
-type Config struct {
+// MonitoringConfig describes a configuration of a monitoring
+type MonitoringConfig struct {
+	Enabled        bool `yaml:"enabled" config:"enabled"`
 	MonitorLogs    bool `yaml:"logs" config:"logs"`
 	MonitorMetrics bool `yaml:"metrics" config:"metrics"`
 }

@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 )
@@ -36,9 +36,6 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		DownloadConfig: &artifact.Config{
 			InstallPath: installPath,
 		},
-		MonitoringConfig: &monitoring.Config{
-			MonitorMetrics: false,
-		},
 	}
 
 	cfg, err := config.NewConfigFrom(operatorConfig)
@@ -56,7 +53,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, installer, stateResolver, nil)
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, installer, stateResolver, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
