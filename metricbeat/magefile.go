@@ -53,20 +53,14 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(update.Update)
-	test.RegisterDeps(GoIntegTest)
+	test.RegisterDeps(GoIntegTest, PythonIntegTest)
 	unittest.RegisterGoTestDeps(Fields)
 	unittest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
-}
-
-//CollectAll generates the docs and the fields.
+// CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
 }
@@ -144,15 +138,6 @@ func Fields() error {
 	return devtools.GenerateFieldsYAML("module")
 }
 
-// ExportDashboard exports a dashboard and writes it into the correct directory
-//
-// Required ENV variables:
-// * MODULE: Name of the module
-// * ID: Dashboard id
-func ExportDashboard() error {
-	return devtools.ExportDashboard()
-}
-
 // FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
 func FieldsDocs() error {
@@ -172,6 +157,11 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
@@ -180,4 +170,19 @@ func CollectDocs() error {
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(Fields)
 	return devtools.GoTestIntegrationForModule(ctx)
+}
+
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+// Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
+// Use any other NOSE_* environment variable to influence the behavior of
+// nosetests.
+func PythonIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+	}, devtools.ListMatchingEnvVars("NOSE_")...)
 }

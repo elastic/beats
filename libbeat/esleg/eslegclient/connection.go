@@ -63,11 +63,15 @@ type ConnectionSettings struct {
 	Parameters       map[string]string
 	CompressionLevel int
 	EscapeHTML       bool
-	Timeout          time.Duration
+
+	Timeout         time.Duration
+	IdleConnTimeout time.Duration
 }
 
 // NewConnection returns a new Elasticsearch client
 func NewConnection(s ConnectionSettings) (*Connection, error) {
+	s = settingsWithDefaults(s)
+
 	u, err := url.Parse(s.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
@@ -124,12 +128,22 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 				DialTLS:         tlsDialer.Dial,
 				TLSClientConfig: s.TLS.ToConfig(),
 				Proxy:           proxy,
+				IdleConnTimeout: s.IdleConnTimeout,
 			},
 			Timeout: s.Timeout,
 		},
 		Encoder: encoder,
 		log:     logp.NewLogger("esclientleg"),
 	}, nil
+}
+
+func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
+	settings := s
+	if settings.IdleConnTimeout == 0 {
+		settings.IdleConnTimeout = 1 * time.Minute
+	}
+
+	return settings
 }
 
 // NewClients returns a list of Elasticsearch clients based on the given
@@ -266,6 +280,7 @@ func (conn *Connection) Ping() (string, error) {
 
 // Close closes a connection.
 func (conn *Connection) Close() error {
+	conn.HTTP.CloseIdleConnections()
 	return nil
 }
 

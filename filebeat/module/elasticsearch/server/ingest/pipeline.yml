@@ -80,7 +80,10 @@ processors:
     - elasticsearch.server.gc.observation_duration.unit
     ignore_missing: true
 - remove:
-    field: elasticsearch.server.timestamp
+    field:
+    - elasticsearch.server.timestamp
+    - elasticsearch.server.@timestamp
+    ignore_missing: true
 - remove:
     field:
     - first_char
