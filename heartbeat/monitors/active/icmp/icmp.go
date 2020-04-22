@@ -98,7 +98,7 @@ func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
 		icmpFields := common.MapStr{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
-			eventext.MergeEventFields(event, icmpFields)
+			eventext.MergeEventFields(event, common.MapStr{"icmp": icmpFields})
 		}
 
 		return nil
