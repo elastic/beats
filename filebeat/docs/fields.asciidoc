@@ -29,7 +29,6 @@ grouped in the following categories:
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
-* <<exported-fields-fortinet>>
 * <<exported-fields-googlecloud>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
@@ -18215,18 +18214,6 @@ Envoy proxy type, tcp or http
 type: keyword
 
 --
-
-[[exported-fields-fortinet]]
-== fortinet fields
-
-fortinet Module
-
-
-
-[float]
-=== fortinet
-
-
 
 [[exported-fields-googlecloud]]
 == Google Cloud fields

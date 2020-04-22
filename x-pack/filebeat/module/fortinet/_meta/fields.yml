@@ -1,9 +1,0 @@
-- key: fortinet
-  title: "fortinet"
-  description: >
-    fortinet Module
-  fields:
-    - name: fortinet
-      type: group
-      description: >
-      fields:
