@@ -179,6 +179,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 		},
 	}
 
+	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
+
 	return result, true
 }
 
@@ -204,6 +206,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			"elasticsearch": output,
 		},
 	}
+
+	o.logger.Debugf("monitoring configuration generated for metricbeat: %v", result)
 
 	return result, true
 }
