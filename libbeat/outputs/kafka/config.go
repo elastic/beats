@@ -200,7 +200,7 @@ func (c *kafkaConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
+func newSaramaConfig(log *logp.Logger, config *kafkaConfig, b backoff.Backoff) (*sarama.Config, error) {
 	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
@@ -283,11 +283,11 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 		retryMax = 1000
 	}
 	k.Producer.Retry.Max = retryMax
-
-	// Configure backoff function. We use equal-jitter as it's the same strategy
-	// used by other outputs (elasticsearch, logstash, redis).
-	b := backoff.NewEqualJitterBackoff(nil, config.Backoff.Init, config.Backoff.Max)
-	k.Producer.Retry.BackoffFunc = func(_, _ int) time.Duration { return b.WaitDuration() }
+	k.Producer.Retry.BackoffFunc = func(_, _ int) time.Duration {
+		d := b.WaitDuration()
+		log.Infof("backing off for %v (init: %v, max: %v)", d, config.Backoff.Init, config.Backoff.Max)
+		return d
+	}
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize

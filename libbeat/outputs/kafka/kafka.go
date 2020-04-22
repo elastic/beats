@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -76,7 +77,11 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(log, config)
+	// Configure backoff function. We use equal-jitter as it's the same strategy
+	// used by other outputs (elasticsearch, logstash, redis).
+	b := backoff.NewEqualJitterBackoff(nil, config.Backoff.Init, config.Backoff.Max)
+
+	libCfg, err := newSaramaConfig(log, config, b)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -91,7 +96,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg, b)
 	if err != nil {
 		return outputs.Fail(err)
 	}
