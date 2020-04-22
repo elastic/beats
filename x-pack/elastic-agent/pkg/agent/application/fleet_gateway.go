@@ -182,6 +182,8 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	var metaData map[string]interface{}
 	if m, err := metadata(); err == nil {
 		metaData = m
+	} else {
+		f.log.Error(errors.New("failed to load metadata", err))
 	}
 
 	// checkin
