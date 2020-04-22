@@ -24,6 +24,7 @@
 - Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
 - Fixed injected log path to monitoring beat {pull}17833[17833]
 - Make sure that the Elastic Agent connect over TLS in cloud. {pull}17843[17843]
+- Moved stream.* fields to top of event {pull}17858[17858]
 
 ==== New features
 
