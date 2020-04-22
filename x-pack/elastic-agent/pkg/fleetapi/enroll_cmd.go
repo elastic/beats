@@ -84,7 +84,7 @@ type EnrollRequest struct {
 
 // Metadata is a all the metadata send or received from the elastic-agent.
 type Metadata struct {
-	Local        map[string]interface{} `json:"local,omitempty"`
+	Local        map[string]interface{} `json:"local"`
 	UserProvided map[string]interface{} `json:"user_provided"`
 }
 
