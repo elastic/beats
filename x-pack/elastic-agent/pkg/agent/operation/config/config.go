@@ -6,7 +6,6 @@ package config
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 )
@@ -17,6 +16,4 @@ type Config struct {
 	RetryConfig   *retry.Config   `yaml:"retry" config:"retry"`
 
 	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
-
-	MonitoringConfig *monitoring.Config `yaml:"settings.monitoring" config:"settings.monitoring"`
 }

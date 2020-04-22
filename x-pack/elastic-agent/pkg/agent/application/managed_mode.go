@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -118,13 +119,17 @@ func newManaged(
 	}
 
 	combinedReporter := reporting.NewReporter(managedApplication.bgContext, log, agentInfo, logR, fleetR)
+	monitor, err := monitoring.NewMonitor(rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize monitoring")
+	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, client, combinedReporter))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, rawConfig, client, combinedReporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}})
+	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
