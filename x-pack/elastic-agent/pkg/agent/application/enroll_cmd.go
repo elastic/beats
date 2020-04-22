@@ -141,7 +141,7 @@ func (c *EnrollCmd) Execute() error {
 
 	metadata, err := metadata()
 	if err != nil {
-		return errors.New(err, "acquiring hostname")
+		c.log.Error(errors.New(err, "acquiring hostname"))
 	}
 
 	r := &fleetapi.EnrollRequest{

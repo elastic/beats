@@ -74,7 +74,7 @@ func (i *AgentInfo) ECSMetadata() (map[string]interface{}, error) {
 
 	info := sysInfo.Info()
 
-	// 	Agent
+	// Agent
 	meta[agentIDKey] = i.agentID
 	meta[agentVersionKey] = release.Version()
 
