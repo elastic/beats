@@ -333,6 +333,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
 - Release Google Cloud module as GA. {pull}17511[17511]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
+- Added new Checkpoint Syslog filebeat module. {pull}17682[17682]
 - Add config option to select a different azure cloud env in the azure-eventhub input and azure module. {issue}17649[17649] {pull}17659[17659]
 - Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]

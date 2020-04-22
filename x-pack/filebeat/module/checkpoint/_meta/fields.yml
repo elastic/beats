@@ -1,0 +1,5 @@
+- key: checkpoint
+  title: Checkpoint
+  description: >
+    Some checkpoint module
+  fields:
