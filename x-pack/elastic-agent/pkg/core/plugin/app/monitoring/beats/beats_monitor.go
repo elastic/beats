@@ -12,64 +12,84 @@ import (
 	"unicode"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
 )
 
 const httpPlusPrefix = "http+"
 
+type wrappedConfig struct {
+	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
+}
+
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
 type Monitor struct {
-	pipelineID string
-
-	process            string
-	monitoringEndpoint string
-	loggingPath        string
-	loggingFile        string
-
-	monitorLogs    bool
-	monitorMetrics bool
+	operatingSystem string
+	config          *monitoringConfig.MonitoringConfig
+	installPath     string
 }
 
 // NewMonitor creates a beats monitor.
-func NewMonitor(process, pipelineID string, downloadConfig *artifact.Config, monitorLogs, monitorMetrics bool) *Monitor {
-	var monitoringEndpoint, loggingPath, loggingFile string
-
-	if monitorMetrics {
-		monitoringEndpoint = getMonitoringEndpoint(process, downloadConfig.OS(), pipelineID)
-	}
-	if monitorLogs {
-		operatingSystem := downloadConfig.OS()
-		loggingFile = getLoggingFile(process, operatingSystem, downloadConfig.InstallPath, pipelineID)
-		loggingPath = filepath.Dir(loggingFile)
-	}
-
+func NewMonitor(downloadConfig *artifact.Config) *Monitor {
 	return &Monitor{
-		pipelineID:         pipelineID,
-		process:            process,
-		monitoringEndpoint: monitoringEndpoint,
-		loggingPath:        loggingPath,
-		loggingFile:        loggingFile,
-		monitorLogs:        monitorLogs,
-		monitorMetrics:     monitorMetrics,
+		operatingSystem: downloadConfig.OS(),
+		installPath:     downloadConfig.InstallPath,
+		config:          &monitoringConfig.MonitoringConfig{},
 	}
+}
+
+// Reload reloads state of the monitoring based on config.
+func (b *Monitor) Reload(rawConfig *config.Config) error {
+	cfg := &wrappedConfig{}
+	if err := rawConfig.Unpack(&cfg); err != nil {
+		return err
+	}
+
+	b.config = cfg.MonitoringConfig
+	return nil
+}
+
+// IsMonitoringEnabled returns true if monitoring is enabled.
+func (b *Monitor) IsMonitoringEnabled() bool { return b.config.Enabled }
+
+// WatchLogs returns true if monitoring is enabled and monitor should watch logs.
+func (b *Monitor) WatchLogs() bool { return b.config.Enabled && b.config.MonitorLogs }
+
+// WatchMetrics returns true if monitoring is enabled and monitor should watch metrics.
+func (b *Monitor) WatchMetrics() bool { return b.config.Enabled && b.config.MonitorMetrics }
+
+func (b *Monitor) generateMonitoringEndpoint(process, pipelineID string) string {
+	return getMonitoringEndpoint(process, b.operatingSystem, pipelineID)
+}
+
+func (b *Monitor) generateLoggingFile(process, pipelineID string) string {
+	return getLoggingFile(process, b.operatingSystem, b.installPath, pipelineID)
+}
+
+func (b *Monitor) generateLoggingPath(process, pipelineID string) string {
+	return filepath.Dir(b.generateLoggingFile(process, pipelineID))
+
 }
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(args []string) []string {
+func (b *Monitor) EnrichArgs(process, pipelineID string, args []string) []string {
 	appendix := make([]string, 0, 7)
 
-	if b.monitoringEndpoint != "" {
+	monitoringEndpoint := b.generateMonitoringEndpoint(process, pipelineID)
+	if monitoringEndpoint != "" {
 		appendix = append(appendix,
 			"-E", "http.enabled=true",
-			"-E", "http.host="+b.monitoringEndpoint,
+			"-E", "http.host="+monitoringEndpoint,
 		)
 	}
 
-	if b.loggingPath != "" {
+	loggingPath := b.generateLoggingPath(process, pipelineID)
+	if loggingPath != "" {
 		appendix = append(appendix,
-			"-E", "logging.files.path="+b.loggingPath,
-			"-E", "logging.files.name="+b.process,
+			"-E", "logging.files.path="+loggingPath,
+			"-E", "logging.files.name="+process,
 			"-E", "logging.files.keepfiles=7",
 			"-E", "logging.files.permission=0644",
 			"-E", "logging.files.interval=1h",
@@ -80,9 +100,9 @@ func (b *Monitor) EnrichArgs(args []string) []string {
 }
 
 // Cleanup removes
-func (b *Monitor) Cleanup() error {
+func (b *Monitor) Cleanup(process, pipelineID string) error {
 	// do not cleanup logs, they might not be all processed
-	drop := b.monitoringDrop()
+	drop := b.monitoringDrop(process, pipelineID)
 	if drop == "" {
 		return nil
 	}
@@ -91,9 +111,9 @@ func (b *Monitor) Cleanup() error {
 }
 
 // Prepare executes steps in order for monitoring to work correctly
-func (b *Monitor) Prepare(uid, gid int) error {
-	drops := []string{b.loggingPath}
-	if drop := b.monitoringDrop(); drop != "" {
+func (b *Monitor) Prepare(process, pipelineID string, uid, gid int) error {
+	drops := []string{b.generateLoggingPath(process, pipelineID)}
+	if drop := b.monitoringDrop(process, pipelineID); drop != "" {
 		drops = append(drops, drop)
 	}
 
@@ -124,31 +144,31 @@ func (b *Monitor) Prepare(uid, gid int) error {
 
 // LogPath describes a path where application stores logs. Empty if
 // application is not monitorable
-func (b *Monitor) LogPath() string {
-	if !b.monitorLogs {
+func (b *Monitor) LogPath(process, pipelineID string) string {
+	if !b.WatchLogs() {
 		return ""
 	}
 
-	return b.loggingFile
+	return b.generateLoggingFile(process, pipelineID)
 }
 
 // MetricsPath describes a location where application exposes metrics
 // collectable by metricbeat.
-func (b *Monitor) MetricsPath() string {
-	if !b.monitorMetrics {
+func (b *Monitor) MetricsPath(process, pipelineID string) string {
+	if !b.WatchMetrics() {
 		return ""
 	}
 
-	return b.monitoringEndpoint
+	return b.generateMonitoringEndpoint(process, pipelineID)
 }
 
 // MetricsPathPrefixed return metrics path prefixed with http+ prefix.
-func (b *Monitor) MetricsPathPrefixed() string {
-	return httpPlusPrefix + b.MetricsPath()
+func (b *Monitor) MetricsPathPrefixed(process, pipelineID string) string {
+	return httpPlusPrefix + b.MetricsPath(process, pipelineID)
 }
 
-func (b *Monitor) monitoringDrop() string {
-	return monitoringDrop(b.monitoringEndpoint)
+func (b *Monitor) monitoringDrop(process, pipelineID string) string {
+	return monitoringDrop(b.generateMonitoringEndpoint(process, pipelineID))
 }
 
 func monitoringDrop(path string) (drop string) {
