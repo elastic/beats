@@ -12,9 +12,8 @@ resource "random_id" "suffix" {
 }
 
 resource "random_password" "db" {
-  length           = 16
-  special          = true
-  override_special = "/@ "
+  length  = 16
+  special = false
 }
 
 resource "aws_db_instance" "test" {

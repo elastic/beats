@@ -37,7 +37,8 @@ pipeline {
 
     // XXX: Set to false by default
     booleanParam(name: 'debug', defaultValue: true, description: 'Allow debug logging for Jenkins steps')
-    booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
+    // XXX: Set to false by default
+    booleanParam(name: 'dry_run', defaultValue: true, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
     /**
@@ -367,6 +368,7 @@ pipeline {
                 withCloudTestEnv() {
                   withBeatsEnv(false) {
                     terraformApply("x-pack/metricbeat/module/aws")
+                    terraformStash("x-pack-metricbeat")
                   }
                 }
               }
@@ -383,7 +385,13 @@ pipeline {
           }
           post {
             cleanup {
-              terraformCleanup("x-pack/metricbeat")
+              // XXX: terraformCleanup(stashName: "x-pack-metricbeat", directory: "x-pack/metricbeat")
+              withCloudTestEnv() {
+                withBeatsEnv(false) {
+                  unstash "terraform-x-pack-metricbeat"
+                  sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh x-pack/metricbeat")
+                }
+              }
             }
           }
         }
@@ -955,17 +963,18 @@ def terraformApply(String directory) {
   }
 }
 
+def terraformStash(String name) {
+  archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+  stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+}
+
 // Looks for all terraform states in `directory` and runs `terraform destroy` for them
-def terraformCleanup(String directory) {
+def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
-    when {
-      expression {
-        return params.runAllCloudTests || params.awsCloudTests
-      }
-    }
     steps {
       withCloudTestEnv() {
         withBeatsEnv(false) {
+          unstash "terraform-${stashName}"
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh $directory")
         }
       }
