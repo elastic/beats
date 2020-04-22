@@ -61,7 +61,7 @@
       }
     },
     {
-      "set": {
+      "append": {
         "field": "event.category",
         "value": ["network"],
         "if": "ctx.checkpoint?.operation != 'Log In'"
@@ -242,7 +242,7 @@
       }
     },
     {
-      "set": {
+      "append": {
         "field": "event.category",
         "value": ["authentication"],
         "if": "ctx.checkpoint?.operation == 'Log In'"
@@ -270,7 +270,7 @@
       }
     },
     {
-      "set" : {
+      "append" : {
         "field": "event.type",
         "value": ["allowed", "connection"],
         "if": "['Accept', 'Allow'].contains(ctx.checkpoint?.rule_action)"
@@ -298,7 +298,7 @@
       }
     },
     {
-      "set" : {
+      "append" : {
         "field": "event.type",
         "value": ["connection", "denied"],
         "if": "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
@@ -307,56 +307,56 @@
     {
       "append": {
         "field": "event.category",
-        "value": "malware",
+        "value": ["malware"],
         "if": "ctx.checkpoint?.malware_action != null"
       }
     },
         {
       "append": {
         "field": "event.category",
-        "value": "intrusion_detection",
+        "value": ["intrusion_detection"],
         "if": "['Detect', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": "{{source.ip}}",
+        "value": ["{{source.ip}}"],
         "if": "ctx.source?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": "{{destination.ip}}",
+        "value": ["{{destination.ip}}"],
         "if": "ctx.destination?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.ip",
-        "value": "{{destination.ip}}",
+        "value": ["{{destination.ip}}"],
         "if": "ctx.destination?.ip != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": "{{checkpoint.file_md5}}",
+        "value": ["{{checkpoint.file_md5}}"],
         "if": "ctx.checkpoint?.file_md5 != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": "{{checkpoint.file_sha1}}",
+        "value": ["{{checkpoint.file_sha1}}"],
         "if": "ctx.checkpoint?.file_sha1 != null"
       }
     },
     {
       "append": {
         "field": "related.hash",
-        "value": "{{checkpoint.file_sha256}}",
+        "value": ["{{checkpoint.file_sha256}}"],
         "if": "ctx.checkpoint?.file_sha256 != null"
       }
     },
@@ -1026,6 +1026,68 @@
         "pattern": "^:\"",
         "replacement": "",
         "if": "ctx.checkpoint?.sys_message != null"
+      }
+    },
+    {
+      "geoip" : {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true,
+        "if": "ctx.source?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "field": "destination.ip",
+        "target_field": "destination.geo",
+        "ignore_missing": true,
+        "if": "ctx.destination?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.asn",
+        "target_field": "source.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name",
+        "ignore_missing": true
       }
     },
     {
