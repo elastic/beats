@@ -14,7 +14,7 @@
   #enabled: true
 
   # Configure task schedule using cron-like syntax
-  schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+  schedule: '@every 5s' # every 5 seconds from start of beat
 
   # List of hosts to ping
   hosts: ["localhost"]
