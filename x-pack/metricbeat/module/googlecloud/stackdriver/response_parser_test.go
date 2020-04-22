@@ -86,7 +86,7 @@ func TestCleanMetricNameString(t *testing.T) {
 			"test construct metric name with ALIGN_NONE aligner",
 			"compute.googleapis.com/instance/cpu/utilization",
 			"ALIGN_NONE",
-			"instance.cpu.utilization.raw",
+			"instance.cpu.utilization.value",
 		},
 	}
 
