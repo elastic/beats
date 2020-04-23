@@ -7,12 +7,39 @@ metadata:
     k8s-app: heartbeat
 data:
   heartbeat.yml: |-
-    # TODO
     #heartbeat.autodiscover:
+    #  # Autodiscover pods
     #  providers:
     #    - type: kubernetes
+    #      resource: pod
+    #      scope: cluster
     #      node: ${NODE_NAME}
     #      hints.enabled: true
+    #
+    #  # Autodiscover services
+    #  providers:
+    #    - type: kubernetes
+    #      resource: service
+    #      scope: cluster
+    #      node: ${NODE_NAME}
+    #      hints.enabled: true
+    #
+    #  # Autodiscover nodes
+    #  providers:
+    #  - node: ${NODE_NAME}
+    #    type: kubernetes
+    #    resource: node
+    #    scope: cluster
+    #    templates:
+    #    # Example, check SSH port of all cluster nodes:
+    #    - condition: ~
+    #      config:
+    #      - hosts:
+    #        - ${data.host}:22
+    #        name: ${data.kubernetes.node.name}
+    #        schedule: '@every 10s'
+    #        timeout: 5s
+    #        type: tcp
 
     processors:
       - add_cloud_metadata:
