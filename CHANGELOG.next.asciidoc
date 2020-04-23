@@ -411,6 +411,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Add final tests and move label to GA for the azure module in metricbeat. {pull}17319[17319]
 - Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
+- Refactor windows/perfmon metricset configuration options and event output. {pull}17596[17596]
 - Reference kubernetes manifests mount data directory from the host when running metricbeat as daemonset, so data persist between executions in the same node. {pull}17429[17429]
 - Add more detailed error messages, system tests and small refactoring to the service metricset in windows. {pull}17725[17725]
 

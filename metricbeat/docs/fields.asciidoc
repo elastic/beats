@@ -18569,20 +18569,13 @@ type: object
 
 --
 
-[float]
-=== website
-
+*`iis.website.*.*`*::
++
+--
 website
 
 
-
-*`iis.website.name`*::
-+
---
-website name
-
-
-type: keyword
+type: object
 
 --
 
@@ -38901,6 +38894,33 @@ Module for Windows
 
 
 
+
+[float]
+=== perfmon
+
+perfmon
+
+
+
+*`windows.perfmon.instance`*::
++
+--
+Instance value.
+
+
+type: keyword
+
+--
+
+*`windows.perfmon.metrics.*.*`*::
++
+--
+Metric values returned.
+
+
+type: object
+
+--
 
 [float]
 === service
