@@ -10,6 +10,7 @@ services:
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${HOME}/.docker:/root/.docker:ro
     network_mode: host
     command: make
 
