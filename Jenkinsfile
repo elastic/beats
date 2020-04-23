@@ -68,7 +68,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
           }
         }
 
@@ -82,7 +82,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -96,7 +96,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -136,7 +136,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
+            mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
         }
         stage('Filebeat Windows'){
@@ -149,7 +149,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "unitTest")
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -177,7 +177,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
+                mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
               }
             }
             stage('Heartbeat Windows'){
@@ -190,7 +190,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "unitTest")
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
               }
             }
           }
@@ -225,7 +225,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
+                mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
               }
             }
             stage('Auditbeat Windows'){
@@ -238,7 +238,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "unitTest")
+                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
               }
             }
           }
@@ -296,7 +296,7 @@ pipeline {
             makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
-        stage('Metricbeat Unit tests'){
+        stage('Metricbeat OSS Unit tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -306,10 +306,10 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
           }
         }
-        stage('Metricbeat Integration tests'){
+        stage('Metricbeat OSS Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -319,20 +319,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
-          }
-        }
-        stage('Metricbeat System tests'){
-          agent { label 'ubuntu && immutable' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_METRICBEAT != "false"
-            }
-          }
-          steps {
-            makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
           }
         }
         stage('Metricbeat x-pack'){
@@ -345,7 +332,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "update build test")
+            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
           }
         }
         stage('Metricbeat crosscompile'){
@@ -358,7 +345,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
+            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -371,7 +358,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
+            mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
         stage('Metricbeat Windows'){
@@ -384,7 +371,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "unitTest")
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -446,7 +433,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "unitTest")
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
               }
             }
           }
@@ -461,7 +448,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "unitTest")
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
           }
         }
         stage('Functionbeat'){
@@ -492,7 +479,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "update build test")
+                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
             }
             stage('Functionbeat Windows'){
@@ -505,7 +492,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "unitTest")
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
               }
             }
           }
@@ -660,13 +647,22 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
-    dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-    // FIXME workaround untill we fix the packer cache
-    sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
+    if(os == 'linux'){
+      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      // FIXME workaround until we fix the packer cache
+      // Retry to avoid DDoS detection from the server
+      retry(3) {
+        sleep randomNumber(min: 2, max: 5)
+        sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
+      }
+    }
     dir("${env.BASE_DIR}") {
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
       sh(label: "Install Mage", script: "make mage")
+      // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+      // See https://github.com/elastic/beats/issues/17787.
+      setGitConfig()
       try {
         if(!params.dry_run){
           body()
@@ -727,7 +723,7 @@ def goos(){
     return 'darwin'
   }
 
-  throw new IllegalArgumentException("Unhandled OS name in NODE_LABELS: " + labels)
+  error("Unhandled OS name in NODE_LABELS: " + labels)
 }
 
 def dumpMage(){
@@ -948,4 +944,13 @@ def getVendorPatterns(beatName){
     """)
   }
   return output?.split('\n').collect{ item -> item as String }
+}
+
+def setGitConfig(){
+  sh(label: 'check git config', script: '''
+    if [ -z "$(git config --get user.email)" ]; then
+      git config user.email "beatsmachine@users.noreply.github.com"
+      git config user.name "beatsmachine"
+    fi
+  ''')
 }

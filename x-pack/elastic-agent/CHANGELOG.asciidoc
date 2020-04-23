@@ -18,6 +18,13 @@
 - Fixed merge of config {pull}17399[17399]
 - Handle abs paths on windows correctly {pull}17461[17461]
 - Improved cancellation of agent {pull}17318[17318]
+- Rename the User-Agent string from Beats Agent to Elastic Agent. {pull}17765[17765]
+- Fix issues when running `mage package` for all the platforms. {pull}17767[17767]
+- Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
+- Fixed process spawning on Windows {pull}17751[17751]
+- Fixed injected log path to monitoring beat {pull}17833[17833]
+- Make sure that the Elastic Agent connect over TLS in cloud. {pull}17843[17843]
+- Moved stream.* fields to top of event {pull}17858[17858]
 
 ==== New features
 
@@ -28,4 +35,6 @@
 - Introduced `mage demo` command {pull}17312[17312]
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
 - Expose stream.* variables in events {pull}17468[17468]
+- Monitoring configuration reloadable {pull}17855[17855]
+- Pack ECS metadata to request payload send to fleet {pull}17894[17894]
 - Allow CLI overrides of paths {pull}17781[17781]
