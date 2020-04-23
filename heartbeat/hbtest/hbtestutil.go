@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -127,6 +128,12 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 	return lookslike.MustCompile(expected)
 }
 
+func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
+	expected := common.MapStr{}
+	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
+	return lookslike.MustCompile(expected)
+}
+
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
 // If IP is set to "" this will check that the field is not present
@@ -225,4 +232,27 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	require.NoError(t, err)
 	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
+}
+
+func StartExpiredHTTPSServer(t *testing.T) (host string, port string, cert *x509.Certificate, doClose func() error) {
+	tlsCert, err := tls.LoadX509KeyPair("fixtures/expired.cert", "fixtures/expired.key")
+	require.NoError(t, err)
+
+	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])
+	require.NoError(t, err)
+
+	// No need to start a real server, since this is invalid, we just
+	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	})
+	require.NoError(t, err)
+
+	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	go func() {
+		srv.Serve(l)
+	}()
+
+	host, port, err = net.SplitHostPort(l.Addr().String())
+	require.NoError(t, err)
+	return host, port, cert, srv.Close
 }

@@ -361,34 +361,6 @@ func runHTTPSServerCheck(
 	)
 }
 
-func startExpiredTLSEndpoint(t *testing.T) (host string, port string, cert *x509.Certificate, doClose func() error) {
-	tlsCert, err := tls.LoadX509KeyPair("fixtures/expired.cert", "fixtures/expired.key")
-	require.NoError(t, err)
-
-	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])
-	require.NoError(t, err)
-
-	// No need to start a real server, since this is invalid, we just
-	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
-		Certificates: []tls.Certificate{tlsCert},
-	})
-	require.NoError(t, err)
-
-	go func() {
-		for {
-			conn, err := l.Accept()
-			if err != nil {
-				break
-			}
-			conn.Close()
-		}
-	}()
-
-	host, port, err = net.SplitHostPort(l.Addr().String())
-	require.NoError(t, err)
-	return host, port, cert, l.Close
-}
-
 func TestHTTPSServer(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 
@@ -396,22 +368,21 @@ func TestHTTPSServer(t *testing.T) {
 }
 
 func TestExpiredHTTPSServer(t *testing.T) {
-	host, port, cert, closeSrv := startExpiredTLSEndpoint(t)
+	host, port, cert, closeSrv := hbtest.StartExpiredHTTPSServer(t)
 	defer closeSrv()
-	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host,port)}
+	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 	event := sendTLSRequest(t, u.String(), true, nil)
 
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up", "http"),
+			hbtest.BaseChecks("127.0.0.1", "down", "http"),
 			hbtest.RespondingTCPChecks(),
-			hbtest.TLSChecks(0, 0, cert),
-			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(
-				u.String(),
-				http.StatusOK,
-			),
+			hbtest.TLSCertChecks(cert),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.ErrorChecks("x509: certificate has expired or is not yet valid", "io"),
+			hbtest.URLChecks(t, &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}),
+			// No HTTP fields expected because we fail at the TCP level
 		)),
 		event.Fields,
 	)
