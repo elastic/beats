@@ -1,12 +1,19 @@
 [
     {
         "@timestamp": "2020-02-07T11:48:51.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "POST",
-        "http.request.referrer": "-",
+        "http.request.method": "post",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -28,7 +35,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -36,12 +42,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:15.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -63,7 +76,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -71,12 +83,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:30.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "DELETE",
-        "http.request.referrer": "-",
+        "http.request.method": "delete",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -98,7 +117,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -106,12 +124,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:43.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "PATCH",
-        "http.request.referrer": "-",
+        "http.request.method": "patch",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -133,7 +158,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
@@ -141,12 +165,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:50.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "PATCHp",
-        "http.request.referrer": "-",
+        "http.request.method": "patchp",
         "http.response.body.bytes": 163,
         "http.response.status_code": 400,
         "http.version": "1.1",
@@ -162,20 +193,23 @@
         "nginx.ingress_controller.upstream.name": "",
         "service.type": "nginx",
         "source.address": "",
-        "url.original": "/products/42",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
-        "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "url.original": "/products/42"
     },
     {
         "@timestamp": "2020-02-07T11:50:09.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
         "http.request.method": "geti",
-        "http.request.referrer": "-",
         "http.response.body.bytes": 163,
         "http.response.status_code": 400,
         "http.version": "1.1",
@@ -191,20 +225,23 @@
         "nginx.ingress_controller.upstream.name": "",
         "service.type": "nginx",
         "source.address": "",
-        "url.original": "/products/42",
-        "user.name": "-",
-        "user_agent.device.name": "Other",
-        "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "url.original": "/products/42"
     },
     {
         "@timestamp": "2020-02-07T11:55:05.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -226,7 +263,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
         "user_agent.original": "Wget/1.20.3 (darwin18.6.0)",
@@ -234,12 +270,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -261,7 +304,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -272,11 +314,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -299,7 +349,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -310,12 +359,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -337,7 +393,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/v2",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -348,11 +403,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -375,7 +438,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
@@ -386,12 +448,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -413,7 +482,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -424,11 +492,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -451,7 +527,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -462,12 +537,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -489,7 +571,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -500,12 +581,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -527,7 +615,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -538,11 +625,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://hello-world.info/",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -565,7 +660,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -576,12 +670,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -603,7 +704,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/v2",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -614,11 +714,19 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -641,7 +749,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
@@ -652,12 +759,19 @@
     },
     {
         "@timestamp": "2020-02-07T12:00:28.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -679,7 +793,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/products/42?address=delhi+technological+university",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
         "user_agent.original": "python-requests/2.22.0",
@@ -687,12 +800,19 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -714,7 +834,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/v2",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
@@ -725,12 +844,19 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -752,7 +878,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/favicon.ico",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
@@ -763,12 +888,19 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:42.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
         "event.module": "nginx",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "GET",
-        "http.request.referrer": "-",
+        "http.request.method": "get",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -790,7 +922,6 @@
         "service.type": "nginx",
         "source.address": "",
         "url.original": "/v2/some",
-        "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
