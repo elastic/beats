@@ -45,7 +45,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newDecodeCEF(c config) (*processor, error) {
-	cfgwarn.Beta("The " + procName + " processor is a beta feature.")
 
 	log := logp.NewLogger(logName)
 	if c.ID != "" {
