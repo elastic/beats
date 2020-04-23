@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetKvm returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/kvm.
+// This is the base64 encoded gzipped contents of module/kvm.
 func AssetKvm() string {
 	return "eJyskDFuwzAMRXed4iN7LqChU9ceQq3YQLBoGrLsQrcvnEZFotByh3Lw4G+//8gzBioWw8oGyCFHsjgNK58MkCiSm8ninbIzgKf5I4UpBxktXgyA7T+w+CWSAT4DRT/ba3DG6JgqeJtcJrK4JFmm2xuF9wi5B3lhJp6zy7+Rxtzl3iKN0u5Zp1V5FGogPaFDrZ95I5ZUdLDucu+zPZW4Og1UviR59YtDs8Zur6uqrC4uPZco4+V/RLSmahGel+3UH1a/CrswPlO79+/f/q+dV/R3AAAA///hct15"
 }
