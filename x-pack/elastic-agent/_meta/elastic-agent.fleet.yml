@@ -18,10 +18,10 @@ management:
   #backoff:
   #
   # Initial time to wait before retrying the call.
-  #init: 1s
+  # init: 1s
   #
   # Maximum time to wait before retrying the call.
-  #max: 10s
+  # max: 10s
 
 download:
   # source of the artifacts, requires elastic like structure and naming of the binaries
