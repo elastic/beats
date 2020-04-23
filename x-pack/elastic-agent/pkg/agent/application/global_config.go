@@ -22,9 +22,9 @@ var (
 func init() {
 	homePath = retrieveExecutablePath()
 	dataPath = retrieveDataPath()
-	overwrites = common.SettingFlag(nil, "E", "Configuration overwrite")
+	overwrites = common.NewConfig()
 	common.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Agent root path")
-	common.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path, agent usually look for beats here")
+	common.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path contains Agent managed binaries")
 }
 
 // HomePath returns home path where.

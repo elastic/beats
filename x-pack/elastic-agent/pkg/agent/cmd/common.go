@@ -50,7 +50,6 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 
 	flags := &globalFlags{}
 
-	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("E"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 
