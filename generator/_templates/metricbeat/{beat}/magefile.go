@@ -100,9 +100,7 @@ func Fmt() {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config,
-		metricbeat.PrepareModulePackagingOSS,
-		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, Imports)
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
