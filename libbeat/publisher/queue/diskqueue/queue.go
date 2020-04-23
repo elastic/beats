@@ -28,10 +28,15 @@ import (
 // Settings contains the configuration fields to create a new disk queue
 // or open an existing one.
 type Settings struct {
-	// The path on disk of the queue's main metadata file.
-	// Paths for data segment files are created by appending ".{segmentIndex}" to
-	// this path.
-	// If blank, the default is "queue.dat" within the beat's data directory.
+	// The destination for log messages related to the disk queue.
+	Logger *logp.Logger
+
+	// The path on disk of the queue's containing directory, which will be
+	// created if it doesn't exist. Within the directory, the queue's state
+	// is stored in queue.dat and each segment's data is stored in
+	// segment.{segmentIndex}
+	// If blank, the default directory is "diskqueue" within the beat's data
+	// directory.
 	Path string
 
 	// The size in bytes of one data page in the on-disk buffer. To minimize
@@ -43,9 +48,6 @@ type Settings struct {
 	// ever occupy on disk. A value of 0 means the queue can grow until the
 	// disk is full.
 	MaxBufferSize uint64
-
-	// The destination for log messages related to the disk queue.
-	Logger *logp.Logger
 
 	// A listener that receives ACKs when events are written to the queue's
 	// disk buffer.
