@@ -26,8 +26,6 @@ import (
 	"sync"
 	"time"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -197,12 +195,6 @@ func New(
 	p.output.Set(out)
 
 	return p, nil
-}
-
-// SetTracer sets an APM tracer to instrument various publishing events
-func (p *Pipeline) SetTracer(tracer *apm.Tracer) error {
-	p.monitors.Tracer = tracer
-	return nil
 }
 
 // SetACKHandler sets a global ACK handler on all events published to the pipeline.

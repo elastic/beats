@@ -69,7 +69,7 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 			worker: w,
 			client: nc,
 			logger: logp.NewLogger("publisher_pipeline_output"),
-			tracer:   tracer,
+			tracer: tracer,
 		}
 	} else {
 		c = &clientWorker{worker: w, client: client}
@@ -102,7 +102,6 @@ func (w *clientWorker) run() {
 				continue
 			}
 			w.observer.outBatchSend(len(batch.Events()))
-
 			if err := w.client.Publish(context.TODO(), batch); err != nil {
 				return
 			}
@@ -178,12 +177,6 @@ func (w *netClientWorker) run() {
 			}(); err != nil {
 				connected = false
 			}
-
-			//if err := w.client.Publish(batch); err != nil {
-			//	w.logger.Errorf("Failed to publish events: %v", err)
-				// on error return to connect loop
-			//	connected = false
-			//}
 		}
 	}
 }
