@@ -33,11 +33,11 @@ type diskQueueBatch struct {
 //
 
 func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
-	return &diskQueueBatch{}, nil
+	panic("TODO: not implemented")
 }
 
 func (consumer *diskQueueConsumer) Close() error {
-	return nil
+	panic("TODO: not implemented")
 }
 
 //
@@ -45,8 +45,9 @@ func (consumer *diskQueueConsumer) Close() error {
 //
 
 func (batch *diskQueueBatch) Events() []publisher.Event {
-	return nil
+	panic("TODO: not implemented")
 }
 
 func (batch *diskQueueBatch) ACK() {
+	panic("TODO: not implemented")
 }

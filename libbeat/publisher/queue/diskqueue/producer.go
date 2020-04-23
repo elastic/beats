@@ -35,13 +35,13 @@ type diskQueueProducer struct {
 //
 
 func (producer *diskQueueProducer) Publish(event publisher.Event) bool {
-	return false
+	panic("TODO: not implemented")
 }
 
 func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
-	return false
+	panic("TODO: not implemented")
 }
 
 func (producer *diskQueueProducer) Cancel() int {
-	return 0
+	panic("TODO: not implemented")
 }

@@ -160,7 +160,7 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 //
 
 func (dq *diskQueue) Close() error {
-	return nil
+	panic("TODO: not implemented")
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {
@@ -168,12 +168,13 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	return &diskQueueProducer{
+	/*return &diskQueueProducer{
 		queue:  dq,
 		config: cfg,
-	}
+	}*/
+	panic("TODO: not implemented")
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{}
+	panic("TODO: not implemented")
 }
