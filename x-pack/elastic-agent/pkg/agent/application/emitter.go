@@ -17,12 +17,16 @@ import (
 type decoratorFunc = func(string, *transpiler.AST, []program.Program) ([]program.Program, error)
 type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
+type reloadable interface {
+	Reload(cfg *config.Config) error
+}
+
 type configModifiers struct {
 	Filters    []filterFunc
 	Decorators []decoratorFunc
 }
 
-func emitter(log *logger.Logger, router *router, modifiers *configModifiers) emitterFunc {
+func emitter(log *logger.Logger, router *router, modifiers *configModifiers, reloadables ...reloadable) emitterFunc {
 	return func(c *config.Config) error {
 		if err := InjectAgentConfig(c); err != nil {
 			return err
@@ -59,6 +63,12 @@ func emitter(log *logger.Logger, router *router, modifiers *configModifiers) emi
 				if err != nil {
 					return err
 				}
+			}
+		}
+
+		for _, r := range reloadables {
+			if err := r.Reload(c); err != nil {
+				return err
 			}
 		}
 

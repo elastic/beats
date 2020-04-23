@@ -5,9 +5,8 @@
 package fleetapi
 
 import (
-	"net"
 	"net/http"
-	"strconv"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -33,15 +32,9 @@ func authHandler(handler http.HandlerFunc, apiKey string) http.HandlerFunc {
 
 func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, host string)) func(t *testing.T) {
 	return func(t *testing.T) {
-		listener, err := net.Listen("tcp", ":0")
-		require.NoError(t, err)
-		defer listener.Close()
-
-		port := listener.Addr().(*net.TCPAddr).Port
-
-		go http.Serve(listener, m(t))
-
-		test(t, "localhost:"+strconv.Itoa(port))
+		s := httptest.NewServer(m(t))
+		defer s.Close()
+		test(t, s.Listener.Addr().String())
 	}
 }
 
