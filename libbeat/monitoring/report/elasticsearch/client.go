@@ -21,9 +21,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.elastic.co/apm"
 	"net/http"
 	"time"
+
+	"go.elastic.co/apm"
 
 	"github.com/pkg/errors"
 

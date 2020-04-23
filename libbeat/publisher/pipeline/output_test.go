@@ -18,12 +18,13 @@
 package pipeline
 
 import (
-	"go.elastic.co/apm/apmtest"
 	"math"
 	"sync"
 	"testing"
 	"testing/quick"
 	"time"
+
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/stretchr/testify/require"
 

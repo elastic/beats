@@ -21,8 +21,6 @@ package elasticsearch
 
 import (
 	"context"
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/apmtest"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -30,6 +28,9 @@ import (
 	"net/url"
 	"testing"
 	"time"
+
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

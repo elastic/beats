@@ -19,10 +19,6 @@ package testing
 
 // ChanClient implements Client interface, forwarding published events to some
 import (
-	"errors"
-
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -50,10 +46,6 @@ func (pub *TestPublisher) ConnectWith(_ beat.ClientConfig) (beat.Client, error) 
 
 func (pub *TestPublisher) SetACKHandler(_ beat.PipelineACKHandler) error {
 	panic("Not supported")
-}
-
-func (pub *TestPublisher) SetTracer(_ *apm.Tracer) error {
-	return errors.New("not supported")
 }
 
 func NewChanClient(bufSize int) *ChanClient {

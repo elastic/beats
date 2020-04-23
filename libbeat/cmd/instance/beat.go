@@ -24,7 +24,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"go.elastic.co/apm"
 	"io"
 	"math"
 	"math/big"
@@ -33,6 +32,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"go.elastic.co/apm"
 
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
