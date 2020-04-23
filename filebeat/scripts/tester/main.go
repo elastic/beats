@@ -185,7 +185,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 		module := parts[0]
 		fileset := parts[1]
 
-		pathToPipeline := filepath.Join(modulesPath, module, fileset, "ingest", "pipeline.json")
+		pathToPipeline := filepath.Join(modulesPath, module, fileset, "ingest", "pipeline.yml")
 		_, err := os.Stat(pathToPipeline)
 		if err != nil {
 			return nil, fmt.Errorf("Cannot find pipeline in %s: %v %v\n", path, err, pathToPipeline)
@@ -199,7 +199,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 			return nil, err
 		}
 		for _, f := range files {
-			isPipelineFile := strings.HasSuffix(f.Name(), ".json")
+			isPipelineFile := strings.HasSuffix(f.Name(), ".yml")
 			if isPipelineFile {
 				fullPath := filepath.Join(path, f.Name())
 				paths = append(paths, fullPath)
@@ -211,7 +211,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 		return paths, nil
 	}
 
-	isPipelineFile := strings.HasSuffix(path, ".json")
+	isPipelineFile := strings.HasSuffix(path, ".yml")
 	if isPipelineFile {
 		return []string{path}, nil
 	}
