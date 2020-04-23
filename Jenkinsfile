@@ -32,10 +32,7 @@ pipeline {
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
-    /**
-     Checkout the code and stash it, to use it on other stages.
-    */
-    stage('Checkout') {
+    stage('Lint'){
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
@@ -47,11 +44,6 @@ pipeline {
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-      }
-    }
-    stage('Lint'){
-      options { skipDefaultCheckout() }
-      steps {
         makeTarget("Lint", "check")
       }
     }
@@ -68,6 +60,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
           }
         }
@@ -82,6 +75,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
           }
         }
@@ -96,6 +90,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
         }
@@ -110,6 +105,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
           }
         }
@@ -123,6 +119,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
           }
         }
@@ -136,6 +133,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
         }
@@ -149,6 +147,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
           }
         }
@@ -164,6 +163,7 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
+                checkoutBeats()
                 makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
               }
             }
@@ -177,6 +177,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
               }
             }
@@ -190,6 +191,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
               }
             }
@@ -207,11 +209,13 @@ pipeline {
           stages {
             stage('Auditbeat Linux'){
               steps {
+                checkoutBeats()
                 makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
               }
             }
             stage('Auditbeat crosscompile'){
               steps {
+                checkoutBeats()
                 makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
               }
             }
@@ -225,6 +229,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
               }
             }
@@ -238,6 +243,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
               }
             }
@@ -253,6 +259,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
           }
         }
@@ -268,16 +275,19 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
+                checkoutBeats()
                 makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
               }
             }
             stage('Libbeat crosscompile'){
               steps {
+                checkoutBeats()
                 makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
               }
             }
             stage('Libbeat stress-tests'){
               steps {
+                checkoutBeats()
                 makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
               }
             }
@@ -293,6 +303,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
@@ -306,6 +317,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
           }
         }
@@ -319,6 +331,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
           }
         }
@@ -332,6 +345,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
           }
         }
@@ -345,6 +359,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
           }
         }
@@ -358,6 +373,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
           }
         }
@@ -371,6 +387,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
@@ -384,6 +401,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
           }
         }
@@ -399,6 +417,7 @@ pipeline {
           stages {
             stage('Packetbeat oss'){
               steps {
+                checkoutBeats()
                 makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
               }
             }
@@ -416,6 +435,7 @@ pipeline {
           stages {
             stage('Dockerlogbeat'){
               steps {
+                checkoutBeats()
                 mageTarget("Elastic Docker Logging Driver Plugin unit tests", "x-pack/dockerlogbeat", "update build test")
               }
             }
@@ -433,6 +453,7 @@ pipeline {
           stages {
             stage('Winlogbeat oss'){
               steps {
+                checkoutBeats()
                 makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
               }
             }
@@ -446,6 +467,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
               }
             }
@@ -461,6 +483,7 @@ pipeline {
             }
           }
           steps {
+            checkoutBeats()
             mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
           }
         }
@@ -476,6 +499,7 @@ pipeline {
           stages {
             stage('Functionbeat x-pack'){
               steps {
+                checkoutBeats()
                 mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
                 withEnv(["GO_VERSION=1.13.1"]){
                   makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
@@ -492,6 +516,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
             }
@@ -505,6 +530,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
               }
             }
@@ -522,6 +548,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
+                checkoutBeats()
                 makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
               }
             }
@@ -539,12 +566,14 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
+                checkoutBeats()
                 makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
                 makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
               }
             }
             stage('Generators Beat Linux'){
               steps {
+                checkoutBeats()
                 makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
                 makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
               }
@@ -559,6 +588,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
               }
             }
@@ -572,6 +602,7 @@ pipeline {
                 }
               }
               steps {
+                checkoutBeats()
                 makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
               }
             }
@@ -593,6 +624,11 @@ pipeline {
       }
     }
   }
+}
+
+def checkoutBeats() {
+  deleteDir()
+  gitCheckout(basedir: "${BASE_DIR}")
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
@@ -658,8 +694,6 @@ def withBeatsEnv(boolean archive, Closure body) {
     "TEST_TAGS=oracle",
     "DOCKER_PULL=0",
   ]) {
-    deleteDir()
-    unstash 'source'
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -701,8 +735,6 @@ def withBeatsEnvWin(Closure body) {
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
   ]){
-    deleteDir()
-    unstash 'source'
     dir("${env.BASE_DIR}"){
       bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
       try {
