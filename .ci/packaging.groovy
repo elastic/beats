@@ -76,7 +76,19 @@ pipeline {
             }
             environment {
               HOME = "${env.WORKSPACE}"
-              PLATFORMS = "!darwin +linux/armv7 +linux/ppc64le +linux/s390x +linux/mips64"
+              PLATFORMS = [
+                '+all',
+                'linux/amd64',
+                'linux/386',
+                'linux/arm64',
+                'linux/armv7',
+                'linux/ppc64le',
+                'linux/mips64',
+                'linux/s390x',
+                'windows/amd64',
+                'windows/386',
+                (params.macos ? '' : 'darwin/amd64'),
+              ].join(' ')
             }
             steps {
               release()
@@ -94,7 +106,10 @@ pipeline {
             }
             environment {
               HOME = "${env.WORKSPACE}"
-              PLATFORMS = "!defaults +darwin/amd64"
+              PLATFORMS = [
+                '+all',
+                'darwin/amd64',
+              ].join(' ')
             }
             steps {
               withMacOSEnv(){
