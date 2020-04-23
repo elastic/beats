@@ -23,18 +23,20 @@ import (
 	"net"
 )
 
-type ConnCheck func(net.Conn) error
+// dataCheck executes over an open TCP connection using the send / receive
+// parameters the user has defined.
+type dataCheck func(net.Conn) error
 
 var (
 	errNoDataReceived = errors.New("no data")
 	errRecvMismatch   = errors.New("received string mismatch")
 )
 
-func (c ConnCheck) Validate(conn net.Conn) error {
+func (c dataCheck) Check(conn net.Conn) error {
 	return c(conn)
 }
 
-func makeValidateConn(config *Config) ConnCheck {
+func makeDataCheck(config *config) dataCheck {
 	send := config.SendString
 	recv := config.ReceiveString
 
@@ -52,7 +54,7 @@ func makeValidateConn(config *Config) ConnCheck {
 
 func checkOk(_ net.Conn) error { return nil }
 
-func checkAll(checks ...ConnCheck) ConnCheck {
+func checkAll(checks ...dataCheck) dataCheck {
 	return func(conn net.Conn) error {
 		for _, check := range checks {
 			if err := check(conn); err != nil {
@@ -63,13 +65,13 @@ func checkAll(checks ...ConnCheck) ConnCheck {
 	}
 }
 
-func checkSend(buf []byte) ConnCheck {
+func checkSend(buf []byte) dataCheck {
 	return func(conn net.Conn) error {
 		return sendBuffer(conn, buf)
 	}
 }
 
-func checkRecv(expected []byte) ConnCheck {
+func checkRecv(expected []byte) dataCheck {
 	return func(conn net.Conn) error {
 		buf := make([]byte, len(expected))
 		if err := recvBuffer(conn, buf); err != nil {

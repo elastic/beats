@@ -15,34 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package monitors
 
 import (
-	"bufio"
-	"bytes"
+	"net"
 )
 
-// factoryDelimiter return a function to split line using a custom delimiter supporting multibytes
-// delimiter, the delimiter is stripped from the returned value.
-func factoryDelimiter(delimiter []byte) bufio.SplitFunc {
-	return func(data []byte, eof bool) (int, []byte, error) {
-		if eof && len(data) == 0 {
-			return 0, nil, nil
-		}
-		if i := bytes.Index(data, delimiter); i >= 0 {
-			return i + len(delimiter), dropDelimiter(data[0:i], delimiter), nil
-		}
-		if eof {
-			return len(data), dropDelimiter(data, delimiter), nil
-		}
-		return 0, nil, nil
-	}
+// Resolver lets us define custom DNS resolvers similar to what the go stdlib provides, but
+// potentially with custom functionality
+type Resolver interface {
+	// ResolveIPAddr is an analog of net.ResolveIPAddr
+	ResolveIPAddr(network string, host string) (*net.IPAddr, error)
+	// LookupIP is an analog of net.LookupIP
+	LookupIP(host string) ([]net.IP, error)
 }
 
-func dropDelimiter(data []byte, delimiter []byte) []byte {
-	if len(data) > len(delimiter) &&
-		bytes.Equal(data[len(data)-len(delimiter):len(data)], delimiter) {
-		return data[0 : len(data)-len(delimiter)]
-	}
-	return data
+// StdResolver uses the go std library to perform DNS resolution.
+type StdResolver struct{}
+
+func NewStdResolver() StdResolver {
+	return StdResolver{}
+}
+
+func (s StdResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
+	return net.ResolveIPAddr(network, host)
+}
+
+func (s StdResolver) LookupIP(host string) ([]net.IP, error) {
+	return net.LookupIP(host)
 }
