@@ -156,7 +156,7 @@
         "set": {
             "field": "user.name",
             "value": "{{osquery.result.decorations.username}}",
-            "if": "ctx?.osquery?.result?.decorations?.uusername != null"
+            "if": "ctx?.osquery?.result?.decorations?.username != null"
         }
     },
     {
