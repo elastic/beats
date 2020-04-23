@@ -35,10 +35,8 @@ pipeline {
     // XXX: Set to false by default
     booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
 
-    // XXX: Set to false by default
-    booleanParam(name: 'debug', defaultValue: true, description: 'Allow debug logging for Jenkins steps')
-    // XXX: Set to false by default
-    booleanParam(name: 'dry_run', defaultValue: true, description: 'Skip build steps, it is for testing pipeline flow')
+    booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
+    booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
     /**
@@ -365,10 +363,21 @@ pipeline {
                 }
               }
               steps {
+                // XXX: Refactor this as a function like this:
+                // startCloudTestEnv('x-pack-metricbeat', [
+                //   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+                // ])
                 withCloudTestEnv() {
                   withBeatsEnv(false) {
-                    terraformApply("x-pack/metricbeat/module/aws")
-                    terraformStash("x-pack-metricbeat")
+                    script {
+                      try {
+                        whenTrue(params.runAllCloudTests || params.awsCloudTests) {
+                          terraformApply("x-pack/metricbeat/module/aws")
+                        }
+                      } finally {
+                        terraformStash("x-pack-metricbeat")
+                      }
+                    }
                   }
                 }
               }
@@ -385,13 +394,7 @@ pipeline {
           }
           post {
             cleanup {
-              // XXX: terraformCleanup(stashName: "x-pack-metricbeat", directory: "x-pack/metricbeat")
-              withCloudTestEnv() {
-                withBeatsEnv(false) {
-                  unstash "terraform-x-pack-metricbeat"
-                  sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh x-pack/metricbeat")
-                }
-              }
+              terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
             }
           }
         }
@@ -968,15 +971,13 @@ def terraformStash(String name) {
   stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
 }
 
-// Looks for all terraform states in `directory` and runs `terraform destroy` for them
+// Looks for all terraform states in directory and runs terraform destroy for them
 def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
-    steps {
-      withCloudTestEnv() {
-        withBeatsEnv(false) {
-          unstash "terraform-${stashName}"
-          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh $directory")
-        }
+    withCloudTestEnv() {
+      withBeatsEnv(false) {
+        unstash "terraform-${stashName}"
+        sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
       }
     }
   }
