@@ -214,6 +214,14 @@ func ErrorChecks(msgSubstr string, errType string) validator.Validator {
 	})
 }
 
+func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
+	msg := x509.CertificateInvalidError{Cert: cert, Reason: x509.Expired}.Error()
+	return lookslike.Compose(
+		ErrorChecks(msg, "io"),
+		TLSCertChecks(cert),
+	)
+}
+
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
@@ -234,11 +242,8 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	return certFile
 }
 
-func StartExpiredHTTPSServer(t *testing.T) (host string, port string, cert *x509.Certificate, doClose func() error) {
-	tlsCert, err := tls.LoadX509KeyPair("fixtures/expired.cert", "fixtures/expired.key")
-	require.NoError(t, err)
-
-	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])
+func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port string, cert *x509.Certificate, doClose func() error) {
+	cert, err := x509.ParseCertificate(tlsCert.Certificate[0])
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just

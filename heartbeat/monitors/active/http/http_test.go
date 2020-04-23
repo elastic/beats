@@ -368,7 +368,9 @@ func TestHTTPSServer(t *testing.T) {
 }
 
 func TestExpiredHTTPSServer(t *testing.T) {
-	host, port, cert, closeSrv := hbtest.StartExpiredHTTPSServer(t)
+	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
+	require.NoError(t, err)
+	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
 	defer closeSrv()
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 	event := sendTLSRequest(t, u.String(), true, nil)
@@ -378,9 +380,8 @@ func TestExpiredHTTPSServer(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "down", "http"),
 			hbtest.RespondingTCPChecks(),
-			hbtest.TLSCertChecks(cert),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.ErrorChecks("x509: certificate has expired or is not yet valid", "io"),
+			hbtest.ExpiredCertChecks(cert),
 			hbtest.URLChecks(t, &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}),
 			// No HTTP fields expected because we fail at the TCP level
 		)),
