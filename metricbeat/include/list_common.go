@@ -96,6 +96,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/conntrack"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/ksm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pageinfo"
+	_ "github.com/elastic/beats/v7/metricbeat/module/linux/perf"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"

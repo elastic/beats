@@ -24960,6 +24960,130 @@ type: object
 
 --
 
+[float]
+=== perf
+
+process performance metrics
+
+
+
+[float]
+=== software_events
+
+perf software events
+
+
+
+*`linux.perf.software_events.cpu_clock`*::
++
+--
+CPU clock
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.task_clock`*::
++
+--
+Clock count specific to the task.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.page_faults`*::
++
+--
+Count of page faults.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.context_switches`*::
++
+--
+Count of context switches.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.cpu_migrations`*::
++
+--
+Number of times process has migrated to a new CPU.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.minor_page_faults`*::
++
+--
+Count of minor page faults.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.major_page_faults`*::
++
+--
+Count of major page faults.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.alignment_faults`*::
++
+--
+Count of unalligned memory accesses.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.emulation_faults`*::
++
+--
+Count of emulation faults.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.time_enabled`*::
++
+--
+Counter for total time perf has been enabled.
+
+
+type: long
+
+--
+
+*`linux.perf.software_events.time_running`*::
++
+--
+Counter for total time perf has been running.
+
+
+type: long
+
+--
+
 [[exported-fields-logstash]]
 == Logstash fields
 

@@ -24,8 +24,15 @@ metricbeat.modules:
     - "pageinfo"
     # - ksm
     # - conntrack
+    # - perf
   enabled: true
   #hostfs: /hostfs
+  perf.processes:
+    - process: "node"
+      events:
+        - hardware: false
+        - software: true
+
 
 
 ----
@@ -41,9 +48,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-linux-pageinfo,pageinfo>>
 
+* <<metricbeat-metricset-linux-perf,perf>>
+
 include::linux/conntrack.asciidoc[]
 
 include::linux/ksm.asciidoc[]
 
 include::linux/pageinfo.asciidoc[]
+
+include::linux/perf.asciidoc[]
 

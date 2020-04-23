@@ -18,6 +18,8 @@
 package linux
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -32,6 +34,7 @@ func init() {
 type Module struct {
 	mb.BaseModule
 	HostFS string `config:"hostfs"`
+	Period time.Duration
 }
 
 // NewModule initializes a new module
@@ -39,7 +42,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// This only needs to be configured once for all system modules.
 
 	config := struct {
-		Hostfs string `config:"hostfs"`
+		Hostfs string        `config:"hostfs"`
+		Period time.Duration `config:"period"`
 	}{}
 
 	if err := base.UnpackConfig(&config); err != nil {
@@ -51,5 +55,5 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		dir = "/"
 	}
 
-	return &Module{BaseModule: base, HostFS: dir}, nil
+	return &Module{BaseModule: base, HostFS: dir, Period: config.Period}, nil
 }

@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.perf",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "perf": {
+            "software_events": {
+                "cpu_clock": 5097853,
+                "task_clock": 5125177,
+                "page_faults": 15,
+                "context_switches": 11,
+                "cpu_migrations": 1,
+                "minor_page_faults": 15,
+                "major_page_faults": 0,
+                "alignment_faults": 0,
+                "emulation_faults": 0,
+                "time_enabled": 5125177,
+                "time_running": 5125177
+            }
+        }
+    },
+    "metricset": {
+        "name": "perf",
+        "period": 10000
+    },
+    "process": {
+        "name": "node",
+        "pgid": 1715021,
+        "pid": 1715073,
+        "ppid": 1715065
+    },
+    "service": {
+        "type": "linux"
+    }
+}

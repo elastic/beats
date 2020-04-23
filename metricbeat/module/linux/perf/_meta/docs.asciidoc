@@ -1,0 +1,1 @@
+The `perf` metricsret of the linux module provides insight into running applications via the perf subsystem.

@@ -588,6 +588,8 @@ github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
 # github.com/haya14busa/go-actions-toolkit v0.0.0-20200105081403-ca0307860f01
 github.com/haya14busa/go-actions-toolkit/core
+# github.com/hodgesds/perf-utils v0.0.8
+github.com/hodgesds/perf-utils
 # github.com/imdario/mergo v0.3.6
 github.com/imdario/mergo
 # github.com/inconshreveable/mousetrap v1.0.0
