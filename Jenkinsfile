@@ -39,7 +39,7 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}")
+        gitCheckout(basedir: "${BASE_DIR}", shallow: true, depth: 1)
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
