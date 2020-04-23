@@ -106,13 +106,12 @@ processors:
 {{else}}
 processors:
   - add_observer_metadata:
-  # Optional, but recommended geo settings for the location {{ .BeatName | title }} is running in
-  #geo:
-    # Token describing this location
-    #name: us-east-1a
-
-    # Lat, Lon "
-    #location: "37.926868, -78.024902"
+      # Optional, but recommended geo settings for the location {{ .BeatName | title }} is running in
+      #geo:
+        # Token describing this location
+        #name: us-east-1a
+        # Lat, Lon "
+        #location: "37.926868, -78.024902"
 {{end}}
 #================================ Logging =====================================
 
