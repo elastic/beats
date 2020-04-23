@@ -16,12 +16,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -38,6 +46,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -59,6 +68,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -90,12 +100,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -112,6 +130,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -133,6 +152,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -164,12 +184,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -186,6 +214,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -207,6 +236,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -238,12 +268,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -260,6 +298,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -281,6 +320,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -312,12 +352,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -334,6 +382,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -355,6 +404,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -386,12 +436,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -408,6 +466,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -429,6 +488,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -460,12 +520,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -482,6 +550,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -503,6 +572,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -534,12 +604,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -556,6 +634,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -577,6 +656,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -608,12 +688,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -630,6 +718,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -651,6 +740,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -682,12 +772,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -704,6 +802,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -725,6 +824,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -756,12 +856,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -778,6 +886,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -799,6 +908,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -830,12 +940,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -852,6 +970,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -873,6 +992,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -904,12 +1024,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -926,6 +1054,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -947,6 +1076,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -978,12 +1108,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1000,6 +1138,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1021,6 +1160,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1052,12 +1192,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1074,6 +1222,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1095,6 +1244,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1126,12 +1276,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1148,6 +1306,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1169,6 +1328,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1200,12 +1360,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1222,6 +1390,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1243,6 +1412,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1274,12 +1444,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1296,6 +1474,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1317,6 +1496,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1348,12 +1528,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1370,6 +1558,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1391,6 +1580,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1422,12 +1612,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1444,6 +1642,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1465,6 +1664,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1496,12 +1696,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1518,6 +1726,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.137.131",
         "panw.panos.destination.nat.port": 443,
@@ -1539,6 +1748,7 @@
             "192.168.1.63",
             "23.72.137.131"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.137.131",
         "server.port": 443,
         "service.type": "panw",
@@ -1570,12 +1780,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1592,6 +1810,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1613,6 +1832,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1644,12 +1864,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1666,6 +1894,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1687,6 +1916,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1718,12 +1948,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1740,6 +1978,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1761,6 +2000,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1792,12 +2032,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1814,6 +2062,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1835,6 +2084,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1866,12 +2116,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1888,6 +2146,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1909,6 +2168,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -1940,12 +2200,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -1962,6 +2230,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -1983,6 +2252,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2014,12 +2284,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2036,6 +2314,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2057,6 +2336,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2088,12 +2368,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2110,6 +2398,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2131,6 +2420,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2162,12 +2452,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2184,6 +2482,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2205,6 +2504,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2236,12 +2536,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2258,6 +2566,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2279,6 +2588,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2310,12 +2620,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2332,6 +2650,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2353,6 +2672,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2384,12 +2704,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2406,6 +2734,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2427,6 +2756,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2458,12 +2788,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2480,6 +2818,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2501,6 +2840,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2532,12 +2872,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2554,6 +2902,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "152.195.55.192",
         "panw.panos.destination.nat.port": 443,
@@ -2575,6 +2924,7 @@
             "192.168.1.63",
             "152.195.55.192"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
         "server.port": 443,
         "service.type": "panw",
@@ -2606,12 +2956,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2628,6 +2986,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "151.101.2.2",
         "panw.panos.destination.nat.port": 443,
@@ -2649,6 +3008,7 @@
             "192.168.1.63",
             "151.101.2.2"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "151.101.2.2",
         "server.port": 443,
         "service.type": "panw",
@@ -2683,12 +3043,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2705,6 +3073,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.192.7.152",
         "panw.panos.destination.nat.port": 443,
@@ -2726,6 +3095,7 @@
             "192.168.1.63",
             "54.192.7.152"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.192.7.152",
         "server.port": 443,
         "service.type": "panw",
@@ -2760,12 +3130,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2782,6 +3160,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -2803,6 +3182,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -2837,12 +3217,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2859,6 +3247,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -2880,6 +3269,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -2914,12 +3304,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -2936,6 +3334,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -2957,6 +3356,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -2991,12 +3391,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3013,6 +3421,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3034,6 +3443,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3068,12 +3478,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3090,6 +3508,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3111,6 +3530,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3145,12 +3565,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3167,6 +3595,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3188,6 +3617,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3222,12 +3652,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3244,6 +3682,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3265,6 +3704,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3299,12 +3739,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3321,6 +3769,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3342,6 +3791,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3376,12 +3826,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3398,6 +3856,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3419,6 +3878,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3453,12 +3913,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3475,6 +3943,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3496,6 +3965,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3530,12 +4000,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3552,6 +4030,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3573,6 +4052,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3607,12 +4087,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3629,6 +4117,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.4.120.175",
         "panw.panos.destination.nat.port": 443,
@@ -3650,6 +4139,7 @@
             "192.168.1.63",
             "52.4.120.175"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
         "server.port": 443,
         "service.type": "panw",
@@ -3684,12 +4174,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3706,6 +4204,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "216.58.194.98",
         "panw.panos.destination.nat.port": 443,
@@ -3727,6 +4226,7 @@
             "192.168.1.63",
             "216.58.194.98"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "216.58.194.98",
         "server.port": 443,
         "service.type": "panw",
@@ -3758,12 +4258,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3780,6 +4288,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -3801,6 +4310,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -3832,12 +4342,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3854,6 +4372,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -3875,6 +4394,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -3906,12 +4426,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -3928,6 +4456,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -3949,6 +4478,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -3980,12 +4510,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4002,6 +4540,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4023,6 +4562,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4054,12 +4594,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4076,6 +4624,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4097,6 +4646,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4128,12 +4678,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4150,6 +4708,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4171,6 +4730,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4202,12 +4762,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4224,6 +4792,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4245,6 +4814,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4276,12 +4846,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4298,6 +4876,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4319,6 +4898,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4350,12 +4930,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4372,6 +4960,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4393,6 +4982,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4424,12 +5014,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4446,6 +5044,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.72.145.245",
         "panw.panos.destination.nat.port": 443,
@@ -4467,6 +5066,7 @@
             "192.168.1.63",
             "23.72.145.245"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
         "server.port": 443,
         "service.type": "panw",
@@ -4501,12 +5101,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4523,6 +5131,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4544,6 +5153,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4578,12 +5188,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4600,6 +5218,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4621,6 +5240,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4655,12 +5275,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4677,6 +5305,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4698,6 +5327,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4732,12 +5362,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4754,6 +5392,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4775,6 +5414,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4809,12 +5449,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4831,6 +5479,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4852,6 +5501,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4886,12 +5536,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4908,6 +5566,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -4929,6 +5588,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -4963,12 +5623,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -4985,6 +5653,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5006,6 +5675,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5040,12 +5710,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5062,6 +5740,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5083,6 +5762,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5117,12 +5797,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5139,6 +5827,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5160,6 +5849,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5194,12 +5884,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5216,6 +5914,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5237,6 +5936,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5271,12 +5971,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5293,6 +6001,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5314,6 +6023,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5348,12 +6058,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5370,6 +6088,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5391,6 +6110,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5425,12 +6145,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5447,6 +6175,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5468,6 +6197,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5502,12 +6232,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5524,6 +6262,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5545,6 +6284,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5579,12 +6319,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5601,6 +6349,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5622,6 +6371,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
@@ -5656,12 +6406,20 @@
         "destination.nat.port": 443,
         "destination.port": 443,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.nat_translated": true,
@@ -5678,6 +6436,7 @@
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
         "observer.serial_number": "012801096514",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.209.101.70",
         "panw.panos.destination.nat.port": 443,
@@ -5699,6 +6458,7 @@
             "192.168.1.63",
             "54.209.101.70"
         ],
+        "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
         "server.port": 443,
         "service.type": "panw",
