@@ -38,7 +38,7 @@
               "title": "Data Usage"
             },
             "gridData": {
-              "h": 16,
+              "h": 18,
               "i": "db895503-5a84-4b26-b889-c3c7ca964643",
               "w": 18,
               "x": 9,
@@ -54,7 +54,7 @@
               "title": "Index Usage"
             },
             "gridData": {
-              "h": 16,
+              "h": 18,
               "i": "0b986285-a5d0-4a31-bdb8-0f29cd50c2eb",
               "w": 21,
               "x": 27,
@@ -70,7 +70,7 @@
               "title": ""
             },
             "gridData": {
-              "h": 12,
+              "h": 14,
               "i": "7d7b71ea-eb6b-43bf-be61-80235d1d4529",
               "w": 9,
               "x": 0,
@@ -89,7 +89,7 @@
               "i": "f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
               "w": 24,
               "x": 0,
-              "y": 16
+              "y": 18
             },
             "panelIndex": "f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
             "panelRefName": "panel_4",
@@ -105,7 +105,7 @@
               "i": "c604014a-647f-4a1d-b2e9-0304fdacc363",
               "w": 24,
               "x": 24,
-              "y": 16
+              "y": 18
             },
             "panelIndex": "c604014a-647f-4a1d-b2e9-0304fdacc363",
             "panelRefName": "panel_5",
@@ -119,13 +119,29 @@
             "gridData": {
               "h": 15,
               "i": "b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
-              "w": 48,
+              "w": 24,
               "x": 0,
-              "y": 31
+              "y": 33
             },
             "panelIndex": "b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
             "panelRefName": "panel_6",
             "title": "Available Storage",
+            "version": "7.6.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Requests Per Status Code"
+            },
+            "gridData": {
+              "h": 15,
+              "i": "5e755432-3e55-405c-91cf-3348d5067a3a",
+              "w": 24,
+              "x": 24,
+              "y": 33
+            },
+            "panelIndex": "5e755432-3e55-405c-91cf-3348d5067a3a",
+            "panelRefName": "panel_7",
+            "title": "Requests Per Status Code",
             "version": "7.6.0"
           }
         ],
@@ -172,11 +188,16 @@
           "id": "81f16b40-32ea-11ea-a83e-25b8612d00cc",
           "name": "panel_6",
           "type": "visualization"
+        },
+        {
+          "id": "037382e0-856e-11ea-91bc-ab084c7ec0e7",
+          "name": "panel_7",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-04-22T12:21:19.547Z",
-      "version": "WzcxMjgsMTJd"
+      "updated_at": "2020-04-23T14:26:12.702Z",
+      "version": "WzczNTAsMTNd"
     },
     {
       "attributes": {
@@ -269,7 +290,7 @@
                 "terms_field": "azure.dimensions.database_name",
                 "terms_order_by": "_count",
                 "type": "timeseries",
-                "value_template": "{{value}} ms"
+                "value_template": "{{value}}"
               }
             ],
             "show_grid": 1,
@@ -287,8 +308,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-22T11:58:56.002Z",
-      "version": "WzcwNjUsMTJd"
+      "updated_at": "2020-04-23T11:58:07.195Z",
+      "version": "WzcxODEsMTNd"
     },
     {
       "attributes": {
@@ -326,7 +347,7 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "#3185FC",
+                "color": "rgba(176,188,0,1)",
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
@@ -334,7 +355,7 @@
                 },
                 "formatter": "bytes",
                 "id": "e9a40231-32e9-11ea-bda2-69435df36a5c",
-                "label": "Data Usage",
+                "label": "Index Usage",
                 "line_width": "2",
                 "metrics": [
                   {
@@ -352,7 +373,7 @@
                 "terms_field": "azure.dimensions.database_name",
                 "terms_order_by": "_count",
                 "type": "timeseries",
-                "value_template": "{{value}} ms"
+                "value_template": "{{value}}"
               }
             ],
             "show_grid": 1,
@@ -370,8 +391,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-22T12:00:12.999Z",
-      "version": "WzcwNjksMTJd"
+      "updated_at": "2020-04-23T11:59:31.862Z",
+      "version": "WzcyMDEsMTNd"
     },
     {
       "attributes": {
@@ -430,6 +451,21 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "azure.dimensions.database_name",
+                "id": "1587643606086",
+                "indexPatternRefName": "control_3_index_pattern",
+                "label": "Database",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "1584710535722",
+                "type": "list"
               }
             ],
             "pinFilters": false,
@@ -459,11 +495,16 @@
           "id": "metricbeat-*",
           "name": "control_2_index_pattern",
           "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_3_index_pattern",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-04-21T12:34:11.783Z",
-      "version": "WzY5MDEsMTFd"
+      "updated_at": "2020-04-23T12:08:07.587Z",
+      "version": "WzcyNDAsMTNd"
     },
     {
       "attributes": {
@@ -501,7 +542,7 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "#3185FC",
+                "color": "rgba(211,49,21,1)",
                 "fill": "0",
                 "filter": {
                   "language": "kuery",
@@ -527,7 +568,7 @@
                 "terms_field": "azure.dimensions.database_name",
                 "terms_order_by": "_count",
                 "type": "timeseries",
-                "value_template": "{{value}} ms"
+                "value_template": "{{value}}"
               }
             ],
             "show_grid": 1,
@@ -545,8 +586,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-22T12:13:09.648Z",
-      "version": "WzcwODEsMTJd"
+      "updated_at": "2020-04-23T12:00:24.232Z",
+      "version": "WzcyMTEsMTNd"
     },
     {
       "attributes": {
@@ -610,7 +651,7 @@
                 "terms_field": "azure.dimensions.database_name",
                 "terms_order_by": "_count",
                 "type": "timeseries",
-                "value_template": "{{value}} ms"
+                "value_template": "{{value}} "
               }
             ],
             "show_grid": 1,
@@ -628,8 +669,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-22T12:14:33.961Z",
-      "version": "WzcwOTAsMTJd"
+      "updated_at": "2020-04-23T12:05:03.644Z",
+      "version": "WzcyMjEsMTNd"
     },
     {
       "attributes": {
@@ -667,7 +708,7 @@
               {
                 "axis_position": "right",
                 "chart_type": "line",
-                "color": "#3185FC",
+                "color": "rgba(101,50,148,1)",
                 "fill": "0",
                 "formatter": "bytes",
                 "id": "e9a40231-32e9-11ea-bda2-69435df36a5c",
@@ -689,7 +730,7 @@
                 "terms_field": "azure.dimensions.database_name",
                 "terms_order_by": "e9a40232-32e9-11ea-bda2-69435df36a5c",
                 "type": "timeseries",
-                "value_template": "{{value}} ms"
+                "value_template": "{{value}}"
               }
             ],
             "show_grid": 1,
@@ -707,8 +748,226 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-04-22T11:52:01.812Z",
-      "version": "WzcwMzEsMTJd"
+      "updated_at": "2020-04-23T12:05:58.477Z",
+      "version": "WzcyMzMsMTNd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
+          }
+        },
+        "title": " Database Account Requests By Status Code [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Requests",
+                "field": "azure.database_account.total_requests.count"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Status Codes",
+                "field": "azure.dimensions.status_code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Database",
+                "field": "azure.dimensions.database_name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "row": false,
+                "size": 5
+              },
+              "schema": "split",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": false,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": false,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "series": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other",
+                      "parsedUrl": {
+                        "basePath": "",
+                        "origin": "http://localhost:5601",
+                        "pathname": "/app/kibana"
+                      }
+                    }
+                  },
+                  "label": "Status Codes",
+                  "params": {}
+                }
+              ],
+              "splitColumn": [
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other",
+                      "parsedUrl": {
+                        "basePath": "",
+                        "origin": "http://localhost:5601",
+                        "pathname": "/app/kibana"
+                      }
+                    }
+                  },
+                  "label": "Database",
+                  "params": {}
+                }
+              ],
+              "x": null,
+              "y": [
+                {
+                  "accessor": 2,
+                  "aggType": "avg",
+                  "format": {
+                    "id": "number",
+                    "params": {
+                      "parsedUrl": {
+                        "basePath": "",
+                        "origin": "http://localhost:5601",
+                        "pathname": "/app/kibana"
+                      }
+                    }
+                  },
+                  "label": "Total Requests",
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {
+              "show": false
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Total Requests"
+                },
+                "drawLinesBetweenPoints": true,
+                "lineWidth": 2,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "thresholdLine": {
+              "color": "#E7664C",
+              "show": false,
+              "style": "full",
+              "value": 10,
+              "width": 1
+            },
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Total Requests"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": " Database Account Requests By Status Code [Metricbeat Azure]",
+          "type": "histogram"
+        }
+      },
+      "id": "037382e0-856e-11ea-91bc-ab084c7ec0e7",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-04-23T14:23:33.900Z",
+      "version": "WzczNDMsMTNd"
     }
   ],
   "version": "7.6.0"
