@@ -137,6 +137,9 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
