@@ -35,7 +35,7 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        //stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Build Packages'){
@@ -109,11 +109,49 @@ pipeline {
 }
 
 def pushCIDockerImages(){
-  sh(label: 'Push Docker image', script: '''
-    if [ -n "$(command -v docker)" ]; then
-      docker images || true
-    fi
-  ''')
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    if ("${env.BEATS_FOLDER}" == "auditbeat"){
+      tagAndPush('auditbeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "filebeat") {
+      tagAndPush('filebeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "heartbeat"){
+      tagAndPush('heartbeat')
+      tagAndPush('heartbeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
+      tagAndPush('journalbeat')
+      tagAndPush('journalbeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "metricbeat"){
+      tagAndPush('metricbeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
+      tagAndPush('packetbeat')
+      tagAndPush('packetbeat-oss')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/auditbeat"){
+      tagAndPush('auditbeat')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
+      tagAndPush('elastic-agent')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/filebeat"){
+      tagAndPush('filebeat')
+    } else if ("${env.BEATS_FOLDER}" == "x-pack/metricbeat"){
+      tagAndPush('metricbeat')
+    }
+  }
+}
+
+def tagAndPush(name){
+  def libbetaVer = sh(label: 'Get libbeat version', script: 'grep defaultBeatVersion ${BASE_DIR}/libbeat/version/version.go|cut -d "=" -f 2|tr -d \\"', returnStdout: true)?.trim()
+  if("${env.SNAPSHOT}" == "true"){
+    libbetaVer += "-SNAPSHOT"
+  }
+  def oldName = "${DOCKER_REGISTRY}/beats/${name}:${libbetaVer}"
+  def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${libbetaVer}"
+  def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
+  dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+  sh(label:'Change tag and push', script: """
+    docker tag ${oldName} ${newName}
+    docker push ${newName}
+    docker tag ${oldName} ${commitName}
+    docker push ${commitName}
+  """)
 }
 
 def release(){
@@ -158,8 +196,7 @@ def withBeatsEnv(Closure body) {
     "PYTHON_ENV=${WORKSPACE}/python-env"
   ]) {
     deleteDir()
-    //unstash 'source'
-    gitCheckout(basedir: "${BASE_DIR}")
+    unstash 'source'
     dir("${env.BASE_DIR}"){
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install Mage", script: "make mage")
