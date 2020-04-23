@@ -97,7 +97,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jcmturner/gofork v1.0.0 // indirect
-	github.com/jcmturner/gokrb5 v8.3.0+incompatible
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
@@ -162,7 +161,6 @@ require (
 	gopkg.in/jcmturner/gokrb5.v7 v7.3.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.2.8
-	honnef.co/go/tools v0.0.1-2019.2.3
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.0.0-20190722141453-b90922c02518
 	k8s.io/apimachinery v0.0.0-20190719140911-bfcf53abc9f8
