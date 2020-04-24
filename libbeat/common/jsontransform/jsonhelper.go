@@ -30,9 +30,8 @@ import (
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys bool, addErrKey bool) {
 	if !overwriteKeys {
 		// @timestamp and @metadata fields are root-level fields. We remove them so they
-		//  don't become part of event.Fields.
-		delete(keys, "@timestamp")
-		delete(keys, "@metadata")
+		// don't become part of event.Fields.
+		removeKeys(keys, "@timestamp", "@metadata")
 
 		// Then, perform deep update without overwriting
 		event.Fields.DeepUpdateNoOverwrite(keys)
@@ -89,13 +88,17 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys
 	}
 
 	// We have accounted for @timestamp, @metadata, type above. So let's remove these keys and
-	// deep update the event with the rest of the keys
-	delete(keys, "@timestamp")
-	delete(keys, "@metadata")
-	delete(keys, "type")
+	// deep update the event with the rest of the keys.
+	removeKeys(keys, "@timestamp", "@metadata", "type")
 	event.Fields.DeepUpdate(keys)
 }
 
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
+}
+
+func removeKeys(keys map[string]interface{}, names ...string) {
+	for _, name := range names {
+		delete(keys, name)
+	}
 }
