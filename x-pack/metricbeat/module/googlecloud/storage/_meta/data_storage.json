@@ -7,26 +7,30 @@
         "provider": "googlecloud"
     },
     "event": {
-        "dataset": "googlecloud.pubsub",
+        "dataset": "googlecloud.storage",
         "duration": 115000,
         "module": "googlecloud"
     },
     "googlecloud": {
         "labels": {
+            "metrics": {
+                "storage_class": "MULTI_REGIONAL"
+            },
             "resource": {
-                "subscription_id": "test-ks"
+                "bucket_name": "fstuermer-log-data-categorization-7-6-0",
+                "location": "us"
             }
         },
-        "pubsub": {
-            "subscription": {
-                "backlog_bytes": {
-                    "value": 0
+        "storage": {
+            "storage": {
+                "total_bytes": {
+                    "value": 4472520191
                 }
             }
         }
     },
     "metricset": {
-        "name": "pubsub",
+        "name": "storage",
         "period": 10000
     },
     "service": {

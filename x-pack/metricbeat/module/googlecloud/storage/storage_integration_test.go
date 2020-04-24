@@ -34,7 +34,7 @@ func TestData(t *testing.T) {
 		{"googlecloud.storage.storage", "./_meta/data_storage.json"},
 	}
 
-	config := googlecloud.GetConfigForTest(t, "storage")
+	config := stackdriver.GetConfigForTest(t, "storage")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)

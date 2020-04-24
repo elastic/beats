@@ -22,16 +22,28 @@
     "googlecloud": {
         "compute": {
             "firewall": {
-                "dropped_bytes_count": 1151,
-                "dropped_packets_count": 5
+                "dropped_bytes_count": {
+                    "value": 386
+                },
+                "dropped_packets_count": {
+                    "value": 7
+                }
             },
             "instance": {
                 "cpu": {
-                    "reserved_cores": 4,
-                    "usage_time": 139.09004128025845,
-                    "utilization": 0.5991834017583945
+                    "reserved_cores": {
+                        "value": 4
+                    },
+                    "usage_time": {
+                        "value": 106.88293868489563
+                    },
+                    "utilization": {
+                        "value": 0.4453455778537318
+                    }
                 },
-                "uptime": 60
+                "uptime": {
+                    "value": 60
+                }
             }
         },
         "labels": {

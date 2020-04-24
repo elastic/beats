@@ -19,7 +19,7 @@
         },
         "pubsub": {
             "subscription": {
-                "oldest_unacked_message_age": {
+                "backlog_bytes": {
                     "value": 0
                 }
             }

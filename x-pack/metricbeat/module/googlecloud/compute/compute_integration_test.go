@@ -35,7 +35,7 @@ func TestData(t *testing.T) {
 		{"googlecloud.compute.firewall", "./_meta/data_firewall.json"},
 	}
 
-	config := googlecloud.GetConfigForTest(t, "compute")
+	config := stackdriver.GetConfigForTest(t, "compute")
 
 	for _, df := range dataFiles {
 		metricSet := mbtest.NewFetcher(t, config)
