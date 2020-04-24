@@ -161,12 +161,14 @@ def tagAndPush(name){
   def newName = "${DOCKER_REGISTRY}/observability-ci/${name}:${libbetaVer}"
   def commitName = "${DOCKER_REGISTRY}/observability-ci/${name}:${env.GIT_BASE_COMMIT}"
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-  sh(label:'Change tag and push', script: """
-    docker tag ${oldName} ${newName}
-    docker push ${newName}
-    docker tag ${oldName} ${commitName}
-    docker push ${commitName}
-  """)
+  retry(3){
+    sh(label:'Change tag and push', script: """
+      docker tag ${oldName} ${newName}
+      docker push ${newName}
+      docker tag ${oldName} ${commitName}
+      docker push ${commitName}
+    """)
+  }
 }
 
 def release(){
