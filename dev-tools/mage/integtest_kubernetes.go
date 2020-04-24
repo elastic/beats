@@ -117,7 +117,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 	// should use the environment set by kubernetes on the pod.
 	insideEnv := map[string]string{}
 	for envKey, envVal := range env {
-		if envKey != "KUBECONFIG" || envKey != "KUBE_CONFIG" {
+		if envKey != "KUBECONFIG" && envKey != "KUBE_CONFIG" {
 			insideEnv[envKey] = envVal
 		}
 	}
