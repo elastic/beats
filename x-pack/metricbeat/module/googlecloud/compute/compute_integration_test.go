@@ -13,7 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
 )
 
 func TestData(t *testing.T) {

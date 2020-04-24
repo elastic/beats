@@ -14,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 )
@@ -45,7 +44,7 @@ func Package() {
 
 	devtools.UseCommunityBeatPackaging()
 
-	mg.Deps(update.Update)
+	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
@@ -99,9 +98,14 @@ func Fmt() {
 	common.Fmt()
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return update.Update()
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, Imports)
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return devtools.KibanaDashboards("module")
 }
 
 // Imports generates an include/list.go file containing

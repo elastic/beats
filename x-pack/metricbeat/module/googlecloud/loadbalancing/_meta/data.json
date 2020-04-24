@@ -35,7 +35,9 @@
         "loadbalancing": {
             "l3": {
                 "internal": {
-                    "egress_packets_count": 63
+                    "egress_packets_count": {
+                        "value": 0
+                    }
                 }
             }
         }

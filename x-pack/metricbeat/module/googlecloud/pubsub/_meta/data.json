@@ -19,7 +19,9 @@
         },
         "pubsub": {
             "subscription": {
-                "oldest_unacked_message_age": 0
+                "oldest_unacked_message_age": {
+                    "value": 0
+                }
             }
         }
     },
