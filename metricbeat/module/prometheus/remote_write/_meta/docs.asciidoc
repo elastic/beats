@@ -8,7 +8,7 @@ remote_write:
 ------------------------------------------------------------------------------
 
 
-TIP: In order to assure the health of the whole queue, the following two configuration
+TIP: In order to assure the health of the whole queue, the following configuration
  https://prometheus.io/docs/practices/remote_write/#parameters[parameters] should be considered:
 
 - `max_shards`: Sets the maximum number of parallelism with which Prometheus will try to send samples to Metricbeat.

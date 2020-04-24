@@ -1,75 +1,62 @@
 {
-    "@timestamp": "2020-01-08T16:05:00.000Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "ecs": {
-        "version": "1.2.0"
-    },
-    "host": {
-        "containerized": false,
-        "name": "mcastro",
-        "hostname": "mcastro",
-        "architecture": "x86_64",
-        "os": {
-            "version": "",
-            "family": "",
-            "name": "Antergos Linux",
-            "kernel": "5.4.3-arch1-1",
-            "platform": "antergos"
-        },
-        "id": "54f70115bae545cbac2b150f254472a0"
-    },
-    "agent": {
-        "type": "metricbeat",
-        "ephemeral_id": "8b802033-b611-414b-bcaf-1aa19e5f5901",
-        "hostname": "mcastro",
-        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
-        "version": "8.0.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
-        "availability_zone": "us-central1-a",
         "account": {
-            "id": "elastic-metricbeat"
+            "id": "elastic-observability"
         },
-        "provider": "googlecloud",
         "instance": {
-            "id": "4503798379141677974",
-            "name": "instance-1"
+            "id": "2528596280375797115",
+            "name": "gke-dev-next-oblt-dev-next-oblt-pool-404d7f0c-cpj6"
         },
         "machine": {
-            "type": "f1-micro"
-        }
+            "type": "n1-standard-4"
+        },
+        "provider": "googlecloud"
     },
+    "cloud.availability_zone": "europe-west1-c",
     "event": {
         "dataset": "googlecloud.compute",
-        "module": "googlecloud",
-        "duration": 1397755844
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 386
+                },
+                "dropped_packets_count": {
+                    "value": 7
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 4
+                    },
+                    "usage_time": {
+                        "value": 106.88293868489563
+                    },
+                    "utilization": {
+                        "value": 0.4453455778537318
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {
+            "user": {
+                "goog-gke-node": ""
+            }
+        }
     },
     "metricset": {
         "name": "compute",
-        "period": 300000
-    },
-    "googlecloud": {
-        "labels": {},
-        "compute": {
-            "instance": {
-                "uptime": 60.00000000000001,
-                "cpu": {
-                    "reserved_cores": 0.2,
-                    "utilization": 0.38202685489490784,
-                    "usage_time": 0.06629814168597115
-                }
-            },
-            "firewall": {
-                "dropped_packets_count": 3
-            }
-        }
+        "period": 10000
     },
     "service": {
         "type": "googlecloud"
     }
 }
-
