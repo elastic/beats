@@ -37,7 +37,6 @@ func (v TLSVersion) Details() *TLSVersionDetails {
 	return nil
 }
 
-
 //Unpack transforms the string into a constant.
 func (v *TLSVersion) Unpack(s string) error {
 	version, found := tlsProtocolVersions[s]

@@ -66,7 +66,7 @@ var tlsProtocolVersions = map[string]TLSVersion{
 // Intended for ECS's tls.version_protocol_field, which does not include
 // numeric version and should be lower case
 type TLSVersionDetails struct {
-	Version string
+	Version  string
 	Protocol string
 	Combined string
 }
@@ -75,7 +75,7 @@ func (pv TLSVersionDetails) String() string {
 	return pv.Combined
 }
 
-var tlsInverseLookup = map [TLSVersion]TLSVersionDetails{
+var tlsInverseLookup = map[TLSVersion]TLSVersionDetails{
 	TLSVersionSSL30: TLSVersionDetails{Version: "3.0", Protocol: "ssl", Combined: "SSLv3"},
 	TLSVersion10:    TLSVersionDetails{Version: "1.0", Protocol: "tls", Combined: "TLSv1.0"},
 	TLSVersion11:    TLSVersionDetails{Version: "1.1", Protocol: "tls", Combined: "TLSv1.1"},
