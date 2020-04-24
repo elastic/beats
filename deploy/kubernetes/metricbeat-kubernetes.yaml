@@ -79,10 +79,11 @@ data:
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.verification_mode: "none"
-      # If using Red Hat OpenShift remove ssl.verification_mode entry and
-      # uncomment these settings:
+      # If there is a CA bundle that contains the issuer of the certificate used in the Kubelet API,
+      # remove ssl.verification_mode entry and use the CA, for instance:
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    # Currently `proxy` metricset is not supported on Openshift, comment out section
     - module: kubernetes
       metricsets:
         - proxy
