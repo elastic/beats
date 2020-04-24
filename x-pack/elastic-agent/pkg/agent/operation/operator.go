@@ -41,6 +41,7 @@ type Operator struct {
 	handlers       map[string]handleFunc
 	stateResolver  *stateresolver.StateResolver
 	eventProcessor callbackHooks
+	monitor        monitoring.Monitor
 	isMonitoring   bool
 
 	apps     map[string]Application
@@ -61,7 +62,8 @@ func NewOperator(
 	fetcher download.Downloader,
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
-	eventProcessor callbackHooks) (*Operator, error) {
+	eventProcessor callbackHooks,
+	monitor monitoring.Monitor) (*Operator, error) {
 
 	operatorConfig := defaultOperatorConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
@@ -86,6 +88,7 @@ func NewOperator(
 		stateResolver:  stateResolver,
 		apps:           make(map[string]Application),
 		eventProcessor: eventProcessor,
+		monitor:        monitor,
 	}
 
 	operator.initHandlerMap()
@@ -98,10 +101,6 @@ func NewOperator(
 
 func defaultOperatorConfig() *operatorCfg.Config {
 	return &operatorCfg.Config{
-		MonitoringConfig: &monitoring.Config{
-			MonitorLogs:    false,
-			MonitorMetrics: false,
-		},
 		RetryConfig: &retry.Config{
 			Enabled:      false,
 			RetriesCount: 0,
@@ -254,9 +253,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
 	}
 
-	monitor := monitoring.NewMonitor(isMonitorable(p), p.BinaryName(), o.pipelineID, o.config.DownloadConfig, o.config.MonitoringConfig.MonitorLogs, o.config.MonitoringConfig.MonitorMetrics)
-
-	a, err := app.NewApplication(o.bgContext, p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, monitor)
+	a, err := app.NewApplication(o.bgContext, p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, o.monitor)
 	if err != nil {
 		return nil, err
 	}

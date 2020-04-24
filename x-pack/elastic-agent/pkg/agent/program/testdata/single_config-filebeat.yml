@@ -9,10 +9,11 @@ filebeat:
       var: value
     processors:
       - add_fields:
+          target: "stream"
           fields:
-            stream.type: logs
-            stream.dataset: generic
-            stream.namespace: default
+            type: logs
+            dataset: generic
+            namespace: default
 output:
   elasticsearch:
     hosts:

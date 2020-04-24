@@ -71,8 +71,7 @@ func create(
 	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
 
 	for _, host := range config.Hosts {
-		settings := monitors.MakeHostJobSettings(host, config.Mode)
-		job, err := monitors.MakeByHostJob(settings, pingFactory)
+		job, err := monitors.MakeByHostJob(host, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 		if err != nil {
 			return nil, 0, err

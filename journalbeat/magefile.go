@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -37,6 +36,8 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -114,13 +115,6 @@ func Update() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML()
-}
-
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------
