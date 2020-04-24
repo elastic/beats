@@ -853,7 +853,6 @@ def isChangedOSSCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('libbeat'))
   return isChanged(allPatterns)
 }
 
@@ -868,13 +867,14 @@ def isChangedXPackCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
   return isChanged(allPatterns)
 }
 
 def loadConfigEnvVars(){
   def empty = []
   env.GO_VERSION = readFile(".go-version").trim()
+
+  sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
@@ -941,15 +941,12 @@ def loadConfigEnvVars(){
   This method grab the dependencies of a Go module and transform them on regexp
 */
 def getVendorPatterns(beatName){
-  def output = ""
-  docker.image("golang:${GO_VERSION}").inside{
-    output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      export HOME=${WORKSPACE}/${BASE_DIR}
-      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
-        |awk '{print \$1"/.*"}'\
-        |sed -e "s#github.com/elastic/beats/v7/##g"
-    """)
-  }
+  def output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
+    export HOME=${WORKSPACE}/${BASE_DIR}
+    go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
+      |awk '{print \$1"/.*"}'\
+      |sed -e "s#github.com/elastic/beats/v7/##g"
+  """)
   return output?.split('\n').collect{ item -> item as String }
 }
 
