@@ -837,7 +837,7 @@ def isChangedOSSCode(patterns) {
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
   allPatterns.addAll(getVendorPatterns('libbeat'))
@@ -852,7 +852,7 @@ def isChangedXPackCode(patterns) {
     "^dev-tools/.*",
     "^testing/.*",
     "^x-pack/libbeat/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
   allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
