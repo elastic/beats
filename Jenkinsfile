@@ -965,7 +965,9 @@ def startCloudTestEnv(String name, environments = []) {
       try {
         for (environment in environments) {
           if (environment.cond || runAll) {
-            terraformApply(environment.dir)
+            retry(2) {
+              terraformApply(environment.dir)
+            }
           }
         }
       } finally {
@@ -985,7 +987,9 @@ def terraformCleanup(String stashName, String directory) {
     withCloudTestEnv() {
       withBeatsEnv(false) {
         unstash "terraform-${stashName}"
-        sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        retry(2) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        }
       }
     }
   }
