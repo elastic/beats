@@ -934,7 +934,9 @@ def loadConfigEnvVars(){
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(getVendorPatterns('generator'))
+  def generatorPatterns = ['^generator/.*']
+  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 }
 
 /**
