@@ -30,12 +30,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -153,10 +153,19 @@ func SummaryChecks(up int, down int) validator.Validator {
 	})
 }
 
+// ResolveChecks returns a lookslike matcher for the 'resolve' fields.
+func ResolveChecks(ip string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"resolve": map[string]interface{}{
+			"ip":     ip,
+			"rtt.us": isdef.IsDuration,
+		},
+	})
+}
+
 // SimpleURLChecks returns a check for a simple URL
 // with only a scheme, host, and port
 func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {
-
 	hostPort := host
 	if port != 0 {
 		hostPort = fmt.Sprintf("%s:%d", host, port)
@@ -165,6 +174,11 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
 	require.NoError(t, err)
 
+	return URLChecks(t, u)
+}
+
+// URLChecks returns a validator for the given URL's fields
+func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
 	})

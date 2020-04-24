@@ -66,6 +66,7 @@ var (
 	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
 	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
+	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
@@ -176,6 +177,14 @@ func _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathL
 
 func _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhGetCounterInfoW.Addr(), 4, uintptr(counter), uintptr(text), uintptr(unsafe.Pointer(size)), uintptr(unsafe.Pointer(lpBuffer)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) {
+	r0, _, _ := syscall.Syscall9(procPdhEnumObjectItemsW.Addr(), 9, uintptr(dataSource), uintptr(machineName), uintptr(unsafe.Pointer(objectName)), uintptr(unsafe.Pointer(counterList)), uintptr(unsafe.Pointer(counterListSize)), uintptr(unsafe.Pointer(instanceList)), uintptr(unsafe.Pointer(instanceListSize)), uintptr(detailLevel), uintptr(flags))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

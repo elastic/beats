@@ -1,0 +1,17 @@
+{
+    "failed": [],
+    "finished": [
+        {
+            "command": "time-sync-status format=json-pretty",
+            "outb": "{\n    \"timechecks\": {\n        \"epoch\": 3,\n        \"round\": 0,\n        \"round_status\": \"finished\"\n    }\n}\n",
+            "outs": ""
+        }
+    ],
+    "has_failed": false,
+    "id": "140713918770000",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "success",
+    "waiting": []
+}

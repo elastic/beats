@@ -2,8 +2,11 @@ version: '2.3'
 
 services:
   appsearch:
+    image: docker.elastic.co/integrations-ci/beats-appsearch:${APPSEARCH_VERSION:-7.5.0}-1
     build:
       context: ./_meta
+      args:
+        APPSEARCH_VERSION: ${APPSEARCH_VERSION:-7.5.0}
     depends_on:
       - elasticsearch
     environment:

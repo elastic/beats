@@ -16,10 +16,12 @@ package autorest
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"math"
 	"net/http"
+	"net/http/cookiejar"
 	"strconv"
 	"time"
 
@@ -69,7 +71,7 @@ type SendDecorator func(Sender) Sender
 
 // CreateSender creates, decorates, and returns, as a Sender, the default http.Client.
 func CreateSender(decorators ...SendDecorator) Sender {
-	return DecorateSender(&http.Client{}, decorators...)
+	return DecorateSender(sender(tls.RenegotiateNever), decorators...)
 }
 
 // DecorateSender accepts a Sender and a, possibly empty, set of SendDecorators, which is applies to
@@ -92,7 +94,7 @@ func DecorateSender(s Sender, decorators ...SendDecorator) Sender {
 //
 // Send will not poll or retry requests.
 func Send(r *http.Request, decorators ...SendDecorator) (*http.Response, error) {
-	return SendWithSender(&http.Client{Transport: tracing.Transport}, r, decorators...)
+	return SendWithSender(sender(tls.RenegotiateNever), r, decorators...)
 }
 
 // SendWithSender sends the passed http.Request, through the provided Sender, returning the
@@ -102,6 +104,29 @@ func Send(r *http.Request, decorators ...SendDecorator) (*http.Response, error) 
 // SendWithSender will not poll or retry requests.
 func SendWithSender(s Sender, r *http.Request, decorators ...SendDecorator) (*http.Response, error) {
 	return DecorateSender(s, decorators...).Do(r)
+}
+
+func sender(renengotiation tls.RenegotiationSupport) Sender {
+	// Use behaviour compatible with DefaultTransport, but require TLS minimum version.
+	defaultTransport := http.DefaultTransport.(*http.Transport)
+	transport := &http.Transport{
+		Proxy:                 defaultTransport.Proxy,
+		DialContext:           defaultTransport.DialContext,
+		MaxIdleConns:          defaultTransport.MaxIdleConns,
+		IdleConnTimeout:       defaultTransport.IdleConnTimeout,
+		TLSHandshakeTimeout:   defaultTransport.TLSHandshakeTimeout,
+		ExpectContinueTimeout: defaultTransport.ExpectContinueTimeout,
+		TLSClientConfig: &tls.Config{
+			MinVersion:    tls.VersionTLS12,
+			Renegotiation: renengotiation,
+		},
+	}
+	var roundTripper http.RoundTripper = transport
+	if tracing.IsEnabled() {
+		roundTripper = tracing.NewTransport(transport)
+	}
+	j, _ := cookiejar.New(nil)
+	return &http.Client{Jar: j, Transport: roundTripper}
 }
 
 // AfterDelay returns a SendDecorator that delays for the passed time.Duration before
@@ -264,10 +289,6 @@ func doRetryForStatusCodesImpl(s Sender, r *http.Request, count429 bool, attempt
 			return
 		}
 		resp, err = s.Do(rr.Request())
-		// if the error isn't temporary don't bother retrying
-		if err != nil && !IsTemporaryNetworkError(err) {
-			return
-		}
 		// we want to retry if err is not nil (e.g. transient network failure).  note that for failed authentication
 		// resp and err will both have a value, so in this case we don't want to retry as it will never succeed.
 		if err == nil && !ResponseHasStatusCode(resp, codes...) || IsTokenRefreshError(err) {

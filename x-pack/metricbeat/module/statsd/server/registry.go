@@ -5,13 +5,13 @@
 package server
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 )
 
 var logger = logp.NewLogger("statd")
@@ -374,9 +374,9 @@ func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
 }
 
 func (r *registry) metricHash(tags map[string]string) string {
-	b, err := json.Marshal(tags)
-	if err != nil { // shouldn't happen on a map[string]string
-		panic(err)
+	mapstrTags := common.MapStr{}
+	for k, v := range tags {
+		mapstrTags[k] = v
 	}
-	return string(b)
+	return labelhash.LabelHash(mapstrTags)
 }

@@ -24,7 +24,7 @@ import (
 	metrics "github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 func TestGoMetricsAdapter(t *testing.T) {

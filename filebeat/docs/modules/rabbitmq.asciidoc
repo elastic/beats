@@ -12,14 +12,14 @@ This is the module for parsing https://www.rabbitmq.com/logging.html[RabbitMQ lo
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 Parses https://www.rabbitmq.com/logging.html[single file format] introduced in 3.7.0.
 
 Tested with version 3.7.14.
-
-include::../include/running-modules.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
 

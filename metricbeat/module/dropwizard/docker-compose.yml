@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   dropwizard:
-    image: docker.elastic.co/integrations-ci/beats-dropwizard:${MAVEN_VERSION:-3.3-jdk-8}-1
+    image: docker.elastic.co/integrations-ci/beats-dropwizard:${DROPWIZARD_VERSION:-4.1.2}-1
     build:
       context: ./_meta
       args:
-        MAVEN_VERSION: ${MAVEN_VERSION:-3.3-jdk-8}
+        DROPWIZARD_VERSION: ${DROPWIZARD_VERSION:-4.1.2}
     ports:
       - 8080

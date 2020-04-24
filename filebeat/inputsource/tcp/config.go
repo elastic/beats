@@ -21,14 +21,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/cfgtype"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 // Name is the human readable name and identifier.
 const Name = "tcp"
-
-type size uint64
 
 // Config exposes the tcp configuration.
 type Config struct {

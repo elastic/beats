@@ -28,6 +28,11 @@ For example, specifying a resource type of ec2 returns all Amazon EC2 resources
 only EC2 instances.
 * *statistic*: Statistics are metric data aggregations over specified periods of time.
 By default, statistic includes Average, Sum, Count, Maximum and Minimum.
+* *tags*: The tags to filter against. If tags are given in config, then only
+collect metrics from resources that have tag key and tag value matches the filter.
+For example, if tags parameter is given as `Organization=Engineering` under
+`AWS/ELB` namespace, then only collect metrics from ELBs with tag name equals to
+`Organization` and tag value equals to `Engineering`.
 
 [float]
 === Configuration examples
@@ -48,6 +53,9 @@ in configurations in order for this metricset to make proper AWS API calls.
     - namespace: AWS/EBS <1>
     - namespace: AWS/ELB <2>
       tags.resource_type_filter: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
     - namespace: AWS/EC2 <3>
       name: CPUUtilization
       statistic: ["Average"]

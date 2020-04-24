@@ -20,6 +20,23 @@
 package main
 
 import (
+	"context"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
+
+func init() {
+	test.RegisterDeps(GoUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) {
+	devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+}

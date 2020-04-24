@@ -7,5 +7,6 @@ services:
       context: ./_meta
       args:
         REDIS_VERSION: ${REDIS_VERSION:-3.2.12}
+    privileged: true
     ports:
       - 6379

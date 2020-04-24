@@ -1,2 +1,35 @@
-The Statsd module is a Metricbeat module which opens a UDP port and listens for statsd metrics.
+The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible
+format.
 
+[float]
+=== Metric types
+
+The module supports the following types of metrics:
+
+*Counter (c)*:: Measurement which accumulates over period of time until flushed (value set to 0).
+
+*Gauge (g)*:: Measurement which can increase, decrease or be set to a value.
+
+*Timer (ms)*:: Time measurement (in milliseconds) of an event.
+
+*Histogram (h)*:: Time measurement, alias for timer.
+
+*Set (s)*:: Measurement which counts unique occurrences until flushed (value set to 0).
+
+[float]
+=== Module-specific configuration notes
+
+The `statsd` module has these additional config options:
+
+*`ttl`*:: It defines how long a metric will be reported after it was last recorded.
+Irrespective of the given ttl, metrics will be reported at least once.
+A ttl of zero means metrics will never expire.
+
+[float]
+=== Metricsets
+
+Currently, there is only `server` metricset in `statsd` module.
+
+[float]
+==== `server`
+The metricset collects metric data sent using UDP and publishes them under the `statsd` prefix.

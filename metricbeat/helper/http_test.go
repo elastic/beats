@@ -31,8 +31,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/metricbeat/helper/dialer"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestGetAuthHeaderFromToken(t *testing.T) {
@@ -160,6 +160,34 @@ func TestAuthentication(t *testing.T) {
 	response.Body.Close()
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
+}
+
+func TestSetHeader(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Headers = map[string]string{
+		"Override": "default",
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	require.NoError(t, err)
+
+	h.SetHeader("Override", "overridden")
+	v := h.headers.Get("override")
+	assert.Equal(t, "overridden", v)
+}
+
+func TestSetHeaderDefault(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Headers = map[string]string{
+		"Override": "default",
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", mb.HostData{})
+	require.NoError(t, err)
+
+	h.SetHeaderDefault("Override", "overridden")
+	v := h.headers.Get("override")
+	assert.Equal(t, "default", v)
 }
 
 func TestOverUnixSocket(t *testing.T) {

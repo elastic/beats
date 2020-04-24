@@ -1,0 +1,40 @@
+{
+    "@timestamp" : "2020-02-25T08:53:00.000Z",
+    "cloud" : {
+        "provider" : "azure",
+        "region" : "westeurope"
+    },
+    "event" : {
+        "module" : "azure",
+        "duration" : 4877063600,
+        "dataset" : "azure.database_account"
+    },
+    "metricset" : {
+        "name" : "database_account",
+        "period" : 300000
+    },
+    "azure" : {
+        "timegrain" : "PT5M",
+        "dimensions" : {
+            "databasename" : "testdb"
+        },
+        "database_account" : {
+            "provisionedthroughput" : {
+                "max" : 400
+            }
+        },
+        "resource" : {
+            "group" : "obs-test",
+            "tags" : {
+                "defaultExperience" : "Core (SQL)"
+            },
+            "name" : "obsaccount",
+            "type" : "Microsoft.DocumentDb/databaseAccounts"
+        },
+        "subscription_id" : "123456-qwer-1234-5678-12345678",
+        "namespace" : "Microsoft.DocumentDb/databaseAccounts"
+    },
+    "service" : {
+        "type" : "azure"
+    }
+}

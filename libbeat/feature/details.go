@@ -19,59 +19,24 @@ package feature
 
 import "fmt"
 
-// Describer contains general information for a specific feature, the fields will be used to report
-// useful information by the factories or any future CLI.
-type Describer interface {
-	// Stability is the stability of the Feature, this allow the user to filter embedded functionality
-	// by their maturity at runtime.
-	// Example: Beta, Experimental, Stable or Undefined.
-	Stability() Stability
-
-	// Doc is a one liner describing the current feature.
-	// Example: Dissect allows to define patterns to extract useful information from a string.
-	Doc() string
-
-	// FullName is the human readable name of the feature.
-	// Example: Jolokia Discovery
-	FullName() string
-}
-
 // Details minimal information that you must provide when creating a feature.
 type Details struct {
-	stability Stability
-	doc       string
-	fullName  string
+	Name       string
+	Stability  Stability
+	Deprecated bool
+	Info       string // short info string
+	Doc        string // long doc string
 }
 
-// Stability is the stability of the Feature, this allow the user to filter embedded functionality
-// by their maturity at runtime.
-// Example: Beta, Experimental, Stable or Undefined.
-func (d *Details) Stability() Stability {
-	return d.stability
+func (d Details) String() string {
+	fmtStr := "name: %s, description: %s (%s)"
+	if d.Deprecated {
+		fmtStr = "name: %s, description: %s (deprecated, %s)"
+	}
+	return fmt.Sprintf(fmtStr, d.Name, d.Info, d.Stability)
 }
 
-// Doc is a one liner describing the current feature.
-// Example: Dissect allows to define patterns to extract useful information from a string.
-func (d *Details) Doc() string {
-	return d.doc
-}
-
-// FullName is the human readable name of the feature.
-// Example: Jolokia Discovery
-func (d *Details) FullName() string {
-	return d.fullName
-}
-
-func (d *Details) String() string {
-	return fmt.Sprintf(
-		"name: %s, description: %s (stability: %s)",
-		d.fullName,
-		d.doc,
-		d.stability,
-	)
-}
-
-// NewDetails return the minimal information a new feature must provide.
-func NewDetails(fullName string, doc string, stability Stability) *Details {
-	return &Details{fullName: fullName, doc: doc, stability: stability}
+// MakeDetails return the minimal information a new feature must provide.
+func MakeDetails(fullName string, doc string, stability Stability) Details {
+	return Details{Name: fullName, Info: doc, Stability: stability}
 }

@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2020-02-24T18:49:02.674Z",
+    "cloudfoundry": {
+        "counter": {
+            "total": 0,
+            "name": "promhttp_metric_handler_errors_total",
+            "delta": 0,
+            "timestamp": "2020-02-24T18:49:02.674Z",
+            "type": "counter"
+        },
+        "envelope": {
+            "origin": "loggregator_forwarder_agent",
+            "deployment": "cf",
+            "ip": "10.144.0.13",
+            "job": "diego-cell",
+            "index": "1e58e943-a498-4339-9d5f-2885bf223db9"
+        }
+    },
+    "event": {
+        "dataset": "cloudfoundry.counter",
+        "module": "cloudfoundry"
+    },
+    "metricset": {
+        "name": "counter"
+    },
+    "service": {
+        "type": "cloudfoundry"
+    }
+}

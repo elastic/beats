@@ -26,15 +26,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -136,7 +136,7 @@ type waitCloser struct {
 	events sync.WaitGroup
 }
 
-type queueFactory func(queue.Eventer) (queue.Queue, error)
+type queueFactory func(queue.ACKListener) (queue.Queue, error)
 
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the
@@ -183,11 +183,7 @@ func New(
 		return nil, err
 	}
 
-	if count := p.queue.BufferConfig().Events; count > 0 {
-		p.eventSema = newSema(count)
-	}
-
-	maxEvents := p.queue.BufferConfig().Events
+	maxEvents := p.queue.BufferConfig().MaxEvents
 	if maxEvents <= 0 {
 		// Maximum number of events until acker starts blocking.
 		// Only active if pipeline can drop events.

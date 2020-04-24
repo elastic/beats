@@ -144,6 +144,7 @@ func (self *_RegExp_parser) scanBracket() {
 		return
 	}
 
+
 	self.pass()
 	for self.chr != -1 {
 		if self.chr == ']' {

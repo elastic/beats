@@ -25,9 +25,12 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var importAPI = "/api/kibana/dashboards/import"
@@ -101,11 +104,18 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
+	var errs multierror.Errors
+
 	params := url.Values{}
 	params.Set("force", "true") //overwrite the existing dashboards
 
-	indexContent := ReplaceIndexInIndexPattern(loader.config.Index, pattern)
-	return loader.client.ImportJSON(importAPI, params, indexContent)
+	if err := ReplaceIndexInIndexPattern(loader.config.Index, pattern); err != nil {
+		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
+	}
+	if err := loader.client.ImportJSON(importAPI, params, pattern); err != nil {
+		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
+	}
+	return errs.Err()
 }
 
 // ImportDashboard imports the dashboard file

@@ -14,9 +14,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // represents the response format of the query
@@ -102,7 +102,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 // DB gets a client ready to query the database
 func (m *MetricSet) DB() (*sqlx.DB, error) {
 	if m.db == nil {
-		db, err := sqlx.Open(m.Driver, m.HostData().URI)
+		db, err := sqlx.Open(switchDriverName(m.Driver), m.HostData().URI)
 		if err != nil {
 			return nil, errors.Wrap(err, "opening connection")
 		}
@@ -250,4 +250,14 @@ func (m *MetricSet) Close() error {
 		return nil
 	}
 	return errors.Wrap(m.db.Close(), "closing connection")
+}
+
+// switchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
+// 'godror' so this detail implementation must be hidden to the user, that should only choose and see 'oracle' as driver
+func switchDriverName(d string) string {
+	if d == "oracle" {
+		return "godror"
+	}
+
+	return d
 }

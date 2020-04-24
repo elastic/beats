@@ -40,7 +40,7 @@ class Test(XPackTest):
         self.assertEqual(len(output), 4)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
         self.assertTrue(evt["mssql"]["transaction_log"]["space_usage"]["used"]["pct"] > 0)
         self.assertTrue(evt["mssql"]["transaction_log"]["stats"]["active_size"]["bytes"] > 0)
 
@@ -69,7 +69,7 @@ class Test(XPackTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
         self.assertTrue(evt["mssql"]["performance"]["buffer"]["page_life_expectancy"]["sec"] > 0)
         self.assertTrue(evt["mssql"]["performance"]["user_connections"] > 0)
 

@@ -133,7 +133,10 @@ metricbeat.modules:
   #diskio.include_devices: []
 
   # Filter systemd services by status or sub-status
-  #service.state_filter: []
+  #service.state_filter: ["active"]
+
+  # Filter systemd services based on a name pattern
+  #service.pattern_filter: ["ssh*", "nfs*"]
 
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
@@ -174,11 +177,25 @@ metricbeat.modules:
   #xpack.enabled: false
 
 #--------------------------------- Ceph Module ---------------------------------
+# Metricsets depending on the Ceph REST API (default port: 5000)
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+# Metricsets depending on the Ceph Manager Daemon (default port: 8003)
+- module: ceph
+  metricsets:
+    - mgr_cluster_disk
+    - mgr_osd_perf
+    - mgr_pool_disk
+    - mgr_osd_pool_stats
+    - mgr_osd_tree
+  period: 1m
+  hosts: [ "https://localhost:8003" ]
+  #username: "user"
+  #password: "secret"
 
 #-------------------------------- Consul Module --------------------------------
 - module: consul
@@ -196,7 +213,7 @@ metricbeat.modules:
   hosts: ["localhost:8091"]
   enabled: true
 
-#------------------------------- Couchdb Module -------------------------------
+#------------------------------- CouchDB Module -------------------------------
 - module: couchdb
   metricsets: ["server"]
   period: 10s
@@ -315,6 +332,8 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 
 #--------------------------------- HTTP Module ---------------------------------
@@ -451,7 +470,7 @@ metricbeat.modules:
     - volume
   period: 10s
   enabled: true
-  hosts: ["https://${HOSTNAME}:10250"]
+  hosts: ["https://${NODE_NAME}:10250"]
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.verification_mode: "none"
   #ssl.certificate_authorities:
@@ -695,10 +714,15 @@ metricbeat.modules:
   #password: pass
 
 #------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
 - module: prometheus
   period: 10s
+  metricsets: ["collector"]
   hosts: ["localhost:9090"]
   metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
   #username: "user"
   #password: "secret"
 
@@ -706,6 +730,43 @@ metricbeat.modules:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
@@ -787,11 +848,14 @@ metricbeat.modules:
   period: 10s
   perfmon.ignore_non_existent_counters: false
   perfmon.group_measurements_by_instance: false
-  perfmon.counters:
-  #  - instance_label: processor.name
-  #    instance_name: total
-  #    measurement_label: processor.time.total.pct
-  #    query: '\Processor Information(_Total)\% Processor Time'
+  perfmon.queries:
+#  - object: 'Process'
+#    instance: ["*"]
+#    counters:
+#    - name: 'Disk Writes/sec'
+#      field: physical_disk.write.per_sec
+#      format: "float"
+#    - name: "% Disk Write Time"
 
 - module: windows
   metricsets: ["service"]
@@ -1004,8 +1068,7 @@ metricbeat.modules:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1068,6 +1131,16 @@ metricbeat.modules:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1204,7 +1277,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1303,7 +1376,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1474,6 +1547,28 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -1490,6 +1585,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -1735,7 +1832,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -1794,10 +1890,10 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
@@ -1821,6 +1917,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true

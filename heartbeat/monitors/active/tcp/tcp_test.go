@@ -18,28 +18,24 @@
 package tcp
 
 import (
-	"crypto/x509"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
@@ -51,118 +47,73 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	return testTCPConfigCheck(t, config, host, port)
 }
 
-func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {
-	config, err := common.NewConfigFrom(configMap)
-	require.NoError(t, err)
-
-	jobs, endpoints, err := create("tcp", config)
-	require.NoError(t, err)
-
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
-
-	event := &beat.Event{}
-	_, err = job(event)
-	require.NoError(t, err)
-
-	require.Equal(t, 1, endpoints)
-
-	return event
-}
-
-func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string) *beat.Event {
-	config, err := common.NewConfigFrom(common.MapStr{
-		"hosts":   host,
-		"ports":   int64(port),
-		"ssl":     common.MapStr{"certificate_authorities": certFileName},
-		"timeout": "1s",
-	})
-	require.NoError(t, err)
-
-	jobs, endpoints, err := create("tcp", config)
-	require.NoError(t, err)
-
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, "test", "", "tcp", sched, time.Duration(0))[0]
-
-	event := &beat.Event{}
-	_, err = job(event)
-	require.NoError(t, err)
-
-	require.Equal(t, 1, endpoints)
-
-	return event
-}
-
-func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server) (*httptest.Server, uint16) {
-	server := serverCreator(hbtest.HelloWorldHandler(200))
-
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
-
-	return server, port
-}
-
+// TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
 func TestUpEndpointJob(t *testing.T) {
-	server, port := setupServer(t, httptest.NewServer)
-	defer server.Close()
+	// Test with domain, IPv4 and IPv6
+	scenarios := []struct {
+		name       string
+		hostname   string
+		isIP       bool
+		expectedIP string
+	}{
+		{
+			name:       "localhost",
+			hostname:   "localhost",
+			isIP:       false,
+			expectedIP: "127.0.0.1",
+		},
+		{
+			name:       "ipv4",
+			hostname:   "127.0.0.1",
+			isIP:       true,
+			expectedIP: "127.0.0.1",
+		},
+		{
+			name:     "ipv6",
+			hostname: "::1",
+			isIP:     true,
+		},
+	}
 
-	event := testTCPCheck(t, "localhost", port)
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			server, port, err := setupServer(t, func(handler http.Handler) (*httptest.Server, error) {
+				return newHostTestServer(handler, scenario.hostname)
+			})
+			// Some machines don't have ipv6 setup correctly, so we ignore the test
+			// if we can't bind to the port / setup the server.
+			if err != nil && scenario.hostname == "::1" {
+				return
+			}
+			require.NoError(t, err)
 
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
-			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
-			hbtest.RespondingTCPChecks(),
-			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     "127.0.0.1",
-					"rtt.us": isdef.IsDuration,
-				},
-			}),
-		)),
-		event.Fields,
-	)
-}
+			defer server.Close()
 
-func TestTLSConnection(t *testing.T) {
-	// Start up a TLS Server
-	server, port := setupServer(t, httptest.NewTLSServer)
-	defer server.Close()
+			hostURL := &url.URL{Scheme: "tcp", Host: net.JoinHostPort(scenario.hostname, strconv.Itoa(int(port)))}
 
-	// Parse its URL
-	serverURL, err := url.Parse(server.URL)
-	require.NoError(t, err)
+			serverURL, err := url.Parse(server.URL)
+			require.NoError(t, err)
 
-	// Determine the IP address the server's hostname resolves to
-	ips, err := net.LookupHost(serverURL.Hostname())
-	require.NoError(t, err)
-	require.Len(t, ips, 1)
-	ip := ips[0]
+			event := testTCPCheck(t, hostURL.String(), port)
 
-	// Parse the cert so we can test against it
-	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
-	require.NoError(t, err)
+			validators := []validator.Validator{
+				hbtest.BaseChecks(serverURL.Hostname(), "up", "tcp"),
+				hbtest.SummaryChecks(1, 0),
+				hbtest.URLChecks(t, hostURL),
+				hbtest.RespondingTCPChecks(),
+			}
 
-	// Save the server's cert to a file so heartbeat can use it
-	certFile := hbtest.CertToTempFile(t, cert)
-	require.NoError(t, certFile.Close())
-	defer os.Remove(certFile.Name())
+			if !scenario.isIP {
+				validators = append(validators, hbtest.ResolveChecks(scenario.expectedIP))
+			}
 
-	event := testTLSTCPCheck(t, ip, port, certFile.Name())
-	testslike.Test(
-		t,
-		lookslike.Strict(lookslike.Compose(
-			hbtest.TLSChecks(0, 0, cert),
-			hbtest.RespondingTCPChecks(),
-			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
-			hbtest.SimpleURLChecks(t, "ssl", serverURL.Hostname(), port),
-		)),
-		event.Fields,
-	)
+			testslike.Test(
+				t,
+				lookslike.Strict(lookslike.Compose(validators...)),
+				event.Fields,
+			)
+		})
+	}
 }
 
 func TestConnectionRefusedEndpointJob(t *testing.T) {
@@ -225,11 +176,8 @@ func TestCheckUp(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(1, 0),
+			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     ip,
-					"rtt.us": isdef.IsDuration,
-				},
 				"tcp": map[string]interface{}{
 					"rtt.validate.us": isdef.IsDuration,
 				},
@@ -261,11 +209,8 @@ func TestCheckDown(t *testing.T) {
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(0, 1),
+			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
-				"resolve": map[string]interface{}{
-					"ip":     ip,
-					"rtt.us": isdef.IsDuration,
-				},
 				"tcp": map[string]interface{}{
 					"rtt.validate.us": isdef.IsDuration,
 				},
@@ -324,4 +269,37 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}
 
 	return "localhost", uint16(portUint64), ip, listener.Close, nil
+}
+
+// StaticResolver allows for a custom in-memory mapping of hosts to IPs, it ignores network names
+// and zones.
+type StaticResolver struct {
+	mapping map[string][]net.IP
+}
+
+func NewStaticResolver(mapping map[string][]net.IP) StaticResolver {
+	return StaticResolver{mapping}
+}
+
+func (s StaticResolver) ResolveIPAddr(network string, host string) (*net.IPAddr, error) {
+	found, err := s.LookupIP(host)
+	if err != nil {
+		return nil, err
+	}
+	return &net.IPAddr{IP: found[0]}, nil
+}
+
+func (s StaticResolver) LookupIP(host string) ([]net.IP, error) {
+	if found, ok := s.mapping[host]; ok {
+		return found, nil
+	} else {
+		return nil, makeStaticNXDomainErr(host)
+	}
+}
+
+func makeStaticNXDomainErr(host string) *net.DNSError {
+	return &net.DNSError{
+		IsNotFound: true,
+		Err:        fmt.Sprintf("Hostname '%s' not found in static resolver", host),
+	}
 }

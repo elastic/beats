@@ -25,9 +25,9 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {
@@ -107,6 +107,22 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	event := events[0]
 	assert.Equal(t, expectedRootFields, event.RootFields)
 	assert.Equal(t, expectedFields, event.MetricSetFields)
+}
+
+func TestMemoryServiceBadData(t *testing.T) {
+
+	badMemStats := types.StatsJSON{
+		Stats: types.Stats{
+			Read:        time.Now(),
+			MemoryStats: types.MemoryStats{}, //Test for cases where this is empty
+		},
+	}
+
+	memoryService := &MemoryService{}
+	memoryRawStats := []docker.Stat{docker.Stat{Stats: badMemStats}}
+	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
+	assert.Len(t, rawStats, 0)
+
 }
 
 func getMemoryStats(read time.Time, number uint64) types.StatsJSON {

@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestWithMaxStartDelay(t *testing.T) {

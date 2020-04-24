@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.
@@ -169,6 +169,10 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		"reason":  eve.Reason,
 		"type":    eve.Type,
 		"count":   eve.Count,
+		"source": common.MapStr{
+			"host":      eve.Source.Host,
+			"component": eve.Source.Component,
+		},
 		"involved_object": common.MapStr{
 			"api_version":      eve.InvolvedObject.APIVersion,
 			"resource_version": eve.InvolvedObject.ResourceVersion,

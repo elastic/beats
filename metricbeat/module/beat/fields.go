@@ -20,7 +20,7 @@
 package beat
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetBeat returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/beat.
+// This is the base64 encoded gzipped contents of module/beat.
 func AssetBeat() string {
 	return "eJzcl0+L2zwQxu/5FIPP7+YD+PAWSlvYSwtloYdSimxPvGJljSuNdvG3L5LXiWPJdtJmE6hOiRU/z0/zR1Lu4Am7HAoUvAFgyQpzyN6j4GwDUKEtjWxZks7h/w0AgJ+ChiqncANgUKGwmEMtNgAWmaWubQ7fM2tV9h9kj8xt9sPPPZLhnyXpnaxz2All/fs7iaqyeVC+Ay0a3LP4wV3rtQ259vVJguhYZawkq/2jQesJuxcy4+dJxX6Etd5/2EbCXusC0v69WNyy4Fh9HIRTtKcqx5kaxjRyY45GaFFjg5q3qEWhsDr62QBWECkUejK3gOfHvYUSNRuhRjbwavMujRNqbluS05wEkZqxRnMeyGfXFGiAdq/6FlJrHRjIcet4678kEeISOAVBNOgBenFwFisoupDFJMQvhw7fiCFoQ4FS12mQcZHaixSp/asidS3LBreNTcZCka7PC0TA6kWTfsbpYFiTIcdS46WMD4V4kPZu2qdC6vlyULIopnNz+TiB41MINpTUNKSBCYRSwXy60FRWIOqVaHoJ7QQ8P770jTItnjUwmN/AY7x0F50B6cdD1446exEIn1EnVwOrETsD6KN3gbCFoplzW4rfGFmUT9GREFMnOuEPwOGoQ/pgeQBNLwqreoHjQMvyeS7nb4vbWy+neHT9EVw+RtvKdUgD4irBQFoZatvblsAawh7VtUqWgm8ZV3ugWAfeCRlfuK4Ku0Kw30mJGqG7m5Aykb8+dqe2FhMLdUXSB+8HehLZxXPAoJiL+cVOga8oqtnTE844AYruVg0VnJeCNTpZjaHZs+5tKT3fkv+A+GIkL19HLpD1b97kn0i7Dxfj9B9nzHnDzIeMTgGWPvwOAAD//2j1+Zk="
 }

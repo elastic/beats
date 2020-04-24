@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func createSocket(bindAddr unix.SockaddrInet4) (fd int, addr unix.SockaddrInet4, err error) {

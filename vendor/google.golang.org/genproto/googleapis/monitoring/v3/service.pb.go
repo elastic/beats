@@ -462,7 +462,7 @@ type ServiceLevelObjective struct {
 	// quality.
 	ServiceLevelIndicator *ServiceLevelIndicator `protobuf:"bytes,3,opt,name=service_level_indicator,json=serviceLevelIndicator,proto3" json:"service_level_indicator,omitempty"`
 	// The fraction of service that must be good in order for this objective to be
-	// met. `0 < goal <= 1`.
+	// met. `0 < goal <= 0.999`.
 	Goal float64 `protobuf:"fixed64,4,opt,name=goal,proto3" json:"goal,omitempty"`
 	// The time period over which the objective will be evaluated.
 	//

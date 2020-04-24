@@ -1,6 +1,14 @@
 # Change Log
 
-## `head`
+## `v3.1.2`
+- fix errors in message handling being ignored [#155](https://github.com/Azure/azure-event-hubs-go/issues/155)
+
+## `v3.1.1`
+- Azure storage SAS token regeneration fix [#157](https://github.com/Azure/azure-event-hubs-go/issues/157)
+
+## `v3.1.0`
+- add support for websocket connections with eph with `eph.WithWebSocketConnection()`
+
 
 ## `v2.0.4`
 - add comment on the `PartitionID` field in `SystemProperties` to clarify that it will always return a nil value [#131](https://github.com/Azure/azure-event-hubs-go/issues/131)

@@ -1,6 +1,10 @@
 [[decode-json-fields]]
 === Decode JSON fields
 
+++++
+<titleabbrev>decode_json_fields</titleabbrev>
+++++
+
 The `decode_json_fields` processor decodes fields containing JSON strings and
 replaces the strings with valid JSON objects.
 

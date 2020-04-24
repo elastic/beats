@@ -13,7 +13,7 @@
 [[monitoring-internal-collection]]
 == Use internal collection to send monitoring data
 ++++
-<titleabbrev>Internal collection</titleabbrev>
+<titleabbrev>Use internal collection</titleabbrev>
 ++++
 
 Use internal collectors to send {beats} monitoring data directly to your

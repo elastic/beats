@@ -12,10 +12,10 @@ The +{modulename}+ module parses error logs created by MSSQL.
 
 include::../include/what-happens.asciidoc[]
 
-[float]
-=== Compatibility
+include::../include/gs-link.asciidoc[]
 
-include::../include/running-modules.asciidoc[]
+//[float]
+//=== Compatibility
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -25,7 +25,7 @@ file to override the default paths for Træfik logs:
 ["source","yaml",subs="attributes"]
 -----
 - module: mssql
-  access:
+  log:
     enabled: true
     var.paths: ["/var/opt/mssql/log/error*"]
 -----
@@ -35,7 +35,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
--M "mssql.access.var.paths=[/var/opt/mssql/log/error*]"
+-M "mssql.log.var.paths=[/var/opt/mssql/log/error*]"
 -----
 
 //set the fileset name used in the included example

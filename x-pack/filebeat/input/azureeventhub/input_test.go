@@ -13,9 +13,9 @@ import (
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var (
@@ -57,9 +57,9 @@ func TestProcessEvents(t *testing.T) {
 		Data:             []byte(msg),
 		SystemProperties: &properties,
 	}
-	err = input.processEvents(&ev, "0")
-	if err != nil {
-		t.Fatal(err)
+	ok := input.processEvents(&ev, "0")
+	if !ok {
+		t.Fatal("OnEvent function returned false")
 	}
 	assert.Equal(t, len(o.Events), 1)
 	message, err := o.Events[0].Fields.GetValue("message")

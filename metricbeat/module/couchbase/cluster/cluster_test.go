@@ -22,9 +22,9 @@ package cluster
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	_ "github.com/elastic/beats/metricbeat/module/couchbase"
+	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase"
 )
 
 func TestData(t *testing.T) {

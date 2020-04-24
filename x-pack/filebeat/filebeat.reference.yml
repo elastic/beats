@@ -96,7 +96,7 @@ filebeat.modules:
 
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
-  s3access:
+  cloudtrail:
     enabled: false
 
     # AWS SQS queue url
@@ -111,6 +111,11 @@ filebeat.modules:
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
     # The duration that the received messages are hidden from ReceiveMessage request
     # Default to be 300s
     #var.visibility_timeout: 300s
@@ -118,6 +123,80 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  cloudwatch:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  ec2:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   elb:
     enabled: false
@@ -134,6 +213,11 @@ filebeat.modules:
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
     # The duration that the received messages are hidden from ReceiveMessage request
     # Default to be 300s
     #var.visibility_timeout: 300s
@@ -141,6 +225,46 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  s3access:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
   vpcflow:
     enabled: false
@@ -157,28 +281,10 @@ filebeat.modules:
     # If not set the default profile is used
     #var.credential_profile_name: fb-aws
 
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-  cloudtrail:
-    enabled: false
-
-    # AWS SQS queue url
-    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
 
     # The duration that the received messages are hidden from ReceiveMessage request
     # Default to be 300s
@@ -187,6 +293,12 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     # Default to be 120s
     #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -194,15 +306,15 @@ filebeat.modules:
   activitylogs:
     enabled: true
     var:
-      # Eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
       eventhub: "insights-operational-logs"
-      # Consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      # consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
       consumer_group: "$Default"
       # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
       connection_string: ""
-      # the name of the storage account the state/offsets will be stored and updated.
+      # the name of the storage account the state/offsets will be stored and updated
       storage_account: ""
-      #The storage account key, this key will be used to authorize access to data in your storage account.
+      # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
 
   auditlogs:
@@ -230,6 +342,25 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+#------------------------------ Checkpoint Module ------------------------------
+- module: checkpoint
+  firewall:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
@@ -289,6 +420,16 @@ filebeat.modules:
 - module: coredns
   # Fileset for native deployment
   log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#----------------------------- Crowdstrike Module -----------------------------
+- module: crowdstrike
+  
+  falcon:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -531,6 +672,7 @@ filebeat.modules:
   # Slow logs
   #slowlog:
     #enabled: true
+
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -547,6 +689,12 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -649,6 +797,69 @@ filebeat.modules:
   #  # Set custom paths for the log files. If left empty,
   #  # Filebeat will choose the paths depending on your OS.
   #  #var.paths:
+
+#------------------------------ Office 365 Module ------------------------------
+- module: o365
+  audit:
+    enabled: true
+
+    # Set the application_id (also known as client ID):
+    var.application_id: "<MyApplicationID>"
+
+    # Configure the tenants to monitor:
+    # Use the tenant ID (also known as directory ID) and the domain name.
+    # var.tenants:
+    #  - id: "tenant_id_1"
+    #    name: "mydomain.onmicrosoft.com"
+    #  - id: "tenant_id_2"
+    #    name: "mycompany.com"
+    var.tenants:
+     - id: "<MyTenantID>"
+       name: "mytenant.onmicrosoft.com"
+
+    # List of content-types to fetch. By default all known content-types
+    # are retrieved:
+    # var.content_type:
+    #  - "Audit.AzureActiveDirectory"
+    #  - "Audit.Exchange"
+    #  - "Audit.SharePoint"
+    #  - "Audit.General"
+    #  - "DLP.All"
+
+    # Use the following settings to enable certificate-based authentication:
+    # var.certificate: "/path/to/certificate.pem"
+    # var.key: "/path/to/private_key.pem"
+    # var.key_passphrase: "myPrivateKeyPassword"
+
+    # Client-secret based authentication:
+    # Comment the following line if using certificate authentication.
+    var.client_secret: "<YourClientSecretHere>"
+
+    # Advanced settings, use with care:
+    # var.api:
+    #   # Settings for custom endpoints:
+    #   authentication_endpoint: "https://login.microsoftonline.us/"
+    #   resource: "https://manage.office365.us"
+    #
+    #   max_retention: 7d
+    #   max_requests_per_minute: 2000
+    #   poll_interval: 3m
+
+#--------------------------------- Okta Module ---------------------------------
+- module: okta
+  system:
+    enabled: true
+    # API key to access Okta
+    #var.api_key
+
+    # URL of the Okta REST API
+    #var.url
+
+    # Disable SSL verification 
+    #var.ssl: |-
+    #  {
+    #    "verification_mode": "none"
+    #  }
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -1548,8 +1759,7 @@ filebeat.inputs:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -1612,6 +1822,16 @@ filebeat.inputs:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1748,7 +1968,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1847,7 +2067,7 @@ output.elasticsearch:
   # this allow you to ensure that a specific certificate is used to validate the chain of trust.
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
-  #ssl.ca_sha256
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2018,6 +2238,28 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -2034,6 +2276,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -2279,7 +2523,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -2338,10 +2581,10 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is false. If
+# Disable the check for an existing lifecycle policy. The default is true. If
 # you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
 # can be installed.
-#setup.ilm.check_exists: false
+#setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
@@ -2365,6 +2608,9 @@ setup.kibana:
 
   # Optional HTTP path
   #path: ""
+
+  # Optional Kibana space ID.
+  #space.id: ""
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true

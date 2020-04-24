@@ -34,12 +34,12 @@ const cef_en_main_cef_extensions int = 24
 //line cef.rl:16
 
 // unpack unpacks a CEF message.
-func (e *Event) unpack(data []byte) error {
+func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark := 0
 
 	// Extension key.
-	var extKey []byte
+	var extKey string
 
 	// Extension value start and end indices.
 	extValueStart, extValueEnd := 0, 0
@@ -48,7 +48,7 @@ func (e *Event) unpack(data []byte) error {
 	// recover from (though the parsing might not be "correct").
 	var recoveredErrs []error
 
-	e.init()
+	e.init(data)
 
 //line parser.go:55
 	{
@@ -329,145 +329,177 @@ func (e *Event) unpack(data []byte) error {
 		case 32:
 			switch data[(p)] {
 			case 32:
-				goto tr54
+				goto tr55
 			case 61:
 				goto tr46
 			case 92:
-				goto tr55
+				goto tr56
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr54
 			}
 			goto tr53
 		case 33:
 			switch data[(p)] {
 			case 32:
-				goto tr56
+				goto tr58
 			case 61:
 				goto tr46
 			case 92:
+				goto tr59
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
 				goto tr57
 			}
 			goto tr48
 		case 34:
 			switch data[(p)] {
 			case 32:
-				goto tr56
+				goto tr58
 			case 61:
 				goto tr46
 			case 92:
-				goto tr57
+				goto tr59
 			case 95:
-				goto tr58
+				goto tr60
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr58
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr57
 				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr58
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr60
+					}
+				case data[(p)] >= 65:
+					goto tr60
 				}
 			default:
-				goto tr58
+				goto tr60
 			}
 			goto tr48
 		case 35:
 			switch data[(p)] {
 			case 32:
-				goto tr56
+				goto tr58
 			case 44:
-				goto tr59
+				goto tr61
 			case 46:
-				goto tr59
+				goto tr61
 			case 61:
-				goto tr60
+				goto tr62
 			case 92:
-				goto tr57
-			case 95:
 				goto tr59
+			case 95:
+				goto tr61
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr59
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr57
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr59
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr61
+					}
+				case data[(p)] >= 65:
+					goto tr61
 				}
 			default:
-				goto tr59
+				goto tr61
 			}
 			goto tr48
 		case 36:
 			switch data[(p)] {
 			case 32:
-				goto tr62
+				goto tr65
 			case 61:
 				goto tr46
 			case 92:
-				goto tr63
+				goto tr66
 			}
-			goto tr61
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr64
+			}
+			goto tr63
 		case 37:
 			switch data[(p)] {
 			case 32:
-				goto tr64
+				goto tr68
 			case 61:
 				goto tr46
 			case 92:
-				goto tr65
+				goto tr69
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr67
 			}
 			goto tr47
 		case 38:
 			switch data[(p)] {
 			case 32:
-				goto tr64
+				goto tr68
 			case 61:
 				goto tr46
 			case 92:
-				goto tr65
+				goto tr69
 			case 95:
-				goto tr66
+				goto tr70
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr66
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr67
 				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr66
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr70
+					}
+				case data[(p)] >= 65:
+					goto tr70
 				}
 			default:
-				goto tr66
+				goto tr70
 			}
 			goto tr47
 		case 39:
 			switch data[(p)] {
 			case 32:
-				goto tr64
+				goto tr68
 			case 44:
-				goto tr67
+				goto tr71
 			case 46:
-				goto tr67
+				goto tr71
 			case 61:
-				goto tr60
+				goto tr62
 			case 92:
-				goto tr65
+				goto tr69
 			case 95:
-				goto tr67
+				goto tr71
 			}
 			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
 					goto tr67
 				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr67
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr71
+					}
+				case data[(p)] >= 65:
+					goto tr71
 				}
 			default:
-				goto tr67
+				goto tr71
 			}
 			goto tr47
 		case 26:
@@ -678,16 +710,16 @@ func (e *Event) unpack(data []byte) error {
 	tr43:
 		cs = 25
 		goto f0
-	tr65:
+	tr69:
 		cs = 26
 		goto _again
-	tr63:
+	tr66:
 		cs = 26
 		goto f20
-	tr57:
+	tr59:
 		cs = 27
 		goto _again
-	tr55:
+	tr56:
 		cs = 27
 		goto f20
 	tr49:
@@ -708,43 +740,55 @@ func (e *Event) unpack(data []byte) error {
 	tr45:
 		cs = 32
 		goto f14
+	tr57:
+		cs = 33
+		goto _again
 	tr48:
 		cs = 33
 		goto f16
 	tr53:
 		cs = 33
 		goto f19
-	tr56:
-		cs = 34
-		goto f16
 	tr54:
+		cs = 33
+		goto f20
+	tr58:
 		cs = 34
-		goto f19
-	tr59:
+		goto _again
+	tr55:
+		cs = 34
+		goto f20
+	tr61:
 		cs = 35
 		goto f16
-	tr58:
+	tr60:
 		cs = 35
 		goto f22
-	tr60:
+	tr62:
 		cs = 36
 		goto f14
+	tr67:
+		cs = 37
+		goto _again
 	tr47:
 		cs = 37
 		goto f16
-	tr61:
+	tr63:
 		cs = 37
 		goto f19
 	tr64:
+		cs = 37
+		goto f20
+	tr68:
 		cs = 38
-		goto f16
-	tr62:
+		goto _again
+	tr65:
 		cs = 38
-		goto f19
-	tr67:
+		goto f20
+	tr71:
 		cs = 39
 		goto f16
-	tr66:
+	tr70:
 		cs = 39
 		goto f23
 	tr52:
@@ -760,43 +804,43 @@ func (e *Event) unpack(data []byte) error {
 	f1:
 //line cef.rl:40
 
-		e.Version, _ = strconv.Atoi(string(data[mark:p]))
+		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
 	f3:
 //line cef.rl:43
 
-		e.DeviceVendor = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f5:
 //line cef.rl:46
 
-		e.DeviceProduct = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f7:
 //line cef.rl:49
 
-		e.DeviceVersion = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f9:
 //line cef.rl:52
 
-		e.DeviceEventClassID = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f11:
 //line cef.rl:55
 
-		e.Name = string(replaceHeaderEscapes(data[mark:p]))
+		e.Name = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f13:
 //line cef.rl:58
 
-		e.Severity = string(data[mark:p])
+		e.Severity = data[mark:p]
 
 		goto _again
 	f14:
@@ -805,7 +849,7 @@ func (e *Event) unpack(data []byte) error {
 		// A new extension key marks the end of the last extension value.
 		if len(extKey) > 0 && extValueStart <= mark-1 {
 			e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:mark-1]))
-			extKey, extValueStart, extValueEnd = nil, 0, 0
+			extKey, extValueStart, extValueEnd = "", 0, 0
 		}
 		extKey = data[mark:p]
 
@@ -829,16 +873,14 @@ func (e *Event) unpack(data []byte) error {
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
 		(p)--
 		cs = 28
-
 		goto _again
 	f17:
 //line cef.rl:87
 
-		extKey, extValueStart, extValueEnd = nil, 0, 0
+		extKey, extValueStart, extValueEnd = "", 0, 0
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 24
-
 		goto _again
 	f2:
 //line cef.rl:37
@@ -847,7 +889,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:43
 
-		e.DeviceVendor = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f4:
@@ -857,7 +899,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:46
 
-		e.DeviceProduct = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f6:
@@ -867,7 +909,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:49
 
-		e.DeviceVersion = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f8:
@@ -877,7 +919,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:52
 
-		e.DeviceEventClassID = string(replaceHeaderEscapes(data[mark:p]))
+		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f10:
@@ -887,7 +929,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:55
 
-		e.Name = string(replaceHeaderEscapes(data[mark:p]))
+		e.Name = replaceHeaderEscapes(data[mark:p])
 
 		goto _again
 	f12:
@@ -897,7 +939,7 @@ func (e *Event) unpack(data []byte) error {
 
 //line cef.rl:58
 
-		e.Severity = string(data[mark:p])
+		e.Severity = data[mark:p]
 
 		goto _again
 	f23:
@@ -950,7 +992,7 @@ func (e *Event) unpack(data []byte) error {
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
 					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = nil, 0, 0
+					extKey, extValueStart, extValueEnd = "", 0, 0
 				}
 
 			case 16:
@@ -972,10 +1014,10 @@ func (e *Event) unpack(data []byte) error {
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
 					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = nil, 0, 0
+					extKey, extValueStart, extValueEnd = "", 0, 0
 				}
 
-//line parser.go:847
+//line parser.go:883
 			}
 		}
 

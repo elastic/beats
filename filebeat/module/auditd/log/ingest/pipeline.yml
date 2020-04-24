@@ -11,7 +11,7 @@ processors:
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid}
       new auid=%{NUMBER:auditd.log.new_auid} old ses=%{NUMBER:auditd.log.old_ses}
       new ses=%{NUMBER:auditd.log.new_ses}"
-    - '%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=[''"](%{DATA:auditd.log.msg}\s+)?%{AUDIT_KEY_VALUES:auditd.log.sub_kv}[''"]'
+    - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=['\"]%{AUDIT_KEY_VALUES:auditd.log.sub_kv}['\"]"
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv}"
     - "%{AUDIT_PREFIX}"
     - "%{AUDIT_TYPE} %{AUDIT_KEY_VALUES:auditd.log.kv}"
@@ -132,6 +132,61 @@ processors:
     params:
       single_quote: "'"
       double_quote: "\""
+- set:
+    field: event.kind
+    value: event
+- set:
+    if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
+    field: event.type
+    value: authentication
+- set:
+    if: "ctx.auditd.log?.record_type == 'KERN_MODULE'"
+    field: event.type
+    value: driver
+- set:
+    if: "ctx.auditd.log?.record_type == 'SOFTWARE_UPDATE'"
+    field: event.type
+    value: package
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
+    field: event.type
+    value: host
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSCALL' && ctx.auditd.log?.syscall == 'execve'"
+    field: event.type
+    value: process
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' || ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: event.category
+    value: host
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'start'"
+    field: event.type
+    value: start
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'stop'"
+    field: event.type
+    value: end
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'create'"
+    field: event.type
+    value: creation
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'delete'"
+    field: event.type
+    value: deletion
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: event.type
+    value: creation
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID' && ctx.auditd.log?.vm != null"
+    field: container.name
+    value: "{{ auditd.log.vm }}"
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID' && ctx.auditd.log?.virt != null"
+    field: container.runtime
+    value: "{{ auditd.log.virt }}"
 - rename:
     ignore_failure: true
     field: auditd.log.arch
@@ -220,6 +275,25 @@ processors:
     ignore_failure: true
     field: process.args
     separator: "\\s+"
+- script:
+    if: "ctx?.process?.args != null"
+    lang: painless
+    source: >-
+      if (ctx.process.args instanceof List) {
+        ctx.process.args_count = ctx.process.args.length;
+      }
+- rename:
+    ignore_failure: true
+    field: auditd.log.exit
+    target_field: process.exit_code
+- convert:
+    ignore_missing: true
+    field: process.exit_code
+    type: long
+- rename:
+    ignore_missing: true
+    field: auditd.log.cwd
+    target_field: process.working_directory
 - rename:
     ignore_failure: true
     field: auditd.log.terminal

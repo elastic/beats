@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: syslog_host
+    default: localhost
+  - name: tags
+    default: [checkpoint-firewall]
+  - name: syslog_port
+    default: 9001
+  - name: input
+    default: syslog
+  - name: log_level
+    default: 7
+
+ingest_pipeline: 
+  - ingest/pipeline.json
+input: config/firewall.yml

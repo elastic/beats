@@ -14,8 +14,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func newIncomingFieldExtractor(l *logp.Logger) *incomingFieldExtractor {

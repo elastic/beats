@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.pubsub",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "labels": {
+            "resource": {
+                "subscription_id": "test-ks"
+            }
+        },
+        "pubsub": {
+            "snapshot": {
+                "backlog_bytes": 19,
+                "backlog_bytes_by_region": 19,
+                "num_messages": 4,
+                "num_messages_by_region": 4,
+                "oldest_message_age": 69319,
+                "oldest_message_age_by_region": 69319
+            },
+            "subscription": {
+                "backlog_bytes": 0,
+                "num_undelivered_messages": 0,
+                "oldest_retained_acked_message_age": 0,
+                "oldest_retained_acked_message_age_by_region": 0,
+                "oldest_unacked_message_age": 0,
+                "oldest_unacked_message_age_by_region": 69277,
+                "retained_acked_bytes": 0,
+                "retained_acked_bytes_by_region": 0,
+                "unacked_bytes_by_region": 19
+            },
+            "topic": {
+                "oldest_retained_acked_message_age_by_region": 0,
+                "oldest_unacked_message_age_by_region": 69319,
+                "retained_acked_bytes_by_region": 0,
+                "unacked_bytes_by_region": 76
+            }
+        }
+    },
+    "metricset": {
+        "name": "pubsub",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

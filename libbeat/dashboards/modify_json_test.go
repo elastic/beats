@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestReplaceStringInDashboard(t *testing.T) {
@@ -109,5 +109,139 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 	for _, test := range tests {
 		result := ReplaceIndexInDashboardObject(test.pattern, test.dashboard)
 		assert.Equal(t, test.expected, result)
+	}
+}
+
+func TestReplaceIndexInIndexPattern(t *testing.T) {
+	// Test that replacing of index name in index pattern works no matter
+	// what the inner types are (MapStr, map[string]interface{} or interface{}).
+	// Also ensures that the inner types are not modified after replacement.
+	tests := []struct {
+		title    string
+		input    common.MapStr
+		index    string
+		expected common.MapStr
+	}{
+		{
+			title: "Replace in []interface(map).map",
+			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+				"attributes": map[string]interface{}{
+					"title":         "phonybeat-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+				"attributes": map[string]interface{}{
+					"title":         "otherindex-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+		},
+		{
+			title: "Replace in []interface(map).mapstr",
+			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "phonybeat-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "otherindex-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+		},
+		{
+			title: "Replace in []map.mapstr",
+			input: common.MapStr{"objects": []map[string]interface{}{{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "phonybeat-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []map[string]interface{}{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "otherindex-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+		},
+		{
+			title: "Replace in []mapstr.mapstr",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "phonybeat-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+				"attributes": common.MapStr{
+					"title":         "otherindex-*",
+					"timeFieldName": "@timestamp",
+				}}}},
+		},
+		{
+			title: "Replace in []mapstr.interface(mapstr)",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+				"attributes": interface{}(common.MapStr{
+					"title":         "phonybeat-*",
+					"timeFieldName": "@timestamp",
+				})}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+				"attributes": interface{}(common.MapStr{
+					"title":         "otherindex-*",
+					"timeFieldName": "@timestamp",
+				})}}},
+		},
+		{
+			title: "Do not create missing attributes",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"id":   "phonybeat-*",
+				"type": "index-pattern",
+			}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+			}}},
+		},
+		{
+			title: "Create missing id",
+			input: common.MapStr{"objects": []common.MapStr{{
+				"type": "index-pattern",
+			}}},
+			index: "otherindex-*",
+			expected: common.MapStr{"objects": []common.MapStr{{
+				"id":   "otherindex-*",
+				"type": "index-pattern",
+			}}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.title, func(t *testing.T) {
+			err := ReplaceIndexInIndexPattern(test.index, test.input)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, test.input)
+		})
 	}
 }

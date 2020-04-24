@@ -1,0 +1,17 @@
+{
+    "failed": [],
+    "finished": [
+        {
+            "command": "df format=json-pretty",
+            "outb": "{\n    \"stats\": {\n        \"total_bytes\": 10737418240,\n        \"total_avail_bytes\": 9659875328,\n        \"total_used_bytes\": 3801088,\n        \"total_used_raw_bytes\": 1077542912,\n        \"total_used_raw_ratio\": 0.10035400092601776,\n        \"num_osds\": 1,\n        \"num_per_pool_osds\": 1\n    },\n    \"stats_by_class\": {},\n    \"pools\": [\n        {\n            \"name\": \"rbd\",\n            \"id\": 1,\n            \"stats\": {\n                \"stored\": 0,\n                \"objects\": 0,\n                \"kb_used\": 0,\n                \"bytes_used\": 0,\n                \"percent_used\": 0,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"cephfs_data\",\n            \"id\": 2,\n            \"stats\": {\n                \"stored\": 0,\n                \"objects\": 0,\n                \"kb_used\": 0,\n                \"bytes_used\": 0,\n                \"percent_used\": 0,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"cephfs_metadata\",\n            \"id\": 3,\n            \"stats\": {\n                \"stored\": 2286,\n                \"objects\": 22,\n                \"kb_used\": 512,\n                \"bytes_used\": 524288,\n                \"percent_used\": 5.7465484132990241e-05,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \".rgw.root\",\n            \"id\": 4,\n            \"stats\": {\n                \"stored\": 2398,\n                \"objects\": 6,\n                \"kb_used\": 384,\n                \"bytes_used\": 393216,\n                \"percent_used\": 4.3099731556139886e-05,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"default.rgw.control\",\n            \"id\": 5,\n            \"stats\": {\n                \"stored\": 0,\n                \"objects\": 8,\n                \"kb_used\": 0,\n                \"bytes_used\": 0,\n                \"percent_used\": 0,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"default.rgw.meta\",\n            \"id\": 6,\n            \"stats\": {\n                \"stored\": 736,\n                \"objects\": 5,\n                \"kb_used\": 256,\n                \"bytes_used\": 262144,\n                \"percent_used\": 2.873356788768433e-05,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"default.rgw.log\",\n            \"id\": 7,\n            \"stats\": {\n                \"stored\": 0,\n                \"objects\": 176,\n                \"kb_used\": 0,\n                \"bytes_used\": 0,\n                \"percent_used\": 0,\n                \"max_avail\": 9123004416\n            }\n        },\n        {\n            \"name\": \"default.rgw.buckets.index\",\n            \"id\": 8,\n            \"stats\": {\n                \"stored\": 0,\n                \"objects\": 1,\n                \"kb_used\": 0,\n                \"bytes_used\": 0,\n                \"percent_used\": 0,\n                \"max_avail\": 9123004416\n            }\n        }\n    ]\n}\n",
+            "outs": ""
+        }
+    ],
+    "has_failed": false,
+    "id": "139687220240336",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "success",
+    "waiting": []
+}
