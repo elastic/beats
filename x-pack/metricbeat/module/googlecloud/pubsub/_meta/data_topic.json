@@ -14,13 +14,21 @@
     "googlecloud": {
         "labels": {
             "resource": {
-                "subscription_id": "test-subscription-1"
+                "topic_id": "test-ks"
             }
         },
         "pubsub": {
-            "subscription": {
-                "backlog_bytes": {
-                    "value": 0
+            "topic": {
+                "message_sizes": {
+                    "bucket_options": {
+                        "Options": {
+                            "ExponentialBuckets": {
+                                "num_finite_buckets": 16,
+                                "growth_factor": 4,
+                                "scale": 1
+                            }
+                        }
+                    }
                 }
             }
         }
