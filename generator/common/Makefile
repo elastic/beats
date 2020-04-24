@@ -5,7 +5,7 @@ BEAT_PATH=${GOPATH}/src/${BEAT_NAME}
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 PREPARE_COMMAND?=
 
--include ${ES_BEATS}/dev-tools/make/mage.mk
+-include ${ES_BEATS}/dev-tools/make/mage-install.mk
 
 # Runs test build for mock beat
 .PHONY: test
