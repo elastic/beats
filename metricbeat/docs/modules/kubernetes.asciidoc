@@ -263,7 +263,7 @@ This module supports TLS connections when using `ssl` config field, as described
 It also supports the options described in <<module-http-config-options>>.
 
 [float]
-=== Metricsets reference
+=== Metricsets
 
 The following metricsets are available:
 
@@ -350,3 +350,4 @@ include::kubernetes/state_storageclass.asciidoc[]
 include::kubernetes/system.asciidoc[]
 
 include::kubernetes/volume.asciidoc[]
+
