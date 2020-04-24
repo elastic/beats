@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,7 +37,7 @@ type KeyValuePoint struct {
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries) (points []KeyValuePoint, err error) {
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -48,7 +49,7 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 		}
 
 		p := KeyValuePoint{
-			Key:       cleanMetricNameString(resp.Metric.Type),
+			Key:       cleanMetricNameString(resp.Metric.Type, aligner),
 			Value:     getValueFromPoint(point),
 			Timestamp: ts,
 		}
@@ -62,8 +63,8 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
-		if ts, err = ptypes.Timestamp(p.Interval.StartTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.StartTime)
+		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
+			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.EndTime)
 		}
 		return ts, nil
 	}
@@ -73,7 +74,7 @@ func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time
 
 var rx = regexp.MustCompile(`^[a-z_-]+\.googleapis.com\/`)
 
-func cleanMetricNameString(s string) string {
+func cleanMetricNameString(s string, aligner string) string {
 	if s == "" {
 		return "unknown"
 	}
@@ -83,7 +84,8 @@ func cleanMetricNameString(s string) string {
 	removedPrefix := strings.TrimPrefix(s, prefix)
 	replacedChars := strings.Replace(removedPrefix, "/", ".", -1)
 
-	return replacedChars
+	metricName := replacedChars + googlecloud.AlignersMapToSuffix[aligner]
+	return metricName
 }
 
 func getValueFromPoint(p *monitoring.Point) (out interface{}) {
