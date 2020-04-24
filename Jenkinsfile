@@ -966,22 +966,20 @@ def terraformStash(String name) {
 def startCloudTestEnv(String name, environments = []) {
   withCloudTestEnv() {
     withBeatsEnv(false) {
-      script {
-        def runAll = params.runAllCloudTests
-        def failed = false
-        for (environment in environments) {
-          if (environment.cond || runAll) {
-            try {
-              terraformApply(environment.dir)
-            } catch (Exception e) {
-              failed = true
-            }
+      def runAll = params.runAllCloudTests
+      def failed = false
+      for (environment in environments) {
+        if (environment.cond || runAll) {
+          try {
+            terraformApply(environment.dir)
+          } catch (Exception e) {
+            failed = true
           }
         }
-        terraformStash(name)
-        if (failed) {
-          error("Some environment failed to start")
-        }
+      }
+      terraformStash(name)
+      if (failed) {
+        error("Some environment failed to start")
       }
     }
   }
