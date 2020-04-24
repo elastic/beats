@@ -102,6 +102,10 @@ In {filebeat}, the new
 {filebeat-ref}/filebeat-input-cloudfoundry.html[`cloudfoundry`] input collects
 http access logs, container logs, and error logs from Cloud Foundry.
 
+To learn how to run {beats} on Cloud Foundry, see:
+
+* {metricbeat-ref}/running-on-cloudfoundry.html[Run {metricbeat} on Cloud Foundry]
+* {filebeat-ref}/running-on-cloudfoundry.html[Run {filebeat} on Cloud Foundry]
 
 [float]
 [role="xpack"]
