@@ -44,7 +44,6 @@ pipeline {
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash name: 'source', useDefaultExcludes: false
         makeTarget("Lint", "check")
       }
     }
