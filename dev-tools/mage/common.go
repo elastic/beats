@@ -822,9 +822,9 @@ func ListMatchingEnvVars(prefixes ...string) []string {
 	return vars
 }
 
-// CloudEnvVars returns the names of environment variables needed to configure
-// connections to cloud environments.
-func CloudEnvVars() []string {
+// IntegrationTestEnvVars returns the names of environment variables needed to configure
+// connections to integration test environments.
+func IntegrationTestEnvVars() []string {
 	// Environment variables that can be configured with paths to files
 	// with authentication information.
 	vars := []string{
