@@ -18,9 +18,9 @@
 package autodiscover
 
 import (
-	"github.com/elastic/beats/libbeat/keystore"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -37,7 +37,7 @@ type registry struct {
 
 	logger *logp.Logger
 
-	keystore   keystore.Keystore
+	keystore keystore.Keystore
 }
 
 // Registry holds all known autodiscover providers, they must be added to it to enable them for use

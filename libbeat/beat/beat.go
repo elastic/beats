@@ -68,7 +68,7 @@ type Beat struct {
 
 	ConfigManager management.ConfigManager // config manager
 
-	Keystore   keystore.Keystore
+	Keystore keystore.Keystore
 }
 
 // BeatConfig struct contains the basic configuration of every beat
