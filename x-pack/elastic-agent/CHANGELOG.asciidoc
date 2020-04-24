@@ -31,6 +31,7 @@
 - Fix default configuration after enroll {pull}18232[18232]
 - Fix make sure the collected logs or metrics include streams information. {pull}18261[18261]
 - Fix version to 7.8 {pull}18286[18286]
+- Fix an issue where the checkin_frequency, jitter, and backoff options where not configurable. {pull}17843[17843]
 
 ==== New features
 
