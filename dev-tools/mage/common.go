@@ -821,3 +821,28 @@ func ListMatchingEnvVars(prefixes ...string) []string {
 	}
 	return vars
 }
+
+// CloudEnvVars returns the names of environment variables needed to configure
+// connections to cloud environments.
+func CloudEnvVars() []string {
+	// Environment variables that can be configured with paths to files
+	// with authentication information.
+	vars := []string{
+		"AWS_SHARED_CREDENTIAL_FILE",
+		"AZURE_AUTH_LOCATION",
+		"GOOGLE_APPLICATION_CREDENTIALS",
+	}
+	// Environment variables with authentication information.
+	prefixes := []string{
+		"AWS_",
+		"AZURE_",
+
+		// Accepted by terraform, but not by many clients, including Beats
+		"GOOGLE_",
+		"GCLOUD_",
+	}
+	for _, prefix := range prefixes {
+		vars = append(vars, ListMatchingEnvVars(prefix)...)
+	}
+	return vars
+}

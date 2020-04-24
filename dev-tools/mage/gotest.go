@@ -137,6 +137,7 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
+	passThruEnvVars := CloudEnvVars()
 	return RunIntegTest("goIntegTest", func() error {
 		module := EnvOr("MODULE", "")
 		if module != "" {
@@ -163,7 +164,7 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 			return errors.New("integration tests failed")
 		}
 		return nil
-	})
+	}, passThruEnvVars...)
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an
