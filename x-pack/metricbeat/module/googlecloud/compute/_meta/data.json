@@ -5,8 +5,8 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "6889336735612324102",
-            "name": "gke-dev-oblt-dev-oblt-pool-83a8831b-kd53"
+            "id": "1174463293187628268",
+            "name": "gke-observability-8--observability-8--bc1afd95-ngmh"
         },
         "machine": {
             "type": "n1-standard-4"
@@ -40,7 +40,7 @@
         },
         "labels": {
             "metrics": {
-                "device_name": "disk-4",
+                "device_name": "disk-2",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
             },
