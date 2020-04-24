@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -122,9 +123,17 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
 		if r.config.Region != "" {
-			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, r.config.Region)
+			region := r.config.Region
+			if strings.HasSuffix(r.config.Region, "*") {
+				region = strings.TrimSuffix(r.config.Region, "*")
+			}
+			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
 		} else if r.config.Zone != "" {
-			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, r.config.Zone)
+			zone := r.config.Zone
+			if strings.HasSuffix(r.config.Zone, "*") {
+				zone = strings.TrimSuffix(r.config.Zone, "*")
+			}
+			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
 		}
 	}
 	return

@@ -73,7 +73,19 @@ func TestGetFilterForMetric(t *testing.T) {
 		{
 			"compute uptime with partial zone",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Region: "us-west1-"}, logger: logger},
+			stackdriverMetricsRequester{config: config{Zone: "us-west1-"}, logger: logger},
+			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
+		},
+		{
+			"compute uptime with wildcard in region",
+			"compute.googleapis.com/instance/uptime",
+			stackdriverMetricsRequester{config: config{Region: "us-*"}, logger: logger},
+			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-\")",
+		},
+		{
+			"compute uptime with wildcard in zone",
+			"compute.googleapis.com/instance/uptime",
+			stackdriverMetricsRequester{config: config{Region: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 	}
