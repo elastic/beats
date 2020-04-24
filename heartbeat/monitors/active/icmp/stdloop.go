@@ -96,6 +96,9 @@ func getStdLoop() (*stdICMPLoop, error) {
 	stdICMPLoopInit.Do(func() {
 		debugf("initializing ICMP loop")
 		stdICMPLoopSingleton, loopErr = newICMPLoop()
+		if loopErr == nil {
+			debugf("ICMP loop successfully initialized")
+		}
 	})
 	return stdICMPLoopSingleton, loopErr
 }
