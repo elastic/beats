@@ -358,29 +358,10 @@ pipeline {
             stage('Prepare cloud integration tests environments'){
               agent { label 'ubuntu && immutable' }
               options { skipDefaultCheckout() }
-              when {
-                expression {
-                  return params.runAllCloudTests || params.awsCloudTests
-                }
-              }
               steps {
-                // XXX: Refactor this as a function like this:
-                // startCloudTestEnv('x-pack-metricbeat', [
-                //   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
-                // ])
-                withCloudTestEnv() {
-                  withBeatsEnv(false) {
-                    script {
-                      try {
-                        whenTrue(params.runAllCloudTests || params.awsCloudTests) {
-                          terraformApply("x-pack/metricbeat/module/aws")
-                        }
-                      } finally {
-                        terraformStash("x-pack-metricbeat")
-                      }
-                    }
-                  }
-                }
+                startCloudTestEnv('x-pack-metricbeat', [
+                   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+                ])
               }
             }
             stage('Metricbeat x-pack'){
@@ -925,6 +906,8 @@ def isChangedXPackCode(patterns) {
   return isChanged(allPatterns)
 }
 
+// withCloudTestEnv executes a closure with credentials for cloud test
+// environments.
 def withCloudTestEnv(Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
@@ -973,7 +956,43 @@ def terraformStash(String name) {
   stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
 }
 
-// Looks for all terraform states in directory and runs terraform destroy for them
+
+// Start testing environment on cloud using terraform and stash its state
+// for manual cleanup if needed.
+//
+// Example:
+//   startCloudTestEnv('x-pack-metricbeat', [
+//     [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+//   ])
+//   ...
+//   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+def startCloudTestEnv(String name, environments = []) {
+  withCloudTestEnv() {
+    withBeatsEnv(false) {
+      script {
+        def runAll = params.runAllCloudTests
+        def failed = false
+        for (environment in environments) {
+          if (environment.cond || runAll) {
+            try {
+              terraformApply(environment.dir)
+            } catch (Exception e) {
+              failed = true
+            }
+          }
+        }
+        terraformStash(name)
+        if (failed) {
+          error("Some environment failed to start")
+        }
+      }
+    }
+  }
+}
+
+
+// Looks for all terraform states in directory and runs terraform destroy for them,
+// it uses terraform states previously stashed by startCloudTestEnv.
 def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
