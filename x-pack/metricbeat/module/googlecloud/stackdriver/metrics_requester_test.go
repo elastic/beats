@@ -85,7 +85,7 @@ func TestGetFilterForMetric(t *testing.T) {
 		{
 			"compute uptime with wildcard in zone",
 			"compute.googleapis.com/instance/uptime",
-			stackdriverMetricsRequester{config: config{Region: "us-west1-*"}, logger: logger},
+			stackdriverMetricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 	}
