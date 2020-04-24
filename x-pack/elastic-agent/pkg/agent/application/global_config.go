@@ -5,22 +5,10 @@
 package application
 
 import (
-	"os"
-	"path/filepath"
-
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
-
-var (
-	homePath string
-	dataPath string
-)
-
-func init() {
-	homePath = retrieveExecutablePath()
-	dataPath = retrieveDataPath()
-}
 
 // InjectAgentConfig injects config to a provided configuration.
 func InjectAgentConfig(c *config.Config) error {
@@ -37,24 +25,8 @@ func InjectAgentConfig(c *config.Config) error {
 func AgentGlobalConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"path": map[string]interface{}{
-			"data": dataPath,
-			"home": homePath,
+			"data": paths.Data(),
+			"home": paths.Home(),
 		},
 	}
-}
-
-// retrieveExecutablePath returns a directory where binary lives
-// Executable is not supported on nacl.
-func retrieveExecutablePath() string {
-	execPath, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-
-	return filepath.Dir(execPath)
-}
-
-// retrieveHomePath returns a home directory of current user
-func retrieveDataPath() string {
-	return filepath.Join(retrieveExecutablePath(), "data")
 }
