@@ -1,5 +1,5 @@
 [[running-on-cloudfoundry]]
-=== Running {beatname_uc} on Cloud Foundry
+=== Run {beatname_uc} on Cloud Foundry
 
 You can use {beatname_uc} on Cloud Foundry to retrieve and ship metrics.
 
@@ -14,18 +14,19 @@ endif::[]
 [float]
 ==== Cloud Foundry credentials
 
-{beatname_uc} needs credentials created with UAA so it can connect to loggregator to receive the logs. The uaac
+{beatname_uc} needs credentials created with UAA so it can connect to loggregator to receive the logs. The `uaac`
 command will create the required credentials for connecting to loggregator.
 
-["source", "sh"]
+["source","sh",subs="attributes"]
 ------------------------------------------------
 uaac client add {beatname_lc} --name {beatname_lc} --secret changeme --authorized_grant_types client_credentials,refresh_token --authorities doppler.firehose,cloud_controller.admin_read_only
 ------------------------------------------------
 
 [WARNING]
 =======================================
-*Use a unique secret:* The uaac command above is just an example and the secret should be changed and the
-`{beatname_lc}.yml` should be updated with your choosen secret.
+*Use a unique secret:* The `uaac` command shown here is an example. Remember to
+replace `changeme` with your secret, and update the +{beatname_lc}.yml+ file to
+use your chosen secret.
 =======================================
 
 
