@@ -32,8 +32,7 @@ pipeline {
     booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
 
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
-    // XXX: Set to false by default
-    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
 
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
@@ -60,9 +59,7 @@ pipeline {
     stage('Lint'){
       options { skipDefaultCheckout() }
       steps {
-        // XXX: Comment this in
-        // makeTarget("Lint", "check")
-        echo "skipping lint"
+        makeTarget("Lint", "check")
       }
     }
     stage('Build and Test'){
