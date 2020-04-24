@@ -1,5 +1,5 @@
 [[running-on-kubernetes]]
-=== Running {beatname_uc} on Kubernetes
+=== Run {beatname_uc} on Kubernetes
 
 You can use {beatname_uc} <<running-on-docker,Docker images>> on Kubernetes to
 retrieve and ship container logs.
