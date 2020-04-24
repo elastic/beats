@@ -35,7 +35,7 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        //stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Build Packages'){
@@ -211,7 +211,8 @@ def withBeatsEnv(Closure body) {
     "PYTHON_ENV=${WORKSPACE}/python-env"
   ]) {
     deleteDir()
-    unstash 'source'
+    //unstash 'source'
+    gitCheckout(basedir: "${BASE_DIR}")
     dir("${env.BASE_DIR}"){
       sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
       sh(label: "Install Mage", script: "make mage")
