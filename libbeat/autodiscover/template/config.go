@@ -18,7 +18,6 @@
 package template
 
 import (
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/conditions"
@@ -109,7 +108,10 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, keystoreEnab
 	}
 
 	if keystoreEnabled {
-		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(autodiscover.GetAutodiscoverKeystore())))
+		if val, ok := event["keystore"]; ok {
+			eventKeystore := val.(keystore.Keystore)
+			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(eventKeystore)))
+		}
 	}
 
 	for _, config := range configs {

@@ -20,7 +20,6 @@ package autodiscover
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -36,8 +35,6 @@ type registry struct {
 	appenders map[string]AppenderBuilder
 
 	logger *logp.Logger
-
-	keystore keystore.Keystore
 }
 
 // Registry holds all known autodiscover providers, they must be added to it to enable them for use
@@ -51,14 +48,4 @@ func NewRegistry() *registry {
 		appenders: make(map[string]AppenderBuilder, 0),
 		logger:    logp.NewLogger("autodiscover"),
 	}
-}
-
-// GetAutodiscoverKeystore returns the Keystore object that is coupled with the autodiscover registry
-func GetAutodiscoverKeystore() keystore.Keystore {
-	return Registry.keystore
-}
-
-// SetAutodiscoverKeystore sets the Keystore object that is coupled with the autodiscover registry
-func SetAutodiscoverKeystore(keystore keystore.Keystore) {
-	Registry.keystore = keystore
 }

@@ -21,6 +21,7 @@ package docker
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/keystore"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -55,10 +56,11 @@ type Provider struct {
 	stoppers      map[string]*time.Timer
 	stopTrigger   chan *dockerContainerMetadata
 	logger        *logp.Logger
+	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
@@ -115,6 +117,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
 		logger:        logger,
+		keystore:      keystore,
 	}, nil
 }
 
@@ -304,6 +307,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 
 func (d *Provider) publish(event bus.Event) {
 	// Try to match a config
+	event["keystore"] = d.keystore
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {

@@ -7,6 +7,7 @@ package ec2
 import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
@@ -33,10 +34,11 @@ type Provider struct {
 	stopListener  bus.Listener
 	watcher       *watcher
 	uuid          uuid.UUID
+	keystore keystore.Keystore
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 
 	config := awsauto.DefaultConfig()
@@ -78,12 +80,12 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 			config.AWSConfig.Endpoint, "ec2", region, awsCfg)))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher) (*Provider, error) {
+func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetcher fetcher, keystore keystore.Keystore) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, err
@@ -94,6 +96,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		bus:       bus,
 		templates: &mapper,
 		uuid:      uuid,
+		keystore: keystore,
 	}
 
 	p.watcher = newWatcher(

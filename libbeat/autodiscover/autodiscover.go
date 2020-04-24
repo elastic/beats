@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -72,6 +73,7 @@ func NewAutodiscover(
 	factory cfgfile.RunnerFactory,
 	configurer EventConfigurer,
 	config *Config,
+	keystore keystore.Keystore,
 ) (*Autodiscover, error) {
 	logger := logp.NewLogger("autodiscover")
 
@@ -81,7 +83,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := Registry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(bus, providerCfg, keystore)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}

@@ -308,7 +308,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		autodiscover.SetAutodiscoverKeystore(b.Keystore)
 		adiscover, err = autodiscover.NewAutodiscover(
 			"filebeat",
 			b.Publisher,
@@ -318,6 +317,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			),
 			autodiscover.QueryConfig(),
 			config.Autodiscover,
+			b.Keystore,
 		)
 		if err != nil {
 			return err

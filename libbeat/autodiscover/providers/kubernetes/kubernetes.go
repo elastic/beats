@@ -59,7 +59,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -99,6 +99,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		builders:  builders,
 		appenders: appenders,
 		logger:    logger,
+		keystore: keystore,
 	}
 
 	switch config.Resource {
@@ -138,6 +139,7 @@ func (p *Provider) String() string {
 
 func (p *Provider) publish(event bus.Event) {
 	// Try to match a config
+	event["keystore"] = p.keystore
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
