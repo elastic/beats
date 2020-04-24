@@ -5,8 +5,8 @@ The `pubsub` metricset contains all GA stage metrics exported from the https://c
 No special permissions are needed apart from the ones detailed in the module section of the docs.
 
 [float]
-=== Fields and labels
-Here is a list of fields `pubsub` metricset collects:
+=== Metrics
+Here is a list of metrics collected by `pubsub` metricset:
 
 [float]
 ==== Snapshot Metrics

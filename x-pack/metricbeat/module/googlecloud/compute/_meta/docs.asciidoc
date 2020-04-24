@@ -5,8 +5,8 @@ The `compute` metricset contains all metrics exported from the https://cloud.goo
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API]. This is enough to get most of the info associated with a metric like Compute labels and metadata and metric specific Labels.
 
 [float]
-=== Fields and labels
-Here is a list of fields `compute` metricset collects:
+=== Metrics and labels
+Here is a list of metrics collected by `compute` metricset:
 
 [float]
 ==== firewall

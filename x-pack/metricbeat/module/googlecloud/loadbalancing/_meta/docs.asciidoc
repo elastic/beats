@@ -3,8 +3,8 @@ Load Balancing metricset to fetch metrics from https://cloud.google.com/load-bal
 The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names have been left untouched for people already familiar with them.
 
 [float]
-=== Fields and labels
-Here is a list of fields `loadbalancing` metricset collects:
+=== Metrics
+Here is a list of metrics collected by `loadbalancing` metricset:
 
 [float]
 ==== https
