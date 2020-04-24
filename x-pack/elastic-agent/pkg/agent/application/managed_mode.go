@@ -11,8 +11,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"time"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -26,13 +24,8 @@ import (
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
 
-var gatewaySettings = &fleetGatewaySettings{
-	Duration: 2 * time.Second,
-	Jitter:   1 * time.Second,
-	Backoff: backoffSettings{
-		Init: 1 * time.Second,
-		Max:  10 * time.Second,
-	},
+type managementCfg struct {
+	Management *config.Config `config:"management"`
 }
 
 type apiClient interface {
@@ -87,10 +80,20 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
+	// merge local configuration and configuration persisted from fleet.
 	rawConfig.Merge(config)
 
 	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to unpack configuration from %s", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	// Extract only management related configuration.
+	managementCfg := &managementCfg{}
+	if err := rawConfig.Unpack(managementCfg); err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
 			errors.TypeFilesystem,
@@ -129,7 +132,15 @@ func newManaged(
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
+	emit := emitter(
+		log,
+		router,
+		&configModifiers{
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{filters.ConstraintFilter},
+		},
+		monitor,
+	)
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
@@ -175,7 +186,7 @@ func newManaged(
 	gateway, err := newFleetGateway(
 		managedApplication.bgContext,
 		log,
-		gatewaySettings,
+		managementCfg.Management,
 		agentInfo,
 		client,
 		actionDispatcher,
