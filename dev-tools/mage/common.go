@@ -226,15 +226,6 @@ func HaveDockerCompose() error {
 	return nil
 }
 
-// HaveKind returns an error if kind is not found on the PATH.
-func HaveKind() error {
-	_, err := exec.LookPath("kind")
-	if err != nil {
-		return fmt.Errorf("kind is not available")
-	}
-	return nil
-}
-
 // HaveKubectl returns an error if kind is not found on the PATH.
 func HaveKubectl() error {
 	_, err := exec.LookPath("kubectl")

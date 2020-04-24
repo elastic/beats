@@ -153,11 +153,14 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 			continue
 		}
 		foundModule = true
-		testEnv := NewIntegrationEnvFromDir(path.Join("./module", fi.Name()))
 
 		// Set MODULE because only want that modules tests to run inside the testing environment.
 		os.Setenv("MODULE", fi.Name())
-		err = RunIntegTest(testEnv, "goIntegTest", func() error {
+		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()))
+		if err != nil {
+			return errors.Wrapf(err, "test setup failed for module %s", fi.Name())
+		}
+		err = runners.Test("goIntegTest", func() error {
 			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
 			if err != nil {
 				return errors.Wrapf(err, "integration tests failed for module %s", fi.Name())

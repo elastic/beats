@@ -19,578 +19,323 @@ package mage
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
-	"strings"
-	"sync"
 
-	"github.com/pkg/errors"
-
+	"github.com/joeshaw/multierror"
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
 )
 
 const (
-	// TestingEnvDocker when using docker-compose
-	TestingEnvDocker = "docker-compose"
-	// TestingEnvKubernetes when using kubernetes
-	TestingEnvKubernetes = "kubernetes"
-
 	// BEATS_DOCKER_INTEGRATION_TEST_ENV is used to indicate that we are inside
-	// of the Docker integration test environment (e.g. in a container).
-	beatsDockerIntegrationTestEnvVar = "BEATS_DOCKER_INTEGRATION_TEST_ENV"
+	// of the integration test environment.
+	insideIntegrationTestEnvVar = "BEATS_DOCKER_INTEGRATION_TEST_ENV"
 )
 
 var (
-	integTestUseCount     int32      // Reference count for the integ test env.
-	integTestUseCountLock sync.Mutex // Lock to guard integTestUseCount.
+	globalIntegrationTesters        map[string]IntegrationTester
+	globalIntegrationTestSetupSteps IntegrationTestSteps
 
-	integTestLock sync.Mutex // Only allow one integration test at a time.
-
-	integTestBuildImagesOnce sync.Once // Build images one time for all integ testing.
-)
-
-// Integration Test Configuration
-var (
-	// StackEnvironment specifies what testing environment
-	// to use (like snapshot (default), latest, 5x). Formerly known as
-	// TESTING_ENVIRONMENT.
-	StackEnvironment = EnvOr("STACK_ENVIRONMENT", "snapshot")
-)
-
-// AddIntegTestUsage increments the use count for the integration test
-// environment and prevents it from being stopped until the last call to
-// StopIntegTestEnv(). You should also pair this with
-// 'defer StopIntegTestEnv()'.
-//
-// This allows for the same environment to be reused by multiple tests (like
-// both Go and Python) without tearing it down in between runs.
-func AddIntegTestUsage() {
-	if IsInIntegTestEnv() {
-		return
-	}
-
-	integTestUseCountLock.Lock()
-	defer integTestUseCountLock.Unlock()
-	integTestUseCount++
-}
-
-// StopIntegTestEnv will stop and removing the integration test environment
-// (e.g. docker-compose rm --stop --force) when there are no more users
-// of the environment.
-func StopIntegTestEnv(testEnv *IntegrationEnv) error {
-	if IsInIntegTestEnv() {
-		return nil
-	}
-
-	integTestUseCountLock.Lock()
-	defer integTestUseCountLock.Unlock()
-	if integTestUseCount == 0 {
-		panic("integTestUseCount is 0. Did you call AddIntegTestUsage()?")
-	}
-
-	integTestUseCount--
-	if integTestUseCount > 0 {
-		return nil
-	}
-
-	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
-		// Ignore error because it will be logged by RunIntegTest.
-		return nil
-	}
-
-	if _, skip := skipIntegTest(testEnv); skip {
-		return nil
-	}
-
-	if testEnv.HasType(TestingEnvDocker) {
-		composeEnv, err := integTestDockerComposeEnvVars()
-		if err != nil {
-			return err
-		}
-
-		// Stop docker-compose.
-		if mg.Verbose() {
-			fmt.Println(">> Stopping Docker test environment...")
-		}
-
-		// Docker-compose rm is noisy. So only pass through stderr when in verbose.
-		out := ioutil.Discard
-		if mg.Verbose() {
-			out = os.Stderr
-		}
-
-		_, err = sh.Exec(
-			composeEnv,
-			ioutil.Discard,
-			out,
-			"docker-compose",
-			"-p", dockerComposeProjectName(),
-			"rm", "--stop", "--force",
-		)
-		if err != nil {
-			return err
-		}
-	}
-	_, keepUp := os.LookupEnv("KIND_SKIP_DELETE")
-	if testEnv.HasType(TestingEnvKubernetes) && os.Getenv("KUBECONFIG") == "" && !keepUp {
-		kindEnv, err := integTestKindEnvVars("")
-		if err != nil {
-			return err
-		}
-
-		// Stop kind.
-		if mg.Verbose() {
-			fmt.Println(">> Stopping Kind test environment...")
-		}
-
-		_, err = sh.Exec(
-			kindEnv,
-			os.Stdout,
-			os.Stderr,
-			"kind",
-			"delete",
-			"cluster",
-			"--name",
-			kindClusterName(),
-		)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// RunIntegTest executes the given target inside the integration testing
-// environment (Docker).
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-// Use STACK_ENVIRONMENT=env to specify what testing environment
-// to use (like snapshot (default), latest, 5x).
-//
-// Always use this with AddIntegTestUsage() and defer StopIntegTestEnv().
-func RunIntegTest(testEnv *IntegrationEnv, mageTarget string, test func() error, passThroughEnvVars ...string) error {
-	if reason, skip := skipIntegTest(testEnv); skip {
-		fmt.Printf(">> %v: Skipping because %v\n", mageTarget, reason)
-		return nil
-	}
-
-	AddIntegTestUsage()
-	defer StopIntegTestEnv(testEnv)
-
-	env := []string{
+	defaultPassthroughEnvVars = []string{
 		"TEST_COVERAGE",
 		"RACE_DETECTOR",
 		"TEST_TAGS",
 		"PYTHON_EXE",
 		"MODULE",
+		"KUBECONFIG",
+		"KUBE_CONFIG",
 	}
-	env = append(env, passThroughEnvVars...)
-	return runInIntegTestEnv(testEnv, mageTarget, test, env...)
+)
+
+// RegisterIntegrationTester registers a integration tester.
+func RegisterIntegrationTester(tester IntegrationTester) {
+	if globalIntegrationTesters == nil {
+		globalIntegrationTesters = make(map[string]IntegrationTester)
+	}
+	globalIntegrationTesters[tester.Name()] = tester
 }
 
-func runInIntegTestEnv(testEnv *IntegrationEnv, mageTarget string, test func() error, passThroughEnvVars ...string) error {
-	if IsInIntegTestEnv() {
-		// Fix file permissions after test is done writing files as root.
-		if runtime.GOOS != "windows" {
-			defer DockerChown(".")
-		}
-		return test()
-	}
+// RegisterIntegrationTestSetupStep registers a integration step.
+func RegisterIntegrationTestSetupStep(step IntegrationTestSetupStep) {
+	globalIntegrationTestSetupSteps = append(globalIntegrationTestSetupSteps, step)
+}
 
-	// Test that we actually have Docker and docker-compose.
-	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
-		return errors.Wrapf(err, "failed to run %v target in integration environment", mageTarget)
-	}
+// IntegrationTestSetupStep is interface used by a step in the integration setup
+// chain. Example could be: Terraform -> Kind -> Kubernetes (IntegrationTester).
+type IntegrationTestSetupStep interface {
+	// Name is the name of the step.
+	Name() string
+	// Use returns true in the case that the step should be used. Not called
+	// when a step is defined as a dependency of a tester.
+	Use(dir string) (bool, error)
+	// Setup sets up the environment for the integration test.
+	Setup(env map[string]string) error
+	// Teardown brings down the environment for the integration test.
+	Teardown(env map[string]string) error
+}
 
-	// Pre-build a mage binary to execute inside docker so that we don't need to
-	// have mage installed inside the container.
-	mg.Deps(buildMage)
+// IntegrationTestSteps wraps all the steps and completes the in the order added.
+type IntegrationTestSteps []IntegrationTestSetupStep
 
-	// Determine the path to use inside the container.
-	repo, err := GetProjectRepoInfo()
-	if err != nil {
-		return err
-	}
-	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
+// Name is the name of the step.
+func (steps IntegrationTestSteps) Name() string {
+	return "IntegrationTestSteps"
+}
 
-	// Only allow one usage at a time.
-	integTestLock.Lock()
-	defer integTestLock.Unlock()
-
-	if testEnv.HasType(TestingEnvDocker) {
-		// Using docker build the images.
-		var err error
-		integTestBuildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
-		if err != nil {
-			return err
-		}
-
-		// Execute the test inside of docker-compose.
-		args := []string{"-p", dockerComposeProjectName(), "run",
-			"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
-			// Disable strict.perms because we moust host dirs inside containers
-			// and the UID/GID won't meet the strict requirements.
-			"-e", "BEAT_STRICT_PERMS=false",
-			// compose.EnsureUp needs to know the environment type.
-			"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
-			"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
-		}
-		if UseVendor {
-			args = append(args, "-e", "GOFLAGS=-mod=vendor")
-		}
-		args, err = addUidGidEnvArgs(args)
-		if err != nil {
-			return err
-		}
-		for _, envVar := range passThroughEnvVars {
-			args = append(args, "-e", envVar+"="+os.Getenv(envVar))
-		}
+// Setup calls Setup on each step in the order defined.
+//
+// In the case that Setup fails on a step, Teardown will be called on the previous
+// successful steps.
+func (steps IntegrationTestSteps) Setup(env map[string]string) error {
+	for i, step := range steps {
 		if mg.Verbose() {
-			args = append(args, "-e", "MAGEFILE_VERBOSE=1")
+			fmt.Printf("Setup %s...\n", step.Name())
 		}
-		args = append(args,
-			"-e", beatsDockerIntegrationTestEnvVar+"=true",
-			"beat", // Docker compose container name.
-			magePath,
-			mageTarget,
-		)
-
-		composeEnv, err := integTestDockerComposeEnvVars()
-		if err != nil {
-			return err
-		}
-
-		if mg.Verbose() {
-			fmt.Println(">> Starting docker test environment...")
-		}
-
-		_, err = sh.Exec(
-			composeEnv,
-			os.Stdout,
-			os.Stderr,
-			"docker-compose",
-			args...,
-		)
-		if err != nil {
-			return err
-		}
-	}
-	if testEnv.HasType(TestingEnvKubernetes) {
-		clusterName := kindClusterName()
-		stdOut := ioutil.Discard
-		stdErr := ioutil.Discard
-		if mg.Verbose() {
-			stdOut = os.Stdout
-			stdErr = os.Stderr
-		}
-
-		kubeConfig := os.Getenv("KUBECONFIG")
-		if kubeConfig == "" {
-			// Create a kubernetes cluster with kind.
-			if mg.Verbose() {
-				fmt.Println(">> Starting Kind test environment...")
+		if err := step.Setup(env); err != nil {
+			prev := i - 1
+			if prev >= 0 {
+				// errors ignored
+				_ = steps.teardownFrom(prev, env)
 			}
-
-			kubeCfgDir := filepath.Join("build", "kind", clusterName)
-			kubeCfgDir, err = filepath.Abs(kubeCfgDir)
-			if err != nil {
-				return err
-			}
-			kubeConfig = filepath.Join(kubeCfgDir, "kubecfg")
-			if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
-				return err
-			}
-
-			args := []string{
-				"create",
-				"cluster",
-				"--name",
-				kindClusterName(),
-				"--kubeconfig", kubeConfig,
-				"--wait",
-				"300s",
-			}
-			kubeVersion := os.Getenv("K8S_VERSION")
-			if kubeVersion != "" {
-				args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
-			}
-
-			_, err = sh.Exec(
-				map[string]string{},
-				stdOut,
-				stdErr,
-				"kind",
-				args...,
-			)
-			if err != nil {
-				return err
-			}
-		}
-
-		manifestPath, _ := testEnv.GetTypeSource(TestingEnvKubernetes)
-		kubeEnv, err := integTestKindEnvVars(kubeConfig)
-		if err != nil {
-			return err
-		}
-
-		if mg.Verbose() {
-			fmt.Println(">> Applying module manifest to cluster...")
-		}
-
-		// Apply the manifest from the module. Module uses the manifest as the
-		// base for running inside the cluster.
-		if err := KubectlApply(kubeEnv, stdOut, stdErr, manifestPath); err != nil {
-			return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
-		}
-		defer func() {
-			if mg.Verbose() {
-				fmt.Println(">> Deleting module manifest from cluster...")
-			}
-			if err := KubectlDelete(kubeEnv, stdOut, stdErr, manifestPath); err != nil {
-				log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
-			}
-		}()
-
-		// Execute the test inside of kubernetes.
-		remoteEnv := map[string]string{
-			beatsDockerIntegrationTestEnvVar: "true",
-			"BEAT_STRICT_PERMS":              "false",
-		}
-		if UseVendor {
-			remoteEnv["GOFLAGS"] = "-mod=vendor"
-		}
-		for _, envVar := range passThroughEnvVars {
-			remoteEnv[envVar] = os.Getenv(envVar)
-		}
-		if mg.Verbose() {
-			remoteEnv["MAGEFILE_VERBOSE"] = "1"
-		}
-		if mg.Verbose() {
-			fmt.Println(">> Executing tests inside of cluster...")
-		}
-
-		destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
-		workDir := filepath.Join(destDir, repo.SubDir)
-		remote, err := NewKubeRemote(kubeConfig, "default", clusterName, workDir, destDir, repo.RootDir)
-		if err != nil {
-			return err
-		}
-		// Uses `os.Stdout` directly as its output should always be shown.
-		err = remote.Run(remoteEnv, os.Stdout, stdErr, magePath, mageTarget)
-		if err != nil {
-			return err
+			return errors.Wrapf(err, "%s setup failed", step.Name())
 		}
 	}
 	return nil
 }
 
-// IsInIntegTestEnv return true if executing inside the integration test
-// environment.
-func IsInIntegTestEnv() bool {
-	_, found := os.LookupEnv(beatsDockerIntegrationTestEnvVar)
-	return found
+// Teardown calls Teardown in the reverse order defined.
+//
+// In the case a teardown step fails the error is recorded but the
+// previous steps teardown is still called. This guarantees that teardown
+// will always be called for each step.
+func (steps IntegrationTestSteps) Teardown(env map[string]string) error {
+	return steps.teardownFrom(len(steps)-1, env)
 }
 
-// IntegrationEnv represents the types of integrations environment the dir needs.
-type IntegrationEnv struct {
-	types map[string]string
+func (steps IntegrationTestSteps) teardownFrom(start int, env map[string]string) error {
+	var errs multierror.Errors
+	for i := start; i >= 0; i-- {
+		if mg.Verbose() {
+			fmt.Printf("Teardown %s...\n", steps[i].Name())
+		}
+		if err := steps[i].Teardown(env); err != nil {
+			errs = append(errs, errors.Wrapf(err, "%s teardown failed", steps[i].Name()))
+		}
+	}
+	return errs.Err()
 }
 
-// NewIntegrationEnvFromDir gets the integration environment for the dir.
-func NewIntegrationEnvFromDir(dir string) *IntegrationEnv {
+// IntegrationTester is interface used by the actual test runner.
+type IntegrationTester interface {
+	// Name returns the name of the tester.
+	Name() string
+	// Use returns true in the case that the tester should be used.
+	Use(dir string) (bool, error)
+	// HasRequirements returns an error if requirements are missing.
+	HasRequirements() error
+	// Test performs excecuting the test inside the environment.
+	Test(dir string, mageTarget string, env map[string]string) error
+	// InsideTest performs the actual test on the inside of environment.
+	InsideTest(test func() error) error
+	// StepRequirements returns the steps this tester requires. These
+	// are always placed before other autodiscover steps.
+	StepRequirements() IntegrationTestSteps
+}
+
+// IntegrationRunner performs the running of the integration tests.
+type IntegrationRunner struct {
+	steps  IntegrationTestSteps
+	tester IntegrationTester
+	dir    string
+	env    map[string]string
+}
+
+// IntegrationRunners is an array of multiple runners.
+type IntegrationRunners []*IntegrationRunner
+
+// NewIntegrationRunners returns the integration test runners discovered from the provided path.
+func NewIntegrationRunners(path string, passThroughEnvVars ...string) (IntegrationRunners, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	types := map[string]string{}
-	dockerFile := filepath.Join(cwd, dir, "docker-compose.yml")
-	if _, err := os.Stat(dockerFile); !os.IsNotExist(err) {
-		types[TestingEnvDocker] = dockerFile
-	}
-	kubeFile := filepath.Join(cwd, dir, "kubernetes.yml")
-	if _, err := os.Stat(kubeFile); !os.IsNotExist(err) {
-		types[TestingEnvKubernetes] = kubeFile
-	}
-	return &IntegrationEnv{types}
-}
+	dir := filepath.Join(cwd, path)
 
-// HasType returns true if the intergration type has that type.
-func (i *IntegrationEnv) HasType(t string) bool {
-	_, ok := i.types[t]
-	return ok
-}
-
-// GetTypeSource returns the source file that determined that type.
-func (i *IntegrationEnv) GetTypeSource(t string) (string, bool) {
-	source, ok := i.types[t]
-	return source, ok
-}
-
-func haveIntegTestEnvRequirements(testEnv *IntegrationEnv) error {
-	if testEnv.HasType(TestingEnvDocker) || testEnv.HasType(TestingEnvKubernetes) {
-		if err := HaveDocker(); err != nil {
-			return err
-		}
-	}
-	if testEnv.HasType(TestingEnvDocker) {
-		if err := HaveDockerCompose(); err != nil {
-			return err
-		}
-	}
-	if testEnv.HasType(TestingEnvKubernetes) {
-		if err := HaveKubectl(); err != nil {
-			return err
-		}
-		// kind is only required when KUBECONFIG is not already set
-		kubecfg := os.Getenv("KUBECONFIG")
-		if kubecfg == "" {
-			if err := HaveKind(); err != nil {
-				return err
+	// Load the overall steps to use (skipped inside of test environment, as they are never ran on the inside).
+	// These steps are duplicated per scenario.
+	var steps IntegrationTestSteps
+	if !IsInIntegTestEnv() {
+		for _, step := range globalIntegrationTestSetupSteps {
+			use, err := step.Use(dir)
+			if err != nil {
+				return nil, errors.Wrapf(err, "%s step failed on Use", step.Name())
+			}
+			if use {
+				steps = append(steps, step)
 			}
 		}
 	}
-	return nil
+
+	// Create the runners (can only be multiple).
+	var runners IntegrationRunners
+	for _, t := range globalIntegrationTesters {
+		use, err := t.Use(dir)
+		if err != nil {
+			return nil, errors.Wrapf(err, "%s tester failed on Use", t.Name())
+		}
+		if use {
+			// Create the steps for the specific runner.
+			var runnerSteps IntegrationTestSteps
+			requirements := t.StepRequirements()
+			if requirements != nil {
+				runnerSteps = append(runnerSteps, requirements...)
+			}
+			runnerSteps = append(runnerSteps, steps...)
+
+			// Create the custom env for the runner.
+			env := map[string]string{
+				insideIntegrationTestEnvVar: "true",
+			}
+			passThroughEnvs(env, defaultPassthroughEnvVars...)
+			passThroughEnvs(env, passThroughEnvVars...)
+			if mg.Verbose() {
+				env["MAGEFILE_VERBOSE"] = "1"
+			}
+			if UseVendor {
+				env["GOFLAGS"] = "-mod=vendor"
+			}
+
+			runner := &IntegrationRunner{
+				steps:  runnerSteps,
+				tester: t,
+				dir:    dir,
+				env:    env,
+			}
+			runners = append(runners, runner)
+		}
+	}
+	return runners, nil
 }
 
-// skipIntegTest returns true if integ tests should be skipped.
-func skipIntegTest(testEnv *IntegrationEnv) (reason string, skip bool) {
-	if IsInIntegTestEnv() {
-		// When test should run under kubernetes we need to ensure we are actually
-		// inside of a kubernetes.
-		_, insideK8s := os.LookupEnv("KUBERNETES_SERVICE_HOST")
-		if testEnv.HasType(TestingEnvKubernetes) && !insideK8s {
-			return "not inside of kubernetes", true
-		}
+// NewDockerIntegrationRunner returns an intergration runner configured only for docker.
+func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunner, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	tester, ok := globalIntegrationTesters["docker"]
+	if !ok {
+		return nil, fmt.Errorf("docker integration test runner not registered")
+	}
+	var runnerSteps IntegrationTestSteps
+	requirements := tester.StepRequirements()
+	if requirements != nil {
+		runnerSteps = append(runnerSteps, requirements...)
+	}
 
-		return "", false
+	// Create the custom env for the runner.
+	env := map[string]string{
+		insideIntegrationTestEnvVar: "true",
+	}
+	passThroughEnvs(env, defaultPassthroughEnvVars...)
+	passThroughEnvs(env, passThroughEnvVars...)
+	if mg.Verbose() {
+		env["MAGEFILE_VERBOSE"] = "1"
+	}
+	if UseVendor {
+		env["GOFLAGS"] = "-mod=vendor"
+	}
+
+	runner := &IntegrationRunner{
+		steps:  runnerSteps,
+		tester: tester,
+		dir:    cwd,
+		env:    env,
+	}
+	return runner, nil
+}
+
+// Test actually performs the test.
+func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err error) {
+	// Inside the testing environment just run the test.
+	if IsInIntegTestEnv() {
+		err = r.tester.InsideTest(test)
+		return
 	}
 
 	// Honor the TEST_ENVIRONMENT value if set.
 	if testEnvVar, isSet := os.LookupEnv("TEST_ENVIRONMENT"); isSet {
-		enabled, err := strconv.ParseBool(testEnvVar)
+		var enabled bool
+		enabled, err = strconv.ParseBool(testEnvVar)
 		if err != nil {
-			panic(errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value"))
+			err = errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value")
 		}
-		return "TEST_ENVIRONMENT=" + testEnvVar, !enabled
+		if !enabled {
+			err = fmt.Errorf("TEST_ENVIRONMENT=%s", testEnvVar)
+			return
+		}
 	}
 
-	// Otherwise skip if we don't have all the right dependencies.
-	if err := haveIntegTestEnvRequirements(testEnv); err != nil {
-		// Skip if we don't meet the requirements.
-		log.Println("Skipping integ test because:", err)
-		return err.Error(), true
+	if err = r.steps.Setup(r.env); err != nil {
+		return
 	}
 
-	return "", false
-}
+	// catch any panics to run teardown
+	inTeardown := false
+	defer func() {
+		if recoverErr := recover(); recoverErr != nil {
+			err = recoverErr.(error)
+			if !inTeardown {
+				// ignore errors
+				_ = r.steps.Teardown(r.env)
+			}
+		}
+	}()
 
-// integTestDockerComposeEnvVars returns the environment variables used for
-// executing docker-compose (not the variables passed into the containers).
-// docker-compose uses these when evaluating docker-compose.yml files.
-func integTestDockerComposeEnvVars() (map[string]string, error) {
-	esBeatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]string{
-		"ES_BEATS":          esBeatsDir,
-		"STACK_ENVIRONMENT": StackEnvironment,
-		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).
-		"TESTING_ENVIRONMENT": StackEnvironment,
-	}, nil
-}
-
-// integTestKindEnvVars returns the environment variables used for
-// executing kind (not the variables passed into the containers).
-func integTestKindEnvVars(kubeConfig string) (map[string]string, error) {
-	return map[string]string{
-		"KUBECONFIG": kubeConfig,
-	}, nil
-}
-
-// dockerComposeProjectName returns the project name to use with docker-compose.
-// It is passed to docker-compose using the `-p` flag. And is passed to our
-// Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
-// environment variable.
-func dockerComposeProjectName() string {
-	commit, err := CommitHash()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
-	}
-
-	version, err := BeatQualifiedVersion()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct docker compose project name"))
-	}
-	version = strings.NewReplacer(".", "_").Replace(version)
-
-	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
-	projectName = MustExpand(projectName, map[string]interface{}{
-		"StackEnvironment": StackEnvironment,
-		"ShortCommit":      commit[:10],
-		"Version":          version,
-	})
-	return projectName
-}
-
-// kindClusterName returns the cluster name to use with kind.
-// It is passed to kind. And is passed to our Go and Python testing libraries
-// through the KIND_CLUSTER_NAME environment variable.
-func kindClusterName() string {
-	commit, err := CommitHash()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct kind cluster name"))
-	}
-
-	version, err := BeatQualifiedVersion()
-	if err != nil {
-		panic(errors.Wrap(err, "failed to construct kind cluster name"))
-	}
-	version = strings.NewReplacer(".", "_").Replace(version)
-
-	clusterName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
-	clusterName = MustExpand(clusterName, map[string]interface{}{
-		"StackEnvironment": StackEnvironment,
-		"ShortCommit":      commit[:10],
-		"Version":          version,
-	})
-	return clusterName
-}
-
-// dockerComposeBuildImages builds all images in the docker-compose.yml file.
-func dockerComposeBuildImages() error {
-	fmt.Println(">> Building docker images")
-
-	composeEnv, err := integTestDockerComposeEnvVars()
-	if err != nil {
-		return err
-	}
-
-	args := []string{"-p", dockerComposeProjectName(), "build", "--force-rm"}
-	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
-		args = append(args, "--no-cache")
-	}
-
-	if _, forcePull := os.LookupEnv("DOCKER_PULL"); forcePull {
-		args = append(args, "--pull")
-	}
-
-	out := ioutil.Discard
 	if mg.Verbose() {
-		out = os.Stderr
+		fmt.Printf(">> Running testing inside of %s...\n", r.tester.Name())
 	}
 
-	_, err = sh.Exec(
-		composeEnv,
-		out,
-		os.Stderr,
-		"docker-compose", args...,
-	)
-	return err
+	err = r.tester.Test(r.dir, mageTarget, r.env)
+
+	if mg.Verbose() {
+		fmt.Printf(">> Done running testing inside of %s...\n", r.tester.Name())
+	}
+
+	inTeardown = true
+	if teardownErr := r.steps.Teardown(r.env); teardownErr != nil {
+		if err == nil {
+			// test didn't error, but teardown did
+			err = teardownErr
+		}
+	}
+	return
+}
+
+// Test runs the test on each runner and collects the errors.
+func (r IntegrationRunners) Test(mageTarget string, test func() error) error {
+	var errs multierror.Errors
+	for _, runner := range r {
+		if err := runner.Test(mageTarget, test); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs.Err()
+}
+
+func passThroughEnvs(env map[string]string, passthrough ...string) {
+	for _, envName := range passthrough {
+		val, set := os.LookupEnv(envName)
+		if set {
+			env[envName] = val
+		}
+	}
+}
+
+// IsInIntegTestEnv return true if executing inside the integration test environment.
+func IsInIntegTestEnv() bool {
+	_, found := os.LookupEnv(insideIntegrationTestEnvVar)
+	return found
 }
