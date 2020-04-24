@@ -70,6 +70,15 @@ in the manifest file:
 If you are using Red Hat OpenShift, you need to specify additional settings in
 the manifest file and enable the container to run as privileged.
 
+. Modify the `DaemonSet` container spec in the manifest file:
++
+[source,yaml]
+-----
+  securityContext:
+    runAsUser: 0
+    privileged: true
+-----
+
 . In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
 specify the following settings under `kubernetes.yml` in the `data` section:
 +
@@ -88,7 +97,26 @@ specify the following settings under `kubernetes.yml` in the `data` section:
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.certificate_authorities:
-        - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        - /path/to/kubelet-service-ca.crt
+-----
+NOTE: `kubelet-service-ca.crt` can be any CA bundle that contains the issuer of the certificate used in the Kubelet API.
+According to each specific installation of Openshift this can be found either in `secrets` or in `configmaps`.
+In some installations it can be available as part of the service account secret, in
+`/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt`.
+In case of using Openshift installer[https://github.com/openshift/installer/blob/master/docs/user/gcp/install.md]
+for GCP then the following `configmap` can be mounted in Metricbeat Pod and use `ca-bundle.crt`
+in `ssl.certificate_authorities`:
++
+[source,shell]
+-----
+Name:         kubelet-serving-ca
+Namespace:    openshift-kube-apiserver
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+ca-bundle.crt:
 -----
 
 . Under the `metricbeat` ClusterRole, add the following resources:
