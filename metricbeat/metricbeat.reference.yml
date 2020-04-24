@@ -1279,6 +1279,9 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
 
@@ -1564,6 +1567,9 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
 
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
@@ -2150,6 +2156,9 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
 
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password

@@ -139,7 +139,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		Timeout: s.Timeout,
 	}
 
-	if s.Kerberos != nil {
+	if s.Kerberos.IsEnabled() {
 		c := &http.Client{
 			Transport: &http.Transport{
 				Dial:            dialer.Dial,
