@@ -55,8 +55,15 @@ spec:
           mountPath: /etc/heartbeat.yml
           readOnly: true
           subPath: heartbeat.yml
+        - name: data
+          mountPath: /usr/share/heartbeat/data
       volumes:
       - name: config
         configMap:
           defaultMode: 0600
           name: heartbeat-deployment-config
+      - name: data
+        hostPath:
+          path: /var/lib/heartbeat-data
+          type: DirectoryOrCreate
+
