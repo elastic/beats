@@ -37,6 +37,8 @@ for regions that are available in GCP.
 
 * *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
 
+* *period*: A single time duration specified for this module collection frequency.
+
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone
@@ -92,7 +94,7 @@ under `us-central1` region in `elastic-observability` project.
 Authentication and authorization in Google Cloud Platform can be achieved in many ways. For the current version of the Google Cloud Platform module for Metricbeat, the only supported method is using Service Account JSON files. A typical JSON with a private key looks like this:
 
 [float]
-==== Example Credentials
+=== Example Credentials
 [source,json]
 ----
 {
@@ -127,7 +129,9 @@ Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics
 
 If you also want to *extract service labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
 
-A recommended `period` value between fetches is between 5 and 10 minutes, depending on how granular you want your metrics. GCP restricts information for less than 5 minutes.
+If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
+GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
+In googlecloud module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
 [float]
 === Rough estimation of the number of API Calls
@@ -166,13 +170,21 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+  region: "us-central1"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
+
+- module: googlecloud
+  metricsets:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 60s
 
 - module: googlecloud
   metricsets:
@@ -204,6 +216,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-googlecloud-pubsub,pubsub>>
 
+* <<metricbeat-metricset-googlecloud-stackdriver,stackdriver>>
+
 * <<metricbeat-metricset-googlecloud-storage,storage>>
 
 include::googlecloud/compute.asciidoc[]
@@ -211,6 +225,8 @@ include::googlecloud/compute.asciidoc[]
 include::googlecloud/loadbalancing.asciidoc[]
 
 include::googlecloud/pubsub.asciidoc[]
+
+include::googlecloud/stackdriver.asciidoc[]
 
 include::googlecloud/storage.asciidoc[]
 
