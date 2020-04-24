@@ -44,6 +44,7 @@ pipeline {
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
+        stash name: 'source', useDefaultExcludes: false
         makeTarget("Lint", "check")
       }
     }
@@ -628,7 +629,12 @@ pipeline {
 
 def checkoutBeats() {
   deleteDir()
-  gitCheckout(basedir: "${BASE_DIR}")
+  if (goos() == 'windows') {
+    // gitCmd is not implemented for Windows
+    unstash 'source'
+  } else {
+    gitCheckout(basedir: "${BASE_DIR}")
+  }
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
