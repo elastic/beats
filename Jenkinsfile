@@ -948,14 +948,9 @@ def terraformApply(String directory) {
   }
 }
 
-def terraformStash(String name) {
-  archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
-  stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
-}
-
-
-// Start testing environment on cloud using terraform and stash its state
-// for manual cleanup if needed.
+// Start testing environment on cloud using terraform. Terraform files are
+// stashed so they can be used by other stages. They are also archived in
+// case manual cleanup is needed.
 //
 // Example:
 //   startCloudTestEnv('x-pack-metricbeat', [
@@ -967,20 +962,17 @@ def startCloudTestEnv(String name, environments = []) {
   withCloudTestEnv() {
     withBeatsEnv(false) {
       def runAll = params.runAllCloudTests
-      def failed = false
-      for (environment in environments) {
-        if (environment.cond || runAll) {
-          try {
+      try {
+        for (environment in environments) {
+          if (environment.cond || runAll) {
             terraformApply(environment.dir)
-          } catch (Exception e) {
-            failed = true
           }
         }
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
-      terraformStash(name)
-      if (failed) {
-        error("Some environment failed to start")
-      }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
     }
   }
 }
