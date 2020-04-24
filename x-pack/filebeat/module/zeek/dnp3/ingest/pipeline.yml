@@ -10,31 +10,6 @@ processors:
 - remove:
     field: zeek.dnp3.ts
 - set:
-    field: event.id
-    value: '{{zeek.session_id}}'
-    if: ctx.zeek.session_id != null
-- set:
-    field: source.ip
-    value: '{{source.address}}'
-- set:
-    field: destination.ip
-    value: '{{destination.address}}'
-- set:
-    field: event.kind
-    value: event
-- append:
-    field: event.category
-    value: network
-- append:
-    field: event.type
-    value: connection
-- append:
-    field: event.type
-    value: protocol
-- append:
-    field: event.type
-    value: info
-- set:
     field: event.action
     value: '{{zeek.dnp3.function.request}}'
     if: "ctx?.zeek?.dnp3?.function?.request != null"

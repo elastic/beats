@@ -69,7 +69,4 @@ processors:
             outcome: failure
 {{ if .community_id }}
   - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
 {{ end }}

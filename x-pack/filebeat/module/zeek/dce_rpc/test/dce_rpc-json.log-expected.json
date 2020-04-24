@@ -13,13 +13,14 @@
         "event.kind": "event",
         "event.module": "zeek",
         "event.type": [
-            "protocol",
             "connection",
+            "protocol",
             "info"
         ],
         "fileset.name": "dce_rpc",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:SJNAD5vtzZuhQjGtfaI8svTnyuw=",
         "network.protocol": "dce_rpc",
         "network.transport": "tcp",
         "related.ip": [

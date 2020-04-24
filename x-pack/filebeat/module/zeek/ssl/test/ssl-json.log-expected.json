@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2019-01-17T01:32:16.805Z",
+        "client.address": "10.178.98.102",
         "destination.address": "35.199.178.4",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
@@ -32,6 +33,7 @@
             "10.178.98.102",
             "35.199.178.4"
         ],
+        "server.address": "35.199.178.4",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
@@ -70,6 +72,7 @@
     },
     {
         "@timestamp": "2019-01-17T01:32:16.805Z",
+        "client.address": "10.178.98.102",
         "destination.address": "35.199.178.4",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
@@ -101,6 +104,7 @@
             "10.178.98.102",
             "35.199.178.4"
         ],
+        "server.address": "35.199.178.4",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",

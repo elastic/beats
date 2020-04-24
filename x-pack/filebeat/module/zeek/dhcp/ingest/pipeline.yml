@@ -13,49 +13,6 @@ processors:
     field: event.id
     value: '{{zeek.session_id}}'
     if: ctx.zeek.session_id != null
-- set:
-    field: source.address
-    value: '{{zeek.dhcp.address.client}}'
-    if: ctx.zeek.dhcp.address?.client != null
-- set:
-    field: client.address
-    value: '{{zeek.dhcp.address.client}}'
-    if: ctx.zeek.dhcp.address?.client != null
-- set:
-    field: destination.address
-    value: '{{zeek.dhcp.address.server}}'
-    if: ctx.zeek.dhcp.address?.server != null
-- set:
-    field: server.address
-    value: '{{zeek.dhcp.address.server}}'
-    if: ctx.zeek.dhcp.address?.server != null
-- set:
-    field: source.ip
-    value: '{{source.address}}'
-    if: ctx.source?.address != null
-- set:
-    field: destination.ip
-    value: '{{destination.address}}'
-    if: ctx.destination?.address != null
-- set:
-    field: network.name
-    value: '{{zeek.dhcp.domain}}'
-    if: ctx.zeek.dhcp.domain != null
-- set:
-    field: event.kind
-    value: event
-- append:
-    field: event.category
-    value: network
-- append:
-    field: event.type
-    value: connection
-- append:
-    field: event.type
-    value: protocol
-- append:
-    field: event.type
-    value: info
 - append:
     field: related.ip
     value: '{{source.ip}}'

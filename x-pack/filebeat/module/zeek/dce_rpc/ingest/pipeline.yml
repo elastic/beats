@@ -7,15 +7,8 @@ processors:
     field: zeek.dce_rpc.ts
     formats:
     - UNIX
-- set:
-    field: event.id
-    value: '{{zeek.session_id}}'
-    if: ctx.zeek.session_id != null
 - remove:
     field: zeek.dce_rpc.ts
-- set:
-    field: source.ip
-    value: '{{source.address}}'
 - append:
     field: related.ip
     value: '{{source.ip}}'
@@ -38,9 +31,6 @@ processors:
     field: source.as.organization_name
     target_field: source.as.organization.name
     ignore_missing: true
-- set:
-    field: destination.ip
-    value: '{{destination.address}}'
 - append:
     field: related.ip
     value: '{{destination.ip}}'
@@ -63,21 +53,6 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
-- set:
-    field: event.kind
-    value: event
-- append:
-    field: event.category
-    value: network
-- append:
-    field: event.type
-    value: protocol
-- append:
-    field: event.type
-    value: connection
-- append:
-    field: event.type
-    value: info
 - set:
     field: event.action
     value: '{{zeek.dce_rpc.operation}}'

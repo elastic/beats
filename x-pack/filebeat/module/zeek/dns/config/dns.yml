@@ -112,7 +112,7 @@ processors:
 
         function addTopLevelDomain(evt) {
             var rd = evt.Get("dns.question.registered_domain");
-            if (rd == null) {
+            if (!rd) {
                 return;
             }
             var firstPeriod = rd.indexOf(".");
@@ -194,7 +194,7 @@ processors:
           - info
           - protocol
 {{ if .community_id }}
-  - community_id: ~
+  - community_id:
 {{ end }}
   - timestamp:
       ignore_missing: true

@@ -7,6 +7,7 @@
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
+            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -65,6 +66,7 @@
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
+            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -122,6 +124,7 @@
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
+            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -177,6 +180,7 @@
         "destination.ip": "198.51.100.249",
         "destination.packets": 0,
         "event.category": [
+            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
