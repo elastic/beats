@@ -95,7 +95,7 @@ func TestSetupNginx(t *testing.T) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
+	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-pipeline", "", nil, nil)
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../module")
@@ -115,7 +115,7 @@ func TestSetupNginx(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
+	status, _, _ := client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-pipeline", "", nil, nil)
 	assert.Equal(t, 200, status)
 	status, _, _ = client.Request("GET", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 	assert.Equal(t, 200, status)
