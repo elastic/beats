@@ -464,6 +464,24 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1138,23 +1156,6 @@ setup.kibana:
   # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
-  # Authentication type to use with Kerberos. Available options: keytab, password.
-  #kerberos.auth_type: password
-
-  # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/elastic.keytab
-
-  # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/krb5.conf
-
-  # Name of the Kerberos user.
-  #kerberos.username: elastic
-
-  # Password of the Kerberos user. It is used when auth_type is set to password.
-  #kerberos.password: changeme
-
-  # Kerberos realm.
-  #kerberos.realm: ELASTIC
 
 
 #================================ Logging ======================================
@@ -1334,6 +1335,24 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
   #metrics.period: 10s
   #state.period: 1m
