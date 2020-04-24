@@ -28,16 +28,11 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(Fields)
 	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -145,7 +140,11 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+// Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
+// Use any other NOSE_* environment variable to influence the behavior of
+// nosetests.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
@@ -153,5 +152,5 @@ func PythonIntegTest(ctx context.Context) error {
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	})
+	}, devtools.ListMatchingEnvVars("NOSE_")...)
 }
