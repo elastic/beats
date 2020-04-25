@@ -161,7 +161,7 @@ func NewInput(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the input will be loaded and updated. All other states will not be touched.
 func (p *Input) loadStates(states []file.State) error {
-	logp.Debug("input", "exclude_files: %s. Number of stats: %d", p.config.ExcludeFiles, len(states))
+	logp.Debug("input", "exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
