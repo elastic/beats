@@ -31,30 +31,30 @@ func TestMergeHosts(t *testing.T) {
 		expectedCfg *common.Config
 	}{
 		"no_hosts": {
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{}),
+			expectedCfg: newConfigWithHosts(),
 		},
 		"only_reporter_hosts": {
-			reporterCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
+			reporterCfg: newConfigWithHosts("r1", "r2"),
+			expectedCfg: newConfigWithHosts("r1", "r2"),
 		},
 		"only_output_hosts": {
-			outCfg:      common.MustNewConfigFrom(map[string][]string{"hosts": []string{"o1", "o2"}}),
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"o1", "o2"}}),
+			outCfg:      newConfigWithHosts("o1", "o2"),
+			expectedCfg: newConfigWithHosts("o1", "o2"),
 		},
 		"equal_hosts": {
-			outCfg:      common.MustNewConfigFrom(map[string][]string{"hosts": []string{"o1", "o2"}}),
-			reporterCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
+			outCfg:      newConfigWithHosts("o1", "o2"),
+			reporterCfg: newConfigWithHosts("r1", "r2"),
+			expectedCfg: newConfigWithHosts("r1", "r2"),
 		},
 		"more_output_hosts": {
-			outCfg:      common.MustNewConfigFrom(map[string][]string{"hosts": []string{"o1", "o2"}}),
-			reporterCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1"}}),
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1"}}),
+			outCfg:      newConfigWithHosts("o1", "o2"),
+			reporterCfg: newConfigWithHosts("r1"),
+			expectedCfg: newConfigWithHosts("r1"),
 		},
 		"more_reporter_hosts": {
-			outCfg:      common.MustNewConfigFrom(map[string][]string{"hosts": []string{"o1"}}),
-			reporterCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),
+			outCfg:      newConfigWithHosts("o1"),
+			reporterCfg: newConfigWithHosts("r1", "r2"),
+			expectedCfg: newConfigWithHosts("r1", "r2"),
 		},
 	}
 
@@ -67,4 +67,11 @@ func TestMergeHosts(t *testing.T) {
 			require.Equal(t, test.expectedCfg, mergedCfg)
 		})
 	}
+}
+
+func newConfigWithHosts(hosts ...string) *common.Config {
+	if len(hosts) == 0 {
+		return common.MustNewConfigFrom(map[string][]string{})
+	}
+	return common.MustNewConfigFrom(map[string][]string{"hosts": hosts})
 }
