@@ -111,23 +111,22 @@ jobs:
     # Metricbeat
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C metricbeat unit-tests coverage-report"
+      env: TARGETS="-C metricbeat unit-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
-      env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C metricbeat integration-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat vendor || travis_terminate 0
-      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C metricbeat system-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
-
     - os: osx
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
+      env: TARGETS="-C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -137,6 +136,21 @@ jobs:
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/metricbeat unit-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/metricbeat integration-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/metricbeat metricbeat libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/metricbeat system-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
       env: TARGETS="-C x-pack/metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test

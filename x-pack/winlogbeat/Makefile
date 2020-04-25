@@ -7,4 +7,4 @@ GOX_OS   := windows
 #
 # Includes
 #
-include ../../dev-tools/make/xpack.mk
+include ../../dev-tools/make/mage.mk
