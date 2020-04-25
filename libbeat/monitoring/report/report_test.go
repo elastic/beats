@@ -31,7 +31,7 @@ func TestMergeHosts(t *testing.T) {
 		expectedCfg *common.Config
 	}{
 		"no_hosts": {
-			expectedCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{}}),
+			expectedCfg: common.MustNewConfigFrom(map[string][]string{}),
 		},
 		"only_reporter_hosts": {
 			reporterCfg: common.MustNewConfigFrom(map[string][]string{"hosts": []string{"r1", "r2"}}),

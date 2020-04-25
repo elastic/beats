@@ -186,21 +186,23 @@ func mergeHosts(merged, outCfg, reporterCfg *common.Config) error {
 		}
 	}
 
+	if len(outputHosts.Hosts) == 0 && len(reporterHosts.Hosts) == 0 {
+		return nil
+	}
+
 	// Give precedence to reporter hosts over output hosts
-	var newHosts hostsCfg
+	var newHostsCfg *common.Config
+	var err error
 	if len(reporterHosts.Hosts) > 0 {
-		newHosts = reporterHosts
+		newHostsCfg, err = common.NewConfigFrom(reporterHosts.Hosts)
 	} else {
-		newHosts = outputHosts
+		newHostsCfg, err = common.NewConfigFrom(outputHosts.Hosts)
+	}
+	if err != nil {
+		return errw.Wrap(err, "unable to make config from new hosts")
 	}
 
-	if merged.HasField("hosts") {
-		if _, err := merged.Remove("hosts", -1); err != nil {
-			return errw.Wrap(err, "unable to remove hosts from merged config")
-		}
-	}
-
-	if err := merged.Merge(newHosts); err != nil {
+	if err := merged.SetChild("hosts", -1, newHostsCfg); err != nil {
 		return errw.Wrap(err, "unable to set new hosts into merged config")
 	}
 	return nil
