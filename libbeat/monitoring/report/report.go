@@ -169,7 +169,7 @@ func collectSubObject(cfg *common.Config) *common.Config {
 
 func mergeHosts(merged, outCfg, reporterCfg *common.Config) error {
 	if merged == nil {
-		return nil
+		merged = common.NewConfig()
 	}
 
 	outputHosts := hostsCfg{}
