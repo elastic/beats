@@ -147,6 +147,6 @@ fields to be used when storing event data in {es}.
 In 7.7, we've improved ECS field mappings in numerous {filebeat} modules,
 making it easier for you to analyze, visualize, and correlate data across
 events. For a list of affected modules, see the 
-<<release-notes,Release Notes>> for 7.7.0.
+{beats-ref}/release-notes.html[Release Notes] for 7.7.0.
 
 // end::notable-highlights[]
