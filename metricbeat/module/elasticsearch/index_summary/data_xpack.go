@@ -51,11 +51,20 @@ var (
 			"is_throttled":            c.Bool("is_throttled"),
 			"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
 		}),
+		"bulk": bulkDict,
 		"search": c.Dict("search", s.Schema{
 			"query_total":          c.Int("query_total"),
 			"query_time_in_millis": c.Int("query_time_in_millis"),
 		}),
 	}
+
+	bulkDict = c.Dict("bulk", s.Schema{
+		"total_operations":     c.Int("total_operations"),
+		"total_time_in_millis": c.Int("total_time_in_millis"),
+		"total_size_in_bytes":  c.Int("total_size_in_bytes"),
+		"avg_time_in_millis":   c.Int("avg_time_in_millis"),
+		"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
+	}, c.DictOptional)
 )
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
