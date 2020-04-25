@@ -127,9 +127,6 @@ func getReporterConfig(
 				return "", nil, err
 			}
 
-			outCfg.PrintDebugf("outCfg")
-			rc.PrintDebugf("rc")
-
 			merged, err := common.MergeConfigs(outCfg, rc)
 			if err != nil {
 				return "", nil, err
