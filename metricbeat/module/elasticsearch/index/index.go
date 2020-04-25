@@ -34,7 +34,7 @@ func init() {
 }
 
 const (
-	statsMetrics = "docs,fielddata,indexing,merge,search,segments,store,refresh,query_cache,request_cache"
+	statsMetrics = "docs,fielddata,indexing,bulk,merge,search,segments,store,refresh,query_cache,request_cache"
 	statsPath    = "/_stats/" + statsMetrics + "?filter_path=indices"
 )
 
