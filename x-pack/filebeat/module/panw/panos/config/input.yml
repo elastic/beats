@@ -18,6 +18,19 @@ exclude_files: [".gz$"]
 tags: {{.tags}}
 
 processors:
+  - add_fields:
+      target: '@metadata'
+      fields:
+        internal:
+          disable_host_metadata: true
+
+  - add_fields:
+      target: 'observer'
+      fields:
+        type: firewall
+        vendor: Palo Alto Networks
+        product: PAN-OS
+
   - add_locale: ~
 
   - decode_csv_fields:
