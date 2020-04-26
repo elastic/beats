@@ -28,9 +28,10 @@ import (
 )
 
 type testCase struct {
-	event common.MapStr
-	want  common.MapStr
-	cfg   []string
+	event    common.MapStr
+	want     common.MapStr
+	wantMeta common.MapStr
+	cfg      []string
 }
 
 func testProcessors(t *testing.T, cases map[string]testCase) {
@@ -63,6 +64,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 			}
 
 			assert.Equal(t, test.want, current.Fields)
+			assert.Equal(t, test.wantMeta, current.Meta)
 		})
 	}
 }

@@ -27,6 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 )
 
 type group struct {
@@ -63,6 +65,31 @@ func newGeneralizeProcessor(keepNull bool) *processorFn {
 var dropDisabledProcessor = newProcessor("dropDisabled", func(event *beat.Event) (*beat.Event, error) {
 	return nil, nil
 })
+
+var dropInternalMetadata = newProcessor("dropInternalMetadata", func(event *beat.Event) (*beat.Event, error) {
+	event.Delete("@metadata.internal")
+	return event, nil
+})
+
+// builtinHostName returns a processor that conditionally adds 'host' to the
+// event if host metadata is not explicitly disabled via metadata in the event.
+// If fields does not contain 'host' this returns nil.
+func builtinHostName(fields common.MapStr, shared, overwrite bool) processors.Processor {
+	host, found := fields["host"]
+	if !found {
+		return nil
+	}
+	delete(fields, "host")
+
+	addHostName := actions.NewAddFields(common.MapStr{"host": host}, shared, overwrite)
+	return newProcessor("addHostName", func(event *beat.Event) (*beat.Event, error) {
+		if add_host_metadata.IsDisabled(event) {
+			return event, nil
+		}
+
+		return addHostName.Run(event)
+	})
+}
 
 func newGroup(title string, log *logp.Logger) *group {
 	return &group{

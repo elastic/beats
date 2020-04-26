@@ -308,7 +308,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 5: client processor list
 	processors.add(localProcessors)
 
-	// setup 6: add beats and host metadata
+	// setup 6: conditionally add host.name
+	if addHostName := builtinHostName(builtin, needsCopy, false); addHostName != nil {
+		processors.add(addHostName)
+	}
+
+	// setup 7: add beats metadata
 	if meta := builtin; len(meta) > 0 {
 		processors.add(actions.NewAddFields(meta, needsCopy, false))
 	}
@@ -321,12 +326,15 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
 	}
 
-	// setup 10: debug print final event (P)
+	// step 10: drop @metadata.internal.
+	processors.add(dropInternalMetadata)
+
+	// setup 11: debug print final event (P)
 	if b.log.IsDebug() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
-	// setup 11: drop all events if outputs are disabled (P)
+	// setup 12: drop all events if outputs are disabled (P)
 	if drop {
 		processors.add(dropDisabledProcessor)
 	}

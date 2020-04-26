@@ -42,6 +42,12 @@ func TestAddFields(t *testing.T) {
 			},
 			cfg: single(`{add_fields: {target: my, fields: {field: test}}}`),
 		},
+		"@metadata target": {
+			event:    common.MapStr{},
+			want:     common.MapStr{},
+			wantMeta: common.MapStr{"field": "test"},
+			cfg:      single(`{add_fields: {target: '@metadata', fields: {field: test}}}`),
+		},
 		"overwrite existing field": {
 			event: common.MapStr{
 				"fields": common.MapStr{"field": "old"},

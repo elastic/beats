@@ -81,8 +81,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	err := p.loadData()
-	if err != nil {
+	if IsDisabled(event) {
+		return event, nil
+	}
+
+	// Refresh host data when it is stale.
+	if err := p.loadData(); err != nil {
 		return nil, err
 	}
 
@@ -145,4 +149,19 @@ func (p *addHostMetadata) loadData() error {
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
+}
+
+// IsDisabled returns true if the event contains the
+// @metadata.internal.disable_host_metadata field with a value of true. This
+// indicates that pipeline should not add any host metadata.
+//
+// This feature should be removed in 8.0 in favor of changes to not add host
+// metadata by default.
+func IsDisabled(event *beat.Event) bool {
+	v, err := event.GetValue("@metadata.internal.disable_host_metadata")
+	if err != nil {
+		return false
+	}
+	disabled, _ := v.(bool)
+	return disabled
 }

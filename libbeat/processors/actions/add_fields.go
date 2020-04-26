@@ -72,15 +72,28 @@ func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.
 }
 
 func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
+	target := event.Fields
 	fields := af.fields
 	if af.shared {
 		fields = fields.Clone()
 	}
 
+	// Handle targeting @metadata.
+	if len(fields) == 1 {
+		if metaFields, _ := fields["@metadata"].(common.MapStr); metaFields != nil {
+			fields = metaFields
+
+			if event.Meta == nil {
+				event.Meta = common.MapStr{}
+			}
+			target = event.Meta
+		}
+	}
+
 	if af.overwrite {
-		event.Fields.DeepUpdate(fields)
+		target.DeepUpdate(fields)
 	} else {
-		event.Fields.DeepUpdateNoOverwrite(fields)
+		target.DeepUpdateNoOverwrite(fields)
 	}
 
 	return event, nil
