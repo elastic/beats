@@ -12,7 +12,7 @@
       {
         "kv": {
           "field": "syslog5424_sd",
-          "field_split": " (?=[a-z]+=)",
+          "field_split": " (?=[a-z\\_\\-]+=)",
           "value_split": "=",
           "prefix": "fortinet.firewall.",
           "ignore_missing": true,
@@ -46,8 +46,15 @@
       },
       {
         "set": {
+          "field": "event.dataset",
+          "value": "fortinet.firewall"
+        }
+      },
+      {
+        "set": {
           "field": "event.timezone",
-          "value": "{{fortinet.firewall.tz}}"
+          "value": "{{fortinet.firewall.tz}}",
+          "if": "ctx.fortinet?.firewall?.tz != null"
         }
       },
       {
@@ -69,7 +76,16 @@
           "field": "_temp.time",
           "target_field": "@timestamp", 
           "formats": ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss Z", "ISO8601"],
-          "timezone": "{{fortinet.firewall.tz}}"
+          "timezone": "{{fortinet.firewall.tz}}",
+          "if": "ctx.fortinet?.firewall?.tz != null"
+        }
+      },
+      {
+        "date": {
+          "field": "_temp.time",
+          "target_field": "@timestamp", 
+          "formats": ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss Z", "ISO8601"],
+          "if": "ctx.fortinet?.firewall?.tz == null"
         }
       },
       {
@@ -88,6 +104,64 @@
         }
       },
       {
+        "rename": {
+          "field": "fortinet.firewall.devname",
+          "target_field": "observer.name",
+          "ignore_missing": true
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.duration",
+          "target_field": "event.duration",
+          "ignore_missing": true
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.devid",
+          "target_field": "observer.serial_number",
+          "ignore_missing": true
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.dstintf",
+          "target_field": "observer.egress.interface.name",
+          "ignore_missing": true,
+          "if": "ctx.observer?.egress?.interface?.name == null"
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.srcintf",
+          "target_field": "observer.ingress.interface.name",
+          "ignore_missing": true,
+          "if": "ctx.observer?.ingress?.interface?.name == null"
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.dst_int",
+          "target_field": "observer.egress.interface.name",
+          "ignore_missing": true
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.src_int",
+          "target_field": "observer.ingress.interface.name",
+          "ignore_missing": true
+        }
+      },
+      {
+        "rename": {
+          "field": "fortinet.firewall.level",
+          "target_field": "log.level",
+          "ignore_missing": true
+        }
+      },
+      {
         "remove": {
           "field": [
             "_temp",
@@ -97,7 +171,8 @@
             "fortinet.firewall.tz",
             "fortinet.firewall.date",
             "fortinet.firewall.eventtime",
-            "fortinet.firewall.time"
+            "fortinet.firewall.time",
+            "host"
           ],
           "ignore_missing": true
         }

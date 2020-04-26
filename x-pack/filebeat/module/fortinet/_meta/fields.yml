@@ -1,9 +1,10 @@
 - key: fortinet
-  title: "fortinet"
+  title: Fortinet
   description: >
     fortinet Module
   fields:
     - name: fortinet
       type: group
       description: >
+        Fields from fortinet FortiOS
       fields:

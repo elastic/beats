@@ -3,282 +3,183 @@
   "processors": [
     {
       "set": {
-        "field": "server.ip",
-        "value": "{{fortinet.firewall.dstip}}",
-        "if": "ctx.fortinet?.firewall?.dstip != null"
+        "field": "event.kind",
+        "value": "event"
       }
     },
     {
-      "set": {
-        "field": "server.ip",
-        "value": "{{fortinet.firewall.remip}}",
-        "if": "ctx.fortinet?.firewall?.remip != null && ctx.server?.ip == null"
+      "append": {
+        "field": "event.type",
+        "value": "denied",
+        "if": "['block', 'blocked'].contains(ctx.fortinet?.firewall?.action)"
       }
     },
     {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{fortinet.firewall.dstip}}",
-        "if": "ctx.fortinet?.firewall?.dstip != null"
+      "append": {
+        "field": "event.type",
+        "value": "info",
+        "if": "ctx.fortinet?.firewall?.subtype == 'dns'"
       }
     },
     {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{fortinet.firewall.remip}}",
-        "if": "ctx.fortinet?.firewall?.remip != null && ctx.destination?.ip == null"
+      "append": {
+        "field": "event.type",
+        "value": "allowed",
+        "if": "['pass', 'passthrough'].contains(ctx.fortinet?.firewall?.action)"
       }
     },
     {
-      "set": {
-        "field": "server.port",
-        "value": "{{fortinet.firewall.dst_port}}",
-        "if": "ctx.fortinet?.firewall?.dst_port != null"
+      "append": {
+        "field": "event.category",
+        "value": "network"
       }
     },
     {
-      "set": {
-        "field": "server.port",
-        "value": "{{fortinet.firewall.remport}}",
-        "if": "ctx.fortinet?.firewall?.remport != null && ctx.destination?.port == null"
+      "rename": {
+        "field": "fortinet.firewall.dstip",
+        "target_field": "destination.ip",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "destination.port",
-        "value": "{{fortinet.firewall.dst_port}}",
-        "if": "ctx.fortinet?.firewall?.dst_port != null"
+      "rename": {
+        "field": "fortinet.firewall.remip",
+        "target_field": "destination.ip",
+        "ignore_missing": true,
+        "if": "ctx.destination?.ip == null"
       }
     },
     {
-      "set": {
-        "field": "destination.port",
-        "value": "{{fortinet.firewall.remport}}",
-        "if": "ctx.fortinet?.firewall?.remport != null && ctx.destination?.port == null"
+      "rename": {
+        "field": "fortinet.firewall.dst_port",
+        "target_field": "destination.port",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "server.port",
-        "value": "{{fortinet.firewall.dstport}}",
-        "if": "ctx.fortinet?.firewall?.dstport != null && ctx.server?.port == null"
+      "rename": {
+        "field": "fortinet.firewall.remport",
+        "target_field": "destination.port",
+        "ignore_missing": true,
+        "if": "ctx.destination?.port == null"
       }
     },
     {
-      "set": {
-        "field": "destination.port",
-        "value": "{{fortinet.firewall.dstport}}",
-        "if": "ctx.fortinet?.firewall?.dstport != null && ctx.destination?.port == null"
+      "rename": {
+        "field": "fortinet.firewall.dstport",
+        "target_field": "destination.port",
+        "ignore_missing": true,
+        "if": "ctx.destination?.port == null"
       }
     },
     {
-      "set": {
-        "field": "server.bytes",
-        "value": "{{fortinet.firewall.rcvdbyte}}",
-        "if": "ctx.fortinet?.firewall?.rcvdbyte != null"
+      "rename": {
+        "field": "fortinet.firewall.rcvdbyte",
+        "target_field": "destination.bytes",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "destination.bytes",
-        "value": "{{fortinet.firewall.rcvdbyte}}",
-        "if": "ctx.fortinet?.firewall?.rcvdbyte != null"
+      "rename": {
+        "field": "fortinet.firewall.recipient",
+        "target_field": "destination.user.email",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "server.user.email",
-        "value": "{{fortinet.firewall.recipient}}",
-        "if": "ctx.fortinet?.firewall?.recipient != null"
+      "rename": {
+        "field": "fortinet.firewall.group",
+        "target_field": "source.user.group.name",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "destination.user.email",
-        "value": "{{fortinet.firewall.recipient}}",
-        "if": "ctx.fortinet?.firewall?.recipient != null"
+      "rename": {
+        "field": "fortinet.firewall.locip",
+        "target_field": "source.ip",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "source.user.group.name",
-        "value": "{{fortinet.firewall.group}}",
-        "if": "ctx.fortinet?.firewall?.group != null"
+      "rename": {
+        "field": "fortinet.firewall.locport",
+        "target_field": "source.port",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "client.user.group.name",
-        "value": "{{fortinet.firewall.group}}",
-        "if": "ctx.fortinet?.firewall?.group != null"
+      "rename": {
+        "field": "fortinet.firewall.src_port",
+        "target_field": "source.port",
+        "ignore_missing": true,
+        "if": "ctx.source?.port == null"
       }
     },
     {
-      "set": {
-        "field": "source.ip",
-        "value": "{{fortinet.firewall.locip}}",
-        "if": "ctx.fortinet?.firewall?.locip != null"
+      "rename": {
+        "field": "fortinet.firewall.sentbyte",
+        "target_field": "source.bytes",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "client.ip",
-        "value": "{{fortinet.firewall.locip}}",
-        "if": "ctx.fortinet?.firewall?.locip != null"
+      "rename": {
+        "field": "fortinet.firewall.srcdomain",
+        "target_field": "source.domain",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "source.port",
-        "value": "{{fortinet.firewall.locport}}",
-        "if": "ctx.fortinet?.firewall?.locport != null"
+      "rename": {
+        "field": "fortinet.firewall.srcip",
+        "target_field": "source.ip",
+        "ignore_missing": true,
+        "if": "ctx.source?.ip == null"
       }
     },
     {
-      "set": {
-        "field": "source.port",
-        "value": "{{fortinet.firewall.src_port}}",
-        "if": "ctx.fortinet?.firewall?.src_port != null && ctx.source.port == null"
+      "rename": {
+        "field": "fortinet.firewall.srcmac",
+        "target_field": "source.mac",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "client.port",
-        "value": "{{fortinet.firewall.locport}}",
-        "if": "ctx.fortinet?.firewall?.locport != null"
+      "rename": {
+        "field": "fortinet.firewall.srcport",
+        "target_field": "source.port",
+        "ignore_missing": true,
+        "if": "ctx.source?.port == null"
       }
     },
     {
-      "set": {
-        "field": "client.port",
-        "value": "{{fortinet.firewall.src_port}}",
-        "if": "ctx.fortinet?.firewall?.src_port != null && ctx.client.port == null"
+      "rename": {
+        "field": "fortinet.firewall.unauthuser",
+        "target_field": "source.user.name",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "source.bytes",
-        "value": "{{fortinet.firewall.sentbyte}}",
-        "if": "ctx.fortinet?.firewall?.sentbyte != null"
+      "rename": {
+        "field": "fortinet.firewall.user",
+        "target_field": "source.user.name",
+        "ignore_missing": true,
+        "if": "ctx.source?.user?.name == null"
       }
     },
     {
-      "set": {
-        "field": "client.bytes",
-        "value": "{{fortinet.firewall.sentbyte}}",
-        "if": "ctx.fortinet?.firewall?.sentbyte != null"
+      "rename": {
+        "field": "fortinet.firewall.sender",
+        "target_field": "source.user.email",
+        "ignore_missing": true
       }
     },
     {
-      "set": {
-        "field": "source.domain",
-        "value": "{{fortinet.firewall.srcdomain}}",
-        "if": "ctx.fortinet?.firewall?.srcdomain != null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.domain",
-        "value": "{{fortinet.firewall.srcdomain}}",
-        "if": "ctx.fortinet?.firewall?.srcdomain != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{fortinet.firewall.srcip}}",
-        "if": "ctx.fortinet?.firewall?.srcip != null && ctx.source?.ip == null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.ip",
-        "value": "{{fortinet.firewall.srcip}}",
-        "if": "ctx.fortinet?.firewall?.srcip != null && ctx.client?.ip == null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.mac",
-        "value": "{{fortinet.firewall.srcmac}}",
-        "if": "ctx.fortinet?.firewall?.srcmac != null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.mac",
-        "value": "{{fortinet.firewall.srcmac}}",
-        "if": "ctx.fortinet?.firewall?.srcmac != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.port",
-        "value": "{{fortinet.firewall.srcport}}",
-        "if": "ctx.fortinet?.firewall?.srcport != null && ctx.source?.port == null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.port",
-        "value": "{{fortinet.firewall.srcport}}",
-        "if": "ctx.fortinet?.firewall?.srcport != null && ctx.client?.port == null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.user.name",
-        "value": "{{fortinet.firewall.unauthuser}}",
-        "if": "ctx.fortinet?.firewall?.unauthuser != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.user.name",
-        "value": "{{fortinet.firewall.user}}",
-        "if": "ctx.fortinet?.firewall?.user != null && ctx.source?.user?.name == null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.user.name",
-        "value": "{{fortinet.firewall.unauthuser}}",
-        "if": "ctx.fortinet?.firewall?.unauthuser != null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.user.name",
-        "value": "{{fortinet.firewall.user}}",
-        "if": "ctx.fortinet?.firewall?.user != null && ctx.client?.user?.name == null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.user.email",
-        "value": "{{fortinet.firewall.sender}}",
-        "if": "ctx.fortinet?.firewall?.sender != null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.user.email",
-        "value": "{{fortinet.firewall.sender}}",
-        "if": "ctx.fortinet?.firewall?.sender != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.user.email",
-        "value": "{{fortinet.firewall.from}}",
-        "if": "ctx.fortinet?.firewall?.from != null && ctx.source?.user?.email == null"
-      }
-    },
-    {
-      "set": {
-        "field": "client.user.email",
-        "value": "{{fortinet.firewall.from}}",
-        "if": "ctx.fortinet?.firewall?.from != null && ctx.client?.user?.email == null"
+      "rename": {
+        "field": "fortinet.firewall.from",
+        "target_field": "source.user.email",
+        "ignore_missing": true,
+        "if": "ctx.source?.user?.email == null"
       }
     },
     {
@@ -318,10 +219,12 @@
       }
     },
     {
-      "rename": {
-        "field": "fortinet.firewall.devid",
-        "target_field": "observer.serial_number",
-        "ignore_missing": true
+      "gsub": {
+        "field": "rule.category",
+        "pattern": "\\.",
+        "replacement": "-",
+        "ignore_missing": true,
+        "if": "ctx.rule?.category != null"
       }
     },
     {
@@ -337,29 +240,6 @@
         "target_field": "network.direction",
         "ignore_missing": true,
         "if": "ctx.network?.direction == null"
-      }
-    },
-    {
-      "rename": {
-        "field": "fortinet.firewall.dst_int",
-        "target_field": "observer.egress.interface.name",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "fortinet.firewall.dstintf",
-        "target_field": "observer.egress.interface.name",
-        "ignore_missing": true,
-        "if": "ctx.observer?.egress?.interface?.name == null"
-      }
-    },
-    {
-      "rename": {
-        "field": "fortinet.firewall.dstintf",
-        "target_field": "observer.egress.interface.name",
-        "ignore_missing": true,
-        "if": "ctx.observer?.egress?.interface?.name == null"
       }
     },
     {
@@ -556,31 +436,15 @@
     },
     {
       "rename": {
-        "field": "fortinet.firewall.reason",
-        "target_field": "event.reason",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
         "field": "fortinet.firewall.service",
         "target_field": "network.protocol",
         "ignore_missing": true
       }
     },
     {
-      "rename": {
-        "field": "fortinet.firewall.src_int",
-        "target_field": "observer.ingress.interface.name",
+      "lowercase": {
+        "field": "network.protocol",
         "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "fortinet.firewall.srcintf",
-        "target_field": "observer.ingress.interface.name",
-        "ignore_missing": true,
-        "if": "ctx.observer?.ingress?.interface?.name == null"
       }
     },
     {
@@ -599,7 +463,7 @@
     },
     {
       "rename": {
-        "field": "fortinet.firewall.scertname",
+        "field": "fortinet.firewall.scertcname",
         "target_field": "tls.client.server_name",
         "ignore_missing": true
       }
@@ -640,6 +504,68 @@
       }
     },
     {
+      "geoip" : {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true,
+        "if": "ctx.source?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "field": "destination.ip",
+        "target_field": "destination.geo",
+        "ignore_missing": true,
+        "if": "ctx.destination?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.asn",
+        "target_field": "source.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
       "remove": {
         "field": [
           "fortinet.firewall.locip",
@@ -650,6 +576,9 @@
           "fortinet.firewall.srcport",
           "fortinet.firewall.srcdomain",
           "fortinet.firewall.srcmac",
+          "fortinet.firewall.group",
+          "fortinet.firewall.sender",
+          "fortinet.firewall.from",
           "fortinet.firewall.unauthuser",
           "fortinet.firewall.user",
           "fortinet.firewall.sentbyte",
