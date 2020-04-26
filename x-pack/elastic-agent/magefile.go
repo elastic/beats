@@ -20,15 +20,16 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 const (
@@ -48,6 +49,7 @@ var Aliases = map[string]interface{}{
 
 func init() {
 	common.RegisterCheckDeps(Update, Check.All)
+	test.RegisterDeps(UnitTest)
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
@@ -421,20 +423,9 @@ func combineErr(errors ...error) error {
 	return e
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // UnitTest performs unit test on agent.
 func UnitTest() {
 	mg.Deps(Test.All)
-}
-
-// IntegTest calls go integtest, we dont have python integ test so far
-// TODO: call integtest mage package when python tests are available
-func IntegTest() {
-	os.Create(filepath.Join("build", "TEST-go-integration.out"))
 }
 
 // BuildFleetCfg embed the default fleet configuration as part of the binary.
@@ -445,11 +436,6 @@ func BuildFleetCfg() error {
 
 	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
-}
-
-// Fields placeholder methods to fix the windows build.
-func Fields() error {
-	return nil
 }
 
 // Enroll runs agent which enrolls before running.
