@@ -297,6 +297,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}
+		file["hash"] = hashes
+		// Remove this for 8.x
 		out.MetricSetFields.Put("hash", hashes)
 	}
 
