@@ -78,6 +78,9 @@
                   description: List of common name (CN) of issuing certificate authority.
                   example: DigiCert SHA2 High Assurance Server CA
                   default_field: false
+                  multi_fields:
+                    - name: text
+                      type: wildcard
                 - name: distinguished_name
                   type: keyword
                   ignore_above: 1024
@@ -142,6 +145,9 @@
                   description: List of common names (CN) of subject.
                   example: r2.shared.global.fastly.net
                   default_field: false
+                  multi_fields:
+                    - name: text
+                      type: wildcard
                 - name: subject.distinguished_name
                   type: keyword
                   ignore_above: 1024
