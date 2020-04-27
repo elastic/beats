@@ -111,6 +111,7 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, keystoreEnab
 		if val, ok := event["keystore"]; ok {
 			eventKeystore := val.(keystore.Keystore)
 			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(eventKeystore)))
+			delete(event, "keystore")
 		}
 	}
 
