@@ -46,7 +46,7 @@ type ConfigItem struct {
 var configList = []ConfigItem{
 	{
 		Key:  "project_name",
-		Help: "Enter the beat name",
+		Help: "Enter the beat name here",
 		Default: func(cfg map[string]string) string {
 			return "examplebeat"
 		},
