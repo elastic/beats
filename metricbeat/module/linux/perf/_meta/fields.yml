@@ -48,7 +48,60 @@
         - name: time_enabled
           type: long
           description: >
-            Counter for total time perf has been enabled.
+            Counter for total time perf has been enabled. 
+        - name: time_running
+          type: long
+          description: >
+            Counter for total time perf has been running.
+    - name: hardware_events
+      type: group
+      description: >
+        perf hardware events
+      fields: 
+        - name: cpu_cycles
+          type: long
+          description: >
+            Count of total cycles.
+        - name: instructions
+          type: long
+          description: >
+            Count of retried instructions.
+        - name: cache_refs
+          type: long
+          description: >
+            Cache accesses.
+        - name: cache_misses
+          type: long
+          description: >
+            Cache misses.
+        - name: branch_instr
+          type: long
+          description: >
+            Retried branch instructions
+        - name: branch_misses
+          type: long
+          description: >
+            mispredicted branch instructions
+        - name: bus_cycles
+          type: long
+          description: >
+            Count of bus cycles.
+        - name: stalled_cycles_frontend
+          type: long
+          description: >
+            Count of stalled cycles during issue.
+        - name: stalled_cycles_backend
+          type: long
+          description: >
+            Count of cycles stalled during retirement
+        - name: ref_cpu_cycles
+          type: long
+          description: >
+            Total cycles not affected by CPU scaling
+        - name: time_enabled
+          type: long
+          description: >
+            Counter for total time perf has been enabled. 
         - name: time_running
           type: long
           description: >

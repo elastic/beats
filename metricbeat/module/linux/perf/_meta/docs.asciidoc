@@ -1,1 +1,30 @@
-The `perf` metricsret of the linux module provides insight into running applications via the perf subsystem.
+The `perf` metricsret of the linux module provides insight into running applications via the perf subsystem. This requires elevated permissions.
+Metrics in Perf are divided into two sections: software counters and hardware counters. Hardware counters are usually unavailable on virtualized systems.
+
+
+[float]
+=== Configuration
+
+Perf configuration is based on process globs that are matched to PIDs:
+
+```
+- module: linux
+  period: 10s
+  metricsets:
+     - perf
+  enabled: true
+  #hostfs: /hostfs
+  perf.sample_period: 3s
+  perf.processes:
+    - process: "systemd"
+      events:
+        hardware: false
+        software: true
+
+```
+
+The `sample_period` metric is universal across all monitored processes. This metric is heavily impacted by the module-wide `period` setting: `perf.sample_period` is a fraction of `linux.period`. 
+In the above, the module `period` setting is 10 seconds, and the `sample_period` is 3 seconds. This means that 3 seconds of performace counters will be gathered every 7 seconds. if `period` is equal to `sample_period`, the processes will be monitored continiously, leading to higher overhead.
+
+
+`perf.process` is a list of process names to monitor. The `process` value is treated as a glob which is matched to a list of running processes, meaning one `process` value may result in multiple processes being monitored. 

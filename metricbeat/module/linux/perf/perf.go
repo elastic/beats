@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package perf
 
 import (
@@ -48,9 +65,8 @@ type perfInfo struct {
 
 // procInfo contains all the controlling information on a given PID.
 type procInfo struct {
-	PID      int
-	Metadata common.MapStr
-	// For a given process, CPUs are mapped to profilers.
+	PID          int
+	Metadata     common.MapStr
 	SoftwareProc perf.SoftwareProfiler
 	HardwareProc perf.HardwareProfiler
 }
@@ -70,7 +86,6 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux perf metricset is beta.")
-
 	linuxModule, ok := base.Module().(*linux.Module)
 	if !ok {
 		return nil, errors.New("unexpected module type")
@@ -84,6 +99,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Sample period of %s exceeds metricset period of %s", config.SamplePeriod, linuxModule.Period)
 	}
 
+	if config.SamplePeriod == 0 {
+		return nil, fmt.Errorf("Sample Period is zero")
+	}
+
 	var isContinuoius = false
 	if config.SamplePeriod == linuxModule.Period {
 		isContinuoius = true
@@ -94,12 +113,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error gathering processes")
 	}
 
+	if len(procList) == 0 {
+		return nil, fmt.Errorf("no processes found that match provided config")
+	}
+
 	if isContinuoius {
 		err := startMonitor(procList)
 		if err != nil {
 			return nil, errors.Wrap(err, "error starting monitor")
 		}
 	}
+
+	// This perf library is Not So Good and eats errors that come from perf_event_open
+	// Do a quck test using a lower-level API to make sure we can actually access perf APIs
+	testP, err := perf.NewMinorFaultsProfiler(procList[0].PID, -1)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating profiler for Minor Page faults")
+	}
+	testP.Close()
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -113,7 +144,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-
 	perfData, err := runSampleForPeriod(m.processes, m.period, m.continuous)
 	if err != nil {
 		return errors.Wrap(err, "error running sample")
@@ -172,7 +202,6 @@ func startMonitor(toSample []procInfo) error {
 
 // runSampleForPeriod starts a sample, sleeps for a given period, then collects metrics.
 func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius bool) ([]perfInfo, error) {
-
 	if !isContinuoius {
 		err := startMonitor(toSample)
 		if err != nil {
@@ -225,17 +254,19 @@ func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius
 
 // Close closes the metricset
 func (m *MetricSet) Close() error {
-
 	for _, pid := range m.processes {
-
-		err := pid.HardwareProc.Stop()
-		if err != nil {
-			return errors.Wrap(err, "error starting HW profiler")
+		if pid.HardwareProc != nil {
+			err := pid.HardwareProc.Stop()
+			if err != nil {
+				return errors.Wrap(err, "error starting HW profiler")
+			}
 		}
 
-		err = pid.SoftwareProc.Stop()
-		if err != nil {
-			return errors.Wrap(err, "error starting SW profiler")
+		if pid.SoftwareProc != nil {
+			err := pid.SoftwareProc.Stop()
+			if err != nil {
+				return errors.Wrap(err, "error starting SW profiler")
+			}
 		}
 
 	}

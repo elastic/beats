@@ -25067,7 +25067,7 @@ type: long
 *`linux.perf.software_events.time_enabled`*::
 +
 --
-Counter for total time perf has been enabled.
+Counter for total time perf has been enabled. 
 
 
 type: long
@@ -25075,6 +25075,133 @@ type: long
 --
 
 *`linux.perf.software_events.time_running`*::
++
+--
+Counter for total time perf has been running.
+
+
+type: long
+
+--
+
+[float]
+=== hardware_events
+
+perf hardware events
+
+
+
+*`linux.perf.hardware_events.cpu_cycles`*::
++
+--
+Count of total cycles.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.instructions`*::
++
+--
+Count of retried instructions.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.cache_refs`*::
++
+--
+Cache accesses.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.cache_misses`*::
++
+--
+Cache misses.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.branch_instr`*::
++
+--
+Retried branch instructions
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.branch_misses`*::
++
+--
+mispredicted branch instructions
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.bus_cycles`*::
++
+--
+Count of bus cycles.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.stalled_cycles_frontend`*::
++
+--
+Count of stalled cycles during issue.
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.stalled_cycles_backend`*::
++
+--
+Count of cycles stalled during retirement
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.ref_cpu_cycles`*::
++
+--
+Total cycles not affected by CPU scaling
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.time_enabled`*::
++
+--
+Counter for total time perf has been enabled. 
+
+
+type: long
+
+--
+
+*`linux.perf.hardware_events.time_running`*::
 +
 --
 Counter for total time perf has been running.
