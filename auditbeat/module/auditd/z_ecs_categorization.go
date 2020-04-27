@@ -47,9 +47,12 @@ var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFiel
 		Types:        map[auparse.AuditMessageType][]string{},
 	},
 	aucoalesce.EventTypeAuditDaemon: nestedCategorizationFields{
-		Categories:   []string{},
-		DefaultTypes: []string{},
-		Types:        map[auparse.AuditMessageType][]string{},
+		Categories:   []string{"process"},
+		DefaultTypes: []string{"info"},
+		Types: map[auparse.AuditMessageType][]string{
+			auparse.AUDIT_DAEMON_END:   []string{"end"},
+			auparse.AUDIT_DAEMON_START: []string{"start"},
+		},
 	},
 	aucoalesce.EventTypeAuditRule: nestedCategorizationFields{
 		Categories:   []string{},
@@ -67,8 +70,8 @@ var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFiel
 		Types:        map[auparse.AuditMessageType][]string{},
 	},
 	aucoalesce.EventTypeDACDecision: nestedCategorizationFields{
-		Categories:   []string{},
-		DefaultTypes: []string{},
+		Categories:   []string{"process"},
+		DefaultTypes: []string{"change"},
 		Types:        map[auparse.AuditMessageType][]string{},
 	},
 	aucoalesce.EventTypeIntegrity: nestedCategorizationFields{
@@ -94,11 +97,6 @@ var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFiel
 			auparse.AUDIT_SYSTEM_RUNLEVEL: []string{"change"},
 			auparse.AUDIT_SYSTEM_SHUTDOWN: []string{"end"},
 		},
-	},
-	aucoalesce.EventTypeTTY: nestedCategorizationFields{
-		Categories:   []string{},
-		DefaultTypes: []string{},
-		Types:        map[auparse.AuditMessageType][]string{},
 	},
 	aucoalesce.EventTypeUnknown: nestedCategorizationFields{
 		Categories:   []string{},
@@ -127,9 +125,12 @@ var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFiel
 		},
 	},
 	aucoalesce.EventTypeUserspace: nestedCategorizationFields{
-		Categories:   []string{},
-		DefaultTypes: []string{},
-		Types:        map[auparse.AuditMessageType][]string{},
+		Categories:   []string{"process"},
+		DefaultTypes: []string{"info"},
+		Types: map[auparse.AuditMessageType][]string{
+			auparse.AUDIT_CHGRP_ID:  []string{"change"},
+			auparse.AUDIT_CHUSER_ID: []string{"change"},
+		},
 	},
 	aucoalesce.EventTypeVirt: nestedCategorizationFields{
 		Categories:   []string{"host"},
@@ -139,14 +140,6 @@ var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFiel
 }
 
 var ecsAuditdCategoryOverrides = map[auparse.AuditMessageType]ecsCategorizationFields{
-	auparse.AUDIT_CHGRP_ID: ecsCategorizationFields{
-		Categories: []string{"process"},
-		Types:      []string{"change"},
-	},
-	auparse.AUDIT_CHUSER_ID: ecsCategorizationFields{
-		Categories: []string{"process"},
-		Types:      []string{"change"},
-	},
 	auparse.AUDIT_EXECVE: ecsCategorizationFields{
 		Categories: []string{"process"},
 		Types:      []string{"start"},

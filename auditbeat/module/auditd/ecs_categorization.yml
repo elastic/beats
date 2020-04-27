@@ -80,31 +80,21 @@ eventTypes:
     default_types:
       - info
 
-  EventTypeAuditRule:
-    # AUDIT_SYSCALL - Syscall event
-    # AUDIT_PATH - Filename path information
-    # AUDIT_IPC	- IPC record
-    # AUDIT_SOCKETCALL - sys_socketcall arguments
-    # AUDIT_SOCKADDR - sockaddr copied as syscall arg
-    # AUDIT_CWD	- Current working directory
-    # AUDIT_IPC_SET_PERM - IPC new permissions record type
-    # AUDIT_MQ_OPEN	- POSIX MQ open record type
-    # AUDIT_MQ_SENDRECV- POSIX MQ send/receive record type
-    # AUDIT_MQ_NOTIFY	- POSIX MQ notify record type
-    # AUDIT_MQ_GETSETATTR - POSIX MQ get/set attribute record type
-    # AUDIT_FD_PAIR	- audit record for pipe/socketpair
-    # AUDIT_OBJ_PID	- ptrace target
-    # AUDIT_BPRM_FCAPS - Information about fcaps increasing perms
-    # AUDIT_CAPSET - Record showing argument to sys_capset
-    # AUDIT_MMAP - Record showing descriptor and flags in mmap
-    # AUDIT_NETFILTER_PKT - Packets traversing netfilter chains
-
   EventTypeUserspace:
     # AUDIT_CHGRP_ID - User space group ID changed
     # AUDIT_TEST - Used for test success messages
     # AUDIT_TRUSTED_APP - Trusted app msg - freestyle text
     # AUDIT_USER_CMD - User shell command and args
     # AUDIT_CHUSER_ID - Changed user ID supplemental data
+    categories:
+      - process
+    default_types:
+      - info
+    types:
+      AUDIT_CHUSER_ID:
+        - change
+      AUDIT_CHGRP_ID:
+        - change
 
   EventTypeSystemServices:
     # AUDIT_KERNEL - Asynchronous audit record. NOT A REQUEST.
@@ -125,24 +115,42 @@ eventTypes:
       AUDIT_SYSTEM_SHUTDOWN:
         - end
 
+  EventTypeAuditDaemon:
+    # AUDIT_DAEMON_START  - Daemon startup record
+    # AUDIT_DAEMON_END - Daemon normal stop record
+    # AUDIT_DAEMON_ABORT - Daemon error stop record
+    # AUDIT_DAEMON_CONFIG - Daemon config change
+    categories:
+      - process
+    default_types:
+      - info
+    types:
+      AUDIT_DAEMON_START:
+        - start
+      AUDIT_DAEMON_END:
+        - end
+
+  EventTypeDACDecision:
+    # AUDIT_SECCOMP - Secure Computing event
+    categories:
+      - process
+    default_types:
+      - change
+
   EventTypeConfig:
     # AUDIT_USYS_CONFIG - User space system config change
     # AUDIT_CONFIG_CHANGE - Audit system configuration change
     # AUDIT_NETFILTER_CFG - Netfilter chain modifications
     # AUDIT_FEATURE_CHANGE - audit log listing feature changes
     # AUDIT_REPLACE - Replace auditd if this packet unanswerd
+    categories:
+    #   - config
 
-  EventTypeTTY:
+    EventTypeTTY:
     # AUDIT_USER_TTY - Non-ICANON TTY input meaning
     # AUDIT_TTY - Input on an administrative TTY
     categories:
     #   - device
-
-  EventTypeAuditDaemon:
-    # AUDIT_DAEMON_START  - Daemon startup record
-    # AUDIT_DAEMON_END - Daemon normal stop record
-    # AUDIT_DAEMON_ABORT - Daemon error stop record
-    # AUDIT_DAEMON_CONFIG - Daemon config change
 
   EventTypeMACDecision:
     # AUDIT_USER_SELINUX_ERR - SE Linux user space error
@@ -189,6 +197,8 @@ eventTypes:
     # AUDIT_INTEGRITY_PCR - PCR invalidation msgs
     # AUDIT_INTEGRITY_RULE - Policy rule
     # AUDIT_ANOM_RBAC_INTEGRITY_FAIL - RBAC file integrity failure
+    categories:
+    #   - check
 
   EventTypeAnomolyResponse:
     # AUDIT_RESP_ANOMALY - Anomaly not reacted to
@@ -206,6 +216,8 @@ eventTypes:
     # AUDIT_RESP_HALT - take the system down
     # AUDIT_RESP_ORIGIN_BLOCK	- Address blocked by iptables
     # AUDIT_RESP_ORIGIN_BLOCK_TIMED - Address blocked for time
+    categories:
+    #   - anomaly
 
   EventTypeMAC:
     # AUDIT_APPARMOR_AUDIT
@@ -238,12 +250,38 @@ eventTypes:
     # AUDIT_USER_MAC_POLICY_LOAD - Userspc daemon loaded policy
     # AUDIT_ROLE_MODIFY	- Admin modified a role
     # AUDIT_USER_MAC_CONFIG_CHANGE - Change made to MAC policy
+    categories:
+    #   - policy
 
-  EventTypeDACDecision:
-    # AUDIT_SECCOMP - Secure Computing event
+  EventTypeAuditRule:
+    # AUDIT_SYSCALL - Syscall event
+    # AUDIT_PATH - Filename path information
+    # AUDIT_IPC	- IPC record
+    # AUDIT_SOCKETCALL - sys_socketcall arguments
+    # AUDIT_SOCKADDR - sockaddr copied as syscall arg
+    # AUDIT_CWD	- Current working directory
+    # AUDIT_EXECVE - execve arguments
+    # AUDIT_IPC_SET_PERM - IPC new permissions record type
+    # AUDIT_MQ_OPEN	- POSIX MQ open record type
+    # AUDIT_MQ_SENDRECV- POSIX MQ send/receive record type
+    # AUDIT_MQ_NOTIFY	- POSIX MQ notify record type
+    # AUDIT_MQ_GETSETATTR - POSIX MQ get/set attribute record type
+    # AUDIT_FD_PAIR	- audit record for pipe/socketpair
+    # AUDIT_OBJ_PID	- ptrace target
+    # AUDIT_BPRM_FCAPS - Information about fcaps increasing perms
+    # AUDIT_CAPSET - Record showing argument to sys_capset
+    # AUDIT_MMAP - Record showing descriptor and flags in mmap
+    # AUDIT_NETFILTER_PKT - Packets traversing netfilter chains
+    categories:
+    #   - ?
 
   EventTypeCrypto:
+    categories:
+    #   - ?
+
   EventTypeUnknown:
+    categories:
+    #   - ?
 
 messageTypes:
   AUDIT_EXECVE:
@@ -261,6 +299,7 @@ messageTypes:
       - process
     types:
       - end
+  # are these mis-classified?
   AUDIT_USER_CHAUTHTOK:
     categories:
       - iam
@@ -278,16 +317,4 @@ messageTypes:
       - iam
     types:
       - user
-      - change
-  # triggers on setuid
-  AUDIT_CHUSER_ID:
-    categories:
-      - process
-    types:
-      - change
-  # triggers on setgid
-  AUDIT_CHGRP_ID:
-    categories:
-      - process
-    types:
       - change
