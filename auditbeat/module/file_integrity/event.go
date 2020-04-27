@@ -300,9 +300,14 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		out.MetricSetFields.Put("hash", hashes)
 	}
 
+	out.MetricSetFields.Put("event.kind", "event")
+	out.MetricSetFields.Put("event.category", []string{"file"})
 	if e.Action > 0 {
-		actions := e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
-		out.MetricSetFields.Put("event.action", actions)
+		actions := e.Action.InOrder(existedBefore, e.Info != nil)
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())
+		out.MetricSetFields.Put("event.action", actions.StringArray())
+	} else {
+		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
 	return out
