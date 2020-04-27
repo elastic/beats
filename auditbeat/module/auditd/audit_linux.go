@@ -475,9 +475,9 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	if eventOutcome == "fail" {
 		eventOutcome = "failure"
 	}
-	ecsCategorization := getECSCategorization(auditEvent.Type)
+	ecsCategorization := getECSCategorization(auditEvent.Category, auditEvent.Type)
 	// keep this for now, remove in 8.x
-	categories = append(ecsCategorization.Categories, auditEvent.Category.String())
+	categories := append(ecsCategorization.Categories, auditEvent.Category.String())
 	out := mb.Event{
 		Timestamp: auditEvent.Timestamp,
 		RootFields: common.MapStr{

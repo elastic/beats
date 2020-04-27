@@ -1,10 +1,27 @@
-AUDIT_USER_LOGIN:
-  categories:
-    - authenticated
-  types:
-    - start
-AUDIT_USER_AUTH:
-  categories:
-    - authenticated
-  types:
-    - info
+eventTypes:
+  # EventTypeUnknown:
+  # EventTypeUserspace:
+  # EventTypeSystemServices:
+  # EventTypeConfig:
+  # EventTypeTTY:
+  # EventTypeUserAccount:
+  EventTypeUserLogin:
+    categories:
+      - authentication
+    default_types:
+      - info
+    types:
+      AUDIT_USER_LOGIN:
+        - start
+  # EventTypeAuditDaemon:
+  # EventTypeMACDecision:
+  # EventTypeAnomoly:
+  # EventTypeIntegrity:
+  # EventTypeAnomolyResponse:
+  # EventTypeMAC:
+  # EventTypeCrypto:
+  # EventTypeVirt:
+  # EventTypeAuditRule:
+  # EventTypeDACDecision:
+  # EventTypeGroupChange:
+# messageTypes:

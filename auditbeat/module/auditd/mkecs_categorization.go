@@ -20,42 +20,39 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
-	"strconv"
 	"strings"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
 )
 
-// Min and max record/message numbers.
-const (
-	minRecordNum = 1000
-	maxRecordNum = 3000
-)
-
-type categorizationFields struct {
-	Name             string   `yaml:"-"`
+type messageType struct {
 	CategoriesString string   `yaml:"-"`
 	TypesString      string   `yaml:"-"`
 	Categories       []string `yaml:"categories"`
 	Types            []string `yaml:"types"`
 }
 
+type eventType struct {
+	CategoriesString   string              `yaml:"-"`
+	DefaultTypesString string              `yaml:"-"`
+	TypeStrings        map[string]string   `yaml:"-"`
+	Categories         []string            `yaml:"categories"`
+	DefaultTypes       []string            `yaml:"default_types"`
+	Types              map[string][]string `yaml:"types"`
+}
+
 // TemplateParams is the data used in evaluating the template.
 type TemplateParams struct {
-	Command        string
-	FieldsByNumber map[int]categorizationFields
+	Command      string                 `yaml:"-"`
+	EventTypes   map[string]eventType   `yaml:"eventTypes"`
+	MessageTypes map[string]messageType `yaml:"messagetypes"`
 }
 
 const fileTemplate = `
@@ -81,6 +78,7 @@ const fileTemplate = `
 package auditd
 
 import (
+	"github.com/elastic/go-libaudit/auparse"
 	"github.com/elastic/go-libaudit/aucoalesce"
 )
 
@@ -89,128 +87,96 @@ type ecsCategorizationFields struct {
 	Types      []string
 }
 
-var ecsAuditdCategories = map[aucoalesce.AuditMessageType]ecsCategorizationFields{
-{{- range $recordNum, $recordType := .FieldsByNumber }}
-	auocoalesce.{{ $recordType.Name }}: ecsCategorizationFields{ // {{ $recordNum }}
-		Categories: []string{ {{ $recordType.CategoriesString }} },
-		Types: []string{ {{ $recordType.TypesString }} },
+type nestedCategorizationFields struct {
+	Categories []string
+	DefaultTypes []string
+	Types map[auparse.AuditMessageType][]string
+}
+
+var ecsAuditdCategories = map[aucoalesce.AuditEventType]nestedCategorizationFields{
+{{- range $name, $eventType := .EventTypes }}
+	aucoalesce.{{ $name }}: nestedCategorizationFields{
+		Categories: []string{ {{ $eventType.CategoriesString }} },
+		DefaultTypes: []string{ {{ $eventType.DefaultTypesString }} },
+		Types: map[auparse.AuditMessageType][]string{
+		{{- range $type, $messageType := $eventType.TypeStrings }}
+			auparse.{{ $type }}: []string{ {{ $messageType }} },
+		{{- end }}
+		},
 	},
 {{- end }}
 }
 
-func getECSCategorization(messageType aucoalesce.AuditMessageType) ecsCategorizationFields {
-	if found, ok := ecsAuditdCategories[messageType]; ok {
+var ecsAuditdCategoryOverrides = map[auparse.AuditMessageType]ecsCategorizationFields{
+{{- range $name, $messageType := .MessageTypes }}
+	auparse.{{ $name }}: ecsCategorizationFields{ 
+		Categories: []string{ {{ $messageType.CategoriesString }} },
+		Types: []string{ {{ $messageType.TypesString }} },
+	},
+{{- end }}
+}
+
+func getECSCategorization(eventType aucoalesce.AuditEventType, messageType auparse.AuditMessageType) ecsCategorizationFields {
+	if found, ok := ecsAuditdCategoryOverrides[messageType]; ok {
 		return found
 	}
+	if found, ok := ecsAuditdCategories[eventType]; ok {
+		var types []string
+		if mappedTypes, ok := found.Types[messageType]; ok {
+			types = mappedTypes
+		} else {
+			types = found.DefaultTypes
+		}
+		return ecsCategorizationFields{
+			Categories: found.Categories,
+			Types: types,
+		}
+	}
+
 	return ecsCategorizationFields{}
 }
 `
 
 var tmpl = template.Must(template.New("message_types").Parse(fileTemplate))
 
-var (
-	headers = []string{
-		`https://raw.githubusercontent.com/torvalds/linux/v4.16/include/uapi/linux/audit.h`,
-		`https://raw.githubusercontent.com/linux-audit/audit-userspace/4d933301b1835cafa08b9e9ef705c8fb6c96cb62/lib/libaudit.h`,
-		`https://raw.githubusercontent.com/linux-audit/audit-userspace/4d933301b1835cafa08b9e9ef705c8fb6c96cb62/lib/msg_typetab.h`,
-	}
-)
-
-func DownloadFile(url, destinationDir string) (string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", fmt.Errorf("http get failed: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("download failed with http status %v", resp.StatusCode)
-	}
-
-	name := filepath.Join(destinationDir, filepath.Base(url))
-	f, err := os.Create(name)
-	if err != nil {
-		return "", fmt.Errorf("failed to create output file: %v", err)
-	}
-
-	_, err = io.Copy(f, resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to write file to disk: %v", err)
-	}
-
-	return name, nil
-}
-
-var (
-	// nameMappingRegex is used to parse name mappings from msg_typetab.h.
-	nameMappingRegex = regexp.MustCompile(`^_S\((AUDIT_\w+),\s+"(\w+)"`)
-
-	// recordTypeDefinitionRegex is used to parse type definitions from audit
-	// header files.
-	recordTypeDefinitionRegex = regexp.MustCompile(`^#define\s+(AUDIT_\w+)\s+(\d+)`)
-)
-
-func readMessageTypeTable() (map[string]string, error) {
-	f, err := os.Open("msg_typetab.h")
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	constantToStringName := map[string]string{}
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		matches := nameMappingRegex.FindStringSubmatch(s.Text())
-		if len(matches) == 3 {
-			constantToStringName[matches[1]] = matches[2]
-		}
-	}
-
-	return constantToStringName, nil
-}
-
-func readRecordTypes() (map[string]int, error) {
-	out, err := exec.Command("gcc", "-E", "-dD", "libaudit.h", "audit.h").Output()
-	if err != nil {
-		return nil, err
-	}
-
-	recordTypeToNum := map[string]int{}
-	s := bufio.NewScanner(bytes.NewReader(out))
-	for s.Scan() {
-		matches := recordTypeDefinitionRegex.FindStringSubmatch(s.Text())
-		if len(matches) != 3 {
-			continue
-		}
-		recordNum, _ := strconv.Atoi(matches[2])
-
-		// Filter constants.
-		if recordNum >= minRecordNum && recordNum <= maxRecordNum {
-			recordTypeToNum[matches[1]] = recordNum
-		}
-	}
-
-	return recordTypeToNum, nil
-}
-
-func categorizationFieldFor(recordType string, schema map[string]categorizationFields) categorizationFields {
-	if found, ok := schema[recordType]; ok {
+func fillMessageTypes(schema map[string]messageType) {
+	for name, message := range schema {
 		categoryStrings := []string{}
 		typeStrings := []string{}
-		for _, category := range found.Categories {
+		for _, category := range message.Categories {
 			categoryStrings = append(categoryStrings, fmt.Sprintf("\"%s\"", category))
 		}
-		for _, typeString := range found.Types {
+		for _, typeString := range message.Types {
 			typeStrings = append(typeStrings, fmt.Sprintf("\"%s\"", typeString))
 		}
-		return categorizationFields{
-			Name:             recordType,
-			CategoriesString: strings.Join(categoryStrings, ", "),
-			TypesString:      strings.Join(typeStrings, ", "),
-		}
+		message.CategoriesString = strings.Join(categoryStrings, ", ")
+		message.TypesString = strings.Join(typeStrings, ", ")
+		schema[name] = message
 	}
-	return categorizationFields{
-		Name: recordType,
+}
+
+func fillEventTypes(schema map[string]eventType) {
+	for name, event := range schema {
+		categoryStrings := []string{}
+		defaultTypeStrings := []string{}
+		for _, category := range event.Categories {
+			categoryStrings = append(categoryStrings, fmt.Sprintf("\"%s\"", category))
+		}
+		for _, typeString := range event.DefaultTypes {
+			defaultTypeStrings = append(defaultTypeStrings, fmt.Sprintf("\"%s\"", typeString))
+		}
+		event.CategoriesString = strings.Join(categoryStrings, ", ")
+		event.DefaultTypesString = strings.Join(defaultTypeStrings, ", ")
+		typeStrings := make(map[string]string, len(event.Types))
+		for name, messageType := range event.Types {
+			types := []string{}
+			for _, typeString := range messageType {
+				types = append(types, fmt.Sprintf("\"%s\"", typeString))
+			}
+			typeStrings[name] = strings.Join(types, ", ")
+		}
+		event.TypeStrings = typeStrings
+		schema[name] = event
 	}
 }
 
@@ -227,70 +193,20 @@ func run() error {
 		return err
 	}
 
-	schema := make(map[string]categorizationFields)
-	if err := yaml.Unmarshal(inData, &schema); err != nil {
+	params := TemplateParams{
+		Command: filepath.Base(os.Args[0]),
+	}
+	if err := yaml.Unmarshal(inData, &params); err != nil {
 		return err
 	}
+	fillEventTypes(params.EventTypes)
+	fillMessageTypes(params.MessageTypes)
 
-	tmp, err := ioutil.TempDir("", "mk_audit_msg_types")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tmp)
-
-	// Download header files from the Linux audit project.
-	var files []string
-	for _, url := range headers {
-		f, err := DownloadFile(url, tmp)
-		if err != nil {
-			return fmt.Errorf("download failed for %v: %v", url, err)
-		}
-		files = append(files, f)
-	}
-
-	if err := os.Chdir(tmp); err != nil {
-		return err
-	}
-
-	recordTypeToStringName, err := readMessageTypeTable()
-	if err != nil {
-		return err
-	}
-
-	recordTypeToNum, err := readRecordTypes()
-	if err != nil {
-		return err
-	}
-
-	numToRecordType := map[int]categorizationFields{}
-	for recordType := range recordTypeToStringName {
-		num, found := recordTypeToNum[recordType]
-		if !found {
-			return fmt.Errorf("missing definition of %v", recordType)
-		}
-		numToRecordType[num] = categorizationFieldFor(recordType, schema)
-	}
-
-	for recordType, num := range recordTypeToNum {
-		// Do not replace existing mappings.
-		if _, found := numToRecordType[num]; found {
-			continue
-		}
-		numToRecordType[num] = categorizationFieldFor(recordType, schema)
-	}
-
-	// Create output file.
 	f, err := os.Create(flagOut)
 	if err != nil {
 		return err
 	}
-
-	// Evaluate template.
-	r := TemplateParams{
-		Command:        filepath.Base(os.Args[0]),
-		FieldsByNumber: numToRecordType,
-	}
-	if err := tmpl.Execute(f, r); err != nil {
+	if err := tmpl.Execute(f, params); err != nil {
 		f.Close()
 		return err
 	}
