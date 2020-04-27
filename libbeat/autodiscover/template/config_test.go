@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/docker/docker/pkg/ioutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -101,10 +101,9 @@ func TestConfigsMappingKeystore(t *testing.T) {
 	secret := "mapping_secret"
 	//expected config
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"correct": "config",
+		"correct":  "config",
 		"password": secret,
 	})
-
 
 	path := getTemporaryKeystoreFile()
 	defer os.Remove(path)
@@ -125,7 +124,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
   - correct: config
     password: "${PASSWORD}"`,
 			event: bus.Event{
-				"foo": 3,
+				"foo":      3,
 				"keystore": keystore,
 			},
 			expected: []*common.Config{config},

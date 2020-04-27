@@ -23,8 +23,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/docker/docker/pkg/ioutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -348,9 +348,9 @@ func TestGenerateHintsDoesNotAccessKeystore(t *testing.T) {
 				"port": 9090,
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
-						"module":    "mockmoduledefaults",
-						"hosts":     "${data.host}:9090",
-						"password":	 "${PASSWORD}",
+						"module":   "mockmoduledefaults",
+						"hosts":    "${data.host}:9090",
+						"password": "${PASSWORD}",
 					},
 				},
 				"keystore": keystore,
@@ -399,8 +399,6 @@ func TestGenerateHintsDoesNotAccessKeystore(t *testing.T) {
 
 	}
 }
-
-
 
 type MockMetricSet struct {
 	mb.BaseMetricSet
