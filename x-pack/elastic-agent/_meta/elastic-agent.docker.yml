@@ -31,12 +31,38 @@ datasources:
 #   # Default is local.
 #   mode: "local"
 
+#   fleet:
+#     access_token: ""
+#     kibana:
+#       # kibana minimal configuration
+#       host: "localhost:5601"
+#       ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+#       # optional values
+#       #protocol: "https"
+#       #username: "elastic"
+#       #password: "changeme"
+#       #path: ""
+#       #ssl.verification_mode: full
+#       #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+#       #ssl.cipher_suites: []
+#       #ssl.curve_types: []
+
 #   reporting:
 #     log:
 #       # format in which logs will be written, options are json or default.
 #       format: "default"
+#     fleet:
+#       # enables fleet reporter. fleet reporting can be enabled only in fleet management.mode.
+#       enabled: false
 
-#   # Allow the Elastic Agent to reload his configuration locally on disk.
+#       # Reporting threshold indicates how many events should be kept in-memory before reporting them to fleet.
+#       reporting_threshold: 10000
+
+#       # Frequency used to check the queue of events to be sent out to fleet.
+#       reporting_check_frequency_sec: 30
+
+#   # Allow fleet to reload his configuration locally on disk.
 #   # Notes: Only specific process configuration will be reloaded.
 #   reload:
 #     # enabled configure the Elastic Agent to reload or not the local configuration.
@@ -56,7 +82,7 @@ datasources:
 #   # timeout for downloading package
 #   timeout: 30s
 #   # file path to a public key used for verifying downloaded artifacts
-#   # if not file is present Elastic Agent will try to load public key from elastic.co website.
+#   # if not file is present agent will try to load public key from elastic.co website.
 #   pgpfile: "${path.data}/elastic.pgp"
 #   # install_path describes the location of installed packages/programs. It is also used
 #   # for reading program specifications.
@@ -72,15 +98,15 @@ datasources:
 #   spawn_timeout: 30s
 
 # retry:
-#   # enabled determines whether retry is possible. Default is false.
+#   # Enabled determines whether retry is possible. Default is false.
 #   enabled: true
-#   # retries_count specifies number of retries. Default is 3.
+#   # RetriesCount specifies number of retries. Default is 3.
 #   # Retry count of 1 means it will be retried one time after one failure.
-#   retries_count: 3
-#   # delay specifies delay in ms between retries. Default is 30s
+#   retriesCount: 3
+#   # Delay specifies delay in ms between retries. Default is 30s
 #   delay: 30s
-#   # max_delay specifies maximum delay in ms between retries. Default is 300s
-#   max_delay: 5m
+#   # MaxDelay specifies maximum delay in ms between retries. Default is 300s
+#   maxDelay: 5m
 #   # Exponential determines whether delay is treated as exponential.
 #   # With 30s delay and 3 retries: 30, 60, 120s
 #   # Default is false
