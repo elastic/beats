@@ -14,7 +14,7 @@ Perf configuration is based on process globs that are matched to PIDs:
      - perf
   enabled: true
   #hostfs: /hostfs
-  perf.sample_period: 3s
+  perf.sample_period: 3s 
   perf.processes:
     - process: "systemd"
       events:

@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux
+
 package perf
 
 import (
-	"encoding/json"
-	"log"
 	"testing"
 	"time"
 
@@ -41,49 +41,49 @@ func TestProcessGet(t *testing.T) {
 	t.Logf("Got: %#v", matches)
 }
 
-func TestSampling(t *testing.T) {
+// func TestSampling(t *testing.T) {
 
-	testProcessList := []sampleConfig{sampleConfig{
-		ProcessGlob: "node",
-		Events:      eventsConfig{HardwareEvents: false, SoftwareEvents: true},
-	},
-	}
+// 	testProcessList := []sampleConfig{sampleConfig{
+// 		ProcessGlob: "node",
+// 		Events:      eventsConfig{HardwareEvents: false, SoftwareEvents: true},
+// 	},
+// 	}
 
-	period := time.Second * 10
+// 	period := time.Second * 10
 
-	matches, err := matchProcesses(testProcessList)
-	assert.NoError(t, err)
-	t.Logf("Got: %d", len(matches))
+// 	matches, err := matchProcesses(testProcessList)
+// 	assert.NoError(t, err)
+// 	t.Logf("Got: %d", len(matches))
 
-	perfData, err := runSampleForPeriod(matches, period, false)
-	assert.NoError(t, err)
-	for _, data := range perfData {
-		log.Printf("Got data from %v", data.Metadata["pid"])
+// 	perfData, err := runSampleForPeriod(matches, period, false)
+// 	assert.NoError(t, err)
+// 	for _, data := range perfData {
+// 		log.Printf("Got data from %v", data.Metadata["pid"])
 
-		pretty, err := json.MarshalIndent(data.HwMetrics, "", "    ")
-		assert.NoError(t, err)
-		log.Printf("%s\n", string(pretty))
+// 		pretty, err := json.MarshalIndent(data.HwMetrics, "", "    ")
+// 		assert.NoError(t, err)
+// 		log.Printf("%s\n", string(pretty))
 
-		pretty, err = json.MarshalIndent(data.SwMetrics, "", "    ")
-		assert.NoError(t, err)
-		log.Printf("%s\n", string(pretty))
+// 		pretty, err = json.MarshalIndent(data.SwMetrics, "", "    ")
+// 		assert.NoError(t, err)
+// 		log.Printf("%s\n", string(pretty))
 
-	}
+// 	}
 
-}
+// }
 
-func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2Error(f)
+// func TestFetch(t *testing.T) {
+// 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+// 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
-	pretty, err := json.MarshalIndent(events, "", "    ")
-	assert.NoError(t, err)
-	log.Printf("%s\n", string(pretty))
-}
+// 	assert.Empty(t, errs)
+// 	if !assert.NotEmpty(t, events) {
+// 		t.FailNow()
+// 	}
+// 	pretty, err := json.MarshalIndent(events, "", "    ")
+// 	assert.NoError(t, err)
+// 	log.Printf("%s\n", string(pretty))
+// }
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
