@@ -4,13 +4,21 @@
 - module: googlecloud
   metricsets:
     - compute
+  region: "us-central1"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
+
+- module: googlecloud
+  metricsets:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 60s
 
 - module: googlecloud
   metricsets:

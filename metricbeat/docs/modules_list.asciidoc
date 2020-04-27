@@ -109,9 +109,10 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
 |<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
+.5+| .5+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
+|<<metricbeat-metricset-googlecloud-stackdriver,stackdriver>> beta[]  
 |<<metricbeat-metricset-googlecloud-storage,storage>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   

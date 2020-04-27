@@ -6,7 +6,9 @@ package stackdriver
 
 import (
 	"testing"
+	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -100,6 +102,65 @@ func TestGetFilterForMetric(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			filter := c.r.getFilterForMetric(c.m)
 			assert.Equal(t, c.expectedFilter, filter)
+		})
+	}
+}
+
+func TestGetTimeIntervalAligner(t *testing.T) {
+	cases := []struct {
+		title            string
+		ingestDelay      time.Duration
+		samplePeriod     time.Duration
+		collectionPeriod duration.Duration
+		inputAligner     string
+		expectedAligner  string
+	}{
+		{
+			"test collectionPeriod equals to samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"",
+			"ALIGN_NONE",
+		},
+		{
+			"test collectionPeriod larger than samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(300),
+			},
+			"ALIGN_MEAN",
+			"ALIGN_MEAN",
+		},
+		{
+			"test collectionPeriod smaller than samplePeriod",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(30),
+			},
+			"ALIGN_MAX",
+			"ALIGN_NONE",
+		},
+		{
+			"test collectionPeriod equals to samplePeriod with given aligner",
+			time.Duration(240) * time.Second,
+			time.Duration(60) * time.Second,
+			duration.Duration{
+				Seconds: int64(60),
+			},
+			"ALIGN_MEAN",
+			"ALIGN_NONE",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			_, aligner := getTimeIntervalAligner(c.ingestDelay, c.samplePeriod, c.collectionPeriod, c.inputAligner)
+			assert.Equal(t, c.expectedAligner, aligner)
 		})
 	}
 }
