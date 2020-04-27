@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 - Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
 - Arbitrary fields and metadata maps are now deep merged into event. {pull}17958[17958]
+- Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Auditbeat*
 
