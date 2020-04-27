@@ -183,7 +183,11 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner()
+	if err != nil {
+		return err
+	}
+	return runner.Test("goIntegTest", func() error {
 		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	})
 }
