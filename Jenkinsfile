@@ -587,7 +587,7 @@ pipeline {
             }
           }
           steps {
-            k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
+            k8sTest(["v1.18.2","v1.17.2","v1.16.4","v1.15.7","v1.14.10"])
           }
         }
       }
@@ -806,7 +806,7 @@ def dumpFilteredEnvironment(){
 def k8sTest(versions){
   versions.each{ v ->
     stage("k8s ${v}"){
-      withEnv(["K8S_VERSION=${v}", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+      withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
           withBeatsEnv(false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")

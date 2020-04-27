@@ -122,7 +122,7 @@ jobs:
       env:
         - TARGETS="-C metricbeat integration-tests"
         - K8S_VERSION=v1.17.2
-        - KIND_VERSION=v1.17.2
+        - KIND_VERSION=v0.7.0
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux

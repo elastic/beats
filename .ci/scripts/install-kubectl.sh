@@ -9,6 +9,6 @@ KUBECTL_CMD="${HOME}/bin/kubectl"
 
 mkdir -p "${HOME}/bin"
 
-curl -sSLo "${KUBECTL_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/$(uname -s)/$(uname -m)/kubectl"
+curl -sSLo "${KUBECTL_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
 chmod +x "${KUBECTL_CMD}"
 
