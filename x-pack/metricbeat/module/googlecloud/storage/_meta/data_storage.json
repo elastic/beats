@@ -2,7 +2,7 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-apm"
+            "id": "elastic-observability"
         },
         "provider": "googlecloud"
     },
@@ -17,14 +17,14 @@
                 "storage_class": "MULTI_REGIONAL"
             },
             "resource": {
-                "bucket_name": "artifacts.elastic-apm.appspot.com",
+                "bucket_name": "fstuermer-log-data-categorization-7-6-0",
                 "location": "us"
             }
         },
         "storage": {
             "storage": {
-                "object_count": {
-                    "value": 15
+                "total_bytes": {
+                    "value": 4472520191
                 }
             }
         }
