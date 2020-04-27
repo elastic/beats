@@ -39,8 +39,8 @@ import (
 )
 
 type backoffConfig struct {
-	Init time.Duration
-	Max  time.Duration
+	Init time.Duration `config:"init"`
+	Max  time.Duration `config:"max"`
 }
 
 type kafkaConfig struct {
