@@ -806,14 +806,14 @@ def dumpFilteredEnvironment(){
 def k8sTest(versions){
   versions.each{ v ->
     stage("k8s ${v}"){
-      withEnv(["K8S_VERSION=${v}"]){
+      withEnv(["K8S_VERSION=${v}", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
           withBeatsEnv(false) {
-            sh(label: "Install k8s", script: """
-              eval "\$(gvm use ${GO_VERSION} --format=bash)"
-              .ci/scripts/kind-setup.sh
-            """)
-            sh(label: "Kubernetes Kind",script: "make KUBECONFIG=\"\$(kind get kubeconfig-path)\" -C deploy/kubernetes test")
+            sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
+            sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
         }
