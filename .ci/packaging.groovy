@@ -53,7 +53,6 @@ pipeline {
               'packetbeat',
               'winlogbeat',
               'x-pack/auditbeat',
-              'x-pack/elastic-agent',
               'x-pack/dockerlogbeat',
               'x-pack/filebeat',
               'x-pack/functionbeat',
