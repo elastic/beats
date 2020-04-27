@@ -1,11 +1,61 @@
+# Useful links:
+# https://raw.githubusercontent.com/torvalds/linux/v4.16/include/uapi/linux/audit.h
+# https://raw.githubusercontent.com/linux-audit/audit-userspace/4d933301b1835cafa08b9e9ef705c8fb6c96cb62/lib/libaudit.h
+# https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-category.html
+# https://github.com/elastic/go-libaudit/blob/master/aucoalesce/event_type.go
+# https://github.com/elastic/go-libaudit/blob/master/aucoalesce/normalizations.yaml
+
 eventTypes:
-  # EventTypeUnknown:
-  # EventTypeUserspace:
-  # EventTypeSystemServices:
-  # EventTypeConfig:
-  # EventTypeTTY:
-  # EventTypeUserAccount:
+  EventTypeUserAccount:
+    # AUDIT_ADD_USER - User account added
+    # AUDIT_DEL_USER - User account deleted
+    # AUDIT_ADD_GROUP - Group account added
+    # AUDIT_DEL_GROUP - Group account deleted
+    # AUDIT_GRP_MGMT - Group account attr was modified
+    # AUDIT_GRP_CHAUTHTOK - Group acct password or pin changed
+    # AUDIT_ACCT_LOCK - User's account locked by admin
+    # AUDIT_ACCT_UNLOCK - User's account unlocked by admin
+    categories:
+      - iam
+    default_types:
+      - info
+    types:
+      AUDIT_ADD_USER:
+        - user
+        - creation
+      AUDIT_USER_MGMT:
+        - user
+        - change
+      AUDIT_DEL_USER:
+        - user
+        - deletion
+      AUDIT_GRP_MGMT:
+        - group
+        - change
+      AUDIT_GRP_CHAUTHTOK:
+        - group
+        - change
+      AUDIT_ADD_GROUP:
+        - group
+        - creation
+      AUDIT_DEL_GROUP:
+        - group
+        - deletion
+
   EventTypeUserLogin:
+    # AUDIT_USER_AUTH - User system access authentication
+    # AUDIT_USER_ACCT - User system access authorization
+    # AUDIT_USER_MGMT - User acct attribute change
+    # AUDIT_CRED_ACQ - User credential acquired
+    # AUDIT_CRED_DISP - User credential disposed
+    # AUDIT_USER_START - User session start
+    # AUDIT_USER_END - User session end
+    # AUDIT_USER_CHAUTHTOK - User acct password or pin changed // should this be classified EventTypeUserAccount?
+    # AUDIT_USER_ERR - User acct state error
+    # AUDIT_CRED_REFR - User credential refreshed
+    # AUDIT_USER_LOGIN - User has logged in
+    # AUDIT_USER_LOGOUT - User has logged out
+    # AUDIT_GRP_AUTH - Authentication for group password
     categories:
       - authentication
     default_types:
@@ -13,15 +63,231 @@ eventTypes:
     types:
       AUDIT_USER_LOGIN:
         - start
-  # EventTypeAuditDaemon:
-  # EventTypeMACDecision:
-  # EventTypeAnomoly:
-  # EventTypeIntegrity:
-  # EventTypeAnomolyResponse:
-  # EventTypeMAC:
-  # EventTypeCrypto:
-  # EventTypeVirt:
-  # EventTypeAuditRule:
-  # EventTypeDACDecision:
-  # EventTypeGroupChange:
-# messageTypes:
+      AUDIT_USER_LOGOUT:
+        - end
+
+  EventTypeVirt:
+    # AUDIT_VIRT_CONTROL - Start, Pause, Stop VM
+    # AUDIT_VIRT_RESOURCE	- Resource assignment
+    # AUDIT_VIRT_MACHINE_ID	- Binding of label to VM
+    # AUDIT_VIRT_INTEGRITY_CHECK - Guest integrity results
+    # AUDIT_VIRT_CREATE	- Creation of guest image
+    # AUDIT_VIRT_DESTROY - Destruction of guest image
+    # AUDIT_VIRT_MIGRATE_IN	- Inbound guest migration info
+    # AUDIT_VIRT_MIGRATE_OUT - Outbound guest migration info
+    categories:
+      - host
+    default_types:
+      - info
+
+  EventTypeAuditRule:
+    # AUDIT_SYSCALL - Syscall event
+    # AUDIT_PATH - Filename path information
+    # AUDIT_IPC	- IPC record
+    # AUDIT_SOCKETCALL - sys_socketcall arguments
+    # AUDIT_SOCKADDR - sockaddr copied as syscall arg
+    # AUDIT_CWD	- Current working directory
+    # AUDIT_IPC_SET_PERM - IPC new permissions record type
+    # AUDIT_MQ_OPEN	- POSIX MQ open record type
+    # AUDIT_MQ_SENDRECV- POSIX MQ send/receive record type
+    # AUDIT_MQ_NOTIFY	- POSIX MQ notify record type
+    # AUDIT_MQ_GETSETATTR - POSIX MQ get/set attribute record type
+    # AUDIT_FD_PAIR	- audit record for pipe/socketpair
+    # AUDIT_OBJ_PID	- ptrace target
+    # AUDIT_BPRM_FCAPS - Information about fcaps increasing perms
+    # AUDIT_CAPSET - Record showing argument to sys_capset
+    # AUDIT_MMAP - Record showing descriptor and flags in mmap
+    # AUDIT_NETFILTER_PKT - Packets traversing netfilter chains
+
+  EventTypeUserspace:
+    # AUDIT_CHGRP_ID - User space group ID changed
+    # AUDIT_TEST - Used for test success messages
+    # AUDIT_TRUSTED_APP - Trusted app msg - freestyle text
+    # AUDIT_USER_CMD - User shell command and args
+    # AUDIT_CHUSER_ID - Changed user ID supplemental data
+
+  EventTypeSystemServices:
+    # AUDIT_KERNEL - Asynchronous audit record. NOT A REQUEST.
+    # AUDIT_SYSTEM_BOOT	- System boot
+    # AUDIT_SYSTEM_SHUTDOWN	- System shutdown
+    # AUDIT_SYSTEM_RUNLEVEL	- System runlevel change
+    # AUDIT_SERVICE_START	- Service (daemon) start
+    # AUDIT_SERVICE_STOP - Service (daemon) stop
+    categories:
+      - host
+    default_types:
+      - info
+    types:
+      AUDIT_SYSTEM_BOOT:
+        - start
+      AUDIT_SYSTEM_RUNLEVEL:
+        - change
+      AUDIT_SYSTEM_SHUTDOWN:
+        - end
+
+  EventTypeConfig:
+    # AUDIT_USYS_CONFIG - User space system config change
+    # AUDIT_CONFIG_CHANGE - Audit system configuration change
+    # AUDIT_NETFILTER_CFG - Netfilter chain modifications
+    # AUDIT_FEATURE_CHANGE - audit log listing feature changes
+    # AUDIT_REPLACE - Replace auditd if this packet unanswerd
+
+  EventTypeTTY:
+    # AUDIT_USER_TTY - Non-ICANON TTY input meaning
+    # AUDIT_TTY - Input on an administrative TTY
+    categories:
+    #   - device
+
+  EventTypeAuditDaemon:
+    # AUDIT_DAEMON_START  - Daemon startup record
+    # AUDIT_DAEMON_END - Daemon normal stop record
+    # AUDIT_DAEMON_ABORT - Daemon error stop record
+    # AUDIT_DAEMON_CONFIG - Daemon config change
+
+  EventTypeMACDecision:
+    # AUDIT_USER_SELINUX_ERR - SE Linux user space error
+    # AUDIT_USER_AVC - User space avc message
+    # AUDIT_APPARMOR_ALLOWED
+    # AUDIT_APPARMOR_DENIED
+    # AUDIT_APPARMOR_ERROR
+    # AUDIT_AVC - SE Linux avc denial or grant
+    # AUDIT_SELINUX_ERR - Internal SE Linux Errors
+    # AUDIT_AVC_PATH - dentry, vfsmount pair from avc
+    categories:
+    #     - policy
+
+  EventTypeAnomoly:
+    # AUDIT_ANOM_PROMISCUOUS - Device changed promiscuous mode
+    # AUDIT_ANOM_ABEND - Process ended abnormally
+    # AUDIT_ANOM_LINK - Suspicious use of file links
+    # AUDIT_ANOM_LOGIN_FAILURES	- Failed login limit reached
+    # AUDIT_ANOM_LOGIN_TIME	- Login attempted at bad time
+    # AUDIT_ANOM_LOGIN_SESSIONS	- Max concurrent sessions reached
+    # AUDIT_ANOM_LOGIN_ACCT	- Login attempted to watched acct
+    # AUDIT_ANOM_LOGIN_LOCATION - Login from forbidden location
+    # AUDIT_ANOM_MAX_DAC - Max DAC failures reached
+    # AUDIT_ANOM_MAX_MAC - Max MAC failures reached
+    # AUDIT_ANOM_AMTU_FAIL - AMTU failure
+    # AUDIT_ANOM_RBAC_FAIL - RBAC self test failure
+    # AUDIT_ANOM_CRYPTO_FAIL - Crypto system test failure
+    # AUDIT_ANOM_EXEC - Execution of file
+    # AUDIT_ANOM_MK_EXE - Make an executable
+    # AUDIT_ANOM_ACCESS_FS - Access of file or dir
+    # AUDIT_ANOM_ADD_ACCT - Adding an acct
+    # AUDIT_ANOM_DEL_ACCT - Deleting an acct
+    # AUDIT_ANOM_MOD_ACCT - Changing an acct
+    # AUDIT_ANOM_ROOT_TRANS - User became root
+    # AUDIT_ANOM_LOGIN_SERVICE - Service acct attempted login
+    categories:
+    #   - anomaly
+
+  EventTypeIntegrity:
+    # AUDIT_INTEGRITY_DATA - Data integrity verification
+    # AUDIT_INTEGRITY_METADATA - Metadata integrity verification
+    # AUDIT_INTEGRITY_STATUS - Integrity enable status
+    # AUDIT_INTEGRITY_HASH - Integrity HASH type
+    # AUDIT_INTEGRITY_PCR - PCR invalidation msgs
+    # AUDIT_INTEGRITY_RULE - Policy rule
+    # AUDIT_ANOM_RBAC_INTEGRITY_FAIL - RBAC file integrity failure
+
+  EventTypeAnomolyResponse:
+    # AUDIT_RESP_ANOMALY - Anomaly not reacted to
+    # AUDIT_RESP_ALERT - Alert email was sent
+    # AUDIT_RESP_KILL_PROC - Kill program
+    # AUDIT_RESP_TERM_ACCESS - Terminate session
+    # AUDIT_RESP_ACCT_REMOTE - Acct locked from remote access
+    # AUDIT_RESP_ACCT_LOCK_TIMED - User acct locked for time
+    # AUDIT_RESP_ACCT_UNLOCK_TIMED - User acct unlocked from time
+    # AUDIT_RESP_ACCT_LOCK - User acct was locked
+    # AUDIT_RESP_TERM_LOCK - Terminal was locked
+    # AUDIT_RESP_SEBOOL	- Set an SE Linux boolean
+    # AUDIT_RESP_EXEC - Execute a script
+    # AUDIT_RESP_SINGLE	- Go to single user mode
+    # AUDIT_RESP_HALT - take the system down
+    # AUDIT_RESP_ORIGIN_BLOCK	- Address blocked by iptables
+    # AUDIT_RESP_ORIGIN_BLOCK_TIMED - Address blocked for time
+
+  EventTypeMAC:
+    # AUDIT_APPARMOR_AUDIT
+    # AUDIT_APPARMOR_HINT
+    # AUDIT_APPARMOR_STATUS
+    # AUDIT_APPARMOR_ERROR
+    # AUDIT_MAC_POLICY_LOAD - Policy file load
+    # AUDIT_MAC_STATUS - Changed enforcing,permissive,off
+    # AUDIT_MAC_CONFIG_CHANGE - Changes to booleans
+    # AUDIT_MAC_UNLBL_ALLOW - NetLabel: allow unlabeled traffic
+    # AUDIT_MAC_CIPSOV4_ADD - NetLabel: add CIPSOv4 DOI entry
+    # AUDIT_MAC_CIPSOV4_DEL - NetLabel: del CIPSOv4 DOI entry
+    # AUDIT_MAC_MAP_ADD - NetLabel: add LSM domain mapping
+    # AUDIT_MAC_MAP_DEL - NetLabel: del LSM domain mapping
+    # AUDIT_MAC_IPSEC_EVENT - Audit an IPSec event
+    # AUDIT_MAC_UNLBL_STCADD - NetLabel: add a static label
+    # AUDIT_MAC_UNLBL_STCDEL - NetLabel: del a static label
+    # AUDIT_MAC_CALIPSO_ADD - NetLabel: add CALIPSO DOI entry
+    # AUDIT_MAC_CALIPSO_DEL - NetLabel: del CALIPSO DOI entry
+    # AUDIT_USER_ROLE_CHANGE - User changed to a new role // should this be classified EventTypeUserAccount?
+    # AUDIT_ROLE_ASSIGN	- Admin assigned user to role // should this be classified EventTypeUserAccount?
+    # AUDIT_ROLE_REMOVE - Admin removed user from role // should this be classified EventTypeUserAccount?
+    # AUDIT_LABEL_OVERRIDE - Admin is overriding a label
+    # AUDIT_LABEL_LEVEL_CHANGE - Object's level was changed
+    # AUDIT_USER_LABELED_EXPORT - Object exported with label
+    # AUDIT_USER_UNLABELED_EXPORT - Object exported without label
+    # AUDIT_DEV_ALLOC - Device was allocated
+    # AUDIT_DEV_DEALLOC	- Device was deallocated
+    # AUDIT_FS_RELABEL - Filesystem relabeled
+    # AUDIT_USER_MAC_POLICY_LOAD - Userspc daemon loaded policy
+    # AUDIT_ROLE_MODIFY	- Admin modified a role
+    # AUDIT_USER_MAC_CONFIG_CHANGE - Change made to MAC policy
+
+  EventTypeDACDecision:
+    # AUDIT_SECCOMP - Secure Computing event
+
+  EventTypeCrypto:
+  EventTypeUnknown:
+
+messageTypes:
+  AUDIT_EXECVE:
+    categories:
+      - process
+    types:
+      - start
+  AUDIT_SERVICE_START:
+    categories:
+      - process
+    types:
+      - start
+  AUDIT_SERVICE_STOP:
+    categories:
+      - process
+    types:
+      - end
+  AUDIT_USER_CHAUTHTOK:
+    categories:
+      - iam
+    types:
+      - user
+      - change
+  AUDIT_ROLE_ASSIGN:
+    categories:
+      - iam
+    types:
+      - user
+      - change
+  AUDIT_ROLE_REMOVE:
+    categories:
+      - iam
+    types:
+      - user
+      - change
+  # triggers on setuid
+  AUDIT_CHUSER_ID:
+    categories:
+      - process
+    types:
+      - change
+  # triggers on setgid
+  AUDIT_CHGRP_ID:
+    categories:
+      - process
+    types:
+      - change

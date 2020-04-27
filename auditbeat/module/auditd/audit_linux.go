@@ -17,7 +17,7 @@
 
 package auditd
 
-//go:generate sh -c "go run mkecs_categorization.go -in ecs_categorization.yml -out zecs_categorization.go"
+//go:generate sh -c "go run mk_ecs_categorization.go -in ecs_categorization.yml -out z_ecs_categorization.go"
 
 import (
 	"fmt"

@@ -52,7 +52,7 @@ type eventType struct {
 type TemplateParams struct {
 	Command      string                 `yaml:"-"`
 	EventTypes   map[string]eventType   `yaml:"eventTypes"`
-	MessageTypes map[string]messageType `yaml:"messagetypes"`
+	MessageTypes map[string]messageType `yaml:"messageTypes"`
 }
 
 const fileTemplate = `
@@ -224,7 +224,7 @@ var flagOut string
 
 func main() {
 	flag.StringVar(&flagIn, "in", "ecs_categorization.yml", "input file")
-	flag.StringVar(&flagOut, "out", "zecs_categorization.go", "output file")
+	flag.StringVar(&flagOut, "out", "z_ecs_categorization.go", "output file")
 	flag.Parse()
 
 	var err error
