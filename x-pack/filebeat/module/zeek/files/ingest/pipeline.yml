@@ -14,34 +14,40 @@ processors:
     source: ctx.zeek.session_id = ctx.zeek.files.session_ids[0];
     if: ctx.zeek.files.session_ids != null
     ignore_failure: true
-- script:
-    lang: painless
-    source: ctx.zeek.files.rx_host = ctx.zeek.files.rx_hosts[0]; ctx.zeek.files.remove('rx_hosts');
-    ignore_failure: true
+- set:
+    field: event.id
+    value: '{{zeek.session_id}}'
+    if: ctx.zeek.session_id != null
+- foreach:
+    field: zeek.files.tx_hosts
+    processor:
+      append:
+        field: related.ip
+        value: "{{_ingest._value}}"
+    ignore_missing: true
 - script:
     lang: painless
     source: ctx.zeek.files.tx_host = ctx.zeek.files.tx_hosts[0]; ctx.zeek.files.remove('tx_hosts');
     ignore_failure: true
 - set:
-    field: event.id
-    value: '{{zeek.session_id}}'
-    if: ctx.zeek.session_id != null
-- append:
     field: server.ip
     value: "{{zeek.files.tx_host}}"
-    if: "ctx?.zeek?.files?.tx_host != null"    
-- append:
-    field: related.ip
-    value: "{{zeek.files.tx_host}}"
     if: "ctx?.zeek?.files?.tx_host != null"
-- append:
+- foreach:
+    field: zeek.files.rx_hosts
+    processor:
+      append:
+        field: related.ip
+        value: "{{_ingest._value}}"
+    ignore_missing: true
+- script:
+    lang: painless
+    source: ctx.zeek.files.rx_host = ctx.zeek.files.rx_hosts[0]; ctx.zeek.files.remove('rx_hosts');
+    ignore_failure: true
+- set:
     field: client.ip
     value: "{{zeek.files.rx_host}}"
     if: "ctx?.zeek?.files?.rx_host != null"    
-- append:
-    field: related.ip
-    value: "{{zeek.files.rx_host}}"
-    if: "ctx?.zeek?.files?.rx_host != null"
 - append:
     field: related.hash
     value: "{{file.hash.md5}}"
