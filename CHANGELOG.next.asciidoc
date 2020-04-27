@@ -27,7 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
+- Build journalbeat with systemd 232 (Debian 9), it may stop working with older versions. {pull}18008[18008]
 
 
 *Metricbeat*
@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
 
 *Metricbeat*
 
@@ -281,6 +282,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Journalbeat*
+
 
 *Metricbeat*
 
