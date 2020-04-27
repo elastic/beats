@@ -2,8 +2,9 @@
 set -exuo pipefail
 
 MSG="parameter missing."
+DEFAULT_HOME="/usr/local"
 K8S_VERSION=${K8S_VERSION:?$MSG}
-HOME=${HOME:?$MSG}
+HOME=${HOME:?$DEFAULT_HOME}
 KUBECTL_CMD="${HOME}/bin/kubectl"
 
 mkdir -p "${HOME}/bin"
