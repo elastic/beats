@@ -9,7 +9,7 @@ beta[]
 <titleabbrev>Unix</titleabbrev>
 ++++
 
-Use the `Unix` input to read events over a stream-oriented Unix domain socket.
+Use the `unix` input to read events over a stream-oriented Unix domain socket.
 
 Example configuration:
 
