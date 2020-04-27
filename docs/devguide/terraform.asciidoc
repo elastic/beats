@@ -46,12 +46,36 @@ directory where `terraform apply` is executed.
 
 Please take a look to Terraform documentation for more details: https://www.terraform.io/intro/index.html
 
+[[terraform-configurations]]
+=== Terraform configuration guidelines
+
+The main purpouse of Terraform in Beats is to create and destroy cloud resources
+required by integration tests. For these configurations there are some things to
+take into account:
+* Apply should work without additional inputs or files. Only input will be the
+  required for specific providers, using environment variables or credential
+  files.
+* You must be able to apply the same configuration multiple times in the same
+  account. This will allow to have multiple builds using the same configuration
+  but with different instances of the resources. Some resources are already
+  created with unique identifiers (as EC2 instances), some others have to be
+  explicitly created with unique names (e.g. S3 buckets). For these cases random
+  suffixes can be added to identifiers.
+* Destroy must work without additional input, and should be able to destroy all
+  the resources created by the configuration. There are some resources that need
+  specific flags to be destroyed by `terraform destroy`. For example S3 buckets
+  need a flag to force to empty the bucket before deleting it, or RDS instances
+  need a flag to disable snapshots on deletion.
+
 [[terraform-in-ci]]
 === Terraform in CI
 
 Integration tests that need the presence of certain resources to work can be
 executed in CI if they provide a Terraform configuration to start these
 resources. These tests are disabled by default in CI.
+
+Terraform states are archived as artifacrs of builds, this allows to manually
+destroy resources created by builds that were not able to do a proper cleanup.
 
 Here is a checklist to add support for a cloud feature in Jenkins:
 * In the feature code:
