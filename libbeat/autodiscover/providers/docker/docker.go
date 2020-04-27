@@ -306,7 +306,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 }
 
 func (d *Provider) publish(event bus.Event) {
-	// add keystore in the event to be consumed by the static configs
+	// attach keystore to the event to be consumed by the static configs
 	event["keystore"] = d.keystore
 	// Try to match a config
 	if config := d.templates.GetConfig(event); config != nil {
