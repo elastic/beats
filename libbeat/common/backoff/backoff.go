@@ -21,9 +21,18 @@ import "time"
 
 // Backoff defines the interface for backoff strategies.
 type Backoff interface {
-	Wait() bool
-	Reset()
+	// WaitDuration returns the duration of time to backoff for, as governed by the backoff
+	// strategy.
 	WaitDuration() time.Duration
+
+	// Wait blocks for a duration of time governed by the backoff strategy. If Wait is called N
+	// times, the duration that Wait blocks for each of the N calls must be the same as the
+	// duration that would be returned by each of the corresponding N calls to WaitDuration. To
+	// ensure this, it is recommended that the implementation of Wait call WaitDuration internally.
+	Wait() bool
+
+	// Reset resets the backoff duration to an initial value governed by the backoff strategy.
+	Reset()
 }
 
 // WaitOnError is a convenience method, if an error is received it will block, if not errors is
