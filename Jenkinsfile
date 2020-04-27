@@ -40,13 +40,13 @@ pipeline {
       steps {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
