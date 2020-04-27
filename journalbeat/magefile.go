@@ -200,7 +200,16 @@ func installDependencies(pkg, arch string) error {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	params := append([]string{"install", "-y",
+		"--no-install-recommends",
+
+		// Journalbeat is built with old versions of Debian that don't update
+		// their repositories, so they have expired keys.
+		// Allow unauthenticated packages.
+		// This was not enough: "-o", "Acquire::Check-Valid-Until=false",
+		"--allow-unauthenticated",
+	}, pkg)
+	return sh.Run("apt-get", params...)
 }
 
 func selectImage(platform string) (string, error) {
