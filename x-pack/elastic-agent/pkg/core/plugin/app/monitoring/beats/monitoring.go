@@ -6,7 +6,6 @@ package beats
 
 import (
 	"fmt"
-	"path/filepath"
 )
 
 const (
@@ -35,8 +34,4 @@ func getLoggingFile(program, operatingSystem, installPath, pipelineID string) st
 	}
 
 	return fmt.Sprintf(logFileFormat, pipelineID, program)
-}
-
-func getLoggingFileDirectory(installPath, operatingSystem, pipelineID string) string {
-	return filepath.Base(getLoggingFile("program", operatingSystem, installPath, pipelineID))
 }
