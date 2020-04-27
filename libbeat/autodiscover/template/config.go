@@ -113,6 +113,10 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, keystoreEnab
 			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(eventKeystore)))
 			delete(event, "keystore")
 		}
+	} else {
+		if _, ok := event["keystore"]; ok {
+			delete(event, "keystore")
+		}
 	}
 
 	for _, config := range configs {
