@@ -119,7 +119,7 @@ func (action Action) String() string {
 // particular action.
 func (action Action) ECSTypes() []string {
 	if name, found := ecsActionNames[action]; found {
-		return []string{ name }
+		return []string{name}
 	}
 	var list []string
 	for flag, name := range ecsActionNames {
@@ -213,5 +213,3 @@ func (actions ActionArray) ECSTypes() []string {
 	}
 	return common.MakeStringSet(list...).ToSlice()
 }
-
-
