@@ -141,24 +141,24 @@ func TestLoginType(t *testing.T) {
 
 	for idx, expected := range []common.MapStr{
 		{
-			"event.category": []string{"authentication"},
-			"event.type":     []string{"authentication_failure"},
+			"event.category": []string{"authentication", "user-login"},
+			"event.type":     []string{"start", "authentication_failure"},
 			"event.outcome":  "failure",
 			"user.name":      "(invalid user)",
 			"user.id":        nil,
 			"session":        nil,
 		},
 		{
-			"event.category": []string{"authentication"},
-			"event.type":     []string{"authentication_success"},
+			"event.category": []string{"authentication", "user-login"},
+			"event.type":     []string{"start", "authentication_success"},
 			"event.outcome":  "success",
 			"user.name":      "adrian",
 			"user.audit.id":  nil,
 			"auditd.session": nil,
 		},
 		{
-			"event.category": []string{"user-login"},
-			"event.type":     []string{},
+			"event.category": []string{"authentication", "user-login"},
+			"event.type":     []string{"info"},
 			"event.outcome":  "success",
 			"user.name":      "root",
 			"user.id":        "0",
