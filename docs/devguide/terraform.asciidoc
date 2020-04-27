@@ -64,7 +64,7 @@ Here is a checklist to add support for a cloud feature in Jenkins:
   * Add a boolean parameter to run the tests on this environment, e.g.
     `awsCloudTests`. This parameter should be set to false by default.
   * Add a conditional block in `withCloudTestEnv` that:
-     * Will be executed if the previoysly added boolean parameter, or `allCloudTests`
+     * Will be executed if the previously added boolean parameter, or `allCloudTests`
        are set to true.
      * Adds the tag to `TEST_TAGS` (as comma separated values), so tests are
        selected.
