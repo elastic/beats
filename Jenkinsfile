@@ -938,6 +938,7 @@ def loadConfigEnvVars(){
 
   def generatorPatterns = ['^generator/.*']
   generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 }
 
