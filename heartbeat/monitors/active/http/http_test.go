@@ -373,7 +373,9 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
 	defer closeSrv()
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
-	event := sendTLSRequest(t, u.String(), true, nil)
+
+	extraConfig := map[string]interface{}{"ssl.certificate_authorities": "../fixtures/expired.cert"}
+	event := sendTLSRequest(t, u.String(), true, extraConfig)
 
 	testslike.Test(
 		t,
