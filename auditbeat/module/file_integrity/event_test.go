@@ -313,6 +313,9 @@ func TestBuildEvent(t *testing.T) {
 			assertHasKey(t, fields, "file.mode")
 		}
 
+		assertHasKey(t, fields, "file.hash.sha1")
+		assertHasKey(t, fields, "file.hash.sha256")
+		// Remove in 8.x
 		assertHasKey(t, fields, "hash.sha1")
 		assertHasKey(t, fields, "hash.sha256")
 	})
