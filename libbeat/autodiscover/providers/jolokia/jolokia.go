@@ -19,7 +19,6 @@ package jolokia
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/keystore"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 func init() {
@@ -94,7 +94,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
-		keystore: keystore,
+		keystore:  keystore,
 	}, nil
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
-	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -16,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -36,7 +36,7 @@ type Provider struct {
 	stopListener  bus.Listener
 	watcher       *watcher
 	uuid          uuid.UUID
-	keystore keystore.Keystore
+	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder is the main builder for this provider.

@@ -7,9 +7,10 @@ package ec2
 import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/keystore"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -34,7 +35,7 @@ type Provider struct {
 	stopListener  bus.Listener
 	watcher       *watcher
 	uuid          uuid.UUID
-	keystore keystore.Keystore
+	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
@@ -96,7 +97,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *awsauto.Config, fetche
 		bus:       bus,
 		templates: &mapper,
 		uuid:      uuid,
-		keystore: keystore,
+		keystore:  keystore,
 	}
 
 	p.watcher = newWatcher(

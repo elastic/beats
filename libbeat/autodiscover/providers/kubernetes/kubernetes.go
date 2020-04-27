@@ -99,7 +99,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		builders:  builders,
 		appenders: appenders,
 		logger:    logger,
-		keystore: keystore,
+		keystore:  keystore,
 	}
 
 	switch config.Resource {
@@ -138,8 +138,9 @@ func (p *Provider) String() string {
 }
 
 func (p *Provider) publish(event bus.Event) {
-	// Try to match a config
+	// add keystore in the event to be consumed by the static configs
 	event["keystore"] = p.keystore
+	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {

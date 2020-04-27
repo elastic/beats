@@ -21,7 +21,6 @@ package docker
 
 import (
 	"fmt"
-	"github.com/elastic/beats/libbeat/keystore"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -34,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -306,8 +306,9 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 }
 
 func (d *Provider) publish(event bus.Event) {
-	// Try to match a config
+	// add keystore in the event to be consumed by the static configs
 	event["keystore"] = d.keystore
+	// Try to match a config
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else {
