@@ -68,12 +68,12 @@ eventTypes:
 
   EventTypeVirt:
     # AUDIT_VIRT_CONTROL - Start, Pause, Stop VM
-    # AUDIT_VIRT_RESOURCE	- Resource assignment
-    # AUDIT_VIRT_MACHINE_ID	- Binding of label to VM
+    # AUDIT_VIRT_RESOURCE - Resource assignment
+    # AUDIT_VIRT_MACHINE_ID - Binding of label to VM
     # AUDIT_VIRT_INTEGRITY_CHECK - Guest integrity results
-    # AUDIT_VIRT_CREATE	- Creation of guest image
+    # AUDIT_VIRT_CREATE - Creation of guest image
     # AUDIT_VIRT_DESTROY - Destruction of guest image
-    # AUDIT_VIRT_MIGRATE_IN	- Inbound guest migration info
+    # AUDIT_VIRT_MIGRATE_IN - Inbound guest migration info
     # AUDIT_VIRT_MIGRATE_OUT - Outbound guest migration info
     categories:
       - host
@@ -98,10 +98,10 @@ eventTypes:
 
   EventTypeSystemServices:
     # AUDIT_KERNEL - Asynchronous audit record. NOT A REQUEST.
-    # AUDIT_SYSTEM_BOOT	- System boot
-    # AUDIT_SYSTEM_SHUTDOWN	- System shutdown
-    # AUDIT_SYSTEM_RUNLEVEL	- System runlevel change
-    # AUDIT_SERVICE_START	- Service (daemon) start
+    # AUDIT_SYSTEM_BOOT - System boot
+    # AUDIT_SYSTEM_SHUTDOWN - System shutdown
+    # AUDIT_SYSTEM_RUNLEVEL - System runlevel change
+    # AUDIT_SERVICE_START - Service (daemon) start
     # AUDIT_SERVICE_STOP - Service (daemon) stop
     categories:
       - host
@@ -116,7 +116,7 @@ eventTypes:
         - end
 
   EventTypeAuditDaemon:
-    # AUDIT_DAEMON_START  - Daemon startup record
+    # AUDIT_DAEMON_START - Daemon startup record
     # AUDIT_DAEMON_END - Daemon normal stop record
     # AUDIT_DAEMON_ABORT - Daemon error stop record
     # AUDIT_DAEMON_CONFIG - Daemon config change
@@ -168,10 +168,10 @@ eventTypes:
     # AUDIT_ANOM_PROMISCUOUS - Device changed promiscuous mode
     # AUDIT_ANOM_ABEND - Process ended abnormally
     # AUDIT_ANOM_LINK - Suspicious use of file links
-    # AUDIT_ANOM_LOGIN_FAILURES	- Failed login limit reached
-    # AUDIT_ANOM_LOGIN_TIME	- Login attempted at bad time
-    # AUDIT_ANOM_LOGIN_SESSIONS	- Max concurrent sessions reached
-    # AUDIT_ANOM_LOGIN_ACCT	- Login attempted to watched acct
+    # AUDIT_ANOM_LOGIN_FAILURES - Failed login limit reached
+    # AUDIT_ANOM_LOGIN_TIME - Login attempted at bad time
+    # AUDIT_ANOM_LOGIN_SESSIONS - Max concurrent sessions reached
+    # AUDIT_ANOM_LOGIN_ACCT - Login attempted to watched acct
     # AUDIT_ANOM_LOGIN_LOCATION - Login from forbidden location
     # AUDIT_ANOM_MAX_DAC - Max DAC failures reached
     # AUDIT_ANOM_MAX_MAC - Max MAC failures reached
@@ -210,11 +210,11 @@ eventTypes:
     # AUDIT_RESP_ACCT_UNLOCK_TIMED - User acct unlocked from time
     # AUDIT_RESP_ACCT_LOCK - User acct was locked
     # AUDIT_RESP_TERM_LOCK - Terminal was locked
-    # AUDIT_RESP_SEBOOL	- Set an SE Linux boolean
+    # AUDIT_RESP_SEBOOL - Set an SE Linux boolean
     # AUDIT_RESP_EXEC - Execute a script
-    # AUDIT_RESP_SINGLE	- Go to single user mode
+    # AUDIT_RESP_SINGLE - Go to single user mode
     # AUDIT_RESP_HALT - take the system down
-    # AUDIT_RESP_ORIGIN_BLOCK	- Address blocked by iptables
+    # AUDIT_RESP_ORIGIN_BLOCK - Address blocked by iptables
     # AUDIT_RESP_ORIGIN_BLOCK_TIMED - Address blocked for time
     categories:
     #   - anomaly
@@ -238,17 +238,17 @@ eventTypes:
     # AUDIT_MAC_CALIPSO_ADD - NetLabel: add CALIPSO DOI entry
     # AUDIT_MAC_CALIPSO_DEL - NetLabel: del CALIPSO DOI entry
     # AUDIT_USER_ROLE_CHANGE - User changed to a new role // should this be classified EventTypeUserAccount?
-    # AUDIT_ROLE_ASSIGN	- Admin assigned user to role // should this be classified EventTypeUserAccount?
+    # AUDIT_ROLE_ASSIGN - Admin assigned user to role // should this be classified EventTypeUserAccount?
     # AUDIT_ROLE_REMOVE - Admin removed user from role // should this be classified EventTypeUserAccount?
     # AUDIT_LABEL_OVERRIDE - Admin is overriding a label
     # AUDIT_LABEL_LEVEL_CHANGE - Object's level was changed
     # AUDIT_USER_LABELED_EXPORT - Object exported with label
     # AUDIT_USER_UNLABELED_EXPORT - Object exported without label
     # AUDIT_DEV_ALLOC - Device was allocated
-    # AUDIT_DEV_DEALLOC	- Device was deallocated
+    # AUDIT_DEV_DEALLOC - Device was deallocated
     # AUDIT_FS_RELABEL - Filesystem relabeled
     # AUDIT_USER_MAC_POLICY_LOAD - Userspc daemon loaded policy
-    # AUDIT_ROLE_MODIFY	- Admin modified a role
+    # AUDIT_ROLE_MODIFY - Admin modified a role
     # AUDIT_USER_MAC_CONFIG_CHANGE - Change made to MAC policy
     categories:
     #   - policy
@@ -256,18 +256,18 @@ eventTypes:
   EventTypeAuditRule:
     # AUDIT_SYSCALL - Syscall event
     # AUDIT_PATH - Filename path information
-    # AUDIT_IPC	- IPC record
+    # AUDIT_IPC - IPC record
     # AUDIT_SOCKETCALL - sys_socketcall arguments
     # AUDIT_SOCKADDR - sockaddr copied as syscall arg
-    # AUDIT_CWD	- Current working directory
+    # AUDIT_CWD - Current working directory
     # AUDIT_EXECVE - execve arguments
     # AUDIT_IPC_SET_PERM - IPC new permissions record type
-    # AUDIT_MQ_OPEN	- POSIX MQ open record type
+    # AUDIT_MQ_OPEN - POSIX MQ open record type
     # AUDIT_MQ_SENDRECV- POSIX MQ send/receive record type
-    # AUDIT_MQ_NOTIFY	- POSIX MQ notify record type
+    # AUDIT_MQ_NOTIFY - POSIX MQ notify record type
     # AUDIT_MQ_GETSETATTR - POSIX MQ get/set attribute record type
-    # AUDIT_FD_PAIR	- audit record for pipe/socketpair
-    # AUDIT_OBJ_PID	- ptrace target
+    # AUDIT_FD_PAIR - audit record for pipe/socketpair
+    # AUDIT_OBJ_PID - ptrace target
     # AUDIT_BPRM_FCAPS - Information about fcaps increasing perms
     # AUDIT_CAPSET - Record showing argument to sys_capset
     # AUDIT_MMAP - Record showing descriptor and flags in mmap
