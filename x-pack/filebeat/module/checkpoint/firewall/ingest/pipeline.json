@@ -61,9 +61,9 @@
       }
     },
     {
-      "set": {
+      "append": {
         "field": "event.category",
-        "value": ["network"],
+        "value": "network",
         "if": "ctx.checkpoint?.operation != 'Log In'"
       }
     },
@@ -242,9 +242,9 @@
       }
     },
     {
-      "set": {
+      "append": {
         "field": "event.category",
-        "value": ["authentication"],
+        "value": "authentication",
         "if": "ctx.checkpoint?.operation == 'Log In'"
       }
     },
@@ -270,7 +270,7 @@
       }
     },
     {
-      "set" : {
+      "append" : {
         "field": "event.type",
         "value": ["allowed", "connection"],
         "if": "['Accept', 'Allow'].contains(ctx.checkpoint?.rule_action)"
@@ -298,7 +298,7 @@
       }
     },
     {
-      "set" : {
+      "append" : {
         "field": "event.type",
         "value": ["connection", "denied"],
         "if": "['Drop', 'Reject', 'Block', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
@@ -1026,6 +1026,68 @@
         "pattern": "^:\"",
         "replacement": "",
         "if": "ctx.checkpoint?.sys_message != null"
+      }
+    },
+    {
+      "geoip" : {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true,
+        "if": "ctx.source?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "field": "destination.ip",
+        "target_field": "destination.geo",
+        "ignore_missing": true,
+        "if": "ctx.destination?.geo == null"
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "source.ip",
+        "target_field": "source.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip" : {
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "destination.ip",
+        "target_field": "destination.as",
+        "properties": ["asn", "organization_name"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.asn",
+        "target_field": "source.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.asn",
+        "target_field": "destination.as.number",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename" : {
+        "field": "destination.as.organization_name",
+        "target_field": "destination.as.organization.name",
+        "ignore_missing": true
       }
     },
     {

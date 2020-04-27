@@ -11,9 +11,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
+
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
@@ -21,42 +22,31 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
-func newStackdriverMetricsRequester(ctx context.Context, c config, window time.Duration, logger *logp.Logger) (*stackdriverMetricsRequester, error) {
-	interval, err := getTimeInterval(window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error trying to get time window")
-	}
-
-	client, err := monitoring.NewMetricClient(ctx, c.opt...)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating Stackdriver client")
-	}
-
-	return &stackdriverMetricsRequester{
-		config:   c,
-		client:   client,
-		logger:   logger,
-		interval: interval,
-	}, nil
-}
-
 type stackdriverMetricsRequester struct {
 	config config
 
-	client   *monitoring.MetricClient
-	interval *monitoringpb.TimeInterval
+	client *monitoring.MetricClient
 
 	logger *logp.Logger
 }
 
-func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out []*monitoringpb.TimeSeries) {
-	out = make([]*monitoringpb.TimeSeries, 0)
+type timeSeriesWithAligner struct {
+	timeSeries []*monitoringpb.TimeSeries
+	aligner    string
+}
+
+func (r *stackdriverMetricsRequester) Metric(ctx context.Context, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
+	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
-		Interval: r.interval,
+		Interval: timeInterval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   r.getFilterForMetric(m),
+		Filter:   r.getFilterForMetric(metricType),
+		Aggregation: &monitoringpb.Aggregation{
+			PerSeriesAligner: googlecloud.AlignersMapToGCP[aligner],
+			AlignmentPeriod:  &r.config.period,
+		},
 	}
 
 	it := r.client.ListTimeSeries(ctx, req)
@@ -67,13 +57,15 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, m string) (out
 		}
 
 		if err != nil {
-			r.logger.Errorf("Could not read time series value: %s: %v", m, err)
+			r.logger.Errorf("Could not read time series value: %s: %v", metricType, err)
 			break
 		}
 
-		out = append(out, resp)
+		timeSeries = append(timeSeries, resp)
 	}
 
+	out.aligner = aligner
+	out.timeSeries = timeSeries
 	return
 }
 
@@ -89,23 +81,29 @@ func constructFilter(m string, region string, zone string) string {
 	return filter
 }
 
-func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, ms []string) ([]*monitoringpb.TimeSeries, error) {
+func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, stackDriverConfigs []stackDriverConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
-	results := make([]*monitoringpb.TimeSeries, 0)
+	results := make([]timeSeriesWithAligner, 0)
 
-	for _, metric := range ms {
-		wg.Add(1)
+	for _, sdc := range stackDriverConfigs {
+		aligner := sdc.Aligner
+		for _, mt := range sdc.MetricTypes {
+			metricType := mt
+			wg.Add(1)
 
-		go func(m string) {
-			defer wg.Done()
+			go func(metricType string) {
+				defer wg.Done()
 
-			ts := r.Metric(ctx, m)
+				metricMeta := metricsMeta[metricType]
+				interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
+				ts := r.Metric(ctx, metricType, interval, aligner)
 
-			lock.Lock()
-			defer lock.Unlock()
-			results = append(results, ts...)
-		}(metric)
+				lock.Lock()
+				defer lock.Unlock()
+				results = append(results, ts)
+			}(metricType)
+		}
 	}
 
 	wg.Wait()
@@ -144,21 +142,28 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	return
 }
 
-// Returns a GCP TimeInterval based on the provided config
-func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, error) {
-	var startTime, endTime time.Time
+// Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+	var startTime, endTime, currentTime time.Time
+	var needsAggregation bool
+	currentTime = time.Now().UTC()
 
-	if windowTime > 0 {
-		endTime = time.Now().UTC()
-		startTime = time.Now().UTC().Add(-windowTime)
+	// When samplePeriod < collectionPeriod, aggregation will be done in ListTimeSeriesRequest.
+	// For example, samplePeriod = 60s, collectionPeriod = 300s, if perSeriesAligner is not given,
+	// ALIGN_MEAN will be used by default.
+	if int64(samplePeriod.Seconds()) < collectionPeriod.Seconds {
+		endTime = currentTime.Add(-ingestDelay)
+		startTime = endTime.Add(-time.Duration(collectionPeriod.Seconds) * time.Second)
+		needsAggregation = true
 	}
 
-	if windowTime.Minutes() < googlecloud.MinTimeIntervalDataWindowMinutes {
-		return nil, errors.Errorf("the provided window time is too small. No less than %d minutes can be fetched", googlecloud.MinTimeIntervalDataWindowMinutes)
-	}
-
-	if windowTime.Minutes() >= googlecloud.MaxTimeIntervalDataWindowMinutes {
-		return nil, errors.Errorf("the provided window time is too big. No more than %d minutes can be fetched", googlecloud.MaxTimeIntervalDataWindowMinutes)
+	// When samplePeriod == collectionPeriod, aggregation is not needed
+	// When samplePeriod > collectionPeriod, aggregation is not needed, use sample period
+	// to determine startTime and endTime to make sure there will be data point in this time range.
+	if int64(samplePeriod.Seconds()) >= collectionPeriod.Seconds {
+		endTime = time.Now().UTC().Add(-ingestDelay)
+		startTime = endTime.Add(-samplePeriod)
+		needsAggregation = false
 	}
 
 	interval := &monitoringpb.TimeInterval{
@@ -170,5 +175,11 @@ func getTimeInterval(windowTime time.Duration) (*monitoringpb.TimeInterval, erro
 		},
 	}
 
-	return interval, nil
+	// Default aligner for aggregation is ALIGN_NONE if it's not given
+	updatedAligner := googlecloud.DefaultAligner
+	if needsAggregation && inputAligner != "" {
+		updatedAligner = inputAligner
+	}
+
+	return interval, updatedAligner
 }

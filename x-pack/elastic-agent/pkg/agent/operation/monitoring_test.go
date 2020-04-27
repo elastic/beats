@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/beats"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
@@ -23,26 +23,27 @@ import (
 
 func TestGenerateSteps(t *testing.T) {
 	const sampleOutput = "sample-output"
-	operator, _ := getMonitorableTestOperator(t, "tests/scripts")
 
 	type testCase struct {
 		Name           string
-		Config         *monitoring.Config
+		Config         *monitoringConfig.MonitoringConfig
 		ExpectedSteps  int
 		FilebeatStep   bool
 		MetricbeatStep bool
 	}
 
 	testCases := []testCase{
-		testCase{"NO monitoring", &monitoring.Config{MonitorLogs: false, MonitorMetrics: false}, 0, false, false},
-		testCase{"FB monitoring", &monitoring.Config{MonitorLogs: true, MonitorMetrics: false}, 1, true, false},
-		testCase{"MB monitoring", &monitoring.Config{MonitorLogs: false, MonitorMetrics: true}, 1, false, true},
-		testCase{"ALL monitoring", &monitoring.Config{MonitorLogs: true, MonitorMetrics: true}, 2, true, true},
+		{"NO monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: false, MonitorMetrics: false}, 0, false, false},
+		{"FB monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: true, MonitorMetrics: false}, 1, true, false},
+		{"MB monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: false, MonitorMetrics: true}, 1, false, true},
+		{"ALL monitoring", &monitoringConfig.MonitoringConfig{MonitorLogs: true, MonitorMetrics: true}, 2, true, true},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			steps := operator.generateMonitoringSteps(tc.Config, "8.0", sampleOutput)
+			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
+			operator, _ := getMonitorableTestOperator(t, "tests/scripts", m)
+			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
 			}
@@ -91,7 +92,7 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.Config) {
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) (*Operator, *operatorCfg.Config) {
 	operatorConfig := &operatorCfg.Config{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
@@ -103,9 +104,6 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 		DownloadConfig: &artifact.Config{
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
-		},
-		MonitoringConfig: &monitoring.Config{
-			MonitorMetrics: true,
 		},
 	}
 
@@ -124,19 +122,19 @@ func getMonitorableTestOperator(t *testing.T, installPath string) (*Operator, *o
 		t.Fatal(err)
 	}
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil)
+
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	monitor := beats.NewMonitor("dummmy", "p1234", &artifact.Config{OperatingSystem: "linux", InstallPath: "/install/path"}, true, true)
-	operator.apps["dummy"] = &testMonitorableApp{monitor: monitor}
+	operator.apps["dummy"] = &testMonitorableApp{monitor: m}
 
 	return operator, operatorConfig
 }
 
 type testMonitorableApp struct {
-	monitor *beats.Monitor
+	monitor monitoring.Monitor
 }
 
 func (*testMonitorableApp) Name() string                                              { return "" }
@@ -147,3 +145,53 @@ func (*testMonitorableApp) Configure(_ context.Context, config map[string]interf
 }
 func (*testMonitorableApp) State() state.State            { return state.State{} }
 func (a *testMonitorableApp) Monitor() monitoring.Monitor { return a.monitor }
+
+type testMonitor struct {
+	monitorLogs    bool
+	monitorMetrics bool
+}
+
+// EnrichArgs enriches arguments provided to application, in order to enable
+// monitoring
+func (b *testMonitor) EnrichArgs(_ string, _ string, args []string) []string { return args }
+
+// Cleanup cleans up all drops.
+func (b *testMonitor) Cleanup(string, string) error { return nil }
+
+// Prepare executes steps in order for monitoring to work correctly
+func (b *testMonitor) Prepare(string, string, int, int) error { return nil }
+
+// LogPath describes a path where application stores logs. Empty if
+// application is not monitorable
+func (b *testMonitor) LogPath(string, string) string {
+	if !b.monitorLogs {
+		return ""
+	}
+	return "path"
+}
+
+// MetricsPath describes a location where application exposes metrics
+// collectable by metricbeat.
+func (b *testMonitor) MetricsPath(string, string) string {
+	if !b.monitorMetrics {
+		return ""
+	}
+	return "path"
+}
+
+// MetricsPathPrefixed return metrics path prefixed with http+ prefix.
+func (b *testMonitor) MetricsPathPrefixed(string, string) string {
+	return "http+path"
+}
+
+// Reload reloads state based on configuration.
+func (b *testMonitor) Reload(cfg *config.Config) error { return nil }
+
+// IsMonitoringEnabled returns true if monitoring is configured.
+func (b *testMonitor) IsMonitoringEnabled() bool { return b.monitorLogs || b.monitorMetrics }
+
+// WatchLogs return true if monitoring is configured and monitoring logs is enabled.
+func (b *testMonitor) WatchLogs() bool { return b.monitorLogs }
+
+// WatchMetrics return true if monitoring is configured and monitoring metrics is enabled.
+func (b *testMonitor) WatchMetrics() bool { return b.monitorMetrics }
