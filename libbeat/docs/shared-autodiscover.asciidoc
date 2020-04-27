@@ -125,6 +125,8 @@ running configuration for a container, 60s by default.
 =======================================
 endif::[]
 
+endif::autodiscoverDocker[]
+
 
 ifdef::autodiscoverKubernetes[]
 [float]
