@@ -319,7 +319,20 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
+            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+          }
+        }
+        stage('Metricbeat Python integration tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false"
+            }
+          }
+          steps {
+            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
           }
         }
         stage('Metricbeat x-pack'){
