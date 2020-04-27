@@ -17,6 +17,8 @@
 
 package auditd
 
+//go:generate sh -c "go run mkecs_categorization.go -in ecs_categorization.yml -out zecs_categorization.go"
+
 import (
 	"fmt"
 	"os"
@@ -473,11 +475,15 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	if eventOutcome == "fail" {
 		eventOutcome = "failure"
 	}
+	ecsCategorization := getECSCategorization(auditEvent.Type)
+	// keep this for now, remove in 8.x
+	categories = append(ecsCategorization.Categories, auditEvent.Category.String())
 	out := mb.Event{
 		Timestamp: auditEvent.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"category": auditEvent.Category.String(),
+				"category": categories,
+				"type":     ecsCategorization.Types,
 				"action":   auditEvent.Summary.Action,
 				"outcome":  eventOutcome,
 			},
@@ -541,7 +547,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 
 	switch auditEvent.Category {
 	case aucoalesce.EventTypeUserLogin:
-		// Customize event.type / event.category to match unified values.
+		// Remove this call in 8.x
 		normalizeEventFields(out.RootFields)
 		// Set ECS user fields from the attempted login account.
 		if usernameOrID := auditEvent.Summary.Actor.Secondary; usernameOrID != "" {
@@ -559,6 +565,40 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	return out
 }
 
+func normalizeEventFields(m common.MapStr) {
+	getFieldAsStrs := func(key string) (s []string, found bool) {
+		iface, err := m.GetValue(key)
+		if err != nil {
+			return
+		}
+		s, found = iface.([]string)
+		return
+	}
+	getFieldAsStr := func(key string) (s string, found bool) {
+		iface, err := m.GetValue(key)
+		if err != nil {
+			return
+		}
+		s, found = iface.(string)
+		return
+	}
+
+	categories, ok1 := getFieldAsStrs("event.category")
+	action, ok2 := getFieldAsStr("event.action")
+	outcome, ok3 := getFieldAsStr("event.outcome")
+	types, ok4 := getFieldAsStrs("event.type")
+	if !ok1 || !ok2 || !ok3 || !ok4 {
+		return
+	}
+	for _, category := range categories {
+		if category == "authentication" && action == "logged-in" { // USER_LOGIN
+			types = append(types, fmt.Sprintf("authentication_%s", outcome))
+			m.Put("event.type", types)
+			return
+		}
+	}
+}
+
 func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
 	usr, err = user.Lookup(userOrID)
 	if err == nil {
@@ -570,28 +610,6 @@ func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
 		return
 	}
 	return user.LookupId(userOrID)
-}
-
-func normalizeEventFields(m common.MapStr) {
-	getFieldAsStr := func(key string) (s string, found bool) {
-		iface, err := m.GetValue(key)
-		if err != nil {
-			return
-		}
-		s, found = iface.(string)
-		return
-	}
-
-	category, ok1 := getFieldAsStr("event.category")
-	action, ok2 := getFieldAsStr("event.action")
-	outcome, ok3 := getFieldAsStr("event.outcome")
-	if !ok1 || !ok2 || !ok3 {
-		return
-	}
-	if category == "user-login" && action == "logged-in" { // USER_LOGIN
-		m.Put("event.category", "authentication")
-		m.Put("event.type", fmt.Sprintf("authentication_%s", outcome))
-	}
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {

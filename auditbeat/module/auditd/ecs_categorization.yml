@@ -1,0 +1,10 @@
+AUDIT_USER_LOGIN:
+  categories:
+    - authenticated
+  types:
+    - start
+AUDIT_USER_AUTH:
+  categories:
+    - authenticated
+  types:
+    - info
