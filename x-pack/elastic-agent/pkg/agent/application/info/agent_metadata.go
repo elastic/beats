@@ -17,7 +17,7 @@ import (
 
 // ECSMeta is a collection of agent related metadata in ECS compliant object form.
 type ECSMeta struct {
-	Agent *AgentECSMeta  `json:"agent"`
+	Agent *AgentECSMeta  `json:"elastic.agent"`
 	Host  *HostECSMeta   `json:"host"`
 	OS    *SystemECSMeta `json:"os"`
 }

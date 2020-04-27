@@ -12,9 +12,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 )
 
 type agentinfo struct{}
