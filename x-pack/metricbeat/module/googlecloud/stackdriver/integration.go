@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package googlecloud
+package stackdriver
 
 import (
 	"os"
@@ -36,7 +36,11 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 
 		if metricSetName == "stackdriver" {
 			config["stackdriver.service"] = "compute"
-			config["stackdriver.metrics"] = []string{"compute.googleapis.com/instance/uptime"}
+			stackDriverConfig := stackDriverConfig{
+				Aligner:     "ALIGN_NONE",
+				MetricTypes: []string{"compute.googleapis.com/instance/uptime"},
+			}
+			config["stackdriver.metrics"] = stackDriverConfig
 		}
 	}
 	return config

@@ -14,13 +14,13 @@
     "googlecloud": {
         "labels": {
             "metrics": {
-                "client_network": "ocp-be-c5kjr-network",
-                "client_subnetwork": "ocp-be-c5kjr-worker-subnet",
-                "client_zone": "us-central1-a"
+                "client_network": "UNKNOWN",
+                "client_subnetwork": "REMOTE_IS_EXTERNAL",
+                "client_zone": "UNKNOWN"
             },
             "resource": {
-                "backend_name": "ocp-be-c5kjr-master-us-central1-a",
-                "backend_scope": "us-central1-a",
+                "backend_name": "ocp-be-c5kjr-master-us-central1-c",
+                "backend_scope": "us-central1-c",
                 "backend_scope_type": "ZONE",
                 "backend_subnetwork_name": "ocp-be-c5kjr-master-subnet",
                 "backend_target_name": "ocp-be-c5kjr-api-internal",
@@ -35,9 +35,7 @@
         "loadbalancing": {
             "l3": {
                 "internal": {
-                    "egress_packets_count": {
-                        "value": 0
-                    }
+                    "egress_packets_count": 394
                 }
             }
         }

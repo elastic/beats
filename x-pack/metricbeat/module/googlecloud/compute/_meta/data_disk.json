@@ -5,8 +5,8 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "2528596280375797115",
-            "name": "gke-dev-next-oblt-dev-next-oblt-pool-404d7f0c-cpj6"
+            "id": "8390997210852978465",
+            "name": "gke-observability-7--observability-7--3dd3e39b-0jm5"
         },
         "machine": {
             "type": "n1-standard-4"
@@ -21,32 +21,29 @@
     },
     "googlecloud": {
         "compute": {
-            "firewall": {
-                "dropped_bytes_count": {
-                    "value": 386
-                },
-                "dropped_packets_count": {
-                    "value": 7
-                }
-            },
             "instance": {
-                "cpu": {
-                    "reserved_cores": {
-                        "value": 4
+                "disk": {
+                    "read_bytes_count": {
+                        "value": 0
                     },
-                    "usage_time": {
-                        "value": 106.88293868489563
+                    "read_ops_count": {
+                        "value": 0
                     },
-                    "utilization": {
-                        "value": 0.4453455778537318
+                    "write_bytes_count": {
+                        "value": 0
+                    },
+                    "write_ops_count": {
+                        "value": 0
                     }
-                },
-                "uptime": {
-                    "value": 60
                 }
             }
         },
         "labels": {
+            "metrics": {
+                "device_name": "gke-observability-7-1--pvc-65581044-7d5d-11ea-8cd9-42010af0011c",
+                "device_type": "permanent",
+                "storage_type": "pd-standard"
+            },
             "user": {
                 "goog-gke-node": ""
             }
