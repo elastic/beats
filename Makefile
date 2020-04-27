@@ -28,7 +28,7 @@ PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG) x-pack/libbeat
 #
 # Includes
 #
-include dev-tools/make/mage.mk
+include dev-tools/make/mage-install.mk
 
 ## help : Show this help.
 help: Makefile
