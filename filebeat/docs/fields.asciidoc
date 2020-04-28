@@ -28244,15 +28244,6 @@ type: keyword
 
 --
 
-*`panw.panos.action`*::
-+
---
-Action taken for the session.
-
-type: keyword
-
---
-
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
