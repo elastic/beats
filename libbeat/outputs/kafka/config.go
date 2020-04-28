@@ -20,13 +20,14 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
@@ -200,7 +201,7 @@ func (c *kafkaConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(log *logp.Logger, config *kafkaConfig, b backoff.Backoff) (*sarama.Config, error) {
+func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
 	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
@@ -283,11 +284,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig, b backoff.Backoff) (
 		retryMax = 1000
 	}
 	k.Producer.Retry.Max = retryMax
-	k.Producer.Retry.BackoffFunc = func(_, _ int) time.Duration {
-		d := b.WaitDuration()
-		log.Infof("backing off for %v (init: %v, max: %v)", d, config.Backoff.Init, config.Backoff.Max)
-		return d
-	}
+	k.Producer.Retry.BackoffFunc = makeBackoffFunc(config.Backoff)
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
@@ -321,4 +318,20 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig, b backoff.Backoff) (
 		return nil, err
 	}
 	return k, nil
+}
+
+func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Duration {
+	maxBackoffRetries := int(math.Ceil(math.Log2(float64(cfg.Max) / float64(cfg.Init))))
+
+	return func(retries, _ int) time.Duration {
+		temp := (uint64(cfg.Init) * uint64(1<<retries)) / 2
+		jitter := uint64(rand.Int63n(int64(temp)))
+
+		backoff := time.Duration(temp + jitter)
+		if retries >= maxBackoffRetries {
+			backoff = cfg.Max
+		}
+
+		return backoff
+	}
 }

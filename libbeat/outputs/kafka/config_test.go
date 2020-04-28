@@ -19,10 +19,8 @@ package kafka
 
 import (
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -59,8 +57,6 @@ func TestConfigAcceptValid(t *testing.T) {
 		},
 	}
 
-	b := backoff.NewEqualJitterBackoff(nil, 1*time.Second, 3*time.Second)
-
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
@@ -70,7 +66,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(logp.L(), cfg, b); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
 		})

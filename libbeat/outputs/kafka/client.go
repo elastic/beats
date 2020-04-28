@@ -27,7 +27,6 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -48,7 +47,6 @@ type client struct {
 	codec    codec.Codec
 	config   sarama.Config
 	mux      sync.Mutex
-	backoff  backoff.Backoff
 
 	producer sarama.AsyncProducer
 
@@ -77,7 +75,6 @@ func newKafkaClient(
 	topic outil.Selector,
 	writer codec.Codec,
 	cfg *sarama.Config,
-	b backoff.Backoff,
 ) (*client, error) {
 	c := &client{
 		log:      logp.NewLogger(logSelector),
@@ -88,7 +85,6 @@ func newKafkaClient(
 		index:    strings.ToLower(index),
 		codec:    writer,
 		config:   *cfg,
-		backoff:  b,
 	}
 	return c, nil
 }
@@ -237,7 +233,6 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	for libMsg := range ch {
 		msg := libMsg.Metadata.(*message)
 		msg.ref.done()
-		c.backoff.Reset()
 	}
 }
 
