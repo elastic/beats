@@ -10,7 +10,7 @@
 - name: destination.geo.country_iso_code
   type: keyword
   description: Country ISO code.
-- name: destination.geo.location.*
+- name: destination.geo.location
   type: geo_point
   description: Longitude and latitude.
 - name: destination.ip
