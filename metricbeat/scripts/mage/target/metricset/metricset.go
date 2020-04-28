@@ -40,19 +40,15 @@ func CreateMetricset() error {
 	if err != nil {
 		return err
 	}
-	scriptPath := "scripts/create_metricset.py"
-	beatsBase := os.Getenv("ES_BEATS")
-	if beatsBase != "" {
-		scriptPath = filepath.Join(beatsBase, scriptPath)
-	}
-	path, err := os.Getwd()
+	beatsDir, err := devtools.ElasticBeatsDir()
 	if err != nil {
 		return err
 	}
+	scriptPath := filepath.Join(beatsDir, "metricbeat", "scripts", "create_metricset.py")
 
 	_, err = sh.Exec(
 		map[string]string{}, os.Stdout, os.Stderr, python, scriptPath,
-		"--path", path, "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
+		"--path", devtools.CWD(), "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
 	)
 	return err
 }
