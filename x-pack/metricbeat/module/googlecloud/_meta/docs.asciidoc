@@ -6,17 +6,81 @@ Note: extra GCP charges on Stackdriver Monitoring API requests will be generated
 == Module config and parameters
 This is a list of the possible module parameters you can tune:
 
-* *zone*: A single string with the zone you want to monitor like "us-central1-a". If you need to fetch from multiple regions, you have to setup a different configuration for each (but you don't need a new instance of Metricbeat running)
+* *zone*: A single string with the zone you want to monitor like `us-central1-a`.
+Or you can specific a partial zone name like `us-central1-` or `us-central1-*`,
+which will monitor all zones start with `us-central1-`: `us-central1-a`,
+`us-central1-b`, `us-central1-c` and `us-central1-f`.
+Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP zones]
+for zones that are available in GCP.
 
-* *region*: A single string with the region you want to monitor like "us-central1". This will enable monitoring for all zones under this region.
+* *region*: A single string with the region you want to monitor like `us-central1`.
+This will enable monitoring for all zones under this region. Or you can specific
+a partial region name like `us-east` or `us-east*`, which will monitor all regions start with
+`us-east`: `us-east1` and `us-east4`. If both region and zone are configured,
+only region will be used.
+Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP regions]
+for regions that are available in GCP.
 
 * *project_id*: A single string with your GCP Project ID
 
-* *credentials_file_path*: A single string pointing to the JSON file path reachable by Metricbeat that you have created using IAM.
+* *credentials_file_path*: A single string pointing to the JSON file path
+reachable by Metricbeat that you have created using IAM.
 
-* *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels and metadata information from Metricsets and fetch metrics onlly. At the moment, *labels and metadata extraction is only supported* in Compute Metricset.
+* *exclude_labels*: (`true`/`false` default `false`) Do not extract extra labels
+and metadata information from metricsets and fetch metrics only. At the moment,
+*labels and metadata extraction is only supported* in `compute` metricset.
 
 * *period*: A single time duration specified for this module collection frequency.
+
+[float]
+== Example configuration
+* `compute` metricset is enabled to collect metrics from `us-central1-a` zone
+in `elastic-observability` project.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+  zone: "us-central1-a"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
+
+* `compute` and `pubsub` metricsets are enabled to collect metrics from all zones
+under `us-central1` region in `elastic-observability` project.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+  region: "us-central1"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
+
+* `compute` metricset is enabled to collect metrics from all regions starts with
+`us-west` in `elastic-observability` project, which includes all zones under
+`us-west1`, `us-west2`, `us-west3` and `us-west4`.
++
+[source,yaml]
+----
+- module: googlecloud
+  metricsets:
+    - compute
+    - pubsub
+  region: "us-west"
+  project_id: "elastic-observability"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
+----
 
 [float]
 == Authentication, authorization and permissions.
