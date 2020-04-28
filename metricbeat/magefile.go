@@ -144,7 +144,7 @@ func moduleFieldsGo() error {
 // Update is an alias for running fields, dashboards, config.
 func Update() {
 	mg.SerialDeps(
-		Fields, Dashboards, Config, CollectDocs,
+		Fields, Dashboards, Config, CollectAll,
 		metricbeat.PrepareModulePackagingOSS,
 		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
