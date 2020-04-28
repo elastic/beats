@@ -97,20 +97,19 @@ jobs:
 
     # Metricbeat
     - os: linux
-      env: TARGETS="-C metricbeat unit-tests coverage-report"
+      env: TARGETS="-C metricbeat unit-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
+      env: TARGETS="-C metricbeat integration-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
+      env: TARGETS="-C metricbeat system-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
-
     - os: osx
-      env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
+      env: TARGETS="-C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -118,6 +117,18 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
+      env: TARGETS="-C x-pack/metricbeat unit-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat integration-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat system-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
       env: TARGETS="-C x-pack/metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
