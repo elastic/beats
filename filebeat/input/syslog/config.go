@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -98,6 +99,8 @@ func factory(
 
 		return tcp.New(&config.Config, factory)
 	case unix.Name:
+		cfgwarn.Beta("Syslog Unix socket support is beta.")
+
 		config := defaultUnix
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
