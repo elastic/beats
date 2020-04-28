@@ -259,22 +259,13 @@ func TestClientPublishTracer(t *testing.T) {
 		},
 	})
 
-	recorder := apmtest.NewRecordingTracer()
-	defer recorder.Close()
-
-	tx := recorder.StartTransaction("output", "test")
-	err := output.Publish(apm.ContextWithTransaction(context.Background(), tx), batch)
-
-	tx.End()
-	recorder.Flush(nil)
-
-	if err != nil {
-		t.Fatal(err)
+	tx, spans, _ := apmtest.WithTransaction(func(ctx context.Context) {
+		err := output.Publish(ctx, batch)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
-
-	payloads := recorder.Payloads()
-	require.Len(t, payloads.Transactions, 1)
-	require.Len(t, payloads.Spans, 2)
+	require.Len(t, spans, 2)
 
 	// get spans in reverse order
 	firstSpan := payloads.Spans[1]
