@@ -906,7 +906,8 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		"event": common.MapStr{
 			"kind":     "event",
 			"action":   "network_flow",
-			"category": "network_traffic",
+			"category": []string{"network", "network_traffic"},
+			"type":     []string{"info"},
 			"start":    f.createdTime,
 			"end":      f.lastSeenTime,
 			"duration": f.lastSeenTime.Sub(f.createdTime).Nanoseconds(),
