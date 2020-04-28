@@ -63,6 +63,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "linux",
 		"metricsets": []string{"conntrack"},
-		"hostfs":     "./_meta/testdata",
+		"hostFS":     "./_meta/testdata",
 	}
 }

@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            linuxModule.HostFS,
+		fs:            filepath.Join(linuxModule.HostFS, "/sys/kernel/mm/ksm"),
 	}, nil
 }
 
@@ -65,8 +65,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	fullPath := filepath.Join(m.fs, "/sys/kernel/mm/ksm")
-	ksmData, err := fetchKSMStats(fullPath)
+
+	ksmData, err := fetchKSMStats(m.fs)
 	if err != nil {
 		return errors.Wrap(err, "error fetching KSM stats")
 	}

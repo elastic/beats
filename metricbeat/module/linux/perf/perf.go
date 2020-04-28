@@ -53,7 +53,7 @@ type sampleConfig struct {
 
 // Config holds the metricset config info for perf
 type Config struct {
-	SamplePeriod time.Duration  `config:"perf.sample_period" validate:"required"`
+	SamplePeriod time.Duration  `config:"perf.sample_period" validate:"required,nonzero"`
 	Processes    []sampleConfig `config:"perf.processes"`
 }
 
@@ -105,10 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Sample Period is zero")
 	}
 
-	var isContinuoius = false
-	if config.SamplePeriod == linuxModule.Period {
-		isContinuoius = true
-	}
+	var isContinuous = config.SamplePeriod == linuxModule.Period
 
 	procList, err := matchProcesses(config.Processes)
 	if err != nil {
@@ -119,7 +116,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("no processes found that match provided config")
 	}
 
-	if isContinuoius {
+	if isContinuous {
 		err := startMonitor(procList)
 		if err != nil {
 			return nil, errors.Wrap(err, "error starting monitor")
@@ -129,16 +126,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// This perf library is Not So Good and eats errors that come from perf_event_open
 	// Do a quck test using a lower-level API to make sure we can actually access perf APIs
 	testP, err := perf.NewMinorFaultsProfiler(procList[0].PID, -1)
+	defer testP.Close()
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating profiler for Minor Page faults")
 	}
-	testP.Close()
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		processes:     procList,
 		period:        config.SamplePeriod,
-		continuous:    isContinuoius,
+		continuous:    isContinuous,
 	}, nil
 }
 
