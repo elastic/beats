@@ -53,7 +53,7 @@ type sampleConfig struct {
 
 // Config holds the metricset config info for perf
 type Config struct {
-	SamplePeriod time.Duration  `config:"perf.sample_period"`
+	SamplePeriod time.Duration  `config:"perf.sample_period" validate:"required"`
 	Processes    []sampleConfig `config:"perf.processes"`
 }
 

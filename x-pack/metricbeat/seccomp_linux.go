@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
+	"github.com/pkg/errors"
 )
 
 func init() {
@@ -15,7 +16,7 @@ func init() {
 	case "amd64", "386":
 		// The linux/perf dataset uses additional syscalls
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "perf_event_open"); err != nil {
-			panic(err)
+			panic(errors.Wrap(err, "error allowing perf_event_open"))
 		}
 	}
 }

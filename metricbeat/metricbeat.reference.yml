@@ -584,9 +584,6 @@ metricbeat.modules:
   #      hardware: false
   #      software: true
 
-
-
-
 #------------------------------- Logstash Module -------------------------------
 - module: logstash
   metricsets: ["node", "node_stats"]
