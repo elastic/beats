@@ -278,6 +278,13 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 		}
 	}
 
+	// log missing requirements and do nothing
+	err = r.tester.HasRequirements()
+	if err != nil {
+		err = errors.Wrapf(err, "%s missing requirements", r.tester.Name())
+		return
+	}
+
 	if err = r.steps.Setup(r.env); err != nil {
 		return
 	}
