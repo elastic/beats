@@ -23,67 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
-
-func TestProcessGet(t *testing.T) {
-
-	testProcessList := []sampleConfig{sampleConfig{
-		ProcessGlob: "sssd",
-		Events:      eventsConfig{HardwareEvents: false, SoftwareEvents: true},
-	},
-	}
-
-	matches, err := matchProcesses(testProcessList)
-	assert.NoError(t, err)
-	t.Logf("Got: %#v", matches)
-}
-
-// func TestSampling(t *testing.T) {
-
-// 	testProcessList := []sampleConfig{sampleConfig{
-// 		ProcessGlob: "node",
-// 		Events:      eventsConfig{HardwareEvents: false, SoftwareEvents: true},
-// 	},
-// 	}
-
-// 	period := time.Second * 10
-
-// 	matches, err := matchProcesses(testProcessList)
-// 	assert.NoError(t, err)
-// 	t.Logf("Got: %d", len(matches))
-
-// 	perfData, err := runSampleForPeriod(matches, period, false)
-// 	assert.NoError(t, err)
-// 	for _, data := range perfData {
-// 		log.Printf("Got data from %v", data.Metadata["pid"])
-
-// 		pretty, err := json.MarshalIndent(data.HwMetrics, "", "    ")
-// 		assert.NoError(t, err)
-// 		log.Printf("%s\n", string(pretty))
-
-// 		pretty, err = json.MarshalIndent(data.SwMetrics, "", "    ")
-// 		assert.NoError(t, err)
-// 		log.Printf("%s\n", string(pretty))
-
-// 	}
-
-// }
-
-// func TestFetch(t *testing.T) {
-// 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-// 	events, errs := mbtest.ReportingFetchV2Error(f)
-
-// 	assert.Empty(t, errs)
-// 	if !assert.NotEmpty(t, events) {
-// 		t.FailNow()
-// 	}
-// 	pretty, err := json.MarshalIndent(events, "", "    ")
-// 	assert.NoError(t, err)
-// 	log.Printf("%s\n", string(pretty))
-// }
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
