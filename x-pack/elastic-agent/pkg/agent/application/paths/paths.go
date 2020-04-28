@@ -5,6 +5,7 @@
 package paths
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 )
@@ -16,8 +17,10 @@ var (
 
 func init() {
 	exePath := retrieveExecutablePath()
-	homePath = exePath
-	dataPath = filepath.Join(exePath, "data")
+
+	fs := flag.CommandLine
+	fs.StringVar(&homePath, "path.home", exePath, "Agent root path")
+	fs.StringVar(&dataPath, "path.data", filepath.Join(exePath, "data"), "Data path contains Agent managed binaries")
 }
 
 // Home returns a directory where binary lives
@@ -32,6 +35,7 @@ func Data() string {
 }
 
 func retrieveExecutablePath() string {
+
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)
