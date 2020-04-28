@@ -40,13 +40,13 @@ pipeline {
       steps {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
@@ -319,7 +319,20 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
+            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+          }
+        }
+        stage('Metricbeat Python integration tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false"
+            }
+          }
+          steps {
+            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
           }
         }
         stage('Metricbeat x-pack'){
@@ -840,7 +853,6 @@ def isChangedOSSCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('libbeat'))
   return isChanged(allPatterns)
 }
 
@@ -855,13 +867,16 @@ def isChangedXPackCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
   return isChanged(allPatterns)
 }
 
 def loadConfigEnvVars(){
   def empty = []
   env.GO_VERSION = readFile(".go-version").trim()
+
+  withEnv(["HOME=${env.WORKSPACE}"]) {
+    sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh")
+  }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
@@ -921,17 +936,25 @@ def loadConfigEnvVars(){
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(getVendorPatterns('generator'))
+  def generatorPatterns = ['^generator/.*']
+  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
+  env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 }
 
 /**
   This method grab the dependencies of a Go module and transform them on regexp
 */
 def getVendorPatterns(beatName){
+  def os = goos()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
   def output = ""
-  docker.image("golang:${GO_VERSION}").inside{
+
+  withEnv([
+    "HOME=${env.WORKSPACE}/${env.BASE_DIR}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+  ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      export HOME=${WORKSPACE}/${BASE_DIR}
       go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
         |awk '{print \$1"/.*"}'\
         |sed -e "s#github.com/elastic/beats/v7/##g"

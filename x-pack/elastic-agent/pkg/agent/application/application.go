@@ -26,28 +26,28 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
-	config, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := InjectAgentConfig(config); err != nil {
+	if err := InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, config)
+	return createApplication(log, pathConfigFile, rawConfig)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
-	config *config.Config,
+	rawConfig *config.Config,
 ) (Application, error) {
 	warn.LogNotGA(log)
 
 	log.Info("Detecting execution mode")
 	c := localDefaultConfig()
-	err := config.Unpack(c)
+	err := rawConfig.Unpack(c)
 	if err != nil {
 		return nil, errors.New(err, "initiating application")
 	}
@@ -63,10 +63,10 @@ func createApplication(
 	switch mgmt.Mode {
 	case localMode:
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, config)
+		return newLocal(ctx, log, pathConfigFile, rawConfig)
 	case fleetMode:
 		log.Info("Agent is managed by Fleet")
-		return newManaged(ctx, log, config)
+		return newManaged(ctx, log, rawConfig)
 	default:
 		return nil, ErrInvalidMgmtMode
 	}
