@@ -25,11 +25,11 @@ import (
 	"runtime"
 	"strconv"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/pkg/errors"
 )
 
 // Server represent a unix server
