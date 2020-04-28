@@ -320,6 +320,8 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	return k, nil
 }
 
+// makeBackoffFunc returns a stateless implementation of exponential-backoff-with-jitter. It is conceptually
+// equivalent to the stateful implementation used by other outputs, EqualJitterBackoff.
 func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Duration {
 	maxBackoffRetries := int(math.Ceil(math.Log2(float64(cfg.Max) / float64(cfg.Init))))
 
