@@ -74,6 +74,10 @@ func (s *Server) createServer() (net.Listener, error) {
 		return nil, err
 	}
 
+	if err := s.setSocketMode(); err != nil {
+		return nil, err
+	}
+
 	if s.config.MaxConnections > 0 {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil
 	}
@@ -82,58 +86,63 @@ func (s *Server) createServer() (net.Listener, error) {
 
 func (s *Server) cleanupStaleSocket() error {
 	path := s.config.Path
-	if info, err := os.Stat(path); !os.IsNotExist(err) {
-		if info.Mode()&os.ModeSocket == 0 {
-			return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
+	info, err := os.Lstat(path)
+	if err != nil {
+		// If the file does not exist, then the cleanup can be considered successful.
+		if os.IsNotExist(err) {
+			return nil
 		}
-
-		if err := os.Remove(path); err != nil {
-			return errors.Wrapf(
-				err,
-				"cannot remove existing unix socket file at location %s",
-				path,
-			)
-		}
+		return errors.Wrapf(err, "cannot lstat unix socket file at location %s", path)
 	}
+
+	if info.Mode()&os.ModeSocket == 0 {
+		return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
+	}
+
+	if err := os.Remove(path); err != nil {
+		return errors.Wrapf(err, "cannot remove existing unix socket file at location %s", path)
+	}
+
 	return nil
 }
 
 func (s *Server) setSocketOwnership() error {
-	if runtime.GOOS == "windows" {
-		logger := logp.NewLogger("unix")
-		if s.config.User != nil {
-			logger.Warn("windows does not support the 'user' configuration option, ignoring")
-		}
-		if s.config.Group != nil {
-			logger.Warn("windows does not support the 'group' configuration option, ignoring")
-		}
-		return nil
-	}
-	// -1 == do not change
-	uid := -1
-	gid := -1
-	if s.config.User != nil {
-		u, err := user.Lookup(*s.config.User)
-		if err != nil {
-			return err
-		}
-		uid, err = strconv.Atoi(u.Uid)
-		if err != nil {
-			return err
-		}
-	}
 	if s.config.Group != nil {
+		if runtime.GOOS == "windows" {
+			logp.NewLogger("unix").Warn("windows does not support the 'group' configuration option, ignoring")
+			return nil
+		}
 		g, err := user.LookupGroup(*s.config.Group)
 		if err != nil {
 			return err
 		}
-		gid, err = strconv.Atoi(g.Gid)
+		gid, err := strconv.Atoi(g.Gid)
 		if err != nil {
 			return err
 		}
-	}
-	if uid != -1 || gid != -1 {
-		return os.Chown(s.config.Path, uid, gid)
+		return os.Chown(s.config.Path, -1, gid)
 	}
 	return nil
+}
+
+func (s *Server) setSocketMode() error {
+	if s.config.Mode != nil {
+		mode, err := parseFileMode(*s.config.Mode)
+		if err != nil {
+			return err
+		}
+		return os.Chmod(s.config.Path, mode)
+	}
+	return nil
+}
+
+func parseFileMode(mode string) (os.FileMode, error) {
+	parsed, err := strconv.ParseUint(mode, 8, 32)
+	if err != nil {
+		return 0, err
+	}
+	if parsed > 0777 {
+		return 0, errors.New("invalid file mode")
+	}
+	return os.FileMode(parsed), nil
 }

@@ -211,7 +211,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 	}
 }
 
-func TestSocketOwnership(t *testing.T) {
+func TestSocketOwnershipAndMode(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("changing socket ownership is only supported on non-windows")
 		return
@@ -227,14 +227,12 @@ func TestSocketOwnership(t *testing.T) {
 
 	group, err := user.LookupGroupId(strconv.Itoa(groups[1]))
 	require.NoError(t, err)
-	current, err := user.Current()
-	require.NoError(t, err)
 
 	path := filepath.Join(os.TempDir(), "test.sock")
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
 		"path":  path,
-		"user":  current.Name,
 		"group": group.Name,
+		"mode":  "0740",
 	})
 	config := defaultConfig
 	err = cfg.Unpack(&config)
@@ -250,12 +248,9 @@ func TestSocketOwnership(t *testing.T) {
 	info, err := file.Lstat(path)
 	require.NoError(t, err)
 	require.NotEqual(t, 0, info.Mode()&os.ModeSocket)
-	require.Equal(t, os.FileMode(0755), info.Mode().Perm())
-	uid, err := info.UID()
-	require.NoError(t, err)
+	require.Equal(t, os.FileMode(0740), info.Mode().Perm())
 	gid, err := info.GID()
 	require.NoError(t, err)
-	require.Equal(t, current.Uid, strconv.Itoa(uid))
 	require.Equal(t, group.Gid, strconv.Itoa(gid))
 }
 
