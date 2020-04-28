@@ -9,4 +9,7 @@
       fields:
         - name: CallCount.sum
           type: long
-          description: The number of specified operations performed in your account.
+          description: The number of specified API operations performed in your account.
+        - name: ResourceCount.sum
+          type: long
+          description: The number of the specified resources running in your account. The resources are defined by the dimensions associated with the metric.
