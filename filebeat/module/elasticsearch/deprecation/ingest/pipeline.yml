@@ -33,7 +33,10 @@ processors:
     value: "{{elasticsearch.node.name}}"
     if: "ctx?.elasticsearch?.node?.name != null"
 - remove:
-    field: elasticsearch.deprecation.timestamp
+    field:
+    - elasticsearch.deprecation.timestamp
+    - elasticsearch.deprecation.@timestamp
+    ignore_missing: true
 - remove:
     field:
     - first_char
