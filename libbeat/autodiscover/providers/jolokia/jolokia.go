@@ -109,6 +109,8 @@ func (p *Provider) Start() {
 }
 
 func (p *Provider) publish(event bus.Event) {
+	// attach keystore to the event to be consumed by the static configs
+	event["keystore"] = p.keystore
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else if config := p.builders.GetConfig(event); config != nil {
