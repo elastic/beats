@@ -1,3 +1,0 @@
-- name: process.name
-  type: keyword
-  description: Process name.
