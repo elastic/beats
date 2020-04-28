@@ -991,16 +991,14 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      echo "### RunBLD test reports ###"
       dir('runbld') {
         stashedTestReports.each { k, v ->
           dir(k) {
             unstash v
           }
         }
-        sh(label: 'runbld', script: """#!/usr/local/bin/runbld
-          echo 'Runbld to store the junit report'
-        """)
+        sh(label: 'Process JUnit reports with runbld',
+           script: "/usr/local/bin/runbld -d '${pwd()}' ${env.WORKSPACE}/${env.BASE_DIR}/.ci/scripts/runbld_junit.sh")
       }
     }
   }
