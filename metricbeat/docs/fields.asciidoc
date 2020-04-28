@@ -25870,7 +25870,6 @@ type: keyword
 
 --
 
-[[exported-fields-linux]]
 == linux fields
 
 linux module
@@ -26196,7 +26195,9 @@ type: object
 === perf
 
 process performance metrics
+[float]
 
+status
 
 
 [float]
@@ -26220,6 +26221,26 @@ type: long
 +
 --
 Clock count specific to the task.
+=== stat
+
+Memory stat
+
+
+
+*`kvm.status.stat.state`*::
++
+--
+domain state
+
+
+type: keyword
+
+--
+
+*`kvm.status.id`*::
++
+--
+Domain id
 
 
 type: long
@@ -26440,6 +26461,13 @@ Counter for total time perf has been running.
 
 
 type: long
+*`kvm.status.name`*::
++
+--
+Domain name
+
+
+type: keyword
 
 --
 
