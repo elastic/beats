@@ -11,11 +11,10 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 func TestData(t *testing.T) {
-	config := googlecloud.GetConfigForTest(t, "stackdriver")
+	config := GetConfigForTest(t, "stackdriver")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

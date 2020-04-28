@@ -4,14 +4,23 @@
   description: >
     GCP module
   fields:
-    - name: googlecloud.labels
-      type: object
+    - name: googlecloud
+      type: group
       fields:
-        - name: user.*
+        - name: labels
           type: object
-        - name: metadata.*
+          fields:
+            - name: user.*
+              type: object
+            - name: metadata.*
+              type: object
+            - name: metrics.*
+              type: object
+            - name: system.*
+              type: object
+        - name: "stackdriver.*.*.*.*"
           type: object
-        - name: metrics.*
-          type: object
-        - name: system.*
-          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Metrics that returned from StackDriver API query.
