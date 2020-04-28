@@ -48,7 +48,8 @@ func CreateMetricset() error {
 
 	_, err = sh.Exec(
 		map[string]string{}, os.Stdout, os.Stderr, python, scriptPath,
-		"--path", devtools.CWD(), "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
+		"--path", devtools.CWD(), "--es_beats", beatsDir,
+		"--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
 	)
 	return err
 }
