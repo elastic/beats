@@ -64,7 +64,7 @@
 - name: source.geo.country_iso_code
   type: keyword
   description: Country ISO code.
-- name: source.geo.location.*
+- name: source.geo.location
   type: geo_point
   description: Longitude and latitude.
 - name: source.geo.region_iso_code

@@ -58,7 +58,7 @@
 - name: geo.country_iso_code
   type: keyword
   description: Country ISO code.
-- name: geo.location.*
+- name: geo.location
   type: geo_point
   description: Longitude and latitude.
 - name: geo.region_iso_code
