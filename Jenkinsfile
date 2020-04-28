@@ -11,7 +11,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
-    JOB_GCS_BUCKET = 'beats-ci-artifacts'
+    JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
@@ -597,17 +597,7 @@ pipeline {
   }
   post {
     always {
-      catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
-        dir('runbld') {
-          googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}",
-            credentialsId: "${JOB_GCS_CREDENTIALS}",
-            localDirectory: ''
-          )
-          sh(label: 'runbld', script: """#!/usr/local/bin/runbld
-            echo 'Runbld to store the junit report'
-          """)
-        }
-      }
+      runbld()
     }
   }
 }
@@ -993,4 +983,19 @@ def junitAndStore(Map params = [:]){
     sharedPublicly:false,
     showInline: true
   )
+}
+
+def runbld() {
+  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+    echo "### RunBLD test reports ###"
+    dir('runbld') {
+      googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/**",
+        credentialsId: "${JOB_GCS_CREDENTIALS}",
+        localDirectory: ''
+      )
+      sh(label: 'runbld', script: """#!/usr/local/bin/runbld
+        echo 'Runbld to store the junit report'
+      """)
+    }
+  }
 }
