@@ -51,22 +51,17 @@ func (b *ExpBackoff) Reset() {
 
 // Wait block until either the timer is completed or channel is done.
 func (b *ExpBackoff) Wait() bool {
-	select {
-	case <-b.done:
-		return false
-	case <-time.After(b.WaitDuration()):
-		b.last = time.Now()
-		return true
-	}
-}
-
-// WaitDuration returns the duration to backoff for before trying again.
-func (b *ExpBackoff) WaitDuration() time.Duration {
 	backoff := b.duration
 	b.duration *= 2
 	if b.duration > b.max {
 		b.duration = b.max
 	}
 
-	return backoff
+	select {
+	case <-b.done:
+		return false
+	case <-time.After(backoff):
+		b.last = time.Now()
+		return true
+	}
 }

@@ -53,17 +53,6 @@ func (b *EqualJitterBackoff) Reset() {
 
 // Wait block until either the timer is completed or channel is done.
 func (b *EqualJitterBackoff) Wait() bool {
-	select {
-	case <-b.done:
-		return false
-	case <-time.After(b.WaitDuration()):
-		b.last = time.Now()
-		return true
-	}
-}
-
-// WaitDuration returns the duration to backoff for before trying again.
-func (b *EqualJitterBackoff) WaitDuration() time.Duration {
 	// Make sure we have always some minimal back off and jitter.
 	temp := int64(b.duration / 2)
 	backoff := time.Duration(temp + rand.Int63n(temp))
@@ -74,5 +63,11 @@ func (b *EqualJitterBackoff) WaitDuration() time.Duration {
 		b.duration = b.max
 	}
 
-	return backoff
+	select {
+	case <-b.done:
+		return false
+	case <-time.After(backoff):
+		b.last = time.Now()
+		return true
+	}
 }

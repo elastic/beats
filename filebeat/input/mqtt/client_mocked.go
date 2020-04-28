@@ -87,9 +87,6 @@ func (m *mockedBackoff) Reset() {
 	m.resetCount++
 }
 
-// WaitDuration returns the duration to backoff for before trying again.
-func (m *mockedBackoff) WaitDuration() time.Duration { return 0 }
-
 type mockedToken struct {
 	timeout bool
 }
