@@ -18,18 +18,19 @@
 package tcp
 
 import (
+	"crypto/x509"
 	"net"
 	"net/url"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/heartbeat/reason"
-
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
@@ -226,6 +227,9 @@ func (jf *jobFactory) execDialer(
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
+		if certErr, ok := err.(x509.CertificateInvalidError); ok {
+			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+		}
 		return reason.IOFailed(err)
 	}
 	defer conn.Close()
