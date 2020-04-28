@@ -62,6 +62,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "linux",
 		"metricsets": []string{"ksm"},
-		"hostFS":     "./_meta/testdata",
+		"hostfs":     "./_meta/testdata",
 	}
 }

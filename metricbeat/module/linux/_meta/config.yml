@@ -6,7 +6,7 @@
     # - conntrack
     # - perf
   enabled: true
-  #hostFS: /hostfs
+  #hostfs: /hostfs
   #perf.sample_period: 3s
   #perf.processes:
   #  - process: "node"

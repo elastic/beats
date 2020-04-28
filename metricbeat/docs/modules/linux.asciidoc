@@ -33,9 +33,6 @@ metricbeat.modules:
   #    events:
   #      hardware: false
   #      software: true
-
-
-
 ----
 
 [float]

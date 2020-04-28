@@ -33,7 +33,7 @@ func init() {
 // Module defines the base module config used in `linux`
 type Module struct {
 	mb.BaseModule
-	HostFS string `config:"hostFS"`
+	HostFS string `config:"hostfs"`
 	Period time.Duration
 }
 
@@ -42,7 +42,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// This only needs to be configured once for all system modules.
 
 	config := struct {
-		Hostfs string        `config:"hostFS"`
+		Hostfs string        `config:"hostfs"`
 		Period time.Duration `config:"period"`
 	}{}
 
