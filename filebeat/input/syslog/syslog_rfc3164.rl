@@ -19,7 +19,8 @@
   # Match: " 5" and "10" as the day
   multiple_digits_day = (([12][0-9]) | ("3"[01]))>tok %day;
   single_digit_day = [1-9]>tok %day;
-  day = (space? single_digit_day | multiple_digits_day);
+  supported_multiple_digits_day = [0][0-9]>tok %day;
+  day = (space? single_digit_day | multiple_digits_day | supported_multiple_digits_day);
 
   # Match: hh:mm:ss (24 hr format)
   hour = ([01][0-9]|"2"[0-3])>tok %hour;
