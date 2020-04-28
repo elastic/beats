@@ -11,6 +11,8 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    JOB_GCS_BUCKET = 'beats-ci-artifacts'
+    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -595,9 +597,15 @@ pipeline {
   }
   post {
     always {
-      sh(label: 'runbld', scripts: """#!/usr/local/bin/runbld
-      echo 'foo'
-      """)
+      dir('runbld') {
+        googleStorageDownload(bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}",
+          credentialsId: "${JOB_GCS_CREDENTIALS}",
+          localDirectory: ''
+        )
+        sh(label: 'runbld', script: """#!/usr/local/bin/runbld
+          echo 'Runbld to store the junit report'
+        """)
+      }
     }
   }
 }
@@ -684,7 +692,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
           }
         }
@@ -718,7 +726,7 @@ def withBeatsEnvWin(Closure body) {
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
         }
       }
@@ -971,4 +979,16 @@ def setGitConfig(){
 
 def isDockerInstalled(){
   return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+}
+
+def junitAndStore(Map params = [:]){
+  junit(params)
+  // STAGE_NAME env variable could be null in some cases
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("\\s",'') : 'uncategorized'
+  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${stageName}",
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pattern: params.testResults,
+    sharedPublicly:false,
+    showInline: true
+  )
 }
