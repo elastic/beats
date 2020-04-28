@@ -271,6 +271,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 		enabled, err = strconv.ParseBool(testEnvVar)
 		if err != nil {
 			err = errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value")
+			return
 		}
 		if !enabled {
 			err = fmt.Errorf("TEST_ENVIRONMENT=%s", testEnvVar)
