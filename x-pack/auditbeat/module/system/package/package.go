@@ -76,6 +76,21 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingPackage:
+		return "info"
+	case eventActionPackageInstalled:
+		return "installation"
+	case eventActionPackageRemoved:
+		return "deletion"
+	case eventActionPackageUpdated:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -343,8 +358,10 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"package"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"message": packageMessage(pkg, action),
 		},

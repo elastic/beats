@@ -51,6 +51,9 @@ func TestHomebrew(t *testing.T) {
 
 		if assert.Len(t, events, 1) {
 			event := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+			checkFieldValue(t, event, "event.kind", "state")
+			checkFieldValue(t, event, "event.category", []string{"package"})
+			checkFieldValue(t, event, "event.type", []string{"info"})
 			checkFieldValue(t, event, "system.audit.package.name", "test-package")
 			checkFieldValue(t, event, "system.audit.package.summary", "Test package")
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
