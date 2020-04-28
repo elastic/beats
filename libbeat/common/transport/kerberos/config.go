@@ -45,11 +45,11 @@ type Config struct {
 	Enabled     *bool    `config:"enabled" yaml:"enabled,omitempty"`
 	AuthType    AuthType `config:"auth_type" validate:"required"`
 	KeyTabPath  string   `config:"keytab"`
-	ConfigPath  string   `config:"config_path"`
+	ConfigPath  string   `config:"config_path" validate:"required"`
 	ServiceName string   `config:"service_name"`
 	Username    string   `config:"username"`
 	Password    string   `config:"password"`
-	Realm       string   `config:"realm"`
+	Realm       string   `config:"realm" validate:"required"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.

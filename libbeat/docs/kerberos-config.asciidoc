@@ -3,11 +3,20 @@
 
 You can specify Kerberos options with any output or input that supports Kerberos, like {es} and Kafka.
 
+The following encryption types are supported:
+
+* aes128-cts-hmac-sha1-96
+* aes128-cts-hmac-sha256-128
+* aes256-cts-hmac-sha1-96
+* aes256-cts-hmac-sha384-192
+* des3-cbc-sha1-kd
+* rc4-hmac
+
 Example output config with Kerberos password based authentication:
 
 [source,yaml]
 ----
-output.elasticsearch.hosts: ["http://my-elasticsearch:9200"]
+output.elasticsearch.hosts: ["http://my-elasticsearch.elastic.co:9200"]
 output.elasticsearch.kerberos.auth_type: password
 output.elasticsearch.kerberos.username: "elastic"
 output.elasticsearch.kerberos.password: "changeme"
@@ -16,7 +25,7 @@ output.elasticsearch.kerberos.realm: "ELASTIC.CO"
 ----
 
 The service principal name for the Elasticsearch instance is contructed from these options. Based on this configuration
-it is going to be `HTTP/my-elasticsearch@ELASTIC.CO`.
+it is going to be `HTTP/my-elasticsearch.elastic.co@ELASTIC.CO`.
 
 [float]
 === Configuration options
@@ -26,171 +35,51 @@ You can specify the following options in the `kerberos` section of the +{beatnam
 [float]
 ==== `enabled`
 
-The `enabled` setting can be used to disable the kerberos configuration by setting
+The `enabled` setting can be used to enable the kerberos configuration by setting
 it to `false`. The default value is `true`.
 
-NOTE: SSL settings are disabled if either `enabled` is set to `false` or the
-`ssl` section is missing.
+NOTE: Kerberos settings are disabled if either `enabled` is set to `false` or the
+`kerberos` section is missing.
 
 [float]
-==== `certificate_authorities`
+==== `auth_type`
 
-The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+There are two options to authenticate with Kerberos KDC: `password` and `keytab`.
 
-[float]
-[[certificate]]
-==== `certificate: "/etc/pki/client/cert.pem"`
-
-The path to the certificate for SSL client authentication. If the certificate
-is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the SSL server does not
-require client authentication, the certificate will be loaded, but not requested or used
-by the server.
-
-When this option is configured, the <<key,`key`>> option is also required.
+`password` expects the principal name and its password. When choosing `keytab`, you
+have to specify a princial name and a path to a keytab. The keytab must contain
+the keys of the selected principal. Otherwise, authentication will fail.
 
 [float]
-[[key]]
-==== `key: "/etc/pki/client/cert.key"`
+==== `config_path`
 
-The client certificate key used for client authentication. This option is required if <<certificate,`certificate`>> is specified.
-
-[float]
-==== `key_passphrase`
-
-The passphrase used to decrypt an encrypted key stored in the configured `key` file.
+You need to set the path to the `krb5.conf`, so +{beatname_lc} can find the Kerberos KDC to
+retrieve a ticket.
 
 [float]
-==== `supported_protocols`
+==== `username`
 
-List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
-not configured, the connection will be dropped during or after the handshake. The
-setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
-`TLSv1.3`.
-
-The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
+Name of the principal used to connect to the output.
 
 [float]
-==== `verification_mode`
+==== `password`
 
-This option controls whether the client verifies server certificates and host
-names. Valid values are `none` and `full`. If `verification_mode` is set
-to `none`, all server host names and certificates are accepted. In this mode,
-TLS-based connections are susceptible to man-in-the-middle attacks. Use this
-option for testing only.
-
-The default is `full`.
+If you configured `password` for `auth_type`, you have to provide a password
+for the selected principal.
 
 [float]
-==== `cipher_suites`
+==== `keytab`
 
-The list of cipher suites to use. The first entry has the highest priority.
-If this option is omitted, the Go crypto library's default
-suites are used (recommended). Note that TLS 1.3 cipher suites are not
-individually configurable in Go, so they are not included in this list.
-
-The following cipher suites are available:
-
-* ECDHE-ECDSA-AES-128-CBC-SHA
-* ECDHE-ECDSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* ECDHE-ECDSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-ECDSA-AES-256-CBC-SHA
-* ECDHE-ECDSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-ECDSA-CHACHA20-POLY1305 (TLS 1.2 only)
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-* ECDHE-RSA-3DES-CBC3-SHA
-* ECDHE-RSA-AES-128-CBC-SHA
-* ECDHE-RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* ECDHE-RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* ECDHE-RSA-AES-256-CBC-SHA
-* ECDHE-RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* ECDHE-RSA-CHACHA20-POLY1205 (TLS 1.2 only)
-* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
-* RSA-3DES-CBC3-SHA
-* RSA-AES-128-CBC-SHA
-* RSA-AES-128-CBC-SHA256 (TLS 1.2 only, disabled by default)
-* RSA-AES-128-GCM-SHA256 (TLS 1.2 only)
-* RSA-AES-256-CBC-SHA
-* RSA-AES-256-GCM-SHA384 (TLS 1.2 only)
-* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
-
-Here is a list of acronyms used in defining the cipher suites:
-
-* 3DES:
-  Cipher suites using triple DES
-
-* AES-128/256:
-  Cipher suites using AES with 128/256-bit keys.
-
-* CBC:
-  Cipher using Cipher Block Chaining as block cipher mode.
-
-* ECDHE:
-  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
-
-* ECDSA:
-  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
-
-* GCM:
-  Galois/Counter mode is used for symmetric key cryptography.
-
-* RC4:
-  Cipher suites using RC4.
-
-* RSA:
-  Cipher suites using RSA.
-
-* SHA, SHA256, SHA384:
-  Cipher suites using SHA-1, SHA-256 or SHA-384.
+If you configured `keytab` for `auth_type`, you have to provide the path to the
+keytab of the selected principal.
 
 [float]
-==== `curve_types`
+==== `service_name`
 
-The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
-
-The following elliptic curve types are available:
-
-* P-256
-* P-384
-* P-521
-* X25519
+This option can only be configured for Kafka. It is the name of the Kafka service, usually `kafka`.
 
 [float]
-==== `renegotiation`
+==== `realm`
 
-This configures what types of TLS renegotiation are supported. The valid options
-are `never`, `once`, and `freely`. The default value is never.
-
-* `never` - Disables renegotiation.
-* `once` - Allows a remote server to request renegotiation once per connection.
-* `freely` - Allows a remote server to repeatedly request renegotiation.
-
-
-[float]
-==== `ca_sha256`
-
-This configures a certificate pin that you can use to ensure that a specific certificate is part of the verified chain.
-
-The pin is a base64 encoded string of the SHA-256 of the certificate.
-
-NOTE: This check is not a replacement for the normal SSL validation, but it adds additional validation.
-If this option is used with  `verification_mode` set to `none`, the check will always fail because
-it will not receive any verified chains.
-
-
-ifeval::["{beatname_lc}" == "filebeat"]
-[float]
-==== `client_authentication`
-
-This configures what types of client authentication are supported. The valid options
-are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
-default to `required` otherwise it will be set to `none`.
-
-NOTE: This option is only valid with the TCP or the Syslog input.
-
-* `none` - Disables client authentication.
-* `optional` - When a client certificate is given, the server will verify it.
-* `required` - Will require clients to provide a valid certificate.
-endif::[]
+Name of the realm where the output resides.
 
