@@ -95,8 +95,11 @@ func (s *Server) cleanupStaleSocket() error {
 		return errors.Wrapf(err, "cannot lstat unix socket file at location %s", path)
 	}
 
-	if info.Mode()&os.ModeSocket == 0 {
-		return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
+	if runtime.GOOS != "windows" {
+		// see https://github.com/golang/go/issues/33357 for context on Windows socket file attributes bug
+		if info.Mode()&os.ModeSocket == 0 {
+			return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
+		}
 	}
 
 	if err := os.Remove(path); err != nil {

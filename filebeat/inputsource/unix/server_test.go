@@ -274,6 +274,10 @@ func TestSocketCleanup(t *testing.T) {
 }
 
 func TestSocketCleanupRefusal(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping due to windows FileAttributes bug https://github.com/golang/go/issues/33357")
+		return
+	}
 	path := filepath.Join(os.TempDir(), "test.sock")
 	f, err := os.Create(path)
 	require.NoError(t, err)
