@@ -18,8 +18,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
-    JOB_GCS_BUCKET = 'beats-ci-temp'
-    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
