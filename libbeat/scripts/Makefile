@@ -359,7 +359,7 @@ update: python-env fields collect config ## @build Update expects the most recen
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	go run ${INSTALL_FLAG} ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
