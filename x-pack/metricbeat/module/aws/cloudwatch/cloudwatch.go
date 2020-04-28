@@ -132,10 +132,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
+	m.Logger().Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
+	m.Logger().Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
 
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.MetricSet.RegionsList {
+			m.Logger().Debugf("Collecting metrics from AWS region %s", regionName)
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
 
@@ -150,6 +153,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
 
+			m.Logger().Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
+
 			err = reportEvents(eventsWithIdentifier, report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
@@ -158,6 +163,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
+		m.Logger().Debugf("Collecting metrics from AWS region %s", regionName)
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
@@ -169,6 +175,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {
+			m.Logger().Debugf("Collected metrics from namespace %s", namespace)
+
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
 				m.Logger().Info(err.Error())
@@ -188,6 +196,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
+
+			m.Logger().Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
 			err = reportEvents(eventsWithIdentifier, report)
 			if err != nil {
@@ -434,12 +444,14 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 	// Construct metricDataQueries
 	metricDataQueries := createMetricDataQueries(listMetricWithStatsTotal, m.Period)
+	m.Logger().Debugf("Number of MetricDataQueries = %d", len(metricDataQueries))
 	if len(metricDataQueries) == 0 {
 		return events, nil
 	}
 
 	// Use metricDataQueries to make GetMetricData API calls
 	metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+	m.Logger().Debugf("Number of metricDataResults = %d", len(metricDataResults))
 	if err != nil {
 		return events, errors.Wrap(err, "GetMetricDataResults failed")
 	}
