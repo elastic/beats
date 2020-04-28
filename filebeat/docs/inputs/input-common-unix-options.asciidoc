@@ -29,8 +29,8 @@ This option is ignored on Windows.
 ==== `mode`
 
 The file mode of the Unix socket that will be created by Filebeat. This is
-expected to be an octal umask. The default valus is the system default (generally
-`0755`).
+expected to be a file mode as an octal string. The default value is the system
+default (generally `0755`).
 
 [float]
 [id="{beatname_lc}-input-{type}-unix-line-delimiter"]
