@@ -21,15 +21,15 @@ The path to the Unix socket that will receive event streams.
 ==== `user`
 
 The user ownership of the Unix socket that will be created by Filebeat.
-The default is the user Filebeat is running as. This option is ignored on
+The default is the user name of the user Filebeat is running as. This option is ignored on
 Windows.
 
 [float]
-[id="{beatname_lc}-input-{type}-unix-user"]
+[id="{beatname_lc}-input-{type}-unix-group"]
 ==== `group`
 
 The group ownership of the Unix socket that will be created by Filebeat.
-The default is the user group of the user Filebeat is running as.
+The default is the primary group name for the user Filebeat is running as.
 This option is ignored on Windows.
 
 [float]
