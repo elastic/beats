@@ -1010,7 +1010,10 @@ def runbld() {
           }
         }
         sh(label: 'Process JUnit reports with runbld',
-           script: "/usr/local/bin/runbld -d '${pwd()}' ${env.WORKSPACE}/${env.BASE_DIR}/.ci/scripts/runbld_junit.sh")
+           script: '''
+            echo 'Processing junit reports with runbld...' > ./runbld-script
+            /usr/local/bin/runbld ./runbld-script
+           ''')
       }
     }
   }
