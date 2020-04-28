@@ -597,14 +597,16 @@ pipeline {
   }
   post {
     always {
-      dir('runbld') {
-        googleStorageDownload(bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}",
-          credentialsId: "${JOB_GCS_CREDENTIALS}",
-          localDirectory: ''
-        )
-        sh(label: 'runbld', script: """#!/usr/local/bin/runbld
-          echo 'Runbld to store the junit report'
-        """)
+      catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+        dir('runbld') {
+          googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}",
+            credentialsId: "${JOB_GCS_CREDENTIALS}",
+            localDirectory: ''
+          )
+          sh(label: 'runbld', script: """#!/usr/local/bin/runbld
+            echo 'Runbld to store the junit report'
+          """)
+        }
       }
     }
   }
