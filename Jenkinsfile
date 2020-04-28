@@ -2,6 +2,13 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the stashed id with the test results to be digested with runbld
+*/
+@Field def stashedTestReports = [:]
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
@@ -975,27 +982,26 @@ def isDockerInstalled(){
 
 def junitAndStore(Map params = [:]){
   junit(params)
-  // STAGE_NAME env variable could be null in some cases
-  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("\\s",'') : 'uncategorized'
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${stageName}",
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pattern: params.testResults,
-    sharedPublicly:false,
-    showInline: true
-  )
+  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stashedTestReports[stageName] = stageName
 }
 
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
-    echo "### RunBLD test reports ###"
-    dir('runbld') {
-      googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/**",
-        credentialsId: "${JOB_GCS_CREDENTIALS}",
-        localDirectory: ''
-      )
-      sh(label: 'runbld', script: """#!/usr/local/bin/runbld
-        echo 'Runbld to store the junit report'
-      """)
+    if (stashedTestReports) {
+      echo "### RunBLD test reports ###"
+      dir('runbld') {
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash v
+          }
+        }
+        sh(label: 'runbld', script: """#!/usr/local/bin/runbld
+          echo 'Runbld to store the junit report'
+        """)
+      }
     }
   }
 }
