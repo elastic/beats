@@ -593,6 +593,13 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+      sh(label: 'runbld', scripts: """#!/usr/local/bin/runbld
+      echo 'foo'
+      """)
+    }
+  }
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
