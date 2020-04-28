@@ -22,25 +22,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-
 	"github.com/pkg/errors"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-)
-
-const (
-	// maximum number of memory stats to be collected
-	// limit is defined by REMOTE_DOMAIN_MEMORY_STATS_MAX
-	// based on https://github.com/libvirt/libvirt/blob/5bb07527c11a6123e044a5dfc48bdeccee144994/src/remote/remote_protocol.x#L136
-	maximumStats = 11
-	// flag VIR_DOMAIN_AFFECT_CURRENT passed to collect memory stats
-	// based on https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainModificationImpact
-	flags = 0
 )
 
 // init registers the MetricSet with the central registry as soon as the program
