@@ -23,7 +23,7 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i)^\\/packaging$')
-    upstream('Beats/beats-beats-mbp/master')
+    upstream('Beats/beats-beats-mbp/7.7')
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
