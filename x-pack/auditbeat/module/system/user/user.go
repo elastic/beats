@@ -76,6 +76,23 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingUser:
+		return "info"
+	case eventActionUserAdded:
+		return "creation"
+	case eventActionUserRemoved:
+		return "deletion"
+	case eventActionUserChanged:
+		return "change"
+	case eventActionPasswordChanged:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 type passwordType uint8
 
 const (
@@ -430,8 +447,10 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"iam"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"user": common.MapStr{
 				"id":   user.UID,
