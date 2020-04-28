@@ -20,10 +20,16 @@ package unix
 import (
 	"fmt"
 	"net"
+	"os"
+	"os/user"
+	"runtime"
+	"strconv"
 
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/pkg/errors"
 )
 
 // Server represent a unix server
@@ -55,8 +61,16 @@ func New(
 }
 
 func (s *Server) createServer() (net.Listener, error) {
+	if err := s.cleanupStaleSocket(); err != nil {
+		return nil, err
+	}
+
 	l, err := net.Listen("unix", s.config.Path)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := s.setSocketOwnership(); err != nil {
 		return nil, err
 	}
 
@@ -64,4 +78,62 @@ func (s *Server) createServer() (net.Listener, error) {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil
 	}
 	return l, nil
+}
+
+func (s *Server) cleanupStaleSocket() error {
+	path := s.config.Path
+	if info, err := os.Stat(path); !os.IsNotExist(err) {
+		if info.Mode()&os.ModeSocket == 0 {
+			return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
+		}
+
+		if err := os.Remove(path); err != nil {
+			return errors.Wrapf(
+				err,
+				"cannot remove existing unix socket file at location %s",
+				path,
+			)
+		}
+	}
+	return nil
+}
+
+func (s *Server) setSocketOwnership() error {
+	if runtime.GOOS == "windows" {
+		logger := logp.NewLogger("unix")
+		if s.config.User != nil {
+			logger.Warn("windows does not support the 'user' configuration option, ignoring")
+		}
+		if s.config.Group != nil {
+			logger.Warn("windows does not support the 'group' configuration option, ignoring")
+		}
+		return nil
+	}
+	// -1 == do not change
+	uid := -1
+	gid := -1
+	if s.config.User != nil {
+		u, err := user.Lookup(*s.config.User)
+		if err != nil {
+			return err
+		}
+		uid, err = strconv.Atoi(u.Uid)
+		if err != nil {
+			return err
+		}
+	}
+	if s.config.Group != nil {
+		g, err := user.LookupGroup(*s.config.Group)
+		if err != nil {
+			return err
+		}
+		gid, err = strconv.Atoi(g.Gid)
+		if err != nil {
+			return err
+		}
+	}
+	if uid != -1 || gid != -1 {
+		return os.Chown(s.config.Path, uid, gid)
+	}
+	return nil
 }
