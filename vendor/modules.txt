@@ -500,7 +500,7 @@ github.com/go-ole/go-ole/oleutil
 # github.com/go-sourcemap/sourcemap v2.1.2+incompatible
 github.com/go-sourcemap/sourcemap
 github.com/go-sourcemap/sourcemap/internal/base64vlq
-# github.com/go-sql-driver/mysql v1.5.0
+# github.com/go-sql-driver/mysql v1.4.1
 github.com/go-sql-driver/mysql
 # github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 github.com/gocarina/gocsv
@@ -837,6 +837,8 @@ go.elastic.co/apm/model
 go.elastic.co/apm/stacktrace
 go.elastic.co/apm/transport
 go.elastic.co/apm/transport/transporttest
+# go.elastic.co/apm/module/apmelasticsearch v1.7.2
+go.elastic.co/apm/module/apmelasticsearch
 # go.elastic.co/apm/module/apmhttp v1.7.2
 go.elastic.co/apm/module/apmhttp
 # go.elastic.co/fastjson v1.0.0
@@ -1001,6 +1003,7 @@ google.golang.org/api/transport/http
 google.golang.org/api/transport/http/internal/propagation
 # google.golang.org/appengine v1.6.5
 google.golang.org/appengine
+google.golang.org/appengine/cloudsql
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/app_identity
 google.golang.org/appengine/internal/base
