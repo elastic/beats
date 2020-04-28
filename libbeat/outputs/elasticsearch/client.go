@@ -239,6 +239,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	}
 
 	failed := len(failedEvents)
+	span.Context.SetLabel("events_failed", failed)
 	if st := client.observer; st != nil {
 		dropped := stats.nonIndexable
 		duplicates := stats.duplicates

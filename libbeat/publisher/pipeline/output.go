@@ -21,6 +21,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
+
 	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -157,26 +159,28 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			if err := func() error {
-				ctx := context.Background()
-				if w.tracer != nil {
-					tx := w.tracer.StartTransaction("publish", "output")
-					defer tx.End()
-					tx.Context.SetLabel("worker", "netclient")
-					ctx = apm.ContextWithTransaction(ctx, tx)
-				}
-				err := w.client.Publish(ctx, batch)
-				if err != nil {
-					err = fmt.Errorf("failed to publish events: %w", err)
-					apm.CaptureError(ctx, err).Send()
-					w.logger.Error(err)
-					// on error return to connect loop
-					return err
-				}
-				return nil
-			}(); err != nil {
+			if err := w.publishBatch(batch); err != nil {
 				connected = false
 			}
 		}
 	}
+}
+
+func (w *netClientWorker) publishBatch(batch publisher.Batch) error {
+	ctx := context.Background()
+	if w.tracer != nil {
+		tx := w.tracer.StartTransaction("publish", "output")
+		defer tx.End()
+		tx.Context.SetLabel("worker", "netclient")
+		ctx = apm.ContextWithTransaction(ctx, tx)
+	}
+	err := w.client.Publish(ctx, batch)
+	if err != nil {
+		err = fmt.Errorf("failed to publish events: %w", err)
+		apm.CaptureError(ctx, err).Send()
+		w.logger.Error(err)
+		// on error return to connect loop
+		return err
+	}
+	return nil
 }

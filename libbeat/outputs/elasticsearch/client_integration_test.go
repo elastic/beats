@@ -29,7 +29,6 @@ import (
 	"testing"
 	"time"
 
-	"go.elastic.co/apm"
 	"go.elastic.co/apm/apmtest"
 
 	"github.com/stretchr/testify/assert"
@@ -264,26 +263,26 @@ func TestClientPublishTracer(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-	}
+	})
 	require.Len(t, spans, 2)
 
 	// get spans in reverse order
-	firstSpan := payloads.Spans[1]
+	firstSpan := spans[1]
 
 	assert.Equal(t, "publishEvents", firstSpan.Name)
 	assert.Equal(t, "output", firstSpan.Type)
-	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.TraceContext().Span))
+	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
 	assert.Equal(t, "events_encoded", firstSpan.Context.Tags[0].Key)
 	assert.Equal(t, 1.0, firstSpan.Context.Tags[0].Value)
 	assert.Equal(t, "events_original", firstSpan.Context.Tags[1].Key)
 	assert.Equal(t, 1.0, firstSpan.Context.Tags[1].Value)
 
-	secondSpan := payloads.Spans[0]
+	secondSpan := spans[0]
 	assert.Contains(t, secondSpan.Name, "POST")
 	assert.Equal(t, "external", secondSpan.Type)
 	assert.Equal(t, "http", secondSpan.Subtype)
 	assert.Equal(t, [8]byte(secondSpan.ParentID), [8]byte(firstSpan.ID))
-	assert.Equal(t, [8]byte(secondSpan.TransactionID), [8]byte(tx.TraceContext().Span))
+	assert.Equal(t, [8]byte(secondSpan.TransactionID), [8]byte(tx.ID))
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 

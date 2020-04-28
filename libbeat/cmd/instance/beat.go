@@ -123,6 +123,8 @@ var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
+	// we need to close the default tracer to prevent the beat sending events to localhost:8200
+	apm.DefaultTracer.Close()
 }
 
 // initRand initializes the runtime random number generator seed using
