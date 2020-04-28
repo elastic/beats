@@ -74,9 +74,13 @@ func TestMakeClientWorker(t *testing.T) {
 				timeout := 20 * time.Second
 
 				// Make sure that all events have eventually been published
-				return waitUntilTrue(timeout, func() bool {
+				success := waitUntilTrue(timeout, func() bool {
 					return numEvents == published
 				})
+				if !success {
+					t.Logf("numBatches = %v, numEvents = %v, published = %v", numBatches, numEvents, published)
+				}
+				return success
 			}, nil)
 
 			if err != nil {
