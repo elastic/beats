@@ -15,11 +15,12 @@ for zones that are available in GCP.
 
 * *region*: A single string with the region you want to monitor like `us-central1`.
 This will enable monitoring for all zones under this region. Or you can specific
-a partial region name like `us-east` or `us-east*`, which will monitor all regions start with
-`us-east`: `us-east1` and `us-east4`. If both region and zone are configured,
-only region will be used.
+a partial region name like `us-east` or `us-east*`, which will monitor all
+regions start with `us-east`: `us-east1` and `us-east4`.
 Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP regions]
 for regions that are available in GCP.
+
+*Note*: If both region and zone are configured, only region will be used.
 
 * *project_id*: A single string with your GCP Project ID
 
