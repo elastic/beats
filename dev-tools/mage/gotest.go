@@ -145,6 +145,7 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	}
 
 	foundModule := false
+	failedModules := []string{}
 	for _, fi := range modulesFileInfo {
 		if !fi.IsDir() {
 			continue
@@ -163,16 +164,20 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		err = runners.Test("goIntegTest", func() error {
 			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
 			if err != nil {
-				return errors.Wrapf(err, "integration tests failed for module %s", fi.Name())
+				return err
 			}
 			return nil
 		})
 		if err != nil {
-			return err
+			// err will already be report to stdout, collect failed module to report at end
+			failedModules = append(failedModules, fi.Name())
 		}
 	}
 	if module != "" && !foundModule {
 		return fmt.Errorf("no module %s", module)
+	}
+	if len(failedModules) > 0 {
+		return fmt.Errorf("failed modules: %s", strings.Join(failedModules, ", "))
 	}
 	return nil
 }

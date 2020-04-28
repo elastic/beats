@@ -188,7 +188,7 @@ func (info *DockerInfo) IsBoot2Docker() bool {
 // HaveDocker returns an error if docker is unavailable.
 func HaveDocker() error {
 	if _, err := GetDockerInfo(); err != nil {
-		return fmt.Errorf("docker is not available")
+		return errors.Wrap(err, "docker is not available")
 	}
 	return nil
 }

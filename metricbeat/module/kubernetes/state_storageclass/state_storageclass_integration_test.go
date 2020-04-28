@@ -30,8 +30,8 @@ import (
 
 func TestFetchMetricset(t *testing.T) {
 	config := test.GetKubeStateMetricsConfig(t, "state_storageclass")
-	metricSet := mbtest.NewReportingMetricSetV2(t, config)
-	events, errs := mbtest.ReportingFetchV2(metricSet)
+	metricSet := mbtest.NewFetcher(t, config)
+	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

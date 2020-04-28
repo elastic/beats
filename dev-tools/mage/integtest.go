@@ -29,9 +29,9 @@ import (
 )
 
 const (
-	// BEATS_DOCKER_INTEGRATION_TEST_ENV is used to indicate that we are inside
+	// BEATS_INSIDE_INTEGRATION_TEST_ENV is used to indicate that we are inside
 	// of the integration test environment.
-	insideIntegrationTestEnvVar = "BEATS_DOCKER_INTEGRATION_TEST_ENV"
+	insideIntegrationTestEnvVar = "BEATS_INSIDE_INTEGRATION_TEST_ENV"
 )
 
 var (
