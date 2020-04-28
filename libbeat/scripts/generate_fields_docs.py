@@ -6,7 +6,7 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
-    if  "nofields" in section:
+    if  "skipdocs" in section:
         return
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
@@ -138,7 +138,7 @@ grouped in the following categories:
         if "anchor" not in section:
             section["anchor"] = section["key"]
 
-        if  "nofields" not in section:
+        if  "skipdocs" not in section:
             output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 

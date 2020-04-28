@@ -19,5 +19,5 @@ func init() {
 // AssetNetflow returns asset data.
 // This is the base64 encoded gzipped contents of module/netflow.
 func AssetNetflow() string {
-	return "eJw8jjFOw0AQRfs9xbtAcgAXVChSClAKkGhNZoxHLDPW7sRWbo8CSvr3/n87vvU64JpTjW33E3KpWiAtqw68ah5qbAVE+7nZkhY+8FQAXv5gpmg0Paut5l93g9GF4+lw/OA2fAOiSSdWbbw/n/a8zcrjDiS045GMIkymVTqfeg0XtnlMctZ7JebLJVlarCba9wU8/pWh/AYAAP//0XBG/g=="
+	return "eJw8zj1Ow0AQhuF+T/FeIDmACyoUKQUoBUi0xjPGoyw7q92JrdweBcnpn+/nwFXvA0Vjzr4dfl1uWROERdaBd41T9i2BaJ+a1TAvAy8J4O0fM3uj6aS2WvnZE4xFOF9O5y8exQ/gTTq+auPz9XLkY1GecyCuneLBKMJsmqXzrXcvwraMQSy6v8RKvQW1+Wqi/ZigX62KT31IfwEAAP//0cxHCg=="
 }
