@@ -80,7 +80,8 @@
                   default_field: false
                   multi_fields:
                     - name: text
-                      type: wildcard
+                      type: text
+                      analyzer: simple
                 - name: distinguished_name
                   type: keyword
                   ignore_above: 1024
@@ -147,7 +148,8 @@
                   default_field: false
                   multi_fields:
                     - name: text
-                      type: wildcard
+                      type: text
+                      analyzer: simple
                 - name: subject.distinguished_name
                   type: keyword
                   ignore_above: 1024
