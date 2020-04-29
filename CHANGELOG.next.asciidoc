@@ -346,6 +346,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enhance `elasticsearch/deprecation` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17728[17728]
 - Improve ECS categorization field mappings in redis module. {issue}16179[16179] {pull}17918[17918]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
+- Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 
 *Heartbeat*
 
