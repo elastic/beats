@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
@@ -46,27 +47,19 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
-	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 )
 
 func init() {
-	common.RegisterCheckDeps(update.Update)
-	test.RegisterDeps(GoIntegTest)
+	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 	unittest.RegisterGoTestDeps(Fields)
 	unittest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": unittest.GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
-}
-
-//CollectAll generates the docs and the fields.
+// CollectAll generates the docs and the fields.
 func CollectAll() {
 	mg.Deps(CollectDocs, FieldsDocs)
 }
@@ -81,8 +74,9 @@ func Package() {
 
 	devtools.UseElasticBeatOSSPackaging()
 	metricbeat.CustomizePackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
-	mg.Deps(update.Update, metricbeat.PrepareModulePackagingOSS)
+	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -106,12 +100,6 @@ func Dashboards() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
-}
-
-// Imports generates an include/list_{suffix}.go file containing
-// a import statement for each module and dataset.
-func Imports() error {
-	return metricbeat.GenerateOSSMetricbeatModuleIncludeListGo()
 }
 
 func configYML() error {
@@ -139,18 +127,24 @@ func MockedTests(ctx context.Context) error {
 	return devtools.GoTest(ctx, params)
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a fields.yml and fields.go for each module.
+func Fields() {
+	mg.Deps(fieldsYML, moduleFieldsGo)
+}
+
+func fieldsYML() error {
 	return devtools.GenerateFieldsYAML("module")
 }
 
-// ExportDashboard exports a dashboard and writes it into the correct directory
-//
-// Required ENV variables:
-// * MODULE: Name of the module
-// * ID: Dashboard id
-func ExportDashboard() error {
-	return devtools.ExportDashboard()
+func moduleFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo("module")
+}
+
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config,
+		metricbeat.PrepareModulePackagingOSS,
+		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
@@ -172,12 +166,60 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(Fields)
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
 	return devtools.GoTestIntegrationForModule(ctx)
+}
+
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+// Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
+// Use any other NOSE_* environment variable to influence the behavior of
+// nosetests.
+func PythonIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
+	}, devtools.ListMatchingEnvVars("NOSE_")...)
+}
+
+// CreateMetricset creates a new metricset.
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * METRICSET: Name of the metricset
+func CreateMetricset(ctx context.Context) error {
+	ve, err := devtools.PythonVirtualenv()
+	if err != nil {
+		return err
+	}
+	python, err := devtools.LookVirtualenvPath(ve, "python")
+	if err != nil {
+		return err
+	}
+	path, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	_, err = sh.Exec(
+		map[string]string{}, os.Stdout, os.Stderr, python, "scripts/create_metricset.py",
+		"--path", path, "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
+	)
+	return err
 }
