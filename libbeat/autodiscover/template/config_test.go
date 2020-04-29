@@ -87,7 +87,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings)
+		mapper, err := NewConfigMapper(mappings, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,8 +124,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
   - correct: config
     password: "${PASSWORD}"`,
 			event: bus.Event{
-				"foo":      3,
-				"keystore": keystore,
+				"foo": 3,
 			},
 			expected: []*common.Config{config},
 		},
@@ -142,7 +141,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings)
+		mapper, err := NewConfigMapper(mappings, keystore)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -166,7 +165,7 @@ func TestNilConditionConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = NewConfigMapper(mappings)
+	_, err = NewConfigMapper(mappings, nil)
 	assert.NoError(t, err)
 	assert.Nil(t, mappings[0].ConditionConfig)
 }

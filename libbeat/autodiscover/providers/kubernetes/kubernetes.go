@@ -55,7 +55,6 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	logger    *logp.Logger
 	eventer   Eventer
-	keystore  keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -77,7 +76,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -99,7 +98,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		builders:  builders,
 		appenders: appenders,
 		logger:    logger,
-		keystore:  keystore,
 	}
 
 	switch config.Resource {
@@ -138,8 +136,6 @@ func (p *Provider) String() string {
 }
 
 func (p *Provider) publish(event bus.Event) {
-	// attach keystore to the event to be consumed by the static configs
-	event["keystore"] = p.keystore
 	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
