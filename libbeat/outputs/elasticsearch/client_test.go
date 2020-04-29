@@ -318,6 +318,68 @@ func TestBulkEncodeEvents(t *testing.T) {
 	}
 }
 
+func TestBulkEncodeEventsWithOpType(t *testing.T) {
+	cases := []common.MapStr{
+		{"_id": "111", "op_type": "index", "message": "test 1", "bulkIndex": 0},
+		{"_id": "112", "op_type": "", "message": "test 2", "bulkIndex": 2},
+		{"_id": "", "op_type": "delete", "message": "test 6", "bulkIndex": -1}, // this won't get encoded due to missing _id
+		{"_id": "", "op_type": "", "message": "test 3", "bulkIndex": 4},
+		{"_id": "114", "op_type": "delete", "message": "test 4", "bulkIndex": 6},
+		{"_id": "115", "op_type": "index", "message": "test 5", "bulkIndex": 7},
+	}
+
+	cfg := common.MustNewConfigFrom(common.MapStr{})
+	info := beat.Info{
+		IndexPrefix: "test",
+		Version:     version.GetDefaultVersion(),
+	}
+
+	im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+	require.NoError(t, err)
+
+	index, pipeline, err := buildSelectors(im, info, cfg)
+	require.NoError(t, err)
+
+	events := make([]publisher.Event, len(cases))
+	for i, fields := range cases {
+		events[i] = publisher.Event{
+			Content: beat.Event{
+				Meta: common.MapStr{
+					"_id":     fields["_id"],
+					"op_type": fields["op_type"],
+				},
+				Fields: common.MapStr{
+					"message": fields["message"],
+				},
+			}}
+	}
+
+	encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(version.GetDefaultVersion()), index, pipeline, events)
+	assert.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
+	assert.Equal(t, 9, len(bulkItems), "incomplete bulk")
+
+	for i := 0; i < len(cases); i++ {
+		bulkEventIndex, _ := cases[i]["bulkIndex"].(int)
+		if bulkEventIndex == -1 {
+			continue
+		}
+		caseOpType, _ := cases[i]["op_type"].(string)
+		caseMessage, _ := cases[i]["message"].(string)
+		switch bulkItems[bulkEventIndex].(type) {
+		case eslegclient.BulkCreateAction:
+			validOpTypes := []string{opTypeCreate, ""}
+			assert.Contains(t, validOpTypes, caseOpType, caseMessage)
+		case eslegclient.BulkIndexAction:
+			assert.Equal(t, opTypeIndex, caseOpType, caseMessage)
+		case eslegclient.BulkDeleteAction:
+			assert.Equal(t, opTypeDelete, caseOpType, caseMessage)
+		default:
+			panic("unknown type")
+		}
+	}
+
+}
+
 func TestClientWithAPIKey(t *testing.T) {
 	var headers http.Header
 
