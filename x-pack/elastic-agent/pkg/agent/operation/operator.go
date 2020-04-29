@@ -101,6 +101,7 @@ func NewOperator(
 
 func defaultOperatorConfig() *operatorCfg.Config {
 	return &operatorCfg.Config{
+		LoggingConfig: *logger.DefaultLoggingConfig(),
 		RetryConfig: &retry.Config{
 			Enabled:      false,
 			RetriesCount: 0,
@@ -253,7 +254,20 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
 	}
 
-	a, err := app.NewApplication(o.bgContext, p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, o.monitor)
+	// TODO: (michal) join args into more compact options version
+	a, err := app.NewApplication(
+		o.bgContext,
+		p.ID(),
+		p.BinaryName(),
+		o.pipelineID,
+		o.config.LoggingConfig.Level.String(),
+		specifier,
+		factory,
+		o.config,
+		o.logger,
+		o.eventProcessor.OnFailing,
+		o.monitor)
+
 	if err != nil {
 		return nil, err
 	}
