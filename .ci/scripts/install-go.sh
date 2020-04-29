@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 set -exo pipefail
 
-function fetch() {
-    ## Load CI functions
-    # shellcheck disable=SC1091
+function retryCommand() {
     if [ -e /usr/local/bin/bash_standard_lib.sh ] ; then
+        # shellcheck disable=SC1091
         source /usr/local/bin/bash_standard_lib.sh
-    fi
-    if [ -n "${JENKINS_URL}" ] ; then
-        retry 2 "$@"
+        retry 3 "$@"
     else
         "$@"
     fi
@@ -23,7 +20,7 @@ GVM_CMD="${HOME}/bin/gvm"
 
 mkdir -p "${HOME}/bin"
 
-fetch -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-${ARCH}-amd64"
+retryCommand curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.2/gvm-${ARCH}-amd64"
 chmod +x "${GVM_CMD}"
 
 gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
