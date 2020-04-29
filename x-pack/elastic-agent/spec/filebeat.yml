@@ -60,6 +60,14 @@ rules:
     - docker
     - redis
     - syslog
+    - s3
+    - netflow
+    - httpjson
+    - o365audit
+    - azureeventhub
+    - cloudfoundry
+    - googlepubsub
+    - kafka
 
 - filter_values:
     selector: inputs
