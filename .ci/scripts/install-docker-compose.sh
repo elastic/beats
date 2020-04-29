@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -exo pipefail
+set -exuo pipefail
 
 function fetch() {
     if [ -e /usr/local/bin/bash_standard_lib.sh ] ; then
