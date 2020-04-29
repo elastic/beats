@@ -237,8 +237,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	fb.pipeline = withPipelineEventCounter(fb.pipeline, wgEvents)
 	fb.pipeline = pipetool.WithDefaultGuarantees(b.Publisher, beat.GuaranteedSend)
+	fb.pipeline = withPipelineEventCounter(fb.pipeline, wgEvents)
 
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
