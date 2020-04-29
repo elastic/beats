@@ -169,6 +169,54 @@
       },
       {
         "remove": {
+          "field": "fortinet.firewall.dstip",
+          "if": "ctx.fortinet?.firewall?.dstip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.srcip",
+          "if": "ctx.fortinet?.firewall?.srcip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.remip",
+          "if": "ctx.fortinet?.firewall?.remip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.locip",
+          "if": "ctx.fortinet?.firewall?.locip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.group",
+          "if": "ctx.fortinet?.firewall?.group == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.user",
+          "if": "ctx.fortinet?.firewall?.user == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.tranip",
+          "if": "ctx.fortinet?.firewall?.tranip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
+          "field": "fortinet.firewall.transip",
+          "if": "ctx.fortinet?.firewall?.transip == 'N/A'"
+        }
+      },
+      {
+        "remove": {
           "field": [
             "_temp",
             "message",

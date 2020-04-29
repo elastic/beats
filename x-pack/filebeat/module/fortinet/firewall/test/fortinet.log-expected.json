@@ -18,6 +18,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:17:49.052-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -88,6 +89,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:17:46.314-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -157,6 +159,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T13:17:35.061-04:00",
         "event.timezone": "-0400",
         "event.type": [
@@ -231,6 +234,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:17:29.360-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -291,6 +295,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:17:12.148-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -364,6 +369,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:17:04.712-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -483,6 +489,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T13:15:18.838-04:00",
         "event.timezone": "-0400",
         "event.type": [
@@ -534,12 +541,11 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:32:48.439-05:00",
         "event.timezone": "-0500",
         "event.type": [
             "user",
-            "access",
-            "allowed",
             "start"
         ],
         "fileset.name": "firewall",
@@ -585,6 +591,7 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "failure",
         "event.start": "2020-04-18T12:32:48.339-05:00",
         "event.timezone": "-0500",
         "event.type": [
@@ -750,12 +757,11 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T12:32:10.109-05:00",
         "event.timezone": "-0500",
         "event.type": [
             "user",
-            "access",
-            "allowed",
             "start"
         ],
         "fileset.name": "firewall",
@@ -1023,12 +1029,11 @@
         "event.dataset": "fortinet.firewall",
         "event.kind": "event",
         "event.module": "fortinet",
+        "event.outcome": "success",
         "event.start": "2020-04-18T14:16:44.674-03:00",
         "event.timezone": "-0300",
         "event.type": [
             "user",
-            "access",
-            "allowed",
             "end"
         ],
         "fileset.name": "firewall",
@@ -1297,7 +1302,7 @@
         "event.type": [
             "connection",
             "end",
-            "network",
+            "protocol",
             "allowed"
         ],
         "fileset.name": "firewall",
@@ -1372,7 +1377,7 @@
         "event.type": [
             "connection",
             "end",
-            "network",
+            "protocol",
             "allowed"
         ],
         "fileset.name": "firewall",

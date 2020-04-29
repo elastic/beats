@@ -11,7 +11,14 @@
       "set": {
         "field": "event.outcome",
         "value": "failure",
-        "if": "ctx.fortinet?.firewall?.result == 'ERROR'"
+        "if": "ctx.fortinet?.firewall?.result == 'ERROR' || ctx.fortinet?.firewall?.status == 'negotiate_error'"
+      }
+    },
+    {
+      "set": {
+        "field": "event.outcome",
+        "value": "success",
+        "if": "ctx.fortinet?.firewall?.result == 'OK' || ['FSSO-logon', 'auth-logon', 'FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
       }
     },
     {
@@ -19,8 +26,6 @@
         "field": "event.type",
         "value": [
           "user",
-          "access",
-          "allowed",
           "start"
         ],
         "if": "['FSSO-logon', 'auth-logon'].contains(ctx.fortinet?.firewall?.action)"
@@ -31,8 +36,6 @@
         "field": "event.type",
         "value": [
           "user",
-          "access",
-          "allowed",
           "end"
         ],
         "if": "['FSSO-logoff', 'auth-logout'].contains(ctx.fortinet?.firewall?.action)"
@@ -88,18 +91,10 @@
       }
     },
     {
-      "set": {
-        "field": "event.outcome",
-        "value": "success",
-        "if": "ctx.fortinet?.firewall?.result == 'OK'"
-      }
-    },
-    {
       "rename": {
         "field": "fortinet.firewall.dstip",
         "target_field": "destination.ip",
-        "ignore_missing": true,
-        "if": "ctx.fortinet?.firewall?.dstip != 'N/A'"
+        "ignore_missing": true
       }
     },
     {
@@ -107,7 +102,7 @@
         "field": "fortinet.firewall.remip",
         "target_field": "destination.ip",
         "ignore_missing": true,
-        "if": "ctx.destination?.ip == null && ctx.fortinet?.firewall?.remip != 'N/A'"
+        "if": "ctx.destination?.ip == null"
       }
     },
     {
@@ -159,8 +154,7 @@
       "rename": {
         "field": "fortinet.firewall.group",
         "target_field": "source.user.group.name",
-        "ignore_missing": true,
-        "if": "ctx.fortinet?.firewall?.group != 'N/A'"
+        "ignore_missing": true
       }
     },
     {
@@ -174,8 +168,7 @@
       "rename": {
         "field": "fortinet.firewall.srcip",
         "target_field": "source.ip",
-        "ignore_missing": true,
-        "if": "ctx.fortinet?.firewall?.srcip != 'N/A'"
+        "ignore_missing": true
       }
     },
     {
@@ -183,7 +176,7 @@
         "field": "fortinet.firewall.locip",
         "target_field": "source.ip",
         "ignore_missing": true,
-        "if": "ctx.source?.ip == null && ctx.fortinet?.firewall?.locip != 'N/A'"
+        "if": "ctx.source?.ip == null"
       }
     },
     {
@@ -220,8 +213,7 @@
       "rename": {
         "field": "fortinet.firewall.user",
         "target_field": "source.user.name",
-        "ignore_missing": true,
-        "if": "ctx.fortinet?.firewall?.user != 'N/A'"
+        "ignore_missing": true
       }
     },
     {
@@ -348,7 +340,8 @@
       "rename": {
         "field": "fortinet.firewall.sess_duration",
         "target_field": "event.duration",
-        "ignore_missing": true
+        "ignore_missing": true,
+        "if": "ctx.event?.duration == null"
       }
     },
     {
@@ -465,7 +458,8 @@
       "script": {
         "lang": "painless",
         "source": "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes",
-        "if": "ctx?.source?.bytes != null && ctx?.destination?.bytes != null"
+        "if": "ctx?.source?.bytes != null && ctx?.destination?.bytes != null",
+        "ignore_failure": true
       }
     },
     {
@@ -480,30 +474,6 @@
         "field": "related.ip",
         "value": "{{destination.ip}}",
         "if": "ctx.destination?.ip != null"
-      }
-    },
-    {
-      "remove": {
-        "field": [
-          "fortinet.firewall.dstip",
-          "fortinet.firewall.remip",
-          "fortinet.firewall.dstport",
-          "fortinet.firewall.remport",
-          "fortinet.firewall.rcvdbyte",
-          "fortinet.firewall.daddr",
-          "fortinet.firewall.dst_host",
-          "fortinet.firewall.group",
-          "fortinet.firewall.sentbyte",
-          "fortinet.firewall.srcip",
-          "fortinet.firewall.locip",
-          "fortinet.firewall.srcmac",
-          "fortinet.firewall.source_mac",
-          "fortinet.firewall.srcport",
-          "fortinet.firewall.locport",
-          "fortinet.firewall.user",
-          "fortinet.firewall.saddr"
-        ],
-        "ignore_missing": true
       }
     }
   ],
