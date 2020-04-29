@@ -255,7 +255,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 				errs = append(errs, errors.Wrap(err, "error loading config file"))
 				continue
 			}
-			set, err := fileset.NewModuleRegistry(confs, "", false)
+			set, err := fileset.NewModuleRegistry(confs, b.Info, false)
 			if err != nil {
 				errs = append(errs, err)
 				continue
