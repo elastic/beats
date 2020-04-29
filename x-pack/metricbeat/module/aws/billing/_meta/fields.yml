@@ -4,3 +4,9 @@
     `billing` contains the estimated charges for your AWS account in Cloudwatch.
   release: beta
   fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: EstimatedCharges.max
+          type: long
+          description: Maximum estimated charges for AWS acccount.
