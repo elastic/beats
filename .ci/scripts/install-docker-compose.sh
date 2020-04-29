@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
-function fetch() {
+function retryCommand() {
     if [ -e /usr/local/bin/bash_standard_lib.sh ] ; then
         # shellcheck disable=SC1091
         source /usr/local/bin/bash_standard_lib.sh
