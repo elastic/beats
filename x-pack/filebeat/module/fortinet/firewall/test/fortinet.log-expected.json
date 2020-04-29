@@ -1473,7 +1473,6 @@
         "event.type": [
             "connection",
             "end",
-            "error",
             "allowed"
         ],
         "fileset.name": "firewall",

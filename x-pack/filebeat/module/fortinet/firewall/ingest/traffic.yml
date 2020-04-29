@@ -27,10 +27,6 @@ processors:
     if: "ctx.fortinet?.firewall?.action != null && ctx.fortinet?.firewall?.action !='start'"
 - append:
     field: event.type
-    value: error
-    if: "ctx.fortinet?.firewall?.action == 'ip-conn'"
-- append:
-    field: event.type
     value: protocol
     if: "ctx.fortinet?.firewall?.app != null && ctx.fortinet?.firewall?.action != 'deny'"
 - append:

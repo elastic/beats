@@ -8,11 +8,3 @@
       description: >
         Fields from fortinet FortiOS
       fields:
-
-- key: file
-  title: File
-  fields:
-    - name: hash.crc32
-      type: keyword
-      description: >
-        CRC32 Hash
