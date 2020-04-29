@@ -21,9 +21,6 @@ processors:
     patterns:
     - '{:plugin_params=>%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=>%{NUMBER:event.duration},
       :took_in_millis=>%{NUMBER:logstash.slowlog.took_in_millis}, :event=>%{GREEDYDATA:logstash.slowlog.event}}'
-- rename:
-    field: '@timestamp'
-    target_field: event.created
 - date:
     if: ctx.event.timezone == null
     field: logstash.slowlog.timestamp
