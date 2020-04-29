@@ -4394,7 +4394,16 @@ type: long
 *`aws.usage.metrics.CallCount.sum`*::
 +
 --
-The number of specified operations performed in your account.
+The number of specified API operations performed in your account.
+
+type: long
+
+--
+
+*`aws.usage.metrics.ResourceCount.sum`*::
++
+--
+The number of the specified resources running in your account. The resources are defined by the dimensions associated with the metric.
 
 type: long
 
