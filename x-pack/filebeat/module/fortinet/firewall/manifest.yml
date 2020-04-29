@@ -13,9 +13,9 @@ var:
     default: 7
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ingest/event.json
-  - ingest/utm.json
-  - ingest/traffic.json
+  - ingest/pipeline.yml
+  - ingest/event.yml
+  - ingest/utm.yml
+  - ingest/traffic.yml
 
 input: config/firewall.yml

@@ -55,6 +55,9 @@
             "192.168.2.1",
             "8.8.8.8"
         ],
+        "related.user": [
+            "elasticuser"
+        ],
         "rule.category": "Internet Telephony",
         "rule.id": "100602",
         "rule.ruleset": "elasticruleset",
@@ -126,6 +129,9 @@
             "192.168.2.1",
             "8.8.8.8"
         ],
+        "related.user": [
+            "elasticuser"
+        ],
         "rule.category": "Web-based Email",
         "rule.id": "38",
         "rule.ruleset": "elasticruleset",
@@ -195,6 +201,9 @@
         "related.ip": [
             "192.168.2.1",
             "8.8.8.8"
+        ],
+        "related.user": [
+            "elasticuser"
         ],
         "rule.category": "Web-Client",
         "rule.id": "12",
@@ -331,6 +340,9 @@
         "related.ip": [
             "192.168.2.1",
             "8.8.8.8"
+        ],
+        "related.user": [
+            "elasticuser"
         ],
         "rule.category": "Web-Client",
         "rule.id": "100602",
@@ -521,6 +533,9 @@
             "192.168.2.1",
             "8.8.4.4"
         ],
+        "related.user": [
+            "elasticuser2"
+        ],
         "rule.id": "12",
         "rule.ruleset": "somecerts",
         "service.type": "fortinet",
@@ -565,6 +580,9 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "10.10.10.10"
+        ],
+        "related.user": [
+            "elasticouser"
         ],
         "rule.description": "FSSO logon authentication status",
         "service.type": "fortinet",
@@ -783,6 +801,9 @@
         "related.ip": [
             "10.10.10.10"
         ],
+        "related.user": [
+            "elastiiiuser"
+        ],
         "rule.description": "Authentication logon",
         "service.type": "fortinet",
         "source.ip": "10.10.10.10",
@@ -914,6 +935,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.user": [
+            "elastico"
+        ],
         "rule.description": "FortiClient connection added",
         "service.type": "fortinet",
         "source.user.name": "elastico",
@@ -1012,6 +1036,9 @@
         "related.ip": [
             "8.8.5.4"
         ],
+        "related.user": [
+            "someuser"
+        ],
         "rule.description": "SSL VPN tunnel up",
         "service.type": "fortinet",
         "source.user.group.name": "somegroup",
@@ -1053,6 +1080,9 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "192.168.1.1"
+        ],
+        "related.user": [
+            "elasticadmin"
         ],
         "rule.description": "FSSO log off authentication status",
         "service.type": "fortinet",
@@ -1145,7 +1175,6 @@
         "event.type": [
             "connection",
             "end",
-            "error",
             "allowed"
         ],
         "fileset.name": "firewall",
@@ -1476,6 +1505,9 @@
         "related.ip": [
             "192.168.1.1",
             "192.168.100.100"
+        ],
+        "related.user": [
+            "elasticsuper"
         ],
         "rule.category": "unscanned",
         "rule.id": "49",

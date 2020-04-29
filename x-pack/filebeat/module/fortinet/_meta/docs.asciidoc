@@ -89,6 +89,7 @@ This is a list of FortiOS fields that are mapped to ECS.
 | filename                   | file.name                      |
 | filesize                   | file.size                      |
 | filetype                   | file.extension                 |
+| filehash                   | file.hash.crc32                |
 | from                       | source.user.email              |
 | group                      | source.user.group              |
 | hostname                   | url.domain                     |
