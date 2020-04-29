@@ -20,9 +20,9 @@ package processors
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	p "github.com/elastic/beats/libbeat/plugin"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	p "github.com/elastic/beats/v7/libbeat/plugin"
 )
 
 type processorPlugin struct {
@@ -52,7 +52,7 @@ type Constructor func(config *common.Config) (Processor, error)
 var registry = NewNamespace()
 
 func RegisterPlugin(name string, constructor Constructor) {
-	logp.Debug("processors", "Register plugin %s", name)
+	logp.L().Named(logName).Debugf("Register plugin %s", name)
 
 	err := registry.Register(name, constructor)
 	if err != nil {

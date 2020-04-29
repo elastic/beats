@@ -23,16 +23,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	dk "github.com/elastic/beats/libbeat/tests/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	dk "github.com/elastic/beats/v7/libbeat/tests/docker"
 )
 
 // Test docker start emits an autodiscover event
 func TestDockerStart(t *testing.T) {
+	log := logp.NewLogger("docker")
+
 	d, err := dk.NewClient()
 	if err != nil {
 		t.Fatal(err)
@@ -42,9 +47,13 @@ func TestDockerStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bus := bus.New("test")
-	config := common.NewConfig()
-	provider, err := AutodiscoverBuilder(bus, UUID, config)
+	bus := bus.New(log, "test")
+	config := defaultConfig()
+	config.CleanupTimeout = 0
+
+	s := &template.MapperSettings{nil, nil}
+	config.Templates = *s
+	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,17 +101,23 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 				assert.Equal(t, getValue(e, "stop"), true)
 				assert.Nil(t, getValue(e, "start"))
 			}
-			assert.Equal(t, getValue(e, "docker.container.image"), "busybox")
-			assert.Equal(t, getValue(e, "docker.container.labels"), common.MapStr{
-				"label": common.MapStr{
-					"value": "foo",
-					"child": "bar",
+			assert.Equal(t, getValue(e, "container.image.name"), "busybox")
+			// labels.dedot=true by default
+			assert.Equal(t,
+				common.MapStr{
+					"label": common.MapStr{
+						"value": "foo",
+						"child": "bar",
+					},
 				},
-			})
-			assert.NotNil(t, getValue(e, "docker.container.id"))
-			assert.NotNil(t, getValue(e, "docker.container.name"))
+				getValue(e, "container.labels"),
+			)
+			assert.NotNil(t, getValue(e, "container.id"))
+			assert.NotNil(t, getValue(e, "container.name"))
 			assert.NotNil(t, getValue(e, "host"))
-			assert.Equal(t, getValue(e, "docker"), getValue(e, "meta.docker"))
+			assert.Equal(t, getValue(e, "docker.container.id"), getValue(e, "meta.container.id"))
+			assert.Equal(t, getValue(e, "docker.container.name"), getValue(e, "meta.container.name"))
+			assert.Equal(t, getValue(e, "docker.container.image"), getValue(e, "meta.container.image.name"))
 			return
 
 		case <-time.After(10 * time.Second):

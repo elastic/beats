@@ -18,7 +18,7 @@ class TestCommands(BaseTest):
 
     def setUp(self):
         super(BaseTest, self).setUp()
-        shutil.copy(self.beat_path + "/_meta/config.yml",
+        shutil.copy(os.path.join(self.beat_path, "tests", "system", "input", "libbeat.yml"),
                     os.path.join(self.working_dir, "libbeat.yml"))
         self.fields_path = os.path.join(self.beat_path, "template/testdata/fields.yml")
 
@@ -47,7 +47,7 @@ class TestCommands(BaseTest):
             extra_args=[
                 "export", "template",
                 "-E", "setup.template.fields=" + self.fields_path,
-                "-E", "migration.enabled=false",
+                "-E", "migration.6_to_7.enabled=false",
             ],
             config="libbeat.yml")
 
@@ -64,7 +64,7 @@ class TestCommands(BaseTest):
             extra_args=[
                 "export", "template",
                 "-E", "setup.template.fields=" + self.fields_path,
-                "-E", "migration.enabled=true",
+                "-E", "migration.6_to_7.enabled=true",
             ],
             config="libbeat.yml")
 

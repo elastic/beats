@@ -18,12 +18,15 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/generator/fields"
+	"github.com/elastic/beats/v7/libbeat/generator/fields"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 func main() {
@@ -89,15 +92,29 @@ func main() {
 		fieldsFiles = append(fieldsFiles, fieldsFile...)
 	}
 
-	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)
+	var buffer bytes.Buffer
+	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, &buffer)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
 		os.Exit(3)
 	}
 
-	outputPath, _ := filepath.Abs(output)
+	_, err = mapping.LoadFields(buffer.Bytes())
 	if err != nil {
-		outputPath = output
+		fmt.Fprintf(os.Stderr, "Generated global fields.yml file for %s is invalid: %+v\n", name, err)
+		os.Exit(3)
 	}
+
+	if output == "-" {
+		fmt.Print(buffer.String())
+		return
+	}
+
+	err = ioutil.WriteFile(output, buffer.Bytes(), 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Cannot write global fields.yml file for %s: %v", name, err)
+	}
+
+	outputPath, _ := filepath.Abs(output)
 	fmt.Fprintf(os.Stderr, "Generated fields.yml for %s to %s\n", name, outputPath)
 }

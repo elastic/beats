@@ -7,13 +7,8 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -43,7 +38,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -88,7 +83,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Handshake completed",
-                "field": "tls.handshake_completed",
+                "field": "tls.established",
                 "json": "",
                 "order": "desc",
                 "orderBy": "1",
@@ -204,7 +199,7 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -232,7 +227,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "tls.alert_types",
+                "field": "tls.detailed.alert_types",
                 "include": ".*",
                 "json": "{\"missing\": \"None\"}",
                 "order": "desc",
@@ -270,13 +265,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.handshake_completed"
+                  "field": "tls.established"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.handshake_completed",
+                  "key": "tls.established",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -285,13 +280,8 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -370,7 +360,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -393,7 +383,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Server Name Indication",
-                "field": "tls.client_hello.extensions.server_name_indication",
+                "field": "tls.client.server_name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -425,7 +415,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -448,7 +438,7 @@
               "id": "2",
               "params": {
                 "customLabel": "TLS version",
-                "field": "tls.version",
+                "field": "tls.detailed.version",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -480,7 +470,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -503,7 +493,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Public Key Size",
-                "field": "tls.server_certificate.public_key_size",
+                "field": "tls.detailed.server_certificate.public_key_size",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -535,7 +525,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -558,7 +548,7 @@
               "id": "2",
               "params": {
                 "exclude": "",
-                "field": "tls.resumption_method",
+                "field": "tls.detailed.resumption_method",
                 "json": "{\n\"missing\": \"none\"\n}",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
@@ -601,7 +591,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -635,7 +625,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Subject Common Name",
-                "field": "tls.server_certificate.subject.common_name",
+                "field": "tls.detailed.server_certificate.subject.common_name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 10
@@ -648,7 +638,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Organization",
-                "field": "tls.server_certificate.subject.organization",
+                "field": "tls.detailed.server_certificate.subject.organization",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -684,7 +674,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -716,7 +706,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Subject Common Name",
-                "field": "tls.client_certificate.subject.common_name",
+                "field": "tls.detailed.client_certificate.subject.common_name",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -729,7 +719,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Signature Algorithm",
-                "field": "tls.client_certificate.signature_algorithm",
+                "field": "tls.detailed.client_certificate.signature_algorithm",
                 "json": "{ \"missing\": \"N/A\" }",
                 "order": "desc",
                 "orderBy": "1",
@@ -766,7 +756,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -798,7 +788,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Cipher",
-                "field": "tls.server_hello.selected_cipher",
+                "field": "tls.cipher",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -834,7 +824,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -866,7 +856,7 @@
               "id": "2",
               "params": {
                 "customLabel": "JA3 Fingerprint",
-                "field": "tls.fingerprints.ja3.hash",
+                "field": "tls.client.ja3",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -927,7 +917,7 @@
               }
             ],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -1056,13 +1046,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.handshake_completed"
+                  "field": "tls.established"
                 },
                 "meta": {
                   "alias": "TLS sessions",
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.handshake_completed",
+                  "key": "tls.established",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1072,13 +1062,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1110,13 +1095,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.client_hello.extensions.server_name_indication"
+                  "field": "tls.client.server_name"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.client_hello.extensions.server_name_indication",
+                  "key": "tls.client.server_name",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1126,13 +1111,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1164,13 +1144,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.version"
+                  "field": "tls.detailed.version"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.version",
+                  "key": "tls.detailed.version",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1180,13 +1160,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1218,13 +1193,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.server_certificate.public_key_size"
+                  "field": "tls.detailed.server_certificate.public_key_size"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.server_certificate.public_key_size",
+                  "key": "tls.detailed.server_certificate.public_key_size",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1234,13 +1209,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1272,13 +1242,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.fingerprints.ja3.hash"
+                  "field": "tls.client.ja3"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.fingerprints.ja3.hash",
+                  "key": "tls.client.ja3",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1288,7 +1258,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1321,13 +1291,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.handshake_completed"
+                  "field": "tls.established"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.handshake_completed",
+                  "key": "tls.established",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
@@ -1354,7 +1324,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1381,13 +1351,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }

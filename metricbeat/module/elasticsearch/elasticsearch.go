@@ -27,13 +27,41 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+func init() {
+	// Register the ModuleFactory function for this module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+// NewModule creates a new module.
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	xpackEnabledMetricSets := []string{
+		"ccr",
+		"enrich",
+		"cluster_stats",
+		"index",
+		"index_recovery",
+		"index_summary",
+		"ml_job",
+		"node_stats",
+		"shard",
+	}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
+}
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+
+// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
+var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -61,15 +89,18 @@ type NodeInfo struct {
 
 // License contains data about the Elasticsearch license
 type License struct {
-	Status            string    `json:"status"`
-	ID                string    `json:"uid"`
-	Type              string    `json:"type"`
-	IssueDate         time.Time `json:"issue_date"`
-	IssueDateInMillis int       `json:"issue_date_in_millis"`
-	MaxNodes          int       `json:"max_nodes"`
-	IssuedTo          string    `json:"issued_to"`
-	Issuer            string    `json:"issuer"`
-	StartDateInMillis int       `json:"start_date_in_millis"`
+	Status             string     `json:"status"`
+	ID                 string     `json:"uid"`
+	Type               string     `json:"type"`
+	IssueDate          *time.Time `json:"issue_date"`
+	IssueDateInMillis  int        `json:"issue_date_in_millis"`
+	ExpiryDate         *time.Time `json:"expiry_date,omitempty"`
+	ExpiryDateInMillis int        `json:"expiry_date_in_millis,omitempty"`
+	MaxNodes           int        `json:"max_nodes,omitempty"`
+	MaxResourceUnits   int        `json:"max_resource_units,omitempty"`
+	IssuedTo           string     `json:"issued_to"`
+	Issuer             string     `json:"issuer"`
+	StartDateInMillis  int        `json:"start_date_in_millis"`
 }
 
 type licenseWrapper struct {
@@ -211,6 +242,12 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	// License found in cache, return it
+	if license != nil {
+		return license, nil
+	}
+
+	// License not found in cache, fetch it from Elasticsearch
 	info, err := GetInfo(http, resetURI)
 	if err != nil {
 		return nil, err
@@ -222,24 +259,22 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 		licensePath = "_license"
 	}
 
-	// Not cached, fetch license from Elasticsearch
-	if license == nil {
-		content, err := fetchPath(http, resetURI, licensePath, "")
-		if err != nil {
-			return nil, err
-		}
-
-		var data licenseWrapper
-		err = json.Unmarshal(content, &data)
-		if err != nil {
-			return nil, err
-		}
-
-		// Cache license for a minute
-		licenseCache.set(&data.License, time.Minute)
+	content, err := fetchPath(http, resetURI, licensePath, "")
+	if err != nil {
+		return nil, err
 	}
 
-	return licenseCache.get(), nil
+	var data licenseWrapper
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Cache license for a minute
+	license = &data.License
+	licenseCache.set(license, time.Minute)
+
+	return license, nil
 }
 
 // GetClusterState returns cluster state information.
@@ -301,6 +336,48 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+type XPack struct {
+	Features struct {
+		CCR struct {
+			Enabled bool `json:"enabled"`
+		} `json:"CCR"`
+	} `json:"features"`
+}
+
+// GetXPack returns information about xpack features.
+func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
+	content, err := fetchPath(http, resetURI, "_xpack", "")
+
+	if err != nil {
+		return XPack{}, err
+	}
+
+	var xpack XPack
+	err = json.Unmarshal(content, &xpack)
+	return xpack, err
+}
+
+// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
+func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
+	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
+	if err != nil {
+		return false, err
+	}
+
+	var response map[string]map[string]map[string]map[string]bool
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return false, err
+	}
+
+	for _, nodeInfo := range response["nodes"] {
+		mlockall := nodeInfo["process"]["mlockall"]
+		return mlockall, nil
+	}
+
+	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
+}
+
 // PassThruField copies the field at the given path from the given source data object into
 // the same path in the given target data object.
 func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
@@ -354,8 +431,13 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently.
-var licenseCache = &_licenseCache{}
+var (
+	// Global cache for license information. Assumption is that license information changes infrequently.
+	licenseCache = &_licenseCache{}
+
+	// LicenseCacheEnabled controls whether license caching is enabled or not. Intended for test use.
+	LicenseCacheEnabled = true
+)
 
 type _licenseCache struct {
 	sync.RWMutex
@@ -377,6 +459,10 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
+	if !LicenseCacheEnabled {
+		return
+	}
+
 	c.Lock()
 	defer c.Unlock()
 
@@ -396,6 +482,42 @@ func (l *License) IsOneOf(candidateLicenses ...string) bool {
 	}
 
 	return false
+}
+
+// ToMapStr converts the license to a common.MapStr. This is necessary
+// for proper marshaling of the data before it's sent over the wire. In
+// particular it ensures that ms-since-epoch values are marshaled as longs
+// and not floats in scientific notation as Elasticsearch does not like that.
+func (l *License) ToMapStr() common.MapStr {
+	m := common.MapStr{
+		"status":               l.Status,
+		"uid":                  l.ID,
+		"type":                 l.Type,
+		"issue_date":           l.IssueDate,
+		"issue_date_in_millis": l.IssueDateInMillis,
+		"expiry_date":          l.ExpiryDate,
+		"issued_to":            l.IssuedTo,
+		"issuer":               l.Issuer,
+		"start_date_in_millis": l.StartDateInMillis,
+	}
+
+	if l.ExpiryDateInMillis != 0 {
+		// We don't want to record a 0 expiry date as this means the license has expired
+		// in the Stack Monitoring UI
+		m["expiry_date_in_millis"] = l.ExpiryDateInMillis
+	}
+
+	// Enterprise licenses have max_resource_units. All other licenses have
+	// max_nodes.
+	if l.MaxNodes != 0 {
+		m["max_nodes"] = l.MaxNodes
+	}
+
+	if l.MaxResourceUnits != 0 {
+		m["max_resource_units"] = l.MaxResourceUnits
+	}
+
+	return m
 }
 
 func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {

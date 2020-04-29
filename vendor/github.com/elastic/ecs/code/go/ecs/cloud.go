@@ -21,7 +21,7 @@ package ecs
 
 // Fields related to the cloud or infrastructure the events are coming from.
 type Cloud struct {
-	// Name of the cloud provider. Example values are ec2, gce, or
+	// Name of the cloud provider. Example values are aws, azure, gcp, or
 	// digitalocean.
 	Provider string `ecs:"provider"`
 

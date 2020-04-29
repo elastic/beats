@@ -26,10 +26,11 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 type mockRunner struct {
@@ -91,7 +92,7 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(_ beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 		meta:   meta,
@@ -135,6 +136,9 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
@@ -162,7 +166,7 @@ func TestAutodiscover(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -255,6 +259,9 @@ func TestAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscoverHash(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 
@@ -286,7 +293,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -319,6 +326,9 @@ func TestAutodiscoverHash(t *testing.T) {
 }
 
 func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
@@ -349,7 +359,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	}
 
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
 	if err != nil {
 		t.Fatal(err)
 	}

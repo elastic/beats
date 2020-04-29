@@ -1,0 +1,80 @@
+language: go
+
+os:
+  - linux
+  - osx
+  - windows
+
+go:
+  - '1.12'
+  - '1.13'
+  - 'tip'
+
+env:
+  - GO111MODULE=on
+
+matrix:
+  exclude:
+  - os: 'windows'
+    go: 'tip'
+
+shared:
+  go_cross_version: &go_cross_version '1.13'
+  bsd:
+    script: &go_bsd_script
+    - eval 'GOOS=$TARGET go build ./...'
+  arm:
+    before_install: &go_arm_before_install
+      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+      - |
+        # install mage
+        (cd /tmp;
+         git clone https://github.com/magefile/mage && cd mage && go run bootstrap.go)
+    script: &go_arm_script
+      - mage -v test
+
+jobs:
+  include:
+    # try to cross compile to untested OSes
+    - name: XBuild OpenBSD
+      env: TARGET=openbsd
+      go: *go_cross_version
+      script: *go_bsd_script
+
+    - name: XBuild NetBSD
+      env: TARGET=netbsd
+      go: *go_cross_version
+      script: *go_bsd_script
+    - name: XBuild FreeBSD
+      env: TARGET=freebsd
+      go: *go_cross_version
+      script: *go_bsd_script
+
+    - name: 32Bit ARM go1.12
+      env: [BUILD_OS=linux, BUILD_ARCH=arm, GO111MODULE=on]
+      go: '1.12'
+      services: [docker]
+      before_install: *go_arm_before_install
+      script: *go_arm_script
+
+    - name: 32Bit ARM go1.13
+      env: [BUILD_OS=linux, BUILD_ARCH=arm]
+      go: '1.13'
+      services: [docker]
+      before_install: *go_arm_before_install
+      script: *go_arm_script
+
+# Check we're testing the correct commit (Snippet from: https://github.com/travis-ci/travis-ci/issues/7459#issuecomment-287040521)
+before_install:
+  - |
+    if [[ ("$TRAVIS_COMMIT" != "$(git rev-parse HEAD)") && ("$TRAVIS_COMMIT" != "$(git rev-parse HEAD^2 2>/dev/null)") ]]; then
+      echo "Commit $(git rev-parse HEAD) doesn't match expected commit $TRAVIS_COMMIT"
+    fi
+  - |
+    # install mage
+    (cd /tmp;
+     git clone https://github.com/magefile/mage && cd mage && go run bootstrap.go)
+
+script:
+- go env
+- mage -v test

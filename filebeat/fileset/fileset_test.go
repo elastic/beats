@@ -20,19 +20,26 @@
 package fileset
 
 import (
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"testing"
 	"text/template"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+func makeTestInfo(version string) beat.Info {
+	return beat.Info{
+		IndexPrefix: "filebeat",
+		Version:     version,
+	}
+}
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
 	modulesPath, err := filepath.Abs("../module")
@@ -49,7 +56,7 @@ func TestLoadManifestNginx(t *testing.T) {
 	manifest, err := fs.readManifest()
 	assert.NoError(t, err)
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
-	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/default.json"})
+	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/pipeline.yml"})
 	assert.Equal(t, manifest.Input, "config/nginx-access.yml")
 
 	vars := manifest.Vars
@@ -61,7 +68,7 @@ func TestLoadManifestNginx(t *testing.T) {
 func TestGetBuiltinVars(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 
-	vars, err := fs.getBuiltinVars("6.6.0")
+	vars, err := fs.getBuiltinVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")
@@ -78,7 +85,7 @@ func TestEvaluateVarsNginx(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -101,7 +108,7 @@ func TestEvaluateVarsNginxOverride(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, "no_plugins", vars["pipeline"])
@@ -114,7 +121,7 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -172,7 +179,7 @@ func TestResolveVariable(t *testing.T) {
 
 func TestGetInputConfigNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read("5.2.0"))
+	assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	cfg, err := fs.getInputConfig()
 	assert.NoError(t, err)
@@ -182,44 +189,86 @@ func TestGetInputConfigNginx(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
 }
 
 func TestGetInputConfigNginxOverrides(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	assert.NoError(t, err)
-	fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
-		Input: map[string]interface{}{
-			"close_eof": true,
+
+	tests := map[string]struct {
+		input      map[string]interface{}
+		expectedFn require.ValueAssertionFunc
+	}{
+		"close_eof": {
+			map[string]interface{}{
+				"close_eof": true,
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
+
+				require.True(t, c.HasField("close_eof"))
+				v, err := c.Bool("close_eof", -1)
+				require.NoError(t, err)
+				require.True(t, v)
+
+				pipelineID, err := c.String("pipeline", -1)
+				assert.NoError(t, err)
+				assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
+			},
 		},
-	})
-	assert.NoError(t, err)
+		"pipeline": {
+			map[string]interface{}{
+				"pipeline": "foobar",
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
 
-	assert.NoError(t, fs.Read("5.2.0"))
+				v, err := c.String("pipeline", -1)
+				require.NoError(t, err)
+				require.Equal(t, "foobar", v)
+			},
+		},
+	}
 
-	cfg, err := fs.getInputConfig()
-	assert.NoError(t, err)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+				Input: test.input,
+			})
+			assert.NoError(t, err)
 
-	assert.True(t, cfg.HasField("paths"))
-	assert.True(t, cfg.HasField("exclude_files"))
-	assert.True(t, cfg.HasField("close_eof"))
-	assert.True(t, cfg.HasField("pipeline"))
-	pipelineID, err := cfg.String("pipeline", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+			assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
-	moduleName, err := cfg.String("_module_name", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "nginx", moduleName)
+			cfg, err := fs.getInputConfig()
+			assert.NoError(t, err)
 
-	filesetName, err := cfg.String("_fileset_name", -1)
-	assert.NoError(t, err)
-	assert.Equal(t, "access", filesetName)
+			assert.True(t, cfg.HasField("paths"))
+			assert.True(t, cfg.HasField("exclude_files"))
+			assert.True(t, cfg.HasField("pipeline"))
+
+			test.expectedFn(t, cfg)
+
+			moduleName, err := cfg.String("_module_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, "nginx", moduleName)
+
+			filesetName, err := cfg.String("_fileset_name", -1)
+			assert.NoError(t, err)
+			assert.Equal(t, "access", filesetName)
+		})
+	}
 }
 
 func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read("5.2.0"))
+	assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	version := common.MustNewVersion("5.2.0")
 	pipelines, err := fs.GetPipelines(*version)
@@ -227,54 +276,9 @@ func TestGetPipelineNginx(t *testing.T) {
 	assert.Len(t, pipelines, 1)
 
 	pipeline := pipelines[0]
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipeline.id)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipeline.id)
 	assert.Contains(t, pipeline.contents, "description")
 	assert.Contains(t, pipeline.contents, "processors")
-}
-
-func TestGetPipelineConvertTS(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("fileset", "modules"))
-
-	// load system/syslog
-	modulesPath, err := filepath.Abs("../module")
-	assert.NoError(t, err)
-	fs, err := New(modulesPath, "syslog", &ModuleConfig{Module: "system"}, &FilesetConfig{
-		Var: map[string]interface{}{
-			"convert_timezone": true,
-		},
-	})
-	assert.NoError(t, err)
-	assert.NoError(t, fs.Read("6.1.0"))
-
-	cases := map[string]struct {
-		Beat     string
-		Timezone bool
-	}{
-		"6.0.0": {Timezone: false},
-		"6.1.0": {Timezone: true},
-		"6.2.0": {Timezone: true},
-	}
-
-	for esVersion, cfg := range cases {
-		pipelineName := "filebeat-6.1.0-system-syslog-pipeline"
-
-		t.Run(fmt.Sprintf("es=%v", esVersion), func(t *testing.T) {
-			ver := common.MustNewVersion(esVersion)
-			pipelines, err := fs.GetPipelines(*ver)
-			require.NoError(t, err)
-
-			pipeline := pipelines[0]
-			assert.Equal(t, pipelineName, pipeline.id)
-
-			marshaled, err := json.Marshal(pipeline.contents)
-			require.NoError(t, err)
-			if cfg.Timezone {
-				assert.Contains(t, string(marshaled), "beat.timezone")
-			} else {
-				assert.NotContains(t, string(marshaled), "beat.timezone")
-			}
-		})
-	}
 }
 
 func TestGetTemplateFunctions(t *testing.T) {

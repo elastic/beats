@@ -25,12 +25,12 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -89,7 +89,7 @@ var (
 					"1m":  c.Float("1m", s.Optional),
 					"5m":  c.Float("5m", s.Optional),
 					"15m": c.Float("15m", s.Optional),
-				}),
+				}, c.DictOptional), // No load average reported by ES on Windows
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
 				"cpuacct": c.Dict("cpuacct", s.Schema{
@@ -141,7 +141,8 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"analyze":    c.Dict("analyze", threadPoolStatsSchema),
+			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema),
 			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),
@@ -155,6 +156,15 @@ var (
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
+			"io_stats": c.Dict("io_stats", s.Schema{
+				"total": c.Dict("total", s.Schema{
+					"operations":       c.Int("operations"),
+					"read_kilobytes":   c.Int("read_kilobytes"),
+					"read_operations":  c.Int("read_operations"),
+					"write_kilobytes":  c.Int("write_kilobytes"),
+					"write_operations": c.Int("write_operations"),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}),
 	}
 
@@ -198,6 +208,13 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		}
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
+
+		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), nodeID)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		nodeData["mlockall"] = mlockall
 
 		// Build source_node object
 		sourceNode := common.MapStr{

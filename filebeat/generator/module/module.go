@@ -19,9 +19,10 @@ package module
 
 import (
 	"fmt"
+	"os"
 	"path"
 
-	"github.com/elastic/beats/filebeat/generator"
+	"github.com/elastic/beats/v7/filebeat/generator"
 )
 
 // Generate creates directories and placeholder files required by a new module.
@@ -31,7 +32,7 @@ func Generate(module, modulesPath, beatsPath string) error {
 		return fmt.Errorf("module already exists: %s", module)
 	}
 
-	err := generator.CreateDirectories(modulePath, "_meta")
+	err := os.MkdirAll(path.Join(modulePath, "_meta"), 0750)
 	if err != nil {
 		return err
 	}

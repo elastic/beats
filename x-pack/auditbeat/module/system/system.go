@@ -5,15 +5,18 @@
 package system
 
 import (
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/go-sysinfo"
+)
+
+const (
+	moduleName = "system"
 )
 
 func init() {
 	// Register the custom ModuleFactory function for the system module.
-	if err := mb.Registry.AddModule("system", NewModule); err != nil {
+	if err := mb.Registry.AddModule(moduleName, NewModule); err != nil {
 		panic(err)
 	}
 }
@@ -49,15 +52,23 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 
-	hostInfo, err := sysinfo.Host()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get host ID")
+	log := logp.NewLogger(moduleName)
+
+	var hostID string
+	if hostInfo, err := sysinfo.Host(); err != nil {
+		log.Errorf("Could not get host info. err=%+v", err)
+	} else {
+		hostID = hostInfo.Info().UniqueID
+	}
+
+	if hostID == "" {
+		log.Warnf("Could not get host ID, will not fill entity_id fields.")
 	}
 
 	return &SystemModule{
 		BaseModule: base,
 		config:     config,
-		hostID:     hostInfo.Info().UniqueID,
+		hostID:     hostID,
 	}, nil
 }
 

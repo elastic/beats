@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-envoyproxy]]
@@ -10,9 +10,9 @@ This is the envoyproxy module.
 The default metricset is `server`.
 
 [float]
-=== Compability
+=== Compatibility
 
-The envoyproxy module is tested with Envoy 1.7.0.
+The envoyproxy module is tested with Envoy 1.7.0 and 1.12.0.
 
 
 [float]

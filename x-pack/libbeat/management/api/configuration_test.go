@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// {"list":[{"id":"6c385a04-f315-489e-9208-c87f41911782","type":"filebeat.inputs","config":{"paths":["/tmp/hello.log"]},"tag":"89be4cfd-6249-4ac2-abe2-8f82520ba435"},{"id":"315ff7e9-ae24-4c99-a9d0-ed4314bc8e60","type":"output","config":{"_sub_type":"elasticsearch","username":"elastic","password":"changeme"},"tag":"89be4cfd-6249-4ac2-abe2-8f82520ba435"}],"success":true}
 func TestConfiguration(t *testing.T) {
 	beatUUID, err := uuid.NewV4()
 	if err != nil {
@@ -26,7 +27,7 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
-		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"_sub_type":"apache2"}},{"type":"metricbeat.modules","config":{"_sub_type":"system","period":"10s"}}]}`)
+		fmt.Fprintf(w, `{"success": true, "list":[{"type":"filebeat.modules","config":{"_sub_type":"apache2"}},{"type":"metricbeat.modules","config":{"_sub_type":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 

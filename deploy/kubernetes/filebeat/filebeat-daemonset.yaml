@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
@@ -6,6 +6,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -13,6 +16,8 @@ spec:
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:%VERSION%
@@ -33,6 +38,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
           # If using Red Hat OpenShift uncomment this:
@@ -48,13 +57,13 @@ spec:
           mountPath: /etc/filebeat.yml
           readOnly: true
           subPath: filebeat.yml
-        - name: inputs
-          mountPath: /usr/share/filebeat/inputs.d
-          readOnly: true
         - name: data
           mountPath: /usr/share/filebeat/data
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: varlog
+          mountPath: /var/log
           readOnly: true
       volumes:
       - name: config
@@ -64,10 +73,9 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: inputs
-        configMap:
-          defaultMode: 0600
-          name: filebeat-inputs
+      - name: varlog
+        hostPath:
+          path: /var/log
       # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
         hostPath:

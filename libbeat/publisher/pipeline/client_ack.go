@@ -20,8 +20,8 @@ package pipeline
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type clientACKer struct {
@@ -33,6 +33,7 @@ func (p *Pipeline) makeACKer(
 	canDrop bool,
 	cfg *beat.ClientConfig,
 	waitClose time.Duration,
+	afterClose func(),
 ) acker {
 	var (
 		bld   = p.ackBuilder
@@ -50,15 +51,16 @@ func (p *Pipeline) makeACKer(
 		acker = bld.createEventACKer(canDrop, sema, cb)
 	default:
 		if waitClose <= 0 {
-			return bld.createPipelineACKer(canDrop, sema)
+			acker = bld.createPipelineACKer(canDrop, sema)
+		} else {
+			acker = bld.createCountACKer(canDrop, sema, func(_ int) {})
 		}
-		acker = bld.createCountACKer(canDrop, sema, func(_ int) {})
 	}
 
 	if waitClose <= 0 {
-		return acker
+		return newCloseACKer(acker, afterClose)
 	}
-	return newWaitACK(acker, waitClose)
+	return newWaitACK(acker, waitClose, afterClose)
 }
 
 func lastEventACK(fn func(interface{})) func([]interface{}) {

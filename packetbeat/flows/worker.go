@@ -23,11 +23,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/flowhash"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
 type flowsProcessor struct {
@@ -38,7 +38,7 @@ type flowsProcessor struct {
 }
 
 var (
-	ErrInvalidTimeout = errors.New("timeout must not <= 1s")
+	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
 	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
 )
 

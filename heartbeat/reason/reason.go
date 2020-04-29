@@ -17,11 +17,12 @@
 
 package reason
 
-import "github.com/elastic/beats/libbeat/common"
+import "github.com/elastic/beats/v7/libbeat/common"
 
 type Reason interface {
 	error
 	Type() string
+	Unwrap() error
 }
 
 type ValidateError struct {
@@ -47,9 +48,11 @@ func IOFailed(err error) Reason {
 }
 
 func (e ValidateError) Error() string { return e.err.Error() }
+func (e ValidateError) Unwrap() error { return e.err }
 func (ValidateError) Type() string    { return "validate" }
 
 func (e IOError) Error() string { return e.err.Error() }
+func (e IOError) Unwrap() error { return e.err }
 func (IOError) Type() string    { return "io" }
 
 func FailError(typ string, err error) common.MapStr {
@@ -68,4 +71,7 @@ func Fail(r Reason) common.MapStr {
 
 func FailIO(err error) common.MapStr { return Fail(IOError{err}) }
 
-func FailValidate(err error) common.MapStr { return Fail(ValidateError{err}) }
+// MakeValidateError creates an instance of ValidateError from the given error.
+func MakeValidateError(err error) ValidateError {
+	return ValidateError{err}
+}

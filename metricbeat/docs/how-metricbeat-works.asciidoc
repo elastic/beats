@@ -13,12 +13,13 @@ to the remote system. So, for example, the Redis module provides an `info`
 metricset that collects information and statistics from Redis by running the
 http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.
 
-image:./images/module-overview.png[Modules and metricsets]
+image::./images/module-overview.png[Modules and metricsets]
 
 Likewise, the MySQL module provides a `status` metricset that collects data
 from MySQL by running a http://dev.mysql.com/doc/refman/5.7/en/show-status.html[`SHOW GLOBAL STATUS`]
 SQL query. Metricsets make it easier for you by grouping sets of related metrics together
-in a single request returned by the remote server.
+in a single request returned by the remote server. Most modules have default metricsets
+ that are enabled if there are no user-enabled metricsets.
 
 Metricbeat retrieves metrics by periodically interrogating the host system based
 on the `period` value that you specify when you configure the module. Because multiple

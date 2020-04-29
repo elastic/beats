@@ -22,9 +22,17 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-seccomp-bpf"
+)
+
+// PolicyChangeType specifies the type of change to make to a seccomp policy.
+type PolicyChangeType uint8
+
+const (
+	// AddSyscall changes a policy by adding a syscall.
+	AddSyscall PolicyChangeType = iota
 )
 
 var (
@@ -133,4 +141,35 @@ func getPolicy(c *common.Config) (*seccomp.Policy, error) {
 	}
 
 	return policy, nil
+}
+
+// ModifyDefaultPolicy modifies the syscalls in the default policy. Any callers
+// of this function must first check the architecture because policies are
+// architecture specific.
+func ModifyDefaultPolicy(changeType PolicyChangeType, syscalls ...string) error {
+	if defaultPolicy == nil {
+		return errors.New("no default policy exists (check the architecture)")
+	}
+
+	switch changeType {
+	case AddSyscall:
+		list := defaultPolicy.Syscalls[0].Names
+		for _, newSyscall := range syscalls {
+			found := false
+			for _, existingSyscall := range list {
+				if found = newSyscall == existingSyscall; found {
+					break
+				}
+			}
+			if !found {
+				list = append(list, newSyscall)
+			}
+		}
+		defaultPolicy.Syscalls[0].Names = list
+
+	default:
+		return errors.New("unsupported PolicyChangeType value")
+	}
+
+	return nil
 }

@@ -18,9 +18,11 @@
 package elasticsearch
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 type elasticsearchConfig struct {
@@ -30,7 +32,9 @@ type elasticsearchConfig struct {
 	Headers          map[string]string `config:"headers"`
 	Username         string            `config:"username"`
 	Password         string            `config:"password"`
+	APIKey           string            `config:"api_key"`
 	ProxyURL         string            `config:"proxy_url"`
+	ProxyDisable     bool              `config:"proxy_disable"`
 	LoadBalance      bool              `config:"loadbalance"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
 	EscapeHTML       bool              `config:"escape_html"`
@@ -55,9 +59,11 @@ var (
 		Protocol:         "",
 		Path:             "",
 		ProxyURL:         "",
+		ProxyDisable:     false,
 		Params:           nil,
 		Username:         "",
 		Password:         "",
+		APIKey:           "",
 		Timeout:          90 * time.Second,
 		MaxRetries:       3,
 		CompressionLevel: 0,
@@ -72,10 +78,14 @@ var (
 )
 
 func (c *elasticsearchConfig) Validate() error {
-	if c.ProxyURL != "" {
-		if _, err := parseProxyURL(c.ProxyURL); err != nil {
+	if c.ProxyURL != "" && !c.ProxyDisable {
+		if _, err := common.ParseURL(c.ProxyURL); err != nil {
 			return err
 		}
+	}
+
+	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
+		return fmt.Errorf("cannot set both api_key and username/password")
 	}
 
 	return nil

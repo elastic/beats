@@ -11,16 +11,9 @@ var:
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.log
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.json
-  - name: convert_timezone
-    default: false
-    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
-    # pipeline
-    min_elasticsearch_version:
-      version: 6.1.0
-      value: false
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ingest/pipeline-plaintext.json
-  - ingest/pipeline-json.json
+  - ingest/pipeline.yml
+  - ingest/pipeline-plaintext.yml
+  - ingest/pipeline-json.yml
 input: config/log.yml

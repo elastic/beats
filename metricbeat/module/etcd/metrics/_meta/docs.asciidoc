@@ -1,0 +1,2 @@
+This is the metrics endpoint metricset of the etcd module.
+This metrics is being read from the Etcd V3 endpoint and won't show any activity regarding Etcd V2.

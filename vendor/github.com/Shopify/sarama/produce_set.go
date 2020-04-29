@@ -81,7 +81,7 @@ func (ps *produceSet) add(msg *ProducerMessage) error {
 
 	if ps.parent.conf.Version.IsAtLeast(V0_11_0_0) {
 		if ps.parent.conf.Producer.Idempotent && msg.sequenceNumber < set.recordsToSend.RecordBatch.FirstSequence {
-			return errors.New("Assertion failed: Message out of sequence added to a batch")
+			return errors.New("assertion failed: message out of sequence added to a batch")
 		}
 		// We are being conservative here to avoid having to prep encode the record
 		size += maximumRecordOverhead

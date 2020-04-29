@@ -25,74 +25,62 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/tests/compose"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/kibana"
-	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats")
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	version, err := getKibanaVersion(t, host)
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
+	require.Empty(t, errs)
+	require.NotEmpty(t, events)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("kibana", "stats").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "kibana")
+	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats")
+	config := mtest.GetConfig("stats", service.Host(), false)
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
-	if err != nil {
-		t.Fatal("getting kibana version", err)
-	}
+	version, err := getKibanaVersion(t, host)
+	require.NoError(t, err)
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
-	if err != nil {
-		t.Fatal("checking if kibana stats API is available", err)
-	}
+	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
 		t.Skip("Kibana stats API is not available until 6.4.0")
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err = mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	err = mbtest.WriteEventsReporterV2Error(f, t, "")
+	require.NoError(t, err)
 }
 
-func getKibanaVersion(kibanaHostPort string) (*common.Version, error) {
+func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
 	if err != nil {
 		return nil, err
@@ -112,6 +100,7 @@ func getKibanaVersion(kibanaHostPort string) (*common.Version, error) {
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
+		t.Log("Kibana GET /api/status response:", string(body))
 		return nil, err
 	}
 

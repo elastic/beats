@@ -23,6 +23,7 @@ import (
 )
 
 var indentByModule = map[string]int{
+	"providers":  0,
 	"processors": 0,
 	"module":     8,
 	"active":     8,

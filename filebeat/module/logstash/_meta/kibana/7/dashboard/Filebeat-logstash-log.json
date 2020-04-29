@@ -7,7 +7,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -60,7 +60,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -249,7 +249,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -268,14 +268,14 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Logstash logs", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -324,7 +324,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Logstash Logs [Filebeat Logstash] ECS", 
+                "title": "[Filebeat Logstash] Logstash Logs ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 

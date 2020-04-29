@@ -57,7 +57,7 @@
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
           "type": "netflow_flow",
-          "vr_fname": ""
+          "vrf_name": ""
         },
         "network": {
           "bytes": 702,
@@ -71,12 +71,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 702,
           "ip": "20.20.20.20",
           "locality": "public",
+          "packets": 9,
           "port": 137
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

@@ -20,8 +20,8 @@ package conditions
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type matcherMap map[string]match.Matcher
@@ -86,11 +86,10 @@ func (c Matcher) Check(event ValuesMap) bool {
 				return false
 			}
 
-		case []string:
+		case []interface{}, []string:
 			if !matcher.MatchAnyString(v) {
 				return false
 			}
-
 		default:
 			str, err := ExtractString(value)
 			if err != nil {

@@ -1,47 +1,74 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "container": {
+        "id": "aa41902101351f415e6e983b0673c0ba715dd4bc316bd5fc0ebd6fcf94287f86",
+        "image": {
+            "name": "redis:latest"
+        },
+        "name": "amazing_cohen",
+        "runtime": "docker"
     },
     "docker": {
-        "container": {
-            "id": "da57ef738524e5a4f6ae17b477f134d30719603db7b96d2c01b6f34010412e66",
-            "labels": {
-                "build-date": "20170911",
-                "com_docker_compose_config-hash": "13a74b89a90a6fdcb6bbbc7eb37b7cb0615bdaf8",
-                "com_docker_compose_container-number": "1",
-                "com_docker_compose_oneoff": "False",
-                "com_docker_compose_project": "metricbeat",
-                "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_version": "1.5.0",
-                "license": "GPLv2",
-                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
-                "name": "CentOS Base Image",
-                "vendor": "CentOS"
-            },
-            "name": "metricbeat_elasticsearch_1"
-        },
         "memory": {
             "fail": {
                 "count": 0
             },
-            "limit": 4139122688,
+            "limit": 2095878144,
             "rss": {
-                "pct": 0.08521683713860477,
-                "total": 352722944
+                "pct": 0.0004025882909345325,
+                "total": 843776
+            },
+            "stats": {
+                "active_anon": 421888,
+                "active_file": 36864,
+                "cache": 86016,
+                "dirty": 0,
+                "hierarchical_memory_limit": 9223372036854771712,
+                "hierarchical_memsw_limit": 9223372036854771712,
+                "inactive_anon": 421888,
+                "inactive_file": 49152,
+                "mapped_file": 53248,
+                "pgfault": 1587,
+                "pgmajfault": 1,
+                "pgpgin": 2426,
+                "pgpgout": 2199,
+                "rss": 843776,
+                "rss_huge": 0,
+                "total_active_anon": 421888,
+                "total_active_file": 36864,
+                "total_cache": 86016,
+                "total_dirty": 0,
+                "total_inactive_anon": 421888,
+                "total_inactive_file": 49152,
+                "total_mapped_file": 53248,
+                "total_pgfault": 1587,
+                "total_pgmajfault": 1,
+                "total_pgpgin": 2426,
+                "total_pgpgout": 2199,
+                "total_rss": 843776,
+                "total_rss_huge": 0,
+                "total_unevictable": 0,
+                "total_writeback": 0,
+                "unevictable": 0,
+                "writeback": 0
             },
             "usage": {
-                "max": 370184192,
-                "pct": 0.08716433389277685,
-                "total": 360783872
+                "max": 7860224,
+                "pct": 0.000672283359618831,
+                "total": 1409024
             }
         }
     },
+    "event": {
+        "dataset": "docker.memory",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
-        "name": "memory",
-        "rtt": 115
+        "name": "memory"
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
     }
 }

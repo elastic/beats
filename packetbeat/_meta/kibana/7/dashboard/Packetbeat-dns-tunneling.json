@@ -152,7 +152,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -311,14 +311,9 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
+              "language": "kuery",
                   "query": "type:dns"
                 }
-              }
-            }
           }
         },
         "title": "Top Domains by Data Volume ECS",
@@ -449,7 +444,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -476,7 +471,7 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "NOT dns.question.type:PTR"
             },
             "version": true

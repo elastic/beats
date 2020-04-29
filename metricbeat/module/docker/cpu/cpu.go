@@ -15,14 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package cpu
 
 import (
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 func init() {
@@ -69,12 +71,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch returns a list of docker CPU stats.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to get docker stats")
 	}
 
 	formattedStats := m.cpuService.getCPUStatsList(stats, m.dedot)
-	return eventsMapping(formattedStats), nil
+	eventsMapping(r, formattedStats)
+
+	return nil
+}
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
 }

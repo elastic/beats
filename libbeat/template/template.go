@@ -22,11 +22,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/go-ucfg/yaml"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 var (
@@ -41,6 +42,7 @@ var (
 	defaultFields []string
 )
 
+// Template holds information for the ES template.
 type Template struct {
 	sync.Mutex
 	name        string
@@ -50,6 +52,7 @@ type Template struct {
 	esVersion   common.Version
 	config      TemplateConfig
 	migration   bool
+	order       int
 }
 
 // New creates a new template instance
@@ -126,10 +129,11 @@ func New(
 		beatName:    beatName,
 		config:      config,
 		migration:   migration,
+		order:       config.Order,
 	}, nil
 }
 
-func (t *Template) load(fields common.Fields) (common.MapStr, error) {
+func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Locking to make sure dynamicTemplates and defaultFields is not accessed in parallel
 	t.Lock()
@@ -140,8 +144,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
 	var err error
 	if len(t.config.AppendFields) > 0 {
-		cfgwarn.Experimental("append_fields is used.")
-		fields, err = common.ConcatFields(fields, t.config.AppendFields)
+		fields, err = mapping.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
 		}
@@ -150,7 +153,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 	// Start processing at the root
 	properties := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion, Migration: t.migration}
-	if err := processor.Process(fields, "", properties); err != nil {
+	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
 	output := t.Generate(properties, dynamicTemplates)
@@ -160,7 +163,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
 // LoadFile loads the the template from the given file path
 func (t *Template) LoadFile(file string) (common.MapStr, error) {
-	fields, err := common.LoadFieldsYaml(file)
+	fields, err := mapping.LoadFieldsYaml(file)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +171,7 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 	return t.load(fields)
 }
 
-// LoadBytes loads the the template from the given byte array
+// LoadBytes loads the template from the given byte array
 func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 	fields, err := loadYamlByte(data)
 	if err != nil {
@@ -176,6 +179,25 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 	}
 
 	return t.load(fields)
+}
+
+// LoadMinimal loads the template only with the given configuration
+func (t *Template) LoadMinimal() (common.MapStr, error) {
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	m := common.MapStr{
+		keyPattern: patterns,
+		"order":    t.order,
+		"settings": common.MapStr{
+			"index": t.config.Settings.Index,
+		},
+	}
+	if t.config.Settings.Source != nil {
+		m["mappings"] = buildMappings(
+			t.beatVersion, t.esVersion, t.beatName,
+			nil, nil,
+			common.MapStr(t.config.Settings.Source))
+	}
+	return m, nil
 }
 
 // GetName returns the name of the template
@@ -192,19 +214,14 @@ func (t *Template) GetPattern() string {
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-
 	return common.MapStr{
 		keyPattern: patterns,
-
+		"order":    t.order,
 		"mappings": buildMappings(
 			t.beatVersion, t.esVersion, t.beatName,
 			properties,
 			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
-			common.MapStr(t.config.Settings.Source),
-		),
-
-		"order": 1,
-
+			common.MapStr(t.config.Settings.Source)),
 		"settings": common.MapStr{
 			"index": buildIdxSettings(
 				t.esVersion,
@@ -293,8 +310,9 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	}
 
 	// number_of_routing shards is only supported for ES version >= 6.1
+	// If ES >= 7.0 we can exclude this setting as well.
 	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) {
+	if !ver.LessThan(version61) && ver.Major < 7 {
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
@@ -311,19 +329,19 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	return indexSettings
 }
 
-func loadYamlByte(data []byte) (common.Fields, error) {
+func loadYamlByte(data []byte) (mapping.Fields, error) {
 	cfg, err := yaml.NewConfig(data)
 	if err != nil {
 		return nil, err
 	}
 
-	var keys []common.Field
+	var keys []mapping.Field
 	err = cfg.Unpack(&keys)
 	if err != nil {
 		return nil, err
 	}
 
-	fields := common.Fields{}
+	fields := mapping.Fields{}
 	for _, key := range keys {
 		fields = append(fields, key.Fields...)
 	}

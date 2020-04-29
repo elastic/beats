@@ -20,8 +20,9 @@
 package ecs
 
 // The organization fields enrich data with information about the company or
-// entity the data is associated with. These fields help you arrange or filter
-// data stored in an index by one or multiple organizations.
+// entity the data is associated with.
+// These fields help you arrange or filter data stored in an index by one or
+// multiple organizations.
 type Organization struct {
 	// Organization name.
 	Name string `ecs:"name"`

@@ -22,12 +22,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kibana"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 )
 
 var (
@@ -86,16 +86,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Kibana Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Kibana Stats API response")
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		err = errors.Wrap(err, "failure to apply stats schema")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
 	var event mb.Event

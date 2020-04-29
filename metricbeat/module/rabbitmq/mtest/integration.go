@@ -18,34 +18,24 @@
 package mtest
 
 import (
-	"net"
 	"os"
 )
 
 // GetIntegrationConfig generates a base configuration with common values for
 // integration tests
-func GetIntegrationConfig() map[string]interface{} {
+func GetIntegrationConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":   "rabbitmq",
-		"hosts":    getTestRabbitMQHost(),
+		"hosts":    []string{host},
 		"username": getTestRabbitMQUsername(),
 		"password": getTestRabbitMQPassword(),
 	}
 }
 
 const (
-	rabbitmqDefaultHost     = "localhost"
-	rabbitmqDefaultPort     = "15672"
 	rabbitmqDefaultUsername = "guest"
 	rabbitmqDefaultPassword = "guest"
 )
-
-func getTestRabbitMQHost() string {
-	return net.JoinHostPort(
-		getenv("RABBITMQ_HOST", rabbitmqDefaultHost),
-		getenv("RABBITMQ_PORT", rabbitmqDefaultPort),
-	)
-}
 
 func getTestRabbitMQUsername() string {
 	return getenv("RABBITMQ_USERNAME", rabbitmqDefaultUsername)

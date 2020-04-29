@@ -1,0 +1,29 @@
+- name: capture_loss
+  type: group
+  description: >
+    Fields exported by the Zeek capture_loss log
+  fields:
+    - name: ts_delta
+      type: integer
+      description: |
+        The time delay between this measurement and the last.
+
+    - name: peer
+      type: keyword
+      description: |
+        In the event that there are multiple Bro instances logging to the same host, this distinguishes each peer with its individual name.
+
+    - name: gaps
+      type: integer
+      description: |
+        Number of missed ACKs from the previous measurement interval.
+
+    - name: acks
+      type: integer
+      description: |
+        Total number of ACKs seen in the previous measurement interval.
+
+    - name: percent_lost
+      type: double
+      description: |
+        Percentage of ACKs seen where the data being ACKed wasn't seen.

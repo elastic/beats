@@ -17,26 +17,11 @@
 
 package consul
 
-import (
-	"fmt"
-	"os"
-)
-
 //GetConfig returns a config object specific for a Consul module and a provided Metricset in 'ms'
-func GetConfig(ms []string) map[string]interface{} {
+func GetConfig(ms []string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "consul",
 		"metricsets": ms,
-		"hosts":      []string{fmt.Sprintf("%s:%s", EnvOr("CONSUL_HOST", "localhost"), EnvOr("CONSUL_PORT", "8500"))},
+		"hosts":      []string{host},
 	}
-}
-
-// EnvOr returns the value of the specified environment variable if it is
-// non-empty. Otherwise it return def.
-func EnvOr(name, def string) string {
-	s := os.Getenv(name)
-	if s == "" {
-		return def
-	}
-	return s
 }

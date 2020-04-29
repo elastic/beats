@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2013-02-26T22:02:38.650Z",
+        "destination.address": "8.8.8.8",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "8.8.8.8",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.traceroute",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "traceroute",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.transport": "udp",
+        "related.ip": [
+            "192.168.1.1",
+            "8.8.8.8"
+        ],
+        "service.type": "zeek",
+        "source.address": "192.168.1.1",
+        "source.ip": "192.168.1.1",
+        "tags": [
+            "zeek.traceroute"
+        ]
+    }
+]

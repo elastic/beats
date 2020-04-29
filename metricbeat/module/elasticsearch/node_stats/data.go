@@ -21,16 +21,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -115,9 +115,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
 	var errs multierror.Errors
@@ -139,25 +137,19 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure to apply node schema")
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
 			continue
 		}
 
 		name, err := event.MetricSetFields.GetValue("name")
 		if err != nil {
-			event.Error = elastic.MakeErrorForMissingField("name", elastic.Elasticsearch)
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, elastic.MakeErrorForMissingField("name", elastic.Elasticsearch))
 			continue
 		}
 
 		nameStr, ok := name.(string)
 		if !ok {
-			event.Error = fmt.Errorf("name is not a string")
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, fmt.Errorf("name is not a string"))
 			continue
 		}
 		event.ModuleFields.Put("node.name", nameStr)

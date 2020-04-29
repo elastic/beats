@@ -20,7 +20,8 @@ package kafka
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -34,24 +35,64 @@ func TestConfigAcceptValid(t *testing.T) {
 			"compression": "lz4",
 			"version":     "1.0.0",
 		},
+		"Kerberos with keytab": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "keytab",
+				"username":     "elastic",
+				"keytab":       "/etc/krb5kcd/kafka.keytab",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+		"Kerberos with user and password pair": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "password",
+				"username":     "elastic",
+				"password":     "changeme",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
 	}
 
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c, err := common.NewConfigFrom(test)
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			cfg, err := readConfig(c)
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			c.SetString("hosts", 0, "localhost")
-
-			cfg := defaultConfig()
-			if err := c.Unpack(&cfg); err != nil {
-				t.Fatalf("Unpacking configuration failed: %v", err)
-			}
-
-			if _, err := newSaramaConfig(&cfg); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
+			}
+		})
+	}
+}
+
+func TestConfigInvalid(t *testing.T) {
+	tests := map[string]common.MapStr{
+		"Kerberos with invalid auth_type": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "invalid_auth_type",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			_, err := readConfig(c)
+			if err == nil {
+				t.Fatalf("Can create test configuration from invalid input")
 			}
 		})
 	}

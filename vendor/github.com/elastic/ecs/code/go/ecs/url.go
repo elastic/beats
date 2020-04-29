@@ -19,7 +19,8 @@
 
 package ecs
 
-// URL fields provide a complete URL, with scheme, host, and path.
+// URL fields provide support for complete or partial URLs, and supports the
+// breaking down into scheme, domain, path, and so on.
 type Url struct {
 	// Unmodified original url as seen in the event source.
 	// Note that in network monitoring, the observed URL may be a full URL,
@@ -37,14 +38,31 @@ type Url struct {
 	// Note: The `:` is not part of the scheme.
 	Scheme string `ecs:"scheme"`
 
-	// Domain of the request, such as "www.elastic.co".
+	// Domain of the url, such as "www.elastic.co".
 	// In some cases a URL may refer to an IP and/or port directly, without a
 	// domain name. In this case, the IP address would go to the `domain`
 	// field.
 	Domain string `ecs:"domain"`
 
+	// The highest registered url domain, stripped of the subdomain.
+	// For example, the registered domain for "foo.google.com" is "google.com".
+	// This value can be determined precisely with a list like the public
+	// suffix list (http://publicsuffix.org). Trying to approximate this by
+	// simply taking the last two labels will not work well for TLDs such as
+	// "co.uk".
+	RegisteredDomain string `ecs:"registered_domain"`
+
+	// The effective top level domain (eTLD), also known as the domain suffix,
+	// is the last part of the domain name. For example, the top level domain
+	// for google.com is "com".
+	// This value can be determined precisely with a list like the public
+	// suffix list (http://publicsuffix.org). Trying to approximate this by
+	// simply taking the last label will not work well for effective TLDs such
+	// as "co.uk".
+	TopLevelDomain string `ecs:"top_level_domain"`
+
 	// Port of the request, such as 443.
-	Port int32 `ecs:"port"`
+	Port int64 `ecs:"port"`
 
 	// Path of the request, such as "/search".
 	Path string `ecs:"path"`
@@ -56,6 +74,13 @@ type Url struct {
 	// exists with an empty string. The `exists` query can be used to
 	// differentiate between the two cases.
 	Query string `ecs:"query"`
+
+	// The field contains the file extension from the original request url.
+	// The file extension is only set if it exists, as not every url has a file
+	// extension.
+	// The leading period must not be included. For example, the value must be
+	// "png", not ".png".
+	Extension string `ecs:"extension"`
 
 	// Portion of the url after the `#`, such as "top".
 	// The `#` is not part of the fragment.

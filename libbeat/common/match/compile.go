@@ -24,7 +24,7 @@ import (
 
 func compile(r *syntax.Regexp) (stringMatcher, error) {
 	switch {
-	case r.Op == syntax.OpLiteral:
+	case isSubstringLiteral(r):
 		s := string(r.Rune)
 		return &substringMatcher{s, []byte(s)}, nil
 

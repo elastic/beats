@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type validationTestCase struct {
@@ -60,7 +60,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			WinlogbeatConfig{},
-			"1 error: At least one event log must be configured as part of " +
+			"1 error: at least one event log must be configured as part of " +
 				"event_logs",
 		},
 	}

@@ -49,7 +49,7 @@ func TestEnrollValid(t *testing.T) {
 		assert.Equal(t, "6.3.0", request.Version)
 		assert.Equal(t, "beatname", request.Name)
 
-		fmt.Fprintf(w, `{"access_token": "fooo"}`)
+		fmt.Fprintf(w, `{"success": true, "item": "fooo"}`)
 	}))
 	defer server.Close()
 
@@ -67,11 +67,12 @@ func TestEnrollError(t *testing.T) {
 		responseCode int
 	}{
 		"invalid enrollment token": {
-			body:         `{"message": "Invalid enrollment token"}`,
+			body:         `{"success": false,  "error": { "message": "Invalid enrollment token", "code": 400 }}`,
 			responseCode: 400,
 		},
+		//NOTE(ph): I believe this is now fixed in the API.
 		"invalid token response": {
-			body:         `{"access_token": ""}`,
+			body:         `{"success": true,  "item": ""}`,
 			responseCode: 200,
 		},
 	}

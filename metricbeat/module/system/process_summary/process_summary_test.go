@@ -25,21 +25,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, ".")
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	require.Empty(t, errs)
 	require.NotEmpty(t, events)

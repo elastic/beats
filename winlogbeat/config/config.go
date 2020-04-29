@@ -20,10 +20,11 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 const (
@@ -39,8 +40,9 @@ var (
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	EventLogs    []*common.Config `config:"event_logs"`
-	RegistryFile string           `config:"registry_file"`
+	EventLogs       []*common.Config `config:"event_logs"`
+	RegistryFile    string           `config:"registry_file"`
+	ShutdownTimeout time.Duration    `config:"shutdown_timeout"`
 }
 
 // Validate validates the WinlogbeatConfig data and returns an error describing
@@ -49,7 +51,7 @@ func (ebc WinlogbeatConfig) Validate() error {
 	var errs multierror.Errors
 
 	if len(ebc.EventLogs) == 0 {
-		errs = append(errs, fmt.Errorf("At least one event log must be "+
+		errs = append(errs, fmt.Errorf("at least one event log must be "+
 			"configured as part of event_logs"))
 	}
 

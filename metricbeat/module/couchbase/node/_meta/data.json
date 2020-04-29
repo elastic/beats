@@ -1,19 +1,15 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "couchbase": {
         "node": {
             "cmd_get": 0,
             "couch": {
                 "docs": {
                     "data_size": {
-                        "bytes": 11467776
+                        "bytes": 9792512
                     },
                     "disk_size": {
-                        "bytes": 11491038
+                        "bytes": 13563791
                     }
                 },
                 "spatial": {
@@ -26,15 +22,15 @@
                 },
                 "views": {
                     "data_size": {
-                        "bytes": 769520
+                        "bytes": 2805219
                     },
                     "disk_size": {
-                        "bytes": 769520
+                        "bytes": 2805219
                     }
                 }
             },
             "cpu_utilization_rate": {
-                "pct": 97
+                "pct": 29.64705882352941
             },
             "current_items": {
                 "total": 7303,
@@ -42,45 +38,52 @@
             },
             "ep_bg_fetched": 0,
             "get_hits": 0,
-            "hostname": "172.18.0.19:8091",
+            "hostname": "172.17.0.2:8091",
             "mcd_memory": {
                 "allocated": {
-                    "bytes": 3157
+                    "bytes": 6377
                 },
                 "reserved": {
-                    "bytes": 3157
+                    "bytes": 6377
                 }
             },
             "memory": {
                 "free": {
-                    "bytes": 1033420800
+                    "bytes": 4678324224
                 },
                 "total": {
-                    "bytes": 4139122688
+                    "bytes": 8359174144
                 },
                 "used": {
-                    "bytes": 53962032
+                    "bytes": 53962016
                 }
             },
             "ops": 0,
             "swap": {
                 "total": {
-                    "bytes": 1073737728
+                    "bytes": 4189057024
                 },
                 "used": {
-                    "bytes": 1015877632
+                    "bytes": 135168
                 }
             },
             "uptime": {
-                "sec": 382
+                "sec": 7260
             },
             "vb_replica_curr_items": 0
         }
     },
+    "event": {
+        "dataset": "couchbase.node",
+        "duration": 115000,
+        "module": "couchbase"
+    },
     "metricset": {
-        "host": "couchbase:8091",
-        "module": "couchbase",
         "name": "node",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "couchbase"
     }
 }

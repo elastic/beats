@@ -22,7 +22,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 // ByteSize defines a new configuration option that will parse `go-humanize` compatible values into a
@@ -33,7 +33,7 @@ type ByteSize int64
 func (s *ByteSize) Unpack(v string) error {
 	sz, err := humanize.ParseBytes(v)
 	if isRawBytes(v) {
-		cfgwarn.Deprecate("7.0", "size now requires a unit (KiB, MiB, etc...), current value: %s.", v)
+		cfgwarn.Deprecate("7.0.0", "size now requires a unit (KiB, MiB, etc...), current value: %s.", v)
 	}
 	if err != nil {
 		return err

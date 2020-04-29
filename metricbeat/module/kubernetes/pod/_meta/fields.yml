@@ -49,14 +49,14 @@
                 CPU used nanocores
             - name: node.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 CPU usage as a percentage of the total node CPU
             - name: limit.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
-                CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+                CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
     - name: memory
       type: group
       fields:
@@ -70,12 +70,12 @@
                 Total memory usage
             - name: node.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 Memory usage as a percentage of the total node allocatable memory
             - name: limit.pct
               type: scaled_float
-              format: percentage
+              format: percent
               description: >
                 Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
         - name: available

@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -58,7 +58,7 @@ func TestFetchEventContent(t *testing.T) {
 	}
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, config)
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

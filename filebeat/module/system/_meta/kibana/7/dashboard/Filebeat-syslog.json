@@ -159,11 +159,9 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.dataset:system.syslog"
                             }
-                        }
                     }
                 }, 
                 "sort": [
@@ -209,13 +207,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }

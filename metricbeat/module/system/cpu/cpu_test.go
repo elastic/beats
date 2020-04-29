@@ -25,12 +25,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
@@ -41,13 +41,13 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	// Do a first fetch to have percentages
-	mbtest.ReportingFetchV2(f)
+	mbtest.ReportingFetchV2Error(f)
 	time.Sleep(1 * time.Second)
 
-	err := mbtest.WriteEventsReporterV2(f, t, ".")
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}

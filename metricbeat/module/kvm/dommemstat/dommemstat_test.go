@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/digitalocean/go-libvirt/libvirttest"
 )
@@ -30,9 +30,9 @@ import (
 func TestFetchEventContents(t *testing.T) {
 	conn := libvirttest.New()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(conn))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(conn))
 
-	events, errs := mbtest.ReportingFetchV2(f)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatal(errs)
 	}

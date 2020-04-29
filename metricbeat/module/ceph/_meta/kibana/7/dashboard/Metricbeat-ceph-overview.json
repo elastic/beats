@@ -1,0 +1,723 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "This Ceph dashboard that shows the most important cluster metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "1",
+              "w": 18,
+              "x": 30,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "title": "Cluster Disk Stats",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 12
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "title": "Throughput",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 12
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "title": "IOPS",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "4",
+              "w": 6,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "title": "OSD Disk Usage",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "5",
+              "w": 5,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_4",
+            "title": "Pools",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "6",
+              "w": 19,
+              "x": 5,
+              "y": 0
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "title": "Pool Objects",
+            "version": "7.3.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Ceph] Cluster Overview",
+        "version": 1
+      },
+      "id": "c93f2c30-b473-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "054a0900-b467-11e9-a579-f5c0a5d81340",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "88d48440-b46b-11e9-a579-f5c0a5d81340",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "346d00d0-b46b-11e9-a579-f5c0a5d81340",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "13efa190-b46c-11e9-a579-f5c0a5d81340",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "393df790-b470-11e9-a579-f5c0a5d81340",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "aa9c2f10-b470-11e9-a579-f5c0a5d81340",
+          "name": "panel_5",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-08-19T15:00:55.571Z",
+      "version": "WzE1NzEsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "bar_color_rules": [
+              {
+                "id": "bd70f9c0-b472-11e9-ba7f-f52449624592"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "7b71f300-b466-11e9-841e-0ddf9a697c96",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(159,5,0,1)",
+                "fill": "0",
+                "formatter": "bytes",
+                "hide_in_legend": 0,
+                "id": "7b71f301-b466-11e9-841e-0ddf9a697c96",
+                "label": "total",
+                "line_width": "1",
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_disk.total.bytes",
+                    "id": "7b71f302-b466-11e9-841e-0ddf9a697c96",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0.2",
+                "formatter": "bytes",
+                "id": "7b71f303-b466-11e9-841e-0ddf9a697c96",
+                "label": "available",
+                "line_width": "1",
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_disk.available.bytes",
+                    "id": "7b71f304-b466-11e9-841e-0ddf9a697c96",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,196,0,1)",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "64f99360-b472-11e9-ba7f-f52449624592",
+                "label": "used",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_disk.used.bytes",
+                    "id": "64f99361-b472-11e9-ba7f-f52449624592",
+                    "type": "max"
+                  }
+                ],
+                "point_size": "0",
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "054a0900-b467-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:56:16.795Z",
+      "version": "WzYwMCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Throughput [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "57f0f3e0-b46b-11e9-88d3-b1e3cace09ae",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,204,202,1)",
+                "fill": 0,
+                "formatter": "number",
+                "id": "57f11af0-b46b-11e9-88d3-b1e3cace09ae",
+                "label": "read",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_status.traffic.read_bytes",
+                    "id": "57f11af1-b46b-11e9-88d3-b1e3cace09ae",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(176,188,0,1)",
+                "fill": 0,
+                "formatter": "number",
+                "id": "57f11af2-b46b-11e9-88d3-b1e3cace09ae",
+                "label": "write",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_status.traffic.write_bytes",
+                    "id": "57f11af3-b46b-11e9-88d3-b1e3cace09ae",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Throughput [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "88d48440-b46b-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:54:20.715Z",
+      "version": "WzU5NiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "IOPS [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "0fc1f2e0-b46b-11e9-9488-8bde5ab143f4",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#3185FC",
+                "fill": 0,
+                "formatter": "number",
+                "id": "0fc1f2e1-b46b-11e9-9488-8bde5ab143f4",
+                "label": "read",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_status.traffic.read_op_per_sec",
+                    "id": "0fc1f2e2-b46b-11e9-9488-8bde5ab143f4",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#DB1374",
+                "fill": 0,
+                "formatter": "number",
+                "id": "0fc1f2e3-b46b-11e9-9488-8bde5ab143f4",
+                "label": "write",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.cluster_status.traffic.write_op_per_sec",
+                    "id": "0fc1f2e4-b46b-11e9-9488-8bde5ab143f4",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "IOPS [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "346d00d0-b46b-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:54:00.152Z",
+      "version": "WzU5MiwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "gauge_color_rules": [
+              {
+                "gauge": "rgba(226,115,0,1)",
+                "id": "e681d700-b46b-11e9-9bdc-15c69a730d82",
+                "operator": "gte",
+                "value": 70
+              },
+              {
+                "gauge": "rgba(247,58,26,1)",
+                "id": "61b552b0-b513-11e9-81ce-0379c4621e40",
+                "value": 90
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_max": "",
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "e17a9bc0-b46b-11e9-9a02-5de45d117640",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(164,221,0,1)",
+                "fill": 0,
+                "formatter": "percent",
+                "id": "e17a9bc1-b46b-11e9-9a02-5de45d117640",
+                "label": "OSD disk usage",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.osd_df.used.pct",
+                    "id": "e17a9bc2-b46b-11e9-9a02-5de45d117640",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "gauge"
+          },
+          "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "13efa190-b46c-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:52:20.880Z",
+      "version": "WzU3NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Pools [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "e96942b0-b46f-11e9-aefa-c791377b99c3"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "21aaa880-b470-11e9-aefa-c791377b99c3"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "gauge_color_rules": [
+              {
+                "id": "20eadaf0-b470-11e9-aefa-c791377b99c3"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "b859c050-b46f-11e9-9f8f-97f5e69abdab",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#3185FC",
+                "fill": 0,
+                "formatter": "number",
+                "id": "b859e760-b46f-11e9-9f8f-97f5e69abdab",
+                "label": "Pools",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.pool_disk.id",
+                    "id": "b859e761-b46f-11e9-9f8f-97f5e69abdab",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "metric"
+          },
+          "title": "Pools [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "393df790-b470-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:53:11.179Z",
+      "version": "WzU4MSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Pool Objects [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "6ac91290-b470-11e9-a4bb-473d6710f872"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "6b864810-b470-11e9-a4bb-473d6710f872"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "filter": {
+              "language": "kuery",
+              "query": ""
+            },
+            "id": "4ce78950-b470-11e9-87e8-53bd102d292b",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": 0,
+                "formatter": "number",
+                "id": "4ce78951-b470-11e9-87e8-53bd102d292b",
+                "label": "Objects",
+                "line_width": 2,
+                "metrics": [
+                  {
+                    "field": "ceph.pool_disk.stats.objects",
+                    "id": "4ce78952-b470-11e9-87e8-53bd102d292b",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 0,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "ceph.pool_disk.name",
+                "value_template": "{{value}}"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Pool Objects [Metricbeat Ceph] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "aa9c2f10-b470-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-08-02T10:53:35.220Z",
+      "version": "WzU4NiwxXQ=="
+    }
+  ],
+  "version": "7.3.0"
+}

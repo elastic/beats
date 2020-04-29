@@ -12,19 +12,18 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/inputsource"
-	"github.com/elastic/beats/filebeat/inputsource/udp"
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 const (
@@ -64,16 +63,40 @@ func init() {
 	}
 }
 
+// An adapter so that logp.Logger can be used as a log.Logger.
+type logDebugWrapper struct {
+	sync.Mutex
+	Logger *logp.Logger
+	buf    []byte
+}
+
+// Write writes messages to the log.
+func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
+	w.Lock()
+	defer w.Unlock()
+	n = len(p)
+	w.buf = append(w.buf, p...)
+	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
+		w.Logger.Debug(string(w.buf[:endl]))
+		w.buf = w.buf[endl+1:]
+	}
+	return n, nil
+}
+
 // NewInput creates a new Netflow input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -84,9 +107,20 @@ func NewInput(
 		return nil, err
 	}
 
+	var customFields []fields.FieldDict
+	for _, yamlPath := range config.CustomDefinitions {
+		f, err := LoadFieldDefinitionsFromFile(yamlPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed parsing custom field definitions from file '%s'", yamlPath)
+		}
+		customFields = append(customFields, f)
+	}
 	decoder, err := decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(config.Protocols...).
-		WithExpiration(config.ExpirationTimeout))
+		WithExpiration(config.ExpirationTimeout).
+		WithLogOutput(&logDebugWrapper{Logger: logger}).
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(config.DetectSequenceReset))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}
@@ -104,10 +138,8 @@ func NewInput(
 }
 
 func (p *netflowInput) Publish(events []beat.Event) error {
-	for _, ev := range events {
-		e := util.NewData()
-		e.Event = ev
-		p.forwarder.Send(e)
+	for _, evt := range events {
+		p.forwarder.Send(evt)
 	}
 	return nil
 }

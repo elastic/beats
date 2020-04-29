@@ -18,15 +18,13 @@
 package metrics
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/mongodb"
-
+	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2/bson"
-)
 
-var debugf = logp.MakeDebug("mongodb.metrics")
+	"github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+)
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "metrics", New,
@@ -54,26 +52,27 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error creating new Session")
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to retrieve serverStatus")
 	}
 
-	data, err := schema.Apply(result)
+	data, err := schemaMetrics.Apply(result, schema.FailOnRequired)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to apply schema")
 	}
-	return data, nil
+	reporter.Event(mb.Event{MetricSetFields: data})
+
+	return nil
 }

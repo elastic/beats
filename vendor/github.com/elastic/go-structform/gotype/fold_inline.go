@@ -20,7 +20,7 @@ package gotype
 import (
 	"reflect"
 
-	"github.com/elastic/go-structform"
+	structform "github.com/elastic/go-structform"
 	"github.com/elastic/go-structform/visitors"
 )
 

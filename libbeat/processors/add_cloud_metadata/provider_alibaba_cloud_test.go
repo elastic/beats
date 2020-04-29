@@ -24,9 +24,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func initECSTestServer() *httptest.Server {
@@ -55,14 +55,15 @@ func TestRetrieveAlibabaCloudMetadata(t *testing.T) {
 	defer server.Close()
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"host": server.Listener.Addr().String(),
+		"providers": []string{"alibaba"},
+		"host":      server.Listener.Addr().String(),
 	})
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}

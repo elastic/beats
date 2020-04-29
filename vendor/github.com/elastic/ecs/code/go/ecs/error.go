@@ -19,9 +19,9 @@
 
 package ecs
 
-// These fields can represent errors of any kind. Use them for errors that
-// happen while fetching events or in cases where the event itself contains an
-// error.
+// These fields can represent errors of any kind.
+// Use them for errors that happen while fetching events or in cases where the
+// event itself contains an error.
 type Error struct {
 	// Unique identifier for the error.
 	ID string `ecs:"id"`
@@ -31,4 +31,10 @@ type Error struct {
 
 	// Error code describing the error.
 	Code string `ecs:"code"`
+
+	// The type of the error, for example the class name of the exception.
+	Type string `ecs:"type"`
+
+	// The stack trace of this error in plain text.
+	StackTrace string `ecs:"stack_trace"`
 }

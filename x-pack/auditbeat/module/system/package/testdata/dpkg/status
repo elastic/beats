@@ -1,0 +1,15 @@
+Package: test
+Status: install ok installed
+Priority: optional
+Section: libs
+Installed-Size: 269
+Maintainer: <>
+Architecture: amd64
+Multi-Arch: same
+Source: test-0
+Version: 8.2.0-1ubuntu2~18.04
+Depends: <>
+Description: Test Package
+ This is a test package.
+Homepage: https://www.elastic.co/
+Original-Maintainer: <>

@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestFetchGroupInfo(t *testing.T) {
@@ -67,36 +67,44 @@ func TestFetchGroupInfo(t *testing.T) {
 			}),
 			expected: []common.MapStr{
 				testEvent("group1", "topic1", 0, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(10),
+					"client":       clientMeta(0),
+					"offset":       int64(10),
+					"consumer_lag": int64(42) - int64(10),
 				}),
 				testEvent("group1", "topic1", 1, common.MapStr{
-					"client": clientMeta(1),
-					"offset": int64(11),
+					"client":       clientMeta(1),
+					"offset":       int64(11),
+					"consumer_lag": int64(42) - int64(11),
 				}),
 				testEvent("group1", "topic1", 2, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(12),
+					"client":       clientMeta(0),
+					"offset":       int64(12),
+					"consumer_lag": int64(42) - int64(12),
 				}),
 				testEvent("group1", "topic3", 0, common.MapStr{
-					"client": clientMeta(1),
-					"offset": int64(6),
+					"client":       clientMeta(1),
+					"offset":       int64(6),
+					"consumer_lag": int64(42) - int64(6),
 				}),
 				testEvent("group1", "topic3", 1, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(7),
+					"client":       clientMeta(0),
+					"offset":       int64(7),
+					"consumer_lag": int64(42) - int64(7),
 				}),
 				testEvent("group2", "topic2", 0, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(3),
+					"client":       clientMeta(0),
+					"offset":       int64(3),
+					"consumer_lag": int64(42) - int64(3),
 				}),
 				testEvent("group2", "topic3", 0, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(9),
+					"client":       clientMeta(0),
+					"offset":       int64(9),
+					"consumer_lag": int64(42) - int64(9),
 				}),
 				testEvent("group2", "topic3", 1, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(10),
+					"client":       clientMeta(0),
+					"offset":       int64(10),
+					"consumer_lag": int64(42) - int64(10),
 				}),
 			},
 		},
@@ -127,12 +135,14 @@ func TestFetchGroupInfo(t *testing.T) {
 			topics: []string{"topic1"},
 			expected: []common.MapStr{
 				testEvent("group1", "topic1", 0, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(1),
+					"client":       clientMeta(0),
+					"offset":       int64(1),
+					"consumer_lag": int64(42) - int64(1),
 				}),
 				testEvent("group1", "topic1", 1, common.MapStr{
-					"client": clientMeta(0),
-					"offset": int64(2),
+					"client":       clientMeta(0),
+					"offset":       int64(2),
+					"consumer_lag": int64(42) - int64(2),
 				}),
 			},
 		},
@@ -224,7 +234,7 @@ func TestFetchGroupInfo(t *testing.T) {
 		for key, expected := range indexEvents(test.expected) {
 			event, found := indexed[key]
 			if !found {
-				t.Errorf("Missing event: %v", key)
+				t.Errorf("Missing key %v from events: %v", key, events)
 				continue
 			}
 			assertEvent(t, expected, event)

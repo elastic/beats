@@ -1,0 +1,9 @@
+- key: template-test-module
+  title: "template-test-module"
+  description: >
+    template-test-module Module
+  fields:
+    - name: template-test-module
+      type: group
+      description: >
+      fields:

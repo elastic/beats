@@ -21,10 +21,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Product supported by X-Pack Monitoring
@@ -77,7 +79,7 @@ func (p Product) String() string {
 // MakeXPackMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
 func MakeXPackMonitoringIndexName(product Product) string {
-	const version = "6"
+	const version = "7"
 
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }
@@ -105,4 +107,64 @@ func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion 
 func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 	r.Error(err)
 	l.Error(err)
+}
+
+// FixTimestampField converts the given timestamp field in the given map from a float64 to an
+// int, so that it is not serialized in scientific notation in the event. This is because
+// Elasticsearch cannot accepts scientific notation to represent millis-since-epoch values
+// for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
+func FixTimestampField(m common.MapStr, field string) error {
+	v, err := m.GetValue(field)
+	if err == common.ErrKeyNotFound {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	switch vv := v.(type) {
+	case float64:
+		_, err := m.Put(field, int(vv))
+		return err
+	}
+	return nil
+}
+
+// NewModule returns a new Elastic stack module with the appropriate metricsets configured.
+func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
+	moduleName := base.Name()
+
+	config := struct {
+		XPackEnabled bool `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	}
+
+	// No special configuration is needed if xpack.enabled != true
+	if !config.XPackEnabled {
+		return base, nil
+	}
+
+	var raw common.MapStr
+	if err := base.UnpackConfig(&raw); err != nil {
+		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	}
+
+	// These metricsets are exactly the ones required if xpack.enabled == true
+	raw["metricsets"] = xpackEnabledMetricsets
+
+	newConfig, err := common.NewConfigFrom(raw)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
+	}
+
+	newModule, err := base.WithConfig(*newConfig)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
+	}
+
+	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)
+
+	return newModule, nil
 }

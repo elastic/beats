@@ -1,0 +1,23 @@
+- name: requests
+  type: group
+  description: Requests processor metrics from GlobalRequestProcessor JMX
+  release: beta
+  fields:
+    - name: mbean
+      description: Mbean that this event is related to
+      type: keyword
+    - name: total
+      description: Number of requests processed
+      type: long
+    - name: bytes.received
+      description: Amount of data received, in bytes
+      type: long
+    - name: bytes.sent
+      description: Amount of data sent, in bytes
+      type: long
+    - name: processing.ms
+      description: Total time to process the requests
+      type: long
+    - name: errors.total
+      description: Number of errors
+      type: long

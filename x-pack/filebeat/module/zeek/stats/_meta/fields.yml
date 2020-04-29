@@ -1,0 +1,163 @@
+- name: stats
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek stats log.
+  fields:
+    - name: peer
+      type: keyword
+      description: |
+        Peer that generated this log. Mostly for clusters.
+
+    - name: memory
+      type: integer
+      description: |
+        Amount of memory currently in use in MB.
+
+    - name: packets
+      type: group
+      fields:
+        - name: processed
+          type: long
+          description: |
+            Number of packets processed since the last stats interval.
+
+        - name: dropped
+          type: long
+          description: |
+            Number of packets dropped since the last stats interval if reading live traffic.
+
+        - name: received
+          type: long
+          description: |
+            Number of packets seen on the link since the last stats interval if reading live traffic.
+
+    - name: bytes
+      type: group
+      fields:
+        - name: received
+          type: long
+          description: |
+            Number of bytes received since the last stats interval if reading live traffic.
+
+    - name: connections
+      type: group
+      fields:
+        - name: tcp
+          type: group
+          fields:
+            - name: active
+              type: integer
+              description: |
+                TCP connections currently in memory.
+
+            - name: count
+              type: integer
+              description: |
+                TCP connections seen since last stats interval.
+
+        - name: udp
+          type: group
+          fields:
+            - name: active
+              type: integer
+              description: |
+                UDP connections currently in memory.
+
+            - name: count
+              type: integer
+              description: |
+                UDP connections seen since last stats interval.
+
+        - name: icmp
+          type: group
+          fields:
+            - name: active
+              type: integer
+              description: |
+                ICMP connections currently in memory.
+
+            - name: count
+              type: integer
+              description: |
+                ICMP connections seen since last stats interval.
+
+    - name: events
+      type: group
+      fields:
+        - name: processed
+          type: integer
+          description: |
+            Number of events processed since the last stats interval.
+
+        - name: queued
+          type: integer
+          description: |
+            Number of events that have been queued since the last stats interval.
+
+    - name: timers
+      type: group
+      fields:
+        - name: count
+          type: integer
+          description: |
+            Number of timers scheduled since last stats interval.
+
+        - name: active
+          type: integer
+          description: |
+            Current number of scheduled timers.
+
+    - name: files
+      type: group
+      fields:
+        - name: count
+          type: integer
+          description: |
+            Number of files seen since last stats interval.
+
+        - name: active
+          type: integer
+          description: |
+            Current number of files actively being seen.
+
+    - name: dns_requests
+      type: group
+      fields:
+        - name: count
+          type: integer
+          description: |
+            Number of DNS requests seen since last stats interval.
+
+        - name: active
+          type: integer
+          description: |
+            Current number of DNS requests awaiting a reply.
+
+    - name: reassembly_size
+      type: group
+      fields:
+        - name: tcp
+          type: integer
+          description: |
+            Current size of TCP data in reassembly.
+
+        - name: file
+          type: integer
+          description: |
+            Current size of File data in reassembly.
+
+        - name: frag
+          type: integer
+          description: |
+            Current size of packet fragment data in reassembly.
+
+        - name: unknown
+          type: integer
+          description: |
+            Current size of unknown data in reassembly (this is only PIA buffer right now).
+
+    - name: timestamp_lag
+      type: integer
+      description: |
+        Lag between the wall clock and packet timestamps if reading live traffic.

@@ -23,16 +23,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/traefik/mtest"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/traefik/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func makeBadRequest(config map[string]interface{}) error {
-	host := config["hosts"].([]string)[0]
-
+func makeBadRequest(host string) error {
 	resp, err := http.Get("http://" + host + "/foobar")
 	if err != nil {
 		return err
@@ -42,13 +40,12 @@ func makeBadRequest(config map[string]interface{}) error {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "traefik")
+	service := compose.EnsureUp(t, "traefik")
 
-	config := mtest.GetConfig("health")
+	makeBadRequest(service.Host())
 
-	makeBadRequest(config)
-
-	ms := mbtest.NewReportingMetricSetV2(t, config)
+	config := mtest.GetConfig("health", service.Host())
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 
 	ms.Fetch(reporter)
@@ -63,14 +60,4 @@ func TestFetch(t *testing.T) {
 
 	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
 	assert.True(t, badResponseCount.(float64) >= 1)
-}
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "traefik")
-
-	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health"))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
 }

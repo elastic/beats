@@ -1,0 +1,97 @@
+# ResourceQuota tests
+
+# This example will create a namespace and apply some resource restrictions on it, then
+# some of those restrictions will be challenged
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rqtest
+
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  namespace: rqtest
+  name: resources
+spec:
+  hard:
+    requests.cpu: 1
+    requests.memory: 1Gi
+    limits.cpu: 2
+    limits.memory: 2Gi
+
+---
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  namespace: rqtest  
+  name: objects
+spec:
+  hard:
+    pods: 3
+    configmaps: 1
+    persistentvolumeclaims: 0
+    replicationcontrollers: 1
+    secrets: 1
+    services: 2
+    services.loadbalancers: 1
+
+---
+
+# See presistent volume claims above. They are not allowed (count 0), which means
+# that this request will fail
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: rqtest    
+  name: willfail
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+# ResourceQuota/objects above allows only for one Service element type LoadBalancer
+# this call should succeed, but subsequent creations will fail.
+#
+# It doesn't matter if the LoadBalancer is really created, what counts is the API
+# object creation. You can try this at your local kubernetes environment.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: willsucceed
+  namespace: rqtest
+spec:
+  selector:
+    app: something
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+
+# As a continuation of the above case, this Service type LoadBalancer will exceed
+# assigned quota for the namespace and will fail
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: willfail
+  namespace: rqtest
+spec:
+  selector:
+    app: something
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

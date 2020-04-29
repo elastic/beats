@@ -27,8 +27,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
@@ -64,18 +64,6 @@ var configOpts = []ucfg.Option{
 const (
 	selectorConfig             = "config"
 	selectorConfigWithPassword = "config-with-passwords"
-)
-
-var debugBlacklist = MakeStringSet(
-	"password",
-	"passphrase",
-	"key_passphrase",
-	"pass",
-	"proxy_url",
-	"url",
-	"urls",
-	"host",
-	"hosts",
 )
 
 // make hasSelector and configDebugf available for unit testing
@@ -128,6 +116,16 @@ func MergeConfigs(cfgs ...*Config) (*Config, error) {
 	return config, nil
 }
 
+func MergeConfigsWithOptions(cfgs []*Config, options ...ucfg.Option) (*Config, error) {
+	config := NewConfig()
+	for _, c := range cfgs {
+		if err := config.MergeWithOpts(c, options...); err != nil {
+			return nil, err
+		}
+	}
+	return config, nil
+}
+
 func NewConfigWithYAML(in []byte, source string) (*Config, error) {
 	opts := append(
 		[]ucfg.Option{
@@ -146,7 +144,7 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 
 func LoadFile(path string) (*Config, error) {
 	if IsStrictPerms() {
-		if err := ownerHasExclusiveWritePerms(path); err != nil {
+		if err := OwnerHasExclusiveWritePerms(path); err != nil {
 			return nil, err
 		}
 	}
@@ -174,6 +172,14 @@ func LoadFiles(paths ...string) (*Config, error) {
 
 func (c *Config) Merge(from interface{}) error {
 	return c.access().Merge(from, configOpts...)
+}
+
+func (c *Config) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
+	o := configOpts
+	if opts != nil {
+		o = append(o, opts...)
+	}
+	return c.access().Merge(from, o...)
 }
 
 func (c *Config) Unpack(to interface{}) error {
@@ -265,7 +271,7 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 		}
 	}
 
-	debugStr := configDebugString(c, filtered)
+	debugStr := DebugString(c, filtered)
 	if debugStr != "" {
 		configDebugf(selector, "%s\n%s", fmt.Sprintf(msg, params...), debugStr)
 	}
@@ -358,7 +364,9 @@ func (ns *ConfigNamespace) IsSet() bool {
 	return ns.config != nil
 }
 
-func configDebugString(c *Config, filterPrivate bool) string {
+// DebugString prints a human readable representation of the underlying config using
+// JSON formatting.
+func DebugString(c *Config, filterPrivate bool) string {
 	var bufs []string
 
 	if c.IsDict() {
@@ -367,7 +375,7 @@ func configDebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -378,7 +386,7 @@ func configDebugString(c *Config, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			filterDebugObject(content)
+			applyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -390,34 +398,10 @@ func configDebugString(c *Config, filterPrivate bool) string {
 	return strings.Join(bufs, "\n")
 }
 
-func filterDebugObject(c interface{}) {
-	switch cfg := c.(type) {
-	case map[string]interface{}:
-		for k, v := range cfg {
-			if debugBlacklist.Has(k) {
-				if arr, ok := v.([]interface{}); ok {
-					for i := range arr {
-						arr[i] = "xxxxx"
-					}
-				} else {
-					cfg[k] = "xxxxx"
-				}
-			} else {
-				filterDebugObject(v)
-			}
-		}
-
-	case []interface{}:
-		for _, elem := range cfg {
-			filterDebugObject(elem)
-		}
-	}
-}
-
-// ownerHasExclusiveWritePerms asserts that the current user or root is the
+// OwnerHasExclusiveWritePerms asserts that the current user or root is the
 // owner of the config file and that the config file is (at most) writable by
 // the owner or root (e.g. group and other cannot have write access).
-func ownerHasExclusiveWritePerms(name string) error {
+func OwnerHasExclusiveWritePerms(name string) error {
 	if runtime.GOOS == "windows" {
 		return nil
 	}
@@ -432,7 +416,7 @@ func ownerHasExclusiveWritePerms(name string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, name, euid)
 	}
 

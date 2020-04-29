@@ -20,8 +20,9 @@ package actions
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 )
 
 // LabelsKey is the default target key for the add_labels processor.
@@ -29,9 +30,9 @@ const LabelsKey = "labels"
 
 func init() {
 	processors.RegisterPlugin("add_labels",
-		configChecked(createAddLabels,
-			requireFields(LabelsKey),
-			allowedFields(LabelsKey, "when")))
+		checks.ConfigChecked(createAddLabels,
+			checks.RequireFields(LabelsKey),
+			checks.AllowedFields(LabelsKey, "when")))
 }
 
 func createAddLabels(c *common.Config) (processors.Processor, error) {
@@ -55,5 +56,5 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
 	return NewAddFields(common.MapStr{
 		LabelsKey: labels.Flatten(),
-	}, shared)
+	}, shared, true)
 }

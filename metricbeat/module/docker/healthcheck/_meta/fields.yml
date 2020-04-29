@@ -1,7 +1,10 @@
 - name: healthcheck
   type: group
   description: >
-    Docker container metrics.
+    Docker healthcheck metrics.
+
+    Healthcheck data will only be available from docker containers where the
+    docker `HEALTHCHECK` instruction has been used to build the docker image.
   release: ga
   fields:
     - name: failingstreak

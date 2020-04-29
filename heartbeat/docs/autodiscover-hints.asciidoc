@@ -1,0 +1,115 @@
+{beatname_uc} supports autodiscover based on hints from the provider. The hints system looks for
+hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.monitor`. As soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get logs for the given container. By default monitors will be created
+for the container that exposes the port being requested to be monitored. You can use hints to modify this behavior. This is the full
+list of supported hints:
+
+
+[float]
+===== `co.elastic.monitor/type`
+
+Define the monitor type to use. Ex: http, tcp, icmp
+
+[float]
+===== `co.elastic.monitor/hosts`
+
+The URIs to monitor. Example:
+[source,yaml]
+-----
+co.elastic.monitor/type: icmp
+co.elastic.monitor/hosts: ${data.host}
+-----
+
+This would ensure that each host has an ICMP monitor enabled on it.
+
+[float]
+===== `co.elastic.monitor/schedule`
+
+Define the schedule on which the monitor should be executed.
+-----
+co.elastic.monitor/schedule: "@every 5s"
+-----
+
+[float]
+===== `co.elastic.monitor/processors`
+
+Define a processor to be added to the {beatname_uc} monitor configuration. See <<filtering-and-enhancing-data>> for the list
+of supported processors.
+
+In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
+arbitrary ordering:
+
+[source,yaml]
+-----
+co.elastic.monitor/processors.1.drop_fields.fields: "field1, field2"
+co.elastic.monitor/processors.drop_fields.fields: "field3"
+-----
+
+In the above sample the processor definition tagged with `1` would be executed first.
+
+[float]
+==== Kubernetes
+
+Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
+
+[source,yaml]
+-----
+heartbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+-----
+
+You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} monitors:
+
+[source,yaml]
+-----
+annotations:
+  co.elastic.monitor/type: icmp
+  co.elastic.monitor/hosts: ${data.host}
+  co.elastic.monitor/schedule: "@every 5s"
+-----
+
+
+[float]
+===== Multiple containers
+
+When a pod has multiple containers, the settings are shared unless you add the container name in the
+hint. For example, these hints configure the container exposing port 8080 to do a HTTP check and have the `sidecar`
+container to have an TCP check.
+
+
+[source,yaml]
+-----
+annotations:
+  co.elastic.monitor/type: http
+  co.elastic.monitor/hosts: ${data.host}:8080/healtlz
+  co.elastic.monitor/schedule: "@every 5s"
+  co.elastic.monitor.sidecar/type: tcp
+  co.elastic.monitor.sidecar/hosts: ${data.host}:8081
+  co.elastic.monitor.sidecar/schedule: "@every 5s"
+
+-----
+
+
+
+[float]
+==== Docker
+
+Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
+
+[source,yaml]
+-----
+heartbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-----
+
+You can label Docker containers with useful info to spin up {beatname_uc} monitors similar to the Kubernetes example:
+----------------------------------------------------------------------
+LABEL co.elastic.monitor/1.type=tcp co.elastic.monitor/1.hosts='${data.host}:6379' co.elastic.monitor/1.schedule='@every 10s'
+LABEL co.elastic.monitor/2.type=icmp co.elastic.monitor/2.hosts='${data.host}' co.elastic.monitor/2.schedule='@every 10s'
+----------------------------------------------------------------------
+

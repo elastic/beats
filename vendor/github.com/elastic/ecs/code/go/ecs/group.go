@@ -27,4 +27,8 @@ type Group struct {
 
 	// Name of the group.
 	Name string `ecs:"name"`
+
+	// Name of the directory the group is a member of.
+	// For example, an LDAP or Active Directory domain name.
+	Domain string `ecs:"domain"`
 }

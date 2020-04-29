@@ -3,6 +3,7 @@ from base import BaseTest
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import unittest
@@ -20,6 +21,21 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         proc.check_kill_and_wait()
+        assert self.log_contains("mockbeat stopped.")
+
+    @unittest.skipIf(sys.platform.startswith("win"), "SIGHUP is not available on Windows")
+    def test_sighup(self):
+        """
+        Basic test with exiting Mockbeat because of SIGHUP
+        """
+        self.render_config_template(
+        )
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        proc.proc.send_signal(signal.SIGHUP)
+        proc.check_wait()
+        assert self.log_contains("mockbeat stopped.")
 
     def test_no_config(self):
         """

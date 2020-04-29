@@ -18,70 +18,55 @@
 package export
 
 import (
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 // GenIndexPatternConfigCmd generates an index pattern for Kibana
-func GenIndexPatternConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
+func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "index-pattern",
 		Short: "Export kibana index pattern to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
-			}
-			err = b.InitWithSettings(settings)
-			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
+				fatalfInitCmd(err)
 			}
 
 			if version == "" {
 				version = b.Info.Version
 			}
 
-			var withMigration bool
-			if b.RawConfig.HasField("migration") {
-				sub, err := b.RawConfig.Child("migration", -1)
-				if err != nil {
-					fatalf("Failed to read migration setting: %+v", err)
-				}
-				withMigration = sub.Enabled()
-			}
-
 			// Index pattern generation
 			v, err := common.NewVersion(version)
 			if err != nil {
-				fatalf("Error creating version: %+v", err)
+				fatalf("Error creating version: %+v.", err)
 			}
-			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, beatVersion, *v, withMigration)
+			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, b.Config.Migration.Enabled())
 			if err != nil {
-				log.Fatal(err)
+				fatalf("Error creating Kibana Generator: %+v.", err)
 			}
 
 			pattern, err := indexPattern.Generate()
 			if err != nil {
-				log.Fatalf("ERROR: %s", err)
+				fatalf("Error generating Index Pattern: %+v.", err)
 			}
 
 			_, err = os.Stdout.WriteString(pattern.StringToPrint() + "\n")
 			if err != nil {
-				fatalf("Error writing index pattern: %+v", err)
+				fatalf("Error writing Index Pattern: %+v.", err)
 			}
 		},
 	}
 
-	genTemplateConfigCmd.Flags().String("es.version", beatVersion, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("index", idxPrefix, "Base index name")
+	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
 
 	return genTemplateConfigCmd
 }

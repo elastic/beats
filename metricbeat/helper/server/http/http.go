@@ -19,14 +19,16 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper/server"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type HttpServer struct {
@@ -50,14 +52,19 @@ func (h *HttpEvent) GetMeta() server.Meta {
 	return h.meta
 }
 
-func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
+func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 	config := defaultHttpConfig()
 	err := mb.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithCancel(context.TODO())
 	h := &HttpServer{
 		done:       make(chan struct{}),
 		eventQueue: make(chan server.Event),
@@ -66,21 +73,50 @@ func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
 	}
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", config.Host, config.Port),
-		Handler: http.HandlerFunc(h.handleFunc),
+		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
+	}
+	if tlsConfig != nil {
+		httpServer.TLSConfig = tlsConfig.BuildModuleConfig(config.Host)
 	}
 	h.server = httpServer
+	return h, nil
+}
+
+func NewHttpServer(mb mb.BaseMetricSet) (server.Server, error) {
+	h, err := getDefaultHttpServer(mb)
+	if err != nil {
+		return nil, err
+	}
+	h.server.Handler = http.HandlerFunc(h.handleFunc)
+
+	return h, nil
+}
+
+func NewHttpServerWithHandler(mb mb.BaseMetricSet, handlerFunc http.HandlerFunc) (server.Server, error) {
+	h, err := getDefaultHttpServer(mb)
+	if err != nil {
+		return nil, err
+	}
+	h.server.Handler = handlerFunc
 
 	return h, nil
 }
 
 func (h *HttpServer) Start() error {
 	go func() {
-
-		logp.Info("Starting http server on %s", h.server.Addr)
-		err := h.server.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			logp.Critical("Unable to start HTTP server due to error: %v", err)
+		if h.server.TLSConfig != nil {
+			logp.Info("Starting HTTPS server on %s", h.server.Addr)
+			//certificate is already loaded. That's why the parameters are empty
+			err := h.server.ListenAndServeTLS("", "")
+			if err != nil && err != http.ErrServerClosed {
+				logp.Critical("Unable to start HTTPS server due to error: %v", err)
+			}
+		} else {
+			logp.Info("Starting HTTP server on %s", h.server.Addr)
+			err := h.server.ListenAndServe()
+			if err != nil && err != http.ErrServerClosed {
+				logp.Critical("Unable to start HTTP server due to error: %v", err)
+			}
 		}
 	}()
 
@@ -130,6 +166,11 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 
 	case "GET":
 		writer.WriteHeader(http.StatusOK)
-		writer.Write([]byte("HTTP Server accepts data via POST"))
+		if req.TLS != nil {
+			writer.Write([]byte("HTTPS Server accepts data via POST"))
+		} else {
+			writer.Write([]byte("HTTP Server accepts data via POST"))
+		}
+
 	}
 }

@@ -25,8 +25,11 @@ heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
              # configured hosts
 
-  # Monitor name used for job name and document type.
-  #name: icmp
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
+
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-icmp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -74,6 +77,9 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 # heartbeat.config.monitors:
@@ -86,9 +92,11 @@ heartbeat.monitors:
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
 
-  # Monitor name used for job name and document type
-  #name: tcp
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-tcp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -158,11 +166,15 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-http-monitor
 
-  # Monitor name used for job name and document type
-  #name: http
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My Monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -246,6 +258,8 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if

@@ -147,11 +147,24 @@ class TestCase(unittest.TestCase, ComposeMixin):
         self.build_path = build_dir + "/system-tests/"
 
         # Start the containers needed to run these tests
-        self.compose_up()
+        self.compose_up_with_retries()
 
     @classmethod
     def tearDownClass(self):
         self.compose_down()
+
+    @classmethod
+    def compose_up_with_retries(self):
+        retries = 3
+        for i in range(retries):
+            try:
+                self.compose_up()
+                return
+            except Exception as e:
+                if i + 1 >= retries:
+                    raise e
+                print("Compose up failed, retrying: {}".format(e))
+                self.compose_down()
 
     def run_beat(self,
                  cmd=None,
@@ -180,7 +193,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                    output=None,
                    logging_args=["-e", "-v", "-d", "*"],
                    extra_args=[],
-                   env={}):
+                   env={},
+                   home=""):
         """
         Starts beat and returns the process handle. The
         caller is responsible for stopping / waiting for the
@@ -203,8 +217,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
+
+        path_home = os.path.normpath(self.working_dir)
+        if home:
+            path_home = home
+
         args += [
-            "-path.home", os.path.normpath(self.working_dir),
+            "-path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -220,8 +239,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def render_config_template(self, template_name=None,
                                output=None, **kargs):
-
-        print("render config")
 
         # Init defaults
         if template_name is None:
@@ -240,7 +257,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         output_path = os.path.join(self.working_dir, output)
         with open(output_path, "wb") as f:
             os.chmod(output_path, 0o600)
-            f.write(output_str.encode('utf8'))
+            f.write(output_str.encode('utf_8'))
 
     # Returns output as JSON object with flattened fields (. notation)
     def read_output(self,
@@ -252,7 +269,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
             for line in f:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
@@ -276,7 +293,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
             for line in f:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
@@ -355,8 +372,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + ".log"
 
-        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
+
+        return data
+
+    def get_log_lines(self, logfile=None):
+        """
+        Returns the log lines as a list of strings
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
+            data = f.readlines()
 
         return data
 
@@ -393,7 +422,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             logfile = self.beat_name + ".log"
 
         try:
-            with open(os.path.join(self.working_dir, logfile), "r") as f:
+            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
                     if is_regexp:
                         if msg.search(line) is not None:
@@ -408,13 +437,37 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         return counter
 
+    def log_contains_countmap(self, pattern, capture_group, logfile=None):
+        """
+        Returns a map of the number of appearances of each captured group in the log file
+        """
+        counts = {}
+
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
+                for line in f:
+                    res = pattern.search(line)
+                    if res is not None:
+                        capt = res.group(capture_group)
+                        if capt in counts:
+                            counts[capt] += 1
+                        else:
+                            counts[capt] = 1
+        except IOError:
+            pass
+
+        return counts
+
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
                 return sum([1 for line in f])
         except IOError:
             return 0
@@ -429,7 +482,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
                 return len([1 for line in f]) == lines
         except IOError:
             return False
@@ -493,9 +546,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+            aliases = []
 
             if doc_list is None:
-                return fields, dictfields
+                return fields, dictfields, aliases
 
             for field in doc_list:
 
@@ -510,14 +564,23 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     newName = field["name"]
 
                 if field.get("type") == "group":
-                    subfields, subdictfields = extract_fields(field["fields"], newName)
+                    subfields, subdictfields, subaliases = extract_fields(field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
+                    aliases.extend(subaliases)
                 else:
                     fields.append(newName)
                     if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
-            return fields, dictfields
+
+                if field.get("type") == "object" and field.get("object_type") == "histogram":
+                    fields.append(newName + ".values")
+                    fields.append(newName + ".counts")
+
+                if field.get("type") == "alias":
+                    aliases.append(newName)
+
+            return fields, dictfields, aliases
 
         global yaml_cache
 
@@ -532,7 +595,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             content += f.read()
 
-            hash = hashlib.md5(content).hexdigest()
+            hash = hashlib.md5(content.encode("utf-8")).hexdigest()
             doc = ""
             if hash in yaml_cache:
                 doc = yaml_cache[hash]
@@ -542,12 +605,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             fields = []
             dictfields = []
+            aliases = []
 
             for item in doc:
-                subfields, subdictfields = extract_fields(item["fields"], "")
+                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
-            return fields, dictfields
+                aliases.extend(subaliases)
+            return fields, dictfields, aliases
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
@@ -581,7 +646,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = "output/" + self.beat_name
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r") as f:
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
                 return pred(len([1 for line in f]))
         except IOError:
             return False
@@ -594,6 +659,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
         return "http://{host}:{port}".format(
             host=os.getenv("ES_HOST", "localhost"),
             port=os.getenv("ES_PORT", "9200"),
+        )
+
+    def get_elasticsearch_url_ssl(self):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        return "https://{host}:{port}".format(
+            host=os.getenv("ES_HOST_SSL", "localhost"),
+            port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
     def get_kibana_url(self):
@@ -610,7 +685,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Assert that all keys present in evt are documented in fields.yml.
         This reads from the global fields.yml, means `make collect` has to be run before the check.
         """
-        expected_fields, dict_fields = self.load_fields()
+        expected_fields, dict_fields, aliases = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)
 
         def field_pattern_match(pattern, key):
@@ -625,15 +700,25 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return False
             return True
 
-        def is_documented(key):
-            if key in expected_fields:
+        def is_documented(key, docs):
+            if key in docs:
                 return True
-            for pattern in (f for f in expected_fields if "*" in f):
+            for pattern in (f for f in docs if "*" in f):
                 if field_pattern_match(pattern, key):
                     return True
             return False
 
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
-            if not(is_documented(key) or metaKey):
+            # Range keys as used in 'date_range' etc will not have docs of course
+            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+            if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
+            if is_documented(key, aliases):
+                raise Exception("Key '{}' found in event is documented as an alias!".format(key))
+
+    def get_beat_version(self):
+        proc = self.start_beat(extra_args=["version"], output="version")
+        proc.wait()
+
+        return self.get_log_lines(logfile="version")[0].split()[2]

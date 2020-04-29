@@ -15,14 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package memory
 
 import (
-	"github.com/docker/docker/client"
+	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 func init() {
@@ -32,6 +36,7 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
@@ -60,12 +65,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch creates a list of memory events for each container.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "failed to get docker stats")
 	}
 
 	memoryStats := m.memoryService.getMemoryStatsList(stats, m.dedot)
-	return eventsMapping(memoryStats), nil
+	if len(memoryStats) == 0 {
+		return fmt.Errorf("No memory stats data available")
+	}
+	eventsMapping(r, memoryStats)
+
+	return nil
+}
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
 }

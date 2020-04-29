@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-nats-overview
+  file: Filebeat-nats-overview.json

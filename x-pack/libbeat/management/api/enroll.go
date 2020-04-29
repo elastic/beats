@@ -10,22 +10,28 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type enrollResponse struct {
-	AccessToken string `json:"access_token"`
+	BaseResponse
+	AccessToken string `json:"item"`
 }
 
 func (e *enrollResponse) Validate() error {
-	if len(e.AccessToken) == 0 {
+	if !e.Success || len(e.AccessToken) == 0 {
 		return errors.New("empty access_token")
 	}
 	return nil
 }
 
-// Enroll a beat in central management, this call returns a valid access token to retrieve configurations
-func (c *Client) Enroll(beatType, beatName, beatVersion, hostname string, beatUUID uuid.UUID, enrollmentToken string) (string, error) {
+// Enroll a beat in central management, this call returns a valid access token to retrieve
+// configurations
+func (c *Client) Enroll(
+	beatType, beatName, beatVersion, hostname string,
+	beatUUID uuid.UUID,
+	enrollmentToken string,
+) (string, error) {
 	params := common.MapStr{
 		"type":      beatType,
 		"name":      beatName,

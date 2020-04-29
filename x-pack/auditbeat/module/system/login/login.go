@@ -13,11 +13,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 const (
@@ -92,7 +92,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -202,9 +202,13 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	switch loginRecord.Type {
 	case userLoginRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "success")
+		event.RootFields.Put("event.type", "authentication_success")
 	case userLoginFailedRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "failure")
+		event.RootFields.Put("event.type", "authentication_failure")
 	}
 
 	return event

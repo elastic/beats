@@ -1,0 +1,105 @@
+[
+    {
+        "etcd": {
+            "api_version": "3",
+            "disk": {
+                "backend_commit_duration": {
+                    "ns": {
+                        "bucket": {
+                            "+Inf": 6,
+                            "1000000": 4,
+                            "1024000000": 6,
+                            "128000000": 6,
+                            "16000000": 6,
+                            "2000000": 4,
+                            "2048000000": 6,
+                            "256000000": 6,
+                            "32000000": 6,
+                            "4000000": 6,
+                            "4096000000": 6,
+                            "512000000": 6,
+                            "64000000": 6,
+                            "8000000": 6,
+                            "8192000000": 6
+                        },
+                        "count": 6,
+                        "sum": 5161901
+                    }
+                },
+                "mvcc_db_total_size": {
+                    "bytes": 24576
+                },
+                "wal_fsync_duration": {
+                    "ns": {
+                        "bucket": {
+                            "+Inf": 3,
+                            "1000000": 0,
+                            "1024000000": 3,
+                            "128000000": 3,
+                            "16000000": 2,
+                            "2000000": 0,
+                            "2048000000": 3,
+                            "256000000": 3,
+                            "32000000": 2,
+                            "4000000": 0,
+                            "4096000000": 3,
+                            "512000000": 3,
+                            "64000000": 3,
+                            "8000000": 2,
+                            "8192000000": 3
+                        },
+                        "count": 3,
+                        "sum": 71772434
+                    }
+                }
+            },
+            "memory": {
+                "go_memstats_alloc": {
+                    "bytes": 3130240
+                }
+            },
+            "network": {
+                "client_grpc_received": {
+                    "bytes": 0
+                },
+                "client_grpc_sent": {
+                    "bytes": 0
+                }
+            },
+            "server": {
+                "grpc_handled": {
+                    "count": 0
+                },
+                "grpc_started": {
+                    "count": 0
+                },
+                "has_leader": 1,
+                "leader_changes": {
+                    "count": 1
+                },
+                "proposals_committed": {
+                    "count": 8
+                },
+                "proposals_failed": {
+                    "count": 0
+                },
+                "proposals_pending": {
+                    "count": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "etcd",
+            "duration": 115000,
+            "module": "etcd"
+        },
+        "metricset": {
+            "name": "metrics",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "etcd"
+        }
+    }
+]

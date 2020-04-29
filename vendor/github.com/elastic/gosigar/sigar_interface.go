@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// ErrNotImplemented is returned when a particular statistic isn't implemented on the host OS.
 type ErrNotImplemented struct {
 	OS string
 }
@@ -12,6 +13,7 @@ func (e ErrNotImplemented) Error() string {
 	return "not implemented on " + e.OS
 }
 
+// IsNotImplemented returns true if the error is ErrNotImplemented
 func IsNotImplemented(err error) bool {
 	switch err.(type) {
 	case ErrNotImplemented, *ErrNotImplemented:
@@ -21,6 +23,7 @@ func IsNotImplemented(err error) bool {
 	}
 }
 
+// Sigar is an interface for gathering system host stats
 type Sigar interface {
 	CollectCpuStats(collectionInterval time.Duration) (<-chan Cpu, chan<- struct{})
 	GetLoadAverage() (LoadAverage, error)
@@ -32,6 +35,7 @@ type Sigar interface {
 	GetRusage(who int) (Rusage, error)
 }
 
+// Cpu contains CPU time stats
 type Cpu struct {
 	User    uint64
 	Nice    uint64
@@ -43,11 +47,13 @@ type Cpu struct {
 	Stolen  uint64
 }
 
+// Total returns total CPU time
 func (cpu *Cpu) Total() uint64 {
 	return cpu.User + cpu.Nice + cpu.Sys + cpu.Idle +
 		cpu.Wait + cpu.Irq + cpu.SoftIrq + cpu.Stolen
 }
 
+// Delta returns the difference between two Cpu stat objects
 func (cpu Cpu) Delta(other Cpu) Cpu {
 	return Cpu{
 		User:    cpu.User - other.User,
@@ -61,14 +67,17 @@ func (cpu Cpu) Delta(other Cpu) Cpu {
 	}
 }
 
+// LoadAverage reports standard load averages
 type LoadAverage struct {
 	One, Five, Fifteen float64
 }
 
+// Uptime reports system uptime
 type Uptime struct {
 	Length float64
 }
 
+// Mem contains host memory stats
 type Mem struct {
 	Total      uint64
 	Used       uint64
@@ -77,12 +86,14 @@ type Mem struct {
 	ActualUsed uint64
 }
 
+// Swap contains stats on swap space
 type Swap struct {
 	Total uint64
 	Used  uint64
 	Free  uint64
 }
 
+// HugeTLBPages contains HugePages stats
 type HugeTLBPages struct {
 	Total              uint64
 	Free               uint64
@@ -92,16 +103,19 @@ type HugeTLBPages struct {
 	TotalAllocatedSize uint64
 }
 
+// CpuList contains a list of CPUs on the host system
 type CpuList struct {
 	List []Cpu
 }
 
+// FDUsage contains stats on filesystem usage
 type FDUsage struct {
 	Open   uint64
 	Unused uint64
 	Max    uint64
 }
 
+// FileSystem contains basic information about a given mounted filesystem
 type FileSystem struct {
 	DirName     string
 	DevName     string
@@ -111,10 +125,12 @@ type FileSystem struct {
 	Flags       uint32
 }
 
+// FileSystemList gets a list of mounted filesystems
 type FileSystemList struct {
 	List []FileSystem
 }
 
+// FileSystemUsage contains basic stats for the specified filesystem
 type FileSystemUsage struct {
 	Total     uint64
 	Used      uint64
@@ -124,21 +140,30 @@ type FileSystemUsage struct {
 	FreeFiles uint64
 }
 
+// ProcList contains a list of processes found on the host system
 type ProcList struct {
 	List []int
 }
 
+// RunState is a byte-long code used to specify the current runtime state of a process
 type RunState byte
 
 const (
-	RunStateSleep   = 'S'
-	RunStateRun     = 'R'
-	RunStateStop    = 'T'
-	RunStateZombie  = 'Z'
-	RunStateIdle    = 'D'
+	// RunStateSleep corresponds to a sleep state
+	RunStateSleep = 'S'
+	// RunStateRun corresponds to a running state
+	RunStateRun = 'R'
+	// RunStateStop corresponds to a stopped state
+	RunStateStop = 'T'
+	// RunStateZombie marks a zombie process
+	RunStateZombie = 'Z'
+	// RunStateIdle corresponds to an idle state
+	RunStateIdle = 'D'
+	// RunStateUnknown corresponds to a process in an unknown state
 	RunStateUnknown = '?'
 )
 
+// ProcState contains basic metadata and process ownership info for the specified process
 type ProcState struct {
 	Name      string
 	Username  string
@@ -151,6 +176,7 @@ type ProcState struct {
 	Processor int
 }
 
+// ProcMem contains memory statistics for a specified process
 type ProcMem struct {
 	Size        uint64
 	Resident    uint64
@@ -160,6 +186,7 @@ type ProcMem struct {
 	PageFaults  uint64
 }
 
+// ProcTime contains run time statistics for a specified process
 type ProcTime struct {
 	StartTime uint64
 	User      uint64
@@ -167,26 +194,31 @@ type ProcTime struct {
 	Total     uint64
 }
 
+// ProcArgs contains a list of args for a specified process
 type ProcArgs struct {
 	List []string
 }
 
+// ProcEnv contains a map of environment variables for specified process
 type ProcEnv struct {
 	Vars map[string]string
 }
 
+// ProcExe contains basic data about a specified process
 type ProcExe struct {
 	Name string
 	Cwd  string
 	Root string
 }
 
+// ProcFDUsage contains data on file limits and usage
 type ProcFDUsage struct {
 	Open      uint64
 	SoftLimit uint64
 	HardLimit uint64
 }
 
+// Rusage contains data on resource usage for a specified process
 type Rusage struct {
 	Utime    time.Duration
 	Stime    time.Duration

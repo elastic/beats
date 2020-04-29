@@ -63,12 +63,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 100,
           "ip": "172.18.65.21",
           "locality": "private",
+          "packets": 2,
           "port": 61209
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-22T12:17:56Z",
@@ -132,12 +135,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 229,
           "ip": "172.18.65.91",
           "locality": "private",
+          "packets": 1,
           "port": 138
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-22T12:17:56Z",
@@ -201,12 +207,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 229,
           "ip": "172.18.65.91",
           "locality": "private",
+          "packets": 1,
           "port": 138
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-22T12:26:04Z",
@@ -270,12 +279,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 104,
           "ip": "172.18.65.21",
           "locality": "private",
+          "packets": 2,
           "port": 61329
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-22T12:26:04Z",
@@ -337,10 +349,13 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 144,
+          "packets": 2,
           "port": 61329
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

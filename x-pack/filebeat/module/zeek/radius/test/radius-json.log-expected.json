@@ -1,0 +1,46 @@
+[
+    {
+        "@timestamp": "2008-08-01T22:52:17.916Z",
+        "destination.address": "10.0.0.100",
+        "destination.ip": "10.0.0.100",
+        "destination.port": 1812,
+        "event.category": [
+            "authentication",
+            "network"
+        ],
+        "event.dataset": "zeek.radius",
+        "event.id": "CRe9VD3flCDWbPmpIh",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "info",
+            "connection"
+        ],
+        "fileset.name": "radius",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:3SdDgWXPnheV2oGfVmxQjfwtr8E=",
+        "network.protocol": "radius",
+        "network.transport": "udp",
+        "related.ip": [
+            "10.0.0.1",
+            "10.0.0.100"
+        ],
+        "related.user": [
+            "John.McGuirk"
+        ],
+        "service.type": "zeek",
+        "source.address": "10.0.0.1",
+        "source.ip": "10.0.0.1",
+        "source.port": 1645,
+        "tags": [
+            "zeek.radius"
+        ],
+        "user.name": "John.McGuirk",
+        "zeek.radius.mac": "00:14:22:e9:54:5e",
+        "zeek.radius.result": "success",
+        "zeek.radius.username": "John.McGuirk",
+        "zeek.session_id": "CRe9VD3flCDWbPmpIh"
+    }
+]

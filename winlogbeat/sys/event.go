@@ -20,13 +20,15 @@ package sys
 import (
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"time"
 )
 
 // UnmarshalEventXML unmarshals the given XML into a new Event.
 func UnmarshalEventXML(rawXML []byte) (Event, error) {
 	var event Event
-	err := xml.Unmarshal(rawXML, &event)
+	decoder := xml.NewDecoder(newXMLSafeReader(rawXML))
+	err := decoder.Decode(&event)
 	return event, err
 }
 
@@ -35,10 +37,11 @@ type Event struct {
 	// System
 	Provider        Provider        `xml:"System>Provider"`
 	EventIdentifier EventIdentifier `xml:"System>EventID"`
-	Version         uint8           `xml:"System>Version"`
+	Version         Version         `xml:"System>Version"`
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
 	OpcodeRaw       uint8           `xml:"System>Opcode"`
+	KeywordsRaw     HexInt64        `xml:"System>Keywords"`
 	TimeCreated     TimeCreated     `xml:"System>TimeCreated"`
 	RecordID        uint64          `xml:"System>EventRecordID"`
 	Correlation     Correlation     `xml:"System>Correlation"`
@@ -60,7 +63,7 @@ type Event struct {
 	// ProcessingErrorData
 	RenderErrorCode         uint32 `xml:"ProcessingErrorData>ErrorCode"`
 	RenderErrorDataItemName string `xml:"ProcessingErrorData>DataItemName"`
-	RenderErr               string
+	RenderErr               []string
 }
 
 // Provider identifies the provider that logged the event. The Name and GUID
@@ -94,7 +97,7 @@ type Execution struct {
 	ProcessorTime uint32 `xml:"ProcessorTime,attr"`
 }
 
-// EventIdentifier is the identifer that the provider uses to identify a
+// EventIdentifier is the identifier that the provider uses to identify a
 // specific event type.
 type EventIdentifier struct {
 	Qualifiers uint16 `xml:"Qualifiers,attr"`
@@ -200,5 +203,44 @@ func (kv *KeyValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 	kv.Value = elem.Value
 
+	return nil
+}
+
+// Version contains the version number of the event's definition.
+type Version uint8
+
+// UnmarshalXML unmarshals the version number as an xsd:unsignedByte. Invalid
+// values are ignored an no error is returned.
+func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+
+	version, err := strconv.ParseUint(s, 10, 8)
+	if err != nil {
+		// Ignore invalid version values.
+		return nil
+	}
+
+	*v = Version(version)
+	return nil
+}
+
+type HexInt64 uint64
+
+func (v *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+
+	num, err := strconv.ParseInt(s, 0, 64)
+	if err != nil {
+		// Ignore invalid version values.
+		return nil
+	}
+
+	*v = HexInt64(num)
 	return nil
 }

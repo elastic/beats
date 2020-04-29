@@ -1,0 +1,21 @@
+- key: statsd
+  title: "Statsd"
+  description: >
+    Statsd module
+  release: ga
+  fields:
+    - name: statsd
+      type: group
+      fields:
+        - name: '*.count'
+          type: object
+          object_type: long
+          object_type_mapping_type: "long"
+          description: >
+            Statsd counters
+        - name: '*.*'
+          type: object
+          object_type: float
+          object_type_mapping_type: "*"
+          description: >
+            Statsd metrics

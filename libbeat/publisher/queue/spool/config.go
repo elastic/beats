@@ -27,7 +27,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 )
 
 type config struct {
@@ -46,7 +46,7 @@ type pathConfig struct {
 
 type writeConfig struct {
 	BufferSize   cfgtype.ByteSize `config:"buffer_size"`
-	FlushEvents  time.Duration    `config:"flush.events"`
+	FlushEvents  int              `config:"flush.events"`
 	FlushTimeout time.Duration    `config:"flush.timeout"`
 	Codec        codecID          `config:"codec"`
 }

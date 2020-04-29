@@ -1,0 +1,12 @@
+////
+This file is generated! See scripts/mage/docs.go or run 'mage docs'.
+////
+
+  * <<{beatname_lc}-module-security,Security>>
+  * <<{beatname_lc}-module-sysmon,Sysmon>>
+
+--
+
+
+include::./modules/security.asciidoc[]
+include::./modules/sysmon.asciidoc[]

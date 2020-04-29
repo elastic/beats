@@ -1,0 +1,61 @@
+{
+    "@timestamp": "2019-09-19T13:42:47.806Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "event": {
+        "dataset": "tomcat.requests",
+        "module": "tomcat",
+        "duration": 97947886
+    },
+    "metricset": {
+        "name": "requests",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:8080",
+        "type": "tomcat"
+    },
+    "tomcat": {
+        "requests": {
+            "processing": {
+                "ms": 0
+            },
+            "errors": {
+                "total": 0
+            },
+            "total": 0,
+            "mbean": "Catalina:name=\"http-nio-8080\",type=GlobalRequestProcessor",
+            "bytes": {
+                "received": 0,
+                "sent": 0
+            }
+        }
+    },
+    "host": {
+        "containerized": false,
+        "hostname": "mcastro",
+        "name": "mcastro",
+        "architecture": "x86_64",
+        "os": {
+            "name": "Antergos Linux",
+            "kernel": "5.0.13-arch1-1-ARCH",
+            "platform": "antergos",
+            "version": "",
+            "family": ""
+        },
+        "id": "54f70115bae545cbac2b150f254472a0"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "ephemeral_id": "ccb9ebe2-bd8b-4d90-a362-37132e09370b",
+        "hostname": "mcastro",
+        "id": "7e36a073-1a32-4a94-b65b-4c7f971fb228",
+        "version": "8.0.0"
+    },
+    "ecs": {
+        "version": "1.1.0"
+    }
+}

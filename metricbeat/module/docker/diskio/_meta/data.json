@@ -1,52 +1,55 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "container": {
+        "id": "8abaa1f3514d3554503034a1df6ee09457f328757bbc9555245244ee853c0b44",
+        "image": {
+            "name": "zookeeper"
+        },
+        "name": "some-zookeeper",
+        "runtime": "docker"
     },
     "docker": {
-        "container": {
-            "id": "59c5d4838454f38c7d67fdacec7a32ca4476a062ef00edf69ba6be9117cf2e7b",
-            "labels": {
-                "build-date": "20170911",
-                "com_docker_compose_config-hash": "a2bcfc1f8c99a4be6920deda8da8d4d06fe0d10d51623b8e1dbcc8228e96926c",
-                "com_docker_compose_container-number": "1",
-                "com_docker_compose_oneoff": "False",
-                "com_docker_compose_project": "metricbeat",
-                "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_version": "1.20.1",
-                "license": "GPLv2",
-                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
-                "name": "CentOS Base Image",
-                "vendor": "CentOS"
-            },
-            "name": "metricbeat_elasticsearch_1"
-        },
         "diskio": {
             "read": {
-                "bytes": 61964288,
-                "ops": 3284,
-                "rate": 0
+                "bytes": 42409984,
+                "ops": 1823,
+                "queued": 0,
+                "rate": 0,
+                "service_time": 0,
+                "wait_time": 0
             },
             "reads": 0,
             "summary": {
-                "bytes": 63479808,
-                "ops": 3500,
-                "rate": 0
+                "bytes": 42414080,
+                "ops": 1824,
+                "queued": 0,
+                "rate": 0,
+                "service_time": 0,
+                "wait_time": 0
             },
             "total": 0,
             "write": {
-                "bytes": 1515520,
-                "ops": 216,
-                "rate": 0
+                "bytes": 4096,
+                "ops": 1,
+                "queued": 0,
+                "rate": 0,
+                "service_time": 0,
+                "wait_time": 0
             },
             "writes": 0
         }
     },
+    "event": {
+        "dataset": "docker.diskio",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
         "name": "diskio",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
     }
 }

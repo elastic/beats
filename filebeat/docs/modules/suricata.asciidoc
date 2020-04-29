@@ -16,29 +16,25 @@ Suricata Eve JSON format].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
-
-This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
-and {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent]
-Elasticsearch plugins.
 
 This module has been developed against Suricata v4.0.4, but is expected to work
 with other versions of Suricata.
 
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-suricata.png[]
-
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+This is an example of how to overwrite the default log file path.
+
+[source,yaml]
+----
+- module: suricata
+  eve:
+    enabled: true
+    var.paths: ["/my/path/suricata.json"]
+----
 
 :fileset_ex: eve
 
@@ -48,6 +44,24 @@ include::../include/config-option-intro.asciidoc[]
 ==== `eve` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/filebeat-suricata-events.png[]
+
+[role="screenshot"]
+image::./images/filebeat-suricata-alerts.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
 
 
 [float]

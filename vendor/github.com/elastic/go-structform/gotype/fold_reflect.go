@@ -214,6 +214,11 @@ func buildFieldFold(C *foldContext, t reflect.Type, idx int) (reFoldFn, error) {
 		return nil, errInlineAndOmitEmpty
 	}
 
+	if tagOpts.omit {
+		// ignore omitted fields
+		return nil, nil
+	}
+
 	if tagOpts.squash {
 		return buildFieldFoldInline(C, t, idx, tagOpts.omitEmpty)
 	}

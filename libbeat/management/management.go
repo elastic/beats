@@ -20,9 +20,9 @@ package management
 import (
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/feature"
 )
 
 // Namespace is the feature namespace for queue definition.
@@ -30,6 +30,8 @@ var Namespace = "libbeat.management"
 
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
+
+var centralMgmtKey = "x-pack-cm"
 
 // ConfigManager interacts with the beat to update configurations
 // from an external source
@@ -47,30 +49,45 @@ type ConfigManager interface {
 	CheckRawConfig(cfg *common.Config) error
 }
 
+// PluginFunc for creating FactoryFunc if it matches a config
+type PluginFunc func(*common.Config) FactoryFunc
+
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error)
 
 // Register a config manager
-func Register(name string, fn FactoryFunc, stability feature.Stability) {
-	f := feature.New(Namespace, name, fn, feature.NewDetails(name, "", stability))
+func Register(name string, fn PluginFunc, stability feature.Stability) {
+	f := feature.New(Namespace, name, fn, feature.MakeDetails(name, "", stability))
 	feature.MustRegister(f)
 }
 
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
-func Factory() FactoryFunc {
+func Factory(cfg *common.Config) FactoryFunc {
 	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
 	}
 
 	for _, f := range factories {
-		if factory, ok := f.Factory().(FactoryFunc); ok {
-			return factory
+		if plugin, ok := f.Factory().(PluginFunc); ok {
+			if factory := plugin(cfg); factory != nil {
+				return factory
+			}
 		}
 	}
 
 	return nilFactory
+}
+
+type modeConfig struct {
+	Mode string `config:"mode" yaml:"mode"`
+}
+
+func defaultModeConfig() *modeConfig {
+	return &modeConfig{
+		Mode: centralMgmtKey,
+	}
 }
 
 // nilManager, fallback when no manager is present

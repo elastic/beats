@@ -25,7 +25,7 @@ class Test(BaseTest):
         self.render_config_template()
         exit_code = self.run_beat(
             logging_args=[],
-            extra_args=["export", "index-pattern", "-E", "migration.enabled:true"])
+            extra_args=["export", "index-pattern", "-E", "migration.6_to_7.enabled:true"])
 
         assert exit_code == 0
         assert self.log_contains('"objects": [')

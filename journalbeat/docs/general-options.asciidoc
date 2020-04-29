@@ -1,5 +1,9 @@
 [[configuration-general-options]]
-== Specify general settings
+== Configure general settings
+
+++++
+<titleabbrev>General settings</titleabbrev>
+++++
 
 You can specify settings in the +{beatname_lc}.yml+ config file to control the
 general behavior of {beatname_uc}. This includes:
@@ -29,30 +33,32 @@ data path. See the <<directory-layout>> section for details. The default is `${p
 ----
 
 [float]
-==== `backoff`
+==== `backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
+
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<{beatname_lc}-backoff,`backoff`>>.
 
 [float]
-==== `max_backoff`
+==== `max_backoff` deprecated:[5.6.1,Use the option under `paths` instead.]
+
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
 <<{beatname_lc}-max-backoff,`max_backoff`>>.
 
 [float]
-==== `seek`
+==== `seek` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
-<<{beatname_lc}-seek,`seek`>>. 
+<<seek,`seek`>>. 
 
 [float]
-==== `include_matches`
+==== `include_matches` deprecated:[5.6.1,Use the option under `paths` instead.]
 
 This option is valid as a global setting under the +{beatname_lc}+ namespace
 or under `paths`. For a description of this option, see
-<<{beatname_lc}-include-matches,`include_matches`>>. 
+<<include-matches,`include_matches`>>. 
 
-include::{libbeat-dir}/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/generalconfig.asciidoc[]
 

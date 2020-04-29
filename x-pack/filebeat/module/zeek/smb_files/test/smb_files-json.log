@@ -1,0 +1,1 @@
+{"ts":1507565599.576942,"uid":"C9YAaEzWLL62yWMn5","id.orig_h":"192.168.10.31","id.orig_p":49239,"id.resp_h":"192.168.10.30","id.resp_p":445,"action":"SMB::FILE_OPEN","path":"\u005c\u005cadmin-pc\u005cADMIN$","name":"PSEXESVC.exe","size":0,"times.modified":1507565599.607777,"times.accessed":1507565599.607777,"times.created":1507565599.607777,"times.changed":1507565599.607777}

@@ -1,77 +1,82 @@
 {
-  "@timestamp": "2016-05-23T08:05:34.853Z",
-  "beat": {
-    "hostname": "beathost",
-    "name": "beathost"
-  },
-  "metricset": {
-    "host": "localhost",
-    "module": "mongodb",
-    "name": "collstats",
-    "rtt": 44269
-  },
-  "mongodb": {
-    "collstats": {
-      "db": "admin",
-      "collection": "system.users",
-      "name": "admin.system.users",
-      "total": {
-        "time": {
-          "us": 54756221
-        },
-        "count": 3159951
-      },
-      "lock": {
-        "read": {
-          "time": {
-            "us": 54747284
-          },
-          "count": 3159944
-        },
-        "write": {
-          "time": {
-            "us": 8937
-          },
-          "count": 7
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mongodb.collstats",
+        "duration": 115000,
+        "module": "mongodb"
+    },
+    "metricset": {
+        "name": "collstats"
+    },
+    "mongodb": {
+        "collstats": {
+            "collection": "startup_log",
+            "commands": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            },
+            "db": "local",
+            "getmore": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            },
+            "insert": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            },
+            "lock": {
+                "read": {
+                    "count": 74,
+                    "time": {
+                        "us": 443
+                    }
+                },
+                "write": {
+                    "count": 1,
+                    "time": {
+                        "us": 8
+                    }
+                }
+            },
+            "name": "local.startup_log",
+            "queries": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            },
+            "remove": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            },
+            "total": {
+                "count": 75,
+                "time": {
+                    "us": 451
+                }
+            },
+            "update": {
+                "count": 0,
+                "time": {
+                    "us": 0
+                }
+            }
         }
-      },
-      "queries": {
-        "time": {
-          "us": 2310
-        },
-        "count": 15
-      },
-      "getmore": {
-        "time": {
-          "us": 0
-        },
-        "count": 0
-      },
-      "insert": {
-        "time": {
-          "us": 8937
-        },
-        "count": 7
-      },
-      "update": {
-        "time": {
-          "us": 0
-        },
-        "count": 0
-      },
-      "remove": {
-        "time": {
-          "us": 0
-        },
-        "count": 0
-      },
-      "commands": {
-        "time": {
-          "us": 50743698
-        },
-        "count": 45793
-      }
+    },
+    "service": {
+        "address": "172.26.0.2:27017",
+        "type": "mongodb"
     }
-  },
-  "type": "metricsets"
 }

@@ -140,8 +140,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "_exists_:kafka.log.trace.class"
+                            "language": "kuery",
+                            "query": "kafka.log.trace.class:*"
                         }, 
                         "version": true
                     }
@@ -225,8 +225,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -377,7 +377,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true

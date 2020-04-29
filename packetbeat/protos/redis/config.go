@@ -18,18 +18,23 @@
 package redis
 
 import (
-	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
 type redisConfig struct {
 	config.ProtocolCommon `config:",inline"`
+	QueueLimits           MessageQueueConfig `config:",inline"`
 }
 
 var (
 	defaultConfig = redisConfig{
 		ProtocolCommon: config.ProtocolCommon{
 			TransactionTimeout: protos.DefaultTransactionExpiration,
+		},
+		QueueLimits: MessageQueueConfig{
+			MaxBytes:    1024 * 1024,
+			MaxMessages: 20000,
 		},
 	}
 )

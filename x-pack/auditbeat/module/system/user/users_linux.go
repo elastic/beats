@@ -6,18 +6,26 @@
 
 package user
 
+// #include <errno.h>
 // #include <sys/types.h>
 // #include <pwd.h>
 // #include <shadow.h>
+//
+// void clearErrno() {
+//      errno = 0;
+// }
 import "C"
 
 import (
 	"crypto/sha512"
 	"os/user"
+	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
@@ -28,24 +36,34 @@ var (
 // GetUsers retrieves a list of users using information from
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
 func GetUsers(readPasswords bool) ([]*User, error) {
+	var errs multierror.Errors
+
+	// We are using a number of thread sensitive C functions in
+	// this file, most importantly setpwent/getpwent/endpwent and
+	// setspent/getspent/endspent. And we set errno (which is thread-local).
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	users, err := readPasswdFile(readPasswords)
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
 
-	err = enrichWithGroups(users)
-	if err != nil {
-		return nil, err
-	}
-
-	if readPasswords {
-		err = enrichWithShadow(users)
+	if len(users) > 0 {
+		err = enrichWithGroups(users)
 		if err != nil {
-			return nil, err
+			errs = append(errs, err)
+		}
+
+		if readPasswords {
+			err = enrichWithShadow(users)
+			if err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 
-	return users, nil
+	return users, errs.Err()
 }
 
 func readPasswdFile(readPasswords bool) ([]*User, error) {
@@ -54,9 +72,22 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 	C.setpwent()
 	defer C.endpwent()
 
-	for passwd, err := C.getpwent(); passwd != nil; passwd, err = C.getpwent() {
-		if err != nil {
-			return nil, errors.Wrap(err, "error getting user")
+	for {
+		// Setting errno to 0 before calling getpwent().
+		// See return value section of getpwent(3).
+		C.clearErrno()
+
+		passwd, err := C.getpwent()
+
+		if passwd == nil {
+			// getpwent() can return ENOENT even when there is no error,
+			// see https://github.com/systemd/systemd/issues/9585.
+			if err != nil && err != syscall.ENOENT {
+				return users, errors.Wrap(err, "error getting user")
+			}
+
+			// No more entries
+			break
 		}
 
 		// passwd is C.struct_passwd
@@ -161,9 +192,22 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	defer C.endspent()
 
 	shadowEntries := make(map[string]shadowFileEntry)
-	for spwd, err := C.getspent(); spwd != nil; spwd, err = C.getspent() {
-		if err != nil {
-			return nil, errors.Wrap(err, "error while reading shadow file")
+
+	for {
+		// While getspnam(3) does not explicitly call out the need for setting errno to 0
+		// as getpwent(3) does, at least glibc uses the same code for both, and so it
+		// probably makes sense to do the same for both.
+		C.clearErrno()
+
+		spwd, err := C.getspent()
+
+		if spwd == nil {
+			if err != nil {
+				return shadowEntries, errors.Wrap(err, "error while reading shadow file")
+			}
+
+			// No more entries
+			break
 		}
 
 		shadow := shadowFileEntry{

@@ -1,5 +1,5 @@
 # Deploy a auditbeat instance per node for node metrics retrieval
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: auditbeat
@@ -7,6 +7,9 @@ metadata:
   labels:
     k8s-app: auditbeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: auditbeat
   template:
     metadata:
       labels:
@@ -15,12 +18,14 @@ spec:
       serviceAccountName: auditbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
+      hostPID: true  # Required by auditd module
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
         image: docker.elastic.co/beats/auditbeat:%VERSION%
         args: [
-          "-c", "/etc/auditbeat.yml"
+          "-c", "/etc/auditbeat.yml",
+          "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
@@ -35,8 +40,20 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
+          capabilities:
+            add:
+              # Capabilities needed for auditd module
+              - 'AUDIT_READ'
+              - 'AUDIT_WRITE'
+              - 'AUDIT_CONTROL'
         resources:
           limits:
             memory: 200Mi
@@ -51,6 +68,8 @@ spec:
         - name: modules
           mountPath: /usr/share/auditbeat/modules.d
           readOnly: true
+        - name: data
+          mountPath: /usr/share/auditbeat/data
         - name: bin
           mountPath: /hostfs/bin
           readOnly: true
@@ -65,6 +84,12 @@ spec:
           readOnly: true
         - name: etc
           mountPath: /hostfs/etc
+          readOnly: true
+        # Directory with root filesystems of containers executed with containerd, this can be
+        # different with other runtimes. This volume is needed to monitor the file integrity
+        # of files in containers.
+        - name: run-containerd
+          mountPath: /run/containerd
           readOnly: true
       volumes:
       - name: bin
@@ -93,4 +118,8 @@ spec:
       - name: data
         hostPath:
           path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate
+      - name: run-containerd
+        hostPath:
+          path: /run/containerd
           type: DirectoryOrCreate

@@ -1,3 +1,4 @@
+import re
 from packetbeat import BaseTest
 
 
@@ -219,3 +220,38 @@ class Test(BaseTest):
         o = objs[0]
         assert o["type"] == "mongodb"
         assert o["event.duration"] >= 0
+
+    def test_opmsg(self):
+        """
+        Tests parser works with opcode 2013 (OP_MSG).
+        """
+        self.render_config_template(
+            mongodb_ports=[9991]
+        )
+        self.run_packetbeat(pcap="mongodb_op_msg_opcode.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        o = objs[0]
+        assert o["type"] == "mongodb"
+
+        count = self.log_contains_count('Unknown operation code: ')
+        assert count == 0
+
+    def test_unknown_opcode_flood(self):
+        """
+        Tests that any repeated unknown opcodes are reported just once.
+        """
+        self.render_config_template(
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongodb_invalid_opcode_2269.pcap",
+                            debug_selectors=["mongodb"])
+
+        unknown_counts = self.log_contains_countmap(
+            re.compile(r'Unknown operation code: (\d+)'), 1)
+
+        assert len(unknown_counts) > 0
+        for k, v in unknown_counts.items():
+            assert v == 1, "Unknown opcode reported more than once: opcode={0}, count={1}".format(
+                k, v)

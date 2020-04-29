@@ -1,7 +1,11 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance the exported data
+== Filter and enhance data with processors
 
-include::{libbeat-dir}/docs/processors.asciidoc[]
+++++
+<titleabbrev>Processors</titleabbrev>
+++++
+
+include::{libbeat-dir}/processors.asciidoc[]
 
 For example, the following configuration reduces the exported fields by
 dropping the `agent.name` and `agent.version` fields under `beat` from all documents.
@@ -13,4 +17,4 @@ processors:
     fields: ['agent']
 ----
 
-include::{libbeat-dir}/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/processors-using.asciidoc[]

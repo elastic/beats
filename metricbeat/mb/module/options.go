@@ -20,8 +20,8 @@ package module
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -64,12 +64,15 @@ func WithMetricSetInfo() Option {
 // given to the `service.name` setting in the module configuration.
 func WithServiceName() Option {
 	return func(w *Wrapper) {
+		if w.Module == nil {
+			return
+		}
+		serviceName := w.Module.Config().ServiceName
+		if serviceName == "" {
+			return
+		}
 		modifier := func(_, _ string, event *mb.Event) {
 			if event == nil {
-				return
-			}
-			serviceName := w.Module.Config().ServiceName
-			if serviceName == "" {
 				return
 			}
 			if event.RootFields == nil {

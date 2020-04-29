@@ -101,7 +101,7 @@
                         "highlightAll": true, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": "event.module: uwsgi"
                         }, 
                         "version": true
@@ -127,7 +127,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true

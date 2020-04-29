@@ -18,9 +18,6 @@
 package linux
 
 import (
-	"bytes"
-	"strconv"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/go-sysinfo/types"
@@ -72,29 +69,4 @@ func parseMemInfo(content []byte) (*types.HostMemoryInfo, error) {
 	}
 
 	return memInfo, nil
-}
-
-func parseBytesOrNumber(data []byte) (uint64, error) {
-	parts := bytes.Fields(data)
-
-	if len(parts) == 0 {
-		return 0, errors.New("empty value")
-	}
-
-	num, err := strconv.ParseUint(string(parts[0]), 10, 64)
-	if err != nil {
-		return 0, errors.Wrap(err, "failed to parse value")
-	}
-
-	var multiplier uint64 = 1
-	if len(parts) >= 2 {
-		switch string(parts[1]) {
-		case "kB":
-			multiplier = 1024
-		default:
-			return 0, errors.Errorf("unhandled unit %v", string(parts[1]))
-		}
-	}
-
-	return num * multiplier, nil
 }

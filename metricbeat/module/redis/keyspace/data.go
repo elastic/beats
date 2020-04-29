@@ -20,11 +20,11 @@ package keyspace
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/redis"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/redis"
 )
 
 // Map data to MapStr
@@ -34,10 +34,7 @@ func eventsMapping(r mb.ReporterV2, info map[string]string) {
 		event := mb.Event{
 			MetricSetFields: space,
 		}
-		if !r.Event(event) {
-			debugf("Failed to report event, interrupting Fetch")
-			return
-		}
+		r.Event(event)
 	}
 }
 

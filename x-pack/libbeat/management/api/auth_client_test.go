@@ -100,7 +100,7 @@ func TestReportEvents(t *testing.T) {
 			}
 
 			apiResponse := EventAPIResponse{
-				Response: []EventResponse{EventResponse{Success: true}},
+				Response: []EventResponse{EventResponse{BaseResponse: BaseResponse{Success: true}}},
 			}
 
 			w.WriteHeader(http.StatusOK)
@@ -118,10 +118,12 @@ func TestReportEvents(t *testing.T) {
 	t.Run("bubble up any errors", func(t *testing.T) {
 		server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			response := struct {
-				Message string
-			}{
-				Message: "bad request",
+			response := BaseResponse{
+				Success: false,
+				Error: ErrorResponse{
+					Message: "bad request",
+					Code:    http.StatusBadRequest,
+				},
 			}
 			json.NewEncoder(w).Encode(response)
 		}))
@@ -139,8 +141,8 @@ func TestReportEvents(t *testing.T) {
 		server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			apiResponse := EventAPIResponse{
 				Response: []EventResponse{
-					EventResponse{Success: true},
-					EventResponse{Success: false},
+					EventResponse{BaseResponse: BaseResponse{Success: true}},
+					EventResponse{BaseResponse: BaseResponse{Success: false}},
 				},
 			}
 			w.WriteHeader(http.StatusOK)
@@ -163,7 +165,7 @@ func TestReportEvents(t *testing.T) {
 		server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			apiResponse := EventAPIResponse{
 				Response: []EventResponse{
-					EventResponse{Success: true},
+					EventResponse{BaseResponse: BaseResponse{Success: true}},
 				},
 			}
 			w.WriteHeader(http.StatusOK)

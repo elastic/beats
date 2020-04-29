@@ -22,13 +22,14 @@ import (
 
 	rd "github.com/garyburd/redigo/redis"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -48,7 +49,7 @@ type Input struct {
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
@@ -58,14 +59,18 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, err
 	}
 
-	outlet, err := outletFactory(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	p := &Input{
 		started:  false,
-		outlet:   outlet,
+		outlet:   out,
 		config:   config,
 		cfg:      cfg,
 		registry: harvester.NewRegistry(),
@@ -80,6 +85,10 @@ func (p *Input) LoadStates(states []file.State) error {
 }
 
 // Run runs the input
+// Note: Filebeat is required to call the redis input's Run() method multiple times. It is expected to be called
+// once initially when the input starts up and then again periodically, where the period is determined
+// by the value of the `scan_frequency` setting.
+// Also see https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-redis.html#redis-scan_frequency.
 func (p *Input) Run() {
 	logp.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
 

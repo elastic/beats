@@ -1,8 +1,9 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "icinga.startup",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "startup",
         "icinga.startup.facility": "cli",
         "input.type": "log",
@@ -12,9 +13,10 @@
         "service.type": "icinga"
     },
     {
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "icinga.startup",
+        "event.kind": "event",
         "event.module": "icinga",
+        "event.type": "info",
         "fileset.name": "startup",
         "icinga.startup.facility": "cli",
         "input.type": "log",

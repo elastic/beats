@@ -24,16 +24,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/haproxy"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "haproxy")
+	service := compose.EnsureUp(t, "haproxy")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(14567)))
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
@@ -46,21 +45,21 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "haproxy")
+	service := compose.EnsureUp(t, "haproxy")
 
-	config := getConfig()
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err := mbtest.WriteEventsReporterV2(f, t, ".")
+	config := getConfig(service.HostForPort(14567))
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "haproxy",
 		"metricsets": []string{"stat"},
-		"hosts":      []string{"tcp://" + haproxy.GetEnvHost() + ":" + haproxy.GetEnvPort()},
+		"hosts":      []string{"tcp://" + host},
 	}
 }

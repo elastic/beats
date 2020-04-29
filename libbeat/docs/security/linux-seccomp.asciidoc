@@ -21,7 +21,7 @@ can be customized through configuration as well.
 A seccomp policy is architecture specific due to the fact that system calls vary
 by architecture. {beatname_uc} includes a whitelist seccomp policy for the
 amd64 and 386 architectures. You can view those policies
-https://github.com/elastic/beats/tree/{doc-branch}/libbeat/common/seccomp[here].
+https://github.com/elastic/beats/tree/{branch}/libbeat/common/seccomp[here].
 
 [float]
 [[seccomp-policy-config]]

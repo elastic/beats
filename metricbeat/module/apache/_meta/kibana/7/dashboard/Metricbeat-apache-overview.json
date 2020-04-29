@@ -636,11 +636,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module: apache"
                             }
-                        }
                     }
                 }, 
                 "sort": [
@@ -663,13 +661,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }

@@ -15,7 +15,7 @@
 ifdef::standalone[]
 
 [[yaml-tips]]
-== YAML tips and gotchas
+== Avoid YAML formatting problems
 
 endif::[]
 
@@ -94,3 +94,21 @@ to an integer. If not, it's converted to a float.
 To prevent unwanted type conversions, avoid using leading zeros in field values,
 or wrap the values in single quotation marks.
 
+[float]
+[[dollar-sign-strings]]
+=== Avoid accidental template variable resolution
+
+The templating engine that allows the config to resolve data from environment 
+variables can result in errors in strings with `$` characters. For example, if a 
+password field contains `$$`, the engine will resolve this to `$`.
+
+To work around this,
+either use the
+ifdef::no_keystore[]
+{filebeat-ref}/keystore.html[keystore]
+endif::[]
+ifndef::no_keystore[]
+<<keystore>>
+endif::[]
+or escape all instances of
+`$` with `$$`.

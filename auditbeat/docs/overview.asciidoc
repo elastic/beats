@@ -12,4 +12,4 @@ Audit Framework. You can also use {beatname_uc} to detect changes to critical
 files, like binaries and configuration files, and identify potential security
 policy violations.
 
-include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+include::{libbeat-dir}/shared-libbeat-description.asciidoc[]

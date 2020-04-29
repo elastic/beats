@@ -10,7 +10,11 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-dashboards]]
-== Load the Kibana dashboards
+== Configure Kibana dashboard loading
+
+++++
+<titleabbrev>Kibana dashboards</titleabbrev>
+++++
 
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana.
@@ -102,7 +106,7 @@ NOTE: This setting only works for Kibana 6.0 and newer.
 [float]
 ==== `setup.dashboards.always_kibana`
 
-Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+Force loading of dashboards using the Kibana API without querying Elasticsearch for the version.
 The default is `false`.
 
 [float]

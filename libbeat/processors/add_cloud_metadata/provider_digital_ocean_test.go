@@ -24,9 +24,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const digitalOceanMetadataV1 = `{
@@ -101,7 +101,7 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}

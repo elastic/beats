@@ -49,6 +49,8 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Expand expands the given Go text/template string.
@@ -544,12 +546,17 @@ func FindFiles(globs ...string) ([]string, error) {
 
 // FindFilesRecursive recursively traverses from the CWD and invokes the given
 // match function on each regular file to determine if the given path should be
-// returned as a match.
+// returned as a match. It ignores files in .git directories.
 func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]string, error) {
 	var matches []string
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
+		}
+
+		// Don't look for files in git directories
+		if info.Mode().IsDir() && filepath.Base(path) == ".git" {
+			return filepath.SkipDir
 		}
 
 		if !info.Mode().IsRegular() {
@@ -718,6 +725,14 @@ func OSSBeatDir(path ...string) string {
 // XPackBeatDir returns the X-Pack beat directory. You can pass paths and they
 // will be joined and appended to the X-Pack beat dir.
 func XPackBeatDir(path ...string) string {
+	// Check if we have an X-Pack only beats
+	cur := CWD()
+
+	if parentDir := filepath.Base(filepath.Dir(cur)); parentDir == "x-pack" {
+		tmp := filepath.Join(filepath.Dir(cur), BeatName)
+		return filepath.Join(append([]string{tmp}, path...)...)
+	}
+
 	return OSSBeatDir(append([]string{XPackDir, BeatName}, path...)...)
 }
 
@@ -755,4 +770,54 @@ func binaryExtension(goos string) string {
 		return ".exe"
 	}
 	return ""
+}
+
+var parseVersionRegex = regexp.MustCompile(`(?m)^[^\d]*(?P<major>\d)+\.(?P<minor>\d)+(?:\.(?P<patch>\d)+.*)?$`)
+
+// ParseVersion extracts the major, minor, and optional patch number from a
+// version string.
+func ParseVersion(version string) (major, minor, patch int, err error) {
+	names := parseVersionRegex.SubexpNames()
+	matches := parseVersionRegex.FindStringSubmatch(version)
+	if len(matches) == 0 {
+		err = errors.Errorf("failed to parse version '%v'", version)
+		return
+	}
+
+	data := map[string]string{}
+	for i, match := range matches {
+		data[names[i]] = match
+	}
+	major, _ = strconv.Atoi(data["major"])
+	minor, _ = strconv.Atoi(data["minor"])
+	patch, _ = strconv.Atoi(data["patch"])
+	return
+}
+
+// listModuleDir calls gotool.ListModuleVendorDir or
+// gotool.ListModuleCacheDir, depending on the value of
+// UseVendor.
+func listModuleDir(modpath string) (string, error) {
+	if UseVendor {
+		return gotool.ListModuleVendorDir(modpath)
+	}
+	return gotool.ListModuleCacheDir(modpath)
+}
+
+// ListMatchingEnvVars returns all of the environment variables names that begin
+// with prefix.
+func ListMatchingEnvVars(prefixes ...string) []string {
+	var vars []string
+	for _, v := range os.Environ() {
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(v, prefix) {
+				eqIdx := strings.Index(v, "=")
+				if eqIdx != -1 {
+					vars = append(vars, v[:eqIdx])
+				}
+				break
+			}
+		}
+	}
+	return vars
 }

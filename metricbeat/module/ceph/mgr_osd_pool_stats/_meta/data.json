@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "ceph": {
+        "mgr_osd_pool_stats": {
+            "pool_id": "9",
+            "pool_name": "scbench",
+            "client_io_rate": {
+                "read_bytes_sec": "85",
+                "write_bytes_sec": "802631707",
+                "read_op_per_sec": "0",
+                "write_op_per_sec": "336"
+            }
+        }
+    },
+    "event": {
+        "dataset": "ceph.mgr_osd_pool_stats",
+        "duration": 115000,
+        "module": "ceph"
+    },
+    "metricset": {
+        "name": "mgr_osd_pool_stats"
+    },
+    "service": {
+        "address": "127.0.0.1:8003",
+        "type": "ceph"
+    }
+}

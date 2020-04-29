@@ -10,10 +10,10 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var debugK = "event_reporter"
+const debugK = "event_reporter"
 
 // EventReporter is an object that will periodically send asyncronously events to the
 // CM events endpoints.

@@ -1,0 +1,22 @@
+{{ template "header" . }}
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+
+  - name: System
+
+  - name: Security
+    processors:
+      - script:
+          lang: javascript
+          id: security
+          file: ${path.home}/module/security/config/winlogbeat-security.js
+
+  - name: Microsoft-Windows-Sysmon/Operational
+    processors:
+      - script:
+          lang: javascript
+          id: sysmon
+          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+
+{{if not .Reference}}{{ template "elasticsearch_settings" . }}{{end}}

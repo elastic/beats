@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      # Change this if it is not "/var/log/coredns.log" in native deployment mode
+      - /var/log/coredns.log
+  - name: tags
+    default: [coredns]
+
+ingest_pipeline:
+  - ingest/pipeline-entry.yml
+  - ingest/pipeline-json.yml
+  - ingest/pipeline-plaintext.yml
+input: config/coredns.yml

@@ -41,7 +41,6 @@ class Test(metricbeat.BaseTest):
                     break
 
         t = json.loads(template_content)
-
         properties = t["mappings"]["properties"]
 
         # Check libbeat fields

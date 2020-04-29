@@ -24,10 +24,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 )
 
 type testAsyncDriver struct {
@@ -50,7 +50,7 @@ func TestAsyncStructuredEvent(t *testing.T) {
 }
 
 func makeAsyncTestClient(conn *transport.Client) testClientDriver {
-	config := defaultConfig
+	config := defaultConfig()
 	config.Timeout = 1 * time.Second
 	config.Pipelining = 3
 	client, err := newAsyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)

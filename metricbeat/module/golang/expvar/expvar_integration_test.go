@@ -20,61 +20,45 @@
 package expvar
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+
+	err := mbtest.WriteEventsReporterV2Error(f, t, "")
+	if !assert.NoError(t, err) {
+		t.FailNow()
 	}
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	assert.NotEmpty(t, events)
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":           "golang",
 		"metricsets":       []string{"expvar"},
 		"expvar.namespace": "metricbeat",
-		"hosts":            []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":            []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("GOLANG_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("GOLANG_PORT")
-
-	if len(port) == 0 {
-		port = "6060"
-	}
-	return port
 }

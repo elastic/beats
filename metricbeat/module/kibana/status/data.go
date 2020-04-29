@@ -22,12 +22,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kibana"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 )
 
 var (
@@ -60,24 +60,18 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure parsing Kibana Status API response")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure parsing Kibana Status API response")
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure to apply status schema")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure to apply status schema")
 	}
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("uuid", elastic.Kibana)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("uuid", elastic.Kibana)
 	}
 	event.RootFields.Put("service.id", uuid)
 	dataFields.Delete("uuid")
@@ -85,9 +79,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set service version
 	version, err := dataFields.GetValue("version.number")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("version.number", elastic.Kibana)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("version.number", elastic.Kibana)
 	}
 	event.RootFields.Put("service.version", version)
 	dataFields.Delete("version")

@@ -21,13 +21,16 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestRenameRun(t *testing.T) {
+	log := logp.NewLogger("rename_test")
 	var tests = []struct {
 		description   string
 		Fields        []fromTo
@@ -92,6 +95,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 2,
 				"b": "q",
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
+				},
 			},
 			error:         true,
 			FailOnError:   true,
@@ -188,6 +194,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 9,
 				"c": 10,
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
+				},
 			},
 			error:         true,
 			IgnoreMissing: false,
@@ -228,6 +237,7 @@ func TestRenameRun(t *testing.T) {
 					IgnoreMissing: test.IgnoreMissing,
 					FailOnError:   test.FailOnError,
 				},
+				logger: log,
 			}
 			event := &beat.Event{
 				Fields: test.Input,

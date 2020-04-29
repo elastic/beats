@@ -24,7 +24,8 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 type IndexPatternGenerator struct {
@@ -110,7 +111,7 @@ func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
 }
 
 func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
-	fields, err := common.LoadFields(i.fields)
+	fields, err := mapping.LoadFields(i.fields)
 	if err != nil {
 		return err
 	}

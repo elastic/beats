@@ -1,0 +1,21 @@
+{
+  "description": "Pipeline for testing template directives in pipelines",
+  "processors": [
+    {
+    {<if .parse_time >}
+      "date": {
+        "field": "field_to_parse",
+        "target_field": "@timestamp",
+        "formats": ["EEE MMM dd H:m:s yyyy", "EEE MMM dd H:m:s.SSSSSS yyyy"],
+        "ignore_failure": true
+      }
+    },
+    {< end >}
+    {
+      "remove": {
+        "field": "field_to_remove",
+        "ignore_failure": true
+      }
+    }
+    ]
+}

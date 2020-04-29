@@ -1,12 +1,16 @@
 [[filebeat-configuration-reloading]]
 == Load external configuration files
 
+++++
+<titleabbrev>Config file loading</titleabbrev>
+++++
+
 {beatname_uc} can load external configuration files for inputs and modules,
 allowing you to separate your configuration into multiple smaller
 configuration files. See the <<load-input-config>> and the
 <<load-module-config>> sections for details.
 
-include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
 
 [float]
 [[load-input-config]]
@@ -20,7 +24,7 @@ example:
 ------------------------------------------------------------------------------
 {beatname_lc}.config.inputs:
   enabled: true
-  path: configs/*.yml
+  path: inputs.d/*.yml
 ------------------------------------------------------------------------------
 
 
@@ -129,4 +133,4 @@ set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
-include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]

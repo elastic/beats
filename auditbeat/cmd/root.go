@@ -21,10 +21,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/metricbeat/beater"
-	"github.com/elastic/beats/metricbeat/mb/module"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/metricbeat/beater"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 )
 
 // Name of the beat (auditbeat).
@@ -46,6 +47,11 @@ func init() {
 		),
 	)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", create, runFlags)
+	settings := instance.Settings{
+		RunFlags:      runFlags,
+		Name:          Name,
+		HasDashboards: true,
+	}
+	RootCmd = cmd.GenRootCmdWithSettings(create, settings)
 	RootCmd.AddCommand(ShowCmd)
 }

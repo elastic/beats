@@ -11,6 +11,8 @@
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
+# Configure which S3 endpoint should we use.
+functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
 # Configure which S3 bucket we should upload the lambda artifact.
 functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
@@ -34,8 +36,23 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -52,6 +69,9 @@ functionbeat.provider.aws.functions:
     #processors:
     #  - dissect:
     #      tokenizer: "%{key1} %{key2}"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
 
   # Create a function that accepts events from SQS queues.
   - name: sqs
@@ -71,8 +91,23 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -95,6 +130,9 @@ functionbeat.provider.aws.functions:
     #      overwrite_keys: false
     #
 
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
   # Create a function that accepts events from Kinesis streams.
   - name: kinesis
     enabled: false
@@ -113,8 +151,23 @@ functionbeat.provider.aws.functions:
     # There is a hard limit of 3008MiB for each function. Default is 128MiB.
     #memory_size: 128MiB
 
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+
     # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
     #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
 
     # Optional fields that you can specify to add additional information to the
     # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -122,6 +175,82 @@ functionbeat.provider.aws.functions:
     #fields:
     #  env: staging
 
+    # Define custom processors for this function.
+    #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+  # Create a function that accepts Cloudwatch logs from Kinesis streams.
+  - name: cloudwatch-logs-kinesis
+    enabled: false
+    type: cloudwatch_logs_kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Cloudwatch logs in Kinesis events"
+
+    # Set base64_encoded if your data is base64 encoded.
+    #base64_encoded: false
+
+    # Set compressed if your data is compressed with gzip.
+    #compressed: true
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Tags are key-value pairs attached to the function.
+    #tags:
+    #  department: ops
+
+    # The amount of time the function is allowed to run.
+    #timeout: 3s
+
+    # Execution role of the function.
+    #role: arn:aws:iam::123456789012:role/MyFunction
+
+    # Connect to private resources in an Amazon VPC.
+    #virtual_private_cloud:
+    #  security_group_ids: []
+    #  subnet_ids: []
+    #
     # Define custom processors for this function.
     #processors:
     #  - decode_json_fields:
@@ -143,3 +272,114 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+# Configure functions to run on Google Cloud Platform, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure which region your project is located in.
+functionbeat.provider.gcp.location_id: "europe-west2"
+# Configure which Google Cloud project to deploy your functions.
+functionbeat.provider.gcp.project_id: "my-project-123456"
+# Configure the Google Cloud Storage we should upload the function artifact.
+functionbeat.provider.gcp.storage_name: "functionbeat-deploy"
+
+functionbeat.provider.gcp.functions:
+  # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from Google Pub/Sub.
+  - name: pubsub
+    enabled: false
+    type: pubsub
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Pub/Sub"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    trigger:
+      resource: "projects/_/pubsub/myPubSub"
+      #service: "pubsub.googleapis.com"
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
+
+  # Create a function that accepts events coming from Google Cloud Storage.
+  - name: storage
+    enabled: false
+    type: storage
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Cloud Storage"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    trigger:
+      resource: "projects/my-project/buckets/my-storage"
+      #event_type: "google.storage.object.finalize"
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"

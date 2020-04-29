@@ -17,6 +17,8 @@
 
 package common
 
+import "sort"
+
 type StringSet map[string]struct{}
 
 func MakeStringSet(strings ...string) StringSet {
@@ -48,4 +50,29 @@ func (set StringSet) Has(s string) (exists bool) {
 		_, exists = set[s]
 	}
 	return
+}
+
+// Equals compares this StringSet with another StringSet.
+func (set StringSet) Equals(anotherSet StringSet) bool {
+	if set.Count() != anotherSet.Count() {
+		return false
+	}
+
+	for k := range set {
+		if !anotherSet.Has(k) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// ToSlice returns the items in the set as a sorted slice.
+func (set StringSet) ToSlice() []string {
+	keys := make([]string, 0, len(set))
+	for key := range set {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }

@@ -20,6 +20,7 @@ package fields
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -78,12 +79,17 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 			return nil, err
 		}
 		files = append(files, ymls...)
-		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat/processors")
-		libbeatFieldFiles, err := CollectModuleFiles(libbeatModulesPath)
-		if err != nil {
-			return nil, err
+		libbeatModulesPaths := []string{
+			filepath.Join(esBeatsPath, "libbeat/processors"),
+			filepath.Join(esBeatsPath, "libbeat/autodiscover/providers"),
 		}
-		files = append(files, libbeatFieldFiles...)
+		for _, libbeatModulesPath := range libbeatModulesPaths {
+			libbeatFieldFiles, err := CollectModuleFiles(libbeatModulesPath)
+			if err != nil {
+				return nil, err
+			}
+			files = append(files, libbeatFieldFiles...)
+		}
 	}
 
 	// Fields for custom beats last, to enable overriding more generically defined fields
@@ -99,28 +105,13 @@ func isLibbeat(beatPath string) bool {
 	return filepath.Base(beatPath) == "libbeat"
 }
 
-func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output string) error {
+func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output io.Writer) error {
 	data, err := GenerateFieldsYml(fieldFiles)
 	if err != nil {
 		return err
 	}
 
-	if output == "-" {
-		fw := bufio.NewWriter(os.Stdout)
-		_, err = fw.Write(data)
-		if err != nil {
-			return err
-		}
-		return fw.Flush()
-	}
-
-	f, err := os.Create(output)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	fw := bufio.NewWriter(f)
+	fw := bufio.NewWriter(output)
 	_, err = fw.Write(data)
 	if err != nil {
 		return err
@@ -132,24 +123,32 @@ func writeGeneratedFieldsYml(fieldFiles []*YmlFile, output string) error {
 func GenerateFieldsYml(fieldFiles []*YmlFile) ([]byte, error) {
 	buf := bytes.NewBufferString("")
 	for _, p := range fieldFiles {
-		file, err := os.Open(p.Path)
+		err := generateFieldsYmlForFile(buf, p)
 		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-
-		fs := bufio.NewScanner(file)
-		for fs.Scan() {
-			err = writeIndentedLine(buf, fs.Text()+"\n", p.Indent)
-			if err != nil {
-				return nil, err
-			}
-		}
-		if err := fs.Err(); err != nil {
 			return nil, err
 		}
 	}
 	return buf.Bytes(), nil
+}
+
+func generateFieldsYmlForFile(buf *bytes.Buffer, p *YmlFile) error {
+	file, err := os.Open(p.Path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	fs := bufio.NewScanner(file)
+	for fs.Scan() {
+		err = writeIndentedLine(buf, fs.Text()+"\n", p.Indent)
+		if err != nil {
+			return err
+		}
+	}
+	if err := fs.Err(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {
@@ -159,7 +158,7 @@ func writeIndentedLine(buf *bytes.Buffer, line string, indent int) error {
 }
 
 // Generate collects fields.yml files and concatenates them into one global file.
-func Generate(esBeatsPath, beatPath string, files []*YmlFile, output string) error {
+func Generate(esBeatsPath, beatPath string, files []*YmlFile, output io.Writer) error {
 	files, err := collectCommonFiles(esBeatsPath, beatPath, files)
 	if err != nil {
 		return err

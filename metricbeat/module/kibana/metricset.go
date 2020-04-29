@@ -18,15 +18,13 @@
 package kibana
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // MetricSet can be used to build other metricsets within the Kibana module.
 type MetricSet struct {
 	mb.BaseMetricSet
 	XPackEnabled bool
-	Log          *logp.Logger
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -40,6 +38,5 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{
 		base,
 		config.XPackEnabled,
-		logp.NewLogger(ModuleName),
 	}, nil
 }

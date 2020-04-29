@@ -21,10 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kubernetes"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
@@ -65,6 +65,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				},
 			},
 			"name": pod.PodRef.Name,
+			"uid":  pod.PodRef.UID,
 
 			"cpu": common.MapStr{
 				"usage": common.MapStr{

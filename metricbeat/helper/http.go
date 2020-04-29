@@ -25,38 +25,45 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
+// HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
+// from HTTP endpoint.
 type HTTP struct {
-	base    mb.BaseMetricSet
-	client  *http.Client // HTTP client that is reused across requests.
-	headers map[string]string
-	uri     string
-	method  string
-	body    []byte
+	hostData mb.HostData
+	client   *http.Client // HTTP client that is reused across requests.
+	headers  http.Header
+	name     string
+	uri      string
+	method   string
+	body     []byte
 }
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
-	config := struct {
-		TLS             *tlscommon.Config `config:"ssl"`
-		Timeout         time.Duration     `config:"timeout"`
-		Headers         map[string]string `config:"headers"`
-		BearerTokenFile string            `config:"bearer_token_file"`
-	}{}
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	return newHTTPFromConfig(config, base.Name(), base.HostData())
+}
+
+// newHTTPWithConfig creates a new http helper from some configuration
+func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP, error) {
+	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
+	}
+	for k, v := range config.Headers {
+		headers.Set(k, v)
 	}
 
 	if config.BearerTokenFile != "" {
@@ -64,7 +71,7 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		if err != nil {
 			return nil, err
 		}
-		config.Headers["Authorization"] = header
+		headers.Set("Authorization", header)
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
@@ -72,26 +79,37 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	var dialer, tlsDialer transport.Dialer
+	// Ensure backward compatibility
+	builder := hostData.Transport
+	if builder == nil {
+		builder = dialer.NewDefaultDialerBuilder()
+	}
 
-	dialer = transport.NetDialer(config.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	dialer, err := builder.Make(config.ConnectTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	var tlsDialer transport.Dialer
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HTTP{
-		base: base,
+		hostData: hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
-				Dial:    dialer.Dial,
-				DialTLS: tlsDialer.Dial,
+				Dial:            dialer.Dial,
+				DialTLS:         tlsDialer.Dial,
+				TLSClientConfig: tlsConfig.ToConfig(),
+				Proxy:           http.ProxyFromEnvironment,
 			},
 			Timeout: config.Timeout,
 		},
-		headers: config.Headers,
+		headers: headers,
 		method:  "GET",
-		uri:     base.HostData().SanitizedURI,
+		uri:     hostData.SanitizedURI,
 		body:    nil,
 	}, nil
 }
@@ -107,12 +125,12 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	}
 
 	req, err := http.NewRequest(h.method, h.uri, reader)
-	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
-		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create HTTP request")
 	}
-
-	for k, v := range h.headers {
-		req.Header.Set(k, v)
+	req.Header = h.headers
+	if h.hostData.User != "" || h.hostData.Password != "" {
+		req.SetBasicAuth(h.hostData.User, h.hostData.Password)
 	}
 
 	resp, err := h.client.Do(req)
@@ -125,7 +143,17 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 // SetHeader sets HTTP headers to use in requests
 func (h *HTTP) SetHeader(key, value string) {
-	h.headers[key] = value
+	h.headers.Set(key, value)
+}
+
+// SetHeaderDefault sets HTTP header as default
+//
+// Note: This will only set the header when the header is not already set.
+func (h *HTTP) SetHeaderDefault(key, value string) {
+	c := h.headers.Get(key)
+	if c == "" {
+		h.headers.Set(key, value)
+	}
 }
 
 // SetMethod sets HTTP method to use in requests
@@ -157,7 +185,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.base.Name(), resp.Status)
+		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.name, resp.Status)
 	}
 
 	return ioutil.ReadAll(resp.Body)

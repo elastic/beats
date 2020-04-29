@@ -26,11 +26,12 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys"
-	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/eventlogging"
 )
 
 const (
@@ -39,8 +40,8 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
-var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
-	"read_buffer_size", "format_buffer_size")
+var eventLoggingConfigKeys = common.MakeStringSet(append(commonConfigKeys,
+	"ignore_older", "read_buffer_size", "format_buffer_size")...)
 
 type eventLoggingConfig struct {
 	ConfigCommon     `config:",inline"`
@@ -277,6 +278,8 @@ func (l *eventLogging) ignoreOlder(r *Record) bool {
 // newEventLogging creates and returns a new EventLog for reading event logs
 // using the Event Logging API.
 func newEventLogging(options *common.Config) (EventLog, error) {
+	cfgwarn.Deprecate("8.0", "The eventlogging API reader is deprecated.")
+
 	c := eventLoggingConfig{
 		ReadBufferSize:   win.MaxEventBufferSize,
 		FormatBufferSize: win.MaxFormatMessageBufferSize,

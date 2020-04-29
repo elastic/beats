@@ -13,7 +13,8 @@ Translations:
 Type: output
 
 {
-    "configuration_blocks": [
+	  "success": true,
+    "list": [
 
         {
             "config": {
@@ -42,8 +43,8 @@ YAML representation:
 Type: *.modules
 
 {
-    "configuration_blocks": [
-
+	  "success": true,
+    "list": [
         {
             "config": {
               "_sub_type": "system"

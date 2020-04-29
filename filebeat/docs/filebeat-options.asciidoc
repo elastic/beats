@@ -2,7 +2,7 @@
 == Configure inputs
 
 ++++
-<titleabbrev>Configure inputs</titleabbrev>
+<titleabbrev>Inputs</titleabbrev>
 ++++
 
 TIP: <<{beatname_lc}-modules-overview,{beatname_uc} modules>> provide the
@@ -44,18 +44,31 @@ You can configure {beatname_uc} to use the following inputs:
 
 * <<{beatname_lc}-input-log>>
 * <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-container>>
+* <<{beatname_lc}-input-kafka>>
 * <<{beatname_lc}-input-redis>>
 * <<{beatname_lc}-input-udp>>
 * <<{beatname_lc}-input-docker>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-syslog>>
+* <<{beatname_lc}-input-mqtt>>
+* <<{beatname_lc}-input-s3>>
 * <<{beatname_lc}-input-netflow>>
+* <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-azure-eventhub>>
+* <<{beatname_lc}-input-cloudfoundry>>
+* <<{beatname_lc}-input-o365audit>>
 
 
+include::multiline.asciidoc[]
 
 include::inputs/input-log.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
+
+include::inputs/input-container.asciidoc[]
+
+include::inputs/input-kafka.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
 
@@ -67,4 +80,16 @@ include::inputs/input-tcp.asciidoc[]
 
 include::inputs/input-syslog.asciidoc[]
 
+include::inputs/input-mqtt.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]

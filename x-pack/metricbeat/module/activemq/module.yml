@@ -1,0 +1,5 @@
+name: activemq
+metricsets:
+- broker
+- queue
+- topic

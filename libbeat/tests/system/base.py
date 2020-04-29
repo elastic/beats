@@ -1,5 +1,6 @@
 import os
 from beat.beat import TestCase
+from elasticsearch import Elasticsearch, NotFoundError
 
 
 class BaseTest(TestCase):
@@ -16,4 +17,12 @@ class BaseTest(TestCase):
             "packetbeat",
             "winlogbeat"
         ]
+        self._es = None
         super(BaseTest, self).setUpClass()
+
+    def es_client(self):
+        if self._es:
+            return self._es
+
+        self._es = Elasticsearch([self.get_elasticsearch_url()])
+        return self._es

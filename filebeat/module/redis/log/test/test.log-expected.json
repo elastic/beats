@@ -1,8 +1,14 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
@@ -13,9 +19,15 @@
         "service.type": "redis"
     },
     {
-        "ecs.version": "1.0.0-beta2",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "debug",
@@ -24,9 +36,15 @@
         "service.type": "redis"
     },
     {
-        "ecs.version": "1.0.0-beta2",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
@@ -35,9 +53,15 @@
         "service.type": "redis"
     },
     {
-        "ecs.version": "1.0.0-beta2",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 250,

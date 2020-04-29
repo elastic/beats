@@ -32,7 +32,7 @@ var accelerateOpBlacklist = operationBlacklist{
 // Request handler to automatically add the bucket name to the endpoint domain
 // if possible. This style of bucket is valid for all bucket names which are
 // DNS compatible and do not contain "."
-func buildUpdateEndpointForS3Config(c *S3) func(*aws.Request) {
+func buildUpdateEndpointForS3Config(c *Client) func(*aws.Request) {
 	forceHostStyle := c.ForcePathStyle
 	accelerate := c.UseAccelerate
 

@@ -15,16 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !windows
+// +build !windows,!integration
 
 package log
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/common/match"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -163,9 +162,3 @@ func TestInit(t *testing.T) {
 		assert.Equal(t, test.count, p.states.Count())
 	}
 }
-
-// TestOutlet is an empty outlet for testing
-type TestOutlet struct{}
-
-func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
-func (o TestOutlet) Close() error                  { return nil }

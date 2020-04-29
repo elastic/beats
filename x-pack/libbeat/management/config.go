@@ -11,7 +11,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 // ManagedConfigTemplate is used to overwrite settings file during enrollment
@@ -50,26 +50,40 @@ const ManagedConfigTemplate = `
 # "publish", "service".
 #logging.selectors: ["*"]
 
-#============================== Xpack Monitoring ===============================
+#============================== X-Pack Monitoring ===============================
 # {{.BeatName}} can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 `
 
-// Config for central management
+const (
+	// ModeCentralManagement is a default CM mode, using existing processes.
+	ModeCentralManagement = "x-pack-cm"
+
+	// ModeFleet is a management mode where fleet is used to retrieve configurations.
+	ModeFleet = "x-pack-fleet"
+)
+
+// Config for central management.
 type Config struct {
 	// true when enrolled
 	Enabled bool `config:"enabled" yaml:"enabled"`
+
+	// Mode specifies whether beat uses Central Management or Fleet.
+	// Options: [cm, fleet]
+	Mode string `config:"mode" yaml:"mode"`
 
 	// Poll configs period
 	Period time.Duration `config:"period" yaml:"period"`
@@ -91,6 +105,7 @@ type EventReporterConfig struct {
 
 func defaultConfig() *Config {
 	return &Config{
+		Mode:   ModeCentralManagement,
 		Period: 60 * time.Second,
 		EventsReporter: EventReporterConfig{
 			Period:       30 * time.Second,
@@ -109,7 +124,7 @@ type templateParams struct {
 	BeatName                  string
 }
 
-// OverwriteConfigFile will overwrite beat settings file with the enrolled template
+// OverwriteConfigFile will overwrite beat settings file with the enrolled template.
 func (c *Config) OverwriteConfigFile(wr io.Writer, beatName string) error {
 	t := template.Must(template.New("beat.management.yml").Parse(ManagedConfigTemplate))
 

@@ -22,12 +22,12 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
@@ -63,7 +63,7 @@ var (
 	}
 )
 
-func eventMapping(response io.Reader, r mb.ReporterV2) {
+func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
@@ -72,7 +72,7 @@ func eventMapping(response io.Reader, r mb.ReporterV2) {
 		if match := paramMatcher.FindStringSubmatch(scanner.Text()); len(match) == 3 {
 			fullEvent[match[1]] = match[2]
 		} else {
-			logp.Warn("Unexpected line in mntr output: %s", scanner.Text())
+			logger.Infof("Unexpected line in mntr output: %s", scanner.Text())
 		}
 	}
 

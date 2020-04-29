@@ -20,7 +20,7 @@ package reader
 import (
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
+	"github.com/elastic/beats/v7/journalbeat/config"
 )
 
 // Config stores the options of a reder.
@@ -39,6 +39,8 @@ type Config struct {
 	Backoff time.Duration
 	// Matches store the key value pairs to match entries.
 	Matches []string
+	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
+	SaveRemoteHostname bool
 }
 
 const (

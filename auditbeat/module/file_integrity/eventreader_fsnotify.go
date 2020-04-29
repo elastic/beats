@@ -26,8 +26,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/module/file_integrity/monitor"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/monitor"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type reader struct {

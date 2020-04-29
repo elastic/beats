@@ -18,29 +18,39 @@
 package beater
 
 import (
+	"io"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 )
 
 type eventLogger struct {
 	source     eventlog.EventLog
 	eventMeta  common.EventMetadata
 	processors beat.ProcessorList
+	keepNull   bool
 }
 
 type eventLoggerConfig struct {
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-	Processors           processors.PluginConfig `config:"processors"`
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+
+	Processors processors.PluginConfig  `config:"processors"`
+	Index      fmtstr.EventFormatString `config:"index"`
+
+	// KeepNull determines whether published events will keep null values or omit them.
+	KeepNull bool `config:"keep_null"`
 }
 
 func newEventLogger(
+	beatInfo beat.Info,
 	source eventlog.EventLog,
 	options *common.Config,
 ) (*eventLogger, error) {
@@ -49,7 +59,7 @@ func newEventLogger(
 		return nil, err
 	}
 
-	processors, err := processors.New(config.Processors)
+	processors, err := processorsForConfig(beatInfo, config)
 	if err != nil {
 		return nil, err
 	}
@@ -64,10 +74,13 @@ func newEventLogger(
 func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 	api := e.source.Name()
 	return pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: e.eventMeta,
-		Meta:          nil, // TODO: configure modules/ES ingest pipeline?
-		Processor:     e.processors,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: e.eventMeta,
+			Meta:          nil, // TODO: configure modules/ES ingest pipeline?
+			Processor:     e.processors,
+			KeepNull:      e.keepNull,
+		},
 		ACKCount: func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)
@@ -79,6 +92,7 @@ func (e *eventLogger) run(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
+	acker *eventACKer,
 ) {
 	api := e.source
 
@@ -116,7 +130,7 @@ func (e *eventLogger) run(
 
 	debugf("EventLog[%s] opened successfully", api.Name())
 
-	for {
+	for stop := false; !stop; {
 		select {
 		case <-done:
 			return
@@ -125,21 +139,53 @@ func (e *eventLogger) run(
 
 		// Read from the event.
 		records, err := api.Read()
-		if err != nil {
+		switch err {
+		case nil:
+		case io.EOF:
+			// Graceful stop.
+			stop = true
+		default:
 			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
-			break
+			return
 		}
 
 		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 		if len(records) == 0 {
-			// TODO: Consider implementing notifications using
-			// NotifyChangeEventLog instead of polling.
 			time.Sleep(time.Second)
 			continue
 		}
 
+		acker.Add(len(records))
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
 		}
 	}
+}
+
+// processorsForConfig assembles the Processors for an eventLogger.
+func processorsForConfig(
+	beatInfo beat.Info, config eventLoggerConfig,
+) (*processors.Processors, error) {
+	procs := processors.NewList(nil)
+
+	// Processor order is important! The index processor, if present, must be
+	// added before the user processors.
+	if !config.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor := add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(indexProcessor)
+	}
+
+	userProcs, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, err
+	}
+	procs.AddProcessors(*userProcs)
+
+	return procs, nil
 }

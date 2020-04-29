@@ -170,13 +170,8 @@
             },
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "http.response.status_code: [300 TO *]"
-                }
-              }
+              "language": "kuery",
+              "query": "http.response.status_code >= 300"
             }
           }
         },
@@ -365,7 +360,7 @@
             },
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -513,13 +508,8 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -549,7 +539,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -614,7 +604,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -698,7 +688,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -802,8 +792,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": "*"
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -829,13 +819,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }

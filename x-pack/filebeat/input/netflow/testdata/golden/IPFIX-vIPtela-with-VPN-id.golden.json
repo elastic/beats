@@ -52,7 +52,7 @@
           "source_transport_port": 41717,
           "tcp_control_bits": 16,
           "type": "netflow_flow",
-          "viptela_vpin_d": 100
+          "viptela_vpn_id": 100
         },
         "network": {
           "bytes": 775,
@@ -66,12 +66,15 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 775,
           "ip": "10.113.7.54",
           "locality": "private",
+          "packets": 8,
           "port": 41717
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

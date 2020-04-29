@@ -7,7 +7,7 @@ var:
     os.darwin: [""]
     os.windows: []
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/log.yml
 
 requires.processors:

@@ -19,19 +19,18 @@ package export
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/dashboards"
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/dashboards"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
-func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
+func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "dashboard",
 		Short: "Export defined dashboard to stdout",
@@ -40,15 +39,9 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 			yml, _ := cmd.Flags().GetString("yml")
 			decode, _ := cmd.Flags().GetBool("decode")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error creating beat: %s\n", err)
-				os.Exit(1)
-			}
-			err = b.Init()
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
+				fatalfInitCmd(err)
 			}
 
 			// Use empty config to use default configs if not set
@@ -58,16 +51,14 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 
 			client, err := kibana.NewKibanaClient(b.Config.Kibana)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error creating Kibana client: %+v\n", err)
-				os.Exit(1)
+				fatalf("Error creating Kibana client: %+v.\n", err)
 			}
 
 			// Export dashboards from yml file
 			if yml != "" {
 				results, info, err := dashboards.ExportAllFromYml(client, yml)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error getting dashboards from yml: %+v\n", err)
-					os.Exit(1)
+					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
 				for i, r := range results {
 					if decode {
@@ -76,9 +67,8 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
-						fmt.Fprintf(os.Stderr, "Error saving dashboard '%s' to file '%s' : %+v\n",
+						fatalf("Error saving dashboard '%s' to file '%s' : %+v.\n",
 							info.Dashboards[i].ID, info.Dashboards[i].File, err)
-						os.Exit(1)
 					}
 				}
 				return
@@ -88,8 +78,7 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 			if dashboard != "" {
 				result, err := dashboards.Export(client, dashboard)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error getting dashboard: %+v\n", err)
-					os.Exit(1)
+					fatalf("Error exporting dashboard: %+v.\n", err)
 				}
 
 				if decode {

@@ -1,0 +1,18 @@
+- name: ios
+  type: group
+  description: >
+    Fields for Cisco IOS logs.
+  fields:
+  - name: access_list
+    type: keyword
+    description: >
+      Name of the IP access list.
+
+  - name: facility
+    type: keyword
+    example: SEC
+    description: >
+      The facility to which the message refers (for example, SNMP, SYS, and so
+      forth). A facility can be a hardware device, a protocol, or a module of
+      the system software. It denotes the source or the cause of the system
+      message.

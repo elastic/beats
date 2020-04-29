@@ -65,6 +65,10 @@ var tlsCipherSuites = map[string]tlsCipherSuite{
 	"RSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_GCM_SHA256),
 	"RSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_CBC_SHA),
 	"RSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_GCM_SHA384),
+
+	"TLS-AES-128-GCM-SHA256":       tlsCipherSuite(tls.TLS_AES_128_GCM_SHA256),
+	"TLS-AES-256-GCM-SHA384":       tlsCipherSuite(tls.TLS_AES_256_GCM_SHA384),
+	"TLS-CHACHA20-POLY1305-SHA256": tlsCipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
 }
 
 var tlsCipherSuitesInverse = make(map[tlsCipherSuite]string, len(tlsCipherSuites))
@@ -99,23 +103,6 @@ var tlsRenegotiationSupportTypes = map[string]tlsRenegotiationSupport{
 	"freely": tlsRenegotiationSupport(tls.RenegotiateFreelyAsClient),
 }
 
-// TLSVersion type for TLS version.
-type TLSVersion uint16
-
-// Define all the possible TLS version.
-const (
-	TLSVersionSSL30 TLSVersion = tls.VersionSSL30
-	TLSVersion10    TLSVersion = tls.VersionTLS10
-	TLSVersion11    TLSVersion = tls.VersionTLS11
-	TLSVersion12    TLSVersion = tls.VersionTLS12
-)
-
-// TLSDefaultVersions list of versions of TLS we should support.
-var TLSDefaultVersions = []TLSVersion{
-	TLSVersion11,
-	TLSVersion12,
-}
-
 type tlsClientAuth int
 
 const (
@@ -128,22 +115,6 @@ var tlsClientAuthTypes = map[string]tlsClientAuth{
 	"none":     tlsClientAuthNone,
 	"optional": tlsClientAuthOptional,
 	"required": tlsClientAuthRequired,
-}
-
-var tlsProtocolVersions = map[string]TLSVersion{
-	"SSLv3":   TLSVersionSSL30,
-	"SSLv3.0": TLSVersionSSL30,
-	"TLSv1":   TLSVersion10,
-	"TLSv1.0": TLSVersion10,
-	"TLSv1.1": TLSVersion11,
-	"TLSv1.2": TLSVersion12,
-}
-
-var tlsProtocolVersionsInverse = map[TLSVersion]string{
-	TLSVersionSSL30: "SSLv3",
-	TLSVersion10:    "TLSv1.0",
-	TLSVersion11:    "TLSv1.1",
-	TLSVersion12:    "TLSv1.2",
 }
 
 // TLSVerificationMode represents the type of verification to do on the remote host,
@@ -161,24 +132,6 @@ const (
 	//       postVerifyTLSConnection
 	// VerifyCertificate
 )
-
-func (v TLSVersion) String() string {
-	if s, ok := tlsProtocolVersionsInverse[v]; ok {
-		return s
-	}
-	return "unknown"
-}
-
-//Unpack transforms the string into a constant.
-func (v *TLSVersion) Unpack(s string) error {
-	version, found := tlsProtocolVersions[s]
-	if !found {
-		return fmt.Errorf("invalid tls version '%v'", s)
-	}
-
-	*v = version
-	return nil
-}
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
 	"":     VerifyFull,

@@ -6,7 +6,7 @@ package system
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
+	"encoding/base64"
 	"hash"
 )
 
@@ -20,7 +20,12 @@ func NewEntityHash() EntityHash {
 	return EntityHash{sha256.New()}
 }
 
-// Sum returns the hash as a string.
+// Sum returns the base64 representation of the hash,
+// truncated to 12 bytes.
 func (h *EntityHash) Sum() string {
-	return hex.EncodeToString(h.Hash.Sum(nil))
+	hash := h.Hash.Sum(nil)
+	if len(hash) > 12 {
+		hash = hash[:12]
+	}
+	return base64.RawStdEncoding.EncodeToString(hash)
 }

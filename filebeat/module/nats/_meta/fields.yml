@@ -1,0 +1,11 @@
+- key: nats
+  title: "nats"
+  description: >
+    Module for parsing NATS log files.
+  release: beta
+  fields:
+    - name: nats
+      type: group
+      description: >
+        Fields from NATS logs.
+      fields:

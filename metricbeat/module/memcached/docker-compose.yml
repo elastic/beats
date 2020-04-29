@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  memcached:
+    image: docker.elastic.co/integrations-ci/beats-memcached:${MEMCACHED_VERSION:-1.4.35}-1
+    build:
+      context: ./_meta
+      args:
+        MEMCACHED_VERSION: ${MEMCACHED_VERSION:-1.4.35}
+    ports:
+      - 11211

@@ -19,8 +19,9 @@
 
 package ecs
 
-// Geo fields can carry data about a specific location related to an event or
-// geo information derived from an IP field.
+// Geo fields can carry data about a specific location related to an event.
+// This geolocation information can be derived from techniques such as Geo IP,
+// or be user-supplied.
 type Geo struct {
 	// Longitude and latitude.
 	Location string `ecs:"location"`

@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/capture_loss.log
+    os.linux:
+      - /var/log/bro/current/capture_loss.log
+    os.darwin:
+      - /usr/local/var/logs/current/capture_loss.log
+  - name: tags
+    default: [zeek.capture_loss]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/capture_loss.yml

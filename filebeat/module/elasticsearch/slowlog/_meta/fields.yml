@@ -51,3 +51,6 @@
     description: "Type"
     example: "doc"
     type: keyword
+  - name: source
+    description: Source of document that was indexed
+    type: keyword

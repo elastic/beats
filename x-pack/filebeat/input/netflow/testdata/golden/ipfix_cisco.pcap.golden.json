@@ -5,9 +5,17 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 719,
+          "packets": 5
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -56,24 +64,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 719,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 5,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 719,
+          "packets": 5
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1477,
+          "packets": 6
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -122,24 +149,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 1477,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 1477,
+          "packets": 6
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1,
+          "packets": 1
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 1
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -188,24 +234,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 1,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 2,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 1
+        },
+        "source": {
+          "bytes": 1,
+          "packets": 1
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 108580,
+          "packets": 79
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -254,24 +319,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 108580,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 79,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 108580,
+          "packets": 79
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 342,
+          "packets": 5
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -320,24 +404,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 342,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 5,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 342,
+          "packets": 5
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1851,
+          "packets": 17
+        },
+        "destination": {
+          "bytes": 9437,
+          "packets": 18
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -386,24 +489,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 11288,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 35,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 9437,
+          "packets": 18
+        },
+        "source": {
+          "bytes": 1851,
+          "packets": 17
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 51480,
+          "packets": 39
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -452,24 +574,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 51480,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 39,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 51480,
+          "packets": 39
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 5135,
+          "packets": 55
+        },
+        "destination": {
+          "bytes": 36894,
+          "packets": 47
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -518,24 +659,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 42029,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 102,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 36894,
+          "packets": 47
+        },
+        "source": {
+          "bytes": 5135,
+          "packets": 55
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 6533,
+          "packets": 14
+        },
+        "destination": {
+          "bytes": 6400,
+          "packets": 20
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -584,24 +744,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 12933,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 34,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 6400,
+          "packets": 20
+        },
+        "source": {
+          "bytes": 6533,
+          "packets": 14
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 5684,
+          "packets": 491
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -650,24 +829,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 5684,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 491,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 5684,
+          "packets": 491
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 4965,
+          "packets": 13
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -716,24 +914,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 4965,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 13,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 4965,
+          "packets": 13
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 138,
+          "packets": 4
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 2
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -782,24 +999,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 138,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 2
+        },
+        "source": {
+          "bytes": 138,
+          "packets": 4
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1,
+          "packets": 1
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -848,24 +1084,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 1,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 1,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 1,
+          "packets": 1
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 6079,
+          "packets": 10
+        },
+        "destination": {
+          "bytes": 1571,
+          "packets": 13
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -914,24 +1169,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 7650,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 23,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 1571,
+          "packets": 13
+        },
+        "source": {
+          "bytes": 6079,
+          "packets": 10
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 2807,
+          "packets": 6
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -980,24 +1254,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 2807,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 2807,
+          "packets": 6
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 0,
+          "packets": 1
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1046,24 +1339,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 0,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 1,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 0,
+          "packets": 1
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1877,
+          "packets": 11
+        },
+        "destination": {
+          "bytes": 3409,
+          "packets": 7
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1112,24 +1424,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 5286,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 18,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 3409,
+          "packets": 7
+        },
+        "source": {
+          "bytes": 1877,
+          "packets": 11
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 2255,
+          "packets": 7
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1178,24 +1509,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 2255,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 7,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 2255,
+          "packets": 7
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 538,
+          "packets": 5
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 0
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1244,24 +1594,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 538,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 5,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 0
+        },
+        "source": {
+          "bytes": 538,
+          "packets": 5
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1487,
+          "packets": 21
+        },
+        "destination": {
+          "bytes": 6305,
+          "packets": 15
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1310,24 +1679,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 7792,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 36,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 6305,
+          "packets": 15
+        },
+        "source": {
+          "bytes": 1487,
+          "packets": 21
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 3110,
+          "packets": 7
+        },
+        "destination": {
+          "bytes": 1973,
+          "packets": 10
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1376,24 +1764,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 5083,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 17,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 1973,
+          "packets": 10
+        },
+        "source": {
+          "bytes": 3110,
+          "packets": 7
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 2,
+          "packets": 4
+        },
+        "destination": {
+          "bytes": 2,
+          "packets": 4
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1442,24 +1849,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 4,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 8,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 2,
+          "packets": 4
+        },
+        "source": {
+          "bytes": 2,
+          "packets": 4
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 2,
+          "packets": 2
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 2
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1508,24 +1934,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 2,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 4,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 2
+        },
+        "source": {
+          "bytes": 2,
+          "packets": 2
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 0,
+          "packets": 4
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 2
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1574,24 +2019,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 0,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 2
+        },
+        "source": {
+          "bytes": 0,
+          "packets": 4
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 1005,
+          "packets": 4
+        },
+        "destination": {
+          "bytes": 174,
+          "packets": 3
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1640,24 +2104,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 1179,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 7,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 174,
+          "packets": 3
+        },
+        "source": {
+          "bytes": 1005,
+          "packets": 4
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 138,
+          "packets": 4
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 2
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1706,24 +2189,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 138,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 2
+        },
+        "source": {
+          "bytes": 138,
+          "packets": 4
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 31,
+          "packets": 2
+        },
+        "destination": {
+          "bytes": 0,
+          "packets": 1
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1772,24 +2274,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 31,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 3,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 0,
+          "packets": 1
+        },
+        "source": {
+          "bytes": 31,
+          "packets": 2
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 13482,
+          "packets": 17
+        },
+        "destination": {
+          "bytes": 8989,
+          "packets": 19
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1838,24 +2359,43 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 22471,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 36,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 8989,
+          "packets": 19
+        },
+        "source": {
+          "bytes": 13482,
+          "packets": 17
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
+        "client": {
+          "bytes": 28373,
+          "packets": 133
+        },
+        "destination": {
+          "bytes": 233345,
+          "packets": 236
+        },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": "network_session",
           "created": "2018-07-03T10:47:00Z",
           "kind": "event"
         },
@@ -1904,16 +2444,27 @@
           "waasoptimization_segment": 16
         },
         "network": {
+          "bytes": 261718,
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
           "iana_number": 6,
+          "packets": 369,
           "transport": "tcp"
         },
         "observer": {
           "ip": "10.101.255.2"
+        },
+        "server": {
+          "bytes": 233345,
+          "packets": 236
+        },
+        "source": {
+          "bytes": 28373,
+          "packets": 133
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

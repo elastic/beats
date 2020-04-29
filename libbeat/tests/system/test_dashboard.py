@@ -1,12 +1,14 @@
-from base import BaseTest
 import os
 import os.path
-import subprocess
-from nose.plugins.attrib import attr
-import unittest
-from unittest import SkipTest
+import re
 import requests
 import semver
+import subprocess
+import unittest
+
+from base import BaseTest
+from nose.plugins.attrib import attr
+from unittest import SkipTest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -188,7 +190,8 @@ class Test(BaseTest):
 
         beat.check_wait(exit_code=1)
 
-        assert self.log_contains("Error getting dashboard: error exporting dashboard: Not found") is True
+        expected_error = re.compile("error exporting dashboard:.*not found", re.IGNORECASE)
+        assert self.log_contains(expected_error)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -242,7 +245,7 @@ class Test(BaseTest):
         )
 
         beat.check_wait(exit_code=1)
-        assert self.log_contains("Error getting dashboards from yml")
+        assert self.log_contains("Error exporting dashboards from yml")
         assert self.log_contains("error opening the list of dashboards")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -361,8 +364,8 @@ class Test(BaseTest):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
             "/api/spaces/space"
         data = {
-            "id": "foo-bar",
-            "name": "Foo bar space"
+            "id": "libbeat-system-tests",
+            "name": "Libbeat System Tests"
         }
 
         headers = {
@@ -370,7 +373,8 @@ class Test(BaseTest):
         }
 
         r = requests.post(url, json=data, headers=headers)
-        assert r.status_code == 200
+        if r.status_code != 200 and r.status_code != 409:
+            self.fail('Bad Kibana status code when creating space: {}'.format(r.status_code))
 
     def get_version(self):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \

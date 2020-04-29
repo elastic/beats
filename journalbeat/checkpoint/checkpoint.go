@@ -32,8 +32,8 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 // Checkpoint persists event log state information to disk.
@@ -138,6 +138,14 @@ func (c *Checkpoint) findRegistryFile() error {
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("error accessing previous registry file: %+v", err)
+	}
+
+	// if two files are the same, do not do anything
+	migratedFs, err := os.Stat(migratedPath)
+	if err == nil {
+		if os.SameFile(fs, migratedFs) {
+			return nil
+		}
 	}
 
 	f, err := os.Open(c.file)

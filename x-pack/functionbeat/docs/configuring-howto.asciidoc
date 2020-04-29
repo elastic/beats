@@ -1,81 +1,67 @@
 [id="configuring-howto-{beatname_lc}"]
 [role="xpack"]
-= Configuring {beatname_uc}
+= Configure {beatname_uc}
 
 [partintro]
 --
+++++
+<titleabbrev>Configure</titleabbrev>
+++++
+
 Before modifying configuration settings, make sure you've completed the
 <<{beatname_lc}-configuration,configuration steps>> in the Getting Started.
 This section describes some common use cases for changing configuration options.
 
-include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared-configuring.asciidoc[]
 
 The following topics describe how to configure {beatname_uc}:
 
 * <<configuration-{beatname_lc}-options>>
+* <<configuration-{beatname_lc}-gcp-options>>
 * <<configuration-general-options>>
-* <<configuring-internal-queue>>
 * <<configuring-output>>
-* <<ilm>>
 * <<configuration-ssl>>
-* <<filtering-and-enhancing-data>>
-* <<configuring-ingest-node>>
-* <<setup-kibana-endpoint>>
+* <<ilm>>
 * <<configuration-template>>
+* <<filtering-and-enhancing-data>>
+* <<configuring-internal-queue>>
 * <<configuration-logging>>
-* <<using-environ-vars>>
-* <<yaml-tips>>
 * <<regexp-support>>
 * <<{beatname_lc}-reference-yml>>
 
 --
 
-include::./config-options.asciidoc[]
+include::./config-options-aws.asciidoc[]
+
+include::./config-options-gcp.asciidoc[]
 
 include::./general-options.asciidoc[]
 
-:allplatforms:
 [role="xpack"]
-include::{libbeat-dir}/docs/queueconfig.asciidoc[]
-:allplatforms!:
+include::{libbeat-dir}/outputconfig.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/shared-ssl-config.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
+include::{libbeat-dir}/shared-ilm.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/setup-config.asciidoc[]
 
+[role="xpack"]
 include::./filtering.asciidoc[]
 
-[role="xpack"]
-include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/docs/setup-config.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
-
-:standalone:
-[role="xpack"]
-include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
-:standalone!:
-
-:standalone:
 :allplatforms:
 [role="xpack"]
-include::{libbeat-dir}/docs/yaml.asciidoc[]
-:standalone!:
+include::{libbeat-dir}/queueconfig.asciidoc[]
 :allplatforms!:
 
 [role="xpack"]
-include::{libbeat-dir}/docs/regexp.asciidoc[]
+include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 [role="xpack"]
-include::{libbeat-dir}/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/regexp.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/reference-yml.asciidoc[]

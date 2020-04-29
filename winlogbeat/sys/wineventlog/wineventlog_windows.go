@@ -27,16 +27,18 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // Errors
 var (
 	// ErrorEvtVarTypeNull is an error that means the content of the EVT_VARIANT
 	// data is null.
-	ErrorEvtVarTypeNull = errors.New("Null EVT_VARIANT data")
+	ErrorEvtVarTypeNull = errors.New("null EVT_VARIANT data")
 )
 
 // bookmarkTemplate is a parameterized string that requires two parameters,
@@ -103,6 +105,44 @@ loop:
 	return channels, nil
 }
 
+// EvtOpenLog gets a handle to a channel or log file that you can then use to
+// get information about the channel or log file.
+func EvtOpenLog(session EvtHandle, path string, flags EvtOpenLogFlag) (EvtHandle, error) {
+	var err error
+	var pathPtr *uint16
+	if path != "" {
+		pathPtr, err = syscall.UTF16PtrFromString(path)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return _EvtOpenLog(session, pathPtr, uint32(flags))
+}
+
+// EvtQuery runs a query to retrieve events from a channel or log file that
+// match the specified query criteria.
+func EvtQuery(session EvtHandle, path string, query string, flags EvtQueryFlag) (EvtHandle, error) {
+	var err error
+	var pathPtr *uint16
+	if path != "" {
+		pathPtr, err = syscall.UTF16PtrFromString(path)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	var queryPtr *uint16
+	if query != "" {
+		queryPtr, err = syscall.UTF16PtrFromString(query)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return _EvtQuery(session, pathPtr, queryPtr, uint32(flags))
+}
+
 // Subscribe creates a new subscription to an event log channel.
 func Subscribe(
 	session EvtHandle,
@@ -136,6 +176,12 @@ func Subscribe(
 	}
 
 	return eventHandle, nil
+}
+
+// EvtSeek seeks to a specific event in a query result set.
+func EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, flags EvtSeekFlag) error {
+	_, err := _EvtSeek(resultSet, position, bookmark, 0, uint32(flags))
+	return err
 }
 
 // EventHandles reads the event handles from a subscription. It attempt to read
@@ -370,7 +416,7 @@ func FormatEventString(
 
 	// This assumes there is only a single string value to read. This will
 	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
-	return sys.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
+	return common.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
 }
 
 // offset reads a pointer value from the reader then calculates an offset from
@@ -461,5 +507,5 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 			"to the buffer, but the buffer can only hold %d bytes",
 			bufferUsed, len(renderBuf))
 	}
-	return sys.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+	return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }

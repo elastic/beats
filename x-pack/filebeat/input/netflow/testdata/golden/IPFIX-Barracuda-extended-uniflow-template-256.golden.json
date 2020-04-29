@@ -71,13 +71,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 0,
           "ip": "10.236.5.4",
           "locality": "private",
           "mac": "00:50:56:b9:26:46",
+          "packets": 0,
           "port": 51917
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2018-04-18T08:16:47Z",
@@ -149,13 +152,16 @@
           "ip": "192.0.2.1"
         },
         "source": {
+          "bytes": 0,
           "ip": "64.235.151.76",
           "locality": "public",
           "mac": "00:00:00:00:00:00",
+          "packets": 0,
           "port": 443
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

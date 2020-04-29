@@ -4,7 +4,7 @@ ifeval::["{has-dashboards}"=="true"]
 .. Open your browser and navigate to the *Dashboard* overview in {kib}:
 http://localhost:5601/app/kibana#/dashboards[http://localhost:5601/app/kibana#/dashboards].
 Replace `localhost` with the name of the {kib} host. If you're using an
-https://cloud.elastic.co/[Elastic Cloud] instance, log in to your cloud account,
+https://cloud.elastic.co/[{ecloud}] instance, log in to your cloud account,
 then navigate to the {kib} endpoint in your deployment.
 .. If necessary, log in with your {kib} username and password.
 .. Enter the module name in the search box, then open a dashboard and explore

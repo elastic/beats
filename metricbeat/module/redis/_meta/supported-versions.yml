@@ -1,0 +1,4 @@
+variants:
+  - REDIS_VERSION: 3.2.12
+  - REDIS_VERSION: 4.0.11
+  - REDIS_VERSION: 5.0.5

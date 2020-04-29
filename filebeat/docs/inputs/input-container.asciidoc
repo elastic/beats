@@ -1,0 +1,64 @@
+:type: container
+
+[id="{beatname_lc}-input-{type}"]
+=== Container input
+
+++++
+<titleabbrev>Container</titleabbrev>
+++++
+
+Use the `container` input to read containers log files.
+
+This input searches for container logs under the given path, and parse them into
+common message lines, extracting timestamps too. Everything happens before line
+filtering, multiline, and JSON decoding, so this input can be used in
+combination with those settings.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container
+  paths: <1>
+    - '/var/lib/docker/containers/*/*.log'
+----
+
+<1> `paths` is required. All other settings are optional.
+
+==== Configuration options
+
+The `container` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+===== `stream`
+
+Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+===== `format`
+
+Use the given format when reading the log file: `auto`, `docker` or `cri`. The
+default is `auto`, it will automatically detect the format. To disable
+autodetection set any of the other options.
+
+
+The following input configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Kubernetes logs path:
+
+[source,yaml]
+----
+- type: container
+  stream: stdout
+  paths:
+    - "/var/log/containers/*.log"
+----
+
+include::../inputs/input-common-harvester-options.asciidoc[]
+
+include::../inputs/input-common-file-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

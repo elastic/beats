@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetchDataUnixSock(t *testing.T) {
@@ -57,9 +57,11 @@ func TestFetchDataUnixSock(t *testing.T) {
 		"hosts":      []string{"unix://" + listener.Addr().String()},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
 
 	assertTestData(t, events)
 	wg.Wait()

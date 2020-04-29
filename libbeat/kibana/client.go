@@ -19,6 +19,7 @@ package kibana
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,20 +31,19 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type Connection struct {
 	URL      string
 	Username string
 	Password string
-	Headers  map[string]string
 
-	http    *http.Client
-	version common.Version
+	HTTP    *http.Client
+	Version common.Version
 }
 
 type Client struct {
@@ -79,7 +79,7 @@ func extractError(result []byte) error {
 
 // NewKibanaClient builds and returns a new Kibana client
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
-	config := defaultClientConfig
+	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -135,10 +135,11 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
-			http: &http.Client{
+			HTTP: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: tlsConfig.ToConfig(),
 				},
 				Timeout: config.Timeout,
 			},
@@ -157,31 +158,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 func (conn *Connection) Request(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (int, []byte, error) {
 
-	reqURL := addToURL(conn.URL, extraPath, params)
-
-	req, err := http.NewRequest(method, reqURL, body)
-	if err != nil {
-		return 0, nil, fmt.Errorf("fail to create the HTTP %s request: %v", method, err)
-	}
-
-	if conn.Username != "" || conn.Password != "" {
-		req.SetBasicAuth(conn.Username, conn.Password)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
-
-	for header, values := range headers {
-		for _, value := range values {
-			req.Header.Add(header, value)
-		}
-	}
-
-	if method != "GET" {
-		req.Header.Set("kbn-version", conn.version.String())
-	}
-
-	resp, err := conn.http.Do(req)
+	resp, err := conn.Send(method, extraPath, params, headers, body)
 	if err != nil {
 		return 0, nil, fmt.Errorf("fail to execute the HTTP %s request: %v", method, err)
 	}
@@ -199,6 +176,46 @@ func (conn *Connection) Request(method, extraPath string,
 
 	retError = extractError(result)
 	return resp.StatusCode, result, retError
+}
+
+// Sends an application/json request to Kibana with appropriate kbn headers
+func (conn *Connection) Send(method, extraPath string,
+	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
+
+	return conn.SendWithContext(context.Background(), method, extraPath, params, headers, body)
+}
+
+// SendWithContext sends an application/json request to Kibana with appropriate kbn headers and the given context.
+func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath string,
+	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
+
+	reqURL := addToURL(conn.URL, extraPath, params)
+
+	req, err := http.NewRequestWithContext(ctx, method, reqURL, body)
+	if err != nil {
+		return nil, fmt.Errorf("fail to create the HTTP %s request: %+v", method, err)
+	}
+
+	if conn.Username != "" || conn.Password != "" {
+		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+	req.Header.Set("kbn-xsrf", "1")
+
+	for header, values := range headers {
+		for _, value := range values {
+			req.Header.Add(header, value)
+		}
+	}
+
+	return conn.RoundTrip(req)
+}
+
+// Implements RoundTrip interface
+func (conn *Connection) RoundTrip(r *http.Request) (*http.Response, error) {
+	return conn.HTTP.Do(r)
 }
 
 func (client *Client) readVersion() error {
@@ -242,13 +259,13 @@ func (client *Client) readVersion() error {
 		return fmt.Errorf("fail to parse kibana version (%v): %+v", versionString, err)
 	}
 
-	client.version = *version
+	client.Version = *version
 	return nil
 }
 
 // GetVersion returns the version read from kibana. The version is not set if
 // IgnoreVersion was set when creating the client.
-func (client *Client) GetVersion() common.Version { return client.version }
+func (client *Client) GetVersion() common.Version { return client.Version }
 
 func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
 

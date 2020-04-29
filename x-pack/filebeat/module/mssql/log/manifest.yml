@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/opt/mssql/log/error*
+    os.darwin:
+      - /var/opt/mssql/log/error*
+    os.windows:
+      - c:\ProgramFiles\Microsoft SQL Server\MSSQL.1MSSQL\LOG\ERRORLOG*
+    os.linux:
+      - /var/opt/mssql/log/error*
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/config.yml

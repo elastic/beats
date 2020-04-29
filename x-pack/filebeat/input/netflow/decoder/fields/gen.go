@@ -61,6 +61,7 @@ var TypeNames = []string{
 	"BasicList",
 	"SubTemplateList",
 	"SubTemplateMultiList",
+	"ACLID",
 }
 
 func write(w io.Writer, msg string) {
@@ -176,7 +177,7 @@ func main() {
 	write(outHandle, fmt.Sprintf(`}
 
 func init() {
-  if err := RegisterFields(%s); err != nil {
+  if err := RegisterGlobalFields(%s); err != nil {
     panic(err)
   }
 }

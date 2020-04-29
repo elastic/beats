@@ -27,14 +27,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	_ "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	_ "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-var host = GetRedisEnvHost() + ":" + GetRedisEnvPort()
-
 func TestFetchRedisInfo(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
+	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -69,7 +68,8 @@ func TestFetchRedisInfo(t *testing.T) {
 }
 
 func TestFetchKeys(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
+	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -95,7 +95,8 @@ func TestFetchKeys(t *testing.T) {
 }
 
 func TestFetchKeyInfo(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
+	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {

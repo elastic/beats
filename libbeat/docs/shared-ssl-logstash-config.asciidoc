@@ -20,7 +20,7 @@ To use SSL mutual authentication:
 document. There are many online resources available that describe how to create certificates.
 +
 TIP: If you are using {security}, you can use the
-{elasticsearch}/certutil.html[elasticsearch-certutil tool] to generate certificates.
+{ref}/certutil.html[elasticsearch-certutil tool] to generate certificates.
 
 . Configure {beatname_uc} to use SSL. In the +{beatname_lc}.yml+ config file, specify the following settings under
 `ssl`:
@@ -51,7 +51,7 @@ For more information about these configuration options, see <<configuration-ssl>
 * `ssl_certificate` and `ssl_key`: Specify the certificate and key that Logstash uses to authenticate with the client.
 * `ssl_verify_mode`: Specifies whether the Logstash server verifies the client certificate against the CA. You
 need to specify either `peer` or `force_peer` to make the server ask for the certificate and validate it. If you
-specify `force_peer`, and {beatname_uc} doesn't provide a certificate, the Logstash connection will be closed. If you choose not to use {elasticsearch}/certutil.html[certutil], the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
+specify `force_peer`, and {beatname_uc} doesn't provide a certificate, the Logstash connection will be closed. If you choose not to use {ref}/certutil.html[certutil], the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
 +
 For example:
 +
@@ -126,7 +126,7 @@ curl: (51) SSL: certificate verification failed (result: 5)
 See the <<ssl-client-fails,troubleshooting docs>> for info about resolving this issue.
 
 [float]
-=== Test the Beats to Logstash connection
+=== Test the {beatname_uc} to Logstash connection
 
 If you have {beatname_uc} running as a service, first stop the service. Then test your setup by running {beatname_uc} in
 the foreground so you can quickly see any errors that occur:

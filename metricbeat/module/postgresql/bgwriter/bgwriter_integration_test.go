@@ -22,22 +22,24 @@ package bgwriter
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/postgresql"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "postgresql")
+	service := compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
@@ -60,21 +62,19 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "postgresql")
+	service := compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "postgresql",
 		"metricsets": []string{"bgwriter"},
-		"hosts":      []string{postgresql.GetEnvDSN()},
+		"hosts":      []string{postgresql.GetDSN(host)},
 		"username":   postgresql.GetEnvUsername(),
 		"password":   postgresql.GetEnvPassword(),
 	}

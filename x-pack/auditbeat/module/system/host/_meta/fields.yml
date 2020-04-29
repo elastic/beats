@@ -2,7 +2,7 @@
   type: group
   description: >
     `host` contains general host information.
-  release: experimental
+  release: beta
   fields:
   - name: uptime
     type: long
@@ -53,6 +53,10 @@
     description: >
       `os` contains information about the operating system.
     fields:
+    - name: codename
+      type: keyword
+      description: >
+        OS codename, if any (e.g. stretch).
     - name: platform
       type: keyword
       description: >

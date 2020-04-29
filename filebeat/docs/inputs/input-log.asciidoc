@@ -57,10 +57,14 @@ multiple input sections:
 IMPORTANT: Make sure a file is not defined more than once across all inputs
 because this can lead to unexpected behaviour.
 
-NOTE: When dealing with file rotation, avoid harvesting symlinks. Instead
+[[rotating-logs]]
+==== Reading from rotating logs
+
+When dealing with file rotation, avoid harvesting symlinks. Instead
 use the <<input-paths>> setting to point to the original file, and specify
 a pattern that matches the file you want to harvest and all of its rotated
-files.  
+files. Also make sure your log rotation strategy prevents lost or duplicate
+messages. For more information, see <<file-log-rotation>>.
 
 [id="{beatname_lc}-input-{type}-options"]
 ==== Configuration options

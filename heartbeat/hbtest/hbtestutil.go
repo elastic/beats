@@ -18,10 +18,12 @@
 package hbtest
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -29,12 +31,20 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v7/libbeat/common"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.
@@ -71,6 +81,23 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	)
 }
 
+// RedirectHandler redirects the paths at the keys in the redirectingPaths map to the locations in their values.
+// For paths not in the redirectingPaths map it returns a 200 response with the given body.
+func RedirectHandler(redirectingPaths map[string]string, body string) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			url, _ := url.Parse(r.RequestURI)
+			redirectTarget, isRedirect := redirectingPaths[url.Path]
+			if isRedirect {
+				w.Header().Add("Location", redirectTarget)
+				w.WriteHeader(302)
+			} else {
+				w.WriteHeader(200)
+				io.WriteString(w, body)
+			}
+		})
+}
+
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
 	u, err := url.Parse(server.URL)
@@ -85,46 +112,78 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 }
 
 // TLSChecks validates the given x509 cert at the given position.
-func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"tls": mapval.Map{
-			"rtt.handshake.us":             mapval.IsDuration,
-			"certificate_not_valid_before": certificate.NotBefore,
-			"certificate_not_valid_after":  certificate.NotAfter,
-		},
-	})
+func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
+	expected := common.MapStr{}
+	// This function is well tested independently, so we just test that things match up here.
+	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
+		Version:           tls.VersionTLS13,
+		HandshakeComplete: true,
+		CipherSuite:       tls.TLS_AES_128_GCM_SHA256,
+		ServerName:        certificate.Subject.CommonName,
+		PeerCertificates:  []*x509.Certificate{certificate},
+	}, time.Duration(1))
+
+	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	return lookslike.MustCompile(expected)
+}
+
+func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
+	expected := common.MapStr{}
+	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
+	return lookslike.MustCompile(expected)
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func BaseChecks(ip string, status string, typ string) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"monitor": mapval.Map{
-			"ip":          ip,
-			"duration.us": mapval.IsDuration,
-			"status":      status,
-			"id":          mapval.IsNonEmptyString,
-			"name":        mapval.IsString,
-			"type":        typ,
-			"check_group": mapval.IsString,
-		},
-	})
+// If IP is set to "" this will check that the field is not present
+func BaseChecks(ip string, status string, typ string) validator.Validator {
+	var ipCheck isdef.IsDef
+	if len(ip) > 0 {
+		ipCheck = isdef.IsEqual(ip)
+	} else {
+		ipCheck = isdef.Optional(isdef.IsEqual(ip))
+	}
+
+	return lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
+				"ip":          ipCheck,
+				"status":      status,
+				"duration.us": isdef.IsDuration,
+				"id":          isdef.IsNonEmptyString,
+				"name":        isdef.IsString,
+				"type":        typ,
+				"check_group": isdef.IsString,
+			},
+		}),
+		hbtestllext.MonitorTimespanValidator,
+	)
 }
 
 // SummaryChecks validates the "summary" field and its subfields.
-func SummaryChecks(up int, down int) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"summary": mapval.Map{
+func SummaryChecks(up int, down int) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"summary": map[string]interface{}{
 			"up":   uint16(up),
 			"down": uint16(down),
 		},
 	})
 }
 
+// ResolveChecks returns a lookslike matcher for the 'resolve' fields.
+func ResolveChecks(ip string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"resolve": map[string]interface{}{
+			"ip":     ip,
+			"rtt.us": isdef.IsDuration,
+		},
+	})
+}
+
 // SimpleURLChecks returns a check for a simple URL
 // with only a scheme, host, and port
-func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapval.Validator {
-
+func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) validator.Validator {
 	hostPort := host
 	if port != 0 {
 		hostPort = fmt.Sprintf("%s:%d", host, port)
@@ -133,27 +192,40 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapv
 	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
 	require.NoError(t, err)
 
-	return mapval.MustCompile(mapval.Map{
+	return URLChecks(t, u)
+}
+
+// URLChecks returns a validator for the given URL's fields
+func URLChecks(t *testing.T, u *url.URL) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
 	})
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
-// consist of a message (or a mapval isdef that can match the message) and a type under the error key.
+// consist of a message (or a lookslike isdef that can match the message) and a type under the error key.
 // The message is checked only as a substring since exact string matches can be fragile due to platform differences.
-func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{
-		"error": mapval.Map{
-			"message": mapval.IsStringContaining(msgSubstr),
+func ErrorChecks(msgSubstr string, errType string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": map[string]interface{}{
+			"message": isdef.IsStringContaining(msgSubstr),
 			"type":    errType,
 		},
 	})
 }
 
+func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
+	msg := x509.CertificateInvalidError{Cert: cert, Reason: x509.Expired}.Error()
+	return lookslike.Compose(
+		ErrorChecks(msg, "io"),
+		TLSCertChecks(cert),
+	)
+}
+
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
-func RespondingTCPChecks() mapval.Validator {
-	return mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration})
+func RespondingTCPChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": isdef.IsDuration})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded
@@ -168,4 +240,24 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	require.NoError(t, err)
 	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
+}
+
+func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port string, cert *x509.Certificate, doClose func() error) {
+	cert, err := x509.ParseCertificate(tlsCert.Certificate[0])
+	require.NoError(t, err)
+
+	// No need to start a real server, since this is invalid, we just
+	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	})
+	require.NoError(t, err)
+
+	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	go func() {
+		srv.Serve(l)
+	}()
+
+	host, port, err = net.SplitHostPort(l.Addr().String())
+	require.NoError(t, err)
+	return host, port, cert, srv.Close
 }

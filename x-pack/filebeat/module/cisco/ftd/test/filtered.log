@@ -1,0 +1,2 @@
+Jan  1 2019 01:00:27 beats asa[1234]: %FTD-7-999999: This message is not filtered.
+Jan  1 2019 01:00:30 beats asa[1234]: %FTD-8-999999: This phony message is dropped due to log level.

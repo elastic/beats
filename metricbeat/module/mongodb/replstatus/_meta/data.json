@@ -1,90 +1,90 @@
 {
-    "@timestamp": "2016-05-23T08:05:34.853Z",
-    "beat": {
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
-    "metricset":{
-        "host":"s1.example.com:27017,s2.example.com:27017,s3.example.com:27017",
-        "module":"mongodb",
-        "name":"replstatus",
-        "rtt": 44269
+    "event": {
+        "dataset": "mongodb.replstatus",
+        "duration": 115000,
+        "module": "mongodb"
+    },
+    "metricset": {
+        "name": "replstatus"
     },
     "mongodb": {
-      "replstatus": {
-        "oplog": {
-          "window": 13881222,
-          "size": {
-            "allocated": 2348399104,
-            "used": 2369966391
-          },
-          "first": {
-            "timestamp": 1520110569
-          },
-          "last": {
-            "timestamp": 1533991791
-          }
-        },
-        "set_name": "beats",
-        "server_date": "2018-08-11T12:49:52.984Z",
-        "optimes": {
-          "last_committed": 1533991791,
-          "applied": 1533991791,
-          "durable": 1533991791
-        },
-        "lag": {
-          "max": 10,
-          "min": 10
-        },
-        "headroom": {
-          "max": 13881212,
-          "min": 13881212
-        },
-        "members": {
-          "arbiter": {
-            "hosts": [
-              "s1.example.com:27017"
-            ],
-            "count": 1
-          },
-          "rollback": {
-            "hosts": [],
-            "count": 0
-          },
-          "unhealthy": {
-            "count": 0,
-            "hosts": []
-          },
-          "secondary": {
-            "count": 1,
-            "optimes": [
-              1533991781
-            ],
-            "hosts": [
-              "s2.example.com:27017"
-            ]
-          },
-          "recovering": {
-            "count": 0,
-            "hosts": []
-          },
-          "unknown": {
-            "hosts": [],
-            "count": 0
-          },
-          "startup2": {
-            "hosts": [],
-            "count": 0
-          },
-          "down": {
-            "hosts": [],
-            "count": 0
-          },
-          "primary": {
-            "optime": 1533991791,
-            "host": "s3.example.com:27017"
-          }
+        "replstatus": {
+            "headroom": {
+                "max": null,
+                "min": null
+            },
+            "lag": {
+                "max": null,
+                "min": null
+            },
+            "members": {
+                "arbiter": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "down": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "primary": {
+                    "host": "22b4e1fb8197:27017",
+                    "optime": 1550700559
+                },
+                "recovering": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "rollback": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "secondary": {
+                    "count": 0,
+                    "hosts": null,
+                    "optimes": null
+                },
+                "startup2": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "unhealthy": {
+                    "count": 0,
+                    "hosts": null
+                },
+                "unknown": {
+                    "count": 0,
+                    "hosts": null
+                }
+            },
+            "oplog": {
+                "first": {
+                    "timestamp": 1550700557
+                },
+                "last": {
+                    "timestamp": 1550700559
+                },
+                "size": {
+                    "allocated": 40572728934,
+                    "used": 180
+                },
+                "window": 2
+            },
+            "optimes": {
+                "applied": 1550700559,
+                "durable": 1550700559,
+                "last_committed": 1550700559
+            },
+            "server_date": "2019-02-20T23:09:23.733+01:00",
+            "set_name": "beats"
         }
-      }
-   }
+    },
+    "service": {
+        "address": "172.26.0.2:27017",
+        "type": "mongodb"
+    }
 }

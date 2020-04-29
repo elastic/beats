@@ -19,26 +19,27 @@
 
 package ecs
 
-// Fields related to HTTP activity.
+// Fields related to HTTP activity. Use the `url` field set to store the url of
+// the request.
 type Http struct {
-	// Http request method.
-	// The field value must be normalized to lowercase for querying. See
-	// "Lowercase Capitalization" in the "Implementing ECS"  section.
+	// HTTP request method.
+	// The field value must be normalized to lowercase for querying. See the
+	// documentation section "Implementing ECS".
 	RequestMethod string `ecs:"request.method"`
 
-	// The full http request body.
+	// The full HTTP request body.
 	RequestBodyContent string `ecs:"request.body.content"`
 
 	// Referrer for this HTTP request.
 	RequestReferrer string `ecs:"request.referrer"`
 
-	// Http response status code.
+	// HTTP response status code.
 	ResponseStatusCode int64 `ecs:"response.status_code"`
 
-	// The full http response body.
+	// The full HTTP response body.
 	ResponseBodyContent string `ecs:"response.body.content"`
 
-	// Http version.
+	// HTTP version.
 	Version string `ecs:"version"`
 
 	// Total size in bytes of the request (body and headers).

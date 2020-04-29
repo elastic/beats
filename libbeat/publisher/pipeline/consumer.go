@@ -18,9 +18,9 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
@@ -138,7 +138,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 	var (
 		out    workQueue
-		batch  *Batch
+		batch  Batch
 		paused = true
 	)
 
@@ -154,7 +154,7 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		}
 
 		paused = c.paused()
-		if !paused && c.out != nil && batch != nil {
+		if c.out != nil && batch != nil {
 			out = c.out.workQueue
 		} else {
 			out = nil
@@ -170,10 +170,12 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 				consumer = nil
 				continue
 			}
+			if queueBatch != nil {
+				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
+			}
 
-			batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
 			paused = c.paused()
-			if paused {
+			if paused || batch == nil {
 				out = nil
 			}
 		}
@@ -193,6 +195,9 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 			handleSignal(sig)
 		case out <- batch:
 			batch = nil
+			if paused {
+				out = nil
+			}
 		}
 	}
 }

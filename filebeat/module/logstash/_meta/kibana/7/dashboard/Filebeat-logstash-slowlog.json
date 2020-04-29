@@ -71,7 +71,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -95,7 +95,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -148,7 +148,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -275,7 +275,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -440,7 +440,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -459,14 +459,14 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Logstash Slowlogs", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -526,7 +526,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Slowlogs [Filebeat Logstash] ECS", 
+                "title": "[Filebeat Logstash] Slowlogs ECS", 
                 "uiStateJSON": {
                     "P-4": {
                         "vis": {

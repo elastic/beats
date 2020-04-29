@@ -22,8 +22,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Command line flags.
@@ -59,6 +59,16 @@ func init() {
 	configPath = makePathFlag("path.config", "Configuration path")
 	makePathFlag("path.data", "Data path")
 	makePathFlag("path.logs", "Logs path")
+}
+
+// OverrideChecker checks if a config should be overwritten.
+type OverrideChecker func(*common.Config) bool
+
+// ConditionalOverride stores a config which needs to overwrite the existing config based on the
+// result of the Check.
+type ConditionalOverride struct {
+	Check  OverrideChecker
+	Config *common.Config
 }
 
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
@@ -122,7 +132,7 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
-func Load(path string, beatOverrides *common.Config) (*common.Config, error) {
+func Load(path string, beatOverrides []ConditionalOverride) (*common.Config, error) {
 	var config *common.Config
 	var err error
 
@@ -149,9 +159,17 @@ func Load(path string, beatOverrides *common.Config) (*common.Config, error) {
 	}
 
 	if beatOverrides != nil {
+		merged := defaults
+		for _, o := range beatOverrides {
+			if o.Check(config) {
+				merged, err = common.MergeConfigs(merged, o.Config)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		config, err = common.MergeConfigs(
-			defaults,
-			beatOverrides,
+			merged,
 			config,
 			overwrites,
 		)

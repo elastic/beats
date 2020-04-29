@@ -1,0 +1,4 @@
+Jan 11 2018 01:00:27 beats ftd[1234]: ApplicationProtocol: http, Client: webserver, DstIP: 10.8.12.47, SrcIP: 10.1.123.45, Message: Intrusion attempt
+Jan 11 2018 01:00:27 beats ftd[1234]: HTTPResponse: 404, Message: Some message here (1:36330:2).
+Jan 11 2018 01:00:27 beats ftd[1234]: HTTPResponse: 404, Message: Some message here (1:36330:2), Empty: ,FileCount:, IngressZone:
+Jan 11 2018 01:00:27 beats ftd[1234]: %ASA-3-430005 Message: This one has a type id, HTTPResponse: 404, Message: And two messages, SrcIP: 127.0.0.1, DstIP: 192.168.3.33, SrcPort: 512, DstPort: 64311

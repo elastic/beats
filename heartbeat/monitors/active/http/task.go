@@ -20,26 +20,32 @@ package http
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
+
+var userAgent = useragent.UserAgent("Heartbeat")
 
 func newHTTPMonitorHostJob(
 	addr string,
@@ -47,14 +53,9 @@ func newHTTPMonitorHostJob(
 	transport *http.Transport,
 	enc contentEncoder,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
-	client := &http.Client{
-		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
-		Transport:     transport,
-		Timeout:       config.Timeout,
-	}
 	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
@@ -63,7 +64,17 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator)
+		var redirects []string
+		client := &http.Client{
+			// Trace visited URLs when redirects occur
+			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
+			Transport:     transport,
+			Timeout:       config.Timeout,
+		}
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		if len(redirects) > 0 {
+			event.PutValue("http.response.redirects", redirects)
+		}
 		return err
 	}), nil
 }
@@ -71,10 +82,10 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) (jobs.Job, error) {
 
 	req, err := buildRequest(addr, config, enc)
@@ -87,10 +98,8 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
-
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(settings, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
 }
@@ -98,14 +107,13 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
-	validator RespCheck,
+	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
-	checkRedirect := makeCheckRedirect(config.MaxRedirects)
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
@@ -131,6 +139,10 @@ func createPingFactory(
 		// It seems they can be invoked still sometime after the request is done
 		cbMutex := sync.Mutex{}
 
+		// We don't support redirects for IP jobs, so this effectively just
+		// prevents following redirects in this case, we know that
+		// config.MaxRedirects must be zero to even be here
+		checkRedirect := makeCheckRedirect(0, nil)
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
@@ -154,7 +166,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -196,6 +208,9 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 		request.Header.Add(k, v)
 	}
+	if ua := request.Header.Get("User-Agent"); ua == "" {
+		request.Header.Set("User-Agent", userAgent)
+	}
 
 	if enc != nil {
 		enc.AddHeaders(&request.Header)
@@ -208,38 +223,54 @@ func execPing(
 	event *beat.Event,
 	client *http.Client,
 	req *http.Request,
-	body []byte,
+	reqBody []byte,
 	timeout time.Duration,
-	validator func(*http.Response) error,
-) (start, end time.Time, errReason reason.Reason) {
+	validator multiValidator,
+	responseConfig responseConfig,
+) (start, end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	req = attachRequestBody(&ctx, req, body)
-	start, end, resp, errReason := execRequest(client, req, validator)
+	req = attachRequestBody(&ctx, req, reqBody)
 
-	if errReason == nil || errReason.Type() != "io" {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"rtt": common.MapStr{
-				"total": look.RTT(end.Sub(start)),
-			},
-		}})
-	}
-
-	if resp != nil {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"response": common.MapStr{"status_code": resp.StatusCode},
-		}})
-	}
-
-	if errReason != nil {
-		if resp != nil {
-			return start, end, errReason
+	// Send the HTTP request. We don't immediately return on error since
+	// we may want to add additional fields to contextualize the error.
+	start, resp, errReason := execRequest(client, req)
+	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
+	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
+	// in other ways
+	if resp == nil || errReason != nil {
+		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+			}
 		}
-		return start, end, errReason
+
+		return start, time.Now(), errReason
 	}
 
-	return start, end, nil
+	bodyFields, errReason := processBody(resp, responseConfig, validator)
+
+	responseFields := common.MapStr{
+		"status_code": resp.StatusCode,
+		"body":        bodyFields,
+	}
+
+	httpFields := common.MapStr{"response": responseFields}
+
+	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
+
+	// Mark the end time as now, since we've finished downloading
+	end = time.Now()
+
+	// Add total HTTP RTT
+	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+		"rtt": common.MapStr{
+			"total": look.RTT(end.Sub(start)),
+		},
+	}})
+
+	return start, end, errReason
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
@@ -252,28 +283,16 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 	return req
 }
 
-func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
+// execute the request. Note that this does not close the resp body, which should be done by caller
+func execRequest(client *http.Client, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
-	if resp != nil { // If above errors, the response will be nil
-		defer resp.Body.Close()
-	}
-	end = time.Now()
 
 	if err != nil {
-		return start, end, nil, reason.IOFailed(err)
+		return start, nil, reason.IOFailed(err)
 	}
 
-	err = validator(resp)
-	if err != nil {
-		return start, time.Now(), resp, reason.ValidateFailed(err)
-	}
-
-	// Read the entirety of the body. Otherwise, the stats for the check
-	// don't include download time.
-	io.Copy(ioutil.Discard, resp.Body)
-
-	return start, time.Now(), resp, nil
+	return start, resp, nil
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {
@@ -298,14 +317,21 @@ func splitHostnamePort(requ *http.Request) (string, uint16, error) {
 	return host, uint16(p), nil
 }
 
-func makeCheckRedirect(max int) func(*http.Request, []*http.Request) error {
+// makeCheckRedirect checks if max redirects are exceeded, also append to the redirects list if we're tracking those.
+// It's kind of ugly to return a result via a pointer argument, but it's the interface the
+// golang HTTP client gives us.
+func makeCheckRedirect(max int, redirects *[]string) func(*http.Request, []*http.Request) error {
 	if max == 0 {
 		return func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
 	}
 
-	return func(_ *http.Request, via []*http.Request) error {
+	return func(r *http.Request, via []*http.Request) error {
+		if redirects != nil {
+			*redirects = append(*redirects, r.URL.String())
+		}
+
 		if max == len(via) {
 			return http.ErrUseLastResponse
 		}

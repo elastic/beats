@@ -1,0 +1,32 @@
+- name: memory
+  type: group
+  description: Memory metrics from java.lang JMX
+  release: beta
+  fields:
+    - name: mbean
+      description: Mbean that this event is related to
+      type: keyword
+    - name: heap.usage.committed
+      description: Committed heap memory usage
+      type: long
+    - name: heap.usage.max
+      description: Max heap memory usage
+      type: long
+    - name: heap.usage.used
+      description: Used heap memory usage
+      type: long
+    - name: heap.usage.init
+      description: Initial heap memory usage
+      type: long
+    - name: other.usage.committed
+      description: Committed non-heap memory usage
+      type: long
+    - name: other.usage.max
+      description: Max non-heap memory usage
+      type: long
+    - name: other.usage.used
+      description: Used non-heap memory usage
+      type: long
+    - name: other.usage.init
+      description: Initial non-heap memory usage
+      type: long

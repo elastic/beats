@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-docker]]
@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
 [float]
-=== Compability
+=== Compatibility
 
 The Docker module is currently tested on Linux and Mac with the community
 edition engine, versions 1.11 and 17.09.0-ce. It is not tested on Windows,

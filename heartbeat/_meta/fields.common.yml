@@ -17,11 +17,19 @@
           type: keyword
           description: >
             The monitors configured name
+          multi_fields:
+            - name: text
+              type: text
+              analyzer: simple
 
         - name: id
           type: keyword
           description: >
             The monitors full job ID as used by heartbeat.
+          multi_fields:
+            - name: text
+              type: text
+              analyzer: simple
 
         - name: duration
           type: group
@@ -63,8 +71,14 @@
           description: >
             A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
 
+        - name: timespan
+          type: date_range
+          description: >
+            Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+
 - key: summary
   title: "Monitor summary"
+  description:
   fields:
     - name: summary
       type: group

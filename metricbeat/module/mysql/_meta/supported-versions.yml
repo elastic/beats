@@ -1,0 +1,15 @@
+variants:
+  - MYSQL_VARIANT: mysql
+    MYSQL_VERSION: 5.7.12
+  - MYSQL_VARIANT: mysql
+    MYSQL_VERSION: 8.0.13
+  - MYSQL_VARIANT: percona
+    MYSQL_VERSION: 5.7.24
+  - MYSQL_VARIANT: percona
+    MYSQL_VERSION: 8.0.13-4
+  - MYSQL_VARIANT: mariadb
+    MYSQL_VERSION: 10.2.23
+  - MYSQL_VARIANT: mariadb
+    MYSQL_VERSION: 10.3.14
+  - MYSQL_VARIANT: mariadb
+    MYSQL_VERSION: 10.4.4

@@ -99,19 +99,8 @@ class Test(filebeat.BaseTest):
         fileset_pipeline = os.path.join("test_modules", "module",
                                         "my_module", "my_fileset", "ingest", "pipeline.json")
 
-        print(os.path.isdir("test_modules"))
-        print(os.path.isdir(os.path.join("test_modules", "module")))
-        print(os.path.isdir(os.path.join("test_modules", "module", "my_module")))
-        print(os.path.isdir(os.path.join("test_modules", "module", "my_module", "my_fileset")))
-        print(os.path.isdir(os.path.join("test_modules", "module", "my_module", "my_fileset", "ingest")))
-        print(os.path.isdir(os.path.join("test_modules", "module", "my_module", "my_fileset", "ingest")))
-        print(os.path.exists(os.path.join("test_modules", "module", "my_module", "my_fileset", "ingest", "pipeline.json")))
-        print(os.path.exists(fileset_pipeline))
-        print(os.path.exists(test_pipeline_path))
         shutil.copyfile(test_pipeline_path, fileset_pipeline)
 
-        print(fileset_pipeline)
-        print(os.path.abspath(fileset_pipeline))
         exit_code = self.run_beat(
             extra_args=["generate", "fields", "my_module", "my_fileset", "-es-beats", "test_modules", "-without-documentation"])
         assert exit_code == 0

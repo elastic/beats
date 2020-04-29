@@ -12,9 +12,9 @@ collect: imports kibana
 
 # Generate imports for all monitors
 .PHONY: imports
-imports: python-env
+imports:
 	@mkdir -p include
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py --out monitors/defaults/default.go ${BEAT_PATH}
+	mage imports
 
 # Collects all module dashboards
 .PHONY: kibana

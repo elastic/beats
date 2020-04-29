@@ -14,9 +14,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (
@@ -30,10 +30,12 @@ type Decoder interface {
 	ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error)
 	ReadFieldDefinition(*bytes.Buffer) (field fields.Key, length uint16, err error)
 	GetLogger() *log.Logger
+	GetFields() fields.FieldDict
 }
 
 type DecoderV9 struct {
 	Logger *log.Logger
+	Fields fields.FieldDict
 }
 
 var _ Decoder = (*DecoderV9)(nil)
@@ -92,7 +94,15 @@ func (d DecoderV9) ReadFieldDefinition(buf *bytes.Buffer) (field fields.Key, len
 	return field, length, nil
 }
 
+func (d DecoderV9) GetFields() fields.FieldDict {
+	if f := d.Fields; f != nil {
+		return f
+	}
+	return fields.GlobalFields
+}
+
 func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Template, err error) {
+	knownFields := d.GetFields()
 	logger := d.GetLogger()
 	record.Fields = make([]template.FieldTemplate, count)
 	for i := 0; i < count; i++ {
@@ -109,7 +119,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 		} else {
 			record.Length += int(field.Length)
 		}
-		if fieldInfo, found := fields.Fields[key]; found {
+		if fieldInfo, found := knownFields[key]; found {
 			min, max := fieldInfo.Decoder.MinLength(), fieldInfo.Decoder.MaxLength()
 			if length == template.VariableLength || min <= field.Length && field.Length <= max {
 				field.Info = fieldInfo
@@ -174,7 +184,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		if buf.Len() < int(length) {
 			return nil, io.EOF
 		}
-		if scopeLen == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
+		if (scopeLen+optsLen) == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
 			return nil, fmt.Errorf("bad length for options template. scope=%d options=%d", scopeLen, optsLen)
 		}
 		template, err := ReadFields(d, buf, (scopeLen+optsLen)/4)
@@ -183,6 +193,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		}
 		template.ID = tID
 		template.ScopeFields = scopeLen / 4
+		template.IsOptions = true
 		templates = append(templates, &template)
 	}
 	return templates, nil

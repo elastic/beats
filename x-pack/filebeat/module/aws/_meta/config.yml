@@ -1,0 +1,204 @@
+- module: aws
+  cloudtrail:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  cloudwatch:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  ec2:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  s3access:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  vpcflow:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb

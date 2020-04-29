@@ -25,8 +25,11 @@ heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
              # configured hosts
 
-  # Monitor name used for job name and document type.
-  #name: icmp
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
+
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-icmp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -74,6 +77,9 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 # heartbeat.config.monitors:
@@ -86,9 +92,11 @@ heartbeat.monitors:
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
 
-  # Monitor name used for job name and document type
-  #name: tcp
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-tcp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -158,11 +166,15 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-http-monitor
 
-  # Monitor name used for job name and document type
-  #name: http
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My Monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -246,6 +258,8 @@ heartbeat.monitors:
     # Interval between file file changed checks.
     #interval: 5s
 
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
 
 heartbeat.scheduler:
   # Limit number of concurrent tasks executed by heartbeat. The task limit if
@@ -296,7 +310,7 @@ heartbeat.scheduler:
     #flush.min_events: 2048
 
     # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
+    # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
   # The spool queue will store events in a local spool file, before
@@ -372,7 +386,7 @@ heartbeat.scheduler:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -452,8 +466,7 @@ heartbeat.scheduler:
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata:
-#   netinfo.enabled: false
+#- add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
@@ -463,7 +476,7 @@ heartbeat.scheduler:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -473,10 +486,63 @@ heartbeat.scheduler:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example URL-decodes the value of field1 to field2
+#
+#processors:
+#- urldecode:
+#    fields:
+#      - from: "field1"
+#        to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -508,8 +574,11 @@ output.elasticsearch:
   # Configure escaping HTML symbols in strings.
   #escape_html: false
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
 
@@ -538,6 +607,11 @@ output.elasticsearch:
 
   # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
@@ -571,9 +645,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
@@ -597,6 +671,11 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -664,9 +743,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -690,6 +769,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -741,7 +826,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version heartbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Heartbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -765,6 +850,9 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
+
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
 
@@ -778,6 +866,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -830,9 +922,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
@@ -853,6 +945,28 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -869,6 +983,8 @@ output.elasticsearch:
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
+  # The hosts setting supports redis and rediss urls with custom password like
+  # redis://:password@localhost:6379.
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
@@ -942,9 +1058,9 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
@@ -991,7 +1107,7 @@ output.elasticsearch:
   #filename: heartbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every heartbeat restart, the files are rotated. The default value is 10240
+  # every Heartbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1002,7 +1118,6 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
 
 #----------------------------- Console output ---------------------------------
 #output.console:
@@ -1019,26 +1134,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the heartbeat installation. This is the default base path
+# The home path for the Heartbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the heartbeat installation. This is the default
+# The configuration path for the Heartbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the heartbeat installation. This is the default base path
-# for all the files in which heartbeat needs to store its data. If not set by a
+# The data path for the Heartbeat installation. This is the default base path
+# for all the files in which Heartbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a heartbeat installation. This is the default location for
+# The logs path for a Heartbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1115,7 +1230,6 @@ output.elasticsearch:
 
 # A list of fields to be added to the template and Kibana index pattern. Also
 # specify setup.template.overwrite: true to overwrite the existing template.
-# This setting is experimental.
 #setup.template.append_fields:
 #- name: field_name
 #  type: field_type
@@ -1141,7 +1255,6 @@ setup.template.settings:
   #index:
     #number_of_shards: 1
     #codec: best_compression
-    #number_of_routing_shards: 30
 
   # A dictionary of settings for the _source field. For more details, please check
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
@@ -1150,22 +1263,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'heartbeat-%{[agent.version]}'.
 #setup.ilm.rollover_alias: "heartbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'heartbeat'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is true. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: true
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -1187,6 +1316,9 @@ setup.kibana:
   # Optional HTTP path
   #path: ""
 
+  # Optional Kibana space ID.
+  #space.id: ""
+
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
 
@@ -1196,9 +1328,9 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1234,13 +1366,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, heartbeat periodically logs its internal metrics that have changed
+# If enabled, Heartbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1278,24 +1413,35 @@ logging.files:
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
 # Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# heartbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== X-Pack Monitoring ===============================
+# Heartbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Heartbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -1306,8 +1452,11 @@ logging.files:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Optional protocol and basic auth credentials.
+  # Protocol - either `http` (default) or `https`.
   #protocol: "https"
+
+  # Authentication credentials - either API key or username/password.
+  #api_key: "id:api_key"
   #username: "beats_system"
   #password: "changeme"
 
@@ -1355,9 +1504,9 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
+  # List of supported/valid TLS versions. By default all TLS versions from 1.1
+  # up to 1.3 are enabled.
+  #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
   # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
@@ -1385,6 +1534,14 @@ logging.files:
   #metrics.period: 10s
   #state.period: 1m
 
+# The `monitoring.cloud.id` setting overwrites the `monitoring.elasticsearch.hosts`
+# setting. You can find the value for this setting in the Elastic Cloud web UI.
+#monitoring.cloud.id:
+
+# The `monitoring.cloud.auth` setting overwrites the `monitoring.elasticsearch.username`
+# and `monitoring.elasticsearch.password` settings. The format is `<user>:<pass>`.
+#monitoring.cloud.auth:
+
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
@@ -1394,11 +1551,20 @@ logging.files:
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname or IP address. It is recommended to use only localhost.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+# Define which user should be owning the named pipe.
+#http.named_pipe.user:
+
+# Define which the permissions that should be applied to the named pipe, use the Security
+# Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
+# `http.user`.
+#http.named_pipe.security_descriptor:
 
 #============================= Process Security ================================
 
@@ -1407,5 +1573,5 @@ logging.files:
 
 #================================= Migration ==================================
 
-# This allows to enable migration aliases
-#migration.enabled: false
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

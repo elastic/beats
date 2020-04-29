@@ -9,22 +9,23 @@
 package ec2iface
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 )
 
-// EC2API provides an interface to enable mocking the
-// ec2.EC2 service client's API operation,
-// paginators, and waiters. This make unit testing your code that calls out
-// to the SDK's service client's calls easier.
+// ClientAPI provides an interface to enable mocking the
+// ec2.Client methods. This make unit testing your code that
+// calls out to the SDK's service client's calls easier.
 //
 // The best way to use this interface is so the SDK's service client's calls
 // can be stubbed out for unit testing your code with the SDK without needing
 // to inject custom request handlers into the SDK's request pipeline.
 //
 //    // myFunc uses an SDK service client to make a request to
-//    // Amazon Elastic Compute Cloud.
-//    func myFunc(svc ec2iface.EC2API) bool {
+//    // Amazon EC2.
+//    func myFunc(svc ec2iface.ClientAPI) bool {
 //        // Make svc.AcceptReservedInstancesExchangeQuote request
 //    }
 //
@@ -42,16 +43,16 @@ import (
 // In your _test.go file:
 //
 //    // Define a mock struct to be used in your unit tests of myFunc.
-//    type mockEC2Client struct {
-//        ec2iface.EC2API
+//    type mockClientClient struct {
+//        ec2iface.ClientPI
 //    }
-//    func (m *mockEC2Client) AcceptReservedInstancesExchangeQuote(input *ec2.AcceptReservedInstancesExchangeQuoteInput) (*ec2.AcceptReservedInstancesExchangeQuoteOutput, error) {
+//    func (m *mockClientClient) AcceptReservedInstancesExchangeQuote(input *ec2.AcceptReservedInstancesExchangeQuoteInput) (*ec2.AcceptReservedInstancesExchangeQuoteOutput, error) {
 //        // mock response/functionality
 //    }
 //
 //    func TestMyFunc(t *testing.T) {
 //        // Setup Test
-//        mockSvc := &mockEC2Client{}
+//        mockSvc := &mockClientClient{}
 //
 //        myfunc(mockSvc)
 //
@@ -62,22 +63,30 @@ import (
 // when the service model is updated and adds new API operations, paginators,
 // and waiters. Its suggested to use the pattern above for testing, or using
 // tooling to generate mocks to satisfy the interfaces.
-type EC2API interface {
+type ClientAPI interface {
 	AcceptReservedInstancesExchangeQuoteRequest(*ec2.AcceptReservedInstancesExchangeQuoteInput) ec2.AcceptReservedInstancesExchangeQuoteRequest
+
+	AcceptTransitGatewayVpcAttachmentRequest(*ec2.AcceptTransitGatewayVpcAttachmentInput) ec2.AcceptTransitGatewayVpcAttachmentRequest
 
 	AcceptVpcEndpointConnectionsRequest(*ec2.AcceptVpcEndpointConnectionsInput) ec2.AcceptVpcEndpointConnectionsRequest
 
 	AcceptVpcPeeringConnectionRequest(*ec2.AcceptVpcPeeringConnectionInput) ec2.AcceptVpcPeeringConnectionRequest
 
+	AdvertiseByoipCidrRequest(*ec2.AdvertiseByoipCidrInput) ec2.AdvertiseByoipCidrRequest
+
 	AllocateAddressRequest(*ec2.AllocateAddressInput) ec2.AllocateAddressRequest
 
 	AllocateHostsRequest(*ec2.AllocateHostsInput) ec2.AllocateHostsRequest
+
+	ApplySecurityGroupsToClientVpnTargetNetworkRequest(*ec2.ApplySecurityGroupsToClientVpnTargetNetworkInput) ec2.ApplySecurityGroupsToClientVpnTargetNetworkRequest
 
 	AssignIpv6AddressesRequest(*ec2.AssignIpv6AddressesInput) ec2.AssignIpv6AddressesRequest
 
 	AssignPrivateIpAddressesRequest(*ec2.AssignPrivateIpAddressesInput) ec2.AssignPrivateIpAddressesRequest
 
 	AssociateAddressRequest(*ec2.AssociateAddressInput) ec2.AssociateAddressRequest
+
+	AssociateClientVpnTargetNetworkRequest(*ec2.AssociateClientVpnTargetNetworkInput) ec2.AssociateClientVpnTargetNetworkRequest
 
 	AssociateDhcpOptionsRequest(*ec2.AssociateDhcpOptionsInput) ec2.AssociateDhcpOptionsRequest
 
@@ -86,6 +95,8 @@ type EC2API interface {
 	AssociateRouteTableRequest(*ec2.AssociateRouteTableInput) ec2.AssociateRouteTableRequest
 
 	AssociateSubnetCidrBlockRequest(*ec2.AssociateSubnetCidrBlockInput) ec2.AssociateSubnetCidrBlockRequest
+
+	AssociateTransitGatewayRouteTableRequest(*ec2.AssociateTransitGatewayRouteTableInput) ec2.AssociateTransitGatewayRouteTableRequest
 
 	AssociateVpcCidrBlockRequest(*ec2.AssociateVpcCidrBlockInput) ec2.AssociateVpcCidrBlockRequest
 
@@ -99,6 +110,8 @@ type EC2API interface {
 
 	AttachVpnGatewayRequest(*ec2.AttachVpnGatewayInput) ec2.AttachVpnGatewayRequest
 
+	AuthorizeClientVpnIngressRequest(*ec2.AuthorizeClientVpnIngressInput) ec2.AuthorizeClientVpnIngressRequest
+
 	AuthorizeSecurityGroupEgressRequest(*ec2.AuthorizeSecurityGroupEgressInput) ec2.AuthorizeSecurityGroupEgressRequest
 
 	AuthorizeSecurityGroupIngressRequest(*ec2.AuthorizeSecurityGroupIngressInput) ec2.AuthorizeSecurityGroupIngressRequest
@@ -106,6 +119,8 @@ type EC2API interface {
 	BundleInstanceRequest(*ec2.BundleInstanceInput) ec2.BundleInstanceRequest
 
 	CancelBundleTaskRequest(*ec2.CancelBundleTaskInput) ec2.CancelBundleTaskRequest
+
+	CancelCapacityReservationRequest(*ec2.CancelCapacityReservationInput) ec2.CancelCapacityReservationRequest
 
 	CancelConversionTaskRequest(*ec2.CancelConversionTaskInput) ec2.CancelConversionTaskRequest
 
@@ -126,6 +141,12 @@ type EC2API interface {
 	CopyImageRequest(*ec2.CopyImageInput) ec2.CopyImageRequest
 
 	CopySnapshotRequest(*ec2.CopySnapshotInput) ec2.CopySnapshotRequest
+
+	CreateCapacityReservationRequest(*ec2.CreateCapacityReservationInput) ec2.CreateCapacityReservationRequest
+
+	CreateClientVpnEndpointRequest(*ec2.CreateClientVpnEndpointInput) ec2.CreateClientVpnEndpointRequest
+
+	CreateClientVpnRouteRequest(*ec2.CreateClientVpnRouteInput) ec2.CreateClientVpnRouteRequest
 
 	CreateCustomerGatewayRequest(*ec2.CreateCustomerGatewayInput) ec2.CreateCustomerGatewayRequest
 
@@ -183,6 +204,14 @@ type EC2API interface {
 
 	CreateTagsRequest(*ec2.CreateTagsInput) ec2.CreateTagsRequest
 
+	CreateTransitGatewayRequest(*ec2.CreateTransitGatewayInput) ec2.CreateTransitGatewayRequest
+
+	CreateTransitGatewayRouteRequest(*ec2.CreateTransitGatewayRouteInput) ec2.CreateTransitGatewayRouteRequest
+
+	CreateTransitGatewayRouteTableRequest(*ec2.CreateTransitGatewayRouteTableInput) ec2.CreateTransitGatewayRouteTableRequest
+
+	CreateTransitGatewayVpcAttachmentRequest(*ec2.CreateTransitGatewayVpcAttachmentInput) ec2.CreateTransitGatewayVpcAttachmentRequest
+
 	CreateVolumeRequest(*ec2.CreateVolumeInput) ec2.CreateVolumeRequest
 
 	CreateVpcRequest(*ec2.CreateVpcInput) ec2.CreateVpcRequest
@@ -200,6 +229,10 @@ type EC2API interface {
 	CreateVpnConnectionRouteRequest(*ec2.CreateVpnConnectionRouteInput) ec2.CreateVpnConnectionRouteRequest
 
 	CreateVpnGatewayRequest(*ec2.CreateVpnGatewayInput) ec2.CreateVpnGatewayRequest
+
+	DeleteClientVpnEndpointRequest(*ec2.DeleteClientVpnEndpointInput) ec2.DeleteClientVpnEndpointRequest
+
+	DeleteClientVpnRouteRequest(*ec2.DeleteClientVpnRouteInput) ec2.DeleteClientVpnRouteRequest
 
 	DeleteCustomerGatewayRequest(*ec2.DeleteCustomerGatewayInput) ec2.DeleteCustomerGatewayRequest
 
@@ -247,6 +280,14 @@ type EC2API interface {
 
 	DeleteTagsRequest(*ec2.DeleteTagsInput) ec2.DeleteTagsRequest
 
+	DeleteTransitGatewayRequest(*ec2.DeleteTransitGatewayInput) ec2.DeleteTransitGatewayRequest
+
+	DeleteTransitGatewayRouteRequest(*ec2.DeleteTransitGatewayRouteInput) ec2.DeleteTransitGatewayRouteRequest
+
+	DeleteTransitGatewayRouteTableRequest(*ec2.DeleteTransitGatewayRouteTableInput) ec2.DeleteTransitGatewayRouteTableRequest
+
+	DeleteTransitGatewayVpcAttachmentRequest(*ec2.DeleteTransitGatewayVpcAttachmentInput) ec2.DeleteTransitGatewayVpcAttachmentRequest
+
 	DeleteVolumeRequest(*ec2.DeleteVolumeInput) ec2.DeleteVolumeRequest
 
 	DeleteVpcRequest(*ec2.DeleteVpcInput) ec2.DeleteVpcRequest
@@ -265,6 +306,8 @@ type EC2API interface {
 
 	DeleteVpnGatewayRequest(*ec2.DeleteVpnGatewayInput) ec2.DeleteVpnGatewayRequest
 
+	DeprovisionByoipCidrRequest(*ec2.DeprovisionByoipCidrInput) ec2.DeprovisionByoipCidrRequest
+
 	DeregisterImageRequest(*ec2.DeregisterImageInput) ec2.DeregisterImageRequest
 
 	DescribeAccountAttributesRequest(*ec2.DescribeAccountAttributesInput) ec2.DescribeAccountAttributesRequest
@@ -277,7 +320,21 @@ type EC2API interface {
 
 	DescribeBundleTasksRequest(*ec2.DescribeBundleTasksInput) ec2.DescribeBundleTasksRequest
 
+	DescribeByoipCidrsRequest(*ec2.DescribeByoipCidrsInput) ec2.DescribeByoipCidrsRequest
+
+	DescribeCapacityReservationsRequest(*ec2.DescribeCapacityReservationsInput) ec2.DescribeCapacityReservationsRequest
+
 	DescribeClassicLinkInstancesRequest(*ec2.DescribeClassicLinkInstancesInput) ec2.DescribeClassicLinkInstancesRequest
+
+	DescribeClientVpnAuthorizationRulesRequest(*ec2.DescribeClientVpnAuthorizationRulesInput) ec2.DescribeClientVpnAuthorizationRulesRequest
+
+	DescribeClientVpnConnectionsRequest(*ec2.DescribeClientVpnConnectionsInput) ec2.DescribeClientVpnConnectionsRequest
+
+	DescribeClientVpnEndpointsRequest(*ec2.DescribeClientVpnEndpointsInput) ec2.DescribeClientVpnEndpointsRequest
+
+	DescribeClientVpnRoutesRequest(*ec2.DescribeClientVpnRoutesInput) ec2.DescribeClientVpnRoutesRequest
+
+	DescribeClientVpnTargetNetworksRequest(*ec2.DescribeClientVpnTargetNetworksInput) ec2.DescribeClientVpnTargetNetworksRequest
 
 	DescribeConversionTasksRequest(*ec2.DescribeConversionTasksInput) ec2.DescribeConversionTasksRequest
 
@@ -357,6 +414,8 @@ type EC2API interface {
 
 	DescribePrincipalIdFormatRequest(*ec2.DescribePrincipalIdFormatInput) ec2.DescribePrincipalIdFormatRequest
 
+	DescribePublicIpv4PoolsRequest(*ec2.DescribePublicIpv4PoolsInput) ec2.DescribePublicIpv4PoolsRequest
+
 	DescribeRegionsRequest(*ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest
 
 	DescribeReservedInstancesRequest(*ec2.DescribeReservedInstancesInput) ec2.DescribeReservedInstancesRequest
@@ -398,6 +457,14 @@ type EC2API interface {
 	DescribeSubnetsRequest(*ec2.DescribeSubnetsInput) ec2.DescribeSubnetsRequest
 
 	DescribeTagsRequest(*ec2.DescribeTagsInput) ec2.DescribeTagsRequest
+
+	DescribeTransitGatewayAttachmentsRequest(*ec2.DescribeTransitGatewayAttachmentsInput) ec2.DescribeTransitGatewayAttachmentsRequest
+
+	DescribeTransitGatewayRouteTablesRequest(*ec2.DescribeTransitGatewayRouteTablesInput) ec2.DescribeTransitGatewayRouteTablesRequest
+
+	DescribeTransitGatewayVpcAttachmentsRequest(*ec2.DescribeTransitGatewayVpcAttachmentsInput) ec2.DescribeTransitGatewayVpcAttachmentsRequest
+
+	DescribeTransitGatewaysRequest(*ec2.DescribeTransitGatewaysInput) ec2.DescribeTransitGatewaysRequest
 
 	DescribeVolumeAttributeRequest(*ec2.DescribeVolumeAttributeInput) ec2.DescribeVolumeAttributeRequest
 
@@ -443,6 +510,10 @@ type EC2API interface {
 
 	DetachVpnGatewayRequest(*ec2.DetachVpnGatewayInput) ec2.DetachVpnGatewayRequest
 
+	DisableEbsEncryptionByDefaultRequest(*ec2.DisableEbsEncryptionByDefaultInput) ec2.DisableEbsEncryptionByDefaultRequest
+
+	DisableTransitGatewayRouteTablePropagationRequest(*ec2.DisableTransitGatewayRouteTablePropagationInput) ec2.DisableTransitGatewayRouteTablePropagationRequest
+
 	DisableVgwRoutePropagationRequest(*ec2.DisableVgwRoutePropagationInput) ec2.DisableVgwRoutePropagationRequest
 
 	DisableVpcClassicLinkRequest(*ec2.DisableVpcClassicLinkInput) ec2.DisableVpcClassicLinkRequest
@@ -451,13 +522,21 @@ type EC2API interface {
 
 	DisassociateAddressRequest(*ec2.DisassociateAddressInput) ec2.DisassociateAddressRequest
 
+	DisassociateClientVpnTargetNetworkRequest(*ec2.DisassociateClientVpnTargetNetworkInput) ec2.DisassociateClientVpnTargetNetworkRequest
+
 	DisassociateIamInstanceProfileRequest(*ec2.DisassociateIamInstanceProfileInput) ec2.DisassociateIamInstanceProfileRequest
 
 	DisassociateRouteTableRequest(*ec2.DisassociateRouteTableInput) ec2.DisassociateRouteTableRequest
 
 	DisassociateSubnetCidrBlockRequest(*ec2.DisassociateSubnetCidrBlockInput) ec2.DisassociateSubnetCidrBlockRequest
 
+	DisassociateTransitGatewayRouteTableRequest(*ec2.DisassociateTransitGatewayRouteTableInput) ec2.DisassociateTransitGatewayRouteTableRequest
+
 	DisassociateVpcCidrBlockRequest(*ec2.DisassociateVpcCidrBlockInput) ec2.DisassociateVpcCidrBlockRequest
+
+	EnableEbsEncryptionByDefaultRequest(*ec2.EnableEbsEncryptionByDefaultInput) ec2.EnableEbsEncryptionByDefaultRequest
+
+	EnableTransitGatewayRouteTablePropagationRequest(*ec2.EnableTransitGatewayRouteTablePropagationInput) ec2.EnableTransitGatewayRouteTablePropagationRequest
 
 	EnableVgwRoutePropagationRequest(*ec2.EnableVgwRoutePropagationInput) ec2.EnableVgwRoutePropagationRequest
 
@@ -467,9 +546,19 @@ type EC2API interface {
 
 	EnableVpcClassicLinkDnsSupportRequest(*ec2.EnableVpcClassicLinkDnsSupportInput) ec2.EnableVpcClassicLinkDnsSupportRequest
 
+	ExportClientVpnClientCertificateRevocationListRequest(*ec2.ExportClientVpnClientCertificateRevocationListInput) ec2.ExportClientVpnClientCertificateRevocationListRequest
+
+	ExportClientVpnClientConfigurationRequest(*ec2.ExportClientVpnClientConfigurationInput) ec2.ExportClientVpnClientConfigurationRequest
+
+	ExportTransitGatewayRoutesRequest(*ec2.ExportTransitGatewayRoutesInput) ec2.ExportTransitGatewayRoutesRequest
+
 	GetConsoleOutputRequest(*ec2.GetConsoleOutputInput) ec2.GetConsoleOutputRequest
 
 	GetConsoleScreenshotRequest(*ec2.GetConsoleScreenshotInput) ec2.GetConsoleScreenshotRequest
+
+	GetEbsDefaultKmsKeyIdRequest(*ec2.GetEbsDefaultKmsKeyIdInput) ec2.GetEbsDefaultKmsKeyIdRequest
+
+	GetEbsEncryptionByDefaultRequest(*ec2.GetEbsEncryptionByDefaultInput) ec2.GetEbsEncryptionByDefaultRequest
 
 	GetHostReservationPurchasePreviewRequest(*ec2.GetHostReservationPurchasePreviewInput) ec2.GetHostReservationPurchasePreviewRequest
 
@@ -478,6 +567,14 @@ type EC2API interface {
 	GetPasswordDataRequest(*ec2.GetPasswordDataInput) ec2.GetPasswordDataRequest
 
 	GetReservedInstancesExchangeQuoteRequest(*ec2.GetReservedInstancesExchangeQuoteInput) ec2.GetReservedInstancesExchangeQuoteRequest
+
+	GetTransitGatewayAttachmentPropagationsRequest(*ec2.GetTransitGatewayAttachmentPropagationsInput) ec2.GetTransitGatewayAttachmentPropagationsRequest
+
+	GetTransitGatewayRouteTableAssociationsRequest(*ec2.GetTransitGatewayRouteTableAssociationsInput) ec2.GetTransitGatewayRouteTableAssociationsRequest
+
+	GetTransitGatewayRouteTablePropagationsRequest(*ec2.GetTransitGatewayRouteTablePropagationsInput) ec2.GetTransitGatewayRouteTablePropagationsRequest
+
+	ImportClientVpnClientCertificateRevocationListRequest(*ec2.ImportClientVpnClientCertificateRevocationListInput) ec2.ImportClientVpnClientCertificateRevocationListRequest
 
 	ImportImageRequest(*ec2.ImportImageInput) ec2.ImportImageRequest
 
@@ -488,6 +585,12 @@ type EC2API interface {
 	ImportSnapshotRequest(*ec2.ImportSnapshotInput) ec2.ImportSnapshotRequest
 
 	ImportVolumeRequest(*ec2.ImportVolumeInput) ec2.ImportVolumeRequest
+
+	ModifyCapacityReservationRequest(*ec2.ModifyCapacityReservationInput) ec2.ModifyCapacityReservationRequest
+
+	ModifyClientVpnEndpointRequest(*ec2.ModifyClientVpnEndpointInput) ec2.ModifyClientVpnEndpointRequest
+
+	ModifyEbsDefaultKmsKeyIdRequest(*ec2.ModifyEbsDefaultKmsKeyIdInput) ec2.ModifyEbsDefaultKmsKeyIdRequest
 
 	ModifyFleetRequest(*ec2.ModifyFleetInput) ec2.ModifyFleetRequest
 
@@ -503,7 +606,11 @@ type EC2API interface {
 
 	ModifyInstanceAttributeRequest(*ec2.ModifyInstanceAttributeInput) ec2.ModifyInstanceAttributeRequest
 
+	ModifyInstanceCapacityReservationAttributesRequest(*ec2.ModifyInstanceCapacityReservationAttributesInput) ec2.ModifyInstanceCapacityReservationAttributesRequest
+
 	ModifyInstanceCreditSpecificationRequest(*ec2.ModifyInstanceCreditSpecificationInput) ec2.ModifyInstanceCreditSpecificationRequest
+
+	ModifyInstanceEventStartTimeRequest(*ec2.ModifyInstanceEventStartTimeInput) ec2.ModifyInstanceEventStartTimeRequest
 
 	ModifyInstancePlacementRequest(*ec2.ModifyInstancePlacementInput) ec2.ModifyInstancePlacementRequest
 
@@ -518,6 +625,8 @@ type EC2API interface {
 	ModifySpotFleetRequestRequest(*ec2.ModifySpotFleetRequestInput) ec2.ModifySpotFleetRequestRequest
 
 	ModifySubnetAttributeRequest(*ec2.ModifySubnetAttributeInput) ec2.ModifySubnetAttributeRequest
+
+	ModifyTransitGatewayVpcAttachmentRequest(*ec2.ModifyTransitGatewayVpcAttachmentInput) ec2.ModifyTransitGatewayVpcAttachmentRequest
 
 	ModifyVolumeRequest(*ec2.ModifyVolumeInput) ec2.ModifyVolumeRequest
 
@@ -537,9 +646,13 @@ type EC2API interface {
 
 	ModifyVpcTenancyRequest(*ec2.ModifyVpcTenancyInput) ec2.ModifyVpcTenancyRequest
 
+	ModifyVpnConnectionRequest(*ec2.ModifyVpnConnectionInput) ec2.ModifyVpnConnectionRequest
+
 	MonitorInstancesRequest(*ec2.MonitorInstancesInput) ec2.MonitorInstancesRequest
 
 	MoveAddressToVpcRequest(*ec2.MoveAddressToVpcInput) ec2.MoveAddressToVpcRequest
+
+	ProvisionByoipCidrRequest(*ec2.ProvisionByoipCidrInput) ec2.ProvisionByoipCidrRequest
 
 	PurchaseHostReservationRequest(*ec2.PurchaseHostReservationInput) ec2.PurchaseHostReservationRequest
 
@@ -550,6 +663,8 @@ type EC2API interface {
 	RebootInstancesRequest(*ec2.RebootInstancesInput) ec2.RebootInstancesRequest
 
 	RegisterImageRequest(*ec2.RegisterImageInput) ec2.RegisterImageRequest
+
+	RejectTransitGatewayVpcAttachmentRequest(*ec2.RejectTransitGatewayVpcAttachmentInput) ec2.RejectTransitGatewayVpcAttachmentRequest
 
 	RejectVpcEndpointConnectionsRequest(*ec2.RejectVpcEndpointConnectionsInput) ec2.RejectVpcEndpointConnectionsRequest
 
@@ -569,11 +684,15 @@ type EC2API interface {
 
 	ReplaceRouteTableAssociationRequest(*ec2.ReplaceRouteTableAssociationInput) ec2.ReplaceRouteTableAssociationRequest
 
+	ReplaceTransitGatewayRouteRequest(*ec2.ReplaceTransitGatewayRouteInput) ec2.ReplaceTransitGatewayRouteRequest
+
 	ReportInstanceStatusRequest(*ec2.ReportInstanceStatusInput) ec2.ReportInstanceStatusRequest
 
 	RequestSpotFleetRequest(*ec2.RequestSpotFleetInput) ec2.RequestSpotFleetRequest
 
 	RequestSpotInstancesRequest(*ec2.RequestSpotInstancesInput) ec2.RequestSpotInstancesRequest
+
+	ResetEbsDefaultKmsKeyIdRequest(*ec2.ResetEbsDefaultKmsKeyIdInput) ec2.ResetEbsDefaultKmsKeyIdRequest
 
 	ResetFpgaImageAttributeRequest(*ec2.ResetFpgaImageAttributeInput) ec2.ResetFpgaImageAttributeRequest
 
@@ -587,6 +706,8 @@ type EC2API interface {
 
 	RestoreAddressToClassicRequest(*ec2.RestoreAddressToClassicInput) ec2.RestoreAddressToClassicRequest
 
+	RevokeClientVpnIngressRequest(*ec2.RevokeClientVpnIngressInput) ec2.RevokeClientVpnIngressRequest
+
 	RevokeSecurityGroupEgressRequest(*ec2.RevokeSecurityGroupEgressInput) ec2.RevokeSecurityGroupEgressRequest
 
 	RevokeSecurityGroupIngressRequest(*ec2.RevokeSecurityGroupIngressInput) ec2.RevokeSecurityGroupIngressRequest
@@ -595,9 +716,13 @@ type EC2API interface {
 
 	RunScheduledInstancesRequest(*ec2.RunScheduledInstancesInput) ec2.RunScheduledInstancesRequest
 
+	SearchTransitGatewayRoutesRequest(*ec2.SearchTransitGatewayRoutesInput) ec2.SearchTransitGatewayRoutesRequest
+
 	StartInstancesRequest(*ec2.StartInstancesInput) ec2.StartInstancesRequest
 
 	StopInstancesRequest(*ec2.StopInstancesInput) ec2.StopInstancesRequest
+
+	TerminateClientVpnConnectionsRequest(*ec2.TerminateClientVpnConnectionsInput) ec2.TerminateClientVpnConnectionsRequest
 
 	TerminateInstancesRequest(*ec2.TerminateInstancesInput) ec2.TerminateInstancesRequest
 
@@ -611,98 +736,69 @@ type EC2API interface {
 
 	UpdateSecurityGroupRuleDescriptionsIngressRequest(*ec2.UpdateSecurityGroupRuleDescriptionsIngressInput) ec2.UpdateSecurityGroupRuleDescriptionsIngressRequest
 
-	WaitUntilBundleTaskComplete(*ec2.DescribeBundleTasksInput) error
-	WaitUntilBundleTaskCompleteWithContext(aws.Context, *ec2.DescribeBundleTasksInput, ...aws.WaiterOption) error
+	WithdrawByoipCidrRequest(*ec2.WithdrawByoipCidrInput) ec2.WithdrawByoipCidrRequest
 
-	WaitUntilConversionTaskCancelled(*ec2.DescribeConversionTasksInput) error
-	WaitUntilConversionTaskCancelledWithContext(aws.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
+	WaitUntilBundleTaskComplete(context.Context, *ec2.DescribeBundleTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilConversionTaskCompleted(*ec2.DescribeConversionTasksInput) error
-	WaitUntilConversionTaskCompletedWithContext(aws.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
+	WaitUntilConversionTaskCancelled(context.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilConversionTaskDeleted(*ec2.DescribeConversionTasksInput) error
-	WaitUntilConversionTaskDeletedWithContext(aws.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
+	WaitUntilConversionTaskCompleted(context.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilCustomerGatewayAvailable(*ec2.DescribeCustomerGatewaysInput) error
-	WaitUntilCustomerGatewayAvailableWithContext(aws.Context, *ec2.DescribeCustomerGatewaysInput, ...aws.WaiterOption) error
+	WaitUntilConversionTaskDeleted(context.Context, *ec2.DescribeConversionTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilExportTaskCancelled(*ec2.DescribeExportTasksInput) error
-	WaitUntilExportTaskCancelledWithContext(aws.Context, *ec2.DescribeExportTasksInput, ...aws.WaiterOption) error
+	WaitUntilCustomerGatewayAvailable(context.Context, *ec2.DescribeCustomerGatewaysInput, ...aws.WaiterOption) error
 
-	WaitUntilExportTaskCompleted(*ec2.DescribeExportTasksInput) error
-	WaitUntilExportTaskCompletedWithContext(aws.Context, *ec2.DescribeExportTasksInput, ...aws.WaiterOption) error
+	WaitUntilExportTaskCancelled(context.Context, *ec2.DescribeExportTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilImageAvailable(*ec2.DescribeImagesInput) error
-	WaitUntilImageAvailableWithContext(aws.Context, *ec2.DescribeImagesInput, ...aws.WaiterOption) error
+	WaitUntilExportTaskCompleted(context.Context, *ec2.DescribeExportTasksInput, ...aws.WaiterOption) error
 
-	WaitUntilImageExists(*ec2.DescribeImagesInput) error
-	WaitUntilImageExistsWithContext(aws.Context, *ec2.DescribeImagesInput, ...aws.WaiterOption) error
+	WaitUntilImageAvailable(context.Context, *ec2.DescribeImagesInput, ...aws.WaiterOption) error
 
-	WaitUntilInstanceExists(*ec2.DescribeInstancesInput) error
-	WaitUntilInstanceExistsWithContext(aws.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
+	WaitUntilImageExists(context.Context, *ec2.DescribeImagesInput, ...aws.WaiterOption) error
 
-	WaitUntilInstanceRunning(*ec2.DescribeInstancesInput) error
-	WaitUntilInstanceRunningWithContext(aws.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
+	WaitUntilInstanceExists(context.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
 
-	WaitUntilInstanceStatusOk(*ec2.DescribeInstanceStatusInput) error
-	WaitUntilInstanceStatusOkWithContext(aws.Context, *ec2.DescribeInstanceStatusInput, ...aws.WaiterOption) error
+	WaitUntilInstanceRunning(context.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
 
-	WaitUntilInstanceStopped(*ec2.DescribeInstancesInput) error
-	WaitUntilInstanceStoppedWithContext(aws.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
+	WaitUntilInstanceStatusOk(context.Context, *ec2.DescribeInstanceStatusInput, ...aws.WaiterOption) error
 
-	WaitUntilInstanceTerminated(*ec2.DescribeInstancesInput) error
-	WaitUntilInstanceTerminatedWithContext(aws.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
+	WaitUntilInstanceStopped(context.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
 
-	WaitUntilKeyPairExists(*ec2.DescribeKeyPairsInput) error
-	WaitUntilKeyPairExistsWithContext(aws.Context, *ec2.DescribeKeyPairsInput, ...aws.WaiterOption) error
+	WaitUntilInstanceTerminated(context.Context, *ec2.DescribeInstancesInput, ...aws.WaiterOption) error
 
-	WaitUntilNatGatewayAvailable(*ec2.DescribeNatGatewaysInput) error
-	WaitUntilNatGatewayAvailableWithContext(aws.Context, *ec2.DescribeNatGatewaysInput, ...aws.WaiterOption) error
+	WaitUntilKeyPairExists(context.Context, *ec2.DescribeKeyPairsInput, ...aws.WaiterOption) error
 
-	WaitUntilNetworkInterfaceAvailable(*ec2.DescribeNetworkInterfacesInput) error
-	WaitUntilNetworkInterfaceAvailableWithContext(aws.Context, *ec2.DescribeNetworkInterfacesInput, ...aws.WaiterOption) error
+	WaitUntilNatGatewayAvailable(context.Context, *ec2.DescribeNatGatewaysInput, ...aws.WaiterOption) error
 
-	WaitUntilPasswordDataAvailable(*ec2.GetPasswordDataInput) error
-	WaitUntilPasswordDataAvailableWithContext(aws.Context, *ec2.GetPasswordDataInput, ...aws.WaiterOption) error
+	WaitUntilNetworkInterfaceAvailable(context.Context, *ec2.DescribeNetworkInterfacesInput, ...aws.WaiterOption) error
 
-	WaitUntilSnapshotCompleted(*ec2.DescribeSnapshotsInput) error
-	WaitUntilSnapshotCompletedWithContext(aws.Context, *ec2.DescribeSnapshotsInput, ...aws.WaiterOption) error
+	WaitUntilPasswordDataAvailable(context.Context, *ec2.GetPasswordDataInput, ...aws.WaiterOption) error
 
-	WaitUntilSpotInstanceRequestFulfilled(*ec2.DescribeSpotInstanceRequestsInput) error
-	WaitUntilSpotInstanceRequestFulfilledWithContext(aws.Context, *ec2.DescribeSpotInstanceRequestsInput, ...aws.WaiterOption) error
+	WaitUntilSnapshotCompleted(context.Context, *ec2.DescribeSnapshotsInput, ...aws.WaiterOption) error
 
-	WaitUntilSubnetAvailable(*ec2.DescribeSubnetsInput) error
-	WaitUntilSubnetAvailableWithContext(aws.Context, *ec2.DescribeSubnetsInput, ...aws.WaiterOption) error
+	WaitUntilSpotInstanceRequestFulfilled(context.Context, *ec2.DescribeSpotInstanceRequestsInput, ...aws.WaiterOption) error
 
-	WaitUntilSystemStatusOk(*ec2.DescribeInstanceStatusInput) error
-	WaitUntilSystemStatusOkWithContext(aws.Context, *ec2.DescribeInstanceStatusInput, ...aws.WaiterOption) error
+	WaitUntilSubnetAvailable(context.Context, *ec2.DescribeSubnetsInput, ...aws.WaiterOption) error
 
-	WaitUntilVolumeAvailable(*ec2.DescribeVolumesInput) error
-	WaitUntilVolumeAvailableWithContext(aws.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
+	WaitUntilSystemStatusOk(context.Context, *ec2.DescribeInstanceStatusInput, ...aws.WaiterOption) error
 
-	WaitUntilVolumeDeleted(*ec2.DescribeVolumesInput) error
-	WaitUntilVolumeDeletedWithContext(aws.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
+	WaitUntilVolumeAvailable(context.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
 
-	WaitUntilVolumeInUse(*ec2.DescribeVolumesInput) error
-	WaitUntilVolumeInUseWithContext(aws.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
+	WaitUntilVolumeDeleted(context.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
 
-	WaitUntilVpcAvailable(*ec2.DescribeVpcsInput) error
-	WaitUntilVpcAvailableWithContext(aws.Context, *ec2.DescribeVpcsInput, ...aws.WaiterOption) error
+	WaitUntilVolumeInUse(context.Context, *ec2.DescribeVolumesInput, ...aws.WaiterOption) error
 
-	WaitUntilVpcExists(*ec2.DescribeVpcsInput) error
-	WaitUntilVpcExistsWithContext(aws.Context, *ec2.DescribeVpcsInput, ...aws.WaiterOption) error
+	WaitUntilVpcAvailable(context.Context, *ec2.DescribeVpcsInput, ...aws.WaiterOption) error
 
-	WaitUntilVpcPeeringConnectionDeleted(*ec2.DescribeVpcPeeringConnectionsInput) error
-	WaitUntilVpcPeeringConnectionDeletedWithContext(aws.Context, *ec2.DescribeVpcPeeringConnectionsInput, ...aws.WaiterOption) error
+	WaitUntilVpcExists(context.Context, *ec2.DescribeVpcsInput, ...aws.WaiterOption) error
 
-	WaitUntilVpcPeeringConnectionExists(*ec2.DescribeVpcPeeringConnectionsInput) error
-	WaitUntilVpcPeeringConnectionExistsWithContext(aws.Context, *ec2.DescribeVpcPeeringConnectionsInput, ...aws.WaiterOption) error
+	WaitUntilVpcPeeringConnectionDeleted(context.Context, *ec2.DescribeVpcPeeringConnectionsInput, ...aws.WaiterOption) error
 
-	WaitUntilVpnConnectionAvailable(*ec2.DescribeVpnConnectionsInput) error
-	WaitUntilVpnConnectionAvailableWithContext(aws.Context, *ec2.DescribeVpnConnectionsInput, ...aws.WaiterOption) error
+	WaitUntilVpcPeeringConnectionExists(context.Context, *ec2.DescribeVpcPeeringConnectionsInput, ...aws.WaiterOption) error
 
-	WaitUntilVpnConnectionDeleted(*ec2.DescribeVpnConnectionsInput) error
-	WaitUntilVpnConnectionDeletedWithContext(aws.Context, *ec2.DescribeVpnConnectionsInput, ...aws.WaiterOption) error
+	WaitUntilVpnConnectionAvailable(context.Context, *ec2.DescribeVpnConnectionsInput, ...aws.WaiterOption) error
+
+	WaitUntilVpnConnectionDeleted(context.Context, *ec2.DescribeVpnConnectionsInput, ...aws.WaiterOption) error
 }
 
-var _ EC2API = (*ec2.EC2)(nil)
+var _ ClientAPI = (*ec2.Client)(nil)

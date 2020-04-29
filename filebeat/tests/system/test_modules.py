@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
+from deepdiff import DeepDiff
 
 
 def load_fileset_test_cases():
@@ -76,7 +77,7 @@ class Test(BaseTest):
 
         body = {
             "transient": {
-                "script.max_compilations_rate": "1000/1m"
+                "script.max_compilations_rate": "2000/1m"
             }
         }
 
@@ -137,8 +138,17 @@ class Test(BaseTest):
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(" ".join(cmd) + "\n")
+        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
+
+        # Use a fixed timezone so results don't vary depending on the environment
+        # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
+        # this can happen because UTC uses to be the default timezone in date parsers when no other
+        # timezone is specified.
+        local_env = os.environ.copy()
+        local_env["TZ"] = 'Etc/GMT+2'
+
         subprocess.Popen(cmd,
+                         env=local_env,
                          stdin=None,
                          stdout=output,
                          stderr=subprocess.STDOUT,
@@ -167,8 +177,7 @@ class Test(BaseTest):
             else:
                 self.assert_fields_are_documented(obj)
 
-        if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(test_file, objects)
+        self._test_expected_events(test_file, objects)
 
     def _test_expected_events(self, test_file, objects):
 
@@ -189,20 +198,18 @@ class Test(BaseTest):
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
 
-        for ev in expected:
-            found = False
-            for obj in objects:
+        for idx in range(len(expected)):
+            ev = expected[idx]
+            obj = objects[idx]
 
-                # Flatten objects for easier comparing
-                obj = self.flatten_object(obj, {}, "")
-                clean_keys(obj)
+            # Flatten objects for easier comparing
+            obj = self.flatten_object(obj, {}, "")
+            clean_keys(obj)
+            clean_keys(ev)
 
-                if ev == obj:
-                    found = True
-                    break
+            d = DeepDiff(ev, obj, ignore_order=True)
 
-            assert found, "The following expected object was not found:\n {}\nSearched in: \n{}".format(
-                pretty_json(ev), pretty_json(objects))
+            assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
 
 def clean_keys(obj):
@@ -212,13 +219,44 @@ def clean_keys(obj):
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
+    # ECS versions change for any ECS release, large or small
+    ecs_key = ["ecs.version"]
+    # datasets for which @timestamp is removed due to date missing
+    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log",
+                        "system.auth", "system.syslog", "cef.log", "activemq.audit", "iptables.log", "cisco.asa", "cisco.ios"}
+    # dataset + log file pairs for which @timestamp is kept as an exception from above
+    remove_timestamp_exception = {
+        ('system.syslog', 'tz-offset.log'),
+        ('system.auth', 'timestamp.log'),
+        ('cisco.asa', 'asa.log'),
+        ('cisco.asa', 'hostnames.log'),
+        ('cisco.asa', 'not-ip.log'),
+        ('cisco.asa', 'sample.log')
+    }
 
-    for key in host_keys + time_keys + other_keys:
+    # Keep source log filename for exceptions
+    filename = None
+    if "log.file.path" in obj:
+        filename = os.path.basename(obj["log.file.path"]).lower()
+
+    for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    # Remove timestamp for comparison where timestamp is not part of the log line
-    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
-        delete_key(obj, "@timestamp")
+    # Most logs from syslog need their timestamp removed because it doesn't
+    # include a year.
+    if obj["event.dataset"] in remove_timestamp:
+        if not (obj['event.dataset'], filename) in remove_timestamp_exception:
+            delete_key(obj, "@timestamp")
+        else:
+            # excluded events need to have their filename saved to the expected.json
+            # so that the exception mechanism can be triggered when the json is
+            # loaded.
+            obj["log.file.path"] = filename
+
+    # Remove @timestamp from aws vpc flow log with custom format (with no event.end time).
+    if obj["event.dataset"] == "aws.vpcflow":
+        if "event.end" not in obj:
+            delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):

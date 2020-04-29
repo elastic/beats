@@ -22,12 +22,12 @@ package network
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

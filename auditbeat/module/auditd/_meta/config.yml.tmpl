@@ -11,6 +11,10 @@
   rate_limit: 0
   include_raw_message: false
   include_warnings: false
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
   {{ end -}}
   # Load audit rules from separate files. Same format as audit.rules(7).
   audit_rule_files: [ '${path.config}/audit.rules.d/*.conf' ]
@@ -41,4 +45,5 @@
     ## Unauthorized access attempts.
     #-a always,exit -F arch=b{{call .ArchBits .GOARCH}} -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b{{call .ArchBits .GOARCH}} -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+
 {{ end }}

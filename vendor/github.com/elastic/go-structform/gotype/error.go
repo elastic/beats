@@ -44,6 +44,13 @@ var (
 	errExpectedObjectValue      = errors.New("expected object value")
 	errExpectedObjectClose      = errors.New("missing object close")
 	errInlineAndOmitEmpty       = errors.New("inline and omitempty must not be set at the same time")
+
+	errUnexpectedNil       = errors.New("unexpected nil value received")
+	errUnexpectedBool      = errors.New("unexpected bool value received")
+	errUnexpectedNum       = errors.New("unexpected numeric value received")
+	errUnexpectedString    = errors.New("unexpected string value received")
+	errUnexpectedArrayEnd  = errors.New("array closed early")
+	errUnexpectedObjectEnd = errors.New("unexpected object close")
 )
 
 func errTODO() error {

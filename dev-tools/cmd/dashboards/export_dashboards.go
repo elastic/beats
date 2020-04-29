@@ -23,11 +23,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
+	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/libbeat/dashboards"
-	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/dashboards"
+	"github.com/elastic/beats/v7/libbeat/kibana"
 )
 
 var (
@@ -84,6 +87,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to export dashboards from YML file: %v", err)
 		}
+		log.Println("Done exporting dashboards from", *ymlFile)
 		return
 	}
 
@@ -121,9 +125,14 @@ func exportSingleDashboard(client *kibana.Client, dashboard, output string) erro
 		return fmt.Errorf("failed to export the dashboard: %+v", err)
 	}
 	result = dashboards.DecodeExported(result)
+
+	if err = os.MkdirAll(filepath.Dir(output), 0755); err != nil {
+		return errors.Wrap(err, "failed to create directory for dashboard")
+	}
+
 	err = ioutil.WriteFile(output, []byte(result.StringToPrint()), dashboards.OutputPermission)
 	if err != nil {
-		return fmt.Errorf("failed to save the dashboards: %+v", err)
+		return fmt.Errorf("failed to save the dashboard: %+v", err)
 	}
 	return nil
 }

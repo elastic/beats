@@ -20,14 +20,20 @@ package stats
 import (
 	"bufio"
 	"net"
+	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
+
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "tcp"}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("memcached", "stats", New,
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -42,16 +48,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	network, address, err := getNetworkAndAddress(m.HostData())
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in fetch")
+	}
+
+	conn, err := net.DialTimeout(network, address, m.Module().Config().Timeout)
+	if err != nil {
+		return errors.Wrap(err, "error in fetch")
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte("stats\n"))
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in connection")
 	}
 
 	scanner := bufio.NewScanner(conn)
@@ -72,5 +86,24 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	event, _ := schema.Apply(data)
-	return event, nil
+
+	reporter.Event(mb.Event{MetricSetFields: event})
+
+	return nil
+}
+
+func getNetworkAndAddress(hostData mb.HostData) (network string, address string, err error) {
+	u, err := url.Parse(hostData.URI)
+	if err != nil {
+		err = errors.Wrap(err, "invalid URL")
+		return
+	}
+
+	network = u.Scheme
+	if network == "unix" {
+		address = u.Path
+	} else {
+		address = u.Host
+	}
+	return
 }

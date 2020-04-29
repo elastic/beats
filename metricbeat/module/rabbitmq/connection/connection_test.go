@@ -20,11 +20,13 @@ package connection
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -33,7 +35,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
@@ -65,21 +67,14 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 60938, peer["port"])
 }
 
-func TestData(t *testing.T) {
-	server := mtest.Server(t, mtest.DefaultServerConfig)
-	defer server.Close()
-
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
 func getConfig(url string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "rabbitmq",
 		"metricsets": []string{"connection"},
 		"hosts":      []string{url},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "rabbitmq", "connection")
 }

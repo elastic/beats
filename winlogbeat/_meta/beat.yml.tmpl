@@ -1,0 +1,19 @@
+{{ template "header" . }}
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+{{if .Reference}}
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+{{end}}
+  - name: System
+{{if .Reference}}
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+{{end}}
+  - name: Security
+{{if .Reference}}
+    # Set to true to publish fields with null values in events.
+    #keep_null: false
+{{end}}
+{{if not .Reference}}{{ template "elasticsearch_settings" . }}{{end}}

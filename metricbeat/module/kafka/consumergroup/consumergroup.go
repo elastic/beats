@@ -20,10 +20,12 @@ package consumergroup
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/kafka"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kafka"
 )
 
 // init registers the MetricSet with the central registry.
@@ -76,11 +78,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch consumer group metrics from kafka
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in connect")
 	}
 	defer broker.Close()
 
@@ -111,6 +112,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
 	if err != nil {
-		r.Error(err)
+		return errors.Wrap(err, "error in fetch")
 	}
+
+	return nil
 }

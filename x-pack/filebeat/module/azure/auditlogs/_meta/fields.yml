@@ -1,0 +1,162 @@
+- name: auditlogs
+  type: group
+  description: >
+    Fields for Azure audit logs.
+  fields:
+    - name: operation_name
+      type: keyword
+      description: >
+        The operation name
+    - name: operation_version
+      type: keyword
+      description: >
+        The operation version
+    - name: identity
+      type: keyword
+      description: >
+        Identity
+    - name: tenant_id
+      type: keyword
+      description: >
+        Tenant ID
+    - name: result_signature
+      type: keyword
+      description: >
+        Result signature
+    - name: properties
+      type: group
+      description: >
+        The audit log properties
+      fields:
+        - name: result
+          type: keyword
+          description: >
+            Log result
+        - name: activity_display_name
+          type: keyword
+          description: >
+            Activity display name
+        - name: result_reason
+          type: keyword
+          description: >
+            Reason for the log result
+        - name: correlation_id
+          type: keyword
+          description: >
+            Correlation ID
+        - name: logged_by_service
+          type: keyword
+          description: >
+            Logged by service
+        - name: operation_type
+          type: keyword
+          description: >
+            Operation type
+        - name: id
+          type: keyword
+          description: >
+            ID
+        - name: activity_datetime
+          type: date
+          description: >
+            Activity timestamp
+        - name: category
+          type: keyword
+          description: >
+            category
+        - name: target_resources.*
+          type: group
+          object_type_mapping_type: "*"
+          description: >
+            Target resources
+          fields:
+            - name: display_name
+              type: keyword
+              description: >
+                Display name
+            - name: id
+              type: keyword
+              description: >
+                ID
+            - name: type
+              type: keyword
+              description: >
+                Type
+            - name: ip_address
+              type: keyword
+              description: >
+                 ip Address
+            - name: user_principal_name
+              type: keyword
+              description: >
+                User principal name
+            - name: modified_properties.*
+              type: group
+              object_type: keyword
+              object_type_mapping_type: "*"
+              description: >
+                Modified properties
+              fields:
+                - name: new_value
+                  type: keyword
+                  description: >
+                    New value
+                - name: display_name
+                  type: keyword
+                  description: >
+                    Display value
+                - name: old_value
+                  type: keyword
+                  description: >
+                    Old value
+        - name: initiated_by
+          type: group
+          description: >
+            Information regarding the initiator
+          fields:
+            - name: app
+              type: group
+              description: >
+                App
+              fields:
+                - name: servicePrincipalName
+                  type: keyword
+                  description: >
+                    Service principal name
+                - name: displayName
+                  type: keyword
+                  description: >
+                    Display name
+                - name: appId
+                  type: keyword
+                  description: >
+                    App ID
+                - name: servicePrincipalId
+                  type: keyword
+                  description: >
+                    Service principal ID
+            - name: user
+              type: group
+              description: >
+                User
+              fields:
+                - name: userPrincipalName
+                  type: keyword
+                  description: >
+                    User principal name
+                - name: displayName
+                  type: keyword
+                  description: >
+                    Display name
+                - name: id
+                  type: keyword
+                  description: >
+                    ID
+                - name: ipAddress
+                  type: keyword
+                  description: >
+                    ip Address
+
+
+
+

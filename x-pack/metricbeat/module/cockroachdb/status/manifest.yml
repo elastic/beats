@@ -1,0 +1,6 @@
+default: true
+input:
+  module: prometheus
+  metricset: collector
+  defaults:
+    metrics_path: /_status/vars

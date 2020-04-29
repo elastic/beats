@@ -1,0 +1,5 @@
+- module: template-test-module
+  # All logs
+  test:
+    enabled: true
+    var.parse_time: true

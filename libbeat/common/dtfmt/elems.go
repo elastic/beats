@@ -142,6 +142,8 @@ func (f textField) requires(c *ctxConfig) error {
 		c.enableDate()
 	case ftDayOfWeek:
 		c.enableWeekday()
+	case ftTimeZoneOffset:
+		c.enableTimeZoneOffset()
 	default:
 		return fmt.Errorf("time field %v not supported by text", f.ft)
 	}
@@ -162,6 +164,8 @@ func (f textField) estimateSize() int {
 			return 6
 		}
 		return 9 // max(month) = len(September)
+	case ftTimeZoneOffset:
+		return 6
 	default:
 		return 0
 	}

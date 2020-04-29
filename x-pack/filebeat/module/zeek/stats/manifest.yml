@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/stats.log
+    os.linux:
+      - /var/log/bro/current/stats.log
+    os.darwin:
+      - /usr/local/var/logs/current/stats.log
+  - name: tags
+    default: [zeek.stats]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/stats.yml

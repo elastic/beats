@@ -27,9 +27,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type JMXMapping struct {
@@ -118,7 +117,14 @@ type MBeanName struct {
 	Properties map[string]string
 }
 
-var mbeanRegexp = regexp.MustCompile("([^,=:*?]+)=([^,=:\"]+|\".*\")")
+// Parse strings with properties with the format key=value, being:
+// - Key a nonempty string of characters which may not contain any of the characters,
+//   comma (,), equals (=), colon, asterisk, or question mark.
+// - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
+//   cannot contain any of the characters comma, equals, colon, or quote.
+//   If quoted, it can contain any character, including newlines, but quote needs to be
+//   escaped with a backslash.
+var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|"([^\\"]|\\.)*?")`)
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs
 // For more information refer: https://jolokia.org/reference/html/protocol.html
@@ -159,7 +165,6 @@ func (m *MBeanName) Canonicalize(escape bool) string {
 // The Mbean string has to abide by the rules which are imposed by Java.
 // For more info: https://docs.oracle.com/javase/8/docs/api/javax/management/ObjectName.html#getCanonicalName--
 func ParseMBeanName(mBeanName string) (*MBeanName, error) {
-
 	// Split mbean string in two parts: the bean domain and the properties
 	parts := strings.SplitN(mBeanName, ":", 2)
 	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
@@ -169,15 +174,6 @@ func ParseMBeanName(mBeanName string) (*MBeanName, error) {
 	// Create a new MBean object
 	mybean := &MBeanName{
 		Domain: parts[0],
-	}
-
-	// First of all verify that all bean properties are
-	// in the form key=value
-	tmpProps := propertyRegexp.FindAllString(parts[1], -1)
-	propertyList := strings.Join(tmpProps, ",")
-	if len(propertyList) != len(parts[1]) {
-		// Some property didn't match
-		return nil, fmt.Errorf("mbean properties must be in the form key=value: %s", mBeanName)
 	}
 
 	// Using this regexp we will split the properties in a 2 dimensional array
@@ -196,7 +192,6 @@ func ParseMBeanName(mBeanName string) (*MBeanName, error) {
 	// }
 	properties := mbeanRegexp.FindAllStringSubmatch(parts[1], -1)
 
-	// If we could not parse MBean properties
 	if properties == nil {
 		return nil, fmt.Errorf("mbean properties must be in the form key=value: %s", mBeanName)
 	}
@@ -204,6 +199,8 @@ func ParseMBeanName(mBeanName string) (*MBeanName, error) {
 	// Initialise properties map
 	mybean.Properties = make(map[string]string)
 
+	// Get the parsed string to check that everything has been parsed
+	var parsed []string
 	for _, prop := range properties {
 
 		// If every row does not have 3 columns, then
@@ -213,7 +210,14 @@ func ParseMBeanName(mBeanName string) (*MBeanName, error) {
 			return nil, fmt.Errorf("mbean properties must be in the form key=value: %s", mBeanName)
 		}
 
+		parsed = append(parsed, prop[0])
+
 		mybean.Properties[prop[1]] = prop[2]
+	}
+
+	// Not all the properties definition has been parsed
+	if parsed := strings.Join(parsed, ","); len(parts[1]) != len(parsed) {
+		return nil, fmt.Errorf("not all properties could be parsed: %s, parsed: %s", mBeanName, parsed)
 	}
 
 	return mybean, nil
@@ -355,20 +359,17 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 	}
 
 	for _, r := range httpReqs {
+		m.http.SetMethod(r.HTTPMethod)
+		m.http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
 
-		http, err := helper.NewHTTP(m.BaseMetricSet)
-
-		http.SetMethod(r.HTTPMethod)
-		http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
-
-		resBody, err := http.FetchContent()
+		resBody, err := m.http.FetchContent()
 		if err != nil {
 			return nil, err
 		}
 
 		if logp.IsDebug(metricsetName) {
 			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
+				"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 		}
 
 		// Map response to Metricbeat events
@@ -421,13 +422,6 @@ func (pc *JolokiaHTTPPostFetcher) BuildRequestsAndMappings(configMappings []JMXM
 
 	return httpRequests, mapping, nil
 }
-
-// Parse strings with properties with the format key=value, being:
-// - key a nonempty string of characters which may not contain any of the characters,
-//   comma (,), equals (=), colon, asterisk, or question mark.
-// - value a string that can be quoted or unquoted, if unquoted it cannot be empty and
-//   cannot contain any of the characters comma, equals, colon, or quote.
-var propertyRegexp = regexp.MustCompile("[^,=:*?]+=([^,=:\"]+|\".*\")")
 
 func (pc *JolokiaHTTPPostFetcher) buildRequestBodyAndMapping(mappings []JMXMapping) ([]byte, AttributeMapping, error) {
 	responseMapping := make(AttributeMapping)
@@ -491,19 +485,17 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 		}
 	}
 
-	http, err := helper.NewHTTP(m.BaseMetricSet)
+	m.http.SetMethod(httpReqs[0].HTTPMethod)
+	m.http.SetBody(httpReqs[0].Body)
 
-	http.SetMethod(httpReqs[0].HTTPMethod)
-	http.SetBody(httpReqs[0].Body)
-
-	resBody, err := http.FetchContent()
+	resBody, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
 	if logp.IsDebug(metricsetName) {
 		m.log.Debugw("Jolokia response body",
-			"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
+			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 	}
 
 	// Map response to Metricbeat events

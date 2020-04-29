@@ -22,11 +22,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -83,16 +83,12 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
 	}
 
 	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure applying stats schema")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure applying stats schema")
 	}
 
 	event.MetricSetFields = fields

@@ -5,13 +5,14 @@ var:
     default:
       - /var/log/apache2/access.log*
       - /var/log/apache2/other_vhosts_access.log*
+      - /var/log/httpd/access_log*
     os.darwin:
       - /usr/local/var/log/apache2/access_log*
     os.windows:
       - "C:/tools/Apache/httpd-2.*/Apache24/logs/access.log*"
       - "C:/Program Files/Apache Software Foundation/Apache2.*/logs/access.log*"
 
-ingest_pipeline: ingest/default.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/access.yml
 
 requires.processors:

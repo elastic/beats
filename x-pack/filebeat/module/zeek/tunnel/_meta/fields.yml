@@ -1,0 +1,15 @@
+- name: tunnel
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek SSH log.
+  fields:
+    - name: type
+      type: keyword
+      description: >
+        The type of tunnel.
+
+    - name: action
+      type: keyword
+      description: >
+        The type of activity that occurred.

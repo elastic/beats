@@ -1,0 +1,69 @@
+{
+    "description": "Pipeline for parsing azure activity logs.",
+    "processors": [
+        {
+            "set": {
+                "field": "cloud.provider",
+                "value": "azure"
+            }
+        },
+        {
+            "grok": {
+                "field": "azure.resource_id",
+                "patterns": ["/SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/NAMESPACES/%{NAMESPACE:azure.resource.namespace}/AUTHORIZATIONRULES/%{RULE:azure.resource.authorization_rule}"],
+                "pattern_definitions" : {
+                    "SUBID" : "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+                    "GROUPID" : ".+",
+                    "PROVIDERNAME" : ".+",
+                    "NAMESPACE": ".+",
+                    "RULE": ".+"
+                },
+                "ignore_failure": true
+            }
+        },
+        {
+            "grok": {
+                "field": "azure.resource_id",
+                "patterns": ["/SUBSCRIPTIONS/%{SUBID:azure.subscription_id}/RESOURCEGROUPS/%{GROUPID:azure.resource.group}/PROVIDERS/%{PROVIDERNAME:azure.resource.provider}/%{NAME:azure.resource.name}"],
+                "pattern_definitions" : {
+                    "SUBID" : "(\\{){0,1}[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(\\}){0,1}",
+                    "GROUPID" : ".+",
+                    "PROVIDERNAME" : "([A-Z])\\w+.([A-Z])\\w+/([A-Z])\\w+.",
+                    "NAME": "((?!AUTHORIZATIONRULES).)*$"
+                },
+                "ignore_failure": true
+            }
+        },
+        {
+            "grok": {
+                "field": "azure.resource_id",
+                "patterns": ["/providers/%{PROVIDER:azure.resource.provider}"],
+                "pattern_definitions" : {
+                    "PROVIDER" : ".+"
+                },
+                "ignore_failure": true
+            }
+        },
+        {
+            "rename": {
+                "field": "azure.resource_id",
+                "target_field": "azure.resource.id",
+                "ignore_missing": true
+            }
+        },
+        {
+            "script": {
+                "source": "if (ctx.event.outcome !=null) {ctx.event.outcome = ctx.event.outcome.substring(0,1).toUpperCase() + ctx.event.outcome.substring(1,ctx.event.outcome.length()).toLowerCase();}",
+                "ignore_failure": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

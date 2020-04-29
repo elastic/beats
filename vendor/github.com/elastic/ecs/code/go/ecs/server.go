@@ -20,14 +20,14 @@
 package ecs
 
 // A Server is defined as the responder in a network connection for events
-// regarding sessions, connections, or bidirectional flow records. For TCP
-// events, the server is the receiver of the initial SYN packet(s) of the TCP
-// connection. For other protocols, the server is generally the responder in
-// the network transaction. Some systems actually use the term "responder" to
-// refer the server in TCP connections. The server fields describe details
-// about the system acting as the server in the network event. Server fields
-// are usually populated in conjunction with client fields. Server fields are
-// generally not populated for packet-level events.
+// regarding sessions, connections, or bidirectional flow records.
+// For TCP events, the server is the receiver of the initial SYN packet(s) of
+// the TCP connection. For other protocols, the server is generally the
+// responder in the network transaction. Some systems actually use the term
+// "responder" to refer the server in TCP connections. The server fields
+// describe details about the system acting as the server in the network event.
+// Server fields are usually populated in conjunction with client fields.
+// Server fields are generally not populated for packet-level events.
 // Client / server representations can add semantic context to an exchange,
 // which is helpful to visualize the data in certain situations. If your
 // context falls in that category, you should still ensure that source and
@@ -53,9 +53,36 @@ type Server struct {
 	// Server domain.
 	Domain string `ecs:"domain"`
 
+	// The highest registered server domain, stripped of the subdomain.
+	// For example, the registered domain for "foo.google.com" is "google.com".
+	// This value can be determined precisely with a list like the public
+	// suffix list (http://publicsuffix.org). Trying to approximate this by
+	// simply taking the last two labels will not work well for TLDs such as
+	// "co.uk".
+	RegisteredDomain string `ecs:"registered_domain"`
+
+	// The effective top level domain (eTLD), also known as the domain suffix,
+	// is the last part of the domain name. For example, the top level domain
+	// for google.com is "com".
+	// This value can be determined precisely with a list like the public
+	// suffix list (http://publicsuffix.org). Trying to approximate this by
+	// simply taking the last label will not work well for effective TLDs such
+	// as "co.uk".
+	TopLevelDomain string `ecs:"top_level_domain"`
+
 	// Bytes sent from the server to the client.
 	Bytes int64 `ecs:"bytes"`
 
 	// Packets sent from the server to the client.
 	Packets int64 `ecs:"packets"`
+
+	// Translated ip of destination based NAT sessions (e.g. internet to
+	// private DMZ)
+	// Typically used with load balancers, firewalls, or routers.
+	NatIP string `ecs:"nat.ip"`
+
+	// Translated port of destination based NAT sessions (e.g. internet to
+	// private DMZ)
+	// Typically used with load balancers, firewalls, or routers.
+	NatPort int64 `ecs:"nat.port"`
 }

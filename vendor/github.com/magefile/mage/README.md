@@ -3,7 +3,7 @@
 
 <p align="center"><img src="https://user-images.githubusercontent.com/3185864/32058716-5ee9b512-ba38-11e7-978a-287eb2a62743.png"/></p>
 
-## About 
+## About
 
 Mage is a make-like build tool using Go.  You write plain-old go functions,
 and Mage automatically uses them as Makefile-like runnable targets.
@@ -11,7 +11,7 @@ and Mage automatically uses them as Makefile-like runnable targets.
 ## Installation
 
 Mage has no dependencies outside the Go standard library, and builds with Go 1.7
-and above (possibly even lower versions, but they're not regularly tested). 
+and above (possibly even lower versions, but they're not regularly tested).
 
 **Using GOPATH**
 
@@ -24,7 +24,7 @@ go run bootstrap.go
 **Using Go Modules**
 
 ```
-git clone https://github.com:magefile/mage
+git clone https://github.com/magefile/mage
 cd mage
 go run bootstrap.go
 ```
@@ -39,7 +39,7 @@ with the correct version information.
 The mage binary will be created in your $GOPATH/bin directory.
 
 You may also install a binary release from our
-[releases](https://github.com/magefile/mage/releases) page. 
+[releases](https://github.com/magefile/mage/releases) page.
 
 ## Demo
 
@@ -47,8 +47,8 @@ You may also install a binary release from our
 
 ## Discussion
 
-Join the `#mage` channel on [gophers slack](https://gophers.slack.com/messages/general/) 
-or post on the [magefile google group](https://groups.google.com/forum/#!forum/magefile) 
+Join the `#mage` channel on [gophers slack](https://gophers.slack.com/messages/general/)
+or post on the [magefile google group](https://groups.google.com/forum/#!forum/magefile)
 for discussion of usage, development, etc.
 
 # Documentation
@@ -71,4 +71,10 @@ superior to bash for any non-trivial task involving branching, looping, anything
 that's not just straight line execution of commands.  And if your project is
 written in Go, why introduce another language as idiosyncratic as bash?  Why not
 use the language your contributors are already comfortable with?
+
+# Thanks
+
+If you use mage and like it, or any of my other software, and you'd like to show your appreciation, you can do so on my patreon:
+
+[<img src=https://user-images.githubusercontent.com/3185864/49846051-64eddf80-fd97-11e8-9f59-d09f5652d214.png>](https://www.patreon.com/join/natefinch?)
 

@@ -28,8 +28,8 @@ import (
 
 	sigar "github.com/elastic/gosigar"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/system"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func Test_Get_CLK_TCK(t *testing.T) {
@@ -51,8 +51,8 @@ func TestDataNameFilter(t *testing.T) {
 		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 3, len(data))
 }
@@ -70,8 +70,8 @@ func TestDataEmptyFilter(t *testing.T) {
 		"metricsets": []string{"diskio"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 10, len(data))
 }
@@ -104,8 +104,8 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}
-
-	got, err := stat.CalIOStatistics(counter)
+	var got DiskIOMetric
+	err := stat.CalIOStatistics(&got, counter)
 	if err != nil {
 		t.Fatal(err)
 	}

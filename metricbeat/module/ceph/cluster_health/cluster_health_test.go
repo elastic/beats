@@ -24,8 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -50,8 +50,13 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
-	event, err := f.Fetch()
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 

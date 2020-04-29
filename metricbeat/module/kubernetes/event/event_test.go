@@ -20,11 +20,11 @@ package event
 import (
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	k8s_io_apimachinery_pkg_apis_meta_v1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
@@ -73,6 +73,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus_io/scrape": "false",
 	}
 
+	source := v1.EventSource{
+		Component: "kubelet",
+		Host:      "prod_1",
+	}
+
 	testCases := map[string]struct {
 		mockEvent        v1.Event
 		expectedMetadata common.MapStr
@@ -80,10 +85,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 	}{
 		"no dedots": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDot,
@@ -96,10 +102,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot labels": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDeDot,
@@ -112,10 +119,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot annotatoins": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDot,
@@ -128,10 +136,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 		"dedot both labels and annotations": {
 			mockEvent: v1.Event{
-				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDeDot,
@@ -149,6 +158,8 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
 			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
 			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
+			assert.Equal(t, source.Host, mapStrOutput["source"].(common.MapStr)["host"])
+			assert.Equal(t, source.Component, mapStrOutput["source"].(common.MapStr)["component"])
 		})
 	}
 }

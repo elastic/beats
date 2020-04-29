@@ -19,4 +19,5 @@ package types
 
 import "github.com/pkg/errors"
 
+// ErrNotImplemented represents an error for a function that is not implemented on a particular platform.
 var ErrNotImplemented = errors.New("unimplemented")

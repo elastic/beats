@@ -13,9 +13,9 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var errConfigurationNotFound = errors.New("no configuration found, you need to enroll your Beat")
@@ -80,7 +80,8 @@ func (c *configResponse) UnmarshalJSON(b []byte) error {
 // Configuration retrieves the list of configuration blocks from Kibana
 func (c *AuthClient) Configuration() (ConfigBlocks, error) {
 	resp := struct {
-		ConfigBlocks []*configResponse `json:"configuration_blocks"`
+		BaseResponse
+		ConfigBlocks []*configResponse `json:"list"`
 	}{}
 	url := fmt.Sprintf("/api/beats/agent/%s/configuration", c.BeatUUID)
 	statusCode, err := c.Client.request("GET", url, nil, c.headers(), &resp)

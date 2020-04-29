@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 )
 
 func buildDecoderByNameMap() {
-	for _, value := range fields.Fields {
+	for _, value := range fields.GlobalFields {
 		decoderByName[value.Name] = value.Decoder
 	}
 }

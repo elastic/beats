@@ -39,7 +39,3 @@ If you are sure you found a bug or have a feature request, open an issue on
 
 We love contributions from our community! Please read the
 [CONTRIBUTING.md](../CONTRIBUTING.md) file.
-
-## Snapshots
-
-For testing purposes, we generate snapshot builds that you can find [here](https://beats-nightlies.s3.amazonaws.com/index.html?prefix=packetbeat). Please be aware that these are built on top of master and are not meant for production.

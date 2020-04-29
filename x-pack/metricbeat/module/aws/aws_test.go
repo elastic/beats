@@ -8,7 +8,10 @@ package aws
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -18,12 +21,13 @@ import (
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.EC2API
+	ec2iface.ClientAPI
 }
 
 var regionName = "us-west-1"
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return ec2.DescribeRegionsRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeRegionsOutput{
@@ -33,6 +37,7 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -48,34 +53,134 @@ func TestGetRegions(t *testing.T) {
 	assert.Equal(t, regionName, regionsList[0])
 }
 
-func TestConvertPeriodToDuration(t *testing.T) {
-	period1 := "300s"
-	duration1, periodSec1, err := convertPeriodToDuration(period1)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", duration1)
-	assert.Equal(t, 300, periodSec1)
+func TestStringInSlice(t *testing.T) {
+	cases := []struct {
+		target         string
+		slice          []string
+		expectedExists bool
+		expectedIdx    int
+	}{
+		{
+			"bar",
+			[]string{"foo", "bar", "baz"},
+			true,
+			1,
+		},
+		{
+			"test",
+			[]string{"foo", "bar", "baz"},
+			false,
+			-1,
+		},
+	}
+	for _, c := range cases {
+		exists, idx := StringInSlice(c.target, c.slice)
+		assert.Equal(t, c.expectedExists, exists)
+		assert.Equal(t, c.expectedIdx, idx)
+	}
+}
 
-	period2 := "30ss"
-	duration2, periodSec2, err := convertPeriodToDuration(period2)
-	assert.Error(t, err)
-	assert.Equal(t, "", duration2)
-	assert.Equal(t, 0, periodSec2)
+var (
+	tagKey1   = "Name"
+	tagValue1 = "ECS Instance"
+	tagKey2   = "User"
+	tagValue2 = "foobar"
+	tagKey3   = "Organization"
+	tagValue3 = "Engineering"
+)
 
-	period3 := "10m"
-	duration3, periodSec3, err := convertPeriodToDuration(period3)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-20m", duration3)
-	assert.Equal(t, 600, periodSec3)
-
-	period4 := "30s"
-	duration4, periodSec4, err := convertPeriodToDuration(period4)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-60s", duration4)
-	assert.Equal(t, 30, periodSec4)
-
-	period5 := "60s"
-	duration5, periodSec5, err := convertPeriodToDuration(period5)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-120s", duration5)
-	assert.Equal(t, 60, periodSec5)
+func TestCheckTagFiltersExist(t *testing.T) {
+	cases := []struct {
+		title          string
+		tagFilters     []Tag
+		tags           interface{}
+		expectedExists bool
+	}{
+		{
+			"tagFilters are included in ec2 tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "ECS Instance",
+				},
+				{
+					Key:   "Organization",
+					Value: "Engineering",
+				},
+			},
+			[]ec2.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			true,
+		},
+		{
+			"one set of tagFilters is included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "test",
+				},
+				{
+					Key:   "Organization",
+					Value: "Engineering",
+				},
+			},
+			[]resourcegroupstaggingapi.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			false,
+		},
+		{
+			"tagFilters is not included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: "test",
+				},
+			},
+			[]resourcegroupstaggingapi.Tag{
+				{
+					Key:   awssdk.String(tagKey1),
+					Value: awssdk.String(tagValue1),
+				},
+				{
+					Key:   awssdk.String(tagKey2),
+					Value: awssdk.String(tagValue2),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+			},
+			false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			exists := CheckTagFiltersExist(c.tagFilters, c.tags)
+			assert.Equal(t, c.expectedExists, exists)
+		})
+	}
 }

@@ -147,6 +147,9 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 	env := []string{
 		"TEST_COVERAGE",
 		"RACE_DETECTOR",
+		"TEST_TAGS",
+		"PYTHON_EXE",
+		"MODULE",
 	}
 	env = append(env, passThroughEnvVars...)
 	return runInIntegTestEnv(mageTarget, test, env...)
@@ -181,7 +184,7 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	if err != nil {
 		return err
 	}
-	magePath := filepath.Join("/go/src", repo.ImportPath, "build/mage-linux-amd64")
+	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
 
 	// Build docker-compose args.
 	args := []string{"-p", dockerComposeProjectName(), "run",
@@ -189,6 +192,12 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// Disable strict.perms because we moust host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
+		// compose.EnsureUp needs to know the environment type.
+		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
+		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
+	}
+	if UseVendor {
+		args = append(args, "-e", "GOFLAGS=-mod=vendor")
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
@@ -319,9 +328,13 @@ func dockerComposeBuildImages() error {
 		return err
 	}
 
-	args := []string{"-p", dockerComposeProjectName(), "build", "--pull", "--force-rm"}
+	args := []string{"-p", dockerComposeProjectName(), "build", "--force-rm"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
+	}
+
+	if _, forcePull := os.LookupEnv("DOCKER_PULL"); forcePull {
+		args = append(args, "--pull")
 	}
 
 	out := ioutil.Discard

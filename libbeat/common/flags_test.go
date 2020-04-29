@@ -91,7 +91,7 @@ func TestSettingsFlag(t *testing.T) {
 		in       []string
 		expected map[string]interface{}
 	}{
-		{nil, nil},
+		{nil, map[string]interface{}{}},
 		{[]string{"a=1"}, map[string]interface{}{"a": uint64(1)}},
 		{[]string{"a=1", "b=false"}, map[string]interface{}{"a": uint64(1), "b": false}},
 		{[]string{"a=1", "b"}, map[string]interface{}{"a": uint64(1), "b": true}},

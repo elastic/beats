@@ -18,46 +18,40 @@
 package export
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version string) *cobra.Command {
+func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(name, idxPrefix, version)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
+			version, _ := cmd.Flags().GetString("es.version")
+			dir, _ := cmd.Flags().GetString("dir")
+
+			if settings.ILM == nil {
+				settings.ILM = ilm.StdSupport
 			}
-			err = b.InitWithSettings(settings)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
+				fatalfInitCmd(err)
 			}
 
-			ilmFactory := settings.ILM
-			if ilmFactory == nil {
-				ilmFactory = ilm.DefaultSupport
+			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
+			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
+			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
+				fatalf("Error exporting ilm-policy: %+v.", err)
 			}
-
-			ilm, err := ilmFactory(nil, b.Info, b.RawConfig)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing ILM support: %s\n", err)
-			}
-
-			fmt.Println(common.MapStr(ilm.Policy().Body).StringToPrint())
 		},
 	}
+
+	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
+	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing policy files. By default policies are printed to stdout.")
 
 	return genTemplateConfigCmd
 }

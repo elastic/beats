@@ -24,17 +24,18 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 const (
@@ -68,6 +69,7 @@ type Input struct {
 	done          chan struct{}
 	numHarvesters atomic.Uint32
 	meta          map[string]string
+	stopOnce      sync.Once
 }
 
 // NewInput instantiates a new Log
@@ -76,6 +78,12 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	cleanupNeeded := true
+	cleanupIfNeeded := func(f func() error) {
+		if cleanupNeeded {
+			f()
+		}
+	}
 
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
@@ -83,15 +91,21 @@ func NewInput(
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
+	defer cleanupIfNeeded(out.Close)
 
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
+	defer cleanupIfNeeded(stateOut.Close)
 
 	meta := context.Meta
 	if len(meta) == 0 {
@@ -137,6 +151,9 @@ func NewInput(
 
 	logp.Info("Configured paths: %v", p.config.Paths)
 
+	cleanupNeeded = false
+	go p.stopWhenDone()
+
 	return p, nil
 }
 
@@ -144,7 +161,7 @@ func NewInput(
 // It goes through all states coming from the registry. Only the states which match the glob patterns of
 // the input will be loaded and updated. All other states will not be touched.
 func (p *Input) loadStates(states []file.State) error {
-	logp.Debug("input", "exclude_files: %s. Number of stats: %d", p.config.ExcludeFiles, len(states))
+	logp.Debug("input", "exclude_files: %s. Number of states: %d", p.config.ExcludeFiles, len(states))
 
 	for _, state := range states {
 		// Check if state source belongs to this input. If yes, update the state.
@@ -286,7 +303,7 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			if p.config.Symlinks {
 				for _, finfo := range paths {
 					if os.SameFile(finfo, fileInfo) {
-						logp.Info("Same file found as symlink and originap. Skipping file: %s", file)
+						logp.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 						continue OUTER
 					}
 				}
@@ -637,8 +654,8 @@ func (p *Input) createHarvester(state file.State, onTerminate func()) (*Harveste
 		p.cfg,
 		state,
 		p.states,
-		func(d *util.Data) bool {
-			return p.stateOutlet.OnEvent(d)
+		func(state file.State) bool {
+			return p.stateOutlet.OnEvent(beat.Event{Private: state})
 		},
 		subOutletWrap(p.outlet),
 	)
@@ -698,10 +715,9 @@ func (p *Input) updateState(state file.State) error {
 
 	// Update first internal state
 	p.states.Update(state)
-
-	data := util.NewData()
-	data.SetState(state)
-	ok := p.outlet.OnEvent(data)
+	ok := p.outlet.OnEvent(beat.Event{
+		Private: state,
+	})
 	if !ok {
 		logp.Info("input outlet closed")
 		return errors.New("input outlet closed")
@@ -718,14 +734,27 @@ func (p *Input) Wait() {
 
 // Stop stops all harvesters and then stops the input
 func (p *Input) Stop() {
-	// Stop all harvesters
-	// In case the beatDone channel is closed, this will not wait for completion
-	// Otherwise Stop will wait until output is complete
-	p.harvesters.Stop()
+	p.stopOnce.Do(func() {
+		// Stop all harvesters
+		// In case the beatDone channel is closed, this will not wait for completion
+		// Otherwise Stop will wait until output is complete
+		p.harvesters.Stop()
 
-	// close state updater
-	p.stateOutlet.Close()
+		// close state updater
+		p.stateOutlet.Close()
 
-	// stop all communication between harvesters and publisher pipeline
-	p.outlet.Close()
+		// stop all communication between harvesters and publisher pipeline
+		p.outlet.Close()
+	})
+}
+
+// stopWhenDone takes care of stopping the input if some of the contexts are done
+func (p *Input) stopWhenDone() {
+	select {
+	case <-p.done:
+	case <-p.stateOutlet.Done():
+	case <-p.outlet.Done():
+	}
+
+	p.Wait()
 }

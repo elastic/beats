@@ -1,0 +1,70 @@
+- key: aws.elb
+  title: "ELB Listener"
+  description: >
+    AWS ELB Listeners
+  short_config: false
+  release: experimental
+  fields:
+    - name: aws.elb
+      type: group
+      description: >
+          Represents an AWS ELB Listener, e.g. a port on an ELB.
+      fields:
+        - name: ip_address_type
+          type: keyword
+          required: true
+          example: "ipv4"
+          description: Whether this is an ipv4 or dual-stack IP
+        - name: state
+          type: keyword
+          example: active
+          description: Current state of the ELB
+        - name: type
+          type: keyword
+          example: application
+          description: Whether this is an application or network loadbalancer
+        - name: protocol
+          type: keyword
+          example: HTTP
+          description: The application layer protocol
+        - name: vpc_id
+          type: keyword
+          example: vpc-123456
+          description: ID of the VPC
+        - name: ssl_policy
+          type: keyword
+          description: The specific SSL policy
+        - name: load_balancer_arn
+          type: keyword
+          example: arn:aws:elasticloadbalancing:us-east-1:331574139922:loadbalancer/app/testytesty/a14c9934d2a6e438
+          description: ARN for the ELB itself
+        - name: security_groups
+          type: keyword
+          example: sg-a1b555d4
+          description: List of security groups for this
+        - name: created
+          type: date
+          example: 2019-06-12T21:55:14.490Z
+          description: Date of creation
+        - name: availability_zones
+          type: keyword
+          example: "us-east-1e"
+          description: List of AZs this is active in
+        - name: host
+          type: keyword
+          example: testytesty-141141146.us-east-1.elb.amazonaws.com
+          description: the hostname for this ELB
+        - name: listener_arn
+          type: keyword
+          example: arn:aws:elasticloadbalancing:us-east-1:334575128422:listener/app/testytesty/b74b9934c5a6e438/0e8425ad18d4d529
+          description: ARN for this ELB listener
+        - name: scheme
+          type: keyword
+          example: internet-facing
+          description: whether this ELB is internet facing or internal-only
+        - name: port
+          type: number
+          example: 8080
+          description: Port number for this listener
+
+

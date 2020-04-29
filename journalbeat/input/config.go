@@ -20,9 +20,10 @@ package input
 import (
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/config"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Config stores the options of an input.
@@ -40,11 +41,15 @@ type Config struct {
 	CursorSeekFallback config.SeekMode `config:"cursor_seek_fallback"`
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
+	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
+	SaveRemoteHostname bool `config:"save_remote_hostname"`
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
 	// Processors to run on events.
 	Processors processors.PluginConfig `config:"processors"`
+	// ES output index pattern
+	Index fmtstr.EventFormatString `config:"index"`
 }
 
 var (
@@ -54,5 +59,6 @@ var (
 		MaxBackoff:         20 * time.Second,
 		Seek:               config.SeekCursor,
 		CursorSeekFallback: config.SeekHead,
+		SaveRemoteHostname: false,
 	}
 )

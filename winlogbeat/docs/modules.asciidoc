@@ -1,0 +1,53 @@
+[id="{beatname_lc}-modules"]
+[role="xpack"]
+= Modules
+
+[partintro]
+--
+This section contains detailed information about the available Windows event
+log processing modules contained in {beatname_uc}. More details about each
+module can be found in the module's documentation.
+
+Winlogbeat modules are constructed using the
+<<processor-script,script processor>> where all processing happens within
+Winlogbeat before the events are delivered to the output.
+
+The general goal of each module is to transform events by renaming fields to
+comply with the {ecs-ref}/index.html[Elastic Common Schema] (ECS). The modules
+may also apply additional categorization, tagging, and parsing as necessary.
+
+The default configuration file included in packages has each of the modules
+configured. To apply the modules to your own configuration file you must add
+a `script` processor to your configuration file and point it at the included
+script file for the module. The documentation for each module includes an
+example.
+
+[float]
+=== Usage with Forwarded Events
+
+The `ForwardedEvents` channel can contain events from multiple producers so you
+may want to use multiple modules. This can be achieved by applying multiple
+script processors that are guarded by a conditional `when` statement.
+
+[source,yaml]
+----
+winlogbeat.event_logs:
+- name: ForwardedEvents
+  tags: [forwarded]
+  processors:
+  - script:
+      when.equals.winlog.channel: Security
+      lang: javascript
+      id: security
+      file: ${path.home}/module/security/config/winlogbeat-security.js
+  - script:
+      when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
+      lang: javascript
+      id: sysmon
+      file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+----
+
+[float]
+=== Modules
+
+include::modules_list.asciidoc[]

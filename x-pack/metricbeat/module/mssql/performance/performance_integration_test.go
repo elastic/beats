@@ -9,13 +9,12 @@ package performance
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mtest "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/testing"
 )
 
 type keyAssertion struct {
@@ -25,9 +24,9 @@ type keyAssertion struct {
 
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
-	compose.EnsureUp(t, "mssql")
+	service := compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("performance"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "performance"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -75,7 +74,7 @@ func TestFetch(t *testing.T) {
 	keys := []keyAssertion{
 		{key: "page_splits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "buffer.page_life_expectancy.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "lock_waits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "lock_waits_per_sec", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "user_connections", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "transactions", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "active_temp_tables", assertion: int64Assertion(int64EqualZero)},

@@ -1,0 +1,87 @@
+[
+    {
+        "dropwizard": {
+            "testnamespace": {
+                "my_gauge": {},
+                "my_histogram": {
+                    "count": 0,
+                    "max": 0,
+                    "mean": 0,
+                    "min": 0,
+                    "p50": 0,
+                    "p75": 0,
+                    "p95": 0,
+                    "p98": 0,
+                    "p99": 0,
+                    "p999": 0,
+                    "stddev": 0
+                },
+                "my_timer": {
+                    "count": 0,
+                    "duration_units": "seconds",
+                    "m15_rate": 0,
+                    "m1_rate": 0,
+                    "m5_rate": 0,
+                    "max": 0,
+                    "mean": 0,
+                    "mean_rate": 0,
+                    "min": 0,
+                    "p50": 0,
+                    "p75": 0,
+                    "p95": 0,
+                    "p98": 0,
+                    "p99": 0,
+                    "p999": 0,
+                    "rate_units": "calls/second",
+                    "stddev": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "dropwizard.testnamespace",
+            "duration": 115000,
+            "module": "dropwizard"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "dropwizard"
+        }
+    },
+    {
+        "dropwizard": {
+            "testnamespace": {
+                "my_counter": {
+                    "count": 1
+                },
+                "my_meter": {
+                    "count": 0,
+                    "m15_rate": 0,
+                    "m1_rate": 0,
+                    "m5_rate": 0,
+                    "mean_rate": 0,
+                    "units": "events/second"
+                },
+                "tags": {
+                    "this": "that"
+                }
+            }
+        },
+        "event": {
+            "dataset": "dropwizard.testnamespace",
+            "duration": 115000,
+            "module": "dropwizard"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "dropwizard"
+        }
+    }
+]

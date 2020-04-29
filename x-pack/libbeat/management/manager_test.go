@@ -18,10 +18,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 type reloadable struct {
@@ -49,13 +49,13 @@ func TestConfigManager(t *testing.T) {
 	i := 0
 	responses := []string{
 		// Initial load
-		`{"configuration_blocks":[{"type":"test.block","config":{"module":"apache2"}}]}`,
+		`{"success": true, "list":[{"type":"test.block","config":{"module":"apache2"}}]}`,
 
 		// No change, no reload
-		`{"configuration_blocks":[{"type":"test.block","config":{"module":"apache2"}}]}`,
+		`{"success": true, "list":[{"type":"test.block","config":{"module":"apache2"}}]}`,
 
 		// Changed, reload
-		`{"configuration_blocks":[{"type":"test.block","config":{"module":"system"}}]}`,
+		`{"success": true, "list":[{"type":"test.block","config":{"module":"system"}}]}`,
 	}
 	mux.Handle(fmt.Sprintf("/api/beats/agent/%s/configuration", id), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, responses[i])
@@ -73,6 +73,7 @@ func TestConfigManager(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -128,10 +129,10 @@ func TestRemoveItems(t *testing.T) {
 	i := 0
 	responses := []string{
 		// Initial load
-		`{"configuration_blocks":[{"type":"test.blocks","config":{"module":"apache2"}}]}`,
+		`{"success": true, "list":[{"type":"test.blocks","config":{"module":"apache2"}}]}`,
 
 		// Return no blocks
-		`{"configuration_blocks":[]}`,
+		`{"success": true, "list":[]}`,
 	}
 	mux.Handle(fmt.Sprintf("/api/beats/agent/%s/configuration", id), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, responses[i])
@@ -148,6 +149,7 @@ func TestRemoveItems(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -206,7 +208,7 @@ func TestUnEnroll(t *testing.T) {
 	mux := http.NewServeMux()
 	i := 0
 	responses := []http.HandlerFunc{ // Initial load
-		responseText(`{"configuration_blocks":[{"type":"test.blocks","config":{"module":"apache2"}}]}`),
+		responseText(`{"success": true, "list":[{"type":"test.blocks","config":{"module":"apache2"}}]}`),
 		http.NotFound,
 	}
 
@@ -225,6 +227,7 @@ func TestUnEnroll(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -277,9 +280,9 @@ func TestBadConfig(t *testing.T) {
 	mux := http.NewServeMux()
 	i := 0
 	responses := []http.HandlerFunc{ // Initial load
-		responseText(`{"configuration_blocks":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
+		responseText(`{"success": true, "list":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
 		// will not resend new events
-		responseText(`{"configuration_blocks":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
+		responseText(`{"success": true, "list":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
 		// recover on call
 		http.NotFound,
 	}
@@ -299,6 +302,7 @@ func TestBadConfig(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -406,7 +410,7 @@ func addEventsReporterHandle(mux *http.ServeMux, uuid uuid.UUID) *collectEventRe
 		resp := api.EventAPIResponse{Response: make([]api.EventResponse, len(requests))}
 
 		for i := 0; i < len(requests); i++ {
-			resp.Response[i] = api.EventResponse{Success: true}
+			resp.Response[i] = api.EventResponse{BaseResponse: api.BaseResponse{Success: true}}
 		}
 
 		json.NewEncoder(w).Encode(resp)

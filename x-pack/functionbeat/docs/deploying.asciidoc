@@ -1,0 +1,115 @@
+[id="deploy-to-cloud-provider"]
+[role="xpack"]
+=== Deploy {beatname_uc} to your cloud provider
+
+After configuring {beatname_uc} and defining cloud functions for the services
+you want to monitor, deploy the functions to your cloud provider. To do this,
+you can use the {beatname_uc} manager (good for getting started), or use your
+own deployment infrastructure.
+
+[[manager-deployment]]
+==== Use the {beatname_uc} manager
+
+Use the built-in manager to deploy, update, or delete {beatname_uc} functions
+when you don't have your own deployment infrastructure or process in place.  
+
+During deployment, the {beatname_uc} manager:
+
+* Exports a function template to use for deployment. For AWS, it exports an
+{cloudformation-ref} template. For Google Cloud, it exports a YAML configuration
+file. To inspect the template, run the <<export-command,`export`>> command.
+* Creates a zip package that includes the function code and +{beatname_lc}.yml+
+config file.
+* Uploads the package to the specified cloud provider.
+
+See <<{beatname_lc}-deploying>> in the getting started to learn how to deploy
+functions by using the {beatname_uc} manager.
+
+[[own-deployment]]
+==== Use your own deployment infrastructure
+
+If you don't want to use the {beatname_uc} manager, use your own deployment
+infrastructure. To do this, create a package, then deploy it to your cloud
+provider:
+
+. Set the following environment variables:
++
+`BEAT_STRICT_PERMS=false`:: This setting makes the function skip the ownership
+check on the configuration file.
+`ENABLED_FUNCTIONS=function-name-1,function-name-2`:: Specifies a
+comma-separated list of functions that are enabled in the configuration file. For
+example, to package functions called `my-kinesis` and `my-cloudwatch-logs`, run:
++
+*linux and mac*:
++
+[source, shell]
+----
+export BEAT_STRICT_PERMS=false
+export ENABLED_FUNCTIONS=my-kinesis,my-cloudwatch-logs
+----
++
+*win*:
++
+[source, shell]
+----
+set BEAT_STRICT_PERMS=false
+set ENABLED_FUNCTIONS=my-kinesis,my-cloudwatch-logs
+----
++
+TIP: For easier management, we recommend having one Lambda per function. 
+
+. Run the `package` command to package the functions and dependencies into an
+archive. For example: 
++
+*linux and mac:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} -v -e -d "*" package --output /path/to/folder/package-{{.Provider}}.zip
+----------------------------------------------------------------------
++
+*win:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+.{backslash}{beatname_lc}.exe -v -e -d "*" package --output /path/to/folder/package-{{.Provider}}.zip
+----------------------------------------------------------------------
++
+For `--output` specify a full path pattern.
++
+The `package` command generates deployment packages for each provider specified
+in the configuration. Each package contains:
++
+* a binary with the function code
+* the `functionbeat.yml` config file
+
+. If certificates are required, add the cert files to the zip package under the
+same path as the configured +{beatname_lc}.yml+ file.
+
+. Export a function template to use for deployment:
++
+*linux and mac:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} export function FUNCTION_NAME
+----------------------------------------------------------------------
++
+*win:*
++
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+.{backslash}{beatname_lc}.exe export function FUNCTION_NAME
+----------------------------------------------------------------------
++
+{beatname_uc} writes the template to stdout. For AWS functions, it writes an
+{cloudformation-ref} tempalte. For Google Cloud, it writes a YAML configuration
+file.
+
+. Modify the template to work with your infrastructure.
+
+. Deploy the package, using the infrastructure and automation supported by your
+cloud provider, for example, {cloudformation-ref} or
+https://cloud.google.com/deployment-manager[Google Cloud Deployment manager].
++
+For more information about deployment, see your cloud provider's documentation.

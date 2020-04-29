@@ -211,6 +211,9 @@ func parsePatternTo(b *builder, pattern string) error {
 		case 'S': // fraction of second
 			b.millisOfSecond(tokLen)
 
+		case 'z': // timezone offset
+			b.timeZoneOffsetText()
+
 		case '\'': // literal
 			if tokLen == 1 {
 				b.appendRune(rune(tokText[0]))

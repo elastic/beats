@@ -26,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/kubernetes/util"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
@@ -51,6 +51,7 @@ func TestEventMapping(t *testing.T) {
 
 	testCases := map[string]interface{}{
 		"name": "nginx-deployment-2303442956-pcqfc",
+		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
 
 		"network.rx.bytes":  107056,
 		"network.rx.errors": 0,
