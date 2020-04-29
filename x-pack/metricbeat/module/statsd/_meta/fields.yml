@@ -10,7 +10,7 @@
         - name: '*.count'
           type: object
           object_type: long
-          object_type_mapping_type: "long"
+          object_type_mapping_type: "*"
           description: >
             Statsd counters
         - name: '*.*'
