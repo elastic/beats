@@ -1003,7 +1003,9 @@ def junitAndStore(Map params = [:]){
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      dir("${env.BASE_DIR}/.runbld") {
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Prepare workspace context',
+           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
@@ -1011,10 +1013,10 @@ def runbld() {
           }
         }
         sh(label: 'Process JUnit reports with runbld',
-           script: '''
-            echo 'Processing JUnit reports with runbld...' > ./runbld-script
-            /usr/local/bin/runbld ./runbld-script
-           ''')
+          script: '''
+          echo 'Processing JUnit reports with runbld...' > ./runbld-script
+          /usr/local/bin/runbld ./runbld-script
+          ''')
       }
     }
   }
