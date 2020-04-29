@@ -6,7 +6,12 @@ package stackdriver
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"github.com/golang/protobuf/ptypes/duration"
+
+	monitoring "cloud.google.com/go/monitoring/apiv3"
 
 	"github.com/pkg/errors"
 
@@ -38,19 +43,33 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config config
+	config            config
+	metricsMeta       map[string]metricMeta
+	requester         *stackdriverMetricsRequester
+	stackDriverConfig []stackDriverConfig `config:"metrics" validate:"nonzero,required"`
+}
+
+//stackDriverConfig holds a configuration specific for stackdriver metricset.
+type stackDriverConfig struct {
+	MetricTypes []string `config:"metric_types" validate:"required"`
+	Aligner     string   `config:"aligner"`
+}
+
+type metricMeta struct {
+	samplePeriod time.Duration
+	ingestDelay  time.Duration
 }
 
 type config struct {
-	Metrics             []string `config:"stackdriver.metrics" validate:"required"`
-	Zone                string   `config:"zone"`
-	Region              string   `config:"region"`
-	ProjectID           string   `config:"project_id" validate:"required"`
-	ExcludeLabels       bool     `config:"exclude_labels"`
-	ServiceName         string   `config:"stackdriver.service"  validate:"required"`
-	CredentialsFilePath string   `config:"credentials_file_path"`
+	Zone                string `config:"zone"`
+	Region              string `config:"region"`
+	ProjectID           string `config:"project_id" validate:"required"`
+	ExcludeLabels       bool   `config:"exclude_labels"`
+	ServiceName         string `config:"stackdriver.service"  validate:"required"`
+	CredentialsFilePath string `config:"credentials_file_path"`
 
-	opt []option.ClientOption
+	opt    []option.ClientOption
+	period duration.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -64,12 +83,39 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	stackDriverConfigs := struct {
+		StackDriverMetrics []stackDriverConfig `config:"stackdriver.metrics" validate:"nonzero,required"`
+	}{}
+
+	if err := base.Module().UnpackConfig(&stackDriverConfigs); err != nil {
+		return nil, err
+	}
+
+	m.stackDriverConfig = stackDriverConfigs.StackDriverMetrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	m.config.period.Seconds = int64(m.Module().Config().Period.Seconds())
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
 		return nil, err
 	}
 
+	// Get ingest delay and sample period for each metric type
+	ctx := context.Background()
+	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating Stackdriver client")
+	}
+
+	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.stackDriverConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "error calling metricDescriptor function")
+	}
+
+	m.requester = &stackdriverMetricsRequester{
+		config: m.config,
+		client: client,
+		logger: m.Logger(),
+	}
 	return m, nil
 }
 
@@ -77,12 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	reqs, err := newStackdriverMetricsRequester(ctx, m.config, m.Module().Config().Period, m.Logger())
-	if err != nil {
-		return errors.Wrapf(err, "error trying to do create a request client to GCP project '%s' in zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
-	}
-
-	responses, err := reqs.Metrics(ctx, m.config.Metrics)
+	responses, err := m.requester.Metrics(ctx, m.stackDriverConfig, m.metricsMeta)
 	if err != nil {
 		return errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 	}
@@ -99,7 +140,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSeries) ([]mb.Event, error) {
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger())
 
 	var gcpService = googlecloud.NewStackdriverMetadataServiceForTimeSeries(nil)
@@ -140,13 +181,14 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []*monitoringpb.TimeSe
 
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
-	if d.Seconds() < 300 {
-		return errors.New("period in Google Cloud config file cannot be set to less than 300 seconds")
+	if d.Seconds() < googlecloud.MonitoringMetricsSamplingRate {
+		return errors.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", googlecloud.MonitoringMetricsSamplingRate)
 	}
 
 	return nil
 }
 
+// Validate googlecloud module config
 func (c *config) Validate() error {
 	// storage metricset does not require region or zone config parameter.
 	if c.ServiceName == "storage" {
@@ -157,4 +199,47 @@ func (c *config) Validate() error {
 		return errors.New("region and zone in Google Cloud config file cannot both be empty")
 	}
 	return nil
+}
+
+// Validate stackdriver related config
+func (mc *stackDriverConfig) Validate() error {
+	gcpAlignerNames := make([]string, 0)
+	for k := range googlecloud.AlignersMapToGCP {
+		gcpAlignerNames = append(gcpAlignerNames, k)
+	}
+
+	if mc.Aligner != "" {
+		if _, ok := googlecloud.AlignersMapToGCP[mc.Aligner]; !ok {
+			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
+		}
+	}
+	return nil
+}
+
+// metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
+// (sample period and ingest delay) of each given metric type
+func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, stackDriverConfigs []stackDriverConfig) (map[string]metricMeta, error) {
+	metricsWithMeta := make(map[string]metricMeta, 0)
+
+	for _, sdc := range stackDriverConfigs {
+		for _, mt := range sdc.MetricTypes {
+			req := &monitoringpb.ListMetricDescriptorsRequest{
+				Name:   "projects/" + projectID,
+				Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
+			}
+
+			it := client.ListMetricDescriptors(ctx, req)
+			out, err := it.Next()
+			if err != nil {
+				return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
+			}
+
+			metricsWithMeta[mt] = metricMeta{
+				samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
+				ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
+			}
+		}
+	}
+
+	return metricsWithMeta, nil
 }

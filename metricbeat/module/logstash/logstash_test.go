@@ -15,12 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
+package logstash_test
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+
+	// Make sure metricsets are registered in mb.Registry
+	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
+	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
 )
 
 func TestGetVertexClusterUUID(t *testing.T) {
@@ -53,7 +60,26 @@ func TestGetVertexClusterUUID(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, test.expectedClusterUUID, GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
+			require.Equal(t, test.expectedClusterUUID, logstash.GetVertexClusterUUID(test.vertex, test.overrideClusterUUID))
 		})
+	}
+}
+
+func TestXPackEnabledMetricSets(t *testing.T) {
+	config := map[string]interface{}{
+		"module":        logstash.ModuleName,
+		"hosts":         []string{"foobar:9600"},
+		"xpack.enabled": true,
+	}
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	require.Len(t, metricSets, 2)
+	for _, ms := range metricSets {
+		name := ms.Name()
+		switch name {
+		case "node", "node_stats":
+		default:
+			t.Errorf("unexpected metricset name = %v", name)
+		}
 	}
 }

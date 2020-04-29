@@ -106,4 +106,4 @@ class Test(BaseTest):
         return "http://" + self.compose_host("kibana")
 
     def kibana_dir(self):
-        return os.path.join(self.beat_path, "_meta", "kibana.generated")
+        return os.path.join(self.beat_path, "build", "kibana")
