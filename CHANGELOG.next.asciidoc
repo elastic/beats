@@ -347,7 +347,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
-
+- Add additional ECS compatible fields for TLS information. {pull}17687[17687]
 
 *Heartbeat*
 
