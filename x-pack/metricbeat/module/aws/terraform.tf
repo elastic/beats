@@ -36,6 +36,11 @@ resource "aws_s3_bucket" "test" {
   force_destroy = true // Required for cleanup
 }
 
+resource "aws_s3_bucket_metric" "test" {
+  bucket = aws_s3_bucket.test.id
+  name   = "EntireBucket"
+}
+
 resource "aws_s3_bucket_object" "test" {
   key     = "someobject"
   bucket  = aws_s3_bucket.test.id

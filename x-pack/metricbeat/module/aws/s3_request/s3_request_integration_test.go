@@ -17,8 +17,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	t.Skip("This test doesn't pass with current terraform scenario")
-
 	config := mtest.GetConfigForTest(t, "s3_request", "86400s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
