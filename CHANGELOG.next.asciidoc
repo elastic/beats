@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
+- Improve ECS categorization field mappings for nginx module. http.request.referrer is now lowercase & http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 
 *Heartbeat*
 
@@ -276,7 +277,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
 - Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
-- Improve ECS categorization field mappings for nginx module. {issue}16174[16174] {pull}17844[17844]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Improve ECS categorization field mappings in redis module. {issue}16179[16179] {pull}17918[17918]
