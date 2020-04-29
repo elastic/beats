@@ -23,7 +23,10 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -35,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -205,6 +209,92 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSocketOwnershipAndMode(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("changing socket ownership is only supported on non-windows")
+		return
+	}
+
+	groups, err := os.Getgroups()
+	require.NoError(t, err)
+
+	if len(groups) <= 1 {
+		t.Skip("no group that we can change to")
+		return
+	}
+
+	group, err := user.LookupGroupId(strconv.Itoa(groups[1]))
+	require.NoError(t, err)
+
+	path := filepath.Join(os.TempDir(), "test.sock")
+	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+		"path":  path,
+		"group": group.Name,
+		"mode":  "0740",
+	})
+	config := defaultConfig
+	err = cfg.Unpack(&config)
+	require.NoError(t, err)
+
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
+	server, err := New(&config, factory)
+	require.NoError(t, err)
+	err = server.Start()
+	require.NoError(t, err)
+	defer server.Stop()
+
+	info, err := file.Lstat(path)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, info.Mode()&os.ModeSocket)
+	require.Equal(t, os.FileMode(0740), info.Mode().Perm())
+	gid, err := info.GID()
+	require.NoError(t, err)
+	require.Equal(t, group.Gid, strconv.Itoa(gid))
+}
+
+func TestSocketCleanup(t *testing.T) {
+	path := filepath.Join(os.TempDir(), "test.sock")
+	mockStaleSocket, err := net.Listen("unix", path)
+	require.NoError(t, err)
+	defer mockStaleSocket.Close()
+
+	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+		"path": path,
+	})
+	config := defaultConfig
+	require.NoError(t, cfg.Unpack(&config))
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
+	server, err := New(&config, factory)
+	require.NoError(t, err)
+	err = server.Start()
+	require.NoError(t, err)
+	server.Stop()
+}
+
+func TestSocketCleanupRefusal(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping due to windows FileAttributes bug https://github.com/golang/go/issues/33357")
+		return
+	}
+	path := filepath.Join(os.TempDir(), "test.sock")
+	f, err := os.Create(path)
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+	defer os.Remove(path)
+
+	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+		"path": path,
+	})
+	config := defaultConfig
+	require.NoError(t, cfg.Unpack(&config))
+	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
+	server, err := New(&config, factory)
+	require.NoError(t, err)
+	err = server.Start()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "refusing to remove file at location")
 }
 
 func TestReceiveNewEventsConcurrently(t *testing.T) {
