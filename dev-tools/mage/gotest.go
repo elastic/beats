@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -137,33 +138,47 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	return RunIntegTest("goIntegTest", func() error {
-		module := EnvOr("MODULE", "")
-		if module != "" {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(module))
-			return errors.Wrapf(err, "integration tests failed for module %s", module)
-		}
+	module := EnvOr("MODULE", "")
+	modulesFileInfo, err := ioutil.ReadDir("./module")
+	if err != nil {
+		return err
+	}
 
-		modulesFileInfo, err := ioutil.ReadDir("./module")
+	foundModule := false
+	failedModules := []string{}
+	for _, fi := range modulesFileInfo {
+		if !fi.IsDir() {
+			continue
+		}
+		if module != "" && module != fi.Name() {
+			continue
+		}
+		foundModule = true
+
+		// Set MODULE because only want that modules tests to run inside the testing environment.
+		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), map[string]string{"MODULE": fi.Name()})
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "test setup failed for module %s", fi.Name())
 		}
-
-		var failed bool
-		for _, fi := range modulesFileInfo {
-			if !fi.IsDir() {
-				continue
-			}
+		err = runners.Test("goIntegTest", func() error {
 			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
 			if err != nil {
-				failed = true
+				return err
 			}
+			return nil
+		})
+		if err != nil {
+			// err will already be report to stdout, collect failed module to report at end
+			failedModules = append(failedModules, fi.Name())
 		}
-		if failed {
-			return errors.New("integration tests failed")
-		}
-		return nil
-	})
+	}
+	if module != "" && !foundModule {
+		return fmt.Errorf("no module %s", module)
+	}
+	if len(failedModules) > 0 {
+		return fmt.Errorf("failed modules: %s", strings.Join(failedModules, ", "))
+	}
+	return nil
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an

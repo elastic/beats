@@ -1,5 +1,5 @@
 [[running-on-kubernetes]]
-=== Running Metricbeat on Kubernetes
+=== Run Metricbeat on Kubernetes
 
 You can use {beatname_uc} <<running-on-docker,Docker images>> on Kubernetes to
 retrieve cluster metrics.

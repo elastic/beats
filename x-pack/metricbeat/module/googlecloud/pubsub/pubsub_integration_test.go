@@ -8,14 +8,38 @@
 package pubsub
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud/stackdriver"
 )
 
 func TestData(t *testing.T) {
-	config := googlecloud.GetConfigForTest(t, "pubsub")
-	metricSet := mbtest.NewFetcher(t, config)
-	metricSet.WriteEvents(t, "/")
+	metricPrefixIs := func(metricPrefix string) func(e common.MapStr) bool {
+		return func(e common.MapStr) bool {
+			v, err := e.GetValue(metricPrefix)
+			return err == nil && v != nil
+		}
+	}
+
+	dataFiles := []struct {
+		metricPrefix string
+		path         string
+	}{
+		{"googlecloud.pubsub", "./_meta/data.json"},
+		{"googlecloud.pubsub.snapshot", "./_meta/data_snapshot.json"},
+		{"googlecloud.pubsub.subscription", "./_meta/data_subscription.json"},
+		{"googlecloud.pubsub.topic", "./_meta/data_topic.json"},
+	}
+
+	config := stackdriver.GetConfigForTest(t, "pubsub")
+
+	for _, df := range dataFiles {
+		metricSet := mbtest.NewFetcher(t, config)
+		t.Run(fmt.Sprintf("metric prefix: %s", df.metricPrefix), func(t *testing.T) {
+			metricSet.WriteEventsCond(t, df.path, metricPrefixIs(df.metricPrefix))
+		})
+	}
 }

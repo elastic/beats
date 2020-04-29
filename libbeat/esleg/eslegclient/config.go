@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
@@ -32,7 +33,8 @@ type config struct {
 	Params   map[string]string `config:"parameters"`
 	Headers  map[string]string `config:"headers"`
 
-	TLS *tlscommon.Config `config:"ssl"`
+	TLS      *tlscommon.Config `config:"ssl"`
+	Kerberos *kerberos.Config  `config:"kerberos"`
 
 	ProxyURL     string `config:"proxy_url"`
 	ProxyDisable bool   `config:"proxy_disable"`
