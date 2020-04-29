@@ -1525,6 +1525,66 @@ type: keyword
 
 --
 
+*`cloud.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+
+
+type: keyword
+
+--
+
+*`cloud.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+
+type: keyword
+
+--
+
+*`cloud.region`*::
++
+--
+Region in which this host is running.
+
+
+type: keyword
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+Availability zone in which this host is running.
+
+
+type: keyword
+
+--
+
+*`cloud.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+
+type: keyword
+
+--
+
+*`cloud.machine.type`*::
++
+--
+Machine type of the host machine.
+
+
+type: keyword
+
+--
+
 [float]
 === aws
 

@@ -8,6 +8,30 @@
       type: keyword
       description: >
         The cloud account name or alias used to identify different entities in a multi-tenant environment.
+    - name: cloud.account.id
+      type: keyword
+      description: >
+        The cloud account or organization id used to identify different entities in a multi-tenant environment.
+    - name: cloud.provider
+      type: keyword
+      description: >
+        Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+    - name: cloud.region
+      type: keyword
+      description: >
+        Region in which this host is running.
+    - name: cloud.availability_zone
+      type: keyword
+      description: >
+        Availability zone in which this host is running.
+    - name: cloud.instance.id
+      type: keyword
+      description: >
+        Instance ID of the host machine.
+    - name: cloud.machine.type
+      type: keyword
+      description: >
+        Machine type of the host machine.
     - name: aws
       type: group
       description: >
