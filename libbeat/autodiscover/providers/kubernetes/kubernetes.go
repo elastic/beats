@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -54,10 +55,11 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	logger    *logp.Logger
 	eventer   Eventer
+	keystore  keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -97,6 +99,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		builders:  builders,
 		appenders: appenders,
 		logger:    logger,
+		keystore:  keystore,
 	}
 
 	switch config.Resource {
@@ -135,6 +138,8 @@ func (p *Provider) String() string {
 }
 
 func (p *Provider) publish(event bus.Event) {
+	// attach keystore to the event to be consumed by the static configs
+	event["keystore"] = p.keystore
 	// Try to match a config
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config

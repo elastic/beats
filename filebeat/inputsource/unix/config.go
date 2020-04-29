@@ -30,6 +30,8 @@ const Name = "unix"
 // Config exposes the unix configuration.
 type Config struct {
 	Path           string           `config:"path"`
+	Group          *string          `config:"group"`
+	Mode           *string          `config:"mode"`
 	Timeout        time.Duration    `config:"timeout" validate:"nonzero,positive"`
 	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"nonzero,positive"`
 	MaxConnections int              `config:"max_connections"`

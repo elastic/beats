@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -56,6 +57,7 @@ func NewInput(
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	cfgwarn.Beta("Unix socket support is beta.")
 
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{

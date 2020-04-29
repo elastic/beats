@@ -67,3 +67,11 @@ update: mage
 .PHONY: crosscompile
 crosscompile: mage
 	mage crossBuild
+
+.PHONY: docs
+docs:
+	mage docs
+
+.PHONY: docs-preview
+docs-preview:
+	PREVIEW=1 $(MAKE) docs
