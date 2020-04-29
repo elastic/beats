@@ -4,14 +4,29 @@
         "destination.address": "172.16.128.202",
         "destination.ip": "172.16.128.202",
         "destination.port": 445,
+        "event.action": "BrowserrQueryOtherDomains",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.dce_rpc",
         "event.id": "CsNHVHa1lzFtvJzT8",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "protocol",
+            "info"
+        ],
         "fileset.name": "dce_rpc",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:SJNAD5vtzZuhQjGtfaI8svTnyuw=",
         "network.protocol": "dce_rpc",
         "network.transport": "tcp",
+        "related.ip": [
+            "172.16.133.6",
+            "172.16.128.202"
+        ],
         "service.type": "zeek",
         "source.address": "172.16.133.6",
         "source.ip": "172.16.133.6",
