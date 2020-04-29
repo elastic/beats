@@ -18,13 +18,17 @@
 package hints
 
 import (
+	"os"
+	"path/filepath"
 	"sort"
 	"testing"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -324,6 +328,78 @@ func TestGenerateHints(t *testing.T) {
 	}
 }
 
+func TestGenerateHintsDoesNotAccessKeystore(t *testing.T) {
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, "stored_secret")
+	os.Setenv("PASSWORD", "env_secret")
+
+	tests := []struct {
+		message string
+		event   bus.Event
+		len     int
+		result  common.MapStr
+	}{
+		{
+			message: "Module, namespace, host hint should return valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":   "mockmoduledefaults",
+						"hosts":    "${data.host}:9090",
+						"password": "${PASSWORD}",
+					},
+				},
+				"keystore": keystore,
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []string{"default"},
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"password":   "env_secret",
+			},
+		},
+	}
+	for _, test := range tests {
+		mockRegister := mb.NewRegister()
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
+
+		m := metricHints{
+			Key:      defaultConfig().Key,
+			Registry: mockRegister,
+		}
+		cfgs := m.CreateConfig(test.event)
+		assert.Equal(t, len(cfgs), test.len)
+		if len(cfgs) != 0 {
+			config := common.MapStr{}
+			err := cfgs[0].Unpack(&config)
+			assert.Nil(t, err, test.message)
+
+			// metricsets order is random, order it for tests
+			if v, err := config.GetValue("metricsets"); err == nil {
+				if msets, ok := v.([]interface{}); ok {
+					metricsets := make([]string, len(msets))
+					for i, v := range msets {
+						metricsets[i] = v.(string)
+					}
+					sort.Strings(metricsets)
+					config["metricsets"] = metricsets
+				}
+			}
+
+			assert.Equal(t, test.result, config, test.message)
+		}
+
+	}
+}
+
 type MockMetricSet struct {
 	mb.BaseMetricSet
 }
@@ -334,4 +410,32 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func (ms *MockMetricSet) Fetch(report mb.Reporter) {
 
+}
+
+// create a keystore with an existing key
+/// `PASSWORD` with the value of `secret` variable.
+func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+	keyStore, err := keystore.NewFileKeystore(path)
+	// Fail fast in the test suite
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore.Store("PASSWORD", []byte(secret))
+	writableKeystore.Save()
+	return keyStore
+}
+
+// create a temporary file on disk to save the keystore.
+func getTemporaryKeystoreFile() string {
+	path, err := ioutils.TempDir("", "testing")
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(path, "keystore")
 }
