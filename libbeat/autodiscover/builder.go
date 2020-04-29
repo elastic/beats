@@ -20,12 +20,14 @@ package autodiscover
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/libbeat/keystore"
-	"github.com/elastic/go-ucfg"
 	"strings"
+
+	"github.com/elastic/go-ucfg"
+	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 // Builder provides an interface by which configs can be built from provider metadata
@@ -37,7 +39,7 @@ type Builder interface {
 // Builders is a struct of Builder list objects and a common Keystore object
 type Builders struct {
 	Builders []Builder
-	keystore  keystore.Keystore
+	client   k8s.Interface
 }
 
 // BuilderConstructor is a func used to generate a Builder object
@@ -95,9 +97,11 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	configs := []*common.Config{}
 	var opts   []ucfg.Option
-	if b.keystore != nil {
+
+	k8sKeystore := getK8sKeystore(event, b.client)
+	if k8sKeystore != nil {
 		opts = []ucfg.Option{
-			ucfg.Resolve(keystore.ResolverWrap(b.keystore)),
+			ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)),
 		}
 	}
 	for _, builder := range b.Builders {
@@ -109,9 +113,26 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
+func getK8sKeystore(event bus.Event, client k8s.Interface) keystore.Keystore {
+	namespace := ""
+	if val, ok := event["kubernetes"]; ok {
+		kubernetesMeta := val.(common.MapStr)
+		ns, err := kubernetesMeta.GetValue("namespace")
+		if err != nil {
+			return nil
+		}
+		namespace = ns.(string)
+	}
+	if namespace != "" {
+		k8sKeystore, _ := keystore.Factoryk8s(namespace, client)
+		return k8sKeystore
+	}
+	return nil
+}
+
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
 // for simplified mode (single 'hints' builder)
-func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, keystore keystore.Keystore) (Builders, error) {
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, client k8s.Interface) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
@@ -130,6 +151,6 @@ func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, keystore ke
 		}
 		builders.Builders = append(builders.Builders, builder)
 	}
-	builders.keystore = keystore
+	builders.client = client
 	return builders, nil
 }

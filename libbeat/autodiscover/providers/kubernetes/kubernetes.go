@@ -81,11 +81,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keyStore
 		return nil, errWrap(err)
 	}
 
-	k8sKeystore, err := kubernetes.CreateKubernetesKeystoreBackend(client)
-	if err != nil {
-		logger.Errorf("")
-	}
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystore)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, client)
 	if err != nil {
 		return nil, errWrap(err)
 	}
