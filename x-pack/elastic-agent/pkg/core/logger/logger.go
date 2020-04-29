@@ -23,6 +23,7 @@ type Config struct {
 	Level loggingLevel `config:"logging.level"`
 }
 
+// DefaultLoggingConfig creates a default logging configuration.
 func DefaultLoggingConfig() *Config {
 	return &Config{
 		Level: loggingLevel(backend.Trace),
