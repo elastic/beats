@@ -14,7 +14,7 @@ As one of the main pieces provided for Kubernetes monitoring, this module is cap
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/[scheduler]
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/[proxy]
 
-Some of the previous components are running in each of the Kubernetes nodes (like `kubelet` or `proxy`) while others provide a single cluster-wide endpoint. This is important to determine the optimal configuration and running strategy for the different metricsets included in the module.
+Some of the previous components are running on each of the Kubernetes nodes (like `kubelet` or `proxy`) while others provide a single cluster-wide endpoint. This is important to determine the optimal configuration and running strategy for the different metricsets included in the module.
 
 For a complete reference on how to configure and run this module on Kubernetes as part of a `DaemonSet` and a `Deployment`, there's a complete example manifest available in <<running-on-kubernetes,Running Metricbeat on Kubernetes>> document.
 
