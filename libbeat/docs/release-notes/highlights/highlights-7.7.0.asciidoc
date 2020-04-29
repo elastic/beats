@@ -7,8 +7,8 @@
 Each release of {beats} brings new features and product improvements. 
 Following are the most notable features and enhancements in 7.7.
 
-//For a complete list of related highlights, see the 
-//https://www.elastic.co/blog/elastic-observability-7-7-0-released[Observability 7.7 release blog].
+For a complete list of related highlights, see the 
+https://www.elastic.co/blog/elastic-observability-7-7-0-released[Observability 7.7 release blog].
 
 For a list of bug fixes and other changes, see the {beats}
 <<breaking-changes-7.7, Breaking Changes>> and <<release-notes, Release Notes>>.
