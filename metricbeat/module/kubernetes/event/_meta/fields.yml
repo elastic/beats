@@ -58,6 +58,10 @@
         type: date
         description: >
           Timestamp of creation of the given event
+    - name: generate_name
+      type: keyword
+      description: >
+        Generate name of the event
     - name: name
       type: keyword
       description: >
