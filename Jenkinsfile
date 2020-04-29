@@ -999,7 +999,6 @@ def junitAndStore(Map params = [:]){
   stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
   stashedTestReports[stageName] = stageName
 }
-dir("${env.BASE_DIR}") {
 
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
