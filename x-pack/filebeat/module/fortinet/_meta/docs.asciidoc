@@ -7,13 +7,17 @@
 
 This is a module for Fortinet FortiOS logs sent in the syslog format.
 
+To configure a remote syslog destination, please reference the https://docs.fortinet.com/document/fortigate/6.0.0/cli-reference/260508/log-syslogd-syslogd2-syslogd3-syslogd4-setting[Fortigate/FortiOS Documentation]
+
+The syslog format choosen should be `Default`.
 
 include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
 
-This module has been tested against FortiOS version 6.0 and above
+This module has been tested against FortiOS version 6.0.x and 6.2.x. 
+Versions above this is expected to work but not tested.
 
 include::../include/configuring-intro.asciidoc[]
 

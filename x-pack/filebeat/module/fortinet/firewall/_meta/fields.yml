@@ -1606,9 +1606,9 @@
         AD server FQDN or IP
 
     - name: session_id
-      type: integer
+      type: keyword
       description: >
-        WAD Session ID
+        Session ID
 
     - name: sessionid
       type: integer

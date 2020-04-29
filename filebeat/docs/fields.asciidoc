@@ -21440,10 +21440,10 @@ type: keyword
 *`fortinet.firewall.session_id`*::
 +
 --
-WAD Session ID
+Session ID
 
 
-type: integer
+type: keyword
 
 --
 
