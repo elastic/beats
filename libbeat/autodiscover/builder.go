@@ -20,6 +20,8 @@ package autodiscover
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/libbeat/keystore"
+	"github.com/elastic/go-ucfg"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,11 +31,14 @@ import (
 // Builder provides an interface by which configs can be built from provider metadata
 type Builder interface {
 	// CreateConfig creates a config from hints passed from providers
-	CreateConfig(event bus.Event) []*common.Config
+	CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config
 }
 
-// Builders is a list of Builder objects
-type Builders []Builder
+// Builders is a struct of Builder list objects and a common Keystore object
+type Builders struct {
+	Builders []Builder
+	keystore  keystore.Keystore
+}
 
 // BuilderConstructor is a func used to generate a Builder object
 type BuilderConstructor func(*common.Config) (Builder, error)
@@ -89,9 +94,14 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 // GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	configs := []*common.Config{}
-
-	for _, builder := range b {
-		if config := builder.CreateConfig(event); config != nil {
+	var opts   []ucfg.Option
+	if b.keystore != nil {
+		opts = []ucfg.Option{
+			ucfg.Resolve(keystore.ResolverWrap(b.keystore)),
+		}
+	}
+	for _, builder := range b.Builders {
+		if config := builder.CreateConfig(event, opts); config != nil {
 			configs = append(configs, config...)
 		}
 	}
@@ -101,11 +111,11 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
 // for simplified mode (single 'hints' builder)
-func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, keystore keystore.Keystore) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
-			return nil, errors.New("hints.enabled is incompatible with manually defining builders")
+			return Builders{}, errors.New("hints.enabled is incompatible with manually defining builders")
 		}
 
 		// pass rest of hints settings to the builder
@@ -116,10 +126,10 @@ func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, 
 	for _, bcfg := range bConfigs {
 		builder, err := Registry.BuildBuilder(bcfg)
 		if err != nil {
-			return nil, err
+			return Builders{}, err
 		}
-		builders = append(builders, builder)
+		builders.Builders = append(builders.Builders, builder)
 	}
-
+	builders.keystore = keystore
 	return builders, nil
 }

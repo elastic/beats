@@ -19,6 +19,7 @@ package hints
 
 import (
 	"fmt"
+	"github.com/elastic/go-ucfg"
 	"regexp"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -70,7 +71,7 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create config based on input hints in the bus event
-func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
+func (l *logHints) CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config {
 	var hints common.MapStr
 	hIface, ok := event["hints"]
 	if ok {

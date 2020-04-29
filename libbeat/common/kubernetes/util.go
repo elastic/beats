@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/keystore"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -68,6 +69,15 @@ func IsInCluster(kubeconfig string) bool {
 		return false
 	}
 	return true
+}
+
+func CreateKubernetesKeystoreBackend(client kubernetes.Interface) (keystore.Keystore, error) {
+	ns, err := inClusterNamespace()
+	if err != nil {
+		return nil, fmt.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
+	}
+	k8sKeystore, _ := keystore.Factoryk8s(ns, client)
+	return k8sKeystore, nil
 }
 
 // DiscoverKubernetesNode figures out the Kubernetes node to use.

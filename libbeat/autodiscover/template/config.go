@@ -77,8 +77,11 @@ func (e Event) GetValue(key string) (interface{}, error) {
 // GetConfig returns a matching Config if any, nil otherwise
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
-	opts := []ucfg.Option{
-		ucfg.Resolve(keystore.ResolverWrap(c.keystore)),
+	var opts   []ucfg.Option
+	if c.keystore != nil {
+		opts = []ucfg.Option{
+			ucfg.Resolve(keystore.ResolverWrap(c.keystore)),
+		}
 	}
 	for _, mapping := range c.ConditionMaps {
 		// An empty condition matches everything

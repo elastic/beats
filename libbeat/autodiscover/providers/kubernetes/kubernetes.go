@@ -58,7 +58,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keyStore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -76,12 +76,16 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore)
+	mapper, err := template.NewConfigMapper(config.Templates, keyStore)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
+	k8sKeystore, err := kubernetes.CreateKubernetesKeystoreBackend(client)
+	if err != nil {
+		logger.Errorf("")
+	}
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystore)
 	if err != nil {
 		return nil, errWrap(err)
 	}
