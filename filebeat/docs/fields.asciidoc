@@ -1405,6 +1405,17 @@ type: boolean
 Fields for AWS CloudWatch logs.
 
 
+
+*`aws.cloudwatch.message`*::
++
+--
+CloudWatch log message.
+
+
+type: text
+
+--
+
 [float]
 === ec2
 
@@ -1663,6 +1674,7 @@ type: keyword
 +
 --
 The error reason if the executed action failed.
+
 
 type: keyword
 
