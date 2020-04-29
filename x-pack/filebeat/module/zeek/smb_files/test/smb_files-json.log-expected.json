@@ -4,15 +4,37 @@
         "destination.address": "192.168.10.30",
         "destination.ip": "192.168.10.30",
         "destination.port": 445,
+        "event.action": "SMB::FILE_OPEN",
+        "event.category": [
+            "network",
+            "file"
+        ],
         "event.dataset": "zeek.smb_files",
         "event.id": "C9YAaEzWLL62yWMn5",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "protocol",
+            "info"
+        ],
+        "file.accessed": "2017-10-09T16:13:19.607Z",
+        "file.created": "2017-10-09T16:13:19.607Z",
+        "file.ctime": "2017-10-09T16:13:19.607Z",
+        "file.mtime": "2017-10-09T16:13:19.607Z",
+        "file.name": "PSEXESVC.exe",
+        "file.path": "\\\\\\\\admin-pc\\\\ADMIN$\\PSEXESVC.exe",
+        "file.size": 0,
         "fileset.name": "smb_files",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
         "network.protocol": "smb",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.10.31",
+            "192.168.10.30"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.10.31",
         "source.ip": "192.168.10.31",

@@ -622,6 +622,11 @@ pipeline {
       }
     }
   }
+  post {
+    cleanup {
+      notifyBuildResult(prComment: true)
+    }
+  }
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
