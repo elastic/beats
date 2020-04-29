@@ -389,7 +389,7 @@ processors:
 - append:
     field: related.hash
     value: "{{fortinet.file.hash.crc32}}"
-    if: "ctx.file?.hash?.crc32 != null"
+    if: "ctx.fortinet?.file?.hash?.crc32 != null"
 on_failure:
 - set:
     field: error.message
