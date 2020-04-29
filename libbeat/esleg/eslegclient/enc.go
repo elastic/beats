@@ -135,12 +135,9 @@ func (b *jsonEncoder) Add(meta, obj interface{}) error {
 		b.buf.Truncate(pos)
 		return err
 	}
-	// obj will be nil in the case of a delete operation
-	if obj != nil {
-		if err := b.AddRaw(obj); err != nil {
-			b.buf.Truncate(pos)
-			return err
-		}
+	if err := b.AddRaw(obj); err != nil {
+		b.buf.Truncate(pos)
+		return err
 	}
 	return nil
 }
