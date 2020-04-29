@@ -7915,7 +7915,7 @@ example: DigiCert SHA2 High Assurance Server CA
 *`tls.server.x509.issuer.common_name.text`*::
 +
 --
-type: wildcard
+type: text
 
 --
 
@@ -8033,7 +8033,7 @@ example: r2.shared.global.fastly.net
 *`tls.server.x509.subject.subject.common_name.text`*::
 +
 --
-type: wildcard
+type: text
 
 --
 
