@@ -18,10 +18,12 @@
 package hbtest
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -29,6 +31,10 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -107,13 +113,25 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"tls": map[string]interface{}{
-			"rtt.handshake.us":             isdef.IsDuration,
-			"certificate_not_valid_before": certificate.NotBefore,
-			"certificate_not_valid_after":  certificate.NotAfter,
-		},
-	})
+	expected := common.MapStr{}
+	// This function is well tested independently, so we just test that things match up here.
+	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
+		Version:           tls.VersionTLS13,
+		HandshakeComplete: true,
+		CipherSuite:       tls.TLS_AES_128_GCM_SHA256,
+		ServerName:        certificate.Subject.CommonName,
+		PeerCertificates:  []*x509.Certificate{certificate},
+	}, time.Duration(1))
+
+	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	return lookslike.MustCompile(expected)
+}
+
+func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
+	expected := common.MapStr{}
+	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
+	return lookslike.MustCompile(expected)
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
@@ -196,6 +214,14 @@ func ErrorChecks(msgSubstr string, errType string) validator.Validator {
 	})
 }
 
+func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
+	msg := x509.CertificateInvalidError{Cert: cert, Reason: x509.Expired}.Error()
+	return lookslike.Compose(
+		ErrorChecks(msg, "io"),
+		TLSCertChecks(cert),
+	)
+}
+
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
@@ -214,4 +240,24 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	require.NoError(t, err)
 	certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
+}
+
+func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port string, cert *x509.Certificate, doClose func() error) {
+	cert, err := x509.ParseCertificate(tlsCert.Certificate[0])
+	require.NoError(t, err)
+
+	// No need to start a real server, since this is invalid, we just
+	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	})
+	require.NoError(t, err)
+
+	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	go func() {
+		srv.Serve(l)
+	}()
+
+	host, port, err = net.SplitHostPort(l.Addr().String())
+	require.NoError(t, err)
+	return host, port, cert, srv.Close
 }

@@ -16,6 +16,9 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
