@@ -24621,6 +24621,16 @@ type: date
 
 --
 
+*`kubernetes.event.metadata.generate_name`*::
++
+--
+Generate name of the event
+
+
+type: keyword
+
+--
+
 *`kubernetes.event.metadata.name`*::
 +
 --
