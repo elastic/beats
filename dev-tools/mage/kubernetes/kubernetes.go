@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+package kubernetes
 
 import (
 	"fmt"
@@ -25,13 +25,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 
-	"github.com/magefile/mage/mg"
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 func init() {
-	RegisterIntegrationTester(&KubernetesIntegrationTester{})
+	mage.RegisterIntegrationTester(&KubernetesIntegrationTester{})
 }
 
 type KubernetesIntegrationTester struct {
@@ -53,15 +54,15 @@ func (d *KubernetesIntegrationTester) Use(dir string) (bool, error) {
 
 // HasRequirements ensures that the required kubectl are installed.
 func (d *KubernetesIntegrationTester) HasRequirements() error {
-	if err := HaveKubectl(); err != nil {
+	if err := mage.HaveKubectl(); err != nil {
 		return err
 	}
 	return nil
 }
 
 // StepRequirements returns the steps required for this tester.
-func (d *KubernetesIntegrationTester) StepRequirements() IntegrationTestSteps {
-	return IntegrationTestSteps{&MageIntegrationTestStep{}, &KindIntegrationTestStep{}}
+func (d *KubernetesIntegrationTester) StepRequirements() mage.IntegrationTestSteps {
+	return mage.IntegrationTestSteps{&mage.MageIntegrationTestStep{}, &KindIntegrationTestStep{}}
 }
 
 // Test performs the tests with kubernetes.
@@ -93,7 +94,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 	}
 
 	// Determine the path to use inside the pod.
-	repo, err := GetProjectRepoInfo()
+	repo, err := mage.GetProjectRepoInfo()
 	if err != nil {
 		return err
 	}
@@ -101,14 +102,14 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	// Apply the manifest from the dir. This is the requirements for the tests that will
 	// run inside the cluster.
-	if err := KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
+	if err := mage.KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
 		return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
 	}
 	defer func() {
 		if mg.Verbose() {
 			fmt.Println(">> Deleting module manifest from cluster...")
 		}
-		if err := KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
+		if err := mage.KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
 			log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
 		}
 	}()
@@ -124,7 +125,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	workDir := filepath.Join(destDir, repo.SubDir)
-	remote, err := NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
+	remote, err := mage.NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
 	if err != nil {
 		return err
 	}
@@ -143,20 +144,20 @@ func (d *KubernetesIntegrationTester) InsideTest(test func() error) error {
 
 // kubernetesPodName returns the pod name to use with kubernetes.
 func kubernetesPodName() string {
-	commit, err := CommitHash()
+	commit, err := mage.CommitHash()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to construct kind cluster name"))
 	}
 
-	version, err := BeatQualifiedVersion()
+	version, err := mage.BeatQualifiedVersion()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to construct kind cluster name"))
 	}
 	version = strings.NewReplacer(".", "_").Replace(version)
 
 	clusterName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
-	clusterName = MustExpand(clusterName, map[string]interface{}{
-		"StackEnvironment": StackEnvironment,
+	clusterName = mage.MustExpand(clusterName, map[string]interface{}{
+		"StackEnvironment": mage.StackEnvironment,
 		"ShortCommit":      commit[:10],
 		"Version":          version,
 	})

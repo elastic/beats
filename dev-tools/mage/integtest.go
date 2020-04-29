@@ -156,7 +156,7 @@ type IntegrationRunner struct {
 type IntegrationRunners []*IntegrationRunner
 
 // NewIntegrationRunners returns the integration test runners discovered from the provided path.
-func NewIntegrationRunners(path string, passThroughEnvVars ...string) (IntegrationRunners, error) {
+func NewIntegrationRunners(path string, passInEnv map[string]string) (IntegrationRunners, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -195,11 +195,12 @@ func NewIntegrationRunners(path string, passThroughEnvVars ...string) (Integrati
 			runnerSteps = append(runnerSteps, steps...)
 
 			// Create the custom env for the runner.
-			env := map[string]string{
-				insideIntegrationTestEnvVar: "true",
+			env := map[string]string{}
+			for k, v := range passInEnv {
+				env[k] = v
 			}
+			env[insideIntegrationTestEnvVar] = "true"
 			passThroughEnvs(env, defaultPassthroughEnvVars...)
-			passThroughEnvs(env, passThroughEnvVars...)
 			if mg.Verbose() {
 				env["MAGEFILE_VERBOSE"] = "1"
 			}

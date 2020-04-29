@@ -31,6 +31,9 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
+	// register kubernetes runner
+	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
+
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	// mage:import
