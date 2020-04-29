@@ -4,6 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/santa.log
+      - /var/db/santa/santa.log
   - name: input
     default: file
 
