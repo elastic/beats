@@ -1,4 +1,4 @@
-description: Pipeline for parsing logstash node logs
+description: Pipeline for parsing logstash slow logs
 processors:
 - rename:
     field: '@timestamp'
