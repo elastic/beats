@@ -297,7 +297,7 @@ processors:
     ignore_missing: true
 - rename:
     field: fortinet.firewall.filehash
-    target_field: file.hash.crc32
+    target_field: fortinet.file.hash.crc32
     ignore_missing: true
 - geoip:
     field: source.ip
@@ -388,7 +388,7 @@ processors:
     if: "ctx.source?.user?.name != null"
 - append:
     field: related.hash
-    value: "{{file.hash.crc32}}"
+    value: "{{fortinet.file.hash.crc32}}"
     if: "ctx.file?.hash?.crc32 != null"
 on_failure:
 - set:
