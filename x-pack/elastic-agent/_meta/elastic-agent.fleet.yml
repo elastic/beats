@@ -5,11 +5,6 @@
 management:
   mode: "fleet"
 
-  # Check in frequency configure the time between calls to fleet to retrieve the new configuration.
-  #
-  # Default is 30s
-  #checkin_frequency: 30s
-
   # Add variance between API calls to better distribute the calls.
   #jitter: 5s
 
