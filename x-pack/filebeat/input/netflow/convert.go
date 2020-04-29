@@ -320,9 +320,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		event.Fields["network"] = ecsNetwork
 	}
 	if len(relatedIP) > 0 {
-		ecsRelated := common.MapStr{}
-		ecsRelated["ip"] = relatedIP
-		event.Fields["related"] = ecsRelated
+		event.Fields["related"] = common.MapStr{"ip": relatedIP}
 	}
 	return
 }
