@@ -326,14 +326,16 @@ func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Durat
 	maxBackoffRetries := int(math.Ceil(math.Log2(float64(cfg.Max) / float64(cfg.Init))))
 
 	return func(retries, _ int) time.Duration {
-		temp := (uint64(cfg.Init) * uint64(1<<retries)) / 2
-		jitter := uint64(rand.Int63n(int64(temp)))
-
-		backoff := time.Duration(temp + jitter)
-		if retries >= maxBackoffRetries {
-			backoff = cfg.Max
+		// compute 'base' duration for exponential backoff
+		dur := cfg.Max
+		if retries < maxBackoffRetries {
+			dur = time.Duration(uint64(cfg.Init) * uint64(1<<retries))
 		}
 
-		return backoff
+		// apply about equaly distributed jitter in second half of the interval, such that the wait
+		// time falls into the interval [dur/2, dur]
+		limit := int64(dur / 2)
+		jitter := rand.Int63n(limit + 1)
+		return time.Duration(limit + jitter)
 	}
 }
