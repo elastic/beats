@@ -617,6 +617,20 @@
       }
     },
     {
+      "append": {
+        "field": "related.ip",
+        "value": "{{source.ip}}",
+        "if": "ctx.source?.ip != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "value": "{{destination.ip}}",
+        "if": "ctx.destination?.ip != null"
+      }
+    },
+    {
       "remove": {
         "field": [
           "fortinet.firewall.locip",

@@ -50,6 +50,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Internet Telephony",
         "rule.id": "100602",
         "rule.ruleset": "elasticruleset",
@@ -116,6 +120,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Web-based Email",
         "rule.id": "38",
         "rule.ruleset": "elasticruleset",
@@ -181,6 +189,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Web-Client",
         "rule.id": "12",
         "rule.ruleset": "elasticruleset",
@@ -247,6 +259,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Web-based Email",
         "rule.id": "26",
         "rule.ruleset": "test",
@@ -307,6 +323,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Web-Client",
         "rule.id": "100602",
         "rule.ruleset": "elasticruleset",
@@ -372,6 +392,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.category": "Remote Access",
         "rule.id": "26",
         "rule.ruleset": "elastictest",
@@ -428,6 +452,10 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.8.8"
+        ],
         "rule.id": "26",
         "rule.ruleset": "elastictest",
         "service.type": "fortinet",
@@ -482,6 +510,10 @@
         "observer.serial_number": "someotherid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.2.1",
+            "8.8.4.4"
+        ],
         "rule.id": "12",
         "rule.ruleset": "somecerts",
         "service.type": "fortinet",
@@ -525,6 +557,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "10.10.10.10"
+        ],
         "rule.description": "FSSO logon authentication status",
         "service.type": "fortinet",
         "source.ip": "10.10.10.10",
@@ -577,6 +612,10 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "8.8.8.8",
+            "8.8.4.4"
+        ],
         "rule.description": "IPsec phase 1 error",
         "service.type": "fortinet",
         "source.as.number": 15169,
@@ -640,6 +679,10 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "9.9.9.9",
+            "8.4.5.4"
+        ],
         "rule.description": "Progress IPsec phase 1",
         "service.type": "fortinet",
         "source.as.number": 19281,
@@ -731,6 +774,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "10.10.10.10"
+        ],
         "rule.description": "Authentication logon",
         "service.type": "fortinet",
         "source.ip": "10.10.10.10",
@@ -788,6 +834,10 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "7.6.3.4",
+            "8.8.5.4"
+        ],
         "rule.description": "Progress IPsec phase 1",
         "service.type": "fortinet",
         "source.geo.continent_name": "North America",
@@ -904,6 +954,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "8.8.8.6"
+        ],
         "rule.description": "SSL VPN new connection",
         "service.type": "fortinet",
         "tags": [
@@ -950,6 +1003,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "8.8.5.4"
+        ],
         "rule.description": "SSL VPN tunnel up",
         "service.type": "fortinet",
         "source.user.group.name": "somegroup",
@@ -990,6 +1046,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.1.1"
+        ],
         "rule.description": "FSSO log off authentication status",
         "service.type": "fortinet",
         "source.ip": "192.168.1.1",
@@ -1109,6 +1168,10 @@
         "observer.serial_number": "newrouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.1.6",
+            "8.8.8.8"
+        ],
         "rule.category": "unscanned",
         "rule.id": "26",
         "rule.name": "elasticnewruleset",
@@ -1179,6 +1242,10 @@
         "observer.serial_number": "newrouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.10.10",
+            "8.6.4.7"
+        ],
         "rule.category": "unknown",
         "rule.id": "3426",
         "rule.name": "newruleelastic",
@@ -1258,6 +1325,10 @@
         "observer.serial_number": "newrouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "2001:4860:4860::8888",
+            "2001:4860:4860::8888"
+        ],
         "rule.category": "unscanned",
         "rule.id": "0",
         "rule.ruleset": "someotherpolicy",
@@ -1331,6 +1402,10 @@
         "observer.serial_number": "newrouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "9.7.7.7",
+            "8.8.8.8"
+        ],
         "rule.category": "unscanned",
         "rule.id": "0",
         "rule.ruleset": "rulepolicy",
@@ -1393,6 +1468,10 @@
         "observer.serial_number": "oldfwid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "192.168.1.1",
+            "192.168.100.100"
+        ],
         "rule.category": "unscanned",
         "rule.id": "49",
         "rule.name": "oldpolicyname",
