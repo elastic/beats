@@ -1013,10 +1013,12 @@ def runbld() {
           }
         }
         sh(label: 'Process JUnit reports with runbld',
-          script: '''
-          echo 'Processing JUnit reports with runbld...' > ./runbld-script
+          script: '''\
+          cat >./runbld-script <<EOF
+          echo "Processing JUnit reports with runbld..."
+          EOF
           /usr/local/bin/runbld ./runbld-script
-          ''')
+          '''.stripIndent())  // stripIdent() requires '''/
       }
     }
   }
