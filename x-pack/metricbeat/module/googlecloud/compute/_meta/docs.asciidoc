@@ -1,11 +1,15 @@
-Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine] Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this Metricset.
+Compute metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine] Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this metricset.
 
-The `compute` Metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names have been left untouched for people already familiar with them.
+The `compute` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names have been left untouched for people already familiar with them.
 
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API]. This is enough to get most of the info associated with a metric like Compute labels and metadata and metric specific Labels.
 
 [float]
-=== Fields and labels
+=== Metrics and labels
+Here is a list of metrics collected by `compute` metricset:
+
+[float]
+==== firewall
 
 * `instance.firewall.dropped_bytes_count`: Incoming bytes dropped by the firewall.
 - `instance_name`: The name of the VM instance.
@@ -13,13 +17,20 @@ Extra labels and metadata are also extracted using the https://cloud.google.com/
 * `instance.firewall.dropped_packets_count`: Incoming packets dropped by the firewall.
 - `instance_name`: The name of the VM instance.
 
+[float]
+==== cpu
+
 * `instance.cpu.reserved_cores`: Number of cores reserved on the host of the `instance`.
 - `instance_name`: The name of the VM instance.
 
 * `instance.cpu.utilization`: The fraction of the allocated CPU that is currently in use on the `instance`.
 - `instance_name`: The name of the VM instance.
+
 * `instance.cpu.usage_time`: Usage for all cores in seconds.
 - `instance_name`: The name of the VM instance.
+
+[float]
+==== disk
 
 * `instance.disk.read_bytes_count`: Count of bytes read from disk.
 - `instance_name`: The name of the VM instance.
@@ -45,8 +56,14 @@ Extra labels and metadata are also extracted using the https://cloud.google.com/
 - `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
 - `device_type`: The disk type: `ephemeral` or `permanent`.
 
+[float]
+==== uptime
+
 * `instance.uptime`: How long the VM has been running, in seconds
 - `instance_name`: The name of the VM instance.
+
+[float]
+==== network
 
 * `instance.network.received_bytes_count`: Count of bytes received from the network
 - `instance_name`: The name of the VM instance.

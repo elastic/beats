@@ -1,9 +1,6 @@
 - module: logstash
-  metricsets:
-    - node
-    - node_stats
+  xpack.enabled: true
   period: 10s
   hosts: ["localhost:9600"]
   #username: "user"
   #password: "secret"
-  xpack.enabled: true

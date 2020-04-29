@@ -37,18 +37,17 @@ const (
 	retryPeriod = 10 * time.Second
 )
 
-// TODO autodiscover providers config reload
-
-// Adapter must be implemented by the beat in order to provide Autodiscover
-type Adapter interface {
-	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-	CreateConfig(bus.Event) ([]*common.Config, error)
-
-	// RunnerFactory provides runner creation by feeding valid configs
-	cfgfile.CheckableRunnerFactory
-
-	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
+// EventConfigurer is used to configure the creation of configuration objects
+// from the autodiscover event bus.
+type EventConfigurer interface {
+	// EventFilter returns the bus filter to retrieve runner start/stop triggering
+	// events. The bus will filter events to the ones, that contain *all* the
+	// the required top-level keys.
 	EventFilter() []string
+
+	// CreateConfig creates a list of configurations from a bus.Event. The
+	// received event will have all keys defined in `EventFilter`.
+	CreateConfig(bus.Event) ([]*common.Config, error)
 }
 
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
@@ -56,7 +55,8 @@ type Adapter interface {
 type Autodiscover struct {
 	bus             bus.Bus
 	defaultPipeline beat.Pipeline
-	adapter         Adapter
+	factory         cfgfile.RunnerFactory
+	configurer      EventConfigurer
 	providers       []Provider
 	configs         map[string]map[uint64]*reload.ConfigWithMeta
 	runners         *cfgfile.RunnerList
@@ -66,7 +66,13 @@ type Autodiscover struct {
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, config *Config) (*Autodiscover, error) {
+func NewAutodiscover(
+	name string,
+	pipeline beat.Pipeline,
+	factory cfgfile.RunnerFactory,
+	configurer EventConfigurer,
+	config *Config,
+) (*Autodiscover, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	// Init Event bus
@@ -86,9 +92,10 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 	return &Autodiscover{
 		bus:             bus,
 		defaultPipeline: pipeline,
-		adapter:         adapter,
+		factory:         factory,
+		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover", factory, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
@@ -102,7 +109,7 @@ func (a *Autodiscover) Start() {
 	}
 
 	a.logger.Info("Starting autodiscover manager")
-	a.listener = a.bus.Subscribe(a.adapter.EventFilter()...)
+	a.listener = a.bus.Subscribe(a.configurer.EventFilter()...)
 
 	// It is important to start the worker first before starting the producer.
 	// In hosts that have large number of workloads, it is easy to have an initial
@@ -175,7 +182,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 		a.configs[eventID] = map[uint64]*reload.ConfigWithMeta{}
 	}
 
-	configs, err := a.adapter.CreateConfig(event)
+	configs, err := a.configurer.CreateConfig(event)
 	if err != nil {
 		a.logger.Debugf("Could not generate config from event %v: %v", event, err)
 		return false
@@ -199,7 +206,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			continue
 		}
 
-		err = a.adapter.CheckConfig(config)
+		err = a.factory.CheckConfig(config)
 		if err != nil {
 			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config '%s', won't start runner", common.DebugString(config, true))))
 			continue
