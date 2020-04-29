@@ -999,11 +999,13 @@ def junitAndStore(Map params = [:]){
   stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
   stashedTestReports[stageName] = stageName
 }
+dir("${env.BASE_DIR}") {
 
 def runbld() {
   catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
     if (stashedTestReports) {
-      dir('runbld') {
+      dir("${env.BASE_DIR}/.runbld") {
+        // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
             unstash v
@@ -1011,7 +1013,7 @@ def runbld() {
         }
         sh(label: 'Process JUnit reports with runbld',
            script: '''
-            echo 'Processing junit reports with runbld...' > ./runbld-script
+            echo 'Processing JUnit reports with runbld...' > ./runbld-script
             /usr/local/bin/runbld ./runbld-script
            ''')
       }
