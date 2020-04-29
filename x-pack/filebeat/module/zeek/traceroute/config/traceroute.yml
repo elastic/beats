@@ -27,3 +27,17 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
+  - convert:
+      fields:
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - info
