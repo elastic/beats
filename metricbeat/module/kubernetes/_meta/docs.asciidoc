@@ -16,7 +16,7 @@ For a complete reference on how to configure and run this module on Kubernetes a
 
 Kubernetes module is a bit complex as its internal metricsets require access to a wide variety of endpoints.
 
-This section highlights and introduces some groups of metricsets with similar endpoint access needs. For more details on the metricsets see the ****configuration example link*** and ***metricsets reference link**** sections below.
+This section highlights and introduces some groups of metricsets with similar endpoint access needs. For more details on the metricsets see `configuration example` and the `metricsets` sections below.
 
 ==== node / system / pod / container / module
 
