@@ -325,8 +325,13 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if id != "" && opType == opTypeDelete {
-		return eslegclient.BulkDeleteAction{Delete: meta}, nil
+	if opType == opTypeDelete {
+		if id != "" {
+			return eslegclient.BulkDeleteAction{Delete: meta}, nil
+		} else {
+			err := fmt.Errorf("op_type delete requires _id")
+			return nil, err
+		}
 	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
 		if opType == opTypeIndex {
