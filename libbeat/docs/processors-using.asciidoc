@@ -285,8 +285,8 @@ comparing the `http.response.code` field with 400.
 [source,yaml]
 ------
 range:
-    http.response.code:
-        gte: 400
+  http.response.code:
+    gte: 400
 ------
 
 This can also be written as:
@@ -294,7 +294,7 @@ This can also be written as:
 [source,yaml]
 ----
 range:
-    http.response.code.gte: 400
+  http.response.code.gte: 400
 ----
 
 The following condition checks if the CPU usage in percentage has a value
@@ -303,8 +303,8 @@ between 0.5 and 0.8.
 [source,yaml]
 ------
 range:
-    system.cpu.user.pct.gte: 0.5
-    system.cpu.user.pct.lt: 0.8
+  system.cpu.user.pct.gte: 0.5
+  system.cpu.user.pct.lt: 0.8
 ------
 
 [float]
@@ -339,7 +339,7 @@ private address space.
 [source,yaml]
 ----
 network:
-    source.ip: private
+  source.ip: private
 ----
 
 This condition returns true if the `destination.ip` value is within the
@@ -348,7 +348,7 @@ IPv4 range of `192.168.1.0` - `192.168.1.255`.
 [source,yaml]
 ----
 network:
-    destination.ip: '192.168.1.0/24'
+  destination.ip: '192.168.1.0/24'
 ----
 
 And this condition returns true when `destination.ip` is within any of the given
@@ -357,7 +357,7 @@ subnets.
 [source,yaml]
 ----
 network:
-    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+  destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
 ----
 
 [float]
@@ -438,8 +438,8 @@ To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
 [source,yaml]
 ------
 or:
- - <condition1>
- - and:
+  - <condition1>
+  - and:
     - <condition2>
     - <condition3>
 
