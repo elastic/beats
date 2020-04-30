@@ -11,6 +11,14 @@ var:
     default: syslog
   - name: log_level
     default: 7
+  - name: certfile
+    default: ""
+  - name: keyfile
+    default: ""
+  - name: cafile
+    default: ""
+  - name: pipeline
+    default: ""
 
 ingest_pipeline: 
   - ingest/pipeline.json
