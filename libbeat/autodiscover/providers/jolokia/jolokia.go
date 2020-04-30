@@ -77,7 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}

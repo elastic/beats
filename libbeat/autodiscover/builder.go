@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/elastic/go-ucfg"
-	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -39,7 +38,7 @@ type Builder interface {
 // Builders is a struct of Builder list objects and a common Keystore object
 type Builders struct {
 	Builders []Builder
-	client   k8s.Interface
+	kubernetesKeystoresRegistry *keystore.KubernetesKeystoresRegistry
 }
 
 // BuilderConstructor is a func used to generate a Builder object
@@ -98,10 +97,12 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	configs := []*common.Config{}
 	var opts   []ucfg.Option
 
-	k8sKeystore := getK8sKeystore(event, b.client)
-	if k8sKeystore != nil {
-		opts = []ucfg.Option{
-			ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)),
+	if b.kubernetesKeystoresRegistry != nil {
+		k8sKeystore := b.kubernetesKeystoresRegistry.GetK8sKeystore(event)
+		if k8sKeystore != nil {
+			opts = []ucfg.Option{
+				ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)),
+			}
 		}
 	}
 	for _, builder := range b.Builders {
@@ -113,26 +114,14 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
-func getK8sKeystore(event bus.Event, client k8s.Interface) keystore.Keystore {
-	namespace := ""
-	if val, ok := event["kubernetes"]; ok {
-		kubernetesMeta := val.(common.MapStr)
-		ns, err := kubernetesMeta.GetValue("namespace")
-		if err != nil {
-			return nil
-		}
-		namespace = ns.(string)
-	}
-	if namespace != "" {
-		k8sKeystore, _ := keystore.Factoryk8s(namespace, client)
-		return k8sKeystore
-	}
-	return nil
+// GetValue extracts given key from an Event
+func (b Builders) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
+	b.kubernetesKeystoresRegistry = k8sKeystoresRegistry
 }
 
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
 // for simplified mode (single 'hints' builder)
-func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, client k8s.Interface) (Builders, error) {
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
@@ -151,6 +140,6 @@ func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config, client k8s.
 		}
 		builders.Builders = append(builders.Builders, builder)
 	}
-	builders.client = client
+
 	return builders, nil
 }

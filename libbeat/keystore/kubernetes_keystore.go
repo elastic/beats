@@ -19,6 +19,8 @@ package keystore
 
 import (
 	"fmt"
+	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/logp"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,6 +28,14 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+type KubernetesKeystores map[string]Keystore
+
+type KubernetesKeystoresRegistry struct {
+	kubernetesKeystores KubernetesKeystores
+	logger *logp.Logger
+	client k8s.Interface
+}
 
 // KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace.
 type KubernetesSecretsKeystore struct {
@@ -38,6 +48,47 @@ func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface) (Keystore, er
 	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client)
 	return keystore, err
 }
+
+func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) *KubernetesKeystoresRegistry {
+	return &KubernetesKeystoresRegistry{
+		kubernetesKeystores: KubernetesKeystores{},
+		logger: logger,
+		client:    client,
+	}
+}
+
+// GetK8sKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace of creates a new one.
+func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore {
+	namespace := ""
+	if val, ok := event["kubernetes"]; ok {
+		kubernetesMeta := val.(common.MapStr)
+		ns, err := kubernetesMeta.GetValue("namespace")
+		if err != nil {
+			kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
+			return nil
+		}
+		namespace = ns.(string)
+	}
+	if namespace != "" {
+		// either retrieve already stored keystore or create a new one for the namespace
+		storedKeystore := kr.lookupForKeystore(namespace)
+		if storedKeystore != nil {
+			return storedKeystore
+		}
+		k8sKeystore, _ := Factoryk8s(namespace, kr.client)
+		kr.kubernetesKeystores["namespace"] = k8sKeystore
+		return k8sKeystore
+	}
+	return nil
+}
+
+func (kr *KubernetesKeystoresRegistry) lookupForKeystore(keystoreNamespace string) (Keystore) {
+	if keystore, ok := kr.kubernetesKeystores[keystoreNamespace]; ok {
+		return keystore
+	}
+	return nil
+}
+
 
 // NewKubernetesSecretsKeystore returns an new k8s Keystore
 func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interface) (Keystore, error) {
@@ -75,4 +126,35 @@ func (k *KubernetesSecretsKeystore) GetConfig() (*common.Config, error) {
 // IsPersisted return if the keystore is physically persisted on disk.
 func (k *KubernetesSecretsKeystore) IsPersisted() bool {
 	return true
+}
+
+func (b Builders) getK8sKeystore(event bus.Event, client k8s.Interface, k8sKeystores map[string]keystore.Keystore) keystore.Keystore {
+	namespace := ""
+	if val, ok := event["kubernetes"]; ok {
+		kubernetesMeta := val.(common.MapStr)
+		ns, err := kubernetesMeta.GetValue("namespace")
+		if err != nil {
+			b.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
+			return nil
+		}
+		namespace = ns.(string)
+	}
+	if namespace != "" {
+		// either retrieve already stored keystore or create a new one for the namespace
+		storedKeystore := b.lookupForKeystore(namespace)
+		if storedKeystore != nil {
+			return storedKeystore
+		}
+		k8sKeystore, _ := keystore.Factoryk8s(namespace, client)
+		b.k8sKeystores["namespace"] = k8sKeystore
+		return k8sKeystore
+	}
+	return nil
+}
+
+func (b Builders) lookupForKeystore(keystoreNamespace string) (keystore.Keystore) {
+	if keystore, ok := b.k8sKeystores[keystoreNamespace]; ok {
+		return keystore
+	}
+	return nil
 }

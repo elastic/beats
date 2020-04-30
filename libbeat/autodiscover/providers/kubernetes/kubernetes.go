@@ -81,7 +81,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keyStore
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, client)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -90,6 +90,10 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keyStore
 	if err != nil {
 		return nil, errWrap(err)
 	}
+
+	k8sKeystoresRegistry := keystore.NewKubernetesKeystoresRegistry(logger, client)
+	mapper.SetKubernetesKeystoresRegistry(k8sKeystoresRegistry)
+	builders.SetKubernetesKeystoresRegistry(k8sKeystoresRegistry)
 
 	p := &Provider{
 		config:    config,
