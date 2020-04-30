@@ -387,6 +387,9 @@ github.com/docker/go-metrics
 github.com/docker/go-plugins-helpers/sdk
 # github.com/docker/go-units v0.4.0
 github.com/docker/go-units
+# github.com/docker/spdystream v0.0.0-20160310174837-449fdfce4d96
+github.com/docker/spdystream
+github.com/docker/spdystream/spdy
 # github.com/dop251/goja v0.0.0-00010101000000-000000000000 => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 github.com/dop251/goja
 github.com/dop251/goja/ast
@@ -836,9 +839,13 @@ go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest/observer
 # golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 golang.org/x/crypto/blake2b
+golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/curve25519
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
+golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/md4
 golang.org/x/crypto/openpgp
 golang.org/x/crypto/openpgp/armor
@@ -849,7 +856,10 @@ golang.org/x/crypto/openpgp/s2k
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/pkcs12
 golang.org/x/crypto/pkcs12/internal/rc2
+golang.org/x/crypto/poly1305
 golang.org/x/crypto/sha3
+golang.org/x/crypto/ssh
+golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/exp v0.0.0-20191227195350-da58074b4299
 golang.org/x/exp/apidiff
@@ -1186,6 +1196,8 @@ k8s.io/apimachinery/pkg/util/clock
 k8s.io/apimachinery/pkg/util/diff
 k8s.io/apimachinery/pkg/util/errors
 k8s.io/apimachinery/pkg/util/framer
+k8s.io/apimachinery/pkg/util/httpstream
+k8s.io/apimachinery/pkg/util/httpstream/spdy
 k8s.io/apimachinery/pkg/util/intstr
 k8s.io/apimachinery/pkg/util/json
 k8s.io/apimachinery/pkg/util/naming
@@ -1198,6 +1210,7 @@ k8s.io/apimachinery/pkg/util/wait
 k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
+k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
 # k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
 k8s.io/client-go/discovery
@@ -1254,8 +1267,11 @@ k8s.io/client-go/tools/clientcmd/api/latest
 k8s.io/client-go/tools/clientcmd/api/v1
 k8s.io/client-go/tools/metrics
 k8s.io/client-go/tools/pager
+k8s.io/client-go/tools/portforward
 k8s.io/client-go/tools/reference
+k8s.io/client-go/tools/watch
 k8s.io/client-go/transport
+k8s.io/client-go/transport/spdy
 k8s.io/client-go/util/cert
 k8s.io/client-go/util/connrotation
 k8s.io/client-go/util/flowcontrol

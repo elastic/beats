@@ -1372,6 +1372,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/docker/spdystream
+Revision: 449fdfce4d96
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/spdystream/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/dop251/goja
 Overwrite: github.com/andrewkroh/goja
 Overwrite-Revision: dd2ac4456e20
