@@ -266,5 +266,5 @@ heartbeat.scheduler:
   # disabled if set to 0. The default is 0.
   #limit: 0
 
-  # Set the scheduler it's timezone
+  # Set the scheduler it's time zone
   #location: ''
