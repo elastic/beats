@@ -72,8 +72,8 @@ type KubeRemote struct {
 	publicKey  []byte
 }
 
-// New creates a new kubernetes remote runner.
-func New(kubeconfig string, namespace string, name string, workDir string, destDir string, syncDir string) (*KubeRemote, error) {
+// NewKubeRemote creates a new kubernetes remote runner.
+func NewKubeRemote(kubeconfig string, namespace string, name string, workDir string, destDir string, syncDir string) (*KubeRemote, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, err
@@ -437,7 +437,6 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 						{
 							Name:          "ssh",
 							Protocol:      apiv1.ProtocolTCP,
-							HostPort:      22,
 							ContainerPort: 22,
 						},
 					},
