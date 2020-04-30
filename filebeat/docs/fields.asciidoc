@@ -21912,7 +21912,7 @@ format: duration
 The name of the upstream.
 
 
-type: text
+type: keyword
 
 --
 
@@ -21922,7 +21922,7 @@ type: text
 The name of the alternative upstream.
 
 
-type: text
+type: keyword
 
 --
 
@@ -21966,7 +21966,7 @@ type: long
 The randomly generated ID of the request
 
 
-type: text
+type: keyword
 
 --
 
