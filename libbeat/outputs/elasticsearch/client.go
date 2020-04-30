@@ -83,6 +83,7 @@ func NewClient(
 		APIKey:           base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
 		Headers:          s.Headers,
 		TLS:              s.TLS,
+		Kerberos:         s.Kerberos,
 		Proxy:            s.Proxy,
 		ProxyDisable:     s.ProxyDisable,
 		Parameters:       s.Parameters,
@@ -149,12 +150,13 @@ func (client *Client) Clone() *Client {
 				// empty.
 				ProxyDisable:      client.conn.Proxy == nil,
 				TLS:               client.conn.TLS,
+				Kerberos:          client.conn.Kerberos,
 				Username:          client.conn.Username,
 				Password:          client.conn.Password,
 				APIKey:            client.conn.APIKey,
 				Parameters:        nil, // XXX: do not pass params?
 				Headers:           client.conn.Headers,
-				Timeout:           client.conn.HTTP.Timeout,
+				Timeout:           client.conn.Timeout,
 				CompressionLevel:  client.conn.CompressionLevel,
 				OnConnectCallback: nil,
 				Observer:          nil,
