@@ -20,7 +20,6 @@ package pageinfo
 import (
 	"bufio"
 	"io"
-	"os"
 	"regexp"
 	"strconv"
 
@@ -45,21 +44,21 @@ type buddyInfo struct {
 // pageInfo represents all the data we get from /proc/pagetypeinfo
 type pageInfo struct {
 	BuddyInfo buddyInfo
-	zones     map[int64]zones
+	Zones     map[int64]zones
 }
 
 var pageinfoLine = regexp.MustCompile(`Node\s*(\d), zone\s*([a-zA-z0-9]*), type\s*([a-zA-z0-9]*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)`)
 
 // readPageFile reads a PageTypeInfo file and returns the parsed data
 // This returns a massive representation of all the meaningful data in /proc/pagetypeinfo
-func readPageFile(path string) (pageInfo, error) {
-	fd, err := os.Open(path)
-	if err != nil {
-		return pageInfo{}, errors.Wrap(err, "error opening file")
-	}
-	defer fd.Close()
+func readPageFile(reader *bufio.Reader) (pageInfo, error) {
+	// fd, err := os.Open(path)
+	// if err != nil {
+	// 	return pageInfo{}, errors.Wrap(err, "error opening file")
+	// }
+	// defer fd.Close()
 
-	reader := bufio.NewReader(fd)
+	// reader := bufio.NewReader(fd)
 	nodes := make(map[int64]zones)
 
 	buddy := buddyInfo{
@@ -129,5 +128,5 @@ func readPageFile(path string) (pageInfo, error) {
 		}
 	} // end line loop
 
-	return pageInfo{zones: nodes, BuddyInfo: buddy}, nil
+	return pageInfo{Zones: nodes, BuddyInfo: buddy}, nil
 }

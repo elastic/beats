@@ -8,17 +8,17 @@
     "linux": {
         "perf": {
             "software_events": {
-                "cpu_clock": 5097853,
-                "task_clock": 5125177,
-                "page_faults": 15,
-                "context_switches": 11,
-                "cpu_migrations": 1,
-                "minor_page_faults": 15,
+                "cpu_clock": 6921734,
+                "task_clock": 6932027,
+                "page_faults": 95,
+                "context_switches": 16,
+                "cpu_migrations": 0,
+                "minor_page_faults": 95,
                 "major_page_faults": 0,
                 "alignment_faults": 0,
                 "emulation_faults": 0,
-                "time_enabled": 5125177,
-                "time_running": 5125177
+                "time_enabled": 6932027,
+                "time_running": 6932027
             }
         }
     },

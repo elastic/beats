@@ -20,6 +20,8 @@ package ksm
 import (
 	"path/filepath"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
@@ -38,37 +40,37 @@ func fetchKSMStats(ksmPath string) (ksmData, error) {
 	// ReadIntFromFile returns pretty verbose error strings, so omit errors.Wrap here
 	pshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_shared"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from pages_shared")
 	}
 
 	pSharing, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_sharing"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from pages_sharing")
 	}
 
 	pUnshared, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_unshared"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from pages_unshared")
 	}
 
 	pVolatile, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "pages_volatile"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from pages_volatile")
 	}
 
 	fScans, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "full_scans"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from full_scans")
 	}
 
 	stableChains, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_chains"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from stable_node_chains")
 	}
 
 	stableDups, err := linux.ReadIntFromFile(filepath.Join(ksmPath, "stable_node_dups"), 10)
 	if err != nil {
-		return ksmData{}, err
+		return ksmData{}, errors.Wrap(err, "error reading from stable_node_dups ")
 	}
 
 	return ksmData{PagesShared: pshared, PagesSharing: pSharing, PagesUnshared: pUnshared,

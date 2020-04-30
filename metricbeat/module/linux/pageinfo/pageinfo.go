@@ -18,6 +18,8 @@
 package pageinfo
 
 import (
+	"bufio"
+	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
@@ -67,14 +69,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	pagePath := filepath.Join(m.fs, "/proc/pagetypeinfo")
 
-	zones, err := readPageFile(pagePath)
+	fd, err := os.Open(pagePath)
+	if err != nil {
+		return errors.Wrap(err, "error opening file")
+	}
+	defer fd.Close()
+
+	reader := bufio.NewReader(fd)
+
+	zones, err := readPageFile(reader)
 	if err != nil {
 		return errors.Wrap(err, "error reading pagetypeinfo")
 	}
 
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
-			"nodes":      zones.zones,
+			"nodes":      zones.Zones,
 			"buddy_info": zones.BuddyInfo,
 		},
 	})

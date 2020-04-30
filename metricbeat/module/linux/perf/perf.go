@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/linux"
 
@@ -65,14 +66,6 @@ type perfInfo struct {
 	SwMetrics perf.SoftwareProfile
 }
 
-// procInfo contains all the controlling information on a given PID.
-type procInfo struct {
-	PID          int
-	Metadata     common.MapStr
-	SoftwareProc perf.SoftwareProfiler
-	HardwareProc perf.HardwareProfiler
-}
-
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
@@ -81,13 +74,15 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	processes  []procInfo
 	period     time.Duration
-	continuous bool
+	configData []sampleConfig
+	logger     *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux perf metricset is beta.")
+	logger := logp.NewLogger("perf")
 	linuxModule, ok := base.Module().(*linux.Module)
 	if !ok {
 		return nil, errors.New("unexpected module type")
@@ -105,22 +100,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Sample Period is zero")
 	}
 
-	var isContinuous = config.SamplePeriod == linuxModule.Period
-
 	procList, err := matchProcesses(config.Processes)
 	if err != nil {
 		return nil, errors.Wrap(err, "error gathering processes")
 	}
 
 	if len(procList) == 0 {
-		return nil, fmt.Errorf("no processes found that match provided config")
-	}
-
-	if isContinuous {
-		err := startMonitor(procList)
-		if err != nil {
-			return nil, errors.Wrap(err, "error starting monitor")
-		}
+		logger.Warn("No processes found matching config, will retry")
+		procList = make([]procInfo, 0)
 	}
 
 	// This perf library is Not So Good and eats errors that come from perf_event_open
@@ -135,7 +122,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		processes:     procList,
 		period:        config.SamplePeriod,
-		continuous:    isContinuous,
+		configData:    config.Processes,
+		logger:        logger,
 	}, nil
 }
 
@@ -143,7 +131,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	perfData, err := runSampleForPeriod(m.processes, m.period, m.continuous)
+
+	if len(m.processes) == 0 {
+		m.logger.Warn("Retrying search for processes")
+		procList, err := matchProcesses(m.configData)
+		if err != nil {
+			return errors.Wrap(err, "error searching for processes")
+		}
+		if len(procList) == 0 {
+			return fmt.Errorf("No processes match config, retrying")
+		}
+		m.processes = procList
+	}
+
+	perfData, err := runSampleForPeriod(m.processes, m.period)
 	if err != nil {
 		return errors.Wrap(err, "error running sample")
 	}
@@ -199,13 +200,13 @@ func startMonitor(toSample []procInfo) error {
 	return nil
 }
 
+//TODO: remove the "continuous" thing
 // runSampleForPeriod starts a sample, sleeps for a given period, then collects metrics.
-func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius bool) ([]perfInfo, error) {
-	if !isContinuoius {
-		err := startMonitor(toSample)
-		if err != nil {
-			return nil, err
-		}
+func runSampleForPeriod(toSample []procInfo, period time.Duration) ([]perfInfo, error) {
+
+	err := startMonitor(toSample)
+	if err != nil {
+		return nil, errors.Wrap(err, "error starting monitor")
 	}
 
 	time.Sleep(period)
@@ -213,6 +214,11 @@ func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius
 	var metrics = []perfInfo{}
 
 	for _, pid := range toSample {
+		// check to make sure the PID is still "live"
+		err := pid.checkAndReplace()
+		if err != nil {
+			return nil, err
+		}
 
 		newMetric := perfInfo{}
 		newMetric.Metadata = pid.Metadata
@@ -224,9 +230,7 @@ func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius
 			}
 			newMetric.HwMetrics = *hwPro
 
-			if !isContinuoius {
-				pid.HardwareProc.Stop()
-			}
+			pid.HardwareProc.Stop()
 			pid.HardwareProc.Reset()
 		}
 
@@ -237,9 +241,7 @@ func runSampleForPeriod(toSample []procInfo, period time.Duration, isContinuoius
 			}
 			newMetric.SwMetrics = *swPro
 
-			if !isContinuoius {
-				pid.SoftwareProc.Stop()
-			}
+			pid.SoftwareProc.Stop()
 			pid.SoftwareProc.Reset()
 
 		}
