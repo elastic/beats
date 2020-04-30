@@ -10,5 +10,5 @@ ENV KDC_NAME elasticsearch_kerberos.elastic
 ENV BUILD_ZONE elastic
 ENV ELASTIC_ZONE $BUILD_ZONE
 
-RUN bash /scripts/installkdc.sh
-RUN bash /scripts/addprincs.sh
+RUN /bin/sh -c /scripts/installkdc.sh
+RUN /bin/sh -c /scripts/addprincs.sh
