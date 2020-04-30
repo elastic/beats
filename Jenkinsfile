@@ -2,6 +2,13 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the stashed id with the test results to be digested with runbld
+*/
+@Field def stashedTestReports = [:]
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
@@ -11,6 +18,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -594,6 +602,9 @@ pipeline {
     }
   }
   post {
+    always {
+      runbld()
+    }
     cleanup {
       notifyBuildResult(prComment: true)
     }
@@ -682,7 +693,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
           }
         }
@@ -716,7 +727,7 @@ def withBeatsEnvWin(Closure body) {
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
         }
       }
@@ -979,4 +990,36 @@ def setGitConfig(){
 
 def isDockerInstalled(){
   return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+}
+
+def junitAndStore(Map params = [:]){
+  junit(params)
+  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stashedTestReports[stageName] = stageName
+}
+
+def runbld() {
+  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+    if (stashedTestReports) {
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Prepare workspace context',
+           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
+        // Unstash the test reports
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash v
+          }
+        }
+        sh(label: 'Process JUnit reports with runbld',
+          script: '''\
+          cat >./runbld-script <<EOF
+          echo "Processing JUnit reports with runbld..."
+          EOF
+          /usr/local/bin/runbld ./runbld-script
+          '''.stripIndent())  // stripIdent() requires '''/
+      }
+    }
+  }
 }
