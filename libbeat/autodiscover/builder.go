@@ -37,7 +37,7 @@ type Builder interface {
 
 // Builders is a struct of Builder list objects and a common Keystore object
 type Builders struct {
-	Builders []Builder
+	Builders                    []Builder
 	kubernetesKeystoresRegistry *keystore.KubernetesKeystoresRegistry
 }
 
@@ -95,7 +95,7 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 // GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	configs := []*common.Config{}
-	var opts   []ucfg.Option
+	var opts []ucfg.Option
 
 	if b.kubernetesKeystoresRegistry != nil {
 		k8sKeystore := b.kubernetesKeystoresRegistry.GetK8sKeystore(event)
@@ -115,7 +115,7 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 }
 
 // GetValue extracts given key from an Event
-func (b Builders) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
+func (b *Builders) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
 	b.kubernetesKeystoresRegistry = k8sKeystoresRegistry
 }
 

@@ -19,9 +19,9 @@ package hints
 
 import (
 	"fmt"
-	"github.com/elastic/go-ucfg"
-
 	"strings"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"

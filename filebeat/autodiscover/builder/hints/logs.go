@@ -19,8 +19,9 @@ package hints
 
 import (
 	"fmt"
-	"github.com/elastic/go-ucfg"
 	"regexp"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"

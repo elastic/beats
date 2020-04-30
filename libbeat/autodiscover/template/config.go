@@ -29,8 +29,8 @@ import (
 // Mapper maps config templates with conditions, if a match happens on a discover event
 // the given template will be used as config
 type Mapper struct {
-	ConditionMaps []*ConditionMap
-	keystore      keystore.Keystore
+	ConditionMaps               []*ConditionMap
+	keystore                    keystore.Keystore
 	kubernetesKeystoresRegistry *keystore.KubernetesKeystoresRegistry
 }
 
@@ -76,14 +76,14 @@ func (e Event) GetValue(key string) (interface{}, error) {
 }
 
 // GetValue extracts given key from an Event
-func (c Mapper) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
+func (c *Mapper) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
 	c.kubernetesKeystoresRegistry = k8sKeystoresRegistry
 }
 
 // GetConfig returns a matching Config if any, nil otherwise
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
-	var opts   []ucfg.Option
+	var opts []ucfg.Option
 	if c.keystore != nil {
 		opts = []ucfg.Option{
 			ucfg.Resolve(keystore.ResolverWrap(c.keystore)),
@@ -129,6 +129,7 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options []uc
 		ucfg.VarExp,
 	}
 	opts = append(opts, options...)
+	logp.Err("Here are the options %v", options)
 
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
