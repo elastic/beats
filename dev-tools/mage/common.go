@@ -220,7 +220,19 @@ func dockerInfo() (*DockerInfo, error) {
 // PATH.
 func HaveDockerCompose() error {
 	_, err := exec.LookPath("docker-compose")
-	return errors.Wrap(err, "docker-compose was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("docker-compose is not available")
+	}
+	return nil
+}
+
+// HaveKubectl returns an error if kind is not found on the PATH.
+func HaveKubectl() error {
+	_, err := exec.LookPath("kubectl")
+	if err != nil {
+		return fmt.Errorf("kubectl is not available")
+	}
+	return nil
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the
