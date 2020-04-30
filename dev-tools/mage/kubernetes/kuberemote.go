@@ -50,6 +50,8 @@ import (
 	"k8s.io/client-go/tools/portforward"
 	watchtools "k8s.io/client-go/tools/watch"
 	"k8s.io/client-go/transport/spdy"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const sshBitSize = 4096
@@ -204,8 +206,13 @@ func (r *KubeRemote) syncServiceAccount() error {
 
 // createPod creates the pod.
 func (r *KubeRemote) createPod(env map[string]string, cmd ...string) (*apiv1.Pod, error) {
+	version, err := mage.GoVersion()
+	if err != nil {
+		return nil, err
+	}
+	image := fmt.Sprintf("golang:%s", version)
 	r.deletePod() // ensure it doesn't already exist
-	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, "golang:1.13.9", env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
+	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, image, env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
 }
 
 // deletePod deletes the pod.
