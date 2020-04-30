@@ -102,9 +102,17 @@ func deepUpdateValue(old interface{}, val MapStr, overwrite bool) interface{} {
 
 	switch sub := old.(type) {
 	case MapStr:
+		if sub == nil {
+			return val
+		}
+
 		sub.deepUpdateMap(val, overwrite)
 		return sub
 	case map[string]interface{}:
+		if sub == nil {
+			return val
+		}
+
 		tmp := MapStr(sub)
 		tmp.deepUpdateMap(val, overwrite)
 		return tmp
