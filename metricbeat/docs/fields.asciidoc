@@ -4168,7 +4168,7 @@ type: long
 *`aws.sns.metrics.NumberOfNotificationsFilteredOut-InvalidAttributes.sum`*::
 +
 --
-The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid – for example, because the attribute JSON is incorrectly formatted.
+The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid - for example, because the attribute JSON is incorrectly formatted.
 
 type: long
 
