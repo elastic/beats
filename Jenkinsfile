@@ -547,6 +547,7 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
+                // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
                   makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
@@ -555,6 +556,7 @@ pipeline {
             }
             stage('Generators Beat Linux'){
               steps {
+                // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
                   makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
@@ -571,6 +573,7 @@ pipeline {
                 }
               }
               steps {
+                // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
                 }
@@ -586,6 +589,7 @@ pipeline {
                 }
               }
               steps {
+                // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
                 }
