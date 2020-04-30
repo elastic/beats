@@ -669,9 +669,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
-      sh(label: "Install Mage", script: "make mage")
+      installTools()
       // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
       // See https://github.com/elastic/beats/issues/17787.
       setGitConfig()
@@ -709,7 +707,7 @@ def withBeatsEnvWin(Closure body) {
     deleteDir()
     unstash 'source'
     dir("${env.BASE_DIR}"){
-      bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
+      installTools()
       try {
         if(!params.dry_run){
           body()
@@ -721,6 +719,17 @@ def withBeatsEnvWin(Closure body) {
         }
       }
     }
+  }
+}
+
+def installTools() {
+  def i = 2 // Number of retries
+  if(isUnix()) {
+    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Mage", script: "make mage") }
+  } else {
+    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -880,7 +889,7 @@ def loadConfigEnvVars(){
   env.GO_VERSION = readFile(".go-version").trim()
 
   withEnv(["HOME=${env.WORKSPACE}"]) {
-    sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh")
+    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
   }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
