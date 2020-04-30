@@ -18,7 +18,11 @@
 package kafka
 
 import (
+	"math"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -95,5 +99,27 @@ func TestConfigInvalid(t *testing.T) {
 				t.Fatalf("Can create test configuration from invalid input")
 			}
 		})
+	}
+}
+
+func TestBackoffFunc(t *testing.T) {
+	cfg := backoffConfig{
+		Init: 1 * time.Second,
+		Max:  10 * time.Second,
+	}
+
+	backoffFn := makeBackoffFunc(cfg)
+
+	maxRetries := 50
+	for retries := 0; retries < maxRetries; retries++ {
+		base := cfg.Init + time.Duration(math.Pow(2, float64(retries)))
+		maxJitter := base / 2
+
+		minBackoff := base - maxJitter
+		maxBackoff := base + maxJitter
+
+		backoff := backoffFn(retries, maxRetries)
+		require.Greater(t, backoff.Milliseconds(), minBackoff.Milliseconds())
+		require.Less(t, backoff.Milliseconds(), maxBackoff.Milliseconds())
 	}
 }
