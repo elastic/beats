@@ -188,33 +188,9 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 		if !use {
 			continue
 		}
-		// Create the steps for the specific runner.
-		var runnerSteps IntegrationTestSteps
-		requirements := t.StepRequirements()
-		if requirements != nil {
-			runnerSteps = append(runnerSteps, requirements...)
-		}
-		runnerSteps = append(runnerSteps, steps...)
-
-		// Create the custom env for the runner.
-		env := map[string]string{}
-		for k, v := range passInEnv {
-			env[k] = v
-		}
-		env[insideIntegrationTestEnvVar] = "true"
-		passThroughEnvs(env, defaultPassthroughEnvVars...)
-		if mg.Verbose() {
-			env["MAGEFILE_VERBOSE"] = "1"
-		}
-		if UseVendor {
-			env["GOFLAGS"] = "-mod=vendor"
-		}
-
-		runner := &IntegrationRunner{
-			steps:  runnerSteps,
-			tester: t,
-			dir:    dir,
-			env:    env,
+		runner, err := initRunner(t, dir, passInEnv)
+		if err != nil {
+			return nil, errors.Wrapf(err, "initializing %s runner", t.Name())
 		}
 		runners = append(runners, runner)
 	}
@@ -224,7 +200,11 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 		if mg.Verbose() {
 			fmt.Printf(">> No runner found in %s, using docker\n", path)
 		}
-		runner, err := NewDockerIntegrationRunner("MODULE")
+		tester, ok := globalIntegrationTesters["docker"]
+		if !ok {
+			return nil, fmt.Errorf("docker integration test runner not registered")
+		}
+		runner, err := initRunner(tester, dir, passInEnv)
 		if err != nil {
 			return nil, errors.Wrapf(err, "initializing docker runner")
 		}
@@ -243,6 +223,10 @@ func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunne
 	if !ok {
 		return nil, fmt.Errorf("docker integration test runner not registered")
 	}
+	return initRunner(tester, cwd, nil, passThroughEnvVars...)
+}
+
+func initRunner(tester IntegrationTester, dir string, passInEnv map[string]string, passThroughEnvVars ...string) (*IntegrationRunner, error) {
 	var runnerSteps IntegrationTestSteps
 	requirements := tester.StepRequirements()
 	if requirements != nil {
@@ -253,8 +237,11 @@ func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunne
 	env := map[string]string{
 		insideIntegrationTestEnvVar: "true",
 	}
-	passThroughEnvs(env, defaultPassthroughEnvVars...)
+	for name, value := range passInEnv {
+		env[name] = value
+	}
 	passThroughEnvs(env, passThroughEnvVars...)
+	passThroughEnvs(env, defaultPassthroughEnvVars...)
 	if mg.Verbose() {
 		env["MAGEFILE_VERBOSE"] = "1"
 	}
@@ -265,7 +252,7 @@ func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunne
 	runner := &IntegrationRunner{
 		steps:  runnerSteps,
 		tester: tester,
-		dir:    cwd,
+		dir:    dir,
 		env:    env,
 	}
 	return runner, nil
