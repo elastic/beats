@@ -107,7 +107,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) updateServiceURI(esVersion common.Version) error {
-	u, err := getServiceURI(esVersion)
+	u, err := getServiceURI(m.GetURI(), esVersion)
 	if err != nil {
 		return err
 	}
@@ -117,8 +117,7 @@ func (m *MetricSet) updateServiceURI(esVersion common.Version) error {
 
 }
 
-func getServiceURI(esVersion common.Version) (string, error) {
-	currURI := statsPath
+func getServiceURI(currURI string, esVersion common.Version) (string, error) {
 	if esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		// Can't request bulk stats so don't change service URI
 		return currURI, nil

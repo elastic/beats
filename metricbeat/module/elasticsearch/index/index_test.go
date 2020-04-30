@@ -34,17 +34,18 @@ func TestGetServiceURI(t *testing.T) {
 	}{
 		"bulk_stats_unavailable": {
 			esVersion:   common.MustNewVersion("7.7.0"),
-			expectedURI: statsPath,
+			expectedURI: "http://eshost:9200" + statsPath,
 		},
 		"bulk_stats_available": {
 			esVersion:   common.MustNewVersion("7.8.0"),
-			expectedURI: strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1),
+			expectedURI: strings.Replace("http://eshost:9200"+statsPath, statsMetrics, statsMetrics+",bulk", 1),
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			newURI, err := getServiceURI(*test.esVersion)
+			currURI := "http://eshost:9200" + statsPath
+			newURI, err := getServiceURI(currURI, *test.esVersion)
 			require.NoError(t, err)
 			require.Equal(t, test.expectedURI, newURI)
 		})
@@ -58,13 +59,14 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 		var uri string
 		var err error
 		for i := uint(0); i < numCalls; i++ {
-			uri, err = getServiceURI(*common.MustNewVersion("7.8.0"))
+			currURI := "http://eshost:9200" + statsPath
+			uri, err = getServiceURI(currURI, *common.MustNewVersion("7.8.0"))
 			if err != nil {
 				return false
 			}
 		}
 
-		return err == nil && uri == strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1)
+		return err == nil && uri == strings.Replace("http://eshost:9200"+statsPath, statsMetrics, statsMetrics+",bulk", 1)
 	}, nil)
 	require.NoError(t, err)
 }
