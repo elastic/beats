@@ -71,7 +71,7 @@ func (m *loggingLevel) Unpack(v string) error {
 	mgt, ok := loggingLevelMap[v]
 	if !ok {
 		return fmt.Errorf(
-			"unknown management mode, received '%s' and valid values are local or fleet",
+			"unknown logging level mode, received '%s' and valid values are 'trace', 'debug', 'info' or 'error'",
 			v,
 		)
 	}

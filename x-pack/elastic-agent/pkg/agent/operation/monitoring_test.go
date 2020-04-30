@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
@@ -105,6 +106,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
+		LoggingConfig: *logger.DefaultLoggingConfig(),
 	}
 
 	cfg, err := config.NewConfigFrom(operatorConfig)
