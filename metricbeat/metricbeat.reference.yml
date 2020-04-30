@@ -666,7 +666,7 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
-#--------------------------------- Nats Module ---------------------------------
+#--------------------------------- NATS Module ---------------------------------
 - module: nats
   metricsets: ["connections", "routes", "stats", "subscriptions"]
   period: 10s

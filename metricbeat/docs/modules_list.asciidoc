@@ -32,7 +32,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-transitgateway,transitgateway>> beta[]  
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
-|<<metricbeat-module-azure,azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-azure,Azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .8+| .8+|  |<<metricbeat-metricset-azure-compute_vm,compute_vm>>   
 |<<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>   
 |<<metricbeat-metricset-azure-container_instance,container_instance>>   
@@ -193,7 +193,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
-|<<metricbeat-module-nats,Nats>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   
 |<<metricbeat-metricset-nats-routes,routes>>   
 |<<metricbeat-metricset-nats-stats,stats>>   

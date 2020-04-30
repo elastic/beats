@@ -4436,7 +4436,7 @@ type: double
 --
 
 [[exported-fields-azure]]
-== azure fields
+== Azure fields
 
 azure module
 
@@ -32641,7 +32641,7 @@ type: long
 --
 
 [[exported-fields-nats]]
-== Nats fields
+== NATS fields
 
 nats Module
 
