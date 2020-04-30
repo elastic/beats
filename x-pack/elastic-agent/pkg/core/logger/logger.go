@@ -20,7 +20,7 @@ type Logger = ecslog.Logger
 
 // Config is a configuration of logging.
 type Config struct {
-	Level loggingLevel `config:"logging.level"`
+	Level loggingLevel `config:"level"`
 }
 
 // DefaultLoggingConfig creates a default logging configuration.
@@ -42,12 +42,17 @@ func createJSONBackend(lvl backend.Level) (backend.Backend, error) {
 //NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
 func NewFromConfig(cfg *config.Config) (*Logger, error) {
-	logConfig := DefaultLoggingConfig()
-	if err := cfg.Unpack(&logConfig); err != nil {
+	wrappedConfig := &struct {
+		Logging *Config `config:"logging"`
+	}{
+		Logging: DefaultLoggingConfig(),
+	}
+
+	if err := cfg.Unpack(&wrappedConfig); err != nil {
 		return nil, err
 	}
 
-	return new(backend.Level(logConfig.Level))
+	return new(backend.Level(wrappedConfig.Logging.Level))
 }
 
 func new(lvl backend.Level) (*Logger, error) {

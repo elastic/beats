@@ -101,7 +101,7 @@ func NewOperator(
 
 func defaultOperatorConfig() *operatorCfg.Config {
 	return &operatorCfg.Config{
-		LoggingConfig: *logger.DefaultLoggingConfig(),
+		LoggingConfig: logger.DefaultLoggingConfig(),
 		RetryConfig: &retry.Config{
 			Enabled:      false,
 			RetriesCount: 0,
