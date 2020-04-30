@@ -68,10 +68,10 @@ func GetKubeletConfig(t *testing.T, metricSetName string) map[string]interface{}
 func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":            "kubernetes",
-		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
-		"hosts":             []string{"localhost:10252"},
+		"module":     "kubernetes",
+		"metricsets": []string{metricSetName},
+		"host":       "${NODE_NAME}",
+		"hosts":      []string{"localhost:10252"},
 	}
 }
 
@@ -79,10 +79,9 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":            "kubernetes",
-		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
-		"hosts":             []string{"localhost:10251"},
+		"module":     "kubernetes",
+		"metricsets": []string{metricSetName},
+		"host":       "${NODE_NAME}",
+		"hosts":      []string{"localhost:10251"},
 	}
 }
-
