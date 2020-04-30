@@ -7,11 +7,12 @@ package application
 import (
 	"fmt"
 
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // IntrospectConfigCmd is an introspect subcommand that shows configurations of the agent.
