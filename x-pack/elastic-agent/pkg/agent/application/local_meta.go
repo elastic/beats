@@ -10,7 +10,7 @@ import (
 )
 
 func metadata() (map[string]interface{}, error) {
-	agentInfo, err := info.NewAgentInfo()
+	agentInfo, err := info.ForceNewAgentInfo()
 	if err != nil {
 		return nil, err
 	}
