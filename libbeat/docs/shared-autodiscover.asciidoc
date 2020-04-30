@@ -124,7 +124,6 @@ running configuration for a container, 60s by default.
 =======================================
 endif::[]
 
-
 [float]
 ===== Kubernetes
 
@@ -244,7 +243,6 @@ running configuration for a container, 60s by default.
 
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
-
 
 [float]
 ===== Manually Defining Ports with Kubernetes
