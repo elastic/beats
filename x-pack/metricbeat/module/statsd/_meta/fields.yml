@@ -13,8 +13,3 @@
           object_type_mapping_type: "*"
           description: >
             Statsd metrics
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: >
-        Statsd labels

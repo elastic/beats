@@ -36965,16 +36965,6 @@ type: object
 
 --
 
-*`labels.*`*::
-+
---
-Statsd labels - release: ga
-
-
-type: object
-
---
-
 [[exported-fields-system]]
 == System fields
 
