@@ -18,14 +18,17 @@
 package kafka
 
 import (
-	"math"
 	"testing"
+	"testing/quick"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	lbtesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -103,23 +106,33 @@ func TestConfigInvalid(t *testing.T) {
 }
 
 func TestBackoffFunc(t *testing.T) {
-	cfg := backoffConfig{
-		Init: 1 * time.Second,
-		Max:  10 * time.Second,
-	}
+	lbtesting.SeedPRNG(t)
+	err := quick.Check(func(i uint) bool {
+		initBackoff := 1 + (i % 5)               // 1 to 5
+		maxBackoff := initBackoff + 1 + (i % 45) // initBackoff+1 to 50
+		maxRetries := int(1 + (i % 50))          // 1 to 50
 
-	backoffFn := makeBackoffFunc(cfg)
+		cfg := backoffConfig{
+			Init: time.Duration(initBackoff) * time.Second,
+			Max:  time.Duration(maxBackoff) * time.Second,
+		}
 
-	maxRetries := 50
-	for retries := 0; retries < maxRetries; retries++ {
-		base := cfg.Init + time.Duration(math.Pow(2, float64(retries)))
-		maxJitter := base / 2
+		backoffFn := makeBackoffFunc(cfg)
 
-		minBackoff := base - maxJitter
-		maxBackoff := base + maxJitter
+		for retries := 0; retries < maxRetries; retries++ {
+			backoff := backoffFn(retries, maxRetries)
 
-		backoff := backoffFn(retries, maxRetries)
-		require.Greater(t, backoff.Milliseconds(), minBackoff.Milliseconds())
-		require.Less(t, backoff.Milliseconds(), maxBackoff.Milliseconds())
-	}
+			if !assert.GreaterOrEqual(t, backoff.Milliseconds(), cfg.Init.Milliseconds()/2) {
+				t.Logf("init: %v, max: %v, retries: %v", cfg.Init, cfg.Max, retries)
+				return false
+			}
+			if !assert.LessOrEqual(t, backoff.Milliseconds(), cfg.Max.Milliseconds()) {
+				t.Logf("init: %v, max: %v, retries: %v", cfg.Init, cfg.Max, retries)
+				return false
+			}
+		}
+
+		return true
+	}, &quick.Config{MaxCount: 25})
+	require.NoError(t, err)
 }
