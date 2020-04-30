@@ -56,10 +56,24 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
-
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "source.address", to: "client.address"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "destination.address", to: "server.address"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        kind:
+          - connection
+          - protocol
 {{ if .community_id }}
   - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
 {{ end }}

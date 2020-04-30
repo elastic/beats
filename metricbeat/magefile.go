@@ -31,6 +31,9 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
+	// register kubernetes runner
+	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
+
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	// mage:import
@@ -143,7 +146,8 @@ func moduleFieldsGo() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config,
+	mg.SerialDeps(
+		Fields, Dashboards, Config, CollectAll,
 		metricbeat.PrepareModulePackagingOSS,
 		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
@@ -193,8 +197,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	}, devtools.ListMatchingEnvVars("NOSE_")...)
+	})
 }
