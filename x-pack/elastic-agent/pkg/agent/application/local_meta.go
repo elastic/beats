@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-func metadata() (map[string]interface{}, error) {
+func metadata() (*info.ECSMeta, error) {
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err

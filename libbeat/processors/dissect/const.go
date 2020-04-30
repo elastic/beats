@@ -28,8 +28,8 @@ var (
 	// ` %{key}, %{key/2}`
 	// into:
 	// [["", "key" ], [", ", "key/2"]]
-	delimiterRE = regexp.MustCompile("(?s)(.*?)%\\{([^}]*?)}")
-	suffixRE    = regexp.MustCompile("(.+?)(/(\\d{1,2}))?(->)?$")
+	ordinalIndicator     = "/"
+	fixedLengthIndicator = "#"
 
 	skipFieldPrefix      = "?"
 	appendFieldPrefix    = "+"
@@ -38,6 +38,14 @@ var (
 	indirectAppendPrefix = "&+"
 	greedySuffix         = "->"
 	pointerFieldPrefix   = "*"
+
+	numberRE = "\\d{1,2}"
+
+	delimiterRE = regexp.MustCompile("(?s)(.*?)%\\{([^}]*?)}")
+	suffixRE    = regexp.MustCompile("(.+?)" + // group 1 for key name
+		"(" + ordinalIndicator + "(" + numberRE + ")" + ")?" + // group 2, 3 for ordinal
+		"(" + fixedLengthIndicator + "(" + numberRE + ")" + ")?" + // group 4, 5 for fixed length
+		"(" + greedySuffix + ")?$") // group 6 for greedy
 
 	defaultJoinString = " "
 
