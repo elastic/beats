@@ -65,6 +65,9 @@ var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 // EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
 var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
+// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
+var BulkStatsAvailableVersion = common.MustNewVersion("7.8.0")
+
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
 
