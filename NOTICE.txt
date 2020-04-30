@@ -1372,6 +1372,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/docker/spdystream
+Revision: 449fdfce4d96
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/spdystream/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/dop251/goja
 Overwrite: github.com/andrewkroh/goja
 Overwrite-Revision: dd2ac4456e20
@@ -7997,6 +8006,15 @@ Dependency: gopkg.in/jcmturner/dnsutils.v1
 Version: v1.0.1
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/jcmturner/dnsutils.v1/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: gopkg.in/jcmturner/goidentity.v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/gopkg.in/jcmturner/goidentity.v3/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 

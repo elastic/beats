@@ -11,5 +11,5 @@ var:
   - name: tags
     default: [zeek.ocsp]
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/ocsp.yml

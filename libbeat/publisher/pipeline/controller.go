@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -34,7 +35,8 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queue queue.Queue
+	queue     queue.Queue
+	workQueue workQueue
 
 	retryer  *retryer
 	consumer *eventConsumer
@@ -50,7 +52,7 @@ type outputGroup struct {
 	timeToLive int // event lifetime
 }
 
-type workQueue chan *Batch
+type workQueue chan publisher.Batch
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
 // instances.
@@ -62,18 +64,19 @@ func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	b queue.Queue,
+	queue queue.Queue,
 ) *outputController {
 	c := &outputController{
-		beat:     beat,
-		monitors: monitors,
-		observer: observer,
-		queue:    b,
+		beat:      beat,
+		monitors:  monitors,
+		observer:  observer,
+		queue:     queue,
+		workQueue: makeWorkQueue(),
 	}
 
 	ctx := &batchContext{}
-	c.consumer = newEventConsumer(monitors.Logger, b, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, nil, c.consumer)
+	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
+	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer)
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
@@ -86,27 +89,26 @@ func (c *outputController) Close() error {
 	c.consumer.sigPause()
 	c.consumer.close()
 	c.retryer.close()
+	close(c.workQueue)
 
 	if c.out != nil {
 		for _, out := range c.out.outputs {
 			out.Close()
 		}
-		close(c.out.workQueue)
 	}
 
 	return nil
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
-	// create new outputGroup with shared work queue
+	// create new output group with the shared work queue
 	clients := outGrp.Clients
-	queue := makeWorkQueue()
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(c.observer, queue, client)
+		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
 	}
 	grp := &outputGroup{
-		workQueue:  queue,
+		workQueue:  c.workQueue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
 		batchSize:  outGrp.BatchSize,
@@ -119,7 +121,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 			c.retryer.sigOutputRemoved()
 		}
 	}
-	c.retryer.updOutput(queue)
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}
@@ -141,7 +142,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 }
 
 func makeWorkQueue() workQueue {
-	return workQueue(make(chan *Batch, 0))
+	return workQueue(make(chan publisher.Batch, 0))
 }
 
 // Reload the output

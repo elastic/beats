@@ -15,22 +15,22 @@ type testCase struct {
 
 func TestMonitoringDrops(t *testing.T) {
 	cases := []testCase{
-		testCase{`/var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`npipe://drop`, ""},
-		testCase{`http+npipe://drop`, ""},
-		testCase{`\\.\pipe\drop`, ""},
-		testCase{`unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`http+unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`file:///var/lib/drop/abc.sock`, "/var/lib/drop"},
-		testCase{`http://localhost/stats`, ""},
-		testCase{`localhost/stats`, ""},
-		testCase{`http://localhost:8080/stats`, ""},
-		testCase{`localhost:8080/stats`, ""},
-		testCase{`http://1.2.3.4/stats`, ""},
-		testCase{`http://1.2.3.4:5678/stats`, ""},
-		testCase{`1.2.3.4:5678/stats`, ""},
-		testCase{`http://hithere.com:5678/stats`, ""},
-		testCase{`hithere.com:5678/stats`, ""},
+		{`/var/lib/drop/abc.sock`, "/var/lib/drop"},
+		{`npipe://drop`, ""},
+		{`http+npipe://drop`, ""},
+		{`\\.\pipe\drop`, ""},
+		{`unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
+		{`http+unix:///var/lib/drop/abc.sock`, "/var/lib/drop"},
+		{`file:///var/lib/drop/abc.sock`, "/var/lib/drop"},
+		{`http://localhost/stats`, ""},
+		{`localhost/stats`, ""},
+		{`http://localhost:8080/stats`, ""},
+		{`localhost:8080/stats`, ""},
+		{`http://1.2.3.4/stats`, ""},
+		{`http://1.2.3.4:5678/stats`, ""},
+		{`1.2.3.4:5678/stats`, ""},
+		{`http://hithere.com:5678/stats`, ""},
+		{`hithere.com:5678/stats`, ""},
 	}
 
 	for _, c := range cases {

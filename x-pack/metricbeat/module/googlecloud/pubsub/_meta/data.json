@@ -14,14 +14,14 @@
     "googlecloud": {
         "labels": {
             "resource": {
-                "topic_id": "test-ks"
+                "subscription_id": "test-subscription-1"
             }
         },
         "pubsub": {
             "subscription": {
-                "backlog_bytes": 20,
-                "num_undelivered_messages": 4,
-                "oldest_unacked_message_age": 435752
+                "backlog_bytes": {
+                    "value": 0
+                }
             }
         }
     },

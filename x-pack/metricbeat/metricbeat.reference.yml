@@ -498,13 +498,21 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
+  region: "us-central1"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 300s
+
+- module: googlecloud
+  metricsets:
     - pubsub
     - loadbalancing
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 60s
 
 - module: googlecloud
   metricsets:
@@ -514,6 +522,15 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 300s
+
+- module: googlecloud
+  metricsets:
+    - compute
+  region: "us-"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s
 
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
@@ -826,7 +843,7 @@ metricbeat.modules:
 
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
-  metricsets: ["dommemstat"]
+  metricsets: ["dommemstat", "status"]
   enabled: true
   period: 10s
   hosts: ["unix:///var/run/libvirt/libvirt-sock"]
@@ -1256,11 +1273,14 @@ metricbeat.modules:
   period: 10s
   perfmon.ignore_non_existent_counters: false
   perfmon.group_measurements_by_instance: false
-  perfmon.counters:
-  #  - instance_label: processor.name
-  #    instance_name: total
-  #    measurement_label: processor.time.total.pct
-  #    query: '\Processor Information(_Total)\% Processor Time'
+  perfmon.queries:
+#  - object: 'Process'
+#    instance: ["*"]
+#    counters:
+#    - name: 'Disk Writes/sec'
+#      field: physical_disk.write.per_sec
+#      format: "float"
+#    - name: "% Disk Write Time"
 
 - module: windows
   metricsets: ["service"]
@@ -1684,6 +1704,27 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1952,17 +1993,21 @@ output.elasticsearch:
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
 
   # Path to the keytab file. It is used when auth_type is set to keytab.
-  #kerberos.keytab: /etc/krb5kdc/kafka.keytab
+  #kerberos.keytab: /etc/security/keytabs/kafka.keytab
 
   # Path to the Kerberos configuration.
-  #kerberos.config_path: /etc/path/config
+  #kerberos.config_path: /etc/krb5.conf
 
-  # The service principal name.
-  #kerberos.service_name: HTTP/my-service@realm
+  # The service name. Service principal name is contructed from
+  # service_name/hostname@realm.
+  #kerberos.service_name: kafka
 
   # Name of the Kerberos user.
   #kerberos.username: elastic
@@ -2536,6 +2581,27 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
   #metrics.period: 10s
   #state.period: 1m
