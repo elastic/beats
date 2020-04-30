@@ -4,8 +4,9 @@ var:
   - name: paths
     default:
       - /var/log/santa.log
+      - /var/db/santa/santa.log
   - name: input
     default: file
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml
