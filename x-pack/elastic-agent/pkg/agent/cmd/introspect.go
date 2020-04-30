@@ -16,7 +16,7 @@ import (
 
 func newIntrospectCommandWithArgs(flags *globalFlags, s []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "introspect",
+		Use:   "inspect",
 		Short: "Shows configuration of the agent",
 		Long:  "Shows current configuration of the agent",
 		Args:  cobra.ExactArgs(0),

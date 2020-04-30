@@ -28,7 +28,7 @@ func NewIntrospectConfigCmd(configPath string,
 	}, nil
 }
 
-// Execute tries to enroll the agent into Fleet.
+// Execute introspects agent configuration.
 func (c *IntrospectConfigCmd) Execute() error {
 	return c.introspectConfig()
 }
