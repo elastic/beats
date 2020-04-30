@@ -18,12 +18,14 @@
 package tcp
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -107,6 +109,35 @@ func TestTLSInvalidCert(t *testing.T) {
 					"type":    "io",
 				},
 			}),
+		)),
+		event.Fields,
+	)
+}
+
+func TestTLSExpiredCert(t *testing.T) {
+	certFile := "../fixtures/expired.cert"
+	tlsCert, err := tls.LoadX509KeyPair(certFile, "../fixtures/expired.key")
+	require.NoError(t, err)
+
+	ip, portStr, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	defer closeSrv()
+
+	portInt, err := strconv.Atoi(portStr)
+	port := uint16(portInt)
+	require.NoError(t, err)
+
+	host := "localhost"
+	event := testTLSTCPCheck(t, host, port, certFile, monitors.NewStdResolver())
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.RespondingTCPChecks(),
+			hbtest.BaseChecks(ip, "down", "tcp"),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.SimpleURLChecks(t, "ssl", host, port),
+			hbtest.ResolveChecks(ip),
+			hbtest.ExpiredCertChecks(cert),
 		)),
 		event.Fields,
 	)

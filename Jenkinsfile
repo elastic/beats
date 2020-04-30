@@ -2,6 +2,13 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the stashed id with the test results to be digested with runbld
+*/
+@Field def stashedTestReports = [:]
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
@@ -11,6 +18,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -40,13 +48,13 @@ pipeline {
       steps {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
@@ -587,10 +595,18 @@ pipeline {
             }
           }
           steps {
-            k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
+            k8sTest(["v1.18.2","v1.17.2","v1.16.4","v1.15.7","v1.14.10"])
           }
         }
       }
+    }
+  }
+  post {
+    always {
+      runbld()
+    }
+    cleanup {
+      notifyBuildResult(prComment: true)
     }
   }
 }
@@ -664,9 +680,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
-      sh(label: "Install Mage", script: "make mage")
+      installTools()
       // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
       // See https://github.com/elastic/beats/issues/17787.
       setGitConfig()
@@ -677,7 +691,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
           }
         }
@@ -704,18 +718,29 @@ def withBeatsEnvWin(Closure body) {
     deleteDir()
     unstash 'source'
     dir("${env.BASE_DIR}"){
-      bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
+      installTools()
       try {
         if(!params.dry_run){
           body()
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
         }
       }
     }
+  }
+}
+
+def installTools() {
+  def i = 2 // Number of retries
+  if(isUnix()) {
+    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Mage", script: "make mage") }
+  } else {
+    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -801,14 +826,14 @@ def dumpFilteredEnvironment(){
 def k8sTest(versions){
   versions.each{ v ->
     stage("k8s ${v}"){
-      withEnv(["K8S_VERSION=${v}"]){
+      withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
           withBeatsEnv(false) {
-            sh(label: "Install k8s", script: """
-              eval "\$(gvm use ${GO_VERSION} --format=bash)"
-              .ci/scripts/kind-setup.sh
-            """)
-            sh(label: "Kubernetes Kind",script: "make KUBECONFIG=\"\$(kind get kubeconfig-path)\" -C deploy/kubernetes test")
+            sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
+            sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
         }
@@ -853,7 +878,6 @@ def isChangedOSSCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('libbeat'))
   return isChanged(allPatterns)
 }
 
@@ -868,13 +892,16 @@ def isChangedXPackCode(patterns) {
     "^\\.ci/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
   return isChanged(allPatterns)
 }
 
 def loadConfigEnvVars(){
   def empty = []
   env.GO_VERSION = readFile(".go-version").trim()
+
+  withEnv(["HOME=${env.WORKSPACE}"]) {
+    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+  }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
@@ -934,17 +961,25 @@ def loadConfigEnvVars(){
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(getVendorPatterns('generator'))
+  def generatorPatterns = ['^generator/.*']
+  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
+  env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 }
 
 /**
   This method grab the dependencies of a Go module and transform them on regexp
 */
 def getVendorPatterns(beatName){
+  def os = goos()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
   def output = ""
-  docker.image("golang:${GO_VERSION}").inside{
+
+  withEnv([
+    "HOME=${env.WORKSPACE}/${env.BASE_DIR}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+  ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      export HOME=${WORKSPACE}/${BASE_DIR}
       go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
         |awk '{print \$1"/.*"}'\
         |sed -e "s#github.com/elastic/beats/v7/##g"
@@ -964,4 +999,36 @@ def setGitConfig(){
 
 def isDockerInstalled(){
   return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+}
+
+def junitAndStore(Map params = [:]){
+  junit(params)
+  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stashedTestReports[stageName] = stageName
+}
+
+def runbld() {
+  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+    if (stashedTestReports) {
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Prepare workspace context',
+           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
+        // Unstash the test reports
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash v
+          }
+        }
+        sh(label: 'Process JUnit reports with runbld',
+          script: '''\
+          cat >./runbld-script <<EOF
+          echo "Processing JUnit reports with runbld..."
+          EOF
+          /usr/local/bin/runbld ./runbld-script
+          '''.stripIndent())  // stripIdent() requires '''/
+      }
+    }
+  }
 }

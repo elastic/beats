@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -72,6 +73,7 @@ func NewAutodiscover(
 	factory cfgfile.RunnerFactory,
 	configurer EventConfigurer,
 	config *Config,
+	keystore keystore.Keystore,
 ) (*Autodiscover, error) {
 	logger := logp.NewLogger("autodiscover")
 
@@ -81,7 +83,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := Registry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(bus, providerCfg, keystore)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
@@ -191,10 +193,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	if a.logger.IsDebug() {
 
 		for _, c := range configs {
-			rc := map[string]interface{}{}
-			c.Unpack(&rc)
-
-			a.logger.Debugf("Generated config: %+v", rc)
+			a.logger.Debugf("Generated config: %+v", common.DebugString(c, true))
 		}
 	}
 
@@ -202,7 +201,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	for _, config := range configs {
 		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
-			a.logger.Debugf("Could not hash config %v: %v", config, err)
+			a.logger.Debugf("Could not hash config %v: %v", common.DebugString(config, true), err)
 			continue
 		}
 
@@ -216,7 +215,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 		dynFields := a.meta.Store(hash, meta)
 
 		if a.configs[eventID][hash] != nil {
-			a.logger.Debugf("Config %v is already running", config)
+			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
 			continue
 		}
 
