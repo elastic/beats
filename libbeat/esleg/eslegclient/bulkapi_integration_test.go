@@ -87,7 +87,7 @@ func TestEmptyBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Bulk(index, "", params, body)
+	_, resp, err := client.Bulk(context.Background(), index, "", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s", err)
 	}
@@ -151,7 +151,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, resp, err := client.Bulk(index, "", params, body)
+	_, resp, err := client.Bulk(context.Background(), index, "", params, body)
 	if err != nil {
 		t.Fatalf("Bulk() returned error: %s [%s]", err, resp)
 	}

@@ -279,8 +279,8 @@ func TestClientPublishTracer(t *testing.T) {
 
 	secondSpan := spans[0]
 	assert.Contains(t, secondSpan.Name, "POST")
-	assert.Equal(t, "external", secondSpan.Type)
-	assert.Equal(t, "http", secondSpan.Subtype)
+	assert.Equal(t, "db", secondSpan.Type)
+	assert.Equal(t, "elasticsearch", secondSpan.Subtype)
 	assert.Equal(t, [8]byte(secondSpan.ParentID), [8]byte(firstSpan.ID))
 	assert.Equal(t, [8]byte(secondSpan.TransactionID), [8]byte(tx.ID))
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
