@@ -1048,6 +1048,8 @@ gopkg.in/inf.v0
 gopkg.in/jcmturner/aescts.v1
 # gopkg.in/jcmturner/dnsutils.v1 v1.0.1
 gopkg.in/jcmturner/dnsutils.v1
+# gopkg.in/jcmturner/goidentity.v3 v3.0.0
+gopkg.in/jcmturner/goidentity.v3
 # gopkg.in/jcmturner/gokrb5.v7 v7.3.0
 gopkg.in/jcmturner/gokrb5.v7/asn1tools
 gopkg.in/jcmturner/gokrb5.v7/client
@@ -1078,6 +1080,8 @@ gopkg.in/jcmturner/gokrb5.v7/keytab
 gopkg.in/jcmturner/gokrb5.v7/krberror
 gopkg.in/jcmturner/gokrb5.v7/messages
 gopkg.in/jcmturner/gokrb5.v7/pac
+gopkg.in/jcmturner/gokrb5.v7/service
+gopkg.in/jcmturner/gokrb5.v7/spnego
 gopkg.in/jcmturner/gokrb5.v7/types
 # gopkg.in/jcmturner/rpc.v1 v1.1.0
 gopkg.in/jcmturner/rpc.v1/mstypes

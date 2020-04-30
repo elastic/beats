@@ -7940,6 +7940,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: gopkg.in/jcmturner/goidentity.v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/gopkg.in/jcmturner/goidentity.v3/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: gopkg.in/jcmturner/gokrb5.v7
 Version: v7.3.0
 License type (autodetected): Apache-2.0
