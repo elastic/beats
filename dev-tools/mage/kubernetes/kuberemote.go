@@ -426,6 +426,8 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 		},
 		Spec: apiv1.PodSpec{
 			ServiceAccountName: svcAccName,
+			HostNetwork:        true,
+			DNSPolicy:          apiv1.DNSClusterFirstWithHostNet,
 			RestartPolicy:      apiv1.RestartPolicyNever,
 			InitContainers: []apiv1.Container{
 				{
@@ -435,6 +437,7 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 						{
 							Name:          "ssh",
 							Protocol:      apiv1.ProtocolTCP,
+							HostPort:      22,
 							ContainerPort: 22,
 						},
 					},
@@ -458,7 +461,7 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 				},
 			},
 			Containers: []apiv1.Container{
-				apiv1.Container{
+				{
 					Name:       "exec",
 					Image:      image,
 					Command:    cmd,
