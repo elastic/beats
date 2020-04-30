@@ -137,7 +137,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			TLSClientConfig: s.TLS.ToConfig(),
 			Proxy:           proxy,
 			IdleConnTimeout: s.IdleConnTimeout,
-		},
+		}),
 		Timeout: s.Timeout,
 	}
 
