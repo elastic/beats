@@ -6,16 +6,18 @@ package beats
 
 import (
 	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 const (
-	// args: pipeline name, application name
-	logFileFormat = "/var/log/elastic-agent/%s/%s"
-	// args: install path, pipeline name, application name
-	logFileFormatWin = "%s\\logs\\elastic-agent\\%s\\%s"
+	// args: data path, pipeline name, application name
+	logFileFormat = "%s/logs/%s/%s"
+	// args: data path, install path, pipeline name, application name
+	logFileFormatWin = "%s\\logs\\%s\\%s"
 
 	// args: pipeline name, application name
-	mbEndpointFileFormat = "unix:///var/run/elastic-agent/%s/%s/%s.sock"
+	mbEndpointFileFormat = "unix://%s/run/%s/%s/%s.sock"
 	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
 )
@@ -25,13 +27,13 @@ func getMonitoringEndpoint(program, operatingSystem, pipelineID string) string {
 		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, program)
 	}
 
-	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, program, program)
+	return fmt.Sprintf(mbEndpointFileFormat, paths.Data(), pipelineID, program, program)
 }
 
 func getLoggingFile(program, operatingSystem, installPath, pipelineID string) string {
 	if operatingSystem == "windows" {
-		return fmt.Sprintf(logFileFormatWin, installPath, pipelineID, program)
+		return fmt.Sprintf(logFileFormatWin, paths.Data(), pipelineID, program)
 	}
 
-	return fmt.Sprintf(logFileFormat, pipelineID, program)
+	return fmt.Sprintf(logFileFormat, paths.Data(), pipelineID, program)
 }

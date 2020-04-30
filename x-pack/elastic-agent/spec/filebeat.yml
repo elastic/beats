@@ -1,6 +1,6 @@
 name: Filebeat
 cmd: filebeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
 configurable: grpc
 rules:
 - inject_index:
@@ -60,6 +60,14 @@ rules:
     - docker
     - redis
     - syslog
+    - s3
+    - netflow
+    - httpjson
+    - o365audit
+    - azureeventhub
+    - cloudfoundry
+    - googlepubsub
+    - kafka
 
 - filter_values:
     selector: inputs

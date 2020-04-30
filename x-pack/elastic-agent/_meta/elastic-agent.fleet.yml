@@ -5,6 +5,19 @@
 management:
   mode: "fleet"
 
+  # Add variance between API calls to better distribute the calls.
+  #jitter: 5s
+
+  # The Elastic Agent does Exponential backoff when an error happen.
+  #
+  #backoff:
+  #
+  # Initial time to wait before retrying the call.
+  # init: 1s
+  #
+  # Maximum time to wait before retrying the call.
+  # max: 10s
+
 download:
   # source of the artifacts, requires elastic like structure and naming of the binaries
   # e.g /windows-x86.zip

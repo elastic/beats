@@ -7,7 +7,7 @@ ES_BEATS?=../../
 #
 # Includes
 #
-include $(ES_BEATS)/dev-tools/make/xpack.mk
+include $(ES_BEATS)/dev-tools/make/mage.mk
 
 .PHONY: test-gcp-functions
 test-gcp-functions: mage

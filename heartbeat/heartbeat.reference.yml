@@ -25,8 +25,11 @@ heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
              # configured hosts
 
-  # Monitor name used for job name and document type.
-  #name: icmp
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
+
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-icmp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -89,9 +92,11 @@ heartbeat.monitors:
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
 
-  # Monitor name used for job name and document type
-  #name: tcp
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: my-tcp-monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -165,9 +170,11 @@ heartbeat.monitors:
   #keep_null: false
 
 - type: http # monitor type `http`. Connect via HTTP an optionally verify response
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-http-monitor
 
-  # Monitor name used for job name and document type
-  #name: http
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My Monitor
 
   # Enable/Disable monitor
   #enabled: true
@@ -670,6 +677,27 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
+
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -937,6 +965,9 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
 
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
@@ -1523,6 +1554,27 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
   #metrics.period: 10s
   #state.period: 1m

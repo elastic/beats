@@ -1405,6 +1405,17 @@ type: boolean
 Fields for AWS CloudWatch logs.
 
 
+
+*`aws.cloudwatch.message`*::
++
+--
+CloudWatch log message.
+
+
+type: text
+
+--
+
 [float]
 === ec2
 
@@ -1663,6 +1674,7 @@ type: keyword
 +
 --
 The error reason if the executed action failed.
+
 
 type: keyword
 
@@ -26446,7 +26458,7 @@ format: duration
 The name of the upstream.
 
 
-type: text
+type: keyword
 
 --
 
@@ -26456,7 +26468,7 @@ type: text
 The name of the alternative upstream.
 
 
-type: text
+type: keyword
 
 --
 
@@ -26500,7 +26512,7 @@ type: long
 The randomly generated ID of the request
 
 
-type: text
+type: keyword
 
 --
 
@@ -28244,6 +28256,15 @@ type: keyword
 
 --
 
+*`panw.panos.action`*::
++
+--
+Action taken for the session.
+
+type: keyword
+
+--
+
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
@@ -28687,7 +28708,7 @@ The disk volume path.
 
 --
 
-*`certificate.common_name`*::
+*`santa.certificate.common_name`*::
 +
 --
 Common name from code signing certificate.
@@ -28696,7 +28717,7 @@ type: keyword
 
 --
 
-*`certificate.sha256`*::
+*`santa.certificate.sha256`*::
 +
 --
 SHA256 hash of code signing certificate.
