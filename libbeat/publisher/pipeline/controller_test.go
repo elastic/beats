@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	lbtesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 
 	"github.com/stretchr/testify/require"
@@ -43,7 +44,7 @@ func TestOutputReload(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			lbtesting.SeedPRNG(t)
 
 			goroutines := resources.NewGoroutinesChecker()
 			defer goroutines.Check(t)
