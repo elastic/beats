@@ -1,19 +1,19 @@
 - module: aws
   period: 12h
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - billing
 - module: aws
   period: 1m
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - natgateway
     - transitgateway
@@ -21,43 +21,43 @@
     - vpn
 - module: aws
   period: 5m
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - sqs
 - module: aws
   period: 24h
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - s3_daily_storage
     - s3_request
 - module: aws
   period: 1m
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - elb
     - rds
   tags_filter:
-    - key: "Organization"
-      value: "Engineering"
+    - key: ""
+      value: ""
 - module: aws
   period: 5m
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - dynamodb
     - ebs
@@ -65,25 +65,25 @@
     - lambda
     - sns
   tags_filter:
-    - key: "Organization"
-      value: "Engineering"
+    - key: ""
+      value: ""
 - module: aws
   period: 300s
-  aws_access_key_id: access-key-id
-  aws_secret_access_key: secret-access-key
-  aws_session_token: session_token
-  credential_profile_name: test-mb
-  role_arn: role-arn
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
   metricsets:
     - cloudwatch
   metrics:
     - namespace: AWS/EC2
-      name: ["CPUUtilization", "DiskWriteOps"]
-      tags.resource_type_filter: ec2:instance
+      name: [""]
+      tags.resource_type_filter: ""
       dimensions:
-        - name: InstanceId
-          value: i-0686946e22cf9494a
-      statistic: ["Average", "Maximum"]
+        - name: ""
+          value: ""
+      statistic: [""]
       tags:
-        - key: "Organization"
-          value: "Engineering"
+        - key: ""
+          value: ""
