@@ -138,7 +138,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
+            mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build goUnitTest integTest")
           }
         }
         stage('Filebeat Mac OS X'){
