@@ -29,25 +29,24 @@ import (
 
 func TestGetServiceURI(t *testing.T) {
 	tests := map[string]struct {
-		esVersion   *common.Version
-		expectedURI string
+		esVersion    *common.Version
+		expectedPath string
 	}{
 		"bulk_stats_unavailable": {
-			esVersion:   common.MustNewVersion("7.7.0"),
-			expectedURI: "http://eshost:9200" + statsPath,
+			esVersion:    common.MustNewVersion("7.7.0"),
+			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
-			esVersion:   common.MustNewVersion("7.8.0"),
-			expectedURI: strings.Replace("http://eshost:9200"+statsPath, statsMetrics, statsMetrics+",bulk", 1),
+			esVersion:    common.MustNewVersion("7.8.0"),
+			expectedPath: strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1),
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			currURI := "http://eshost:9200" + statsPath
-			newURI, err := getServiceURI(currURI, *test.esVersion)
+			newURI, err := getServicePath(*test.esVersion)
 			require.NoError(t, err)
-			require.Equal(t, test.expectedURI, newURI)
+			require.Equal(t, test.expectedPath, newURI)
 		})
 	}
 }
@@ -59,14 +58,13 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 		var uri string
 		var err error
 		for i := uint(0); i < numCalls; i++ {
-			currURI := "http://eshost:9200" + statsPath
-			uri, err = getServiceURI(currURI, *common.MustNewVersion("7.8.0"))
+			uri, err = getServicePath(*common.MustNewVersion("7.8.0"))
 			if err != nil {
 				return false
 			}
 		}
 
-		return err == nil && uri == strings.Replace("http://eshost:9200"+statsPath, statsMetrics, statsMetrics+",bulk", 1)
+		return err == nil && uri == strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1)
 	}, nil)
 	require.NoError(t, err)
 }
