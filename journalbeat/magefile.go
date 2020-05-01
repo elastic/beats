@@ -231,5 +231,7 @@ func selectImage(platform string) (string, error) {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
