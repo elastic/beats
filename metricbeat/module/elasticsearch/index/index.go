@@ -21,10 +21,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -77,7 +76,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	if err := m.updateServiceURI(*info.Version.Number); err != nil {
+	if err := m.updateServicePath(*info.Version.Number); err != nil {
 		if m.XPack {
 			m.Logger().Error(err)
 			return nil
@@ -106,31 +105,32 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) updateServiceURI(esVersion common.Version) error {
-	u, err := getServiceURI(m.GetURI(), esVersion)
+func (m *MetricSet) updateServicePath(esVersion common.Version) error {
+	p, err := getServicePath(esVersion)
 	if err != nil {
 		return err
 	}
 
-	m.HTTP.SetURI(u)
+	m.SetServiceURI(p)
 	return nil
 
 }
 
-func getServiceURI(currURI string, esVersion common.Version) (string, error) {
+func getServicePath(esVersion common.Version) (string, error) {
+	currPath := statsPath
 	if esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		// Can't request bulk stats so don't change service URI
-		return currURI, nil
+		return currPath, nil
 	}
 
-	u, err := url.Parse(currURI)
+	u, err := url.Parse(currPath)
 	if err != nil {
 		return "", err
 	}
 
 	if strings.HasSuffix(u.Path, ",bulk") {
 		// Bulk stats already being requested so don't change service URI
-		return currURI, nil
+		return currPath, nil
 	}
 
 	u.Path += ",bulk"
