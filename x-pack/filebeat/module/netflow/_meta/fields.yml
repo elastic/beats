@@ -4,3 +4,4 @@
     Module for receiving NetFlow and IPFIX flow records over UDP. The module
     does not add fields beyond what the netflow input provides.
   skipdocs:
+  fields:
