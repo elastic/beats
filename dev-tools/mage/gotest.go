@@ -456,5 +456,10 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}
+
+	start := time.Now()
+	defer func() {
+		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
+	}()
 	return sh.RunV("go", args...)
 }

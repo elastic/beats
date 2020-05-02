@@ -5,7 +5,6 @@ services:
     depends_on:
       - proxy_dep
     environment:
-      - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
       - BEAT_STRICT_PERMS=false
       - REDIS_HOST=redis
       - REDIS_PORT=6379
