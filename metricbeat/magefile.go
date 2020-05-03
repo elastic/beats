@@ -27,10 +27,12 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+
+	// register kubernetes runner
+	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
 
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -48,6 +50,8 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
@@ -142,7 +146,8 @@ func moduleFieldsGo() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config,
+	mg.SerialDeps(
+		Fields, Dashboards, Config, CollectAll,
 		metricbeat.PrepareModulePackagingOSS,
 		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
@@ -192,34 +197,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	}, devtools.ListMatchingEnvVars("NOSE_")...)
-}
-
-// CreateMetricset creates a new metricset.
-//
-// Required ENV variables:
-// * MODULE: Name of the module
-// * METRICSET: Name of the metricset
-func CreateMetricset(ctx context.Context) error {
-	ve, err := devtools.PythonVirtualenv()
-	if err != nil {
-		return err
-	}
-	python, err := devtools.LookVirtualenvPath(ve, "python")
-	if err != nil {
-		return err
-	}
-	path, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	_, err = sh.Exec(
-		map[string]string{}, os.Stdout, os.Stderr, python, "scripts/create_metricset.py",
-		"--path", path, "--module", os.Getenv("MODULE"), "--metricset", os.Getenv("METRICSET"),
-	)
-	return err
+	})
 }

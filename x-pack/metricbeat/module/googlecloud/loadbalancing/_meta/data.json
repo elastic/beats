@@ -14,120 +14,30 @@
     "googlecloud": {
         "labels": {
             "metrics": {
-                "cache_result": "DISABLED",
-                "proxy_continent": "Europe",
-                "response_code": "502",
-                "response_code_class": "500"
+                "client_network": "ocp-be-c5kjr-network",
+                "client_subnetwork": "ocp-be-c5kjr-worker-subnet",
+                "client_zone": "us-central1-a"
             },
             "resource": {
-                "backend_name": "INVALID_BACKEND",
-                "backend_scope": "INVALID_BACKEND",
-                "backend_scope_type": "INVALID_BACKEND",
-                "backend_target_name": "test1-backend-ks",
+                "backend_name": "ocp-be-c5kjr-master-us-central1-a",
+                "backend_scope": "us-central1-a",
+                "backend_scope_type": "ZONE",
+                "backend_subnetwork_name": "ocp-be-c5kjr-master-subnet",
+                "backend_target_name": "ocp-be-c5kjr-api-internal",
                 "backend_target_type": "BACKEND_SERVICE",
-                "backend_type": "INVALID_BACKEND",
-                "forwarding_rule_name": "test-lb-ks-forwarding-rule",
-                "matched_url_path_rule": "UNMATCHED",
-                "region": "global",
-                "target_proxy_name": "test-lb-ks-target-proxy",
-                "url_map_name": "test-lb-ks"
+                "backend_type": "INSTANCE_GROUP",
+                "forwarding_rule_name": "ocp-be-c5kjr-api-internal",
+                "load_balancer_name": "ocp-be-c5kjr-api-internal",
+                "network_name": "ocp-be-c5kjr-network",
+                "region": "us-central1"
             }
         },
         "loadbalancing": {
-            "https": {
-                "backend_latencies": {
-                    "count": 4,
-                    "mean": 97.927,
-                    "bucket_options": {
-                        "Options": {
-                            "ExponentialBuckets": {
-                                "num_finite_buckets": 66,
-                                "growth_factor": 1.4,
-                                "scale": 1
-                            }
-                        }
-                    },
-                    "bucket_counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        4
-                    ]
-                },
-                "backend_request_bytes_count": 736,
-                "backend_request_count": 4,
-                "backend_response_bytes_count": 1952,
-                "frontend_tcp_rtt": {
-                    "count": 4,
-                    "mean": 50,
-                    "bucket_options": {
-                        "Options": {
-                            "ExponentialBuckets": {
-                                "num_finite_buckets": 66,
-                                "growth_factor": 1.4,
-                                "scale": 1
-                            }
-                        }
-                    },
-                    "bucket_counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        4
-                    ]
-                },
-                "request_bytes_count": 736,
-                "request_count": 4,
-                "response_bytes_count": 1952,
-                "total_latencies": {
-                    "count": 4,
-                    "mean": 98.423,
-                    "bucket_options": {
-                        "Options": {
-                            "ExponentialBuckets": {
-                                "num_finite_buckets": 66,
-                                "growth_factor": 1.4,
-                                "scale": 1
-                            }
-                        }
-                    },
-                    "bucket_counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        4
-                    ]
+            "l3": {
+                "internal": {
+                    "egress_packets_count": {
+                        "value": 0
+                    }
                 }
             }
         }
