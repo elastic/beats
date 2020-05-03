@@ -30,7 +30,7 @@ var security = (function () {
 
     // User Account Control Attributes Table
     // https://support.microsoft.com/es-us/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties
-    var uac_flags = [
+    var uacFlags = [
         [0x0001, 'SCRIPT'],
         [0x0002, 'ACCOUNTDISABLE'],
         [0x0008, 'HOMEDIR_REQUIRED'],
@@ -252,7 +252,7 @@ var security = (function () {
 
     // Audit Policy Changes Table
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4719
-    var audit_actions = {
+    var auditActions = {
         "8448": "Success Removed",
         "8450": "Failure Removed",
         "8449": "Success Added",
@@ -274,7 +274,7 @@ var security = (function () {
 
     // Audit Categories Description
     // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpac/77878370-0712-47cd-997d-b07053429f6d
-    var audit_description = {
+    var auditDescription = {
         "0CCE9210-69AE-11D9-BED3-505054503030":["Security State Change", "System"],
         "0CCE9211-69AE-11D9-BED3-505054503030":["Security System Extension", "System"],
         "0CCE9212-69AE-11D9-BED3-505054503030":["System Integrity", "System"],
@@ -1362,15 +1362,15 @@ var security = (function () {
     };
 
     var addEventOutcome = function(evt) {
-        var audit_result = evt.Get("winlog.keywords");
-        if (!audit_result) {
+        var auditResult = evt.Get("winlog.keywords");
+        if (!auditResult) {
             return;
         }
-        var  event_outcome = eventOutcomes[audit_result];
-        if (event_outcome === undefined) {
+        var  eventOutcome = eventOutcomes[auditResult];
+        if (eventOutcome === undefined) {
             return;
         }
-        evt.Put("event.outcome", event_outcome);
+        evt.Put("event.outcome", eventOutcome);
     };
 
     var addLogonType = function(evt) {
@@ -1422,40 +1422,40 @@ var security = (function () {
         if (!code) {
             return;
         }
-        var uac_code=parseInt(code);
-        var uac_result = [];
-        for (var i=0; i<uac_flags.length; i++) {
-            if ((uac_code | uac_flags[i][0]) === uac_code) {
-                uac_result.push(uac_flags[i][1]);
+        var uacCode = parseInt(code);
+        var uacResult = [];
+        for (var i = 0; i < uacFlags.length; i++) {
+            if ((uacCode | uacFlags[i][0]) === uacCode) {
+                uacResult.push(uacFlags[i][1]);
             }
         }
-        if (uac_result) {
-            evt.Put("winlog.event_data.NewUACList",uac_result);
+        if (uacResult) {
+            evt.Put("winlog.event_data.NewUACList", uacResult);
         }
-        var uac_list=evt.Get("winlog.event_data.UserAccountControl").replace(/\s/g,'').split("%%").filter(String);
-        if (! uac_list) {
+        var uacList = evt.Get("winlog.event_data.UserAccountControl").replace(/\s/g, '').split("%%").filter(String);
+        if (!uacList) {
             return;
         }
-        evt.Put("winlog.event_data.UserAccountControl",uac_list);
+        evt.Put("winlog.event_data.UserAccountControl", uacList);
       };
 
     var addAuditInfo = function(evt) {
-        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{",'').replace("}",'').toUpperCase();
+        var subcategoryGuid = evt.Get("winlog.event_data.SubcategoryGuid").replace("{", '').replace("}", '').toUpperCase();
         if (!subcategoryGuid) {
             return;
         }
-        if (!audit_description[subcategoryGuid]) {
+        if (!auditDescription[subcategoryGuid]) {
             return;
         }
-        evt.Put("winlog.event_data.Category",audit_description[subcategoryGuid][1]);
-        evt.Put("winlog.event_data.SubCategory",audit_description[subcategoryGuid][0]);
-        var coded_actions=evt.Get("winlog.event_data.AuditPolicyChanges").split(",");
-        var action_results=[];
-        for (var j=0; j<coded_actions.length; j++) {
-            var action_code=coded_actions[j].replace("%%",'').replace(' ','');
-            action_results.push(audit_actions[action_code]);
+        evt.Put("winlog.event_data.Category", auditDescription[subcategoryGuid][1]);
+        evt.Put("winlog.event_data.SubCategory", auditDescription[subcategoryGuid][0]);
+        var codedActions = evt.Get("winlog.event_data.AuditPolicyChanges").split(",");
+        var actionResults = [];
+        for (var j = 0; j < codedActions.length; j++) {
+            var actionCode = codedActions[j].replace("%%", '').replace(' ', '');
+            actionResults.push(auditActions[actionCode]);
         }
-        evt.Put("winlog.event_data.AuditPolicyChangesDescription",action_results);
+        evt.Put("winlog.event_data.AuditPolicyChangesDescription", actionResults);
     };
 
     var addTicketOptionsDescription = function(evt) {
@@ -1463,16 +1463,16 @@ var security = (function () {
         if (!code) {
             return;
         }
-        var tkt_code=parseInt(code,16).toString(2);
-        var tkt_result = [];
-        var tkt_code_len=tkt_code.length;
-        for (var i=tkt_code_len; i>=0; i--) {
-            if (tkt_code[i] == 1) {
-                tkt_result.push(ticketOptions[(32-tkt_code_len)+i]);
+        var tktCode = parseInt(code, 16).toString(2);
+        var tktResult = [];
+        var tktCodeLen = tktCode.length;
+        for (var i = tktCodeLen; i >= 0; i--) {
+            if (tktCode[i] == 1) {
+                tktResult.push(ticketOptions[(32-tktCodeLen)+i]);
             }
         }
-        if (tkt_result) {
-            evt.Put("winlog.event_data.TicketOptionsDescription",tkt_result);
+        if (tktResult) {
+            evt.Put("winlog.event_data.TicketOptionsDescription", tktResult);
         }
     };
 
@@ -1481,8 +1481,8 @@ var security = (function () {
         if (!code) {
             return;
         }
-        var enc_type_code=code.toLowerCase();
-        evt.Put("winlog.event_data.TicketEncryptionTypeDescription",ticketEncryptionTypes[enc_type_code]);
+        var encTypeCode = code.toLowerCase();
+        evt.Put("winlog.event_data.TicketEncryptionTypeDescription", ticketEncryptionTypes[encTypeCode]);
     };
 
     var addTicketStatus = function(evt) {
@@ -1490,7 +1490,7 @@ var security = (function () {
         if (!code) {
             return;
         }
-        evt.Put("winlog.event_data.StatusDescription",kerberosTktStatusCodes[code]);
+        evt.Put("winlog.event_data.StatusDescription", kerberosTktStatusCodes[code]);
     };
 
     var addSessionData = new processor.Chain()
@@ -1506,7 +1506,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.AccountName");
-            evt.AppendTo('related.user',user);
+            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1522,7 +1522,7 @@ var security = (function () {
             if (!code) {
                 return;
             }
-            evt.Put("service.type",serviceTypes[code]);
+            evt.Put("service.type", serviceTypes[code]);
         })
         .Build();
 
@@ -1538,10 +1538,10 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             if (/.@*/.test(user)) {
-                user=user.split('@')[0];
-                evt.Put('user.name',user);
+                user = user.split('@')[0];
+                evt.Put('user.name', user);
             }
-            evt.AppendTo('related.user',user);
+            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1587,7 +1587,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
-            evt.AppendTo('related.user',user);
+            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1602,7 +1602,7 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.user_data.SubjectUserName");
-            evt.AppendTo('related.user',user);
+            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1712,10 +1712,10 @@ var security = (function () {
         .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
-            if (user)  {
+            if (user) {
                 var res = /^-$/.test(user);
                 if (!res) {
-                    evt.AppendTo('related.user',user);
+                    evt.AppendTo('related.user', user);
                 }
             }
          })
@@ -1730,10 +1730,10 @@ var security = (function () {
         .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
-            if (user)  {
+            if (user) {
                 var res = /^-$/.test(user);
                 if (!res) {
-                    evt.AppendTo('related.user',user);
+                    evt.AppendTo('related.user', user);
                 }
             }
          })
@@ -1775,7 +1775,7 @@ var security = (function () {
             var user = evt.Get("winlog.event_data.TargetUserName");
             var res = /^-$/.test(user);
                 if (!res) {
-                    evt.AppendTo('related.user',user);
+                    evt.AppendTo('related.user', user);
                 }
         })
         .Build();
@@ -1809,7 +1809,7 @@ var security = (function () {
         .Add(addEventOutcome)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            evt.AppendTo('related.user',user);
+            evt.AppendTo('related.user', user);
             evt.AppendTo("event.type", "user");
         })
         .Build();
@@ -1820,10 +1820,10 @@ var security = (function () {
         .Add(addEventFields)
         .Add(addEventOutcome)
         .Add(function(evt) {
-            var user_new = evt.Get("winlog.event_data.NewTargetUserName");
-            evt.AppendTo('related.user',user_new);
-            var user_old = evt.Get("winlog.event_data.OldTargetUserName");
-            evt.AppendTo('related.user',user_old);
+            var userNew = evt.Get("winlog.event_data.NewTargetUserName");
+            evt.AppendTo('related.user', userNew);
+            var userOld = evt.Get("winlog.event_data.OldTargetUserName");
+            evt.AppendTo('related.user', userOld);
             evt.AppendTo("event.type", "user");
         })
         .Build();
@@ -1837,11 +1837,11 @@ var security = (function () {
         .Add(addEventOutcome)
         .Add(function(evt) {
             evt.AppendTo("event.type", "group");
-            var member=evt.Get("winlog.event_data.MemberName");
+            var member = evt.Get("winlog.event_data.MemberName");
             if (!member) {
                 return;
             }
-            evt.AppendTo("related.user",member.split(',')[0].replace('CN=','').replace('cn=',''));
+            evt.AppendTo("related.user", member.split(',')[0].replace('CN=', '').replace('cn=', ''));
         })
 
         .Build();
@@ -1920,7 +1920,7 @@ var security = (function () {
         .Add(function(evt) {
             var ip = evt.Get("source.ip");
             if (/::ffff:/.test(ip)) {
-                evt.Put("source.ip",ip.replace("::ffff:",""));
+                evt.Put("source.ip", ip.replace("::ffff:", ""));
             }
         })
         .Build();
@@ -1956,21 +1956,21 @@ var security = (function () {
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
         .Add(function(evt){
-            var mask_codes=evt.Get("winlog.event_data.AccessMask");
-            if (!mask_codes) {
+            var maskCodes = evt.Get("winlog.event_data.AccessMask");
+            if (!maskCodes) {
                 return;
             }
-            var mask_list=mask_codes.replace(/\s+/g,'').split("%%").filter(String);
-            evt.Put("winlog.event_data.AccessMask",mask_list);
-            var mask_results=[];
-            for (var j=0; j<mask_list.length; j++) {
-                var description=msobjsMessageTable[mask_list[j]];
+            var maskList = maskCodes.replace(/\s+/g, '').split("%%").filter(String);
+            evt.Put("winlog.event_data.AccessMask", maskList);
+            var maskResults = [];
+            for (var j = 0; j < maskList.length; j++) {
+                var description = msobjsMessageTable[maskList[j]];
                 if (description === undefined) {
                     return;
                 }
-                mask_results.push(description);
+                maskResults.push(description);
             }
-            evt.Put("winlog.event_data.AccessMaskDescription",mask_results);
+            evt.Put("winlog.event_data.AccessMaskDescription", maskResults);
         })
         .Build();
 
@@ -2205,8 +2205,8 @@ var security = (function () {
         4964: event4964.Run,
 
         process: function(evt) {
-            var event_id = evt.Get("winlog.event_id");
-            var processor = this[event_id];
+            var eventId = evt.Get("winlog.event_id");
+            var processor = this[eventId];
             if (processor === undefined) {
                 return;
             }
