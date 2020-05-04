@@ -10,9 +10,4 @@
     # - perf
   enabled: true
   #hostfs: /hostfs
-  #perf.sample_period: 3s
-  #perf.processes:
-  #  - process: "node"
-  #    events:
-  #      hardware: false
-  #      software: true
+
