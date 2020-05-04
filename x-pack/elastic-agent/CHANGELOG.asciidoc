@@ -27,6 +27,7 @@
 - Moved stream.* fields to top of event {pull}17858[17858]
 - Use /tmp for default monitoring endpoint location for libbeat {pull}18131[18131]
 - Use default output by default {pull}18091[18091]
+- Fix panic and flaky tests for the Agent. {pull}18135[18135]
 
 ==== New features
 

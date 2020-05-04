@@ -98,6 +98,9 @@ func newFleetGatewayWithScheduler(
 	r fleetReporter,
 	acker fleetAcker,
 ) (*fleetGateway, error) {
+
+	// Backoff implementation doesn't support the using context as the shutdown mechanism.
+	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
 
 	return &fleetGateway{
@@ -144,10 +147,8 @@ func (f *fleetGateway) worker() {
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-		case <-f.done:
-			return
 		case <-f.bgContext.Done():
-			f.Stop()
+			f.stop()
 			return
 		}
 	}
@@ -211,7 +212,7 @@ func (f *fleetGateway) Start() {
 	}(&f.wg)
 }
 
-func (f *fleetGateway) Stop() {
+func (f *fleetGateway) stop() {
 	f.log.Info("Fleet gateway is stopping")
 	defer f.scheduler.Stop()
 	close(f.done)
