@@ -212,6 +212,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
+- Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
 
 *Auditbeat*
 
@@ -220,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
+- Add system module process dataset ECS categorization fields. {pull}18032[18032]
 
 *Filebeat*
 
@@ -283,11 +285,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
+- Make `decode_cef` processor GA. {pull}17944[17944]
 - Improve ECS categorization field mappings in redis module. {issue}16179[16179] {pull}17918[17918]
 - Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 - Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
 - Added an input option `publisher_pipeline.disable_host` to disable `host.name`
   from being added to events by default. {pull}18159[18159]
+- Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 
 *Heartbeat*
 
@@ -377,6 +381,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 - Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
+- Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
+- Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 
 ==== Deprecated
 

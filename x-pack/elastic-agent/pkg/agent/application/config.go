@@ -8,23 +8,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
-
-// TODO(ph) correctly setup global path.
-func fleetAgentConfigPath() string {
-	return info.AgentConfigFile
-}
-
-// TODO(ph) correctly setup with global path.
-func fleetActionStoreFile() string {
-	return info.AgentActionStoreFile
-}
 
 // Config define the configuration of the Agent.
 type Config struct {
