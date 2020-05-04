@@ -19,3 +19,13 @@ type Config struct {
 	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
 	LoggingConfig  *logger.Config   `yaml:"logging,omitempty" config:"logging,omitempty"`
 }
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *Config {
+	return &Config{
+		ProcessConfig:  process.DefaultConfig(),
+		RetryConfig:    retry.DefaultConfig(),
+		DownloadConfig: artifact.DefaultConfig(),
+		LoggingConfig:  logger.DefaultLoggingConfig(),
+	}
+}
