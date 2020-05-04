@@ -17,7 +17,12 @@ BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
-GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /scripts/cmd/ )
+ifeq ($(shell uname -s), AIX)
+	# Don't list packages with docker or kubernetes on AIX
+	GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ | grep -v docker | grep -v kubernetes | grep -v /libbeat/tests/compose )
+else
+	GOPACKAGES?=$(shell go list ${BEAT_IMPORT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
+endif
 PACKER_TEMPLATES_DIR?=${ES_BEATS}/dev-tools/packer ## @Building Directory of templates that are used by "make release"
 NOTICE_FILE?=../NOTICE.txt
 LICENSE_FILE?=../licenses/APACHE-LICENSE-2.0.txt

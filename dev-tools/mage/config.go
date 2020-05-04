@@ -121,6 +121,12 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 		params[k] = v
 	}
 
+	if params["GOOS"] == "aix" {
+		// Force the removal for docker and kubernetes parts for AIX.
+		params["UseDockerMetadataProcessor"] = false
+		params["UseKubernetesMetadataProcessor"] = false
+	}
+
 	// Short
 	if types.IsShort() {
 		file := filepath.Join(targetDir, BeatName+".yml")

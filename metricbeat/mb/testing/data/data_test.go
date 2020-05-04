@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -38,8 +39,14 @@ func TestAll(t *testing.T) {
 		metricSetName := s[5]
 
 		t.Run(fmt.Sprintf("%s.%s", moduleName, metricSetName), func(t *testing.T) {
-			config := mbtest.ReadDataConfig(t, f)
-			mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config)
+
+			if runtime.GOOS == "aix" && (moduleName == "docker" || moduleName == "kubernetes") {
+				t.Skipf("%s module not available on AIX", moduleName)
+
+			} else {
+				config := mbtest.ReadDataConfig(t, f)
+				mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config)
+			}
 		})
 	}
 }
