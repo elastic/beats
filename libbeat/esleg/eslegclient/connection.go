@@ -26,6 +26,8 @@ import (
 	"net/url"
 	"time"
 
+	"go.elastic.co/apm/module/apmelasticsearch"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -128,14 +130,16 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	var httpClient esHTTPClient
+	// when dropping the legacy client in favour of the official Go client, it should be instrumented
+	// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 	httpClient = &http.Client{
-		Transport: &http.Transport{
+		Transport: apmelasticsearch.WrapRoundTripper(&http.Transport{
 			Dial:            dialer.Dial,
 			DialTLS:         tlsDialer.Dial,
 			TLSClientConfig: s.TLS.ToConfig(),
 			Proxy:           proxy,
 			IdleConnTimeout: s.IdleConnTimeout,
-		},
+		}),
 		Timeout: s.Timeout,
 	}
 

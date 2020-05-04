@@ -5,9 +5,12 @@
 package artifact
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 // Config is a configuration used for verifier and downloader
@@ -40,6 +43,18 @@ type Config struct {
 	// local or network disk.
 	// If not provided FileSystem Downloader will fallback to /beats subfolder of elastic-agent directory.
 	DropPath string `yaml:"dropPath" config:"drop_path"`
+}
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *Config {
+	dataPath := paths.Data()
+	return &Config{
+		BeatsSourceURI:  "https://artifacts.elastic.co/downloads/beats/",
+		TargetDirectory: filepath.Join(dataPath, "downloads"),
+		Timeout:         30 * time.Second,
+		PgpFile:         filepath.Join(dataPath, "elastic.pgp"),
+		InstallPath:     filepath.Join(dataPath, "install"),
+	}
 }
 
 // OS return configured operating system or falls back to runtime.GOOS
