@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.9]]
+=== Beats version 6.8.9
+https://github.com/elastic/beats/compare/v6.8.8...v6.8.9[View commits]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix crashes when multiple TCP ports are specified. {pull}17262[17262]
+
 [[release-notes-6.8.8]]
 === Beats version 6.8.8
 https://github.com/elastic/beats/compare/v6.8.7...v6.8.8[View commits]
