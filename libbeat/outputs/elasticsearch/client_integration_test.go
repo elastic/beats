@@ -89,7 +89,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 		},
 	})
 
-	err = output.Publish(batch)
+	err := output.Publish(batch)
 	if err != nil {
 		t.Fatal(err)
 	}
