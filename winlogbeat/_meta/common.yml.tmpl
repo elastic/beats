@@ -34,3 +34,9 @@ setup.template.settings:
   #index.codec: best_compression
   #_source.enabled: false
 {{end -}}
+{{define "processors.yml.tmpl"}}
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+{{end -}}
