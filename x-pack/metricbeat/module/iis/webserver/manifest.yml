@@ -33,8 +33,7 @@ input:
       - name: "Anonymous Users/sec"
       - name: "Total NonAnonymous Users"
     #asp.net
-    - object: "ASP.NET Applications"
-      instance: "__Total__"
+    - object: "ASP.NET"
       namespace: "asp_net"
       counters:
       - name: "Application Restarts"
@@ -76,6 +75,7 @@ input:
       instance: "w3wp*"
       counters:
       - name: "% Processor Time"
+        field: "cpu_usage_perc"
       - name: "Handle Count"
       - name: "Thread Count"
       - name: "Working Set"
