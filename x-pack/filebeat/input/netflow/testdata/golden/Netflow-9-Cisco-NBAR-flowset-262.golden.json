@@ -13,12 +13,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.368Z"
+          "start": "2017-02-14T11:10:19.368Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "Bk-2FcuOyCU",
@@ -70,6 +76,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.30.18.62",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 44,
           "ip": "10.30.18.62",
@@ -94,12 +106,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.368Z"
+          "start": "2017-02-14T11:10:19.368Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "4Xk8GtQfUAo",
@@ -151,6 +169,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.30.18.62",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 106,
           "ip": "10.30.18.62",
@@ -175,12 +199,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.924Z"
+          "start": "2017-02-14T11:10:19.924Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "tfLRXnB6AOA",
@@ -232,6 +262,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 44,
           "ip": "10.10.172.60",
@@ -256,12 +292,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.996Z"
+          "start": "2017-02-14T11:10:19.996Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "1mfP23NPuB8",
@@ -313,6 +355,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
+        },
         "source": {
           "bytes": 76,
           "ip": "10.10.172.60",
@@ -337,12 +385,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:10:36Z",
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
           "kind": "event",
-          "start": "2017-02-14T11:10:19.936Z"
+          "start": "2017-02-14T11:10:19.936Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "g6a7KlISbtM",
@@ -393,6 +447,12 @@
         },
         "observer": {
           "ip": "192.0.2.1"
+        },
+        "related": {
+          "ip": [
+            "10.10.172.60",
+            "10.30.19.180"
+          ]
         },
         "source": {
           "bytes": 2794,
