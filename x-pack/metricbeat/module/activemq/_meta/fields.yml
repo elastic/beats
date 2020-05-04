@@ -1,5 +1,5 @@
 - key: activemq
-  title: "Activemq"
+  title: "ActiveMQ"
   release: ga
   description: >
     activemq module
