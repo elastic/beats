@@ -31,6 +31,9 @@ winlogbeat.event_logs:
 
   - name: Security
 
+  - name: ForwardedEvents
+    tags: [forwarded]
+
 
 # ================================== General ===================================
 

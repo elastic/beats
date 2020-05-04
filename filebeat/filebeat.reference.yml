@@ -452,6 +452,11 @@ filebeat.inputs:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
+  # By default, all events contain `host.name`. This option can be set to true
+  # to disable the addition of this field to all events. The default value is
+  # false.
+  #publisher_pipeline.disable_host: false
+
   # Ignore files which were modified more then the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
