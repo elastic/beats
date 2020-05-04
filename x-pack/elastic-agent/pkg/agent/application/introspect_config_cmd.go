@@ -9,6 +9,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -77,7 +78,7 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	as, err := newActionStore(log, storage.NewDiskStore(fleetActionStoreFile()))
+	as, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
 	if err != nil {
 		return nil, err
 	}
