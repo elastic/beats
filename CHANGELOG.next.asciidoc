@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - CEF extensions are now mapped to the data types defined in the CEF guide. {pull}14342[14342]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
+- Improve ECS categorization field mappings for nginx module. http.request.referrer is now lowercase & http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 
 *Heartbeat*
 
@@ -265,8 +266,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `replace` processor for replacing string values of fields. {pull}17342[17342]
 - Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
 - Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
+- Add Kerberos support to Elasticsearch output. {pull}17927[17927]
+- Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
-
 
 *Auditbeat*
 
@@ -352,6 +354,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings for nginx module. {issue}16174[16174] {pull}17844[17844]
+- Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 - Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
 
 *Heartbeat*
