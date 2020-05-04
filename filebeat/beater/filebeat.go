@@ -410,6 +410,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			),
 			autodiscover.QueryConfig(),
 			config.Autodiscover,
+			b.Keystore,
 		)
 		if err != nil {
 			return err

@@ -6,24 +6,31 @@ package application
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 // InjectAgentConfig injects config to a provided configuration.
 func InjectAgentConfig(c *config.Config) error {
-	globalConfig := AgentGlobalConfig()
+	globalConfig := agentGlobalConfig()
 	if err := c.Merge(globalConfig); err != nil {
 		return errors.New("failed to inject agent global config", err, errors.TypeConfig)
+	}
+
+	return injectOverwrites(c)
+}
+
+func injectOverwrites(c *config.Config) error {
+	if err := c.Merge(overwrites); err != nil {
+		return errors.New("failed to inject agent overwrites", err, errors.TypeConfig)
 	}
 
 	return nil
 }
 
-// AgentGlobalConfig gets global config used for resolution of variables inside configuration
+// agentGlobalConfig gets global config used for resolution of variables inside configuration
 // such as ${path.data}.
-func AgentGlobalConfig() map[string]interface{} {
+func agentGlobalConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"path": map[string]interface{}{
 			"data": paths.Data(),
