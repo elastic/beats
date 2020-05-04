@@ -368,11 +368,11 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
 			validOpTypes := []string{opTypeCreate, ""}
-			assert.Contains(t, validOpTypes, caseOpType, caseMessage)
+			require.Contains(t, validOpTypes, caseOpType, caseMessage)
 		case eslegclient.BulkIndexAction:
-			assert.Equal(t, opTypeIndex, caseOpType, caseMessage)
+			require.Equal(t, opTypeIndex, caseOpType, caseMessage)
 		case eslegclient.BulkDeleteAction:
-			assert.Equal(t, opTypeDelete, caseOpType, caseMessage)
+			require.Equal(t, opTypeDelete, caseOpType, caseMessage)
 		default:
 			panic("unknown type")
 		}
