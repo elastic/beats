@@ -116,6 +116,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 		"UseDockerMetadataProcessor":     true,
 		"UseKubernetesMetadataProcessor": false,
 		"ExcludeDashboards":              false,
+		"UseProcessorsTemplate":          false,
 	}
 	for k, v := range args.ExtraVars {
 		params[k] = v
