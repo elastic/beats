@@ -586,11 +586,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
         # "fields.yml" you should run "make update" on metricbeat folder
-        with open(fields_doc, "r") as f:
+        with open(fields_doc, "r", encoding="utf-8") as f:
             path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
-            with open(path) as f2:
+            with open(path, encoding="utf-8") as f2:
                 content = f2.read()
 
             content += f.read()
