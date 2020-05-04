@@ -90,17 +90,20 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 	if err != nil {
 		return err
 	}
+	dockerRepoRoot := filepath.Join("/go/src", repo.CanonicalRootImportPath)
+	dockerGoCache := filepath.Join(dockerRepoRoot, "build/docker-gocache")
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
 
 	// Execute the inside of docker-compose.
 	args := []string{"-p", dockerComposeProjectName(), "run",
 		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
-		// Disable strict.perms because we moust host dirs inside containers
+		// Disable strict.perms because we mount host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
 		// compose.EnsureUp needs to know the environment type.
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
+		"-e", "GOCACHE=" + dockerGoCache,
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
