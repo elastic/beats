@@ -37,5 +37,5 @@ specify for `limit` should be below the configured ulimit.
 [[heartbeat-scheduler-location]]
 ==== `location`
 
-The timezone for the scheduler. By default the scheduler uses localtime.
+The time zone for the scheduler. By default the scheduler uses localtime.
 
