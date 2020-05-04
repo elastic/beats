@@ -129,7 +129,7 @@ func TestWriteJSONKeys(t *testing.T) {
 
 			WriteJSONKeys(event, test.keys, test.overwriteKeys, false)
 			require.Equal(t, test.expectedMetadata, event.Meta)
-			require.Equal(t, test.expectedTimestamp, event.Timestamp)
+			require.Equal(t, test.expectedTimestamp.UnixNano(), event.Timestamp.UnixNano())
 			require.Equal(t, test.expectedFields, event.Fields)
 		})
 	}
