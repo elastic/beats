@@ -43,7 +43,9 @@ The username to use for authentication
 [float]
 ===== `co.elastic.metrics/password`
 
-The password to use for authentication. It is recommended to retrieve this sensitive information from an ENV variable or a keystore and avoid placing passwords in plain text
+The password to use for authentication. It is recommended to retrieve this sensitive information from an ENV variable
+and avoid placing passwords in plain text. Unlike static autodiscover configuration, hints based autodiscover has
+no access to the keystore of Metricbeat since it could be a potential security issue.
 
 [float]
 ===== `co.elastic.metrics/ssl.*`

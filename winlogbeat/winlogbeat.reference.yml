@@ -26,19 +26,12 @@ winlogbeat.event_logs:
   - name: Application
     ignore_older: 72h
 
-    # Set to true to publish fields with null values in events.
-    #keep_null: false
-
   - name: System
-
-    # Set to true to publish fields with null values in events.
-    #keep_null: false
 
   - name: Security
 
-    # Set to true to publish fields with null values in events.
-    #keep_null: false
-
+  - name: ForwardedEvents
+    tags: [forwarded]
 
 
 #================================ General ======================================

@@ -68,7 +68,7 @@ func newManaged(
 		return nil, err
 	}
 
-	path := fleetAgentConfigPath()
+	path := info.AgentConfigFile()
 
 	// TODO(ph): Define the encryption password.
 	store := storage.NewEncryptedDiskStore(path, []byte(""))
@@ -138,9 +138,9 @@ func newManaged(
 	batchedAcker := newLazyAcker(acker)
 
 	// Create the action store that will persist the last good policy change on disk.
-	actionStore, err := newActionStore(log, storage.NewDiskStore(fleetActionStoreFile()))
+	actionStore, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
 	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", fleetActionStoreFile()))
+		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
 	}
 	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
 

@@ -15,9 +15,11 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    TERRAFORM_VERSION = "0.12.24"
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
@@ -36,6 +38,11 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+
+    booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
+    string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
+
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -352,8 +359,30 @@ pipeline {
               return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
-          steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+          stages {
+            stage('Prepare cloud integration tests environments'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                startCloudTestEnv('x-pack-metricbeat', [
+                   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+                ])
+              }
+            }
+            stage('Metricbeat x-pack'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                withCloudTestEnv() {
+                  mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                }
+              }
+            }
+          }
+          post {
+            cleanup {
+              terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+            }
           }
         }
         stage('Metricbeat crosscompile'){
@@ -671,7 +700,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
-    "TEST_TAGS=oracle",
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
@@ -738,6 +767,7 @@ def installTools() {
   if(isUnix()) {
     retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
     retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
     retry(i) { sh(label: "Install Mage", script: "make mage") }
   } else {
     retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
@@ -809,6 +839,7 @@ def dumpFilteredEnvironment(){
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
   echo "STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}"
+  echo "TEST_TAGS: ${env.TEST_TAGS}"
   echo "GOX_OS: ${env.GOX_OS}"
   echo "GOX_OSARCH: ${env.GOX_OSARCH}"
   echo "GOX_FLAGS: ${env.GOX_FLAGS}"
@@ -893,6 +924,98 @@ def isChangedXPackCode(patterns) {
   ]
   allPatterns.addAll(patterns)
   return isChanged(allPatterns)
+}
+
+// withCloudTestEnv executes a closure with credentials for cloud test
+// environments.
+def withCloudTestEnv(Closure body) {
+  def maskedVars = []
+  def testTags = "${env.TEST_TAGS}"
+
+  // AWS
+  if (params.allCloudTests || params.awsCloudTests) {
+    testTags = "${testTags},aws"
+    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
+    if (!aws.containsKey('access_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
+    }
+    if (!aws.containsKey('secret_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
+    }
+    maskedVars.addAll([
+      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
+      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
+    ])
+  }
+
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
+    withEnvMask(vars: maskedVars) {
+      body()
+    }
+  }
+}
+
+def terraformInit(String directory) {
+  dir(directory) {
+    sh(label: "Terraform Init on ${directory}", script: "terraform init")
+  }
+}
+
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+// Start testing environment on cloud using terraform. Terraform files are
+// stashed so they can be used by other stages. They are also archived in
+// case manual cleanup is needed.
+//
+// Example:
+//   startCloudTestEnv('x-pack-metricbeat', [
+//     [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+//   ])
+//   ...
+//   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+def startCloudTestEnv(String name, environments = []) {
+  withCloudTestEnv() {
+    withBeatsEnv(false) {
+      def runAll = params.runAllCloudTests
+      try {
+        for (environment in environments) {
+          if (environment.cond || runAll) {
+            retry(2) {
+              terraformApply(environment.dir)
+            }
+          }
+        }
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+      }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+    }
+  }
+}
+
+
+// Looks for all terraform states in directory and runs terraform destroy for them,
+// it uses terraform states previously stashed by startCloudTestEnv.
+def terraformCleanup(String stashName, String directory) {
+  stage("Remove cloud scenarios in ${directory}"){
+    withCloudTestEnv() {
+      withBeatsEnv(false) {
+        unstash "terraform-${stashName}"
+        retry(2) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        }
+      }
+    }
+  }
 }
 
 def loadConfigEnvVars(){
