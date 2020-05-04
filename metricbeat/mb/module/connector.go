@@ -30,7 +30,7 @@ import (
 // Connector configures and establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
-	pipeline      beat.Pipeline
+	pipeline      beat.PipelineConnector
 	processors    *processors.Processors
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
@@ -54,7 +54,7 @@ type metricSetRegister interface {
 }
 
 func NewConnector(
-	beatInfo beat.Info, pipeline beat.Pipeline,
+	beatInfo beat.Info, pipeline beat.PipelineConnector,
 	c *common.Config, dynFields *common.MapStrPointer,
 ) (*Connector, error) {
 	config := connectorConfig{}

@@ -26,3 +26,12 @@
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 300s
+
+- module: googlecloud
+  metricsets:
+    - compute
+  region: "us-"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 60s

@@ -23,14 +23,23 @@
         "destination.packets": 1,
         "destination.port": 80,
         "event.action": "flow_started",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network_traffic",
+            "network"
+        ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.end": "2012-04-10T04:39:56.000-02:00",
+        "event.kind": "event",
         "event.module": "panw",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "start",
+            "connection"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -44,6 +53,7 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -62,6 +72,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.bytes": 0,
         "server.ip": "204.232.231.46",
         "server.packets": 1,

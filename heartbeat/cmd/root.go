@@ -20,8 +20,10 @@ package cmd
 import (
 	"fmt"
 
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover"
 	"github.com/elastic/beats/v7/heartbeat/beater"
+
+	// include all heartbeat specific autodiscovery builders
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 
 	// register default heartbeat monitors
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"
@@ -39,7 +41,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	settings := instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithBeatMeta("agent")),
+		Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithAgentMeta()),
 		HasDashboards: false,
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)

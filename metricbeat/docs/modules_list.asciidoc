@@ -124,7 +124,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-http-server,server>>   
 |<<metricbeat-module-ibmmq,IBM MQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-ibmmq-qmgr,qmgr>> beta[]  
-|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-iis-application_pool,application_pool>> beta[]  
 |<<metricbeat-metricset-iis-webserver,webserver>> beta[]  
 |<<metricbeat-metricset-iis-website,website>> beta[]  

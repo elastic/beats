@@ -30,7 +30,7 @@ type ConnectorFunc func(*common.Config, beat.ClientConfig) (Outleter, error)
 
 type pipelineConnector struct {
 	parent   *OutletFactory
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 }
 
 // Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.

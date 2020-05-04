@@ -2,12 +2,23 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the stashed id with the test results to be digested with runbld
+*/
+@Field def stashedTestReports = [:]
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    PIPELINE_LOG_LEVEL = "INFO"
+    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKER_REGISTRY = 'docker.elastic.co'
+    RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -17,7 +28,6 @@ pipeline {
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
     disableConcurrentBuilds()
-//    checkoutToSubdirectory "${env.BASE_DIR}"
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
@@ -27,6 +37,7 @@ pipeline {
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
+    booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
   stages {
     /**
@@ -36,14 +47,14 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}")
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
@@ -316,7 +327,20 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (integTest)", "metricbeat", "integTest")
+            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+          }
+        }
+        stage('Metricbeat Python integration tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false"
+            }
+          }
+          steps {
+            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
           }
         }
         stage('Metricbeat x-pack'){
@@ -571,10 +595,18 @@ pipeline {
             }
           }
           steps {
-            k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
+            k8sTest(["v1.18.2","v1.17.2","v1.16.4","v1.15.7","v1.14.10"])
           }
         }
       }
+    }
+  }
+  post {
+    always {
+      runbld()
+    }
+    cleanup {
+      notifyBuildResult(prComment: true)
     }
   }
 }
@@ -644,16 +676,22 @@ def withBeatsEnv(boolean archive, Closure body) {
   ]) {
     deleteDir()
     unstash 'source'
+    if(isDockerInstalled()){
+      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    }
     dir("${env.BASE_DIR}") {
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
-      sh(label: "Install Mage", script: "make mage")
+      installTools()
+      // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
+      // See https://github.com/elastic/beats/issues/17787.
+      setGitConfig()
       try {
-        body()
+        if(!params.dry_run){
+          body()
+        }
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
           }
         }
@@ -680,16 +718,29 @@ def withBeatsEnvWin(Closure body) {
     deleteDir()
     unstash 'source'
     dir("${env.BASE_DIR}"){
-      bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
+      installTools()
       try {
-        body()
+        if(!params.dry_run){
+          body()
+        }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
         }
       }
     }
+  }
+}
+
+def installTools() {
+  def i = 2 // Number of retries
+  if(isUnix()) {
+    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Mage", script: "make mage") }
+  } else {
+    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -775,14 +826,14 @@ def dumpFilteredEnvironment(){
 def k8sTest(versions){
   versions.each{ v ->
     stage("k8s ${v}"){
-      withEnv(["K8S_VERSION=${v}"]){
+      withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
           withBeatsEnv(false) {
-            sh(label: "Install k8s", script: """
-              eval "\$(gvm use ${GO_VERSION} --format=bash)"
-              .ci/scripts/kind-setup.sh
-            """)
-            sh(label: "Kubernetes Kind",script: "make KUBECONFIG=\"\$(kind get kubeconfig-path)\" -C deploy/kubernetes test")
+            sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
+            sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
         }
@@ -818,7 +869,7 @@ def isChanged(patterns){
 }
 
 def isChangedOSSCode(patterns) {
-  def always = [
+  def allPatterns = [
     "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
@@ -826,11 +877,12 @@ def isChangedOSSCode(patterns) {
     "^dev-tools/.*",
     "^\\.ci/.*",
   ]
-  return isChanged(always + patterns)
+  allPatterns.addAll(patterns)
+  return isChanged(allPatterns)
 }
 
 def isChangedXPackCode(patterns) {
-  def always = [
+  def allPatterns = [
     "^Jenkinsfile",
     "^vendor/.*",
     "^libbeat/.*",
@@ -839,91 +891,144 @@ def isChangedXPackCode(patterns) {
     "^x-pack/libbeat/.*",
     "^\\.ci/.*",
   ]
-  return isChanged(always + patterns)
+  allPatterns.addAll(patterns)
+  return isChanged(allPatterns)
 }
 
 def loadConfigEnvVars(){
+  def empty = []
+  env.GO_VERSION = readFile(".go-version").trim()
+
+  withEnv(["HOME=${env.WORKSPACE}"]) {
+    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+  }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
-  env.BUILD_LIBBEAT = isChangedOSSCode([])
-  env.BUILD_LIBBEAT_XPACK = env.BUILD_LIBBEAT || isChangedXPackCode([])
+  env.BUILD_LIBBEAT = isChangedOSSCode(empty)
+  env.BUILD_LIBBEAT_XPACK = isChangedXPackCode(empty)
 
   // Auditbeat depends on metricbeat as framework, but does not include any of
   // the modules from Metricbeat.
   // The Auditbeat x-pack build contains all functionality from OSS Auditbeat.
-  env.BUILD_AUDITBEAT = isChangedOSSCode([
-    "^metricbeat/.*",
-    "^auditbeat/.*",
-  ])
-  env.BUILD_AUDITBEAT_XPACK = env.BUILD_AUDITBEAT || isChangedXPackCode([
-    "^x-pack/auditbeat/.*",
-  ])
+  env.BUILD_AUDITBEAT = isChangedOSSCode(getVendorPatterns('auditbeat'))
+  env.BUILD_AUDITBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/auditbeat'))
 
   // Dockerlogbeat is a standalone Beat that only relies on libbeat.
-  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode([
-    "^x-pack/dockerlogbeat/.*",
-  ])
+  env.BUILD_DOCKERLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/dockerlogbeat'))
 
   // Filebeat depends on libbeat only.
   // The Filebeat x-pack build contains all functionality from OSS Filebeat.
-  env.BUILD_FILEBEAT = isChangedOSSCode(["^filebeat/.*"])
-  env.BUILD_FILEBEAT_XPACK = env.BUILD_FILEBEAT || isChangedXPackCode([
-    "^x-pack/filebeat/.*",
-  ])
+  env.BUILD_FILEBEAT = isChangedOSSCode(getVendorPatterns('filebeat'))
+  env.BUILD_FILEBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/filebeat'))
 
   // Metricbeat depends on libbeat only.
   // The Metricbeat x-pack build contains all functionality from OSS Metricbeat.
-  env.BUILD_METRICBEAT = isChangedOSSCode(["^metricbeat/.*"])
-  env.BUILD_METRICBEAT_XPACK = env.BUILD_METRICBEAT || isChangedXPackCode([
-    "^x-pack/metricbeat/.*",
-  ])
+  env.BUILD_METRICBEAT = isChangedOSSCode(getVendorPatterns('metricbeat'))
+  env.BUILD_METRICBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/metricbeat'))
 
   // Functionbeat is a standalone beat that depends on libbeat only.
   // Functionbeat is available as x-pack build only.
-  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode([
-    "^x-pack/functionbeat/.*",
-  ])
+  env.BUILD_FUNCTIONBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/functionbeat'))
 
   // Heartbeat depends on libbeat only.
   // The Heartbeat x-pack build contains all functionality from OSS Heartbeat.
-  env.BUILD_HEARTBEAT = isChangedOSSCode(["^heartbeat/.*"])
-  env.BUILD_HEARTBEAT_XPACK = env.BUILD_HEARTBEAT || isChangedXPackCode([
-    "^x-pack/heartbeat/.*",
-  ])
-
+  env.BUILD_HEARTBEAT = isChangedOSSCode(getVendorPatterns('heartbeat'))
+  env.BUILD_HEARTBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/heartbeat'))
 
   // Journalbeat depends on libbeat only.
   // The Journalbeat x-pack build contains all functionality from OSS Journalbeat.
-  env.BUILD_JOURNALBEAT = isChangedOSSCode(["^journalbeat/.*"])
-  env.BUILD_JOURNALBEAT_XPACK = env.BUILD_JOURNALBEAT || isChangedXPackCode([
-    "^x-pack/journalbeat/.*",
-  ])
+  env.BUILD_JOURNALBEAT = isChangedOSSCode(getVendorPatterns('journalbeat'))
+  env.BUILD_JOURNALBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/journalbeat'))
 
   // Packetbeat depends on libbeat only.
   // The Packetbeat x-pack build contains all functionality from OSS Packetbeat.
-  env.BUILD_PACKETBEAT = isChangedOSSCode(["^packetbeat/.*"])
-  env.BUILD_PACKETBEAT_XPACK = env.BUILD_PACKETBEAT || isChangedXPackCode([
-    "^x-pack/packetbeat/.*",
-  ])
+  env.BUILD_PACKETBEAT = isChangedOSSCode(getVendorPatterns('packetbeat'))
+  env.BUILD_PACKETBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/packetbeat'))
 
   // Winlogbeat depends on libbeat only.
   // The Winlogbeat x-pack build contains all functionality from OSS Winlogbeat.
-  env.BUILD_WINLOGBEAT = isChangedOSSCode(["^winlogbeat/.*"])
-  env.BUILD_WINLOGBEAT_XPACK = env.BUILD_WINLOGBEAT || isChangedXPackCode([
-    "^x-pack/winlogbeat/.*",
-  ])
+  env.BUILD_WINLOGBEAT = isChangedOSSCode(getVendorPatterns('winlogbeat'))
+  env.BUILD_WINLOGBEAT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/winlogbeat'))
+
+  // Elastic-agent is a self-contained product, that depends on libbeat only.
+  // The agent acts as a supervisor for other Beats like Filebeat or Metricbeat.
+  // The agent is available as x-pack build only.
+  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode(getVendorPatterns('x-pack/elastic-agent'))
 
   // The Kubernetes test use Filebeat and Metricbeat, but only need to be run
   // if the deployment scripts have been updated. No Beats specific testing is
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(["^generator/.*"])
+  def generatorPatterns = ['^generator/.*']
+  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
+  env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
+}
 
-  env.BUILD_ELASTIC_AGENT_XPACK = isChangedXPackCode([
-    "^x-pack/elastic-agent/.*",
-  ])
+/**
+  This method grab the dependencies of a Go module and transform them on regexp
+*/
+def getVendorPatterns(beatName){
+  def os = goos()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+  def output = ""
 
-  env.GO_VERSION = readFile(".go-version").trim()
+  withEnv([
+    "HOME=${env.WORKSPACE}/${env.BASE_DIR}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+  ]) {
+    output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
+      go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
+        |awk '{print \$1"/.*"}'\
+        |sed -e "s#github.com/elastic/beats/v7/##g"
+    """)
+  }
+  return output?.split('\n').collect{ item -> item as String }
+}
+
+def setGitConfig(){
+  sh(label: 'check git config', script: '''
+    if [ -z "$(git config --get user.email)" ]; then
+      git config user.email "beatsmachine@users.noreply.github.com"
+      git config user.name "beatsmachine"
+    fi
+  ''')
+}
+
+def isDockerInstalled(){
+  return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+}
+
+def junitAndStore(Map params = [:]){
+  junit(params)
+  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stashedTestReports[stageName] = stageName
+}
+
+def runbld() {
+  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+    if (stashedTestReports) {
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Prepare workspace context',
+           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
+        // Unstash the test reports
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash v
+          }
+        }
+        sh(label: 'Process JUnit reports with runbld',
+          script: '''\
+          cat >./runbld-script <<EOF
+          echo "Processing JUnit reports with runbld..."
+          EOF
+          /usr/local/bin/runbld ./runbld-script
+          '''.stripIndent())  // stripIdent() requires '''/
+      }
+    }
+  }
 }

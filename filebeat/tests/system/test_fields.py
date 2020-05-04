@@ -63,7 +63,7 @@ class Test(BaseTest):
     def test_beat_fields(self):
         """
         Checks that it's possible to set a custom shipper name. Also
-        tests that beat.hostname  has values.
+        tests that agent.hostname has values.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
@@ -80,5 +80,6 @@ class Test(BaseTest):
         output = self.read_output()
         doc = output[0]
         assert doc["host.name"] == "testShipperName"
+        assert doc["agent.name"] == "testShipperName"
         assert doc["agent.hostname"] == socket.gethostname()
         assert "fields" not in doc
