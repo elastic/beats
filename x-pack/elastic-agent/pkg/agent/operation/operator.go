@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -23,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 )
@@ -65,7 +63,7 @@ func NewOperator(
 	eventProcessor callbackHooks,
 	monitor monitoring.Monitor) (*Operator, error) {
 
-	operatorConfig := defaultOperatorConfig()
+	operatorConfig := operatorCfg.DefaultConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
 	}
@@ -97,18 +95,6 @@ func NewOperator(
 	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
-}
-
-func defaultOperatorConfig() *operatorCfg.Config {
-	return &operatorCfg.Config{
-		RetryConfig: &retry.Config{
-			Enabled:      false,
-			RetriesCount: 0,
-			Delay:        30 * time.Second,
-			MaxDelay:     5 * time.Minute,
-			Exponential:  false,
-		},
-	}
 }
 
 // State describes the current state of the system.
