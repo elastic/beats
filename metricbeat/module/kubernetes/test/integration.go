@@ -56,7 +56,7 @@ func GetKubeletConfig(t *testing.T, metricSetName string) map[string]interface{}
 		"module":            "kubernetes",
 		"metricsets":        []string{metricSetName},
 		"host":              "${NODE_NAME}",
-		"hosts":             []string{"https://${NODE_NAME}:10250"},
+		"hosts":             []string{"https://localhost:10250"},
 		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
 		"ssl": map[string]interface{}{
 			"verification_mode": "none",
