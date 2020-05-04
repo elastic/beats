@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -109,16 +110,22 @@ func TestProcessorsForConfig(t *testing.T) {
 		if test.event.Fields == nil {
 			test.event.Fields = common.MapStr{}
 		}
-		config, err := outletConfigFromString(test.configStr)
+		config, err := common.NewConfigFrom(test.configStr)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
-		processors, err := processorsForConfig(test.beatInfo, config, test.clientCfg)
+
+		editor, err := newCommonConfigEditor(test.beatInfo, config)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
+
+		clientCfg, err := editor(test.clientCfg)
+		require.NoError(t, err)
+
+		processors := clientCfg.Processing.Processor
 		processedEvent, err := processors.Run(&test.event)
 		// We don't check if err != nil, because we are testing the final outcome
 		// of running the processors, including when some of them fail.
@@ -160,16 +167,21 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	configStr := `processors:
 - add_fields: {fields: {testField: value}}
 - add_fields: {fields: {testField2: stuff}}`
-	config, err := outletConfigFromString(configStr)
+	config, err := common.NewConfigFrom(configStr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	processors, err := processorsForConfig(
-		beat.Info{}, config, beat.ClientConfig{})
+
+	editor, err := newCommonConfigEditor(beat.Info{}, config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 2, len(processors.List))
+
+	clientCfg, err := editor(beat.ClientConfig{})
+	require.NoError(t, err)
+
+	lst := clientCfg.Processing.Processor
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -189,20 +201,6 @@ func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
 
 func (p *setRawIndex) String() string {
 	return fmt.Sprintf("set_raw_index=%v", p.indexStr)
-}
-
-// Helper function to convert from YML input string to an unpacked
-// inputOutletConfig
-func outletConfigFromString(s string) (inputOutletConfig, error) {
-	config := inputOutletConfig{}
-	cfg, err := common.NewConfigFrom(s)
-	if err != nil {
-		return config, err
-	}
-	if err := cfg.Unpack(&config); err != nil {
-		return config, err
-	}
-	return config, nil
 }
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
