@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:39:43.0856521Z",
     "event": {
       "action": "locked-out-user-account",
+      "category": "iam",
       "code": 4740,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
