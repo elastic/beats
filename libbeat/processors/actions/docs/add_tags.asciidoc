@@ -17,9 +17,9 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_tags:
-    tags: [web, production]
-    target: "environment"
+  - add_tags:
+      tags: [web, production]
+      target: "environment"
 ------------------------------------------------------------------------------
 
 Adds the environment field to every event:
