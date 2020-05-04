@@ -38,6 +38,7 @@
 - Display the stability of the agent at enroll and start.  {pull}17336[17336]
 - Expose stream.* variables in events {pull}17468[17468]
 - Monitoring configuration reloadable {pull}17855[17855]
+- Pack ECS metadata to request payload send to fleet {pull}17894[17894]
 - Allow CLI overrides of paths {pull}17781[17781]
 - Enable Filebeat input: S3, Azureeventhub, cloudfoundry, httpjson, netflow, o365audit. {pull}17909[17909]
 - Use data subfolder as default for process logs {pull}17960[17960]

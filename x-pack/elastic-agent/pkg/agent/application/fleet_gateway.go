@@ -179,16 +179,16 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// get events
 	ee, ack := f.reporter.Events()
 
-	var metaData map[string]interface{}
-	if m, err := metadata(); err == nil {
-		metaData = m
+	ecsMeta, err := metadata()
+	if err != nil {
+		f.log.Error(errors.New("failed to load metadata", err))
 	}
 
 	// checkin
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
 		Events:   ee,
-		Metadata: metaData,
+		Metadata: ecsMeta,
 	}
 
 	resp, err := cmd.Execute(ctx, req)
