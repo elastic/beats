@@ -454,6 +454,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 - Add Audit and Log Management, Computer Object Management, and Distribution Group related events to the Security module. {pull}15217[15217]
 - Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
+- Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 
 ==== Deprecated
 
