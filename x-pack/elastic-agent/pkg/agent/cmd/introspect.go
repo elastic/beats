@@ -21,7 +21,7 @@ func newIntrospectCommandWithArgs(flags *globalFlags, s []string, streams *cli.I
 		Long:  "Shows current configuration of the agent",
 		Args:  cobra.ExactArgs(0),
 		Run: func(c *cobra.Command, args []string) {
-			command, err := application.NewIntrospectConfigCmd("elastic-agent.yml")
+			command, err := application.NewIntrospectConfigCmd(flags.Config())
 			if err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
@@ -49,7 +49,7 @@ func newIntrospectOutputCommandWithArgs(flags *globalFlags, _ []string, streams 
 			outName, _ := c.Flags().GetString("output")
 			program, _ := c.Flags().GetString("program")
 
-			command, err := application.NewIntrospectOutputCmd("elastic-agent.yml", outName, program)
+			command, err := application.NewIntrospectOutputCmd(flags.Config(), outName, program)
 			if err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
