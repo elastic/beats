@@ -18,7 +18,7 @@ import (
 
 // TODO(ph) correctly setup global path.
 func fleetAgentConfigPath() string {
-	return info.AgentConfigFile
+	return info.AgentConfigFile()
 }
 
 // TODO(ph) correctly setup with global path.

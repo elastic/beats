@@ -8,17 +8,19 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 // AgentConfigFile is a name of file used to store agent information
-const AgentConfigFile = "fleet.yml"
+const defaultAgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent_info"
 
 // AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
@@ -33,6 +35,10 @@ type ioStore interface {
 	Load() (io.ReadCloser, error)
 }
 
+func AgentConfigFile() string {
+	return filepath.Join(paths.Home(), defaultAgentConfigFile)
+}
+
 func generateAgentID() (string, error) {
 	uid, err := uuid.NewV4()
 	if err != nil {
@@ -43,7 +49,8 @@ func generateAgentID() (string, error) {
 }
 
 func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
-	s := storage.NewEncryptedDiskStore(AgentConfigFile, []byte(""))
+	agentConfigFile := AgentConfigFile()
+	s := storage.NewEncryptedDiskStore(agentConfigFile, []byte(""))
 
 	agentinfo, err := getInfoFromStore(s)
 	if err != nil {
@@ -67,6 +74,7 @@ func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 }
 
 func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
+	agentConfigFile := AgentConfigFile()
 	reader, err := s.Load()
 	if err != nil {
 		return nil, err
@@ -75,9 +83,9 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
 		return nil, errors.New(err,
-			fmt.Sprintf("fail to read configuration %s for the agent", AgentConfigFile),
+			fmt.Sprintf("fail to read configuration %s for the agent", agentConfigFile),
 			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, AgentConfigFile))
+			errors.M(errors.MetaKeyPath, agentConfigFile))
 	}
 
 	if err := reader.Close(); err != nil {
@@ -110,6 +118,7 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 }
 
 func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
+	agentConfigFile := AgentConfigFile()
 	reader, err := s.Load()
 	if err != nil {
 		return err
@@ -117,9 +126,9 @@ func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
 
 	cfg, err := config.NewConfigFrom(reader)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("fail to read configuration %s for the agent", AgentConfigFile),
+		return errors.New(err, fmt.Sprintf("fail to read configuration %s for the agent", agentConfigFile),
 			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, AgentConfigFile))
+			errors.M(errors.MetaKeyPath, agentConfigFile))
 	}
 
 	if err := reader.Close(); err != nil {
