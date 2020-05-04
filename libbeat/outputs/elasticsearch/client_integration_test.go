@@ -21,6 +21,7 @@ package elasticsearch
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -43,9 +44,39 @@ import (
 
 func TestClientPublishEvent(t *testing.T) {
 	index := "beat-int-pub-single-event"
-	output, client := connectTestEs(t, map[string]interface{}{
+	cfg := map[string]interface{}{
 		"index": index,
-	})
+	}
+
+	testPublishEvent(t, index, cfg)
+}
+
+func TestClientPublishEventKerberosAware(t *testing.T) {
+	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	index := "beat-int-pub-single-event-behind-kerb"
+	cfg := map[string]interface{}{
+		"hosts":    eslegtest.GetEsKerberosHost(),
+		"index":    index,
+		"username": "",
+		"password": "",
+		"kerberos": map[string]interface{}{
+			"auth_type":   "password",
+			"config_path": "testdata/krb5.conf",
+			"username":    eslegtest.GetUser(),
+			"password":    eslegtest.GetPass(),
+			"realm":       "ELASTIC",
+		},
+	}
+
+	testPublishEvent(t, index, cfg)
+}
+
+func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
+	output, client := connectTestEs(t, cfg)
 
 	// drop old index preparing test
 	client.conn.Delete(index, "", "", nil)
@@ -279,6 +310,33 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	client.Connect()
 
 	return client, client
+}
+
+// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+func setupRoleMapping(t *testing.T, host string) error {
+	_, client := connectTestEs(t, map[string]interface{}{
+		"hosts":    host,
+		"username": "elastic",
+		"password": "changeme",
+	})
+
+	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
+
+	status, _, err := client.conn.RequestURL("POST", roleMappingURL, map[string]interface{}{
+		"roles":   []string{"superuser"},
+		"enabled": true,
+		"rules": map[string]interface{}{
+			"field": map[string]interface{}{
+				"username": "beats@ELASTIC",
+			},
+		},
+	})
+
+	if status >= 300 {
+		return fmt.Errorf("non-2xx return code: %d", status)
+	}
+
+	return err
 }
 
 func randomClient(grp outputs.Group) outputs.NetworkClient {
