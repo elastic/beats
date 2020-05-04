@@ -8020,7 +8020,7 @@ example: SHA256-RSA
 --
 
 
-*`tls.server.x509.subject.subject.common_name`*::
+*`tls.server.x509.subject.common_name`*::
 +
 --
 List of common names (CN) of subject.
@@ -8031,14 +8031,14 @@ example: r2.shared.global.fastly.net
 
 --
 
-*`tls.server.x509.subject.subject.common_name.text`*::
+*`tls.server.x509.subject.common_name.text`*::
 +
 --
 type: text
 
 --
 
-*`tls.server.x509.subject.subject.distinguished_name`*::
+*`tls.server.x509.subject.distinguished_name`*::
 +
 --
 Distinguished name (DN) of the certificate subject entity.
