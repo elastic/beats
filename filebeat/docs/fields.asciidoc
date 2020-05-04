@@ -4152,7 +4152,7 @@ type: date
 *`cef.extensions.deviceTimeZone`*::
 +
 --
-The timezone for the device generating the event.
+The time zone for the device generating the event.
 
 type: keyword
 
