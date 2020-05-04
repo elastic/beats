@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // FlagField fields used to keep information or errors when events are parsed.
@@ -61,8 +60,7 @@ func (e *Event) GetMetaStringValue(key string) (string, error) {
 		if s, ok := tmp.(string); ok {
 			return s, nil
 		} else {
-			logp.Err("Event[%s] '%v' is no string value", key, tmp)
-			return val, nil
+			return val, err
 		}
 	} else {
 		return val, err
