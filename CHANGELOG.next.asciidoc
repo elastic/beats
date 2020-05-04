@@ -211,6 +211,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
+- Add support for basic ECS logging. {pull}17974[17974]
 
 *Auditbeat*
 
