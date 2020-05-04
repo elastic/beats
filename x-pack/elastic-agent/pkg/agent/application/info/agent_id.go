@@ -19,12 +19,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
-// AgentConfigFile is a name of file used to store agent information
+// defaultAgentConfigFile is a name of file used to store agent information
 const defaultAgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent_info"
 
-// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
-const AgentActionStoreFile = "action_store.yml"
+// defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+const defaultAgentActionStoreFile = "action_store.yml"
 
 type persistentAgentInfo struct {
 	ID string `json:"ID" yaml:"ID" config:"ID"`
@@ -35,8 +35,14 @@ type ioStore interface {
 	Load() (io.ReadCloser, error)
 }
 
+// AgentConfigFile is a name of file used to store agent information
 func AgentConfigFile() string {
 	return filepath.Join(paths.Home(), defaultAgentConfigFile)
+}
+
+// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+func AgentActionStoreFile() string {
+	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
 }
 
 func generateAgentID() (string, error) {
