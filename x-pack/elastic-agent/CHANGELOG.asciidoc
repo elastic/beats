@@ -42,4 +42,5 @@
 - Allow CLI overrides of paths {pull}17781[17781]
 - Enable Filebeat input: S3, Azureeventhub, cloudfoundry, httpjson, netflow, o365audit. {pull}17909[17909]
 - Use data subfolder as default for process logs {pull}17960[17960]
+- Follow home path for all config files {pull}18161[18161]
 - Do not require unnecessary configuration {pull}18003[18003]
