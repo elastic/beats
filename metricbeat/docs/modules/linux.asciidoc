@@ -46,13 +46,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-linux-pageinfo,pageinfo>>
 
-* <<metricbeat-metricset-linux-perf,perf>>
-
 include::linux/conntrack.asciidoc[]
 
 include::linux/ksm.asciidoc[]
 
 include::linux/pageinfo.asciidoc[]
-
-include::linux/perf.asciidoc[]
 
