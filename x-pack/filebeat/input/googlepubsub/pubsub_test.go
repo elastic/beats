@@ -208,7 +208,7 @@ func defaultTestConfig() *common.Config {
 }
 
 func isInDockerIntegTestEnv() bool {
-	return os.Getenv("BEATS_DOCKER_INTEGRATION_TEST_ENV") != ""
+	return os.Getenv("BEATS_INSIDE_INTEGRATION_TEST_ENV") != ""
 }
 
 func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {

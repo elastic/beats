@@ -28,17 +28,23 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
+
+type esHTTPClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+	CloseIdleConnections()
+}
 
 // Connection manages the connection for a given client.
 type Connection struct {
 	ConnectionSettings
 
 	Encoder BodyEncoder
-	HTTP    *http.Client
+	HTTP    esHTTPClient
 
 	version common.Version
 	log     *logp.Logger
@@ -55,7 +61,8 @@ type ConnectionSettings struct {
 	APIKey   string
 	Headers  map[string]string
 
-	TLS *tlscommon.TLSConfig
+	TLS      *tlscommon.TLSConfig
+	Kerberos *kerberos.Config
 
 	OnConnectCallback func() error
 	Observer          transport.IOStatser
@@ -120,20 +127,39 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	return &Connection{
-		ConnectionSettings: s,
-		HTTP: &http.Client{
+	var httpClient esHTTPClient
+	httpClient = &http.Client{
+		Transport: &http.Transport{
+			Dial:            dialer.Dial,
+			DialTLS:         tlsDialer.Dial,
+			TLSClientConfig: s.TLS.ToConfig(),
+			Proxy:           proxy,
+			IdleConnTimeout: s.IdleConnTimeout,
+		},
+		Timeout: s.Timeout,
+	}
+
+	if s.Kerberos.IsEnabled() {
+		c := &http.Client{
 			Transport: &http.Transport{
 				Dial:            dialer.Dial,
-				DialTLS:         tlsDialer.Dial,
-				TLSClientConfig: s.TLS.ToConfig(),
 				Proxy:           proxy,
 				IdleConnTimeout: s.IdleConnTimeout,
 			},
 			Timeout: s.Timeout,
-		},
-		Encoder: encoder,
-		log:     logp.NewLogger("esclientleg"),
+		}
+		httpClient, err = kerberos.NewClient(s.Kerberos, c, s.URL)
+		if err != nil {
+			return nil, err
+		}
+		logp.Info("kerberos client created")
+	}
+
+	return &Connection{
+		ConnectionSettings: s,
+		HTTP:               httpClient,
+		Encoder:            encoder,
+		log:                logp.NewLogger("esclientleg"),
 	}, nil
 }
 
@@ -190,6 +216,7 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 			Proxy:            proxyURL,
 			ProxyDisable:     config.ProxyDisable,
 			TLS:              tlsConfig,
+			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
 			APIKey:           config.APIKey,
