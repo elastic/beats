@@ -353,6 +353,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings for nginx module. {issue}16174[16174] {pull}17844[17844]
+- Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 
 *Heartbeat*
 
