@@ -46,6 +46,7 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseCommunityBeatPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
