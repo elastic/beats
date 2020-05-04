@@ -25,6 +25,7 @@
 - Fixed injected log path to monitoring beat {pull}17833[17833]
 - Make sure that the Elastic Agent connect over TLS in cloud. {pull}17843[17843]
 - Moved stream.* fields to top of event {pull}17858[17858]
+- Use /tmp for default monitoring endpoint location for libbeat {pull}18131[18131]
 - Use default output by default {pull}18091[18091]
 
 ==== New features
@@ -39,3 +40,4 @@
 - Monitoring configuration reloadable {pull}17855[17855]
 - Allow CLI overrides of paths {pull}17781[17781]
 - Enable Filebeat input: S3, Azureeventhub, cloudfoundry, httpjson, netflow, o365audit. {pull}17909[17909]
+- Use data subfolder as default for process logs {pull}17960[17960]

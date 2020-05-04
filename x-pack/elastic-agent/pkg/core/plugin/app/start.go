@@ -15,6 +15,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
@@ -210,12 +211,7 @@ func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *aut
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	wd := ""
-	if w, err := os.Getwd(); err == nil {
-		wd = w
-	}
-
-	dataPath := filepath.Join(wd, "data", pipelineID, id)
+	dataPath := filepath.Join(paths.Data(), pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }
 
