@@ -32,4 +32,4 @@ class Test(XPackTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             self.assertIn("prometheus", list(evt.keys()), evt)
-            self.assertIn("metrics", list(evt["prometheus"].keys()), evt)
+            self.assertIn("labels", list(evt["prometheus"].keys()), evt)
