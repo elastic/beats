@@ -7418,84 +7418,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------
-<<<<<<< HEAD
-Dependency: go.elastic.co/ecszap
-Version: v0.1.1
-Revision: cdd95a104193
-License type (autodetected): Apache-2.0
-./vendor/go.elastic.co/ecszap/LICENSE:
---------------------------------------------------------------------
-Apache License 2.0
-
--------NOTICE.txt-----
-ecszap
-Copyright 2020-2020 Elasticsearch B.V.
-
-==========================================================================
-Third party libraries used by the Elastic ecszap project:
-==========================================================================
-
-Dependency: github.com/stretchr/testify
-Version: v1.4.0
-License type: MIT
-https://github.com/stretchr/testify/blob/199de5f3a493a9bf2dcc7fa5bf841d7759c13d7d/LICENSE:
---------------------------------------------------------------------
-MIT License
-
-Copyright (c) 2012-2018 Mat Ryer and Tyler Bunnell
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
---------------------------------------------------------------------
-
-
-Dependency: go.uber.org/zap
-Version: v1.14.0
-License type: MIT
-https://github.com/uber-go/zap/blob/0bd02a6308c1bac3a03b02dc385555297cb22f83/LICENSE.txt:
---------------------------------------------------------------------
-Copyright (c) 2016-2017 Uber Technologies, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
---------------------------------------------------------------------
-
-
-Dependency: github.com/magefile/mage
-Version: v1.9.0
-License type: Apache-2.0
-https://github.com/magefile/mage/blob/324c6690ed410efc1d9b597e477c46d42cbeb340/LICENSE:
-=======
 Dependency: go.elastic.co/apm
 Version: v1.7.2
 License type (autodetected): Apache-2.0
@@ -7603,13 +7525,92 @@ Dependency: go.elastic.co/apm/module/apmhttp
 Version: v1.7.2
 License type (autodetected): Apache-2.0
 ./vendor/go.elastic.co/apm/module/apmhttp/LICENSE:
->>>>>>> elastic/master
 --------------------------------------------------------------------
 Apache License 2.0
 
 
 --------------------------------------------------------------------
-<<<<<<< HEAD
+Dependency: go.elastic.co/ecszap
+Version: v0.1.1
+Revision: cdd95a104193
+License type (autodetected): Apache-2.0
+./vendor/go.elastic.co/ecszap/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+ecszap
+Copyright 2020-2020 Elasticsearch B.V.
+
+==========================================================================
+Third party libraries used by the Elastic ecszap project:
+==========================================================================
+
+Dependency: github.com/stretchr/testify
+Version: v1.4.0
+License type: MIT
+https://github.com/stretchr/testify/blob/199de5f3a493a9bf2dcc7fa5bf841d7759c13d7d/LICENSE:
+--------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2012-2018 Mat Ryer and Tyler Bunnell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+--------------------------------------------------------------------
+
+
+Dependency: go.uber.org/zap
+Version: v1.14.0
+License type: MIT
+https://github.com/uber-go/zap/blob/0bd02a6308c1bac3a03b02dc385555297cb22f83/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2016-2017 Uber Technologies, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+--------------------------------------------------------------------
+
+
+Dependency: github.com/magefile/mage
+Version: v1.9.0
+License type: Apache-2.0
+https://github.com/magefile/mage/blob/324c6690ed410efc1d9b597e477c46d42cbeb340/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/pkg/errors
 Version: v0.9.1
 License type (autodetected): BSD-2-Clause
@@ -7639,7 +7640,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
-=======
+--------------------------------------------------------------------
 Dependency: go.elastic.co/fastjson
 Version: v1.0.0
 License type (autodetected): Apache-2.0
@@ -7648,7 +7649,6 @@ License type (autodetected): Apache-2.0
 Apache License 2.0
 
 
->>>>>>> elastic/master
 --------------------------------------------------------------------
 Dependency: go.opencensus.io
 Version: v0.22.2
