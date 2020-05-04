@@ -383,19 +383,12 @@ func configYML() error {
 
 // ConfigFileParams returns the parameters for generating OSS config.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.XPackBeatDir("_meta/common.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.p2.yml"),
-		},
-		ReferenceParts: []string{
-			devtools.XPackBeatDir("_meta/common.reference.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.reference.p2.yml"),
-		},
-		DockerParts: []string{
-			devtools.XPackBeatDir("_meta/elastic-agent.docker.yml"),
-		},
-	}
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	p.Short.Template = "_meta/config/elastic-agent.yml.tmpl"
+	p.Reference.Template = "_meta/config/elastic-agent.reference.yml.tmpl"
+	p.Docker.Template = "_meta/config/elastic-agent.docker.yml.tmpl"
+	return p
 }
 
 // fieldDocs generates docs/fields.asciidoc containing all fields
