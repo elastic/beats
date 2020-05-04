@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:28:46.1631928Z",
     "event": {
       "action": "enabled-user-account",
+      "category": "iam",
       "code": 4722,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -63,10 +69,16 @@
     "@timestamp": "2019-09-06T13:29:08.5737904Z",
     "event": {
       "action": "enabled-user-account",
+      "category": "iam",
       "code": 4722,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "creation",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
