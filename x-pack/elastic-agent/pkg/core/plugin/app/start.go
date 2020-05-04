@@ -211,7 +211,7 @@ func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *aut
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	dataPath := filepath.Join(paths.Data(), pipelineID, id)
+	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }
 
