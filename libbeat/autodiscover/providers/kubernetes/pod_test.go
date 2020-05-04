@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -332,6 +333,7 @@ func TestGenerateHints(t *testing.T) {
 }
 
 func TestEmitEvent(t *testing.T) {
+	k, _ := keystore.NewFileKeystore("test")
 	name := "filebeat"
 	namespace := "default"
 	podIP := "127.0.0.1"
@@ -395,6 +397,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "127.0.0.1",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "foobar",
@@ -527,6 +530,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "",
@@ -596,6 +600,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "127.0.0.1",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "",
@@ -645,6 +650,7 @@ func TestEmitEvent(t *testing.T) {
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
+				keystore:  k,
 			}
 
 			pod := &pod{
