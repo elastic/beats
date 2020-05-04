@@ -32,7 +32,13 @@ type Config struct {
 }
 
 func localDefaultConfig() *Config {
-	return &Config{}
+	localModeCfg, _ := config.NewConfigFrom(map[string]interface{}{
+		"mode": "local",
+	})
+
+	return &Config{
+		Management: localModeCfg,
+	}
 }
 
 type managementMode int
