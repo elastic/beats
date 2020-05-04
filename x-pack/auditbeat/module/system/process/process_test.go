@@ -66,9 +66,11 @@ func TestProcessEvent(t *testing.T) {
 	}
 
 	expectedRootFields := map[string]interface{}{
-		"event.kind":   "event",
-		"event.action": "process_started",
-		"message":      "Process zsh (PID: 9086) by user elastic STARTED",
+		"event.kind":     "event",
+		"event.category": []string{"process"},
+		"event.type":     []string{"start"},
+		"event.action":   "process_started",
+		"message":        "Process zsh (PID: 9086) by user elastic STARTED",
 
 		"process.pid":        9086,
 		"process.ppid":       9085,

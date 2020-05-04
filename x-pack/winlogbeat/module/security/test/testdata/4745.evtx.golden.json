@@ -3,10 +3,16 @@
     "@timestamp": "2019-12-18T16:29:05.0175739Z",
     "event": {
       "action": "changed-distribution-group-account",
+      "category": "iam",
       "code": 4745,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "group"
+      ]
     },
     "group": {
       "domain": "TEST",

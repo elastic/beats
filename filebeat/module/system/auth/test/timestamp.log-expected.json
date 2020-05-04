@@ -2,6 +2,7 @@
     {
         "@timestamp": "2019-06-14T10:40:20.912-02:00",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
@@ -16,6 +17,7 @@
     {
         "@timestamp": "2019-06-14T09:31:15.412-02:00",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.timezone": "-02:00",
         "fileset.name": "auth",
