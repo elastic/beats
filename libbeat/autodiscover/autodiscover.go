@@ -55,7 +55,7 @@ type EventConfigurer interface {
 // new modules when any configured providers does a match
 type Autodiscover struct {
 	bus             bus.Bus
-	defaultPipeline beat.Pipeline
+	defaultPipeline beat.PipelineConnector
 	factory         cfgfile.RunnerFactory
 	configurer      EventConfigurer
 	providers       []Provider
@@ -69,7 +69,7 @@ type Autodiscover struct {
 // NewAutodiscover instantiates and returns a new Autodiscover manager
 func NewAutodiscover(
 	name string,
-	pipeline beat.Pipeline,
+	pipeline beat.PipelineConnector,
 	factory cfgfile.RunnerFactory,
 	configurer EventConfigurer,
 	config *Config,
