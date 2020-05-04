@@ -17,33 +17,44 @@
 
 package kerberos
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type AuthType uint
 
 const (
-	AUTH_PASSWORD = 1
-	AUTH_KEYTAB   = 2
+	authPassword = 1
+	authKeytab   = 2
 
-	authPassword  = "password"
-	authKeytabStr = "keytab"
+	authPasswordStr = "password"
+	authKeytabStr   = "keytab"
 )
 
 var (
+	InvalidAuthType = errors.New("invalid authentication type")
+
 	authTypes = map[string]AuthType{
-		authPassword:  AUTH_PASSWORD,
-		authKeytabStr: AUTH_KEYTAB,
+		authPasswordStr: authPassword,
+		authKeytabStr:   authKeytab,
 	}
 )
 
 type Config struct {
+	Enabled     *bool    `config:"enabled" yaml:"enabled,omitempty"`
 	AuthType    AuthType `config:"auth_type" validate:"required"`
 	KeyTabPath  string   `config:"keytab"`
-	ConfigPath  string   `config:"config_path"`
+	ConfigPath  string   `config:"config_path" validate:"required"`
 	ServiceName string   `config:"service_name"`
 	Username    string   `config:"username"`
 	Password    string   `config:"password"`
-	Realm       string   `config:"realm"`
+	Realm       string   `config:"realm" validate:"required"`
+}
+
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (c *Config) IsEnabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 // Unpack validates and unpack "auth_type" config option
@@ -59,19 +70,21 @@ func (t *AuthType) Unpack(value string) error {
 }
 
 func (c *Config) Validate() error {
-	if c.AuthType == AUTH_PASSWORD {
+	switch c.AuthType {
+	case authPassword:
 		if c.Username == "" {
 			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
 		}
 		if c.Password == "" {
 			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
 		}
-	}
 
-	if c.AuthType == AUTH_KEYTAB {
+	case authKeytab:
 		if c.KeyTabPath == "" {
 			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
 		}
+	default:
+		return InvalidAuthType
 	}
 
 	return nil
