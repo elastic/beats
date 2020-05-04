@@ -374,7 +374,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		case eslegclient.BulkDeleteAction:
 			require.Equal(t, opTypeDelete, caseOpType, caseMessage)
 		default:
-			panic("unknown type")
+			require.FailNow(t, "unknown type")
 		}
 	}
 
