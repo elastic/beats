@@ -97,6 +97,7 @@ func makeES(
 				Proxy:            proxyURL,
 				ProxyDisable:     config.ProxyDisable,
 				TLS:              tlsConfig,
+				Kerberos:         config.Kerberos,
 				Username:         config.Username,
 				Password:         config.Password,
 				APIKey:           config.APIKey,

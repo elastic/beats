@@ -174,7 +174,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
 	}
 
-	if config.Kerberos != nil {
+	if config.Kerberos.IsEnabled() {
 		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
 
 		k.Net.SASL.Enable = true
