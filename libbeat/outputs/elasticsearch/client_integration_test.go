@@ -29,6 +29,8 @@ import (
 	"testing"
 	"time"
 
+	"go.elastic.co/apm/apmtest"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -58,7 +60,7 @@ func TestClientPublishEvent(t *testing.T) {
 		},
 	})
 
-	err := output.Publish(batch)
+	err := output.Publish(context.Background(), batch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +98,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		err := output.Publish(outest.NewBatch(event))
+		err := output.Publish(context.Background(), outest.NewBatch(event))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -177,7 +179,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		err := output.Publish(outest.NewBatch(events...))
+		err := output.Publish(context.Background(), outest.NewBatch(events...))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -239,6 +241,46 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 	assert.Equal(t, 1, getCount("testfield:1")) // with pipeline 1
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
+}
+
+func TestClientPublishTracer(t *testing.T) {
+	index := "beat-apm-tracer-test"
+	output, client := connectTestEs(t, map[string]interface{}{
+		"index": index,
+	})
+
+	client.conn.Delete(index, "", "", nil)
+
+	batch := outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"message": "Hello world",
+		},
+	})
+
+	tx, spans, _ := apmtest.WithTransaction(func(ctx context.Context) {
+		err := output.Publish(ctx, batch)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	require.Len(t, spans, 2)
+
+	// get spans in reverse order
+	firstSpan := spans[1]
+
+	assert.Equal(t, "publishEvents", firstSpan.Name)
+	assert.Equal(t, "output", firstSpan.Type)
+	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
+	assert.True(t, len(firstSpan.Context.Tags) > 0, "no tags found")
+
+	secondSpan := spans[0]
+	assert.Contains(t, secondSpan.Name, "POST")
+	assert.Equal(t, "db", secondSpan.Type)
+	assert.Equal(t, "elasticsearch", secondSpan.Subtype)
+	assert.Equal(t, [8]byte(secondSpan.ParentID), [8]byte(firstSpan.ID))
+	assert.Equal(t, [8]byte(secondSpan.TransactionID), [8]byte(tx.ID))
+	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
 func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {

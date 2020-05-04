@@ -141,6 +141,9 @@ require (
 	github.com/urso/ecslog v0.0.1
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
+	go.elastic.co/apm v1.7.2
+	go.elastic.co/apm/module/apmelasticsearch v1.7.2
+	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
 	go.uber.org/zap v1.7.1

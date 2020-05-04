@@ -118,6 +118,8 @@ github.com/akavel/rsrc/ico
 github.com/andrewkroh/sys/windows/svc/eventlog
 # github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb
 github.com/antlr/antlr4/runtime/Go/antlr
+# github.com/armon/go-radix v1.0.0
+github.com/armon/go-radix
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 github.com/armon/go-socks5
 # github.com/aws/aws-lambda-go v1.6.0
@@ -736,6 +738,12 @@ github.com/samuel/go-thrift/parser
 github.com/sanathkr/go-yaml
 # github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522
 github.com/sanathkr/yaml
+# github.com/santhosh-tekuri/jsonschema v1.2.4
+github.com/santhosh-tekuri/jsonschema
+github.com/santhosh-tekuri/jsonschema/decoders
+github.com/santhosh-tekuri/jsonschema/formats
+github.com/santhosh-tekuri/jsonschema/loader
+github.com/santhosh-tekuri/jsonschema/mediatypes
 # github.com/shirou/gopsutil v2.19.11+incompatible
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/internal/common
@@ -752,6 +760,7 @@ github.com/stretchr/objx
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
+github.com/stretchr/testify/suite
 # github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 github.com/tsg/go-daemon
 # github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
@@ -807,6 +816,32 @@ github.com/yuin/gopher-lua
 github.com/yuin/gopher-lua/ast
 github.com/yuin/gopher-lua/parse
 github.com/yuin/gopher-lua/pm
+# go.elastic.co/apm v1.7.2
+go.elastic.co/apm
+go.elastic.co/apm/apmconfig
+go.elastic.co/apm/apmtest
+go.elastic.co/apm/internal/apmcontext
+go.elastic.co/apm/internal/apmhostutil
+go.elastic.co/apm/internal/apmhttputil
+go.elastic.co/apm/internal/apmlog
+go.elastic.co/apm/internal/apmschema
+go.elastic.co/apm/internal/apmstrings
+go.elastic.co/apm/internal/apmversion
+go.elastic.co/apm/internal/configutil
+go.elastic.co/apm/internal/iochan
+go.elastic.co/apm/internal/pkgerrorsutil
+go.elastic.co/apm/internal/ringbuffer
+go.elastic.co/apm/internal/wildcard
+go.elastic.co/apm/model
+go.elastic.co/apm/stacktrace
+go.elastic.co/apm/transport
+go.elastic.co/apm/transport/transporttest
+# go.elastic.co/apm/module/apmelasticsearch v1.7.2
+go.elastic.co/apm/module/apmelasticsearch
+# go.elastic.co/apm/module/apmhttp v1.7.2
+go.elastic.co/apm/module/apmhttp
+# go.elastic.co/fastjson v1.0.0
+go.elastic.co/fastjson
 # go.opencensus.io v0.22.2
 go.opencensus.io
 go.opencensus.io/internal
