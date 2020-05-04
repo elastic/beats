@@ -17,14 +17,6 @@ func InjectAgentConfig(c *config.Config) error {
 		return errors.New("failed to inject agent global config", err, errors.TypeConfig)
 	}
 
-	return injectOverwrites(c)
-}
-
-func injectOverwrites(c *config.Config) error {
-	if err := c.Merge(overwrites); err != nil {
-		return errors.New("failed to inject agent overwrites", err, errors.TypeConfig)
-	}
-
 	return nil
 }
 
