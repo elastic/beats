@@ -12,12 +12,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-07-18T01:35:35Z",
           "duration": 29695000000,
           "end": "2018-07-18T01:35:02.969Z",
           "kind": "event",
-          "start": "2018-07-18T01:34:33.274Z"
+          "start": "2018-07-18T01:34:33.274Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "dK1E5m-O-ns",
@@ -69,6 +75,12 @@
         },
         "observer": {
           "ip": "192.0.2.1"
+        },
+        "related": {
+          "ip": [
+            "20.20.20.20",
+            "20.20.255.255"
+          ]
         },
         "source": {
           "bytes": 702,

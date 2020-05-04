@@ -24,10 +24,6 @@ import (
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
 
-type managementCfg struct {
-	Management *config.Config `config:"management"`
-}
-
 type apiClient interface {
 	Send(
 		method string,
@@ -92,7 +88,7 @@ func newManaged(
 	}
 
 	// Extract only management related configuration.
-	managementCfg := &managementCfg{}
+	managementCfg := &Config{}
 	if err := rawConfig.Unpack(managementCfg); err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
