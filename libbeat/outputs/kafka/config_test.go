@@ -18,11 +18,10 @@
 package kafka
 
 import (
+	"fmt"
+	"math"
 	"testing"
-	"testing/quick"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
@@ -107,32 +106,29 @@ func TestConfigInvalid(t *testing.T) {
 
 func TestBackoffFunc(t *testing.T) {
 	lbtesting.SeedPRNG(t)
-	err := quick.Check(func(i uint) bool {
-		initBackoff := 1 + (i % 5)               // 1 to 5
-		maxBackoff := initBackoff + 1 + (i % 45) // initBackoff+1 to 50
-		maxRetries := int(1 + (i % 50))          // 1 to 50
+	tests := map[int]backoffConfig{
+		15: {Init: 1 * time.Second, Max: 60 * time.Second},
+		7:  {Init: 2 * time.Second, Max: 20 * time.Second},
+		4:  {Init: 5 * time.Second, Max: 7 * time.Second},
+	}
 
-		cfg := backoffConfig{
-			Init: time.Duration(initBackoff) * time.Second,
-			Max:  time.Duration(maxBackoff) * time.Second,
-		}
+	for numRetries, backoffCfg := range tests {
+		t.Run(fmt.Sprintf("%v_retries", numRetries), func(t *testing.T) {
+			backoffFn := makeBackoffFunc(backoffCfg)
 
-		backoffFn := makeBackoffFunc(cfg)
+			prevBackoff := backoffCfg.Init
+			for retries := 1; retries <= numRetries; retries++ {
+				backoff := prevBackoff * 2
 
-		for retries := 0; retries < maxRetries; retries++ {
-			backoff := backoffFn(retries, maxRetries)
+				expectedBackoff := math.Min(float64(backoff), float64(backoffCfg.Max))
+				actualBackoff := backoffFn(retries, 50)
 
-			if !assert.GreaterOrEqual(t, backoff.Milliseconds(), cfg.Init.Milliseconds()/2) {
-				t.Logf("init: %v, max: %v, retries: %v", cfg.Init, cfg.Max, retries)
-				return false
+				require.GreaterOrEqual(t, float64(actualBackoff), expectedBackoff/2)
+				require.LessOrEqual(t, float64(actualBackoff), expectedBackoff)
+
+				prevBackoff = backoff
 			}
-			if !assert.LessOrEqual(t, backoff.Milliseconds(), cfg.Max.Milliseconds()) {
-				t.Logf("init: %v, max: %v, retries: %v", cfg.Init, cfg.Max, retries)
-				return false
-			}
-		}
 
-		return true
-	}, &quick.Config{MaxCount: 25})
-	require.NoError(t, err)
+		})
+	}
 }
