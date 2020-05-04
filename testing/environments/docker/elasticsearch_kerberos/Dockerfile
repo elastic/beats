@@ -12,5 +12,4 @@ ENV ELASTIC_ZONE $BUILD_ZONE
 
 USER root
 RUN /scripts/installkdc.sh && /scripts/addprincs.sh
-
 USER elasticsearch

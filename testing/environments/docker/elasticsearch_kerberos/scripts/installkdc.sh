@@ -67,5 +67,12 @@ EOF
 kadmin.local -q "addprinc -pw elastic admin/admin@$REALM_NAME"
 kadmin.local -q "ktadd -k /etc/admin.keytab admin/admin@$REALM_NAME"
 
+# set ownership for ES
+chown -R elasticsearch:elasticsearch $LOGDIR
+chown -R elasticsearch:elasticsearch $KDC_CONFIG
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5.conf
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
+
+
 # Create a link so addprinc.sh is on path
 ln -s /scripts/addprinc.sh /usr/bin/

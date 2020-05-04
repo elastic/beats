@@ -16,12 +16,12 @@
 # under the License.
 
 [kdcdefaults]
-    kdc_listen = 88
-    kdc_tcp_listen = 88
+    kdc_listen = 1088
+    kdc_tcp_listen = 1088
 
 [realms]
     ${REALM_NAME} = {
-        kadmind_port = 749
+        kadmind_port = 1749
         max_life = 12h 0m 0s
         max_renewable_life = 7d 0h 0m 0s
         master_key_type = aes256-cts
@@ -29,6 +29,6 @@
     }
 
 [logging]
-    kdc = FILE:/var/log/krb5kdc.log
-    admin_server = FILE:/var/log/kadmin.log
-    default = FILE:/var/log/krb5lib.log
+    kdc = FILE:/var/log/krb5/krb5kdc.log
+    admin_server = FILE:/var/log/krb5/kadmin.log
+    default = FILE:/var/log/krb5/krb5lib.log

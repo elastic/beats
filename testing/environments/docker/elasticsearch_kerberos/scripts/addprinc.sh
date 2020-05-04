@@ -52,6 +52,7 @@ else
     sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "ktadd -k $USER_KTAB $USER_PRIN"
     sudo chmod 777 $USER_KTAB
     sudo cp $USER_KTAB /usr/share/elasticsearch/config
+    sudo chown elasticsearch:elasticsearch /usr/share/elasticsearch/config/$USER.keytab
   else
     echo "Provisioning '${PRINC}@${REALM}' principal with password..."
     sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -pw $PASSWD $PRINC"

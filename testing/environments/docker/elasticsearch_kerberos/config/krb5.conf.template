@@ -32,8 +32,8 @@
 
 [realms]
     ${REALM_NAME} = {
-        kdc = localhost:88
-        admin_server = localhost:749
+        kdc = localhost:1088
+        admin_server = localhost:1749
         default_domain = ${BUILD_ZONE}
     }
 

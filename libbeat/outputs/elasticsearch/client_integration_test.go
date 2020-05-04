@@ -320,7 +320,7 @@ func setupRoleMapping(t *testing.T, host string) error {
 		"password": "changeme",
 	})
 
-	roleMappingURL := client.conn.URL + "/_xpack/security/role_mapping/kerbrolemapping"
+	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
 
 	status, _, err := client.conn.RequestURL("POST", roleMappingURL, map[string]interface{}{
 		"roles":   []string{"superuser"},
