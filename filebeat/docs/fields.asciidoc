@@ -49,7 +49,6 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
-* <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-o365>>
 * <<exported-fields-okta>>
@@ -3114,7 +3113,8 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+
 
 type: keyword
 
@@ -30470,12 +30470,6 @@ type: short
 
 --
 
-[[exported-fields-netflow-module]]
-== NetFlow fields
-
-Module for receiving NetFlow and IPFIX flow records over UDP. The module does not add fields beyond what the netflow input provides.
-
-
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -33030,7 +33024,7 @@ The disk volume path.
 
 --
 
-*`certificate.common_name`*::
+*`santa.certificate.common_name`*::
 +
 --
 Common name from code signing certificate.
@@ -33039,7 +33033,7 @@ type: keyword
 
 --
 
-*`certificate.sha256`*::
+*`santa.certificate.sha256`*::
 +
 --
 SHA256 hash of code signing certificate.

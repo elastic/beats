@@ -40,7 +40,8 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+
 
 type: keyword
 
@@ -7915,7 +7916,7 @@ example: DigiCert SHA2 High Assurance Server CA
 *`tls.server.x509.issuer.common_name.text`*::
 +
 --
-type: wildcard
+type: text
 
 --
 
@@ -8033,7 +8034,7 @@ example: r2.shared.global.fastly.net
 *`tls.server.x509.subject.subject.common_name.text`*::
 +
 --
-type: wildcard
+type: text
 
 --
 
