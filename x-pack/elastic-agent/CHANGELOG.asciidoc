@@ -43,5 +43,6 @@
 - Enable Filebeat input: S3, Azureeventhub, cloudfoundry, httpjson, netflow, o365audit. {pull}17909[17909]
 - Configurable log level {pull}18083[18083]
 - Use data subfolder as default for process logs {pull}17960[17960]
+- Enable introspecting configuration {pull}18124[18124]
 - Follow home path for all config files {pull}18161[18161]
 - Do not require unnecessary configuration {pull}18003[18003]
