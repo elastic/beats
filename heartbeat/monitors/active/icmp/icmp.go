@@ -53,7 +53,7 @@ func create(
 		return nil, 0, err
 	}
 
-	jf, err := newJobFactory(config, monitors.NewStdResolver(), loop)
+	jf, err := newJobFactory(config, loop)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -63,13 +63,12 @@ func create(
 
 type jobFactory struct {
 	config    Config
-	resolver  monitors.Resolver
 	loop      ICMPLoop
 	ipVersion string
 }
 
-func newJobFactory(config Config, resolver monitors.Resolver, loop ICMPLoop) (*jobFactory, error) {
-	jf := &jobFactory{config: config, resolver: resolver, loop: loop}
+func newJobFactory(config Config, loop ICMPLoop) (*jobFactory, error) {
+	jf := &jobFactory{config: config, loop: loop}
 	err := jf.checkConfig()
 	if err != nil {
 		return nil, err

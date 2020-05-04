@@ -19,7 +19,6 @@ package icmp
 
 import (
 	"net"
-	"net/url"
 	"testing"
 	"time"
 
@@ -32,12 +31,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestICMPFields(t *testing.T) {
 	host := "localhost"
-	hostURL := &url.URL{Scheme: "icmp", Host: host}
 	ip := "127.0.0.1"
 	cfg := Config{
 		Hosts: []string{host},
@@ -49,11 +48,14 @@ func TestICMPFields(t *testing.T) {
 		lookslike.Compose(
 			hbtest.BaseChecks(ip, "up", "icmp"),
 			hbtest.SummaryChecks(1, 0),
-			hbtest.URLChecks(t, hostURL),
-			hbtest.ResolveChecks(ip),
+			hbtest.SimpleURLChecks(t, "icmp", host, 0),
 			lookslike.MustCompile(map[string]interface{}{
 				"icmp.requests": 1,
 				"icmp.rtt":      look.RTT(testMockLoop.pingRtt),
+				"resolve": map[string]interface{}{
+					"ip":     "127.0.0.1",
+					"rtt.us": isdef.IsDuration,
+				},
 			}),
 		),
 	)
@@ -62,7 +64,7 @@ func TestICMPFields(t *testing.T) {
 
 func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	tl := mockLoop{pingRtt: time.Microsecond * 1000, pingRequests: 1}
-	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
+	jf, err := newJobFactory(cfg, tl)
 	require.NoError(t, err)
 	j, endpoints, err := jf.makeJobs()
 	require.Len(t, j, 1)
