@@ -140,7 +140,7 @@
               - name: subject
                 type: group
                 fields:
-                - name: subject.common_name
+                - name: common_name
                   type: keyword
                   ignore_above: 1024
                   description: List of common names (CN) of subject.
@@ -150,7 +150,7 @@
                     - name: text
                       type: text
                       analyzer: simple
-                - name: subject.distinguished_name
+                - name: distinguished_name
                   type: keyword
                   ignore_above: 1024
                   description: Distinguished name (DN) of the certificate subject entity.
