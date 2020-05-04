@@ -1,0 +1,353 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Overview of Googlecloud Storage Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "title": "Filters"
+            },
+            "gridData": {
+              "h": 16,
+              "i": "4a10dd3e-452e-4480-8238-5d87e48d736f",
+              "w": 16,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "4a10dd3e-452e-4480-8238-5d87e48d736f",
+            "panelRefName": "panel_0",
+            "title": "Filters",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Total Size of All Objects"
+            },
+            "gridData": {
+              "h": 16,
+              "i": "ba50ef47-bf98-456a-ada0-8d1c4a561205",
+              "w": 32,
+              "x": 16,
+              "y": 0
+            },
+            "panelIndex": "ba50ef47-bf98-456a-ada0-8d1c4a561205",
+            "panelRefName": "panel_1",
+            "title": "Total Size of All Objects",
+            "version": "7.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "title": "Total Number of Objects"
+            },
+            "gridData": {
+              "h": 18,
+              "i": "7ea8ecaf-9c49-4d82-8f95-8f659276bfec",
+              "w": 48,
+              "x": 0,
+              "y": 16
+            },
+            "panelIndex": "7ea8ecaf-9c49-4d82-8f95-8f659276bfec",
+            "panelRefName": "panel_2",
+            "title": "Total Number of Objects",
+            "version": "7.7.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Googlecloud] Storage Overview",
+        "version": 1
+      },
+      "id": "755cff00-8db4-11ea-ac5f-d38207a07f19",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "edf17c30-8db3-11ea-ac5f-d38207a07f19",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "479a7a30-8db3-11ea-ac5f-d38207a07f19",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "43118c20-8db2-11ea-ac5f-d38207a07f19",
+          "name": "panel_2",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-05-04T03:07:59.088Z",
+      "version": "Wzc2NTAsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Storage Filter [Metricbeat GoogleCloud]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "googlecloud.labels.metrics.storage_class",
+                "id": "1588561283530",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "Storage Class",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "googlecloud.labels.resource.bucket_name",
+                "id": "1588561371516",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "Bucket Name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "googlecloud.labels.resource.location",
+                "id": "1588561395726",
+                "indexPatternRefName": "control_2_index_pattern",
+                "label": "Location",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "Storage Filter [Metricbeat GoogleCloud]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "edf17c30-8db3-11ea-ac5f-d38207a07f19",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_2_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-05-04T03:04:11.891Z",
+      "version": "Wzc2NDMsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Total Bytes Per Bucket [Metricbeat GoogleCloud]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "1aa22dc0-8db3-11ea-8976-ab39a67938c3"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "1bffc1f0-8db3-11ea-8976-ab39a67938c3"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "googlecloud.storage.storage.total_bytes.value",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "3",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "top_n"
+          },
+          "title": "Total Bytes Per Bucket [Metricbeat GoogleCloud]",
+          "type": "metrics"
+        }
+      },
+      "id": "479a7a30-8db3-11ea-ac5f-d38207a07f19",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-05-04T02:59:32.819Z",
+      "version": "Wzc2MjUsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Total Number of Objects Per Bucket [Metricbeat GoogleCloud]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "5m",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "googlecloud.storage.storage.object_count.value",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "3",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "googlecloud.labels.resource.bucket_name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Total Number of Objects Per Bucket [Metricbeat GoogleCloud]",
+          "type": "metrics"
+        }
+      },
+      "id": "43118c20-8db2-11ea-ac5f-d38207a07f19",
+      "migrationVersion": {
+        "visualization": "7.7.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-05-04T02:52:32.148Z",
+      "version": "Wzc2MTUsNF0="
+    }
+  ],
+  "version": "7.7.0"
+}
