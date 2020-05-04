@@ -81,6 +81,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 		a.limiter.Add()
 	}
 
+	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args)
 
 	// specify beat name to avoid data lock conflicts
@@ -112,6 +113,27 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	a.watch(ctx, a.state.ProcessInfo.Process, cfg)
 
 	return nil
+}
+
+func injectLogLevel(logLevel string, args []string) []string {
+	var level string
+	// Translate to level beat understands
+	switch logLevel {
+	case "trace":
+		level = "debug"
+	case "info":
+		level = "info"
+	case "debug":
+		level = "debug"
+	case "error":
+		level = "error"
+	}
+
+	if args == nil || level == "" {
+		return args
+	}
+
+	return append(args, "-E", "logging.level="+level)
 }
 
 func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {

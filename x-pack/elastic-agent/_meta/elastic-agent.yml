@@ -119,3 +119,7 @@ datasources:
 #   logs: false
 #   # enables metrics monitoring
 #   metrics: false
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: trace
