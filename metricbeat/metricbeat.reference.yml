@@ -574,7 +574,6 @@ metricbeat.modules:
     - "pageinfo"
     # - ksm
     # - conntrack
-    # - perf
   enabled: true
   #hostfs: /hostfs
 
