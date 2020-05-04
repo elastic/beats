@@ -18,10 +18,13 @@
 package elasticsearch
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"go.elastic.co/apm"
 
 	"github.com/pkg/errors"
 
@@ -103,7 +106,7 @@ func (c *publishClient) Close() error {
 	return c.es.Close()
 }
 
-func (c *publishClient) Publish(batch publisher.Batch) error {
+func (c *publishClient) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	var failed []publisher.Event
 	var reason error
@@ -141,7 +144,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		case report.FormatXPackMonitoringBulk:
 			err = c.publishXPackBulk(params, event, typ)
 		case report.FormatBulk:
-			err = c.publishBulk(event, typ)
+			err = c.publishBulk(ctx, event, typ)
 		}
 
 		if err != nil {
@@ -186,7 +189,7 @@ func (c *publishClient) publishXPackBulk(params map[string]string, event publish
 	return err
 }
 
-func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
+func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
@@ -233,8 +236,9 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	_, result, err := c.es.Bulk(getMonitoringIndexName(), "", nil, bulk[:])
+	_, result, err := c.es.Bulk(ctx, getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
+		apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", err)).Send()
 		return err
 	}
 
