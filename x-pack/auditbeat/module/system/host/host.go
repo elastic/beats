@@ -123,7 +123,6 @@ func (host *Host) toMapStr() common.MapStr {
 		"timezone.name":       host.Info.Timezone,
 		"timezone.offset.sec": host.Info.TimezoneOffsetSec,
 		"hostname":            host.Info.Hostname,
-		"name":                host.Info.Hostname,
 		"id":                  host.Info.UniqueID,
 		"architecture":        host.Info.Architecture,
 
@@ -351,11 +350,12 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	}
 
 	// Copy select host.* fields in case add_host_metadata is not configured.
-	hostTopLevel := common.MapStr{}
+	hostTopLevel := common.MapStr{
+		"name": host.Hostname,
+	}
 	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
 	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
 	hostFields.CopyFieldsTo(hostTopLevel, "hostname")
-	hostFields.CopyFieldsTo(hostTopLevel, "name")
 	hostFields.CopyFieldsTo(hostTopLevel, "id")
 	hostFields.CopyFieldsTo(hostTopLevel, "ip")
 	hostFields.CopyFieldsTo(hostTopLevel, "mac")
