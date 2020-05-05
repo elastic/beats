@@ -16,13 +16,13 @@ file or by pointing the processor at external file(s).
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    source: >
-      function process(event) {
-          event.Tag("js");
-      }
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Tag("js");
+        }
 ----
 
 This loads `filter.js` from disk.
@@ -30,10 +30,10 @@ This loads `filter.js` from disk.
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    file: ${path.config}/filter.js
+  - script:
+      lang: javascript
+      id: my_filter
+      file: ${path.config}/filter.js
 ----
 
 Parameters can be passed to the script by adding `params` to the config.
@@ -43,21 +43,21 @@ code must define a `register(params)` function to receive the parameters.
 [source,yaml]
 ----
 processors:
-- script:
-    lang: javascript
-    id: my_filter
-    params:
-      threshold: 15
-    source: >
-      var params = {threshold: 42};
-      function register(scriptParams) {
-          params = scriptParams;
-      }
-      function process(event) {
-          if (event.Get("severity") < params.threshold) {
-              event.Cancel();
-          }
-      }
+  - script:
+      lang: javascript
+      id: my_filter
+      params:
+        threshold: 15
+      source: >
+        var params = {threshold: 42};
+        function register(scriptParams) {
+            params = scriptParams;
+        }
+        function process(event) {
+            if (event.Get("severity") < params.threshold) {
+                event.Cancel();
+            }
+        }
 ----
 
 If the script defines a `test()` function it will be invoked when the processor

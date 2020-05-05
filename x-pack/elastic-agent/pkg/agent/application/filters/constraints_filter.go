@@ -229,7 +229,7 @@ func initVarStore(store *constraintVarStore) error {
 		return err
 	}
 
-	meta, err := agentInfo.ECSMetadata()
+	meta, err := agentInfo.ECSMetadataFlatMap()
 	if err != nil {
 		return errors.New(err, "failed to gather host metadata")
 	}
