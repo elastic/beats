@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
+- Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -274,6 +275,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
+- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -283,6 +285,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
+- Add system module user dataset ECS categorization fields. {pull}18035[18035]
+- Add system module login dataset ECS categorization fields. {pull}18034[18034]
+- Add system module package dataset ECS categorization fields. {pull}18033[18033]
+- Add ECS categories for system module host dataset. {pull}18031[18031]
 - Add system module socket dataset ECS categorization fields. {pull}18036[18036]
 
 *Filebeat*
@@ -357,6 +363,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
 - Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
 - Enhance `elasticsearch/deprecation` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17728[17728]
+- Make `decode_cef` processor GA. {pull}17944[17944]
 - Improve ECS categorization field mappings in redis module. {issue}16179[16179] {pull}17918[17918]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
@@ -364,7 +371,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
 - Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 - Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
+- Added an input option `publisher_pipeline.disable_host` to disable `host.name`
+  from being added to events by default. {pull}18159[18159]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
+- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Heartbeat*
 
@@ -468,6 +478,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
+- Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 
 ==== Deprecated
 
