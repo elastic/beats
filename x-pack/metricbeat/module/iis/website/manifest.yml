@@ -6,18 +6,18 @@ input:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
     perfmon.queries:
-    - object: 'Web Service'
+    - object: "Web Service"
       instance: "*"
       namespace : "network"
       counters:
-      - name: 'Total Bytes Received'
-      - name: 'Total Bytes Sent'
+      - name: "Total Bytes Received"
+      - name: "Total Bytes Sent"
       - name: "Bytes Sent/sec"
       - name: "Bytes Received/sec"
       - name: "Current Connections"
       - name: "Maximum Connections"
       - name: "Total Connection Attempts (all instances)"
-        field: total_connection_attempts
+        field: "total_connection_attempts"
       - name: "Total Get Requests"
       - name: "Get Requests/sec"
       - name: "Total Post Requests"
@@ -30,7 +30,7 @@ input:
 
 processors:
 - drop_event.when.equals:
-    iis.website.name: '_Total'
+    iis.website.instance: '_Total'
 - drop_fields:
     fields: "iis.website.object"
 - rename:

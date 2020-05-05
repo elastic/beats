@@ -46,13 +46,13 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
 	warn.PrintNotGA(streams.Out)
-
-	config, err := config.LoadYAML(flags.PathConfigFile)
+	pathConfigFile := flags.Config()
+	config, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", flags.PathConfigFile),
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
 			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, flags.PathConfigFile))
+			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -95,7 +95,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	c, err := application.NewEnrollCmd(
 		logger,
 		&options,
-		flags.PathConfigFile,
+		pathConfigFile,
 	)
 
 	if err != nil {

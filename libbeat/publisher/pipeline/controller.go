@@ -105,7 +105,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
-		worker[i] = makeClientWorker(c.observer, c.workQueue, client)
+		worker[i] = makeClientWorker(c.observer, c.workQueue, client, c.monitors.Tracer)
 	}
 	grp := &outputGroup{
 		workQueue:  c.workQueue,

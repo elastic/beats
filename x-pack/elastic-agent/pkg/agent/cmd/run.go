@@ -33,12 +33,13 @@ func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStream
 }
 
 func run(flags *globalFlags, streams *cli.IOStreams) error {
-	config, err := config.LoadYAML(flags.PathConfigFile)
+	pathConfigFile := flags.Config()
+	config, err := config.LoadYAML(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", flags.PathConfigFile),
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
 			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, flags.PathConfigFile))
+			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
 	logger, err := logger.NewFromConfig(config)
@@ -46,7 +47,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error {
 		return err
 	}
 
-	app, err := application.New(logger, flags.PathConfigFile)
+	app, err := application.New(logger, pathConfigFile)
 	if err != nil {
 		return err
 	}

@@ -92,6 +92,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm/dommemstat"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kvm/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"

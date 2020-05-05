@@ -30,7 +30,7 @@ an error; you need to either drop or rename the key before using dissect.
 For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
 found an error will be logged and no modification is done on the original event.
 
-NOTE: A key can contain any characters except reserved suffix or prefix modifiers:  `/`,`&`, `+`
+NOTE: A key can contain any characters except reserved suffix or prefix modifiers:  `/`,`&`, `+`, `#`
 and `?`.
 
 See <<conditions>> for a list of supported conditions.

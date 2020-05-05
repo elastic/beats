@@ -2,7 +2,9 @@
     {
         "@timestamp": "2019-09-10T16:19:28.465Z",
         "event.dataset": "zeek.capture_loss",
+        "event.kind": "metric",
         "event.module": "zeek",
+        "event.type": "info",
         "fileset.name": "capture_loss",
         "input.type": "log",
         "log.offset": 0,
