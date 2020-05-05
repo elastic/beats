@@ -44,7 +44,7 @@ class TestLogging(BaseTest):
         self.run_beat_with_args("mockbeat start running",
                                 logging_args=["-e"],
                                 extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs.enabled=true"])
+                                            "-E", "logging.ecs=true"])
         self.assert_contains_ecs_log()
 
     def test_file_default(self):
@@ -54,7 +54,7 @@ class TestLogging(BaseTest):
         self.run_beat_with_args("Mockbeat is alive!",
                                 logging_args=[],
                                 extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs.enabled=false"])
+                                            "-E", "logging.ecs=false"])
         self.assert_not_contains_ecs_log(logfile="logs/mockbeat")
 
     def test_file_ecs(self):
@@ -63,5 +63,5 @@ class TestLogging(BaseTest):
         """
         self.run_beat_with_args("Mockbeat is alive!",
                                 extra_args=["-E", "logging.json=true",
-                                            "-E", "logging.ecs.enabled=true"])
+                                            "-E", "logging.ecs=true"])
         self.assert_contains_ecs_log(logfile="logs/mockbeat")
