@@ -29,7 +29,7 @@ const (
 	headerSize = 8192
 )
 
-// this does a best-effort to get the file type, if no
+// getMimeType does a best-effort to get the file type, if no
 // filetype can be determined, it just returns an empty
 // string
 func getMimeType(path string) string {
