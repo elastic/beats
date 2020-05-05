@@ -1158,7 +1158,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/denisenkom/go-mssqldb
-Revision: 4e0d7dc8888f
+Revision: bbfc9a55622e
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/denisenkom/go-mssqldb/LICENSE.txt:
 --------------------------------------------------------------------
@@ -2827,6 +2827,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------
+Dependency: github.com/golang-sql/civil
+Revision: cb61b32ac6fe
+License type (autodetected): Apache-2.0
+./vendor/github.com/golang-sql/civil/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
 
 
 --------------------------------------------------------------------

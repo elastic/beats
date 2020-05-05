@@ -4,7 +4,6 @@
 4d63.com/tz
 # cloud.google.com/go v0.51.0
 cloud.google.com/go
-cloud.google.com/go/civil
 cloud.google.com/go/compute/metadata
 cloud.google.com/go/functions/metadata
 cloud.google.com/go/iam
@@ -320,9 +319,11 @@ github.com/coreos/pkg/dlopen
 github.com/davecgh/go-spew/spew
 # github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892
 github.com/davecgh/go-xdr/xdr2
-# github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f
+# github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 github.com/denisenkom/go-mssqldb
 github.com/denisenkom/go-mssqldb/internal/cp
+github.com/denisenkom/go-mssqldb/internal/decimal
+github.com/denisenkom/go-mssqldb/internal/querytext
 # github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 github.com/devigned/tab
 # github.com/dgrijalva/jwt-go v3.2.1-0.20190620180102-5e25c22bd5d6+incompatible
@@ -523,6 +524,8 @@ github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
+# github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe
+github.com/golang-sql/civil
 # github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7
 github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.3.2
