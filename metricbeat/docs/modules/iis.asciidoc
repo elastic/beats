@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-iis]]
 [role="xpack"]
-== iis module
+== IIS module
 
 beta[]
 
@@ -63,7 +63,7 @@ This metricset will collect metrics of specific application pools, users can con
 [float]
 === Example configuration
 
-The iis module supports the standard configuration options that are described
+The IIS module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
