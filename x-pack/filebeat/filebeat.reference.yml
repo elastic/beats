@@ -480,6 +480,21 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------- Fortinet Module -------------------------------
+- module: fortinet
+  firewall:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9004.
+    #var.syslog_port: 9004
+
 #----------------------------- Google Cloud Module -----------------------------
 - module: googlecloud
   vpcflow:
@@ -2745,6 +2760,11 @@ logging.files:
 
 # Set to true to log messages in JSON format.
 #logging.json: false
+
+# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
+# information. Recommended to use in combination with `logging.json=true`
+# Defaults to false.
+#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring
