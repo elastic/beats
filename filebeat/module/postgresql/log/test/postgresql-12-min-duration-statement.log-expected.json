@@ -1,10 +1,17 @@
 [
     {
         "@timestamp": "2020-04-16T10:48:36.677Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 327000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -18,10 +25,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:48:40.316Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 320000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -35,9 +49,16 @@
     },
     {
         "@timestamp": "2020-04-16T10:48:44.696Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "ERROR",
@@ -49,9 +70,16 @@
     },
     {
         "@timestamp": "2020-04-16T10:48:44.696Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "STATEMENT",
@@ -63,10 +91,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:49:16.871Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 3431000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -83,9 +118,16 @@
     },
     {
         "@timestamp": "2020-04-16T10:49:19.866Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "ERROR",
@@ -97,10 +139,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:49:54.907Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 3039000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -117,10 +166,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:49:55.464Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 179000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -134,10 +190,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:50:05.322Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 1661000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -151,10 +214,17 @@
     },
     {
         "@timestamp": "2020-04-16T10:50:06.741Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 144000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",

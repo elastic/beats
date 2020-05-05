@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "DETAIL",
@@ -14,10 +21,17 @@
     },
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 112336998,
+        "event.duration": 112337000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -31,9 +45,16 @@
     },
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "DETAIL",
@@ -44,10 +65,17 @@
     },
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 2474306885,
+        "event.duration": 2474306816,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -61,9 +89,16 @@
     },
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "DETAIL",
@@ -74,10 +109,17 @@
     },
     {
         "@timestamp": "2019-09-22T06:28:24.000Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 18327000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
