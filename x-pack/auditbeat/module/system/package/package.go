@@ -122,6 +122,7 @@ type Package struct {
 	Summary     string
 	URL         string
 	Error       error
+	Type        string
 }
 
 // Hash creates a hash for Package.
@@ -134,8 +135,12 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() common.MapStr {
+func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
 	mapstr := common.MapStr{
+		"name":    pkg.Name,
+		"version": pkg.Version,
+	}
+	ecsMapstr := common.MapStr{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
@@ -146,29 +151,39 @@ func (pkg Package) toMapStr() common.MapStr {
 
 	if pkg.Arch != "" {
 		mapstr.Put("arch", pkg.Arch)
+		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
 		mapstr.Put("license", pkg.License)
+		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
 		mapstr.Put("installtime", pkg.InstallTime)
+		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
 		mapstr.Put("size", pkg.Size)
+		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
 		mapstr.Put("summary", pkg.Summary)
+		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
 		mapstr.Put("url", pkg.URL)
+		ecsMapstr.Put("reference", pkg.URL)
 	}
 
-	return mapstr
+	if pkg.Type != "" {
+		ecsMapstr.Put("type", pkg.Type)
+	}
+
+	return mapstr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -355,6 +370,7 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 }
 
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
@@ -363,9 +379,10 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 				"type":     []string{action.Type()},
 				"action":   action.String(),
 			},
+			"package": ecsPkgFields,
 			"message": packageMessage(pkg, action),
 		},
-		MetricSetFields: pkg.toMapStr(),
+		MetricSetFields: pkgFields,
 	}
 
 	if ms.HostID() != "" {
@@ -555,7 +572,9 @@ func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 		value := strings.TrimSpace(words[1])
 
 		if pkg == nil {
-			pkg = &Package{}
+			pkg = &Package{
+				Type: "dpkg",
+			}
 		}
 
 		switch strings.ToLower(words[0]) {

@@ -59,6 +59,11 @@ func TestHomebrew(t *testing.T) {
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 			checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
 			checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
+			checkFieldValue(t, event, "package.name", "test-package")
+			checkFieldValue(t, event, "package.description", "Test package")
+			checkFieldValue(t, event, "package.reference", "https://www.elastic.co/")
+			checkFieldValue(t, event, "package.version", "1.0.0")
+			checkFieldValue(t, event, "package.type", "brew")
 		}
 	}
 }
