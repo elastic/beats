@@ -220,7 +220,19 @@ func dockerInfo() (*DockerInfo, error) {
 // PATH.
 func HaveDockerCompose() error {
 	_, err := exec.LookPath("docker-compose")
-	return errors.Wrap(err, "docker-compose was not found on the PATH")
+	if err != nil {
+		return fmt.Errorf("docker-compose is not available")
+	}
+	return nil
+}
+
+// HaveKubectl returns an error if kind is not found on the PATH.
+func HaveKubectl() error {
+	_, err := exec.LookPath("kubectl")
+	if err != nil {
+		return fmt.Errorf("kubectl is not available")
+	}
+	return nil
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the
@@ -802,4 +814,22 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	minor, _ = strconv.Atoi(data["minor"])
 	patch, _ = strconv.Atoi(data["patch"])
 	return
+}
+
+// ListMatchingEnvVars returns all of the environment variables names that begin
+// with prefix.
+func ListMatchingEnvVars(prefixes ...string) []string {
+	var vars []string
+	for _, v := range os.Environ() {
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(v, prefix) {
+				eqIdx := strings.Index(v, "=")
+				if eqIdx != -1 {
+					vars = append(vars, v[:eqIdx])
+				}
+				break
+			}
+		}
+	}
+	return vars
 }

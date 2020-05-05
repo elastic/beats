@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2017-07-31T11:36:42.585Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -15,9 +22,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.605Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -29,9 +43,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.615Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -43,9 +64,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.616Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -57,9 +85,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.956Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -68,15 +103,25 @@
         "postgresql.log.database": "unknown",
         "postgresql.log.timestamp": "2017-07-31 13:36:42.956 CEST",
         "process.pid": 4980,
+        "related.user": [
+            "unknown"
+        ],
         "service.type": "postgresql",
         "user.name": "unknown"
     },
     {
         "@timestamp": "2017-07-31T11:36:43.557Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 37118000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -90,15 +135,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:43.557 CEST",
         "process.pid": 4983,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:36:44.104Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 2895000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -112,15 +167,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:44.104 CEST",
         "process.pid": 4986,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:36:44.642Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 2809000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -134,14 +199,24 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:44.642 CEST",
         "process.pid": 4989,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:16.249Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "FATAL",
@@ -150,14 +225,24 @@
         "postgresql.log.database": "users",
         "postgresql.log.timestamp": "2017-07-31 13:39:16.249 CEST",
         "process.pid": 5407,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:17.945Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "FATAL",
@@ -166,15 +251,25 @@
         "postgresql.log.database": "user",
         "postgresql.log.timestamp": "2017-07-31 13:39:17.945 CEST",
         "process.pid": 5500,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:21.025Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 37598000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -188,15 +283,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:21.025 CEST",
         "process.pid": 5404,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:31.619Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 9482000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -207,15 +312,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:31.619 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:40.147Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 765000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -226,15 +341,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:40.147 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:40:54.310Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 26082001,
+        "event.duration": 26082000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -248,15 +373,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:40:54.310 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:43:22.645Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 36161999,
+        "event.duration": 36162000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -267,15 +402,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:43:22.645 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:02.670Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 10540000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -286,15 +431,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:02.670 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:23.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 5156000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -305,15 +460,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:23.016 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:55.637Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 25871000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -324,15 +489,25 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:55.637 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2019-05-06T19:00:04.511Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 753000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -346,6 +521,9 @@
         "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2019-05-06 19:00:04.511 UTC",
         "process.pid": 913763,
+        "related.user": [
+            "elastic"
+        ],
         "service.type": "postgresql",
         "user.name": "elastic"
     }

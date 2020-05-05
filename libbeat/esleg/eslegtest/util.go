@@ -64,6 +64,11 @@ func GetEsHost() string {
 	return getEnv("ES_HOST", ElasticsearchDefaultHost)
 }
 
+// GetEsKerberosHost returns the Elasticsearch testing host.
+func GetEsKerberosHost() string {
+	return getEnv("ES_KERBEROS_HOST", ElasticsearchDefaultHost)
+}
+
 // getEsPort returns the Elasticsearch testing port.
 func getEsPort() string {
 	return getEnv("ES_PORT", ElasticsearchDefaultPort)

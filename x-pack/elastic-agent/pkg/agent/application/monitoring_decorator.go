@@ -19,10 +19,11 @@ const (
 	monitoringOutputFormatKey = "outputs.%s"
 	outputKey                 = "output"
 
-	enabledKey       = "settings.monitoring.enabled"
-	outputsKey       = "outputs"
-	elasticsearchKey = "elasticsearch"
-	typeKey          = "type"
+	enabledKey        = "settings.monitoring.enabled"
+	outputsKey        = "outputs"
+	elasticsearchKey  = "elasticsearch"
+	typeKey           = "type"
+	defaultOutputName = "default"
 )
 
 func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
@@ -35,23 +36,22 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	}
 
 	var config map[string]interface{}
-
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		config = make(map[string]interface{})
 		config[enabledKey] = false
 	} else {
 		// get monitoring output name to be used
+		monitoringOutputName := defaultOutputName
 		useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
-		if !found {
-			return programsToRun, nil
-		}
+		if found {
 
-		monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
-		if !ok {
-			return programsToRun, nil
-		}
+			monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
+			if !ok {
+				return programsToRun, nil
+			}
 
-		monitoringOutputName := monitoringOutputNameKey.String()
+			monitoringOutputName = monitoringOutputNameKey.String()
+		}
 
 		ast := rootAst.Clone()
 		if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {

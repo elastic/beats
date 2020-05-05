@@ -25,7 +25,6 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -45,9 +44,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
+	_ "github.com/elastic/beats/v7/filebeat/include"
+
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
+
+	// include all filebeat specific builders
+	_ "github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -84,7 +88,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info.Version, true)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +167,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
-		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory)
 		if fb.config.ConfigModules.Enabled() {
 			modulesLoader := cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
@@ -255,7 +259,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 				errs = append(errs, errors.Wrap(err, "error loading config file"))
 				continue
 			}
-			set, err := fileset.NewModuleRegistry(confs, "", false)
+			set, err := fileset.NewModuleRegistry(confs, b.Info, false)
 			if err != nil {
 				errs = append(errs, err)
 				continue
@@ -336,15 +340,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	inputLoader := input.NewRunnerFactory(pipelineConnector, registrar, fb.done)
-	moduleLoader := fileset.NewFactory(pipelineConnector,
-		registrar,
-		b.Info.Version,
-		pipelineLoaderFactory,
-		config.OverwritePipelines,
-		fb.done,
-	)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 
-	crawler, err := newCrawler(inputLoader, moduleLoader, pipelineConnector, config.Inputs, fb.done, *once)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -378,10 +376,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(b.Publisher, registrar, config.ConfigInput, config.ConfigModules)
+	err = crawler.Start(b.Publisher, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
-		return err
+		return fmt.Errorf("Failed to start crawler: %+v", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
@@ -403,8 +401,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
-		adapter := fbautodiscover.NewAutodiscoverAdapter(inputLoader, moduleLoader)
-		adiscover, err = autodiscover.NewAutodiscover("filebeat", b.Publisher, adapter, config.Autodiscover)
+		adiscover, err = autodiscover.NewAutodiscover(
+			"filebeat",
+			b.Publisher,
+			cfgfile.MultiplexedRunnerFactory(
+				cfgfile.MatchHasField("module", moduleLoader),
+				cfgfile.MatchDefault(inputLoader),
+			),
+			autodiscover.QueryConfig(),
+			config.Autodiscover,
+			b.Keystore,
+		)
 		if err != nil {
 			return err
 		}
