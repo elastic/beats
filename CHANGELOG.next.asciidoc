@@ -295,6 +295,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
 - Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
+- Added new Fortigate Syslog filebeat module. {pull}17890[17890]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Make `decode_cef` processor GA. {pull}17944[17944]
