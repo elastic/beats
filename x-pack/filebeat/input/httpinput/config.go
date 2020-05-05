@@ -33,7 +33,7 @@ func defaultConfig() config {
 	c.Password = ""
 	c.ResponseCode = 200
 	c.ResponseBody = `{"message": "success"}`
-	c.ResponseHeaders = `{"Content-Type"=>"application/json"}`
+	c.ResponseHeaders = `{"Content-Type": "application/json"}`
 	c.ListenAddress = ""
 	c.ListenPort = "8000"
 	c.URL = "/"
