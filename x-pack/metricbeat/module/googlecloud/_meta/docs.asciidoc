@@ -134,14 +134,14 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `compute`, `loadbalancing`, and `pubsub` metricset in
-`googlecloud` module.
+Currently, we have `compute`, `loadbalancing`, `pubsub`, `stackdriver` and
+`storage` metricset in `googlecloud` module.
 
 [float]
 === `compute`
-Compute Metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine]
-Virtual Machines in Google Cloud Platform. The `compute` metricset contains some of the
-metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API].
+This metricset fetches metrics from https://cloud.google.com/compute/[Compute Engine]
+Virtual Machines in Google Cloud Platform. The `compute` metricset contains some
+of the metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[GCP Compute Monitoring API].
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
 This is enough to get most of the info associated with a metric like compute
 labels and metadata and metric specific Labels.
@@ -149,3 +149,42 @@ labels and metadata and metric specific Labels.
 The `compute` metricset comes with a predefined dashboard:
 
 image::./images/metricbeat-googlecloud-compute-overview.png[]
+
+[float]
+=== `loadbalancing`
+This metricset fetches metrics from https://cloud.google.com/load-balancing/[Load Balancing]
+in Google Cloud Platform. The `loadbalancing` metricset contains all metrics
+exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[GCP Load Balancing Monitoring API].
+
+[float]
+=== `pubsub`
+This metricset fetches metrics from https://cloud.google.com/pubsub/[Pub/Sub]
+topics and subscriptions in Google Cloud Platform. The `pubsub` metricset
+contains all GA stage metrics exported from the
+https://cloud.google.com/monitoring/api/metrics_gcp#gcp-pubsub[GCP PubSub Monitoring API].
+
+The `pubsub` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-pubsub-overview.png[]
+
+[float]
+=== `stackdriver`
+Stackdriver provides visibility into the performance, uptime, and overall health
+of cloud-powered applications. It collects metrics, events, and metadata from
+different services from Google Cloud.
+This metricset is to collect https://cloud.google.com/monitoring/api/metrics_gcp[monitoring metrics]
+from Google Cloud using `ListTimeSeries` API.
+
+[float]
+=== `storage`
+This metricset fetches metrics from https://cloud.google.com/storage/[Storage]
+in Google Cloud Platform. The `storage` metricset contains all GA metrics
+exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-storage[GCP Storage Monitoring API].
+
+We recommend users to define `period: 5m` for this metricset because in Google
+Cloud, storage monitoring metrics are written every 5-minute sample period with
+a 10-minute ingest delay.
+
+The `storage` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-googlecloud-storage-overview.png[]
