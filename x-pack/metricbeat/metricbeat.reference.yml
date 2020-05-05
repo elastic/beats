@@ -517,7 +517,6 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - storage
-  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
