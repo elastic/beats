@@ -1,5 +1,81 @@
 # Changelog
 
+## 1.14.0 (20 Feb 2020)
+
+Enhancements:
+* [#771][]: Optimize calls for disabled log levels.
+* [#773][]: Add millisecond duration encoder.
+* [#775][]: Add option to increase the level of a logger.
+* [#786][]: Optimize time formatters using `Time.AppendFormat` where possible.
+
+Thanks to @caibirdme for their contributions to this release.
+
+## 1.13.0 (13 Nov 2019)
+
+Enhancements:
+* [#758][]: Add `Intp`, `Stringp`, and other similar `*p` field constructors
+  to log pointers to primitives with support for `nil` values.
+
+Thanks to @jbizzle for their contributions to this release.
+
+## 1.12.0 (29 Oct 2019)
+
+Enhancements:
+* [#751][]: Migrate to Go modules.
+
+## 1.11.0 (21 Oct 2019)
+
+Enhancements:
+* [#725][]: Add `zapcore.OmitKey` to omit keys in an `EncoderConfig`.
+* [#736][]: Add `RFC3339` and `RFC3339Nano` time encoders.
+
+Thanks to @juicemia, @uhthomas for their contributions to this release.
+
+## 1.10.0 (29 Apr 2019)
+
+Bugfixes:
+* [#657][]: Fix `MapObjectEncoder.AppendByteString` not adding value as a
+  string.
+* [#706][]: Fix incorrect call depth to determine caller in Go 1.12.
+
+Enhancements:
+* [#610][]: Add `zaptest.WrapOptions` to wrap `zap.Option` for creating test
+  loggers.
+* [#675][]: Don't panic when encoding a String field.
+* [#704][]: Disable HTML escaping for JSON objects encoded using the
+  reflect-based encoder.
+
+Thanks to @iaroslav-ciupin, @lelenanam, @joa, @NWilson for their contributions
+to this release.
+
+## v1.9.1 (06 Aug 2018)
+
+Bugfixes:
+
+* [#614][]: MapObjectEncoder should not ignore empty slices.
+
+## v1.9.0 (19 Jul 2018)
+
+Enhancements:
+* [#602][]: Reduce number of allocations when logging with reflection.
+* [#572][], [#606][]: Expose a registry for third-party logging sinks.
+
+Thanks to @nfarah86, @AlekSi, @JeanMertz, @philippgille, @etsangsplk, and
+@dimroc for their contributions to this release.
+
+## v1.8.0 (13 Apr 2018)
+
+Enhancements:
+* [#508][]: Make log level configurable when redirecting the standard
+  library's logger.
+* [#518][]: Add a logger that writes to a `*testing.TB`.
+* [#577][]: Add a top-level alias for `zapcore.Field` to clean up GoDoc.
+
+Bugfixes:
+* [#574][]: Add a missing import comment to `go.uber.org/zap/buffer`.
+
+Thanks to @DiSiqueira and @djui for their contributions to this release.
+
 ## v1.7.1 (25 Sep 2017)
 
 Bugfixes:
@@ -266,5 +342,25 @@ upgrade to the upcoming stable release.
 [#487]: https://github.com/uber-go/zap/pull/487
 [#490]: https://github.com/uber-go/zap/pull/490
 [#491]: https://github.com/uber-go/zap/pull/491
-[#491]: https://github.com/uber-go/zap/pull/439
 [#504]: https://github.com/uber-go/zap/pull/504
+[#508]: https://github.com/uber-go/zap/pull/508
+[#518]: https://github.com/uber-go/zap/pull/518
+[#577]: https://github.com/uber-go/zap/pull/577
+[#574]: https://github.com/uber-go/zap/pull/574
+[#602]: https://github.com/uber-go/zap/pull/602
+[#572]: https://github.com/uber-go/zap/pull/572
+[#606]: https://github.com/uber-go/zap/pull/606
+[#614]: https://github.com/uber-go/zap/pull/614
+[#657]: https://github.com/uber-go/zap/pull/657
+[#706]: https://github.com/uber-go/zap/pull/706
+[#610]: https://github.com/uber-go/zap/pull/610
+[#675]: https://github.com/uber-go/zap/pull/675
+[#704]: https://github.com/uber-go/zap/pull/704
+[#725]: https://github.com/uber-go/zap/pull/725
+[#736]: https://github.com/uber-go/zap/pull/736
+[#751]: https://github.com/uber-go/zap/pull/751
+[#758]: https://github.com/uber-go/zap/pull/758
+[#771]: https://github.com/uber-go/zap/pull/771
+[#773]: https://github.com/uber-go/zap/pull/773
+[#775]: https://github.com/uber-go/zap/pull/775
+[#786]: https://github.com/uber-go/zap/pull/786
