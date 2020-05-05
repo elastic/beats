@@ -24,8 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	lbtesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -103,7 +103,7 @@ func TestConfigInvalid(t *testing.T) {
 }
 
 func TestBackoffFunc(t *testing.T) {
-	lbtesting.SeedPRNG(t)
+	testutil.SeedPRNG(t)
 	tests := map[int]backoffConfig{
 		15: {Init: 1 * time.Second, Max: 60 * time.Second},
 		7:  {Init: 2 * time.Second, Max: 20 * time.Second},

@@ -15,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+// This file contains commonly-used utility functions for testing.
+
+package testutil
 
 import (
 	"flag"

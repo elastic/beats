@@ -29,10 +29,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	lbtesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func TestMakeClientWorker(t *testing.T) {
@@ -43,7 +43,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			lbtesting.SeedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 300 + (i % 100) // between 300 and 399
