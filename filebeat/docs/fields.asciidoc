@@ -28702,7 +28702,7 @@ The disk volume path.
 
 --
 
-*`certificate.common_name`*::
+*`santa.certificate.common_name`*::
 +
 --
 Common name from code signing certificate.
@@ -28711,7 +28711,7 @@ type: keyword
 
 --
 
-*`certificate.sha256`*::
+*`santa.certificate.sha256`*::
 +
 --
 SHA256 hash of code signing certificate.
