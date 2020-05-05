@@ -355,8 +355,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	}
 
 	encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(version.GetDefaultVersion()), index, pipeline, events)
-	assert.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
-	assert.Equal(t, 9, len(bulkItems), "incomplete bulk")
+	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
+	require.Equal(t, 9, len(bulkItems), "incomplete bulk")
 
 	for i := 0; i < len(cases); i++ {
 		bulkEventIndex, _ := cases[i]["bulkIndex"].(int)
