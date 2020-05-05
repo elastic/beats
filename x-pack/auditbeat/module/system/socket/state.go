@@ -884,6 +884,11 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	if inetType == inetTypeIPv6 && f.local.addr.IP.To4() != nil && f.remote.addr.IP.To4() != nil {
 		inetType = inetTypeIPv4
 	}
+	eventType := []string{"info"}
+	if inetType == inetTypeIPv6 || inetType == inetTypeIPv4 {
+		eventType = append(eventType, "connection")
+	}
+
 	root := common.MapStr{
 		"source":      src,
 		"client":      src,
@@ -906,7 +911,8 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		"event": common.MapStr{
 			"kind":     "event",
 			"action":   "network_flow",
-			"category": "network_traffic",
+			"category": []string{"network", "network_traffic"},
+			"type":     eventType,
 			"start":    f.createdTime,
 			"end":      f.lastSeenTime,
 			"duration": f.lastSeenTime.Sub(f.createdTime).Nanoseconds(),
@@ -915,6 +921,17 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"final":    final,
 			"complete": f.complete,
 		},
+	}
+
+	relatedIPs := []string{}
+	if len(localAddr.IP) != 0 {
+		relatedIPs = append(relatedIPs, localAddr.IP.String())
+	}
+	if len(localAddr.IP) > 0 {
+		relatedIPs = append(relatedIPs, remoteAddr.IP.String())
+	}
+	if len(relatedIPs) > 0 {
+		root.Put("related.ip", relatedIPs)
 	}
 
 	metricset := common.MapStr{
@@ -940,6 +957,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 				root.Put("group.id", gid)
 				if name := userCache.LookupUID(uid); name != "" {
 					root.Put("user.name", name)
+					root.Put("related.user", []string{name})
 				}
 				if name := groupCache.LookupGID(gid); name != "" {
 					root.Put("group.name", name)
