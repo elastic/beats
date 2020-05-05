@@ -215,11 +215,18 @@ func NewEvent(
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
+func isASCIILetter(letter byte) bool {
+	// It appears that Windows only allows ascii characters for drive letters
+	// and that's what go checks for: https://golang.org/src/path/filepath/path_windows.go#L63
+	// **If** Windows/go ever return multibyte utf16 characters we'll need to change
+	// the drive letter mapping logic.
+	return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z')
+}
+
 func getDriveLetter(path string) string {
 	volume := filepath.VolumeName(path)
 	if len(volume) == 2 && volume[1] == ':' {
-		letter := path[0]
-		if (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') {
+		if isASCIILetter(volume[0]) {
 			return strings.ToUpper(volume[:1])
 		}
 	}
