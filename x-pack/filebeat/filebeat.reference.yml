@@ -37,7 +37,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- Activemq Module -------------------------------
+#------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   # Audit logs
   audit:
@@ -489,7 +489,7 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
-#------------------------------- Haproxy Module -------------------------------
+#------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
   log:
@@ -699,7 +699,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Nats Module ---------------------------------
+#--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
   log:

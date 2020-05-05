@@ -1,5 +1,5 @@
 - key: aws
-  title: "aws"
+  title: "AWS"
   description: >
     `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
   release: ga
