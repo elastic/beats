@@ -301,20 +301,20 @@ var sysmon = (function () {
         evt.Put(nameField, path.basename(exe));
     };
 
-    var splitCommandLine = function(evt, field) {
-        var commandLine = evt.Get(field);
+    var splitCommandLine = function(evt, source, target) {
+        var commandLine = evt.Get(source);
         if (!commandLine) {
             return;
         }
-        evt.Put(field, winlogbeat.splitCommandLine(commandLine));
+        evt.Put(target, winlogbeat.splitCommandLine(commandLine));
     };
 
     var splitProcessArgs = function(evt) {
-        splitCommandLine(evt, "process.args");
+        splitCommandLine(evt, "process.command_line", "process.args");
     };
 
     var splitParentProcessArgs = function(evt) {
-        splitCommandLine(evt, "process.parent.args");
+        splitCommandLine(evt, "process.parent.command_line", "process.parent.args");
     };
 
     var addUser = function(evt) {
@@ -468,12 +468,12 @@ var sysmon = (function () {
                 {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.CommandLine", to: "process.args"},
+                {from: "winlog.event_data.CommandLine", to: "process.command_line"},
                 {from: "winlog.event_data.CurrentDirectory", to: "process.working_directory"},
                 {from: "winlog.event_data.ParentProcessGuid", to: "process.parent.entity_id"},
                 {from: "winlog.event_data.ParentProcessId", to: "process.parent.pid", type: "long"},
                 {from: "winlog.event_data.ParentImage", to: "process.parent.executable"},
-                {from: "winlog.event_data.ParentCommandLine", to: "process.parent.args"},
+                {from: "winlog.event_data.ParentCommandLine", to: "process.parent.command_line"},
             ],
             mode: "rename",
             ignore_missing: true,

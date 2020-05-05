@@ -91,7 +91,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewEncryptedDiskStore(fleetAgentConfigPath(), []byte("")),
+		storage.NewEncryptedDiskStore(info.AgentConfigFile(), []byte("")),
 	)
 
 	return NewEnrollCmdWithStore(
@@ -141,7 +141,7 @@ func (c *EnrollCmd) Execute() error {
 
 	metadata, err := metadata()
 	if err != nil {
-		return errors.New(err, "acquiring hostname")
+		return errors.New(err, "acquiring metadata failed")
 	}
 
 	r := &fleetapi.EnrollRequest{

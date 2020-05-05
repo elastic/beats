@@ -13,8 +13,8 @@ dropping the `agent.name` and `agent.version` fields under `beat` from all docum
 [source, yaml]
 ----
 processors:
- - drop_fields:
-    fields: ['agent']
+  - drop_fields:
+      fields: ['agent']
 ----
 
 include::{libbeat-dir}/processors-using.asciidoc[]
