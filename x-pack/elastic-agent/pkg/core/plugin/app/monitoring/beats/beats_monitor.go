@@ -18,6 +18,12 @@ import (
 
 const httpPlusPrefix = "http+"
 
+var defaultMonitoringConfig = monitoringConfig.MonitoringConfig{
+	Enabled:        true,
+	MonitorLogs:    true,
+	MonitorMetrics: true,
+}
+
 type wrappedConfig struct {
 	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
 }
@@ -35,7 +41,7 @@ func NewMonitor(downloadConfig *artifact.Config) *Monitor {
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
 		installPath:     downloadConfig.InstallPath,
-		config:          &monitoringConfig.MonitoringConfig{},
+		config:          &defaultMonitoringConfig,
 	}
 }
 
@@ -47,7 +53,7 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 	}
 
 	if cfg == nil || cfg.MonitoringConfig == nil {
-		b.config = &monitoringConfig.MonitoringConfig{}
+		b.config = &defaultMonitoringConfig
 	} else {
 		b.config = cfg.MonitoringConfig
 	}
