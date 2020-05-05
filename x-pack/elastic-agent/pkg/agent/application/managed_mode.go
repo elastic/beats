@@ -201,7 +201,6 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
-	m.gateway.Stop()
 	return nil
 }
 

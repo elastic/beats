@@ -20,7 +20,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: kvm
-  metricsets: ["dommemstat"]
+  metricsets: ["dommemstat", "status"]
   enabled: true
   period: 10s
   hosts: ["unix:///var/run/libvirt/libvirt-sock"]
@@ -39,5 +39,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kvm-dommemstat,dommemstat>>
 
+* <<metricbeat-metricset-kvm-status,status>>
+
 include::kvm/dommemstat.asciidoc[]
+
+include::kvm/status.asciidoc[]
 

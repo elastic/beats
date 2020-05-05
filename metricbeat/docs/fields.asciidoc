@@ -26940,6 +26940,50 @@ type: keyword
 
 --
 
+[float]
+=== status
+
+status
+
+
+
+[float]
+=== stat
+
+Memory stat
+
+
+
+*`kvm.status.stat.state`*::
++
+--
+domain state
+
+
+type: keyword
+
+--
+
+*`kvm.status.id`*::
++
+--
+Domain id
+
+
+type: long
+
+--
+
+*`kvm.status.name`*::
++
+--
+Domain name
+
+
+type: keyword
+
+--
+
 [[exported-fields-logstash]]
 == Logstash fields
 

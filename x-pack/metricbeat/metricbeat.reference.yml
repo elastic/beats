@@ -845,7 +845,7 @@ metricbeat.modules:
 
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
-  metricsets: ["dommemstat"]
+  metricsets: ["dommemstat", "status"]
   enabled: true
   period: 10s
   hosts: ["unix:///var/run/libvirt/libvirt-sock"]
@@ -994,7 +994,7 @@ metricbeat.modules:
   metricsets: ["tablespace", "performance"]
   enabled: true
   period: 10s
-  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 
   # username: ""
   # password: ""

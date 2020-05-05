@@ -103,6 +103,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		// collecting the first one.
 		if output.AccountAliases != nil {
 			metricSet.AccountName = output.AccountAliases[0]
+			base.Logger().Debug("AWS Credentials belong to account name: ", metricSet.AccountName)
 		}
 	}
 
@@ -115,6 +116,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	} else {
 		metricSet.AccountID = *outputIdentity.Account
+		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
 	}
 
 	// Construct MetricSet with a full regions list
