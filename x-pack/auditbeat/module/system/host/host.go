@@ -350,9 +350,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	}
 
 	// Copy select host.* fields in case add_host_metadata is not configured.
-	hostTopLevel := common.MapStr{
-		"name": host.Hostname,
-	}
+	hostTopLevel := common.MapStr{}
 	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
 	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
 	hostFields.CopyFieldsTo(hostTopLevel, "hostname")
