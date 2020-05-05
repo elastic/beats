@@ -845,6 +845,17 @@ metricbeat.modules:
   # Timeout to connect to Libvirt server
   #timeout: 1s
 
+#-------------------------------- Linux Module --------------------------------
+- module: linux
+  period: 10s
+  metricsets:
+    - "pageinfo"
+    # - ksm
+    # - conntrack
+  enabled: true
+  #hostfs: /hostfs
+
+
 #------------------------------- Logstash Module -------------------------------
 - module: logstash
   metricsets: ["node", "node_stats"]
@@ -2462,6 +2473,11 @@ logging.files:
 
 # Set to true to log messages in JSON format.
 #logging.json: false
+
+# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
+# information. Recommended to use in combination with `logging.json=true`
+# Defaults to false.
+#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
