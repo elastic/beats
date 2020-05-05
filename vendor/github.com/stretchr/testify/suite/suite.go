@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"runtime/debug"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,21 +17,31 @@ import (
 var allTestsFilter = func(_, _ string) (bool, error) { return true, nil }
 var matchMethod = flag.String("testify.m", "", "regular expression to select tests of the testify suite to run")
 
+type TestingT interface {
+	Run(name string, f func(t *testing.T)) bool
+	Errorf(format string, args ...interface{})
+	Fatalf(format string, args ...interface{})
+	FailNow()
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+	Skip(args ...interface{})
+}
+
 // Suite is a basic testing suite with methods for storing and
 // retrieving the current *testing.T context.
 type Suite struct {
 	*assert.Assertions
 	require *require.Assertions
-	t       *testing.T
+	t       TestingT
 }
 
 // T retrieves the current *testing.T context.
-func (suite *Suite) T() *testing.T {
+func (suite *Suite) T() TestingT {
 	return suite.t
 }
 
 // SetT sets the current *testing.T context.
-func (suite *Suite) SetT(t *testing.T) {
+func (suite *Suite) SetT(t TestingT) {
 	suite.t = t
 	suite.Assertions = assert.New(t)
 	suite.require = require.New(t)
@@ -80,11 +91,12 @@ func (suite *Suite) Run(name string, subtest func()) bool {
 // Run takes a testing suite and runs all of the tests attached
 // to it.
 func Run(t *testing.T, suite TestingSuite) {
+	testsSync := &sync.WaitGroup{}
 	suite.SetT(t)
 	defer failOnPanic(t)
 
 	suiteSetupDone := false
-	
+
 	methodFinder := reflect.TypeOf(suite)
 	tests := []testing.InternalTest{}
 	for index := 0; index < methodFinder.NumMethod(); index++ {
@@ -103,6 +115,7 @@ func Run(t *testing.T, suite TestingSuite) {
 			}
 			defer func() {
 				if tearDownAllSuite, ok := suite.(TearDownAllSuite); ok {
+					testsSync.Wait()
 					tearDownAllSuite.TearDownSuite()
 				}
 			}()
@@ -111,6 +124,7 @@ func Run(t *testing.T, suite TestingSuite) {
 		test := testing.InternalTest{
 			Name: method.Name,
 			F: func(t *testing.T) {
+				defer testsSync.Done()
 				parentT := suite.T()
 				suite.SetT(t)
 				defer failOnPanic(t)
@@ -134,6 +148,7 @@ func Run(t *testing.T, suite TestingSuite) {
 			},
 		}
 		tests = append(tests, test)
+		testsSync.Add(1)
 	}
 	runTests(t, tests)
 }

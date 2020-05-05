@@ -23,6 +23,14 @@ datasources:
           - metricset: filesystem
             dataset: system.filesystem
 
+settings.monitoring:
+  # enabled turns on monitoring of running processes
+  enabled: true
+  # enables log monitoring
+  logs: true
+  # enables metrics monitoring
+  metrics: true
+
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:
 #   #
@@ -111,14 +119,6 @@ datasources:
 #   # With 30s delay and 3 retries: 30, 60, 120s
 #   # Default is false
 #   exponential: false
-
-# settings.monitoring:
-#   # enabled turns on monitoring of running processes
-#   enabled: false
-#   # enables log monitoring
-#   logs: false
-#   # enables metrics monitoring
-#   metrics: false
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
