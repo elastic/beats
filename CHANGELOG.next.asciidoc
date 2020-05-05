@@ -216,6 +216,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
+- Add support for basic ECS logging. {pull}17974[17974]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 
@@ -227,6 +228,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
+- Add system module socket dataset ECS categorization fields. {pull}18036[18036]
+- Add ECS categories for system module host dataset. {pull}18031[18031]
+- Add system module package dataset ECS categorization fields. {pull}18033[18033]
+- Add system module login dataset ECS categorization fields. {pull}18034[18034]
+- Add system module user dataset ECS categorization fields. {pull}18035[18035]
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 
@@ -301,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - When using the `json.*` setting available on some inputs, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 
 *Heartbeat*
 
