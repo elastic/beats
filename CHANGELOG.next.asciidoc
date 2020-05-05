@@ -277,6 +277,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for basic ECS logging. {pull}17974[17974]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
+- Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 
 *Auditbeat*
 

@@ -15,23 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package backoff
+// This file contains commonly-used utility functions for testing.
 
-// Backoff defines the interface for backoff strategies.
-type Backoff interface {
-	// Wait blocks for a duration of time governed by the backoff strategy.
-	Wait() bool
+package testutil
 
-	// Reset resets the backoff duration to an initial value governed by the backoff strategy.
-	Reset()
-}
+import (
+	"flag"
+	"math/rand"
+	"testing"
+	"time"
+)
 
-// WaitOnError is a convenience method, if an error is received it will block, if not errors is
-// received, the backoff will be resetted.
-func WaitOnError(b Backoff, err error) bool {
-	if err == nil {
-		b.Reset()
-		return true
+var (
+	SeedFlag = flag.Int64("seed", 0, "Randomization seed")
+)
+
+func SeedPRNG(t *testing.T) {
+	seed := *SeedFlag
+	if seed == 0 {
+		seed = time.Now().UnixNano()
 	}
-	return b.Wait()
+
+	t.Logf("reproduce test with `go test ... -seed %v`", seed)
+	rand.Seed(seed)
 }
