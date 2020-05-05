@@ -492,8 +492,8 @@ var sysmon = (function () {
         HKU: "HKU",
     };
 
-    var qwordRegex = new RegExp(/ab+c/, "i");
-    var dwordRegex = new RegExp(/DWORD \(()\)/, "i");
+    var qwordRegex = new RegExp(/QWORD \(((0x\d{8})-(0x\d{8}))\)/, "i");
+    var dwordRegex = new RegExp(/DWORD \((0x\d{8})\)/, "i");
 
     var setRegistryFields = function (evt) {
         var path = evt.Get("winlog.event_data.TargetObject");
@@ -521,22 +521,26 @@ var sysmon = (function () {
         var dataType;
         var dataValue;
         var match = qwordRegex.exec(data);
-        if (match.length > 0) {
-            dataType = "SZ_QWORD";
-            dataValue = match[1];
+        if (match && match.length > 0) {
+            var parsedHighByte = parseInt(match[2]);
+            var parsedLowByte = parseInt(match[3]);
+            if (!isNaN(parsedHighByte) && !isNaN(parsedLowByte)) {
+                dataValue = "" + ((parsedHighByte << 8) + parsedLowByte);
+                dataType = "SZ_QWORD";
+            }
         } else {
             match = dwordRegex.exec(data);
-            if (match.length > 0) {
-                dataType = "SZ_DWORD";
-                dataValue = match[1];
+            if (match && match.length > 0) {
+                var parsedValue = parseInt(match[1]);
+                if (!isNaN(parsedValue)) {
+                    dataType = "SZ_DWORD";
+                    dataValue = "" + parsedValue;
+                }
             }
         }
-        if (match.length > 0) {
-            var parsedValue = parseInt(dataValue);
-            if (!isNan(parsedValue)) {
-                evt.Put("registry.data.strings", [parsedValue]);
-                evt.Put("registry.data.type", dataType);
-            }
+        if (dataType) {
+            evt.Put("registry.data.strings", [dataValue]);
+            evt.Put("registry.data.type", dataType);
         }
     };
 
