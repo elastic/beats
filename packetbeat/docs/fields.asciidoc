@@ -10304,141 +10304,141 @@ SIP-specific event fields.
 *`sip.method`*::
 +
 --
+SIP Request Method
+
+
 type: keyword
 
 example: INVITE
-
-SIP Request Method
-
 
 --
 
 *`sip.request-uri`*::
 +
 --
+SIP Request URI
+
+
 type: keyword
 
 example: sip:hoge@example.com:5060;transport=udp
-
-SIP Request URI
-
 
 --
 
 *`sip.status-code`*::
 +
 --
+SIP Response code, status code
+
+
 type: long
 
 example: 200
-
-SIP Response code, status code
-
 
 --
 
 *`sip.status-phrase`*::
 +
 --
+SIP Response, status phrase
+
+
 type: keyword
 
 example: OK
-
-SIP Response, status phrase
-
 
 --
 
 *`sip.from`*::
 +
 --
+SIP From header value
+
+
 type: keyword
 
 example: "sipp" <sip:sipp@10.0.0.1>;tag=2363SIPpTag001
-
-SIP From header value
-
 
 --
 
 *`sip.to`*::
 +
 --
+SIP To header value
+
+
 type: keyword
 
 example: "sut" <sip:6505550252@192.168.0.1>;tag=16489SIPpTag012
-
-SIP To header value
-
 
 --
 
 *`sip.call-id`*::
 +
 --
+SIP Call-ID header value
+
+
 type: keyword
 
 example: 
-
-SIP Call-ID header value
-
 
 --
 
 *`sip.cseq`*::
 +
 --
+SIP CSeq header value
+
+
 type: keyword
 
 example: 1 INVITE
-
-SIP CSeq header value
-
 
 --
 
 *`sip.body`*::
 +
 --
-type: object
-
 The body of the SIP message.
+
+type: object
 
 --
 
 *`sip.src`*::
 +
 --
+Source IP address and port
+
+
 type: keyword
 
 example: 192.168.0.1:5060
-
-Source IP address and port
-
 
 --
 
 *`sip.dst`*::
 +
 --
+Destination IP address and port
+
+
 type: keyword
 
 example: 192.168.0.1:5060
-
-Destination IP address and port
-
 
 --
 
 *`unixtimenano`*::
 +
 --
+unixtime as nanosec
+
+
 type: long
 
 example: 1516199666016756000
-
-unixtime as nanosec
-
 
 --
 
