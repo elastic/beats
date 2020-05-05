@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
+- Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -274,6 +275,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
+- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -367,6 +369,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added an input option `publisher_pipeline.disable_host` to disable `host.name`
   from being added to events by default. {pull}18159[18159]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
+- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Heartbeat*
 
