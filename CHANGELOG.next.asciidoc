@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
 
 *Auditbeat*
 
