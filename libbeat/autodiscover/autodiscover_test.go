@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
@@ -142,7 +143,7 @@ func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -164,9 +165,9 @@ func TestAutodiscover(t *testing.T) {
 	config := Config{
 		Providers: []*common.Config{providerConfig},
 	}
-
+	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -266,7 +267,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -291,9 +292,9 @@ func TestAutodiscoverHash(t *testing.T) {
 	config := Config{
 		Providers: []*common.Config{providerConfig},
 	}
-
+	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -332,7 +333,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config) (Provider, error) {
+	Registry.AddProvider("mock", func(b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -357,9 +358,9 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	config := Config{
 		Providers: []*common.Config{providerConfig},
 	}
-
+	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
 	if err != nil {
 		t.Fatal(err)
 	}
