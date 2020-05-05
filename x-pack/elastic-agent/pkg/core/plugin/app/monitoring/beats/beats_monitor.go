@@ -46,7 +46,12 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 		return err
 	}
 
-	b.config = cfg.MonitoringConfig
+	if cfg == nil || cfg.MonitoringConfig == nil {
+		b.config = &monitoringConfig.MonitoringConfig{}
+	} else {
+		b.config = cfg.MonitoringConfig
+	}
+
 	return nil
 }
 

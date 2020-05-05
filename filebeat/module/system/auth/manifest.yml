@@ -11,5 +11,5 @@ var:
       - /var/log/secure.log*
     os.windows: []
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/auth.yml

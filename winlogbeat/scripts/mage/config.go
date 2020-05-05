@@ -54,7 +54,8 @@ func configFileParams() devtools.ConfigFileParams {
 			devtools.LibbeatDir("_meta/config.docker.yml"),
 		},
 		ExtraVars: map[string]interface{}{
-			"GOOS": "windows",
+			"GOOS":                  "windows",
+			"UseProcessorsTemplate": true,
 		},
 	}
 }

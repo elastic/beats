@@ -844,7 +844,7 @@ metricbeat.modules:
 
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
-  metricsets: ["dommemstat"]
+  metricsets: ["dommemstat", "status"]
   enabled: true
   period: 10s
   hosts: ["unix:///var/run/libvirt/libvirt-sock"]
@@ -993,7 +993,7 @@ metricbeat.modules:
   metricsets: ["tablespace", "performance"]
   enabled: true
   period: 10s
-  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+  hosts: ["user:pass@0.0.0.0:1521/ORCLPDB1.localdomain"]
 
   # username: ""
   # password: ""
@@ -1422,151 +1422,151 @@ metricbeat.modules:
 # values:
 #
 #processors:
-#- include_fields:
-#    fields: ["cpu"]
-#- drop_fields:
-#    fields: ["cpu.user", "cpu.system"]
+#  - include_fields:
+#      fields: ["cpu"]
+#  - drop_fields:
+#      fields: ["cpu.user", "cpu.system"]
 #
 # The following example drops the events that have the HTTP response code 200:
 #
 #processors:
-#- drop_event:
-#    when:
-#       equals:
-#           http.code: 200
+#  - drop_event:
+#      when:
+#        equals:
+#          http.code: 200
 #
 # The following example renames the field a to b:
 #
 #processors:
-#- rename:
-#    fields:
-#       - from: "a"
-#         to: "b"
+#  - rename:
+#      fields:
+#        - from: "a"
+#          to: "b"
 #
 # The following example tokenizes the string into fields:
 #
 #processors:
-#- dissect:
-#    tokenizer: "%{key1} - %{key2}"
-#    field: "message"
-#    target_prefix: "dissect"
+#  - dissect:
+#      tokenizer: "%{key1} - %{key2}"
+#      field: "message"
+#      target_prefix: "dissect"
 #
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
 #
 #processors:
-#- add_cloud_metadata: ~
+#  - add_cloud_metadata: ~
 #
 # The following example enriches each event with the machine's local time zone
 # offset from UTC.
 #
 #processors:
-#- add_locale:
-#    format: offset
+#  - add_locale:
+#      format: offset
 #
 # The following example enriches each event with docker metadata, it matches
 # given fields to an existing container id and adds info from that container:
 #
 #processors:
-#- add_docker_metadata:
-#    host: "unix:///var/run/docker.sock"
-#    match_fields: ["system.process.cgroup.id"]
-#    match_pids: ["process.pid", "process.ppid"]
-#    match_source: true
-#    match_source_index: 4
-#    match_short_id: false
-#    cleanup_timeout: 60
-#    labels.dedot: false
-#    # To connect to Docker over TLS you must specify a client and CA certificate.
-#    #ssl:
-#    #  certificate_authority: "/etc/pki/root/ca.pem"
-#    #  certificate:           "/etc/pki/client/cert.pem"
-#    #  key:                   "/etc/pki/client/cert.key"
+#  - add_docker_metadata:
+#      host: "unix:///var/run/docker.sock"
+#      match_fields: ["system.process.cgroup.id"]
+#      match_pids: ["process.pid", "process.ppid"]
+#      match_source: true
+#      match_source_index: 4
+#      match_short_id: false
+#      cleanup_timeout: 60
+#      labels.dedot: false
+#      # To connect to Docker over TLS you must specify a client and CA certificate.
+#      #ssl:
+#      #  certificate_authority: "/etc/pki/root/ca.pem"
+#      #  certificate:           "/etc/pki/client/cert.pem"
+#      #  key:                   "/etc/pki/client/cert.key"
 #
 # The following example enriches each event with docker metadata, it matches
 # container id from log path available in `source` field (by default it expects
 # it to be /var/lib/docker/containers/*/*.log).
 #
 #processors:
-#- add_docker_metadata: ~
+#  - add_docker_metadata: ~
 #
 # The following example enriches each event with host metadata.
 #
 #processors:
-#- add_host_metadata: ~
+#  - add_host_metadata: ~
 #
 # The following example enriches each event with process metadata using
 # process IDs included in the event.
 #
 #processors:
-#- add_process_metadata:
-#    match_pids: ["system.process.ppid"]
-#    target: system.process.parent
+#  - add_process_metadata:
+#      match_pids: ["system.process.ppid"]
+#      target: system.process.parent
 #
 # The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
-#- decode_json_fields:
-#    fields: ["field1", "field2", ...]
-#    process_array: false
-#    max_depth: 1
-#    target: ""
-#    overwrite_keys: false
+#  - decode_json_fields:
+#      fields: ["field1", "field2", ...]
+#      process_array: false
+#      max_depth: 1
+#      target: ""
+#      overwrite_keys: false
 #
 #processors:
-#- decompress_gzip_field:
-#    from: "field1"
-#    to: "field2"
-#    ignore_missing: false
-#    fail_on_error: true
+#  - decompress_gzip_field:
+#      from: "field1"
+#      to: "field2"
+#      ignore_missing: false
+#      fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #
 #processors:
-#- copy_fields:
-#    fields:
+#  - copy_fields:
+#      fields:
 #        - from: message
 #          to: message_copied
-#    fail_on_error: true
-#    ignore_missing: false
+#      fail_on_error: true
+#      ignore_missing: false
 #
 # The following example truncates the value of message to 1024 bytes
 #
 #processors:
-#- truncate_fields:
-#    fields:
-#      - message
-#    max_bytes: 1024
-#    fail_on_error: false
-#    ignore_missing: true
+#  - truncate_fields:
+#      fields:
+#        - message
+#      max_bytes: 1024
+#      fail_on_error: false
+#      ignore_missing: true
 #
 # The following example preserves the raw message under event.original
 #
 #processors:
-#- copy_fields:
-#    fields:
+#  - copy_fields:
+#      fields:
 #        - from: message
 #          to: event.original
-#    fail_on_error: false
-#    ignore_missing: true
-#- truncate_fields:
-#    fields:
-#      - event.original
-#    max_bytes: 1024
-#    fail_on_error: false
-#    ignore_missing: true
+#      fail_on_error: false
+#      ignore_missing: true
+#  - truncate_fields:
+#      fields:
+#        - event.original
+#      max_bytes: 1024
+#      fail_on_error: false
+#      ignore_missing: true
 #
 # The following example URL-decodes the value of field1 to field2
 #
 #processors:
-#- urldecode:
-#    fields:
-#      - from: "field1"
-#        to: "field2"
-#    ignore_missing: false
-#    fail_on_error: true
+#  - urldecode:
+#      fields:
+#        - from: "field1"
+#          to: "field2"
+#      ignore_missing: false
+#      fail_on_error: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1704,6 +1704,27 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1972,6 +1993,9 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
 
   # Authentication type to use with Kerberos. Available options: keytab, password.
   #kerberos.auth_type: password
@@ -2558,6 +2582,27 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
+  #kerberos.enabled: true
+
+  # Authentication type to use with Kerberos. Available options: keytab, password.
+  #kerberos.auth_type: password
+
+  # Path to the keytab file. It is used when auth_type is set to keytab.
+  #kerberos.keytab: /etc/elastic.keytab
+
+  # Path to the Kerberos configuration.
+  #kerberos.config_path: /etc/krb5.conf
+
+  # Name of the Kerberos user.
+  #kerberos.username: elastic
+
+  # Password of the Kerberos user. It is used when auth_type is set to password.
+  #kerberos.password: changeme
+
+  # Kerberos realm.
+  #kerberos.realm: ELASTIC
 
   #metrics.period: 10s
   #state.period: 1m
