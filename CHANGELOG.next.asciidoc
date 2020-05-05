@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `setup.dashboards.index` setting not working. {pull}17749[17749]
 - Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
+- Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 
 *Auditbeat*
 
@@ -447,6 +448,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add static mapping for metricsets under aws module. {pull}17614[17614] {pull}17650[17650]
 - Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
+- Remove requirement to connect as sysdba in Oracle module {issue}15846[15846] {pull}18182[18182]
 
 *Packetbeat*
 
