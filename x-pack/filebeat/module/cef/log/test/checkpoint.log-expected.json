@@ -90,7 +90,8 @@
         "source.nat.port": 35398,
         "source.port": 49363,
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -139,7 +140,8 @@
         "service.type": "cef",
         "source.port": 4001,
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     },
     {
@@ -191,7 +193,8 @@
         "service.type": "cef",
         "source.ip": "fd00::555",
         "tags": [
-            "cef"
+            "cef",
+            "forwarded"
         ]
     }
 ]
