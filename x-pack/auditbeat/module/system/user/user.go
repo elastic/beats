@@ -76,6 +76,23 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingUser:
+		return "info"
+	case eventActionUserAdded:
+		return "creation"
+	case eventActionUserRemoved:
+		return "deletion"
+	case eventActionUserChanged:
+		return "change"
+	case eventActionPasswordChanged:
+		return "change"
+	default:
+		return "info"
+	}
+}
+
 type passwordType uint8
 
 const (
@@ -164,12 +181,22 @@ func (user User) toMapStr() common.MapStr {
 			groupMapStr = append(groupMapStr, common.MapStr{
 				"name": group.Name,
 				"gid":  group.Gid,
+				"id":   group.Gid,
 			})
 		}
 		evt.Put("group", groupMapStr)
 	}
 
 	return evt
+}
+
+func (user User) PrimaryGroup() *user.Group {
+	for _, group := range user.Groups {
+		if group.Gid == user.GID {
+			return group
+		}
+	}
+	return nil
 }
 
 // entityID creates an ID that uniquely identifies this user across machines.
@@ -430,12 +457,17 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"iam"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"user": common.MapStr{
 				"id":   user.UID,
 				"name": user.Name,
+			},
+			"related": common.MapStr{
+				"user": []string{user.Name},
 			},
 			"message": userMessage(user, action),
 		},
@@ -444,6 +476,18 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 
 	if ms.HostID() != "" {
 		event.RootFields.Put("user.entity_id", user.entityID(ms.HostID()))
+	}
+
+	primaryGroup := user.PrimaryGroup()
+	if primaryGroup != nil {
+		event.RootFields.Put("user.group", common.MapStr{
+			"id":   primaryGroup.Gid,
+			"name": primaryGroup.Name,
+		})
+	} else if user.GID != "" { // fallback to just filling out the GID
+		event.RootFields.Put("user.group", common.MapStr{
+			"id": user.GID,
+		})
 	}
 
 	return event

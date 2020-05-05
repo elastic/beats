@@ -357,7 +357,9 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	}
 	defer C.my_headerFree(openedLibrpm.headerFree, header)
 
-	pkg := Package{}
+	pkg := Package{
+		Type: "rpm",
+	}
 
 	name := C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_NAME)
 	if name != nil {
