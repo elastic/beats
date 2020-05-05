@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-const message = "The Elastic Agent is currently in Alpha and should not be used in production"
+const message = "The Elastic Agent is currently in Experimental and should not be used in production"
 
 // LogNotGA warns the users in the log that the Elastic Agent is not GA.
 func LogNotGA(log *logger.Logger) {
