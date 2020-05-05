@@ -44,6 +44,16 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "process"
+        ],
+        "type": [
+          "change"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -81,12 +91,17 @@
   {
     "@timestamp": "2019-03-18T16:57:37.949Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 1,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_start"
+      "type": [
+        "start",
+        "process_start"
+      ]
     },
     "hash": {
       "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
@@ -158,12 +173,17 @@
   {
     "@timestamp": "2019-03-18T16:57:37.964Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 1,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_start"
+      "type": [
+        "start",
+        "process_start"
+      ]
     },
     "hash": {
       "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
@@ -238,12 +258,17 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 5,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_end"
+      "type": [
+        "end",
+        "process_end"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -283,12 +308,17 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 5,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_end"
+      "type": [
+        "end",
+        "process_end"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -328,12 +358,17 @@
   {
     "@timestamp": "2019-03-18T16:57:39.012Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 1,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_start"
+      "type": [
+        "start",
+        "process_start"
+      ]
     },
     "hash": {
       "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
@@ -417,6 +452,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -478,6 +525,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -542,6 +601,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -605,6 +676,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -667,6 +750,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -735,6 +830,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -800,6 +907,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -863,6 +982,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -924,6 +1055,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -990,6 +1133,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -1055,6 +1210,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -1117,6 +1284,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -1178,6 +1357,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1245,6 +1436,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -1310,6 +1513,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1377,6 +1592,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "start",
+          "protocol"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2012-r2"
     },
@@ -1434,12 +1661,17 @@
   {
     "@timestamp": "2019-03-18T16:57:52.35Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 5,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_end"
+      "type": [
+        "end",
+        "process_end"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1479,12 +1711,17 @@
   {
     "@timestamp": "2019-03-18T16:57:52.364Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 5,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_end"
+      "type": [
+        "end",
+        "process_end"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1528,6 +1765,16 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
@@ -1579,6 +1826,16 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
+    },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
     },
@@ -1628,6 +1885,16 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
@@ -1679,6 +1946,16 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
+    },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
     },
@@ -1724,12 +2001,17 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 5,
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
-      "type": "process_end"
+      "type": [
+        "end",
+        "process_end"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1773,6 +2055,16 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
@@ -1823,6 +2115,16 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "change"
+        ]
+      }
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"

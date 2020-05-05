@@ -77,13 +77,9 @@ func Config() {
 }
 
 func configYML() error {
-	customDeps := devtools.ConfigFileParams{
-		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
-		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
-		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
-		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
-	}
-	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
 
 // Clean cleans all generated files and build artifacts.

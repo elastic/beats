@@ -52,6 +52,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
 * <<exported-fields-kvm>>
+* <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
@@ -26981,6 +26982,328 @@ Domain name
 
 
 type: keyword
+
+--
+
+[[exported-fields-linux]]
+== linux fields
+
+linux module
+
+
+
+[float]
+=== linux
+
+
+
+
+[float]
+=== conntrack
+
+conntrack
+
+
+
+[float]
+=== summary
+
+summary of nf_conntrack statistics, summed across CPU cores
+
+
+
+*`linux.conntrack.summary.drop`*::
++
+--
+packets dropped due to conntrack failiure
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.early_drop`*::
++
+--
+conntrack entries dropped to make room for new ones
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.entries`*::
++
+--
+entries in the conntrack table
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.found`*::
++
+--
+successfully searched entries
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.ignore`*::
++
+--
+packets seen already connected to a conntrack entry
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.insert_failed`*::
++
+--
+Number of entries where list insert insert failed 
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.invalid`*::
++
+--
+packets seen that cannot be tracked
+
+
+type: long
+
+--
+
+*`linux.conntrack.summary.search_restart`*::
++
+--
+table lookups which had to be restarted due to table resizes
+
+
+type: long
+
+--
+
+[float]
+=== ksm
+
+ksm
+
+
+
+[float]
+=== stats
+
+KSM statistics
+
+
+
+*`linux.ksm.stats.pages_shared`*::
++
+--
+Shared pages in use.
+
+
+type: long
+
+--
+
+*`linux.ksm.stats.pages_sharing`*::
++
+--
+Sites sharing pages.
+
+
+type: long
+
+--
+
+*`linux.ksm.stats.pages_unshared`*::
++
+--
+Unique pages.
+
+
+type: long
+
+--
+
+*`linux.ksm.stats.full_scans`*::
++
+--
+Number of times mergable pages have been scanned.
+
+
+type: long
+
+--
+
+*`linux.ksm.stats.stable_node_chains`*::
++
+--
+Pages that have reached max_page_sharing.
+
+
+type: long
+
+--
+
+*`linux.ksm.stats.stable_node_dups`*::
++
+--
+Number of duplicated KSM pages.
+
+
+type: long
+
+--
+
+[float]
+=== pageinfo
+
+pageinfo
+
+
+
+[float]
+=== buddy_info
+
+Data from /proc/buddyinfo grouping used pages by order
+
+
+
+[float]
+=== DMA
+
+DMA page Data
+
+
+
+*`linux.pageinfo.buddy_info.DMA.0`*::
++
+--
+free chunks of 2^0*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.1`*::
++
+--
+free chunks of 2^1*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.2`*::
++
+--
+free chunks of 2^2*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.3`*::
++
+--
+free chunks of 2^3*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.4`*::
++
+--
+free chunks of 2^4*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.5`*::
++
+--
+free chunks of 2^5*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.6`*::
++
+--
+free chunks of 2^6*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.7`*::
++
+--
+free chunks of 2^7*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.8`*::
++
+--
+free chunks of 2^8*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.9`*::
++
+--
+free chunks of 2^9*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.buddy_info.DMA.10`*::
++
+--
+free chunks of 2^10*PAGE_SIZE
+
+
+type: long
+
+--
+
+*`linux.pageinfo.nodes.*`*::
++
+--
+Raw allocation info from /proc/pagetypeinfo
+
+
+type: object
 
 --
 
