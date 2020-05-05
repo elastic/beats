@@ -55,16 +55,16 @@ func (e *Event) SetID(id string) {
 }
 
 func (e *Event) GetMetaStringValue(key string) (string, error) {
-	var val string
-	if tmp, err := e.GetValue("@metadata." + key); err == nil {
-		if s, ok := tmp.(string); ok {
-			return s, nil
-		} else {
-			return val, err
-		}
-	} else {
-		return val, err
+	tmp, err := e.Meta.GetValue(key)
+	if err != nil {
+		return "", err
 	}
+
+	if s, ok := tmp.(string); ok {
+		return s, nil
+	}
+
+	return "", nil
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
