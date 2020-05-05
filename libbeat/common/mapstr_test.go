@@ -87,6 +87,11 @@ func TestMapStrDeepUpdate(t *testing.T) {
 			MapStr{"a.b": 1},
 			MapStr{"a": 1, "a.b": 1},
 		},
+		{
+			MapStr{"a": (MapStr)(nil)},
+			MapStr{"a": MapStr{"b": 1}},
+			MapStr{"a": MapStr{"b": 1}},
+		},
 	}
 
 	for i, test := range tests {

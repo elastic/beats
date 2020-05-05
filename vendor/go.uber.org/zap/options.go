@@ -20,7 +20,11 @@
 
 package zap
 
-import "go.uber.org/zap/zapcore"
+import (
+	"fmt"
+
+	"go.uber.org/zap/zapcore"
+)
 
 // An Option configures a Logger.
 type Option interface {
@@ -55,7 +59,7 @@ func Hooks(hooks ...func(zapcore.Entry) error) Option {
 }
 
 // Fields adds fields to the Logger.
-func Fields(fs ...zapcore.Field) Option {
+func Fields(fs ...Field) Option {
 	return optionFunc(func(log *Logger) {
 		log.core = log.core.With(fs)
 	})
@@ -105,5 +109,18 @@ func AddCallerSkip(skip int) Option {
 func AddStacktrace(lvl zapcore.LevelEnabler) Option {
 	return optionFunc(func(log *Logger) {
 		log.addStack = lvl
+	})
+}
+
+// IncreaseLevel increase the level of the logger. It has no effect if
+// the passed in level tries to decrease the level of the logger.
+func IncreaseLevel(lvl zapcore.LevelEnabler) Option {
+	return optionFunc(func(log *Logger) {
+		core, err := zapcore.NewIncreaseLevelCore(log.core, lvl)
+		if err != nil {
+			fmt.Fprintf(log.errorOutput, "failed to IncreaseLevel: %v", err)
+		} else {
+			log.core = core
+		}
 	})
 }

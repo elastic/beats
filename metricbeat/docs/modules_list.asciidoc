@@ -109,9 +109,10 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
 |<<metricbeat-module-googlecloud,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
+.5+| .5+|  |<<metricbeat-metricset-googlecloud-compute,compute>> beta[]  
 |<<metricbeat-metricset-googlecloud-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-googlecloud-pubsub,pubsub>> beta[]  
+|<<metricbeat-metricset-googlecloud-stackdriver,stackdriver>> beta[]  
 |<<metricbeat-metricset-googlecloud-storage,storage>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   
@@ -123,7 +124,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-http-server,server>>   
 |<<metricbeat-module-ibmmq,IBM MQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-ibmmq-qmgr,qmgr>> beta[]  
-|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-iis,iis>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-iis-application_pool,application_pool>> beta[]  
 |<<metricbeat-metricset-iis-webserver,webserver>> beta[]  
 |<<metricbeat-metricset-iis-website,website>> beta[]  
@@ -167,7 +168,12 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-system,system>>   
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,kvm>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
+|<<metricbeat-metricset-kvm-status,status>> beta[]  
+|<<metricbeat-module-linux,linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-linux-conntrack,conntrack>> beta[]  
+|<<metricbeat-metricset-linux-ksm,ksm>> beta[]  
+|<<metricbeat-metricset-linux-pageinfo,pageinfo>> beta[]  
 |<<metricbeat-module-logstash,Logstash>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-logstash-node,node>>   
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
@@ -180,8 +186,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
 |<<metricbeat-module-mssql,MSSQL>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> beta[]  
-|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>>   
+|<<metricbeat-metricset-mssql-transaction_log,transaction_log>>   
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -264,7 +270,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-vsphere-host,host>>   
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
@@ -306,6 +312,7 @@ include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]
 include::modules/kvm.asciidoc[]
+include::modules/linux.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]

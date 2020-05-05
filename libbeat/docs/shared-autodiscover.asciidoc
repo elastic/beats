@@ -124,6 +124,7 @@ running configuration for a container, 60s by default.
 =======================================
 endif::[]
 
+
 [float]
 ===== Kubernetes
 
@@ -240,7 +241,6 @@ running configuration for a container, 60s by default.
           enabled: true
           include_labels: ["nodelabel2"]
 -------------------------------------------------------------------------------------
-
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 

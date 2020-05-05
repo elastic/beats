@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2019-01-17T01:32:16.805Z",
+        "client.address": "10.178.98.102",
         "destination.address": "35.199.178.4",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
@@ -13,14 +14,26 @@
         "destination.geo.region_name": "California",
         "destination.ip": "35.199.178.4",
         "destination.port": 9243,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ssl",
         "event.id": "CAOvs1BMFCX2Eh0Y3",
+        "event.kind": [
+            "connection",
+            "protocol"
+        ],
         "event.module": "zeek",
         "fileset.name": "ssl",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:1PMhYqOKBIyRAQeMbg/pWiJ198g=",
         "network.transport": "tcp",
+        "related.ip": [
+            "10.178.98.102",
+            "35.199.178.4"
+        ],
+        "server.address": "35.199.178.4",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
@@ -59,6 +72,7 @@
     },
     {
         "@timestamp": "2019-01-17T01:32:16.805Z",
+        "client.address": "10.178.98.102",
         "destination.address": "35.199.178.4",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
@@ -71,14 +85,26 @@
         "destination.geo.region_name": "California",
         "destination.ip": "35.199.178.4",
         "destination.port": 9243,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.ssl",
         "event.id": "C3mki91FnnNtm0u1ok",
+        "event.kind": [
+            "connection",
+            "protocol"
+        ],
         "event.module": "zeek",
         "fileset.name": "ssl",
         "input.type": "log",
         "log.offset": 635,
         "network.community_id": "1:zYbLmqRN6PLPB067HNAiAQISqvI=",
         "network.transport": "tcp",
+        "related.ip": [
+            "10.178.98.102",
+            "35.199.178.4"
+        ],
+        "server.address": "35.199.178.4",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",

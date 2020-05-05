@@ -49,6 +49,7 @@ var (
 				"index_time_in_millis":    c.Int("index_time_in_millis"),
 				"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
 			}),
+			"bulk": elasticsearch.BulkStatsDict,
 			"search": c.Dict("search", s.Schema{
 				"query_total":          c.Int("query_total"),
 				"query_time_in_millis": c.Int("query_time_in_millis"),

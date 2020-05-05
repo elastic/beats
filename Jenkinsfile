@@ -2,15 +2,25 @@
 
 @Library('apm@current') _
 
+import groovy.transform.Field
+
+/**
+ This is required to store the stashed id with the test results to be digested with runbld
+*/
+@Field def stashedTestReports = [:]
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    TERRAFORM_VERSION = "0.12.24"
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
+    RUNBLD_DISABLE_NOTIFICATIONS = 'true'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -28,6 +38,11 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
+
+    booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
+    string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
+
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -39,14 +54,14 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}")
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
         }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
     stage('Lint'){
@@ -68,7 +83,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Linux", "-C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Linux", "x-pack/elastic-agent", "build test")
           }
         }
 
@@ -82,7 +97,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "unitTest")
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -96,7 +111,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Elastic Agent x-pack Mac OS X", "TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite")
+            mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -136,7 +151,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C filebeat testsuite")
+            mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
         }
         stage('Filebeat Windows'){
@@ -149,7 +164,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "unitTest")
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -177,7 +192,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Heartbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C heartbeat testsuite")
+                mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
               }
             }
             stage('Heartbeat Windows'){
@@ -190,7 +205,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "unitTest")
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
               }
             }
           }
@@ -225,7 +240,7 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Auditbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C auditbeat testsuite")
+                mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
               }
             }
             stage('Auditbeat Windows'){
@@ -238,7 +253,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "unitTest")
+                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
               }
             }
           }
@@ -296,7 +311,7 @@ pipeline {
             makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
           }
         }
-        stage('Metricbeat Unit tests'){
+        stage('Metricbeat OSS Unit tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -306,10 +321,10 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Unit tests", "-C metricbeat unit-tests coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (unitTest)", "metricbeat", "build unitTest")
           }
         }
-        stage('Metricbeat Integration tests'){
+        stage('Metricbeat OSS Integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -319,10 +334,10 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat Integration tests", "-C metricbeat integration-tests-environment coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
           }
         }
-        stage('Metricbeat System tests'){
+        stage('Metricbeat Python integration tests'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -332,7 +347,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat System tests", "-C metricbeat update system-tests-environment coverage-report")
+            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
           }
         }
         stage('Metricbeat x-pack'){
@@ -344,8 +359,30 @@ pipeline {
               return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
-          steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "update build test")
+          stages {
+            stage('Prepare cloud integration tests environments'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                startCloudTestEnv('x-pack-metricbeat', [
+                   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+                ])
+              }
+            }
+            stage('Metricbeat x-pack'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                withCloudTestEnv() {
+                  mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                }
+              }
+            }
+          }
+          post {
+            cleanup {
+              terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+            }
           }
         }
         stage('Metricbeat crosscompile'){
@@ -358,7 +395,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss crosscompile", "-C metricbeat crosscompile")
+            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -371,7 +408,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat oss Mac OS X", "TEST_ENVIRONMENT=0 -C metricbeat testsuite")
+            mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
         stage('Metricbeat Windows'){
@@ -384,7 +421,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "unitTest")
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -446,7 +483,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "unitTest")
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
               }
             }
           }
@@ -461,7 +498,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "unitTest")
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
           }
         }
         stage('Functionbeat'){
@@ -492,7 +529,7 @@ pipeline {
                 }
               }
               steps {
-                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "update build test")
+                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
             }
             stage('Functionbeat Windows'){
@@ -505,7 +542,7 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "unitTest")
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
               }
             }
           }
@@ -539,14 +576,20 @@ pipeline {
           stages {
             stage('Generators Metricbeat Linux'){
               steps {
-                makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
-                makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
+                // FIXME see https://github.com/elastic/beats/issues/18132
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
+                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
+                }
               }
             }
             stage('Generators Beat Linux'){
               steps {
-                makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
-                makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
+                // FIXME see https://github.com/elastic/beats/issues/18132
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
+                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
+                }
               }
             }
             stage('Generators Metricbeat Mac OS X'){
@@ -559,7 +602,10 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+                // FIXME see https://github.com/elastic/beats/issues/18132
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                  makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+                }
               }
             }
             stage('Generators Beat Mac OS X'){
@@ -572,7 +618,10 @@ pipeline {
                 }
               }
               steps {
-                makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                // FIXME see https://github.com/elastic/beats/issues/18132
+                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+                  makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                }
               }
             }
           }
@@ -587,10 +636,18 @@ pipeline {
             }
           }
           steps {
-            k8sTest(["v1.16.2","v1.15.3","v1.14.6","v1.13.10","v1.12.10","v1.11.10"])
+            k8sTest(["v1.18.2","v1.17.2","v1.16.4","v1.15.7","v1.14.10"])
           }
         }
       }
+    }
+  }
+  post {
+    always {
+      runbld()
+    }
+    cleanup {
+      notifyBuildResult(prComment: true)
     }
   }
 }
@@ -655,24 +712,16 @@ def withBeatsEnv(boolean archive, Closure body) {
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
-    "TEST_TAGS=oracle",
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
     unstash 'source'
-    if(os == 'linux'){
+    if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-      // FIXME workaround until we fix the packer cache
-      // Retry to avoid DDoS detection from the server
-      retry(3) {
-        sleep randomNumber(min: 2, max: 5)
-        sh 'docker pull docker.elastic.co/observability-ci/database-enterprise:12.2.0.1'
-      }
     }
     dir("${env.BASE_DIR}") {
-      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
-      sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh")
-      sh(label: "Install Mage", script: "make mage")
+      installTools()
       // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
       // See https://github.com/elastic/beats/issues/17787.
       setGitConfig()
@@ -683,7 +732,7 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
           }
         }
@@ -710,18 +759,30 @@ def withBeatsEnvWin(Closure body) {
     deleteDir()
     unstash 'source'
     dir("${env.BASE_DIR}"){
-      bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat")
+      installTools()
       try {
         if(!params.dry_run){
           body()
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
         }
       }
     }
+  }
+}
+
+def installTools() {
+  def i = 2 // Number of retries
+  if(isUnix()) {
+    retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+    retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
+    retry(i) { sh(label: "Install Mage", script: "make mage") }
+  } else {
+    retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -790,6 +851,7 @@ def dumpFilteredEnvironment(){
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
   echo "STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}"
+  echo "TEST_TAGS: ${env.TEST_TAGS}"
   echo "GOX_OS: ${env.GOX_OS}"
   echo "GOX_OSARCH: ${env.GOX_OSARCH}"
   echo "GOX_FLAGS: ${env.GOX_FLAGS}"
@@ -807,14 +869,14 @@ def dumpFilteredEnvironment(){
 def k8sTest(versions){
   versions.each{ v ->
     stage("k8s ${v}"){
-      withEnv(["K8S_VERSION=${v}"]){
+      withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
           withBeatsEnv(false) {
-            sh(label: "Install k8s", script: """
-              eval "\$(gvm use ${GO_VERSION} --format=bash)"
-              .ci/scripts/kind-setup.sh
-            """)
-            sh(label: "Kubernetes Kind",script: "make KUBECONFIG=\"\$(kind get kubeconfig-path)\" -C deploy/kubernetes test")
+            sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
+            sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
         }
@@ -856,10 +918,9 @@ def isChangedOSSCode(patterns) {
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('libbeat'))
   return isChanged(allPatterns)
 }
 
@@ -871,16 +932,111 @@ def isChangedXPackCode(patterns) {
     "^dev-tools/.*",
     "^testing/.*",
     "^x-pack/libbeat/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
-  allPatterns.addAll(getVendorPatterns('x-pack/libbeat'))
   return isChanged(allPatterns)
+}
+
+// withCloudTestEnv executes a closure with credentials for cloud test
+// environments.
+def withCloudTestEnv(Closure body) {
+  def maskedVars = []
+  def testTags = "${env.TEST_TAGS}"
+
+  // AWS
+  if (params.allCloudTests || params.awsCloudTests) {
+    testTags = "${testTags},aws"
+    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
+    if (!aws.containsKey('access_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
+    }
+    if (!aws.containsKey('secret_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
+    }
+    maskedVars.addAll([
+      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
+      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
+    ])
+  }
+
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
+    withEnvMask(vars: maskedVars) {
+      body()
+    }
+  }
+}
+
+def terraformInit(String directory) {
+  dir(directory) {
+    sh(label: "Terraform Init on ${directory}", script: "terraform init")
+  }
+}
+
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+// Start testing environment on cloud using terraform. Terraform files are
+// stashed so they can be used by other stages. They are also archived in
+// case manual cleanup is needed.
+//
+// Example:
+//   startCloudTestEnv('x-pack-metricbeat', [
+//     [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+//   ])
+//   ...
+//   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+def startCloudTestEnv(String name, environments = []) {
+  withCloudTestEnv() {
+    withBeatsEnv(false) {
+      def runAll = params.runAllCloudTests
+      try {
+        for (environment in environments) {
+          if (environment.cond || runAll) {
+            retry(2) {
+              terraformApply(environment.dir)
+            }
+          }
+        }
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+      }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+    }
+  }
+}
+
+
+// Looks for all terraform states in directory and runs terraform destroy for them,
+// it uses terraform states previously stashed by startCloudTestEnv.
+def terraformCleanup(String stashName, String directory) {
+  stage("Remove cloud scenarios in ${directory}"){
+    withCloudTestEnv() {
+      withBeatsEnv(false) {
+        unstash "terraform-${stashName}"
+        retry(2) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        }
+      }
+    }
+  }
 }
 
 def loadConfigEnvVars(){
   def empty = []
   env.GO_VERSION = readFile(".go-version").trim()
+
+  withEnv(["HOME=${env.WORKSPACE}"]) {
+    retry(2) { sh(label: "Install Go ${env.GO_VERSION}", script: ".ci/scripts/install-go.sh") }
+  }
 
   // Libbeat is the core framework of Beats. It has no additional dependencies
   // on other projects in the Beats repository.
@@ -940,17 +1096,25 @@ def loadConfigEnvVars(){
   // involved.
   env.BUILD_KUBERNETES = isChanged(["^deploy/kubernetes/.*"])
 
-  env.BUILD_GENERATOR = isChangedOSSCode(getVendorPatterns('generator'))
+  def generatorPatterns = ['^generator/.*']
+  generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
+  generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
+  env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 }
 
 /**
   This method grab the dependencies of a Go module and transform them on regexp
 */
 def getVendorPatterns(beatName){
+  def os = goos()
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
   def output = ""
-  docker.image("golang:${GO_VERSION}").inside{
+
+  withEnv([
+    "HOME=${env.WORKSPACE}/${env.BASE_DIR}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+  ]) {
     output = sh(label: 'Get vendor dependency patterns', returnStdout: true, script: """
-      export HOME=${WORKSPACE}/${BASE_DIR}
       go list -mod=vendor -f '{{ .ImportPath }}{{ "\\n" }}{{ join .Deps "\\n" }}' ./${beatName}\
         |awk '{print \$1"/.*"}'\
         |sed -e "s#github.com/elastic/beats/v7/##g"
@@ -966,4 +1130,40 @@ def setGitConfig(){
       git config user.name "beatsmachine"
     fi
   ''')
+}
+
+def isDockerInstalled(){
+  return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+}
+
+def junitAndStore(Map params = [:]){
+  junit(params)
+  // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
+  def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stashedTestReports[stageName] = stageName
+}
+
+def runbld() {
+  catchError(buildResult: 'SUCCESS', message: 'runbld post build action failed.') {
+    if (stashedTestReports) {
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Prepare workspace context',
+           script: 'find . -type f -name "TEST*.xml" -path "*/build/*" -delete')
+        // Unstash the test reports
+        stashedTestReports.each { k, v ->
+          dir(k) {
+            unstash v
+          }
+        }
+        sh(label: 'Process JUnit reports with runbld',
+          script: '''\
+          cat >./runbld-script <<EOF
+          echo "Processing JUnit reports with runbld..."
+          EOF
+          /usr/local/bin/runbld ./runbld-script
+          '''.stripIndent())  // stripIdent() requires '''/
+      }
+    }
+  }
 }

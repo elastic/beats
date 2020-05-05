@@ -18,16 +18,16 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_labels:
-    labels:
-      number: 1
-      with.dots: test
-      nested:
-        with.dots: nested
-      array:
-        - do
-        - re
-        - with.field: mi
+  - add_labels:
+      labels:
+        number: 1
+        with.dots: test
+        nested:
+          with.dots: nested
+        array:
+          - do
+          - re
+          - with.field: mi
 ------------------------------------------------------------------------------
 
 Adds these fields to every event:
