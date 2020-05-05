@@ -499,11 +499,11 @@ metricbeat.modules:
 - module: googlecloud
   metricsets:
     - compute
-  region: "us-central1"
+  region: "us-"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
+  period: 1m
 
 - module: googlecloud
   metricsets:
@@ -513,25 +513,15 @@ metricbeat.modules:
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 60s
+  period: 1m
 
 - module: googlecloud
   metricsets:
     - storage
-  region: "us-central1"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
-  period: 300s
-
-- module: googlecloud
-  metricsets:
-    - compute
-  region: "us-"
-  project_id: "your project id"
-  credentials_file_path: "your JSON credentials file path"
-  exclude_labels: false
-  period: 60s
+  period: 5m
 
 #------------------------------- Graphite Module -------------------------------
 - module: graphite
@@ -1923,6 +1913,17 @@ output.elasticsearch:
   # all events are published.  Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
   #max_retries: 3
+
+  # The number of seconds to wait before trying to republish to Kafka
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to republish. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful publish, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to republish to
+  # Kafka after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.

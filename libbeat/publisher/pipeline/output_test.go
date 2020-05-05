@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -42,7 +43,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 300 + (i % 100) // between 300 and 399
@@ -96,7 +97,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 1000 + (i % 100) // between 1000 and 1099
@@ -182,7 +183,7 @@ func TestReplaceClientWorker(t *testing.T) {
 }
 
 func TestMakeClientTracer(t *testing.T) {
-	seedPRNG(t)
+	testutil.SeedPRNG(t)
 
 	numBatches := 10
 	numEvents := atomic.MakeUint(0)

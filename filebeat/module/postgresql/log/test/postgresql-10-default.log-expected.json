@@ -1,0 +1,155 @@
+[
+    {
+        "@timestamp": "2020-04-15T10:02:55.244Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "database system was shut down at 2020-04-15 12:02:52 CEST",
+        "postgresql.log.timestamp": "2020-04-15 12:02:55.244 CEST",
+        "process.pid": 23922,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:02:55.247Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 101,
+        "message": "database system is ready to accept connections",
+        "postgresql.log.timestamp": "2020-04-15 12:02:55.247 CEST",
+        "process.pid": 23920,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:04:45.416Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "FATAL",
+        "log.offset": 191,
+        "message": "password authentication failed for user \"root\"",
+        "postgresql.log.timestamp": "2020-04-15 12:04:45.416 CEST",
+        "process.pid": 24981,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:04:45.416Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "DETAIL",
+        "log.offset": 283,
+        "message": "Role \"root\" does not exist.\n\tConnection matched pg_hba.conf line 80: \"local   all             all                                     md5\"",
+        "postgresql.log.timestamp": "2020-04-15 12:04:45.416 CEST",
+        "process.pid": 24981,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:04:45.416Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 468,
+        "message": "could not send data to client: Broken pipe",
+        "postgresql.log.timestamp": "2020-04-15 12:04:45.416 CEST",
+        "process.pid": 24981,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:06:36.719Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "ERROR",
+        "log.offset": 554,
+        "message": "syntax error at or near \"l\" at character 1",
+        "postgresql.log.timestamp": "2020-04-15 12:06:36.719 CEST",
+        "process.pid": 25143,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-15T10:56:29.569Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "STATEMENT",
+        "log.offset": 642,
+        "message": "SELECT al.id, al.tenant_id, al.created_by_id, al.create_ip, al.audit_date, al.audit_table, al.entity_id, al.entity_name, al.reason_for_change, al.audit_log_event_type_id,\n\t        aet.lookup_code, al.old_value, al.new_value, al.event_crf_id, al.event_crf_version_id, al.study_id, al.study_site_id, ss.rc_oid, al.subject_id, s.unique_identifier,\n\t        al.study_event_id, sed.name AS studyEventName, al.user_id, al.value_index, al.crf_version_id, al.global_logs, cv.version_name, crf.id AS crfId, crf.name AS crfName\n\t         FROM public.rc_audit_log_events AS al\n\t        LEFT JOIN rc_crf_versions AS cv ON cv.id=al.crf_version_id\n\t            LEFT JOIN rc_crfs AS crf ON crf.id=cv.crf_id\n\t            LEFT JOIN ad_lookup_codes AS aet ON aet.id=al.audit_log_event_type_id\n\t            LEFT JOIN rc_study_sites AS ss ON ss.id=al.study_site_id\n\t            LEFT JOIN rc_subjects AS s ON s.id=al.subject_id\n\t            LEFT JOIN rc_study_events AS se ON se.id=al.study_event_id\n\t            LEFT JOIN rc_study_event_definitions AS sed ON sed.id=se.study_event_definition_id\n\t            WHERE al.tenant_id=$1 AND al.study_id=$2  AND aet.lookup_code IN ($3, $4, $5, $6) AND al.audit_date >= $7 ORDER BY al.id DESC  limit $8\n\t;",
+        "postgresql.log.timestamp": "2020-04-15 12:56:29.569 CEST",
+        "process.pid": 25143,
+        "service.type": "postgresql"
+    }
+]
