@@ -20,6 +20,7 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/winlogbeat/beater"
 
 	// Register fields.
@@ -35,4 +36,8 @@ import (
 var Name = "winlogbeat"
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name, HasDashboards: true})
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
+	Name:          Name,
+	HasDashboards: true,
+	Processing:    processing.MakeDefaultSupport(true, processing.WithECS, processing.WithAgentMeta()),
+})

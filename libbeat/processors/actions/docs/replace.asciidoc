@@ -24,13 +24,13 @@ Following example will change path from /usr/bin to /usr/local/bin
 [source,yaml]
 -------
 processors:
-- replace:
-    fields:
-     - field: "file.path"
-       pattern: "/usr/"
-       replacement: "/usr/local/"
-    ignore_missing: false
-    fail_on_error: true
+  - replace:
+      fields:
+        - field: "file.path"
+          pattern: "/usr/"
+          replacement: "/usr/local/"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 The `replace` processor has following configuration settings:
