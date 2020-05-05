@@ -97,7 +97,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 	for name, ctor := range tests {
 		t.Run(name, func(t *testing.T) {
-			seedPRNG(t)
+			testutil.SeedPRNG(t)
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 1000 + (i % 100) // between 1000 and 1099
@@ -183,7 +183,7 @@ func TestReplaceClientWorker(t *testing.T) {
 }
 
 func TestMakeClientTracer(t *testing.T) {
-	seedPRNG(t)
+	testutil.SeedPRNG(t)
 
 	numBatches := 10
 	numEvents := atomic.MakeUint(0)
