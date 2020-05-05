@@ -1720,6 +1720,11 @@ logging.files:
 # Set to true to log messages in JSON format.
 #logging.json: false
 
+# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
+# information. Recommended to use in combination with `logging.json=true`
+# Defaults to false.
+#logging.ecs: false
+
 # ============================= X-Pack Monitoring ==============================
 # Packetbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
