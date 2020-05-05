@@ -29,4 +29,4 @@ rules:
   - get
 ```
 
-The previous configuration and RBAC requirement is available in the complete example manifest proposed in <<running-on-kubernetes,Running Metricbeat on Kubernetes>> document.
+The previous configuration and RBAC requirement is available in the complete example manifest proposed in <<running-on-kubernetes, Running Metricbeat on Kubernetes>> document.
