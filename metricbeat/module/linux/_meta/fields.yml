@@ -1,0 +1,10 @@
+- key: linux
+  title: "linux"
+  release: beta
+  description: >
+    linux module
+  fields:
+    - name: linux
+      type: group
+      description: >
+      fields:
