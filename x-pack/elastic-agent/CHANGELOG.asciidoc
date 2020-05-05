@@ -51,3 +51,4 @@
 - Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
 - Enable introspecting configuration {pull}18124[18124]
 - Follow home path for all config files {pull}18161[18161]
+- Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
