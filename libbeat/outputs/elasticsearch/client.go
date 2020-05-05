@@ -316,11 +316,7 @@ func createEventBulkMeta(
 	}
 
 	id, _ := event.GetMetaStringValue("_id")
-	opType, err := event.GetMetaStringValue(opTypeKey)
-	if err != nil {
-		log.Errorf("%s %v is no string value", opTypeKey, opType)
-		return nil, err
-	}
+	opType, _ := event.GetMetaStringValue(opTypeKey)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
