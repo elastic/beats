@@ -32,5 +32,5 @@ func init() {
 // AssetKvm returns asset data.
 // This is the base64 encoded gzipped contents of module/kvm.
 func AssetKvm() string {
-	return "eJyskDFuwzAMRXed4iN7LqChU9ceQq3YQLBoGrLsQrcvnEZFotByh3Lw4G+//8gzBioWw8oGyCFHsjgNK58MkCiSm8ninbIzgKf5I4UpBxktXgyA7T+w+CWSAT4DRT/ba3DG6JgqeJtcJrK4JFmm2xuF9wi5B3lhJp6zy7+Rxtzl3iKN0u5Zp1V5FGogPaFDrZ95I5ZUdLDucu+zPZW4Og1UviR59YtDs8Zur6uqrC4uPZco4+V/RLSmahGel+3UH1a/CrswPlO79+/f/q+dV/R3AAAA///hct15"
+	return "eJzckzFuxCAQRXtO8bX9XoAiVdocgoTJCpkxFmBHvn3k7BLZeBZHStLsFC485v0HZs7oaNboJlZAdtmTxqmb+KSASJ5MIo1XykYBltJbdEN2odd4UgCWdeBgR08KeHfkbdJfjTN6w1TAS+V5II1LDONweyPwtpA1yAZm4pRN/m5JzLvcW0ui1PssVatshSpIS+hQ61ovxCHOMlh2WfssT6FdnDqaP0K04heHZpXdvayiMhk/tlx86C9/IyIlFQu332wj/jD6ObBx/Z7aPP/22f80c4Ne378x/WYYdoTHGIRl2b9Ogr3+FSnnQe/eZwAAAP//6Q5sWg=="
 }
