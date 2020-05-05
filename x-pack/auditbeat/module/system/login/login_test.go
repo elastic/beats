@@ -128,7 +128,9 @@ func TestWtmp(t *testing.T) {
 	checkFieldValue(t, events[0].RootFields, "event.action", "user_logout")
 	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
 	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
+	checkFieldValue(t, events[0].RootFields, "related.ip", []string{"10.0.2.2"})
 	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
+	checkFieldValue(t, events[0].RootFields, "related.user", []string{"vagrant"})
 	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
 }
 

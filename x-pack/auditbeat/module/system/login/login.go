@@ -178,7 +178,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	if loginRecord.Username != "" {
 		event.RootFields.Put("user.name", loginRecord.Username)
-
+		event.RootFields.Put("related.user", []string{loginRecord.Username})
 		if loginRecord.UID != -1 {
 			event.RootFields.Put("user.id", loginRecord.UID)
 		}
@@ -194,6 +194,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	if loginRecord.IP != nil {
 		event.RootFields.Put("source.ip", loginRecord.IP)
+		event.RootFields.Put("related.ip", []string{loginRecord.IP.String()})
 	}
 
 	if loginRecord.Hostname != "" && loginRecord.Hostname != loginRecord.IP.String() {
