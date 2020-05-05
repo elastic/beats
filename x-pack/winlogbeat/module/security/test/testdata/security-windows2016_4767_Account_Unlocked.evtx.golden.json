@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:40:52.3149485Z",
     "event": {
       "action": "unlocked-user-account",
+      "category": "iam",
       "code": 4767,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"

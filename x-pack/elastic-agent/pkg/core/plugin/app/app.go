@@ -42,6 +42,7 @@ type Application struct {
 	id              string
 	name            string
 	pipelineID      string
+	logLevel        string
 	spec            Specifier
 	state           state.State
 	grpcClient      remoteconfig.Client
@@ -70,7 +71,7 @@ type ArgsDecorator func([]string) []string
 // the application.
 func NewApplication(
 	ctx context.Context,
-	id, appName, pipelineID string,
+	id, appName, pipelineID, logLevel string,
 	spec Specifier,
 	factory remoteconfig.ConnectionCreator,
 	cfg *config.Config,
@@ -90,6 +91,7 @@ func NewApplication(
 		id:              id,
 		name:            appName,
 		pipelineID:      pipelineID,
+		logLevel:        logLevel,
 		spec:            spec,
 		clientFactory:   factory,
 		processConfig:   cfg.ProcessConfig,
@@ -139,7 +141,7 @@ func (a *Application) Stop() {
 		}
 
 		// cleanup drops
-		a.monitor.Cleanup()
+		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
 }
 
@@ -199,7 +201,7 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 }
 
 func (a *Application) reportCrash(ctx context.Context) {
-	a.monitor.Cleanup()
+	a.monitor.Cleanup(a.name, a.pipelineID)
 
 	// TODO: reporting crash
 	if a.failureReporter != nil {

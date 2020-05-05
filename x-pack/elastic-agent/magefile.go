@@ -20,15 +20,16 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 const (
@@ -48,6 +49,7 @@ var Aliases = map[string]interface{}{
 
 func init() {
 	common.RegisterCheckDeps(Update, Check.All)
+	test.RegisterDeps(UnitTest)
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
@@ -277,6 +279,7 @@ func Package() {
 		"linux-x86_64.tar.gz",
 		"windows-x86.zip",
 		"windows-x86_64.zip",
+		"linux-arm64.tar.gz",
 	}, devtools.UseElasticAgentPackaging)
 }
 
@@ -380,19 +383,12 @@ func configYML() error {
 
 // ConfigFileParams returns the parameters for generating OSS config.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.XPackBeatDir("_meta/common.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.p2.yml"),
-		},
-		ReferenceParts: []string{
-			devtools.XPackBeatDir("_meta/common.reference.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.reference.p2.yml"),
-		},
-		DockerParts: []string{
-			devtools.XPackBeatDir("_meta/elastic-agent.docker.yml"),
-		},
-	}
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	p.Short.Template = "_meta/config/elastic-agent.yml.tmpl"
+	p.Reference.Template = "_meta/config/elastic-agent.reference.yml.tmpl"
+	p.Docker.Template = "_meta/config/elastic-agent.docker.yml.tmpl"
+	return p
 }
 
 // fieldDocs generates docs/fields.asciidoc containing all fields
@@ -420,20 +416,9 @@ func combineErr(errors ...error) error {
 	return e
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // UnitTest performs unit test on agent.
 func UnitTest() {
 	mg.Deps(Test.All)
-}
-
-// IntegTest calls go integtest, we dont have python integ test so far
-// TODO: call integtest mage package when python tests are available
-func IntegTest() {
-	os.Create(filepath.Join("build", "TEST-go-integration.out"))
 }
 
 // BuildFleetCfg embed the default fleet configuration as part of the binary.
@@ -444,11 +429,6 @@ func BuildFleetCfg() error {
 
 	fmt.Printf(">> BuildFleetCfg %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
-}
-
-// Fields placeholder methods to fix the windows build.
-func Fields() error {
-	return nil
 }
 
 // Enroll runs agent which enrolls before running.

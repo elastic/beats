@@ -14,9 +14,11 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/update"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
@@ -44,8 +46,9 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseCommunityBeatPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
-	mg.Deps(update.Update)
+	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
@@ -74,13 +77,9 @@ func Config() {
 }
 
 func configYML() error {
-	customDeps := devtools.ConfigFileParams{
-		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
-		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
-		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
-		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
-	}
-	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
 
 // Clean cleans all generated files and build artifacts.
@@ -99,9 +98,14 @@ func Fmt() {
 	common.Fmt()
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return update.Update()
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, Imports)
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return devtools.KibanaDashboards("module")
 }
 
 // Imports generates an include/list.go file containing
