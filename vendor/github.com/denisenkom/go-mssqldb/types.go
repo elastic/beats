@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/denisenkom/go-mssqldb/internal/cp"
+	"github.com/denisenkom/go-mssqldb/internal/decimal"
 )
 
 // fixed-length data types
@@ -62,6 +63,7 @@ const (
 	typeNChar      = 0xef
 	typeXml        = 0xf1
 	typeUdt        = 0xf0
+	typeTvp        = 0xf3
 
 	// long length types
 	typeText    = 0x23
@@ -72,6 +74,10 @@ const (
 const _PLP_NULL = 0xFFFFFFFFFFFFFFFF
 const _UNKNOWN_PLP_LEN = 0xFFFFFFFFFFFFFFFE
 const _PLP_TERMINATOR = 0x00000000
+
+// TVP COLUMN FLAGS
+const _TVP_END_TOKEN = 0x00
+const _TVP_ROW_TOKEN = 0x01
 
 // TYPE_INFO rule
 // http://msdn.microsoft.com/en-us/library/dd358284.aspx
@@ -145,6 +151,8 @@ func writeTypeInfo(w io.Writer, ti *typeInfo) (err error) {
 		// those are fixed length
 		// https://msdn.microsoft.com/en-us/library/dd341171.aspx
 		ti.Writer = writeFixedType
+	case typeTvp:
+		ti.Writer = writeFixedType
 	default: // all others are VARLENTYPE
 		err = writeVarLen(w, ti)
 		if err != nil {
@@ -162,6 +170,7 @@ func writeFixedType(w io.Writer, ti typeInfo, buf []byte) (err error) {
 // https://msdn.microsoft.com/en-us/library/dd358341.aspx
 func writeVarLen(w io.Writer, ti *typeInfo) (err error) {
 	switch ti.TypeId {
+
 	case typeDateN:
 		ti.Writer = writeByteLenType
 	case typeTimeN, typeDateTime2N, typeDateTimeOffsetN:
@@ -203,6 +212,7 @@ func writeVarLen(w io.Writer, ti *typeInfo) (err error) {
 		ti.Writer = writeByteLenType
 	case typeBigVarBin, typeBigVarChar, typeBigBinary, typeBigChar,
 		typeNVarChar, typeNChar, typeXml, typeUdt:
+
 		// short len types
 		if ti.Size > 8000 || ti.Size == 0 {
 			if err = binary.Write(w, binary.LittleEndian, uint16(0xffff)); err != nil {
@@ -809,12 +819,12 @@ func decodeMoney(buf []byte) []byte {
 		uint64(buf[1])<<40 |
 		uint64(buf[2])<<48 |
 		uint64(buf[3])<<56)
-	return scaleBytes(strconv.FormatInt(money, 10), 4)
+	return decimal.ScaleBytes(strconv.FormatInt(money, 10), 4)
 }
 
 func decodeMoney4(buf []byte) []byte {
 	money := int32(binary.LittleEndian.Uint32(buf[0:4]))
-	return scaleBytes(strconv.FormatInt(int64(money), 10), 4)
+	return decimal.ScaleBytes(strconv.FormatInt(int64(money), 10), 4)
 }
 
 func decodeGuid(buf []byte) []byte {
@@ -826,15 +836,14 @@ func decodeGuid(buf []byte) []byte {
 func decodeDecimal(prec uint8, scale uint8, buf []byte) []byte {
 	var sign uint8
 	sign = buf[0]
-	dec := Decimal{
-		positive: sign != 0,
-		prec:     prec,
-		scale:    scale,
-	}
+	var dec decimal.Decimal
+	dec.SetPositive(sign != 0)
+	dec.SetPrec(prec)
+	dec.SetScale(scale)
 	buf = buf[1:]
 	l := len(buf) / 4
 	for i := 0; i < l; i++ {
-		dec.integer[i] = binary.LittleEndian.Uint32(buf[0:4])
+		dec.SetInteger(binary.LittleEndian.Uint32(buf[0:4]), uint8(i))
 		buf = buf[4:]
 	}
 	return dec.Bytes()
@@ -1177,7 +1186,7 @@ func makeDecl(ti typeInfo) string {
 	case typeBigChar, typeChar:
 		return fmt.Sprintf("char(%d)", ti.Size)
 	case typeBigVarChar, typeVarChar:
-		if ti.Size > 4000 || ti.Size == 0 {
+		if ti.Size > 8000 || ti.Size == 0 {
 			return fmt.Sprintf("varchar(max)")
 		} else {
 			return fmt.Sprintf("varchar(%d)", ti.Size)
@@ -1219,6 +1228,11 @@ func makeDecl(ti typeInfo) string {
 		return ti.UdtInfo.TypeName
 	case typeGuid:
 		return "uniqueidentifier"
+	case typeTvp:
+		if ti.UdtInfo.SchemaName != "" {
+			return fmt.Sprintf("%s.%s READONLY", ti.UdtInfo.SchemaName, ti.UdtInfo.TypeName)
+		}
+		return fmt.Sprintf("%s READONLY", ti.UdtInfo.TypeName)
 	default:
 		panic(fmt.Sprintf("not implemented makeDecl for type %#x", ti.TypeId))
 	}
