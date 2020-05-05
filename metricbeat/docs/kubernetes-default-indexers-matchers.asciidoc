@@ -8,7 +8,7 @@ configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_kubernetes_metadata:
-    default_indexers.enabled: false
-    default_matchers.enabled: false
+  - add_kubernetes_metadata:
+      default_indexers.enabled: false
+      default_matchers.enabled: false
 -------------------------------------------------------------------------------

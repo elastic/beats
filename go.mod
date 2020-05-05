@@ -42,7 +42,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
-	github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f
+	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.1-0.20190620180102-5e25c22bd5d6+incompatible // indirect
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
@@ -143,6 +143,9 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
+	go.elastic.co/apm v1.7.2
+	go.elastic.co/apm/module/apmelasticsearch v1.7.2
+	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.uber.org/atomic v1.3.1
 	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
 	go.uber.org/zap v1.7.1
@@ -159,7 +162,7 @@ require (
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.27.1
 	gopkg.in/inf.v0 v0.9.0
-	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
+	gopkg.in/jcmturner/gokrb5.v7 v7.3.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.2.8
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb

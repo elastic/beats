@@ -11,8 +11,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"time"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -25,15 +23,6 @@ import (
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
-
-var gatewaySettings = &fleetGatewaySettings{
-	Duration: 2 * time.Second,
-	Jitter:   1 * time.Second,
-	Backoff: backoffSettings{
-		Init: 1 * time.Second,
-		Max:  10 * time.Second,
-	},
-}
 
 type apiClient interface {
 	Send(
@@ -68,7 +57,7 @@ func newManaged(
 		return nil, err
 	}
 
-	path := fleetAgentConfigPath()
+	path := info.AgentConfigFile()
 
 	// TODO(ph): Define the encryption password.
 	store := storage.NewEncryptedDiskStore(path, []byte(""))
@@ -87,10 +76,20 @@ func newManaged(
 			errors.M(errors.MetaKeyPath, path))
 	}
 
+	// merge local configuration and configuration persisted from fleet.
 	rawConfig.Merge(config)
 
 	cfg := defaultFleetAgentConfig()
 	if err := config.Unpack(cfg); err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("fail to unpack configuration from %s", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	// Extract only management related configuration.
+	managementCfg := &Config{}
+	if err := rawConfig.Unpack(managementCfg); err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
 			errors.TypeFilesystem,
@@ -129,7 +128,15 @@ func newManaged(
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 
-	emit := emitter(log, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}, Filters: []filterFunc{filters.ConstraintFilter}}, monitor)
+	emit := emitter(
+		log,
+		router,
+		&configModifiers{
+			Decorators: []decoratorFunc{injectMonitoring},
+			Filters:    []filterFunc{filters.ConstraintFilter},
+		},
+		monitor,
+	)
 	acker, err := newActionAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
@@ -138,9 +145,9 @@ func newManaged(
 	batchedAcker := newLazyAcker(acker)
 
 	// Create the action store that will persist the last good policy change on disk.
-	actionStore, err := newActionStore(log, storage.NewDiskStore(fleetActionStoreFile()))
+	actionStore, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
 	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", fleetActionStoreFile()))
+		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
 	}
 	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
 
@@ -175,7 +182,7 @@ func newManaged(
 	gateway, err := newFleetGateway(
 		managedApplication.bgContext,
 		log,
-		gatewaySettings,
+		managementCfg.Management,
 		agentInfo,
 		client,
 		actionDispatcher,
@@ -201,7 +208,6 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
-	m.gateway.Stop()
 	return nil
 }
 

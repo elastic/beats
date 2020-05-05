@@ -51,6 +51,8 @@ include::../inputs/input-common-tcp-options.asciidoc[]
 
 ===== Protocol `unix`:
 
+beta[]
+
 include::../inputs/input-common-unix-options.asciidoc[]
 
 [id="{beatname_lc}-input-{type}-common-options"]

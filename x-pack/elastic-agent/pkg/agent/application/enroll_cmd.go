@@ -91,7 +91,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewEncryptedDiskStore(fleetAgentConfigPath(), []byte("")),
+		storage.NewEncryptedDiskStore(info.AgentConfigFile(), []byte("")),
 	)
 
 	return NewEnrollCmdWithStore(

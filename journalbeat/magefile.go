@@ -193,7 +193,15 @@ func installDependencies(arch string, pkgs ...string) error {
 		return err
 	}
 
-	params := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	params := append([]string{"install", "-y",
+		"--no-install-recommends",
+
+		// Journalbeat is built with old versions of Debian that don't update
+		// their repositories, so they have expired keys.
+		// Allow unauthenticated packages.
+		// This was not enough: "-o", "Acquire::Check-Valid-Until=false",
+		"--allow-unauthenticated",
+	}, pkgs...)
 	return sh.Run("apt-get", params...)
 }
 
@@ -223,5 +231,7 @@ func selectImage(platform string) (string, error) {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
