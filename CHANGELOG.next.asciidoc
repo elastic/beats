@@ -83,6 +83,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 - Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
+- Arbitrary fields and metadata maps are now deep merged into event. {pull}17958[17958]
+- Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -214,7 +216,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
+- Add support for basic ECS logging. {pull}17974[17974]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
+- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -224,6 +228,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
+- Add system module socket dataset ECS categorization fields. {pull}18036[18036]
+- Add ECS categories for system module host dataset. {pull}18031[18031]
 - Add system module package dataset ECS categorization fields. {pull}18033[18033]
 
 *Filebeat*
@@ -295,6 +301,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added an input option `publisher_pipeline.disable_host` to disable `host.name`
   from being added to events by default. {pull}18159[18159]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
+- When using the `json.*` setting available on some inputs, decoded fields are now deep-merged into existing event. {pull}17958[17958]
+- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 
 *Heartbeat*
 
@@ -374,6 +383,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aggregation aligner as a config parameter for googlecloud stackdriver metricset. {issue}17141[[17141] {pull}17719[17719]
 - Move the perfmon metricset to GA. {issue}16608[16608] {pull}17879[17879]
 - Add static mapping for metricsets under aws module. {pull}17614[17614] {pull}17650[17650]
+- Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
+- Remove requirement to connect as sysdba in Oracle module {issue}15846[15846] {pull}18182[18182]
+- Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 
 *Packetbeat*
 
