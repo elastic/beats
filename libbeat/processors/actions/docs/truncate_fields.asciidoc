@@ -23,10 +23,10 @@ For example, this configuration truncates the field named `message` to 5 charact
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- truncate_fields:
-  fields:
-  - message
-  max_characters: 5
-  fail_on_error: false
-  ignore_missing: true
+  - truncate_fields:
+    fields:
+    - message
+    max_characters: 5
+    fail_on_error: false
+    ignore_missing: true
 ------------------------------------------------------------------------------
