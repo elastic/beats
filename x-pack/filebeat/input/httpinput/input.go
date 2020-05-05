@@ -174,7 +174,7 @@ func (in *HttpInput) apiResponse(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if !ok {
-		return
+		in.log.Error("Failed to send event")
 	}
 
 	// On success, returns the configured response parameters
