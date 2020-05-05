@@ -166,3 +166,7 @@ processors:
         - {from: destination.nat.ip, to: panw.panos.destination.nat.ip, type: ip}
         - {from: source.nat.port, to: panw.panos.source.nat.port, type: long}
         - {from: destination.nat.port, to: panw.panos.destination.nat.port, type: long}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0
