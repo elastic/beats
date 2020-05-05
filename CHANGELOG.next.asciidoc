@@ -287,6 +287,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
 - Add system module user dataset ECS categorization fields. {pull}18035[18035]
 - Add system module login dataset ECS categorization fields. {pull}18034[18034]
+- Add system module package dataset ECS categorization fields. {pull}18033[18033]
 
 *Filebeat*
 
