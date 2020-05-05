@@ -32,6 +32,7 @@ func init() {
 					"access",
 					"brk",
 					"chmod",
+					"chown",
 					"clock_gettime",
 					"clone",
 					"close",

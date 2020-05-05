@@ -13,5 +13,5 @@ multiline:
 {{ end }}
 
 processors:
-# Locale for timezone is only needed in non-json logs
+# Locale for time zone is only needed in non-json logs
 - add_locale.when.not.regexp.message: "^{"

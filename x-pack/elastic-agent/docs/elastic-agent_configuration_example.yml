@@ -25,6 +25,10 @@ outputs:
 settings.monitoring:
   use_output: monitoring
 
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: trace
+
 datasources:
   # use the nginx package
   - id?: nginx-x1

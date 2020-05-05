@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
@@ -104,7 +106,7 @@ func moduleFieldsGo() error {
 	return devtools.GenerateModuleFieldsGo("module")
 }
 
-// fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
+// fieldsYML generates a fields.yml based on metricbeat + x-pack/metricbeat/modules.
 func fieldsYML() error {
 	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module")
 }
@@ -132,8 +134,6 @@ func Update() {
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -158,8 +158,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	}, devtools.ListMatchingEnvVars("NOSE_")...)
+	})
 }
