@@ -48,3 +48,4 @@
 - Enable introspecting configuration {pull}18124[18124]
 - Follow home path for all config files {pull}18161[18161]
 - Do not require unnecessary configuration {pull}18003[18003]
+- Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
