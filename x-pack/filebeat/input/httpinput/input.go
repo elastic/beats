@@ -139,7 +139,7 @@ func (in *HttpInput) run() error {
 	return err
 }
 
-// Stop stops the misp input and waits for it to fully stop.
+// Stops HTTP input and waits for it to finish
 func (in *HttpInput) Stop() {
 	in.httpServer.Shutdown(in.workerCtx)
 	in.workerCancel()
