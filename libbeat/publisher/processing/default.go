@@ -269,6 +269,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
 	builtin := b.builtinMeta
+	if cfg.DisableHost {
+		tmp := builtin.Clone()
+		tmp.Delete("host")
+		builtin = tmp
+	}
+
 	var clientFields common.MapStr
 	for _, mod := range b.modifiers {
 		m := mod.ClientFields(b.info, cfg)

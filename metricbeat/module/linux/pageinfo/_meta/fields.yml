@@ -1,0 +1,65 @@
+- name: pageinfo
+  type: group
+  release: beta
+  description: >
+    pageinfo
+  fields:
+    - name: buddy_info
+      type: group
+      description: >
+        Data from /proc/buddyinfo grouping used pages by order
+      fields:
+        - name: DMA
+          type: group
+          description: >
+            DMA page Data
+          fields:
+            - name: "0"
+              type: long
+              description: >
+                free chunks of 2^0*PAGE_SIZE
+            - name: "1"
+              type: long
+              description: >
+                free chunks of 2^1*PAGE_SIZE
+            - name: "2"
+              type: long
+              description: >
+                free chunks of 2^2*PAGE_SIZE
+            - name: "3"
+              type: long
+              description: >
+                free chunks of 2^3*PAGE_SIZE
+            - name: "4"
+              type: long
+              description: >
+                free chunks of 2^4*PAGE_SIZE
+            - name: "5"
+              type: long
+              description: >
+                free chunks of 2^5*PAGE_SIZE
+            - name: "6"
+              type: long
+              description: >
+                free chunks of 2^6*PAGE_SIZE
+            - name: "7"
+              type: long
+              description: >
+                free chunks of 2^7*PAGE_SIZE
+            - name: "8"
+              type: long
+              description: >
+                free chunks of 2^8*PAGE_SIZE
+            - name: "9"
+              type: long
+              description: >
+                free chunks of 2^9*PAGE_SIZE
+            - name: "10"
+              type: long
+              description: >
+                free chunks of 2^10*PAGE_SIZE
+    - name: nodes.*
+      type: object
+      description: >
+            Raw allocation info from /proc/pagetypeinfo
+
