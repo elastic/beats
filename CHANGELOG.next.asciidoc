@@ -300,6 +300,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - When using the `json.*` setting available on some inputs, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 
 *Heartbeat*
 
