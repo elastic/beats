@@ -25,14 +25,14 @@ var defaultMonitoringConfig = monitoringConfig.MonitoringConfig{
 }
 
 type wrappedConfig struct {
-	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
+	MonitoringConfig monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
 }
 
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
 type Monitor struct {
 	operatingSystem string
-	config          *monitoringConfig.MonitoringConfig
+	config          monitoringConfig.MonitoringConfig
 	installPath     string
 }
 
@@ -41,21 +41,21 @@ func NewMonitor(downloadConfig *artifact.Config) *Monitor {
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
 		installPath:     downloadConfig.InstallPath,
-		config:          &defaultMonitoringConfig,
+		config:          defaultMonitoringConfig,
 	}
 }
 
 // Reload reloads state of the monitoring based on config.
 func (b *Monitor) Reload(rawConfig *config.Config) error {
-	cfg := &wrappedConfig{}
+	cfg := &wrappedConfig{
+		MonitoringConfig: defaultMonitoringConfig,
+	}
 	if err := rawConfig.Unpack(&cfg); err != nil {
 		return err
 	}
 
-	if cfg == nil || cfg.MonitoringConfig == nil {
-		b.config = &defaultMonitoringConfig
-	} else {
-		b.config = cfg.MonitoringConfig
+	if cfg == nil {
+		b.config = defaultMonitoringConfig
 	}
 
 	return nil
