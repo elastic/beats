@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-aws-ec2]]
-=== aws ec2 metricset
+=== AWS ec2 metricset
 
 include::../../../../x-pack/metricbeat/module/aws/ec2/_meta/docs.asciidoc[]
 
