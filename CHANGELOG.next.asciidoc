@@ -377,6 +377,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   from being added to events by default. {pull}18159[18159]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 
 *Heartbeat*
 
