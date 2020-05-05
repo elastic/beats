@@ -12,6 +12,7 @@ auditbeat.modules:
     - /sbin
     - /usr/sbin
     - /etc
+
 processors:
 - add_cloud_metadata: ~
 - add_docker_metadata: ~

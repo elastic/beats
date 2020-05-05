@@ -24,6 +24,8 @@ import (
 	"testing/quick"
 	"time"
 
+	"go.elastic.co/apm/apmtest"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -58,7 +60,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				client := ctor(publishFn)
 
-				worker := makeClientWorker(nilObserver, wqu, client)
+				worker := makeClientWorker(nilObserver, wqu, client, nil)
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
@@ -137,7 +139,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(nilObserver, wqu, client)
+				worker := makeClientWorker(nilObserver, wqu, client, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -162,7 +164,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(nilObserver, wqu, client)
+				makeClientWorker(nilObserver, wqu, client, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
@@ -176,5 +178,54 @@ func TestReplaceClientWorker(t *testing.T) {
 				t.Error(err)
 			}
 		})
+	}
+}
+
+func TestMakeClientTracer(t *testing.T) {
+	seedPRNG(t)
+
+	numBatches := 10
+	numEvents := atomic.MakeUint(0)
+
+	wqu := makeWorkQueue()
+	retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+	defer retryer.close()
+
+	var published atomic.Uint
+	publishFn := func(batch publisher.Batch) error {
+		published.Add(uint(len(batch.Events())))
+		return nil
+	}
+
+	client := newMockNetworkClient(publishFn)
+
+	recorder := apmtest.NewRecordingTracer()
+	defer recorder.Close()
+
+	worker := makeClientWorker(nilObserver, wqu, client, recorder.Tracer)
+	defer worker.Close()
+
+	for i := 0; i < numBatches; i++ {
+		batch := randomBatch(10, 15).withRetryer(retryer)
+		numEvents.Add(uint(len(batch.Events())))
+		wqu <- batch
+	}
+
+	// Give some time for events to be published
+	timeout := 10 * time.Second
+
+	// Make sure that all events have eventually been published
+	matches := waitUntilTrue(timeout, func() bool {
+		return numEvents == published
+	})
+	if !matches {
+		t.Errorf("expected %d events, got %d", numEvents, published)
+	}
+	recorder.Flush(nil)
+
+	apmEvents := recorder.Payloads()
+	transactions := apmEvents.Transactions
+	if len(transactions) != numBatches {
+		t.Errorf("expected %d traces, got %d", numBatches, len(transactions))
 	}
 }

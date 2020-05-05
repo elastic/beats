@@ -16,6 +16,9 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
@@ -43,6 +46,7 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseCommunityBeatPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
@@ -73,13 +77,9 @@ func Config() {
 }
 
 func configYML() error {
-	customDeps := devtools.ConfigFileParams{
-		ShortParts:     []string{"_meta/short.yml", devtools.LibbeatDir("_meta/config.yml.tmpl")},
-		ReferenceParts: []string{"_meta/reference.yml", devtools.LibbeatDir("_meta/config.reference.yml.tmpl")},
-		DockerParts:    []string{"_meta/docker.yml", devtools.LibbeatDir("_meta/config.docker.yml")},
-		ExtraVars:      map[string]interface{}{"BeatName": devtools.BeatName},
-	}
-	return devtools.Config(devtools.AllConfigTypes, customDeps, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
 
 // Clean cleans all generated files and build artifacts.

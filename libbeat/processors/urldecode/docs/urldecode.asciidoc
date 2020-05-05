@@ -14,12 +14,12 @@ key, each entry contains a `from: source-field` and a `to: target-field` pair, w
 [source,yaml]
 -------
 processors:
-- urldecode:
-    fields:
-    - from: "field1"
-      to: "field2"
-    ignore_missing: false
-    fail_on_error: true
+  - urldecode:
+      fields:
+        - from: "field1"
+          to: "field2"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 In the example above:

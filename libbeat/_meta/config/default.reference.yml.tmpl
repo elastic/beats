@@ -1,0 +1,22 @@
+{{block "beat.reference.yml.tmpl" . }}{{end}}
+{{template "general.reference.yml.tmpl" .}}
+{{template "processors.reference.yml.tmpl" .}}
+{{template "elastic-cloud.yml.tmpl" .}}
+{{template "outputs.yml.tmpl" .}}
+{{template "output-elasticsearch.reference.yml.tmpl" .}}
+{{template "output-logstash.reference.yml.tmpl" .}}
+{{if not .ExcludeKafka}}{{template "output-kafka.reference.yml.tmpl" .}}{{end}}
+{{if not .ExcludeRedis}}{{template "output-redis.reference.yml.tmpl" .}}{{end}}
+{{if not .ExcludeFileOutput}}{{template "output-file.reference.yml.tmpl" .}}{{end}}
+{{if not .ExcludeConsole}}{{template "output-console.reference.yml.tmpl" .}}{{end}}
+{{template "paths.reference.yml.tmpl" .}}
+{{template "keystore.reference.yml.tmpl" .}}
+{{template "setup.dashboards.reference.yml.tmpl" .}}
+{{template "setup.template.reference.yml.tmpl" .}}
+{{template "setup.ilm.reference.yml.tmpl" .}}
+{{template "setup.kibana.reference.yml.tmpl" .}}
+{{template "logging.reference.yml.tmpl" .}}
+{{template "monitoring.reference.yml.tmpl" .}}
+{{template "http.reference.yml.tmpl" .}}
+{{template "seccomp.reference.yml.tmpl" .}}
+{{template "migration.yml.tmpl" .}}

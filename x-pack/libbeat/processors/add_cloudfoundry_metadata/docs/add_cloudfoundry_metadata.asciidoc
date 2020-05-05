@@ -26,17 +26,17 @@ Each event is annotated with:
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_cloudfoundry_metadata:
-    api_address: https://api.dev.cfdev.sh
-    client_id: uaa-filebeat
-    client_secret: verysecret
-    ssl:
-      verification_mode: none
-    # To connect to Cloud Foundry over verified TLS you can specify a client and CA certificate.
-    #ssl:
-    #  certificate_authorities: ["/etc/pki/cf/ca.pem"]
-    #  certificate:              "/etc/pki/cf/cert.pem"
-    #  key:                      "/etc/pki/cf/cert.key"
+  - add_cloudfoundry_metadata:
+      api_address: https://api.dev.cfdev.sh
+      client_id: uaa-filebeat
+      client_secret: verysecret
+      ssl:
+        verification_mode: none
+      # To connect to Cloud Foundry over verified TLS you can specify a client and CA certificate.
+      #ssl:
+      #  certificate_authorities: ["/etc/pki/cf/ca.pem"]
+      #  certificate:              "/etc/pki/cf/cert.pem"
+      #  key:                      "/etc/pki/cf/cert.key"
 -------------------------------------------------------------------------------
 
 It has the following settings:
