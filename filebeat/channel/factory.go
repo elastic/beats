@@ -50,6 +50,10 @@ type inputOutletConfig struct {
 	Processors           processors.PluginConfig `config:"processors"`
 	KeepNull             bool                    `config:"keep_null"`
 
+	PublisherPipeline struct {
+		DisableHost bool `config:"disable_host"` // Disable addition of host.name.
+	} `config:"publisher_pipeline"`
+
 	// implicit event fields
 	Type        string `config:"type"`         // input.type
 	ServiceType string `config:"service.type"` // service.type

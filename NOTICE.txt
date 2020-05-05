@@ -6580,8 +6580,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/prometheus/procfs
-Version: v0.0.9
-Revision: 42f6e295b56f
+Version: v0.0.11
 License type (autodetected): Apache-2.0
 ./vendor/github.com/prometheus/procfs/LICENSE:
 --------------------------------------------------------------------
@@ -7823,7 +7822,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: c96a22e43c9c
+Revision: b016eb3dc98e
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
