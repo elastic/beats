@@ -18,6 +18,7 @@
 package outputs
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -91,12 +92,12 @@ func (f *failoverClient) Close() error {
 	return f.clients[f.active].Close()
 }
 
-func (f *failoverClient) Publish(batch publisher.Batch) error {
+func (f *failoverClient) Publish(ctx context.Context, batch publisher.Batch) error {
 	if f.active < 0 {
 		batch.Retry()
 		return errNoActiveConnection
 	}
-	return f.clients[f.active].Publish(batch)
+	return f.clients[f.active].Publish(ctx, batch)
 }
 
 func (f *failoverClient) Test(d testing.Driver) {
