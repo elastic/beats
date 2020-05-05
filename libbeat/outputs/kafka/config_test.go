@@ -23,8 +23,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	lbtesting "github.com/elastic/beats/v7/libbeat/testing"
@@ -123,8 +121,9 @@ func TestBackoffFunc(t *testing.T) {
 				expectedBackoff := math.Min(float64(backoff), float64(backoffCfg.Max))
 				actualBackoff := backoffFn(retries, 50)
 
-				require.GreaterOrEqual(t, float64(actualBackoff), expectedBackoff/2)
-				require.LessOrEqual(t, float64(actualBackoff), expectedBackoff)
+				if !((expectedBackoff/2 <= float64(actualBackoff)) && (float64(actualBackoff) <= expectedBackoff)) {
+					t.Fatalf("backoff '%v' not in expected range [%v, %v] (retries: %v)", actualBackoff, expectedBackoff/2, expectedBackoff, retries)
+				}
 
 				prevBackoff = backoff
 			}
