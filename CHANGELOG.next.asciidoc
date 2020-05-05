@@ -219,6 +219,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for basic ECS logging. {pull}17974[17974]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
+- Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 
 *Auditbeat*
 
@@ -228,6 +229,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
+- Add system module socket dataset ECS categorization fields. {pull}18036[18036]
+- Add ECS categories for system module host dataset. {pull}18031[18031]
+- Add system module package dataset ECS categorization fields. {pull}18033[18033]
+- Add system module login dataset ECS categorization fields. {pull}18034[18034]
+- Add system module user dataset ECS categorization fields. {pull}18035[18035]
 
 *Filebeat*
 
@@ -283,12 +289,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add config option to select a different azure cloud env in the azure-eventhub input and azure module. {issue}17649[17649] {pull}17659[17659]
 - Added new Checkpoint Syslog filebeat module. {pull}17682[17682]
 - Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
+- Add support for v10, v11 and v12 logs on Postgres {issue}13810[13810] {pull}17732[17732]
 - Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
 - Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
 - Enhance `elasticsearch/deprecation` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17728[17728]
 - Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
 - Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
 - Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
+- Added new Fortigate Syslog filebeat module. {pull}17890[17890]
 - Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
 - Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
 - Make `decode_cef` processor GA. {pull}17944[17944]
@@ -380,6 +388,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aggregation aligner as a config parameter for googlecloud stackdriver metricset. {issue}17141[[17141] {pull}17719[17719]
 - Move the perfmon metricset to GA. {issue}16608[16608] {pull}17879[17879]
 - Add static mapping for metricsets under aws module. {pull}17614[17614] {pull}17650[17650]
+- Add dashboard for googlecloud storage metricset. {pull}18172[18172]
 - Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
 - Remove requirement to connect as sysdba in Oracle module {issue}15846[15846] {pull}18182[18182]
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
@@ -395,6 +404,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add experimental event log reader implementation that should be faster in most cases. {issue}6585[6585] {pull}16849[16849]
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
+- Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
 
 ==== Deprecated
 
