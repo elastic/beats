@@ -583,9 +583,9 @@ github.com/gorilla/websocket
 github.com/grpc-ecosystem/grpc-gateway/internal
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
-# github.com/hashicorp/errwrap v0.0.0-20141028054710-7554cd9344ce
+# github.com/hashicorp/errwrap v1.0.0
 github.com/hashicorp/errwrap
-# github.com/hashicorp/go-multierror v0.0.0-20161216184304-ed905158d874
+# github.com/hashicorp/go-multierror v1.0.0
 github.com/hashicorp/go-multierror
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
@@ -707,7 +707,7 @@ github.com/prometheus/client_model/go
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.0.9-0.20191208103036-42f6e295b56f
+# github.com/prometheus/procfs v0.0.11
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
@@ -759,7 +759,7 @@ github.com/spf13/cobra
 github.com/spf13/pflag
 # github.com/stretchr/objx v0.2.0
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.4.0
+# github.com/stretchr/testify v1.5.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
@@ -847,6 +847,9 @@ go.elastic.co/apm/transport/transporttest
 go.elastic.co/apm/module/apmelasticsearch
 # go.elastic.co/apm/module/apmhttp v1.7.2
 go.elastic.co/apm/module/apmhttp
+# go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+go.elastic.co/ecszap
+go.elastic.co/ecszap/internal
 # go.elastic.co/fastjson v1.0.0
 go.elastic.co/fastjson
 # go.opencensus.io v0.22.2
@@ -867,11 +870,13 @@ go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
-# go.uber.org/atomic v1.3.1
+# go.uber.org/atomic v1.5.0
 go.uber.org/atomic
-# go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
+# go.uber.org/multierr v1.3.0
 go.uber.org/multierr
-# go.uber.org/zap v1.7.1
+# go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee
+go.uber.org/tools/update-license
+# go.uber.org/zap v1.14.0
 go.uber.org/zap
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/bufferpool
@@ -940,7 +945,7 @@ golang.org/x/oauth2/jwt
 # golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c
+# golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
