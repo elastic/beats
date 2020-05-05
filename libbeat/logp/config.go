@@ -28,7 +28,7 @@ type Config struct {
 	JSON       bool     `config:"json"`      // Write logs as JSON.
 	Level      Level    `config:"level"`     // Logging level (error, warning, info, debug).
 	Selectors  []string `config:"selectors"` // Selectors for debug level logging.
-	ECSEnabled bool     `config:"ecs"`
+	ECSEnabled bool     `config:"ecs"`       // Adds minimal ECS information using ECS conformant keys to every log line
 
 	toObserver  bool
 	toIODiscard bool
