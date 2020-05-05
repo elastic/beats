@@ -164,10 +164,9 @@ a "could not locate that index-pattern" error. To resolve this problem:
 +
 --
 * Set the *Time filter field name* to `@timestamp`.
-* If you're using a custom index name, set the *Custom index pattern ID*
-advanced option. For example, if your custom index name is
-+{beatname_lc}-customname+, set the custom index pattern ID to
-+{beatname_lc}-customname-*+.
+* Set the *Custom index pattern ID* advanced option. For example, if your
+custom index name is +{beatname_lc}-customname+, set the custom index pattern ID
+to +{beatname_lc}-customname-*+.
 --
 
 For more information, see {kibana-ref}/index-patterns.html[Creating an index
