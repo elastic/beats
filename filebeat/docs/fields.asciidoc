@@ -67,7 +67,7 @@ grouped in the following categories:
 
 --
 [[exported-fields-activemq]]
-== activemq fields
+== ActiveMQ fields
 
 Module for parsing ActiveMQ log files.
 
@@ -17414,7 +17414,7 @@ example: Critical
 --
 
 [[exported-fields-elasticsearch]]
-== elasticsearch fields
+== Elasticsearch fields
 
 elasticsearch Module
 
@@ -23069,7 +23069,7 @@ type: long
 --
 
 [[exported-fields-haproxy]]
-== haproxy fields
+== HAProxy fields
 
 haproxy Module
 
@@ -27141,7 +27141,7 @@ alias to: source.ip
 --
 
 [[exported-fields-nats]]
-== nats fields
+== NATS fields
 
 Module for parsing NATS log files.
 

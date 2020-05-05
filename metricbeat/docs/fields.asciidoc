@@ -84,7 +84,7 @@ grouped in the following categories:
 
 --
 [[exported-fields-activemq]]
-== Activemq fields
+== ActiveMQ fields
 
 activemq module
 
@@ -1510,7 +1510,7 @@ type: long
 --
 
 [[exported-fields-aws]]
-== Aws fields
+== AWS fields
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 

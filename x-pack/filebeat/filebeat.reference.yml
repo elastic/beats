@@ -37,7 +37,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- Activemq Module -------------------------------
+#------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   # Audit logs
   audit:

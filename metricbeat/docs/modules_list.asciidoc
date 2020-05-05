@@ -5,7 +5,7 @@ This file is generated! See scripts/mage/docs_collector.go
 [options="header"]
 |===
 |Modules   |Dashboards   |Metricsets   
-|<<metricbeat-module-activemq,Activemq>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-activemq,ActiveMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-activemq-broker,broker>>   
 |<<metricbeat-metricset-activemq-queue,queue>>   
 |<<metricbeat-metricset-activemq-topic,topic>>   
@@ -15,7 +15,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
-|<<metricbeat-module-aws,Aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-aws,AWS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .16+| .16+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
