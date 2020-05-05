@@ -464,6 +464,82 @@ var sysmon = (function () {
         ignore_missing: true,
     });
 
+    var setAdditionalSignatureFields = function (evt) {
+        var signed = evt.Get("winlog.event_data.Signed");
+        if (!signed) {
+            return;
+        }
+        evt.Put("file.code_signature.signed", true);
+        var signatureStatus = evt.Get("winlog.event_data.SignatureStatus");
+        evt.Put("file.code_signature.valid", signatureStatus === "Valid");
+    };
+
+    // https://docs.microsoft.com/en-us/windows/win32/sysinfo/registry-hives
+    var commonRegistryHives = {
+        HKEY_CLASSES_ROOT: "HKCR",
+        HKCR: "HKCR",
+        HKEY_CURRENT_CONFIG: "HKCC",
+        HKCC: "HKCC",
+        HKEY_CURRENT_USER: "HKCU",
+        HKCU: "HKCU",
+        HKEY_DYN_DATA: "HKDD",
+        HKDD: "HKDD",
+        HKEY_LOCAL_MACHINE: "HKLM",
+        HKLM: "HKLM",
+        HKEY_PERFORMANCE_DATA: "HKPD",
+        HKPD: "HKPD",
+        HKEY_USERS: "HKU",
+        HKU: "HKU",
+    };
+
+    var qwordRegex = new RegExp(/ab+c/, "i");
+    var dwordRegex = new RegExp(/DWORD \(()\)/, "i");
+
+    var setRegistryFields = function (evt) {
+        var path = evt.Get("winlog.event_data.TargetObject");
+        if (!path) {
+            return;
+        }
+        evt.Put("registry.path", path);
+        var pathTokens = path.split("\\");
+        var hive = commonRegistryHives[pathTokens[0]];
+        if (hive) {
+            evt.Put("registry.hive", hive);
+            pathTokens.splice(0, 1);
+            if (pathTokens.length > 0) {
+                evt.Put("registry.key", pathTokens.join("\\"));
+            }
+        }
+        var value = pathTokens[pathTokens.length - 1];
+        evt.Put("registry.value", value);
+        var data = evt.Get("winlog.event_data.Details");
+        if (!data) {
+            return;
+        }
+        // sysmon only returns details of a registry modification
+        // if it's a qword or dword
+        var dataType;
+        var dataValue;
+        var match = qwordRegex.exec(data);
+        if (match.length > 0) {
+            dataType = "SZ_QWORD";
+            dataValue = match[1];
+        } else {
+            match = dwordRegex.exec(data);
+            if (match.length > 0) {
+                dataType = "SZ_DWORD";
+                dataValue = match[1];
+            }
+        }
+        if (match.length > 0) {
+            var parsedValue = parseInt(dataValue);
+            if (!isNan(parsedValue)) {
+                evt.Put("registry.data.strings", [parsedValue]);
+                evt.Put("registry.data.type", dataType);
+            }
+        }
+    };
+
     // Event ID 1 - Process Create.
     var event1 = new processor.Chain()
         .Add(parseUtcTime)
@@ -737,6 +813,20 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.Signature",
+                    to: "file.code_signature.subject_name",
+                },
+                {
+                    from: "winlog.event_data.SignatureStatus",
+                    to: "file.code_signature.status",
+                },
+            ],
+            fail_on_error: false,
+        })
+        .Add(setAdditionalSignatureFields)
         .Add(splitHashes)
         .Add(removeEmptyEventData)
         .Build();
@@ -778,6 +868,20 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.Signature",
+                    to: "file.code_signature.subject_name",
+                },
+                {
+                    from: "winlog.event_data.SignatureStatus",
+                    to: "file.code_signature.status",
+                },
+            ],
+            fail_on_error: false,
+        })
+        .Add(setAdditionalSignatureFields)
         .Add(setProcessNameUsingExe)
         .Add(splitHashes)
         .Add(removeEmptyEventData)
@@ -959,6 +1063,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -990,6 +1095,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
@@ -1021,6 +1127,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
