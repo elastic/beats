@@ -79,6 +79,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
 - Fix `setup.dashboards.index` setting not working. {pull}17749[17749]
 - Fix Elasticsearch license endpoint URL referenced in error message. {issue}17880[17880] {pull}18030[18030]
+- Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
+- Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
+- Arbitrary fields and metadata maps are now deep merged into event. {pull}17958[17958]
+- Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Auditbeat*
 
@@ -192,6 +196,42 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `providers` setting to `add_cloud_metadata` processor. {pull}13812[13812]
 - Ensure that init containers are no longer tailed after they stop {pull}14394[14394]
 - Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
+- Add document_id setting to decode_json_fields processor. {pull}15859[15859]
+- Include network information by default on add_host_metadata and add_observer_metadata. {issue}15347[15347] {pull}16077[16077]
+- Add `aws_ec2` provider for autodiscover. {issue}12518[12518] {pull}14823[14823]
+- Add monitoring variable `libbeat.config.scans` to distinguish scans of the configuration directory from actual reloads of its contents. {pull}16440[16440]
+- Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
+- Add support for Histogram type in fields.yml {pull}16570[16570]
+- Windows .exe files now have embedded file version info. {issue}15232[15232]t
+- Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
+- Add Kerberos support to Kafka input and output. {pull}16781[16781]
+- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621
+- Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
+- Add `translate_sid` processor on Windows for converting Windows security identifier (SID) values to names. {issue}7451[7451] {pull}16013[16013]
+- Add capability of enrich `container.id` with process id in `add_process_metadata` processor {pull}15947[15947]
+- Update RPM packages contained in Beat Docker images. {issue}17035[17035]
+- Update supported versions of `redis` output. {pull}17198[17198]
+- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
+- Add `replace` processor for replacing string values of fields. {pull}17342[17342]
+- Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
+- Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
+- Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
+- Add keystore support for autodiscover static configurations. {pull]16306[16306]
+- Add Kerberos support to Elasticsearch output. {pull}17927[17927]
+- Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
+- Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
+- Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
+- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
+
+*Auditbeat*
+
+- Reference kubernetes manifests include configuration for auditd and enrichment with kubernetes metadata. {pull}17431[17431]
+- Reference kubernetes manifests mount data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- Log to stderr when running using reference kubernetes manifests. {pull}17443[174443]
+- Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
+- Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
+- Add system module process dataset ECS categorization fields. {pull}18032[18032]
 
 *Filebeat*
 
@@ -250,6 +290,26 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve AWS cloudtrail field mappings {issue}16086[16086] {issue}16110[16110] {pull}17155[17155]
 - Release Google Cloud module as GA. {pull}17511[17511]
 - Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
+- Add config option to select a different azure cloud env in the azure-eventhub input and azure module. {issue}17649[17649] {pull}17659[17659]
+- Added new Checkpoint Syslog filebeat module. {pull}17682[17682]
+- Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
+- Enhance `elasticsearch/server` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17714[17714]
+- Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
+- Enhance `elasticsearch/deprecation` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17728[17728]
+- Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
+- Improve ECS categorization field mappings in misp module. {issue}16026[16026] {pull}17344[17344]
+- Added Unix stream socket support as an input source and a syslog input source. {pull}17492[17492]
+- Improve ECS categorization field mappings in postgresql module. {issue}16177[16177] {pull}17914[17914]
+- Improve ECS categorization field mappings in rabbitmq module. {issue}16178[16178] {pull}17916[17916]
+- Make `decode_cef` processor GA. {pull}17944[17944]
+- Improve ECS categorization field mappings in redis module. {issue}16179[16179] {pull}17918[17918]
+- Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
+- Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
+- Added an input option `publisher_pipeline.disable_host` to disable `host.name`
+  from being added to events by default. {pull}18159[18159]
+- Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
+- When using the `json.*` setting available on some inputs, decoded fields are now deep-merged into existing event. {pull}17958[17958]
+- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 
 *Heartbeat*
 
