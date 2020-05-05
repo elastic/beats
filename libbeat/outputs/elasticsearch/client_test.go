@@ -20,6 +20,7 @@
 package elasticsearch
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -242,7 +243,7 @@ func TestClientWithHeaders(t *testing.T) {
 	}}
 
 	batch := outest.NewBatch(event, event, event)
-	err = client.Publish(batch)
+	err = client.Publish(context.Background(), batch)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, requestCount)
 }
