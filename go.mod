@@ -93,7 +93,7 @@ require (
 	github.com/gorilla/mux v1.7.2 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/hashicorp/go-multierror v0.0.0-20161216184304-ed905158d874
+	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -135,7 +135,7 @@ require (
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 	github.com/urso/ecslog v0.0.1
@@ -144,9 +144,10 @@ require (
 	go.elastic.co/apm v1.7.2
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
 	go.elastic.co/apm/module/apmhttp v1.7.2
-	go.uber.org/atomic v1.3.1
-	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
-	go.uber.org/zap v1.7.1
+	go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+	go.uber.org/atomic v1.5.0
+	go.uber.org/multierr v1.3.0
+	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
