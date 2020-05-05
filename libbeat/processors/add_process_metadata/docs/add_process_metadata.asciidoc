@@ -11,9 +11,9 @@ processes, identified by their process ID (PID).
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_process_metadata:
-    match_pids: [system.process.ppid]
-    target: system.process.parent
+  - add_process_metadata:
+      match_pids: [system.process.ppid]
+      target: system.process.parent
 -------------------------------------------------------------------------------
 
 The fields added to the event look as follows:

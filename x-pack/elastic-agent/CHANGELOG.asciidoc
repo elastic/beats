@@ -29,6 +29,8 @@
 - ECS compliant Elastic agent metadata sent to fleet {pull}18006[18006]
 - Use default output by default {pull}18091[18091]
 - Use /tmp for default monitoring endpoint location for libbeat {pull}18131[18131]
+- Fix panic and flaky tests for the Agent. {pull}18135[18135]
+- Fix default configuration after enroll {pull}18232[18232]
 
 ==== New features
 
@@ -47,4 +49,5 @@
 - Use data subfolder as default for process logs {pull}17960[17960]
 - Do not require unnecessary configuration {pull}18003[18003]
 - Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
+- Enable introspecting configuration {pull}18124[18124]
 - Follow home path for all config files {pull}18161[18161]
