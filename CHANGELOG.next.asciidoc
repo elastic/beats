@@ -285,6 +285,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syscall kprobe arguments for 32-bit systems in socket module. {pull}17500[17500]
 - Fix memory leak on when we miss socket close kprobe events. {pull}17500[17500]
 - Add system module process dataset ECS categorization fields. {pull}18032[18032]
+- Add system module user dataset ECS categorization fields. {pull}18035[18035]
 
 *Filebeat*
 
