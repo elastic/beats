@@ -4,41 +4,6 @@
     `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
   release: ga
   fields:
-    - name: cloud.account.name
-      type: keyword
-      overwrite: true
-      description: >
-       AWS cloud account name or alias used to identify different entities in a multi-tenant environment.
-    - name: cloud.account.id
-      type: keyword
-      overwrite: true
-      description: >
-        AWS cloud account ID used to identify different entities in a multi-tenant environment.
-    - name: cloud.provider
-      type: keyword
-      overwrite: true
-      description: >
-        Name of the cloud provider: aws.
-    - name: cloud.region
-      type: keyword
-      overwrite: true
-      description: >
-        Region in which this AWS service is running.
-    - name: cloud.availability_zone
-      type: keyword
-      overwrite: true
-      description: >
-        Availability zone in which this AWS service is running.
-    - name: cloud.instance.id
-      type: keyword
-      overwrite: true
-      description: >
-        AWS EC2 instance ID.
-    - name: cloud.machine.type
-      type: keyword
-      overwrite: true
-      description: >
-        AWS EC2 instance machine type.
     - name: aws
       type: group
       description: >
