@@ -26,8 +26,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "system_info",
         "osquery.result.unix_time": "1512649280",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "system_info",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -56,8 +60,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -86,8 +94,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -116,8 +128,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -146,8 +162,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -176,8 +196,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -206,8 +230,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -236,8 +264,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -266,8 +298,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -296,8 +332,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -326,8 +366,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -356,8 +400,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -386,8 +434,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -416,8 +468,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -446,8 +502,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -476,8 +536,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -506,8 +570,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -536,8 +604,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -566,8 +638,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -596,8 +672,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -626,8 +706,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -656,8 +740,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -686,8 +774,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -716,8 +808,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -746,8 +842,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -776,8 +876,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -806,8 +910,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -836,8 +944,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -866,8 +978,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -896,8 +1012,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -926,8 +1046,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -956,8 +1080,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -986,8 +1114,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1016,8 +1148,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1046,8 +1182,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1076,8 +1216,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1106,8 +1250,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1136,8 +1284,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1166,8 +1318,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1196,8 +1352,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1226,8 +1386,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1256,8 +1420,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1286,8 +1454,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1316,8 +1488,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1346,8 +1522,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1376,8 +1556,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1406,8 +1590,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1436,8 +1624,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1466,8 +1658,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1496,8 +1692,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1526,8 +1726,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1556,8 +1760,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1586,8 +1794,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1616,8 +1828,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1646,8 +1862,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1676,8 +1896,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:15.000Z",
@@ -1706,8 +1930,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_kernel_modules",
         "osquery.result.unix_time": "1512669435",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_kernel_modules",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1738,8 +1966,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1770,8 +2002,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1802,8 +2038,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1834,8 +2074,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1866,8 +2110,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1898,8 +2146,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1930,8 +2182,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1962,8 +2218,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -1994,8 +2254,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -2026,8 +2290,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -2058,8 +2326,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -2091,8 +2363,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_os_version",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:18.000Z",
@@ -2140,8 +2416,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669438",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_osquery_info",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2172,8 +2452,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2204,8 +2488,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2236,8 +2524,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2268,8 +2560,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2300,8 +2596,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2332,8 +2632,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2364,8 +2668,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2396,8 +2704,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2428,8 +2740,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2460,8 +2776,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2492,8 +2812,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_disk_encryption",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_disk_encryption",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2525,8 +2849,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_os_version",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_os_version",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:19.000Z",
@@ -2574,8 +2902,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_osquery_info",
         "osquery.result.unix_time": "1512669439",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_osquery_info",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2611,8 +2943,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2648,8 +2984,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2685,8 +3025,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2722,8 +3066,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2759,8 +3107,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2796,8 +3148,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2833,8 +3189,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2870,8 +3230,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2907,8 +3271,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2944,8 +3312,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -2981,8 +3353,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3018,8 +3394,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3055,8 +3435,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3092,8 +3476,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3129,8 +3517,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3166,8 +3558,12 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     },
     {
         "@timestamp": "2017-12-07T17:57:21.000Z",
@@ -3203,7 +3599,11 @@
         "osquery.result.host_identifier": "ubuntu-xenial",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1512669441",
+        "related.user": [
+            "ubuntu"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "ubuntu"
     }
 ]
