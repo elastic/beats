@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -37,6 +39,15 @@ func TestData(t *testing.T) {
 
 	for _, e := range events {
 		if name, _ := e.RootFields.GetValue("user.name"); name == "elastic" {
+			relatedNames, err := e.RootFields.GetValue("related.user")
+			require.NoError(t, err)
+			require.Equal(t, []string{"elastic"}, relatedNames)
+			groupName, err := e.RootFields.GetValue("user.group.name")
+			require.NoError(t, err)
+			require.Equal(t, "elastic", groupName)
+			groupID, err := e.RootFields.GetValue("user.group.id")
+			require.NoError(t, err)
+			require.Equal(t, "1001", groupID)
 			fullEvent := mbtest.StandardizeEvent(f, e, core.AddDatasetToEvent)
 			mbtest.WriteEventToDataJSON(t, fullEvent, "")
 			return

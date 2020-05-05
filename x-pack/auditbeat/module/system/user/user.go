@@ -181,12 +181,22 @@ func (user User) toMapStr() common.MapStr {
 			groupMapStr = append(groupMapStr, common.MapStr{
 				"name": group.Name,
 				"gid":  group.Gid,
+				"id":   group.Gid,
 			})
 		}
 		evt.Put("group", groupMapStr)
 	}
 
 	return evt
+}
+
+func (user User) PrimaryGroup() *user.Group {
+	for _, group := range user.Groups {
+		if group.Gid == user.GID {
+			return group
+		}
+	}
+	return nil
 }
 
 // entityID creates an ID that uniquely identifies this user across machines.
@@ -456,6 +466,9 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 				"id":   user.UID,
 				"name": user.Name,
 			},
+			"related": common.MapStr{
+				"user": []string{user.Name},
+			},
 			"message": userMessage(user, action),
 		},
 		MetricSetFields: user.toMapStr(),
@@ -463,6 +476,18 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 
 	if ms.HostID() != "" {
 		event.RootFields.Put("user.entity_id", user.entityID(ms.HostID()))
+	}
+
+	primaryGroup := user.PrimaryGroup()
+	if primaryGroup != nil {
+		event.RootFields.Put("user.group", common.MapStr{
+			"id":   primaryGroup.Gid,
+			"name": primaryGroup.Name,
+		})
+	} else if user.GID != "" { // fallback to just filling out the GID
+		event.RootFields.Put("user.group", common.MapStr{
+			"id": user.GID,
+		})
 	}
 
 	return event
