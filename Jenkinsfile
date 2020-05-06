@@ -1105,8 +1105,10 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 
-  // Skip all the stages with asciidoc and png changes only
+  // Skip all the stages for only the Pull Requests that contain only changes in asciidoc
+  // and png files.
   env.ONLY_DOCS = !params.runAllStages &&
+                  !env.CHANGE_ID?.trim() &&
                   isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png)' ], shouldMatchAll: true)
 }
 
