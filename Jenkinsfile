@@ -66,10 +66,6 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
-      when {
-        beforeAgent true
-        expression { return env.ONLY_DOCS == "false" }
-      }
       steps {
         makeTarget("Lint", "check")
       }
@@ -1109,9 +1105,9 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 
-  // Skip all the stages for PRs with changes in the docs only
+  // Skip all the stages with asciidoc and png changes only
   env.ONLY_DOCS = !params.runAllStages &&
-                  isGitRegionMatch(patterns: [ '^docs/.*' ], shouldMatchAll: true)
+                  isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png)' ], shouldMatchAll: true)
 }
 
 /**
