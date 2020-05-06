@@ -18,12 +18,13 @@
 package template
 
 import (
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-ucfg"
 )
 
 // Mapper maps config templates with conditions, if a match happens on a discover event
