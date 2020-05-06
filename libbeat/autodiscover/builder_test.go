@@ -20,6 +20,7 @@ package autodiscover
 import (
 	"testing"
 
+	"github.com/elastic/go-ucfg"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -28,7 +29,7 @@ import (
 
 type fakeBuilder struct{}
 
-func (f *fakeBuilder) CreateConfig(event bus.Event) []*common.Config {
+func (f *fakeBuilder) CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config {
 	return []*common.Config{common.NewConfig()}
 }
 

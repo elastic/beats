@@ -203,7 +203,7 @@ func TestGenerateHints(t *testing.T) {
 			config: defaultConfig(),
 			logger: logp.NewLogger("hints.builder"),
 		}
-		cfgs := m.CreateConfig(test.event)
+		cfgs := m.CreateConfig(test.event, nil)
 		assert.Equal(t, len(cfgs), test.len, test.message)
 
 		if len(cfgs) != 0 {
