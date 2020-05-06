@@ -168,7 +168,12 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 		"filebeat": map[string]interface{}{
 			"inputs": []interface{}{
 				map[string]interface{}{
-					"type":  "log",
+					"type": "log",
+					"multiline": map[string]interface{}{
+						"pattern": "^[0-9]{4}",
+						"negate":  true,
+						"match":   "after",
+					},
 					"paths": paths,
 					"index": "logs-agent-default",
 					"processors": []map[string]interface{}{
