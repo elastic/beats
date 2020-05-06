@@ -27,15 +27,15 @@ import (
 
 	"go.elastic.co/apm"
 
-	"github.com/elastic/beats/v7/libbeat/testing"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -290,7 +290,7 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		if opType, err := event.GetMetaStringValue(opTypeKey); err == nil && opType == opTypeDelete {
+		if opType, err := events.GetMetaStringValue(*event, opTypeKey); err == nil && opType == opTypeDelete {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
@@ -325,8 +325,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	id, _ := event.GetMetaStringValue("_id")
-	opType, _ := event.GetMetaStringValue(opTypeKey)
+	id, _ := events.GetMetaStringValue(*event, "_id")
+	opType, _ := events.GetMetaStringValue(*event, opTypeKey)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
