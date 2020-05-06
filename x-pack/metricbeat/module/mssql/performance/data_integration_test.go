@@ -19,21 +19,10 @@ import (
 func TestData(t *testing.T) {
 	t.Skip("Skipping `data.json` generation test")
 
-	_, config, err := getHostURI()
-	if err != nil {
-		t.Fatal("error getting config information", err.Error())
-	}
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("performance"))
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-
-	if err = mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err := mbtest.WriteEventsReporterV2(f, t, "")
+	assert.NoError(t, err)
 }
 
 func getHostURI() (string, map[string]interface{}, error) {

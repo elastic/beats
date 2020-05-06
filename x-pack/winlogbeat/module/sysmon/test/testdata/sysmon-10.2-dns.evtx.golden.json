@@ -30,6 +30,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -100,6 +112,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -172,6 +196,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -249,6 +285,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -319,6 +367,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -398,6 +458,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -464,6 +536,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -541,6 +625,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -603,6 +699,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -682,6 +790,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -794,6 +914,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -860,6 +992,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -931,6 +1075,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -1008,6 +1164,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1070,6 +1238,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -1148,6 +1328,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1219,6 +1411,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1289,6 +1493,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -1388,6 +1604,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1465,6 +1693,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -1589,6 +1829,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1699,6 +1951,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -1816,6 +2080,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -1896,6 +2172,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -2014,6 +2302,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -2136,6 +2436,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2202,6 +2514,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -2315,6 +2639,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2385,6 +2721,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -2498,6 +2846,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2565,6 +2925,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2631,6 +3003,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -2738,6 +3122,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2833,6 +3229,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -2899,6 +3307,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3001,6 +3421,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3118,6 +3550,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3237,6 +3681,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -3303,6 +3759,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3421,6 +3889,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -3532,6 +4012,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -3599,6 +4091,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -3661,6 +4165,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3741,6 +4257,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3848,6 +4376,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -3960,6 +4500,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4034,6 +4586,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -4153,6 +4717,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4228,6 +4804,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -4325,6 +4913,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4396,6 +4996,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4463,6 +5075,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4517,6 +5141,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4570,6 +5206,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -4683,6 +5331,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4759,6 +5419,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -4825,6 +5497,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -4938,6 +5622,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5013,6 +5709,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -5126,6 +5834,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5192,6 +5912,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -5275,6 +6007,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5357,6 +6101,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5424,6 +6180,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -5536,6 +6304,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -5655,6 +6435,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5773,6 +6565,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5885,6 +6689,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -5960,6 +6776,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -6043,6 +6871,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -6109,6 +6949,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -6221,6 +7073,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -6344,6 +7208,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -6455,6 +7331,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -6525,6 +7413,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -6643,6 +7543,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -6713,6 +7625,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -6831,6 +7755,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -6943,6 +7879,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7032,6 +7980,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -7151,6 +8111,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7243,6 +8215,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7305,6 +8289,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -7418,6 +8414,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7500,6 +8508,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7562,6 +8582,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -7674,6 +8706,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -7788,6 +8832,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -7879,6 +8935,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -7992,6 +9060,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8093,6 +9173,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8193,6 +9285,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -8316,6 +9420,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8429,6 +9545,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8534,6 +9662,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -8647,6 +9787,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8759,6 +9911,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -8829,6 +9993,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -8940,6 +10116,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9010,6 +10198,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9093,6 +10293,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9164,6 +10376,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9237,6 +10461,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9307,6 +10543,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9380,6 +10628,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9446,6 +10706,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9523,6 +10795,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9593,6 +10877,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9669,6 +10965,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9739,6 +11047,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -9811,6 +11131,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -9881,6 +11213,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10000,6 +11344,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -10082,6 +11438,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -10154,6 +11522,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10268,6 +11648,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -10330,6 +11722,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10401,6 +11805,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10519,6 +11935,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -10585,6 +12013,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10656,6 +12096,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10771,6 +12223,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -10893,6 +12357,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -10963,6 +12439,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -11080,6 +12568,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -11199,6 +12699,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -11312,6 +12824,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -11419,6 +12943,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -11537,6 +13073,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -11865,6 +13413,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -11997,6 +13557,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12063,6 +13635,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -12139,6 +13723,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12192,6 +13788,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -12263,6 +13871,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -12382,6 +14002,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12500,6 +14132,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12570,6 +14214,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -12683,6 +14339,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12795,6 +14463,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -12906,6 +14586,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13006,6 +14698,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13077,6 +14781,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13147,6 +14863,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -13260,6 +14988,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13342,6 +15082,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -13461,6 +15213,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13527,6 +15291,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -13599,6 +15375,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13666,6 +15454,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13720,6 +15520,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13773,6 +15585,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13825,6 +15649,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -13901,6 +15737,18 @@
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
     },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
+    },
     "host": {
       "name": "vagrant-2016"
     },
@@ -13967,6 +15815,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
@@ -14068,6 +15928,18 @@
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "network"
+        ],
+        "type": [
+          "connection",
+          "protocol",
+          "info"
+        ]
+      }
     },
     "host": {
       "name": "vagrant-2016"
