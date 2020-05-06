@@ -170,7 +170,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 				map[string]interface{}{
 					"type": "log",
 					"multiline": map[string]interface{}{
-						"pattern": `^\d{4}`,
+						"pattern": "^[0-9]{4}",
 						"negate":  true,
 						"match":   "after",
 					},
