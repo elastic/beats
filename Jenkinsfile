@@ -1108,7 +1108,7 @@ def loadConfigEnvVars(){
   // Skip all the stages for only the Pull Requests that contain only changes in asciidoc
   // and png files.
   env.ONLY_DOCS = !params.runAllStages &&
-                  !env.CHANGE_ID?.trim() &&
+                  env.CHANGE_ID?.trim() &&
                   isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png|Jenkinsfile)' ], shouldMatchAll: true)
 }
 
