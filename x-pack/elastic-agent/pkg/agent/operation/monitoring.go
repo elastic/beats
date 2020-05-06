@@ -171,6 +171,18 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 					"type":  "log",
 					"paths": paths,
 					"index": "logs-agent-default",
+					"processors": []map[string]interface{}{
+						map[string]interface{}{
+							"add_fields": map[string]interface{}{
+								"target": "stream",
+								"fields": map[string]interface{}{
+									"type":      "logs",
+									"dataset":   "agent",
+									"namespace": "default",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -199,6 +211,18 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"period":     "10s",
 					"hosts":      hosts,
 					"index":      "metrics-agent-default",
+					"processors": []map[string]interface{}{
+						map[string]interface{}{
+							"add_fields": map[string]interface{}{
+								"target": "stream",
+								"fields": map[string]interface{}{
+									"type":      "metrics",
+									"dataset":   "agent",
+									"namespace": "default",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
