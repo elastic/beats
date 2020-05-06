@@ -67,7 +67,15 @@ type bulkResultStats struct {
 
 const (
 	defaultEventType = "doc"
+	opTypeCreate     = "create"
+	opTypeDelete     = "delete"
+	opTypeIndex      = "index"
 )
+
+// opTypeKey defines the metadata key name for event operation type.
+// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, it will assume
+// either `create` or `index`. See `createEventBulkMeta`. If in doubt, set explicitly.
+const opTypeKey = "op_type"
 
 // NewClient instantiates a new client.
 func NewClient(
@@ -281,7 +289,12 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		bulkItems = append(bulkItems, meta, event)
+		if opType, err := event.GetMetaStringValue(opTypeKey); err == nil && opType == opTypeDelete {
+			// We don't include the event source in a bulk DELETE
+			bulkItems = append(bulkItems, meta)
+		} else {
+			bulkItems = append(bulkItems, meta, event)
+		}
 		okEvents = append(okEvents, data[i])
 	}
 	return okEvents, bulkItems
@@ -311,16 +324,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	var id string
-	if m := event.Meta; m != nil {
-		if tmp := m["_id"]; tmp != nil {
-			if s, ok := tmp.(string); ok {
-				id = s
-			} else {
-				log.Errorf("Event ID '%v' is no string value", id)
-			}
-		}
-	}
+	id, _ := event.GetMetaStringValue("_id")
+	opType, _ := event.GetMetaStringValue(opTypeKey)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
@@ -329,7 +334,17 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
+	if opType == opTypeDelete {
+		if id != "" {
+			return eslegclient.BulkDeleteAction{Delete: meta}, nil
+		} else {
+			return nil, fmt.Errorf("%s %s requires _id", opTypeKey, opTypeDelete)
+		}
+	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
+		if opType == opTypeIndex {
+			return eslegclient.BulkIndexAction{Index: meta}, nil
+		}
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
