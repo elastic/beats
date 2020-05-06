@@ -25,8 +25,8 @@ type config struct {
 func defaultConfig() config {
 	var c config
 	c.UseSSL = false
-	c.SSLCertificate = "/home/marius/go/src/github.com/P1llus/beats/x-pack/filebeat/server.crt"
-	c.SSLKey = "/home/marius/go/src/github.com/P1llus/beats/x-pack/filebeat/server.key"
+	c.SSLCertificate = ""
+	c.SSLKey = ""
 	c.SSLCA = ""
 	c.BasicAuth = false
 	c.Username = ""
