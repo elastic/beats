@@ -29,7 +29,8 @@ pipeline {
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
-    disableConcurrentBuilds()
+    quietPeriod(10)
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
