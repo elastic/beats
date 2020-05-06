@@ -1111,7 +1111,7 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for PRs with changes in the docs only
   env.ONLY_DOCS = !params.runAllStages &&
-                  isGitRegionMatch(patterns: [ '(^docs/.*|Jenkinsfile)' ], shouldMatchAll: true)
+                  isGitRegionMatch(patterns: [ '^docs/.*' ], shouldMatchAll: true)
 }
 
 /**
