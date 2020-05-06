@@ -166,6 +166,9 @@ The `cloudtrail` fileset does not read the CloudTrail Digest files
 that are delivered to the S3 bucket when Log File Integrity is turned
 on, it only reads the CloudTrail logs.
 
+[role="screenshot"]
+image::./images/filebeat-aws-cloudtrail.png[]
+
 [float]
 === cloudwatch fileset
 
