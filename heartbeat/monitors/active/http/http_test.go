@@ -109,8 +109,7 @@ func httpBaseChecks(urlStr string) validator.Validator {
 
 func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		httpBaseChecks(url),
-		httpBodyChecks(),
+		minimalRespondingHTTPChecks(url, statusCode),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
 				"response.status_code":   statusCode,
@@ -121,6 +120,7 @@ func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 				"rtt.write_request.us":   isdef.IsDuration,
 			},
 		}),
+		respondingHTTPHeaderChecks(),
 	)
 }
 
@@ -148,6 +148,17 @@ func respondingHTTPBodyChecks(body string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http.response.body.content": body,
 		"http.response.body.bytes":   len(body),
+	})
+}
+
+func respondingHTTPHeaderChecks() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http.response.headers": map[string]interface{}{
+			"Date": isdef.IsString,
+			"Content-Length": isdef.Optional(isdef.IsString),
+			"Content-Type": isdef.Optional(isdef.IsString),
+			"Location": isdef.Optional(isdef.IsString),
+		},
 	})
 }
 
@@ -511,7 +522,11 @@ func TestRedirect(t *testing.T) {
 				hbtest.BaseChecks("", "up", "http"),
 				hbtest.SummaryChecks(1, 0),
 				minimalRespondingHTTPChecks(testURL, 200),
+				respondingHTTPHeaderChecks(),
 				lookslike.MustCompile(map[string]interface{}{
+					// For redirects that are followed we shouldn't record this header because there's no sensible
+					// value
+					"http.response.headers.Location": isdef.KeyMissing,
 					"http.response.redirects": []string{
 						server.URL + redirectingPaths["/redirect_one"],
 						server.URL + redirectingPaths["/redirect_two"],
