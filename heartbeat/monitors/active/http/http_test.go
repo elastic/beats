@@ -100,7 +100,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*htt
 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
-func httpBaseChecks(urlStr string) validator.Validator {
+func urlChecks(urlStr string) validator.Validator {
 	u, _ := url.Parse(urlStr)
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
@@ -110,23 +110,27 @@ func httpBaseChecks(urlStr string) validator.Validator {
 func respondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		minimalRespondingHTTPChecks(url, statusCode),
-		lookslike.MustCompile(map[string]interface{}{
-			"http": map[string]interface{}{
-				"response.status_code":   statusCode,
-				"rtt.content.us":         isdef.IsDuration,
-				"rtt.response_header.us": isdef.IsDuration,
-				"rtt.total.us":           isdef.IsDuration,
-				"rtt.validate.us":        isdef.IsDuration,
-				"rtt.write_request.us":   isdef.IsDuration,
-			},
-		}),
+		respondingHTTPStatusAndTimingChecks(statusCode),
 		respondingHTTPHeaderChecks(),
 	)
 }
 
+func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"http": map[string]interface{}{
+			"response.status_code":   statusCode,
+			"rtt.content.us":         isdef.IsDuration,
+			"rtt.response_header.us": isdef.IsDuration,
+			"rtt.total.us":           isdef.IsDuration,
+			"rtt.validate.us":        isdef.IsDuration,
+			"rtt.write_request.us":   isdef.IsDuration,
+		},
+	})
+}
+
 func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		httpBaseChecks(url),
+		urlChecks(url),
 		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
@@ -154,10 +158,10 @@ func respondingHTTPBodyChecks(body string) validator.Validator {
 func respondingHTTPHeaderChecks() validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http.response.headers": map[string]interface{}{
-			"Date": isdef.IsString,
+			"Date":           isdef.IsString,
 			"Content-Length": isdef.Optional(isdef.IsString),
-			"Content-Type": isdef.Optional(isdef.IsString),
-			"Location": isdef.Optional(isdef.IsString),
+			"Content-Type":   isdef.Optional(isdef.IsString),
+			"Location":       isdef.Optional(isdef.IsString),
 		},
 	})
 }
@@ -252,24 +256,18 @@ func TestUpStatuses(t *testing.T) {
 	}
 }
 
-func TestUpStatusesWithUrlsConfig(t *testing.T) {
-	for _, status := range upStatuses {
-		status := status
-		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status), true)
-
-			testslike.Test(
-				t,
-				lookslike.Strict(lookslike.Compose(
-					hbtest.BaseChecks("127.0.0.1", "up", "http"),
-					hbtest.RespondingTCPChecks(),
-					hbtest.SummaryChecks(1, 0),
-					respondingHTTPChecks(server.URL, status),
-				)),
-				event.Fields,
-			)
-		})
-	}
+func TestHeadersDisabled(t *testing.T) {
+	server, event := checkServer(t, hbtest.HelloWorldHandler(200), false)
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
+			hbtest.RespondingTCPChecks(),
+			hbtest.SummaryChecks(1, 0),
+			respondingHTTPChecks(server.URL, 200),
+		)),
+		event.Fields,
+	)
 }
 
 func TestDownStatuses(t *testing.T) {
@@ -455,7 +453,7 @@ func TestConnRefusedJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
-			httpBaseChecks(url),
+			urlChecks(url),
 		)),
 		event.Fields,
 	)
@@ -477,7 +475,7 @@ func TestUnreachableJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
-			httpBaseChecks(url),
+			urlChecks(url),
 		)),
 		event.Fields,
 	)
@@ -536,6 +534,44 @@ func TestRedirect(t *testing.T) {
 			event.Fields,
 		)
 	}
+}
+
+func TestNoHeaders(t *testing.T) {
+	server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+	defer server.Close()
+
+	configSrc := map[string]interface{}{
+		"urls":                     server.URL,
+		"response.include_headers": false,
+	}
+
+	config, err := common.NewConfigFrom(configSrc)
+	require.NoError(t, err)
+
+	jobs, _, err := create("http", config)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(jobs, "test", "", "http", sched, time.Duration(0))[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
+			hbtest.SummaryChecks(1, 0),
+			hbtest.RespondingTCPChecks(),
+			respondingHTTPStatusAndTimingChecks(200),
+			minimalRespondingHTTPChecks(server.URL, 200),
+			lookslike.MustCompile(map[string]interface{}{
+				"http.response.headers": isdef.KeyMissing,
+			}),
+		)),
+		event.Fields,
+	)
 }
 
 func TestNewRoundTripper(t *testing.T) {

@@ -97,7 +97,7 @@ var defaultConfig = Config{
 	Response: responseConfig{
 		IncludeBody:         "on_error",
 		IncludeBodyMaxBytes: 2048,
-		IncludeHeaders: true,
+		IncludeHeaders:      true,
 	},
 	Mode: monitors.DefaultIPSettings,
 	Check: checkConfig{
