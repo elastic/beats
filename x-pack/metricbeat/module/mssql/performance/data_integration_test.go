@@ -8,9 +8,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
-
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -20,10 +17,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	logp.TestingSetup()
-	service := compose.EnsureUp(t, "mssql")
+	t.Skip("Skipping `data.json` generation test")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "performance"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("performance"))
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	assert.NoError(t, err)
