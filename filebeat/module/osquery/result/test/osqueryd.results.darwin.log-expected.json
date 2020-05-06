@@ -22,8 +22,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "org.python.python.app",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -48,8 +52,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.ruby",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -74,8 +82,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.a2p",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -100,8 +112,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.javajdk16.cmd",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -126,8 +142,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.php",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -152,8 +172,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.nc",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -178,8 +202,12 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.ksh",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_explicit_auths",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -206,8 +234,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "httpd",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -234,8 +266,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "cupsd",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -262,8 +298,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AEServer",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -290,8 +330,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "ftpd",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -318,8 +362,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AppleFileServer",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -346,8 +394,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "sshd-keygen-wrapper",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -374,8 +426,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "smbd",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -402,8 +458,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AppleVNCServer",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:50.000Z",
@@ -430,8 +490,12 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "ODSAgent",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_alf_services",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -481,9 +545,13 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
         "service.type": "osquery",
-        "url.full": "https://addons.cdn.mozilla.net/user-media/addons/8542/lastpass_password_manager-4.2.3.20-an+fx.xpi?filehash=sha256%3Acb837b4d738d51fac1d4361b7ac50cac1fc2828c2848057f10f88220aff77380"
+        "url.full": "https://addons.cdn.mozilla.net/user-media/addons/8542/lastpass_password_manager-4.2.3.20-an+fx.xpi?filehash=sha256%3Acb837b4d738d51fac1d4361b7ac50cac1fc2828c2848057f10f88220aff77380",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -533,8 +601,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -584,8 +656,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -635,8 +711,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -686,8 +766,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -737,8 +821,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -788,8 +876,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -839,8 +931,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -890,8 +986,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -941,8 +1041,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -992,8 +1096,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1043,8 +1151,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1094,9 +1206,13 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_firefox_addons",
         "service.type": "osquery",
-        "url.full": "file:///var/folders/rl/ps6sz7995lq3kqz5v9bmwjlh0000gn/T/tmpaddon"
+        "url.full": "file:///var/folders/rl/ps6sz7995lq3kqz5v9bmwjlh0000gn/T/tmpaddon",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1123,8 +1239,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1151,8 +1271,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1179,8 +1303,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1207,8 +1335,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1235,8 +1367,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1263,8 +1399,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1291,8 +1431,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1319,8 +1463,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1347,8 +1495,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1375,8 +1527,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1403,8 +1559,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1431,8 +1591,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1459,8 +1623,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1487,8 +1655,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1515,8 +1687,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1543,8 +1719,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1571,8 +1751,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1599,8 +1783,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1627,8 +1815,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1655,8 +1847,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1683,8 +1879,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1711,8 +1911,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1739,8 +1943,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1767,8 +1975,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1795,8 +2007,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1823,8 +2039,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1851,8 +2071,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1879,8 +2103,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1907,8 +2135,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1935,8 +2167,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1963,8 +2199,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -1991,8 +2231,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2019,8 +2263,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2047,8 +2295,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2075,8 +2327,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2103,8 +2359,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2131,8 +2391,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2159,8 +2423,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2187,8 +2455,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2215,8 +2487,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2243,8 +2519,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2271,8 +2551,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2299,8 +2583,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2327,8 +2615,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2355,8 +2647,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2383,8 +2679,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2411,8 +2711,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2439,8 +2743,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2467,8 +2775,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2495,8 +2807,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2523,8 +2839,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2551,8 +2871,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2579,8 +2903,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2607,8 +2935,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2635,8 +2967,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2663,8 +2999,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2691,8 +3031,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2719,8 +3063,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2747,8 +3095,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2775,8 +3127,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2803,8 +3159,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2831,8 +3191,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2859,8 +3223,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2887,8 +3255,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2915,8 +3287,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2943,8 +3319,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2971,8 +3351,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -2999,8 +3383,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -3027,8 +3415,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -3055,8 +3447,12 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     },
     {
         "@timestamp": "2017-12-28T14:39:51.000Z",
@@ -3083,7 +3479,11 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_homebrew_packages",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     }
 ]
