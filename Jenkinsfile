@@ -1109,7 +1109,7 @@ def loadConfigEnvVars(){
   // and png files.
   env.ONLY_DOCS = !params.runAllStages &&
                   !env.CHANGE_ID?.trim() &&
-                  isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png)' ], shouldMatchAll: true)
+                  isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png|Jenkinsfile)' ], shouldMatchAll: true)
 }
 
 /**
