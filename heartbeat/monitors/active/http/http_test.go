@@ -237,22 +237,31 @@ var downStatuses = []int{
 }
 
 func TestUpStatuses(t *testing.T) {
-	for _, status := range upStatuses {
-		status := status
-		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
-			server, event := checkServer(t, hbtest.HelloWorldHandler(status), false)
+	for _, useURLs := range []bool{true, false} {
+		for _, status := range upStatuses {
+			status := status
 
-			testslike.Test(
-				t,
-				lookslike.Strict(lookslike.Compose(
-					hbtest.BaseChecks("127.0.0.1", "up", "http"),
-					hbtest.RespondingTCPChecks(),
-					hbtest.SummaryChecks(1, 0),
-					respondingHTTPChecks(server.URL, status),
-				)),
-				event.Fields,
-			)
-		})
+			field := "hosts"
+			if useURLs {
+				field = "urls"
+			}
+
+			testName := fmt.Sprintf("Test OK HTTP status %d using %s config field", status, field)
+			t.Run(testName, func(t *testing.T) {
+				server, event := checkServer(t, hbtest.HelloWorldHandler(status), useURLs)
+
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "up", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(1, 0),
+						respondingHTTPChecks(server.URL, status),
+					)),
+					event.Fields,
+				)
+			})
+		}
 	}
 }
 
