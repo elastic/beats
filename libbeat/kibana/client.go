@@ -274,7 +274,7 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 
 	body, err := json.Marshal(jsonBody)
 	if err != nil {
-		client.log.Errorf("Failed to json encode body (%v): %#v", err, jsonBody)
+		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
 		return fmt.Errorf("fail to marshal the json content: %v", err)
 	}
 
