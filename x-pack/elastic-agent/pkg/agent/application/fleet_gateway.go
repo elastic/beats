@@ -11,10 +11,32 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
+
+// Default Configuration for the Fleet Gateway.
+var defaultGatewaySettings = &fleetGatewaySettings{
+	Duration: 30 * time.Second,
+	Jitter:   5 * time.Second,
+	Backoff: backoffSettings{
+		Init: 1 * time.Second,
+		Max:  10 * time.Second,
+	},
+}
+
+type fleetGatewaySettings struct {
+	Duration time.Duration   `config:"checkin_frequency"`
+	Jitter   time.Duration   `config:"jitter"`
+	Backoff  backoffSettings `config:"backoff"`
+}
+
+type backoffSettings struct {
+	Init time.Duration `config:"init"`
+	Max  time.Duration `config:"max"`
+}
 
 type dispatcher interface {
 	Dispatch(acker fleetAcker, actions ...action) error
@@ -52,27 +74,22 @@ type fleetGateway struct {
 	acker      fleetAcker
 }
 
-type fleetGatewaySettings struct {
-	Duration time.Duration
-	Jitter   time.Duration
-	Backoff  backoffSettings
-}
-
-type backoffSettings struct {
-	Init time.Duration
-	Max  time.Duration
-}
-
 func newFleetGateway(
 	ctx context.Context,
 	log *logger.Logger,
-	settings *fleetGatewaySettings,
+	rawConfig *config.Config,
 	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
 	r fleetReporter,
 	acker fleetAcker,
 ) (*fleetGateway, error) {
+
+	settings := defaultGatewaySettings
+	if err := rawConfig.Unpack(settings); err != nil {
+		return nil, errors.New(err, "fail to read gateway configuration")
+	}
+
 	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
 	return newFleetGatewayWithScheduler(
 		ctx,
