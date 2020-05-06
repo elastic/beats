@@ -98,8 +98,11 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
+  index: "test-ok"
+  parameters:
+    prefer_v2_templates: true
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
@@ -165,3 +168,5 @@ processors:
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
 
+setup.ilm.enabled: false
+setup.template.enabled: false

@@ -71,6 +71,8 @@ func (conn *Connection) Bulk(
 		return 0, nil, nil
 	}
 
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
@@ -78,7 +80,7 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 
-	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
+	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
 	if err != nil {
 		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
@@ -99,6 +101,8 @@ func (conn *Connection) SendMonitoringBulk(
 		return nil, nil
 	}
 
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
@@ -111,7 +115,7 @@ func (conn *Connection) SendMonitoringBulk(
 		}
 	}
 
-	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, params, enc)
+	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, mergedParams, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -224,4 +228,24 @@ func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
 		}
 	}
 	return nil
+}
+
+func mergeParams(m1, m2 map[string]string) map[string]string {
+	if len(m1) == 0 {
+		return m2
+	}
+	if len(m2) == 0 {
+		return m1
+	}
+	merged := make(map[string]string, len(m1)+len(m2))
+
+	for k, v := range m1 {
+		merged[k] = v
+	}
+
+	for k, v := range m2 {
+		merged[k] = v
+	}
+
+	return merged
 }
