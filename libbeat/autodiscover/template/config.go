@@ -83,18 +83,14 @@ func (c *Mapper) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.K
 // GetConfig returns a matching Config if any, nil otherwise
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
-	var opts []ucfg.Option
+	opts := []ucfg.Option{}
 	if c.keystore != nil {
-		opts = []ucfg.Option{
-			ucfg.Resolve(keystore.ResolverWrap(c.keystore)),
-		}
+		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(c.keystore)))
 	}
 	if c.kubernetesKeystoresRegistry != nil {
 		k8sKeystore := c.kubernetesKeystoresRegistry.GetK8sKeystore(event)
 		if k8sKeystore != nil {
-			opts = []ucfg.Option{
-				ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)),
-			}
+			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)))
 		}
 	}
 	for _, mapping := range c.ConditionMaps {
