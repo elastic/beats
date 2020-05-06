@@ -18,7 +18,6 @@
 package keystore
 
 import (
-	"fmt"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,11 +40,12 @@ type KubernetesKeystoresRegistry struct {
 type KubernetesSecretsKeystore struct {
 	namespace string
 	client    k8s.Interface
+	logger    *logp.Logger
 }
 
 // Factoryk8s Create the right keystore with the configured options.
-func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface) (Keystore, error) {
-	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client)
+func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (Keystore, error) {
+	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client, logger)
 	return keystore, err
 }
 
@@ -57,7 +57,7 @@ func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) *
 	}
 }
 
-// GetK8sKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace of creates a new one.
+// GetK8sKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
 func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore {
 	namespace := ""
 	if val, ok := event["kubernetes"]; ok {
@@ -75,10 +75,11 @@ func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore 
 		if storedKeystore != nil {
 			return storedKeystore
 		}
-		k8sKeystore, _ := Factoryk8s(namespace, kr.client)
+		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
 		kr.kubernetesKeystores["namespace"] = k8sKeystore
 		return k8sKeystore
 	}
+	kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
 	return nil
 }
 
@@ -90,38 +91,48 @@ func (kr *KubernetesKeystoresRegistry) lookupForKeystore(keystoreNamespace strin
 }
 
 // NewKubernetesSecretsKeystore returns an new k8s Keystore
-func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interface) (Keystore, error) {
+func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (Keystore, error) {
 	keystore := KubernetesSecretsKeystore{
 		namespace: keystoreNamespace,
 		client:    ks8client,
+		logger:    logger,
 	}
 	return &keystore, nil
 }
 
 // Retrieve return a SecureString instance that will contains both the key and the secret.
 func (k *KubernetesSecretsKeystore) Retrieve(key string) (*SecureString, error) {
-	// key = "kubernetes:somenamespace:somesecret:value"
-	toks := strings.Split(key, ".")
-	ns := toks[1]
-	secretName := toks[2]
-	secretVar := toks[3]
+	// key = "kubernetes.somenamespace.somesecret.value"
+	tokens := strings.Split(key, ".")
+	if len(tokens) != 4 {
+		k.logger.Debugf(
+			"not valid secret key: %v. Secrets should be of the following format %v",
+			key,
+			"kubernetes.somenamespace.somesecret.value",
+		)
+		return nil, ErrKeyDoesntExists
+	}
+	ns := tokens[1]
+	secretName := tokens[2]
+	secretVar := tokens[3]
 	if ns != k.namespace {
-		return nil, fmt.Errorf("cannot access Kubernetes secrets from a different namespace than: %v", ns)
+		k.logger.Debugf("cannot access Kubernetes secrets from a different namespace than: %v", ns)
+		return nil, ErrKeyDoesntExists
 	}
 	secretIntefrace := k.client.CoreV1().Secrets(ns)
 	secrets, err := secretIntefrace.List(metav1.ListOptions{})
 	if err != nil {
-		// log the error here
-		return nil, err
+		k.logger.Errorf("Could not retrieve secrets from k8s API: %v", err)
+		return nil, ErrKeyDoesntExists
 	}
 	if len(secrets.Items) == 0 {
-		// log the error here
-		return nil, fmt.Errorf("no secrets found for namespace: %v", ns)
+		k.logger.Debugf("no secrets found for namespace: %v", ns)
+		return nil, ErrKeyDoesntExists
 	}
 	secret, err := secretIntefrace.Get(secretName, metav1.GetOptions{})
 	if err != nil {
-		// log the error here
-		return nil, err
+		k.logger.Errorf("Could not retrieve secret from k8s API: %v", err)
+		return nil, ErrKeyDoesntExists
 	}
 	secretString := secret.Data[secretVar]
 	return NewSecureString(secretString), nil

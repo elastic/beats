@@ -87,7 +87,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, nil, nil)
+		mapper, err := NewConfigMapper(mappings, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
