@@ -20,8 +20,9 @@ package autodiscover
 import (
 	"testing"
 
-	"github.com/elastic/go-ucfg"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
