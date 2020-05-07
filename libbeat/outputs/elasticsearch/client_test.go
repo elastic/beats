@@ -32,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	e "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
@@ -368,12 +369,12 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		caseMessage, _ := cases[i]["message"].(string)
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
-			validOpTypes := []string{opTypeCreate, ""}
+			validOpTypes := []string{e.FieldMetaOpTypeCreate, ""}
 			require.Contains(t, validOpTypes, caseOpType, caseMessage)
 		case eslegclient.BulkIndexAction:
-			require.Equal(t, opTypeIndex, caseOpType, caseMessage)
+			require.Equal(t, e.FieldMetaOpTypeIndex, caseOpType, caseMessage)
 		case eslegclient.BulkDeleteAction:
-			require.Equal(t, opTypeDelete, caseOpType, caseMessage)
+			require.Equal(t, e.FieldMetaOpTypeDelete, caseOpType, caseMessage)
 		default:
 			require.FailNow(t, "unknown type")
 		}

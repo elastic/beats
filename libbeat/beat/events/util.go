@@ -19,6 +19,22 @@ package events
 
 import "github.com/elastic/beats/v7/libbeat/beat"
 
+const (
+	FieldMetaID       = "_id"
+	FieldMetaIndex    = "index"
+	FieldMetaRawIndex = "raw_index"
+	FieldMetaAlias    = "alias"
+	FieldMetaPipeline = "pipeline"
+
+	// FieldMetaOpType defines the metadata key name for event operation type.
+	// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, it will assume
+	// either `create` or `index`. See `createEventBulkMeta`. If in doubt, set explicitly.
+	FieldMetaOpType       = "op_type"
+	FieldMetaOpTypeCreate = "create"
+	FieldMetaOpTypeDelete = "delete"
+	FieldMetaOpTypeIndex  = "index"
+)
+
 // GetMetaStringValue returns the value of the given event metadata string field
 func GetMetaStringValue(e beat.Event, key string) (string, error) {
 	tmp, err := e.Meta.GetValue(key)
