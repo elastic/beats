@@ -123,6 +123,12 @@ var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
+
+	// By default, the APM tracer is active. We switch behaviour to not require users to have
+	// an APM Server running, making it opt-in
+	if os.Getenv("ELASTIC_APM_ACTIVE") == "" {
+		os.Setenv("ELASTIC_APM_ACTIVE", "false")
+	}
 	// we need to close the default tracer to prevent the beat sending events to localhost:8200
 	apm.DefaultTracer.Close()
 }
