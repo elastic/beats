@@ -161,7 +161,7 @@ func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCo
 	var counterType uint32
 	var value PdhCounterValueDouble
 	if err := _PdhGetFormattedCounterValueDouble(counter, PdhFmtDouble|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
@@ -172,7 +172,7 @@ func PdhGetFormattedCounterValueLarge(counter PdhCounterHandle) (uint32, *PdhCou
 	var counterType uint32
 	var value PdhCounterValueLarge
 	if err := _PdhGetFormattedCounterValueLarge(counter, PdhFmtLarge|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
@@ -183,7 +183,7 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 	var counterType uint32
 	var value PdhCounterValueLong
 	if err := _PdhGetFormattedCounterValueLong(counter, PdhFmtLong|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
