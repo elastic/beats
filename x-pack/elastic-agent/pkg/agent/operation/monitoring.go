@@ -32,7 +32,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 
 	o.isMonitoring = true
 
-	for _, step := range o.getMonitoringSteps(s) {
+	for _, step := range o.getMonitoringSteps(s, o.monitor.WatchLogs(), o.monitor.WatchMetrics()) {
 		p, cfg, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -57,7 +57,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.getMonitoringSteps(s) {
+	for _, step := range o.getMonitoringSteps(s, true, true) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -66,6 +66,7 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 				"operator.handleStopSidecar failed to create program")
 		}
 
+		o.logger.Debugf("stopping program %v", p)
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
 		}
@@ -86,7 +87,7 @@ func monitoringTags() map[app.Tag]string {
 	}
 }
 
-func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.Step {
+func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchMetrics bool) []configrequest.Step {
 	// get output
 	config, err := getConfigFromStep(step)
 	if err != nil {
@@ -112,13 +113,13 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	return o.generateMonitoringSteps(step.Version, output)
+	return o.generateMonitoringSteps(step.Version, output, watchLogs, watchMetrics)
 }
 
-func (o *Operator) generateMonitoringSteps(version string, output interface{}) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version string, output interface{}, watchLogs, watchMetrics bool) []configrequest.Step {
 	var steps []configrequest.Step
 
-	if o.monitor.WatchLogs() {
+	if watchLogs {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -136,7 +137,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		steps = append(steps, filebeatStep)
 	}
 
-	if o.monitor.WatchMetrics() {
+	if watchMetrics {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
