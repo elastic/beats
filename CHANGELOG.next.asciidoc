@@ -44,6 +44,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Add support to Sysmon file delete events (event ID 23). {issue}18094[18094]
+
 *Functionbeat*
 
 

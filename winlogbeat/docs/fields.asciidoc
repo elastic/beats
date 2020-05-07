@@ -7572,6 +7572,24 @@ type: keyword
 
 --
 
+*`sysmon.file.archived`*::
++
+--
+Indicates if the deleted file was archived.
+
+type: boolean
+
+--
+
+*`sysmon.file.is_executable`*::
++
+--
+Indicates if the deleted file was an executable.
+
+type: boolean
+
+--
+
 [[exported-fields-winlog]]
 == Winlogbeat fields
 
