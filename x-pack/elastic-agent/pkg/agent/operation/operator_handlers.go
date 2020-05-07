@@ -42,6 +42,7 @@ func (o *Operator) handleRun(step configrequest.Step) error {
 }
 
 func (o *Operator) handleRemove(step configrequest.Step) error {
+	o.logger.Debugf("stopping process %s: %s", step.Process, step.ID)
 	if step.Process == monitoringName {
 		return o.handleStopSidecar(step)
 	}
