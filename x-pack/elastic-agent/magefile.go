@@ -340,8 +340,8 @@ func flagsSet() []string {
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 
 	return []string{
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.buildTime=%s"`, ts),
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.commit=%s"`, commitID),
+		fmt.Sprintf(`-X "github.com/elastic/beats/v7/libbeat/version.buildTime=%s"`, ts),
+		fmt.Sprintf(`-X "github.com/elastic/beats/v7/libbeat/version.commit=%s"`, commitID),
 		fmt.Sprintf(` -X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot=%s"`, isSnapshot),
 	}
 }
