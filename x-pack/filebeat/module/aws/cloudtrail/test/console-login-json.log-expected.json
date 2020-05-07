@@ -28,7 +28,7 @@
         "source.address": "192.0.2.110",
         "source.ip": "192.0.2.110",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "AIDACKCEVSQ6C2EXAMPLE",
         "user.name": "JohnDoe",
@@ -70,7 +70,7 @@
         "source.address": "192.0.2.100",
         "source.ip": "192.0.2.100",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "AIDACKCEVSQ6C2EXAMPLE",
         "user.name": "JaneDoe",
@@ -118,7 +118,7 @@
         "source.address": "192.0.2.100",
         "source.ip": "192.0.2.100",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "AROAIDPPEZS35WEXAMPLE:AssumedRoleSessionName",
         "user.name": "RoleToBeAssumed",

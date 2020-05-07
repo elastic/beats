@@ -58,7 +58,7 @@
         "rule.ruleset": "User",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -112,7 +112,7 @@
         "rule.reference": "http://example.net/single",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "SecurityComplianceAlerts"
     },
@@ -166,7 +166,7 @@
         "rule.ruleset": "MalwareFamily",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "threat.technique.id": "Malware/Evil.Malware.B",
         "user.id": "SecurityComplianceAlerts"

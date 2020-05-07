@@ -50,7 +50,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -111,7 +111,7 @@
         "source.packets": 68,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -172,7 +172,7 @@
         "source.packets": 78,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -227,7 +227,7 @@
         "source.packets": 1,
         "source.port": 22,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -281,7 +281,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -335,7 +335,7 @@
         "source.packets": 7,
         "source.port": 50646,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -396,7 +396,7 @@
         "source.packets": 251,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -457,7 +457,7 @@
         "source.packets": 92,
         "source.port": 33880,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -518,7 +518,7 @@
         "source.packets": 247,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -579,7 +579,7 @@
         "source.packets": 63,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -634,7 +634,7 @@
         "source.packets": 3,
         "source.port": 59679,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -695,7 +695,7 @@
         "source.packets": 94,
         "source.port": 33576,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -756,7 +756,7 @@
         "source.packets": 356,
         "source.port": 33562,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -817,7 +817,7 @@
         "source.packets": 361,
         "source.port": 33692,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -878,7 +878,7 @@
         "source.packets": 360,
         "source.port": 33542,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -939,7 +939,7 @@
         "source.packets": 99,
         "source.port": 33970,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -990,7 +990,7 @@
         "source.packets": 8690,
         "source.port": 9243,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1044,7 +1044,7 @@
         "source.packets": 7,
         "source.port": 34836,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1105,7 +1105,7 @@
         "source.packets": 367,
         "source.port": 33554,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1161,7 +1161,7 @@
         "source.packets": 608,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1222,7 +1222,7 @@
         "source.packets": 258,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1273,7 +1273,7 @@
         "source.packets": 44438,
         "source.port": 46864,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1327,7 +1327,7 @@
         "source.packets": 7,
         "source.port": 33478,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1388,7 +1388,7 @@
         "source.packets": 241,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1444,7 +1444,7 @@
         "source.packets": 732,
         "source.port": 65320,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1505,7 +1505,7 @@
         "source.packets": 246,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1566,7 +1566,7 @@
         "source.packets": 340,
         "source.port": 33548,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1620,7 +1620,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1676,7 +1676,7 @@
         "source.packets": 18,
         "source.port": 59623,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1737,7 +1737,7 @@
         "source.packets": 363,
         "source.port": 33552,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1791,7 +1791,7 @@
         "source.packets": 7,
         "source.port": 33924,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1852,7 +1852,7 @@
         "source.packets": 260,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1913,7 +1913,7 @@
         "source.packets": 265,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1969,7 +1969,7 @@
         "source.packets": 607,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2030,7 +2030,7 @@
         "source.packets": 356,
         "source.port": 33534,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2091,7 +2091,7 @@
         "source.packets": 735,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2145,7 +2145,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2201,7 +2201,7 @@
         "source.packets": 594,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2262,7 +2262,7 @@
         "source.packets": 58,
         "source.port": 33524,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2323,7 +2323,7 @@
         "source.packets": 130,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2384,7 +2384,7 @@
         "source.packets": 250,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2445,7 +2445,7 @@
         "source.packets": 37,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2506,7 +2506,7 @@
         "source.packets": 237,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2567,7 +2567,7 @@
         "source.packets": 353,
         "source.port": 33694,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2621,7 +2621,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2677,7 +2677,7 @@
         "source.packets": 605,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2731,7 +2731,7 @@
         "source.packets": 7,
         "source.port": 33862,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2787,7 +2787,7 @@
         "source.packets": 737,
         "source.port": 65321,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2843,7 +2843,7 @@
         "source.packets": 600,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2904,7 +2904,7 @@
         "source.packets": 949,
         "source.port": 49680,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -2965,7 +2965,7 @@
         "source.packets": 227,
         "source.port": 60112,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3026,7 +3026,7 @@
         "source.packets": 270,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3082,7 +3082,7 @@
         "source.packets": 709,
         "source.port": 65316,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3138,7 +3138,7 @@
         "source.packets": 728,
         "source.port": 65263,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3192,7 +3192,7 @@
         "source.packets": 7,
         "source.port": 50438,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3246,7 +3246,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3302,7 +3302,7 @@
         "source.packets": 11,
         "source.port": 22,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3363,7 +3363,7 @@
         "source.packets": 353,
         "source.port": 33558,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3424,7 +3424,7 @@
         "source.packets": 354,
         "source.port": 33548,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3480,7 +3480,7 @@
         "source.packets": 717,
         "source.port": 65271,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3534,7 +3534,7 @@
         "source.packets": 7,
         "source.port": 34178,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3588,7 +3588,7 @@
         "source.packets": 7,
         "source.port": 33602,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3649,7 +3649,7 @@
         "source.packets": 366,
         "source.port": 33554,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3703,7 +3703,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3757,7 +3757,7 @@
         "source.packets": 7,
         "source.port": 52454,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3818,7 +3818,7 @@
         "source.packets": 251,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3872,7 +3872,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3933,7 +3933,7 @@
         "source.packets": 361,
         "source.port": 33530,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -3994,7 +3994,7 @@
         "source.packets": 366,
         "source.port": 33556,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4055,7 +4055,7 @@
         "source.packets": 86,
         "source.port": 33570,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4116,7 +4116,7 @@
         "source.packets": 247,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4170,7 +4170,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4231,7 +4231,7 @@
         "source.packets": 118,
         "source.port": 33858,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4285,7 +4285,7 @@
         "source.packets": 7,
         "source.port": 33064,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4346,7 +4346,7 @@
         "source.packets": 251,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4400,7 +4400,7 @@
         "source.packets": 7,
         "source.port": 53706,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4454,7 +4454,7 @@
         "source.packets": 7,
         "source.port": 52260,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4508,7 +4508,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4562,7 +4562,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4616,7 +4616,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4670,7 +4670,7 @@
         "source.packets": 7,
         "source.port": 34906,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4724,7 +4724,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4785,7 +4785,7 @@
         "source.packets": 361,
         "source.port": 33534,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4846,7 +4846,7 @@
         "source.packets": 358,
         "source.port": 33510,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4900,7 +4900,7 @@
         "source.packets": 7,
         "source.port": 58216,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -4961,7 +4961,7 @@
         "source.packets": 243,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5015,7 +5015,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5069,7 +5069,7 @@
         "source.packets": 7,
         "source.port": 5601,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5123,7 +5123,7 @@
         "source.packets": 7,
         "source.port": 34090,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5184,7 +5184,7 @@
         "source.packets": 246,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5245,7 +5245,7 @@
         "source.packets": 71,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5306,7 +5306,7 @@
         "source.packets": 75,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5367,7 +5367,7 @@
         "source.packets": 249,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5428,7 +5428,7 @@
         "source.packets": 357,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5489,7 +5489,7 @@
         "source.packets": 242,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5550,7 +5550,7 @@
         "source.packets": 244,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5611,7 +5611,7 @@
         "source.packets": 708,
         "source.port": 60108,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5672,7 +5672,7 @@
         "source.packets": 74,
         "source.port": 9200,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5733,7 +5733,7 @@
         "source.packets": 95,
         "source.port": 33968,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -5794,7 +5794,7 @@
         "source.packets": 351,
         "source.port": 33590,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

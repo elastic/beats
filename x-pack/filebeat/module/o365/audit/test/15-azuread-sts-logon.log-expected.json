@@ -82,7 +82,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -178,7 +178,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -274,7 +274,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -370,7 +370,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -466,7 +466,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -562,7 +562,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -658,7 +658,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -754,7 +754,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -850,7 +850,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -946,7 +946,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1042,7 +1042,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1138,7 +1138,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1234,7 +1234,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1330,7 +1330,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1423,7 +1423,7 @@
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1519,7 +1519,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1615,7 +1615,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1708,7 +1708,7 @@
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1804,7 +1804,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1900,7 +1900,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -1996,7 +1996,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2092,7 +2092,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2188,7 +2188,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2284,7 +2284,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2380,7 +2380,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2476,7 +2476,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2572,7 +2572,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2668,7 +2668,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2764,7 +2764,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2859,7 +2859,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -2956,7 +2956,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3042,7 +3042,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
@@ -3136,7 +3136,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3222,7 +3222,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
@@ -3317,7 +3317,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3403,7 +3403,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
@@ -3498,7 +3498,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3594,7 +3594,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3690,7 +3690,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3776,7 +3776,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
@@ -3871,7 +3871,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -3964,7 +3964,7 @@
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4060,7 +4060,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4156,7 +4156,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4242,7 +4242,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Other",
@@ -4336,7 +4336,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4432,7 +4432,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4528,7 +4528,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4624,7 +4624,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4720,7 +4720,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4816,7 +4816,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -4912,7 +4912,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5008,7 +5008,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5104,7 +5104,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5200,7 +5200,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5296,7 +5296,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5392,7 +5392,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5488,7 +5488,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5581,7 +5581,7 @@
         "source.geo.location.lon": -3.684,
         "source.ip": "37.29.234.179",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5677,7 +5677,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5773,7 +5773,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5869,7 +5869,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -5965,7 +5965,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6061,7 +6061,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6157,7 +6157,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6253,7 +6253,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6349,7 +6349,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6445,7 +6445,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "83.57.233.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -6541,7 +6541,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",

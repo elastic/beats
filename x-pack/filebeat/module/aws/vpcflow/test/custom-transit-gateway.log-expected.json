@@ -41,7 +41,7 @@
         "source.ip": "10.20.33.164",
         "source.port": 39812,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

@@ -63,7 +63,7 @@
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -138,7 +138,7 @@
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -228,7 +228,7 @@
         "source.user.full_name": "xxxxxx",
         "source.user.id": "00u1abvz4pYqdM8ms4x6",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",

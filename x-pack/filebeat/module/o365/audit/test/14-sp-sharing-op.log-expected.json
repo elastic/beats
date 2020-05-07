@@ -40,7 +40,7 @@
         "related.user": "app",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "sharepoint",
         "user.id": "app@sharepoint",
@@ -90,7 +90,7 @@
         "related.user": "app",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "sharepoint",
         "user.id": "app@sharepoint",
@@ -140,7 +140,7 @@
         "related.user": "app",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "sharepoint",
         "user.id": "app@sharepoint",
@@ -190,7 +190,7 @@
         "related.user": "app",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "sharepoint",
         "user.id": "app@sharepoint",
@@ -240,7 +240,7 @@
         "related.user": "app",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "sharepoint",
         "user.id": "app@sharepoint",
@@ -305,7 +305,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -378,7 +378,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -452,7 +452,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -526,7 +526,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -600,7 +600,7 @@
         "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.10.151",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",

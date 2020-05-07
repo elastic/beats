@@ -61,7 +61,7 @@
         "source.ip": "10.128.0.16",
         "source.port": 60094,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -125,7 +125,7 @@
         "source.ip": "192.0.2.126",
         "source.port": 64853,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -192,7 +192,7 @@
         "source.ip": "192.0.2.219",
         "source.port": 2897,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -257,7 +257,7 @@
         "source.ip": "192.0.2.14",
         "source.port": 61000,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -322,7 +322,7 @@
         "source.ip": "192.0.2.14",
         "source.port": 61000,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -389,7 +389,7 @@
         "source.ip": "192.0.2.151",
         "source.port": 62551,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -456,7 +456,7 @@
         "source.ip": "192.0.2.241",
         "source.port": 44542,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -523,7 +523,7 @@
         "source.ip": "192.0.2.114",
         "source.port": 41293,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -590,7 +590,7 @@
         "source.ip": "192.0.2.251",
         "source.port": 59106,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -657,7 +657,7 @@
         "source.ip": "192.0.2.189",
         "source.port": 61000,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -724,7 +724,7 @@
         "source.ip": "192.0.2.189",
         "source.port": 61000,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -791,7 +791,7 @@
         "source.ip": "192.0.2.200",
         "source.port": 42716,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -856,7 +856,7 @@
         "source.ip": "10.28.0.16",
         "source.port": 46418,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -921,7 +921,7 @@
         "source.ip": "10.28.0.16",
         "source.port": 58725,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -992,7 +992,7 @@
         "source.ip": "192.0.2.114",
         "source.port": 44666,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1063,7 +1063,7 @@
         "source.ip": "192.0.2.114",
         "source.port": 44668,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1129,7 +1129,7 @@
         "source.ip": "192.0.2.7",
         "source.port": 1683,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1200,7 +1200,7 @@
         "source.ip": "192.0.2.114",
         "source.port": 45068,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1271,7 +1271,7 @@
         "source.ip": "192.0.2.114",
         "source.port": 45062,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -1341,7 +1341,7 @@
         "source.ip": "10.42.0.10",
         "source.port": 57794,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

@@ -25,7 +25,7 @@
         "source.ip": "192.168.131.39",
         "source.port": "2817",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
         "tls.version": "1.2",

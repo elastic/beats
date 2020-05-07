@@ -29,7 +29,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -63,7 +63,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -97,7 +97,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -131,7 +131,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -165,7 +165,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -199,7 +199,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -233,7 +233,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -267,7 +267,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     },
@@ -301,7 +301,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Service Account"
     }

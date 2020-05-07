@@ -37,7 +37,7 @@
         "source.ip": "72.21.218.154",
         "source.port": "51341",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",

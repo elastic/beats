@@ -22,7 +22,7 @@ exclude_files: [".gz$"]
 
 {{ end }}
 tags: {{.tags | tojson}}
-publisher_pipeline.disable_host: {{ inList .tags "cloud" }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - script:

@@ -30,7 +30,7 @@
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "Application"
     },
@@ -89,7 +89,7 @@
         "related.user": "asr",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -135,7 +135,7 @@
         "related.user": "asr",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -172,7 +172,7 @@
         "related.user": "bob",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "bob@testsiem.onmicrosoft.com",

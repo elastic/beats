@@ -28,7 +28,7 @@
         "source.address": "192.0.2.1",
         "source.ip": "192.0.2.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "AIDAQRSTUVWXYZEXAMPLE:devdsk",
         "user_agent.device.name": "Spider",

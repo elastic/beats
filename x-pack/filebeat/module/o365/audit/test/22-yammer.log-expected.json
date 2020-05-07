@@ -55,7 +55,7 @@
         "source.ip": "79.159.10.151",
         "source.port": "12345",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "36787265537"
@@ -107,7 +107,7 @@
         "source.ip": "fdfd::555",
         "source.port": "12346",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "asr@testsiem2.onmicrosoft.com",
         "user.id": "36085768193"

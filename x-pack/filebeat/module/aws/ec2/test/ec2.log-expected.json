@@ -11,7 +11,7 @@
         "process.name": "systemd",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -27,7 +27,7 @@
         "process.pid": "3000",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -43,7 +43,7 @@
         "process.pid": "2898",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -59,7 +59,7 @@
         "process.pid": "2898",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -75,7 +75,7 @@
         "process.pid": "2898",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -90,7 +90,7 @@
         "process.name": "ec2net",
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

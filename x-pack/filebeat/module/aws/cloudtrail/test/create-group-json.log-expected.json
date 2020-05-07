@@ -30,7 +30,7 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "0123456789012",
         "user.name": "Alice",
@@ -67,7 +67,7 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "0123456789012",
         "user.name": "Alice",

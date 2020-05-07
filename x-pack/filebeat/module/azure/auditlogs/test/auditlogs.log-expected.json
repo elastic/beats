@@ -39,7 +39,7 @@
         "log.offset": 0,
         "service.type": "azure",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

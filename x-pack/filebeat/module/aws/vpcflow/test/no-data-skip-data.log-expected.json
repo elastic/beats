@@ -21,7 +21,7 @@
         "log.offset": 0,
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -46,7 +46,7 @@
         "log.offset": 82,
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

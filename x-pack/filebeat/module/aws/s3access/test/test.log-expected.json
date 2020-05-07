@@ -41,7 +41,7 @@
         ],
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
@@ -92,7 +92,7 @@
         ],
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
@@ -145,7 +145,7 @@
         ],
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
@@ -196,7 +196,7 @@
         ],
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.1",
@@ -249,7 +249,7 @@
         ],
         "service.type": "aws",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.1",

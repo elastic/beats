@@ -27,7 +27,7 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",

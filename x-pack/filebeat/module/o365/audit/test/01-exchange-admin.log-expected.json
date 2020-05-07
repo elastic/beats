@@ -39,7 +39,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -96,7 +96,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -153,7 +153,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -197,7 +197,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -241,7 +241,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -286,7 +286,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -332,7 +332,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -376,7 +376,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -433,7 +433,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -490,7 +490,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -535,7 +535,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -592,7 +592,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -649,7 +649,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -706,7 +706,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -763,7 +763,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -820,7 +820,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -877,7 +877,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -921,7 +921,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -966,7 +966,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1011,7 +1011,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1055,7 +1055,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1100,7 +1100,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1157,7 +1157,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1214,7 +1214,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1271,7 +1271,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1328,7 +1328,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1385,7 +1385,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1442,7 +1442,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1499,7 +1499,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1556,7 +1556,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1615,7 +1615,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1672,7 +1672,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1729,7 +1729,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1786,7 +1786,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1843,7 +1843,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1900,7 +1900,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -1957,7 +1957,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2014,7 +2014,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2071,7 +2071,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2128,7 +2128,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2182,7 +2182,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2228,7 +2228,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2273,7 +2273,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2318,7 +2318,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2363,7 +2363,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2422,7 +2422,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2479,7 +2479,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2536,7 +2536,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2593,7 +2593,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2650,7 +2650,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2707,7 +2707,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2764,7 +2764,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2821,7 +2821,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2878,7 +2878,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2935,7 +2935,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -2992,7 +2992,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3049,7 +3049,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3095,7 +3095,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3141,7 +3141,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3198,7 +3198,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3255,7 +3255,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3301,7 +3301,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3345,7 +3345,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3404,7 +3404,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3461,7 +3461,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3518,7 +3518,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3575,7 +3575,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3632,7 +3632,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3689,7 +3689,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3746,7 +3746,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3803,7 +3803,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3848,7 +3848,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3894,7 +3894,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3939,7 +3939,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -3985,7 +3985,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4029,7 +4029,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4075,7 +4075,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4119,7 +4119,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4165,7 +4165,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4222,7 +4222,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4279,7 +4279,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4336,7 +4336,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4393,7 +4393,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4450,7 +4450,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4507,7 +4507,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4564,7 +4564,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4621,7 +4621,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4667,7 +4667,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4724,7 +4724,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4781,7 +4781,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4826,7 +4826,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4883,7 +4883,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4927,7 +4927,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -4973,7 +4973,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5027,7 +5027,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5084,7 +5084,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5130,7 +5130,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5187,7 +5187,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5246,7 +5246,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     },
@@ -5303,7 +5303,7 @@
         "server.address": "HE1PR0102MB3228 (15.20.2707.017)",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "NT AUTHORITY\\SYSTEM (Microsoft.Exchange.ServiceHost)"
     }

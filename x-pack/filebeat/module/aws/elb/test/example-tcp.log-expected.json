@@ -23,7 +23,7 @@
         "source.ip": "192.168.131.39",
         "source.port": "2817",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -45,7 +45,7 @@
         "source.ip": "192.168.131.39",
         "source.port": "2817",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

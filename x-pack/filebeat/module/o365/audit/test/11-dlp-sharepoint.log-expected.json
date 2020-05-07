@@ -77,7 +77,7 @@
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
@@ -171,7 +171,7 @@
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
@@ -261,7 +261,7 @@
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
@@ -355,7 +355,7 @@
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
@@ -449,7 +449,7 @@
         "rule.name": "High volume of content detected France Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/INTERNAL%20CREDIT%20CARD%20NUMBERS.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
@@ -543,7 +543,7 @@
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
         "user.domain": "testsiem2.onmicrosoft.com",
@@ -637,7 +637,7 @@
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
         "user.domain": "testsiem2.onmicrosoft.com",

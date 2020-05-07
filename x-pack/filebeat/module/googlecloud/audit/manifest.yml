@@ -14,7 +14,7 @@ var:
   - name: keep_original_message
     default: false
   - name: tags
-    default: [cloud]
+    default: [forwarded]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

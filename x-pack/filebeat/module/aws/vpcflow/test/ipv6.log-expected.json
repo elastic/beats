@@ -40,7 +40,7 @@
         "source.packets": 54,
         "source.port": 34892,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

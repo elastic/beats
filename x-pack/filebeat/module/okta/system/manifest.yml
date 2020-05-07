@@ -47,7 +47,7 @@ var:
     default: |-
       {}
   - name: tags
-    default: [cloud]
+    default: [forwarded]
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.yml

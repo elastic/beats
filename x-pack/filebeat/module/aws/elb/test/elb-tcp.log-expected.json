@@ -32,7 +32,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "51600",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -68,7 +68,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "51726",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -104,7 +104,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "51734",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -140,7 +140,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "51738",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -176,7 +176,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "46288",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -212,7 +212,7 @@
         "source.ip": "77.227.156.41",
         "source.port": "46304",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

@@ -55,7 +55,7 @@
         "source.packets": 20,
         "source.port": 20641,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -114,7 +114,7 @@
         "source.packets": 20,
         "source.port": 49761,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -157,7 +157,7 @@
         "source.packets": 4,
         "source.port": 0,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -200,7 +200,7 @@
         "source.packets": 4,
         "source.port": 0,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

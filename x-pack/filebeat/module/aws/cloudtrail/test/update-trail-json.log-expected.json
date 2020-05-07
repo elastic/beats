@@ -35,7 +35,7 @@
         "source.geo.region_name": "Oregon",
         "source.ip": "205.251.233.182",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
@@ -77,7 +77,7 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",

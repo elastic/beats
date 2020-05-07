@@ -5,7 +5,7 @@ paths:
     {{ end }}
 exclude_files: [".gz$"]
 tags: {{.tags | tojson}}
-publisher_pipeline.disable_host: {{ inList .tags "cloud" }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - add_fields:

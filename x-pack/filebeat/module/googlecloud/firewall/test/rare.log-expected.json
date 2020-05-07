@@ -63,7 +63,7 @@
         "source.ip": "10.142.0.10",
         "source.port": 57794,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     },
     {
@@ -130,7 +130,7 @@
         "source.ip": "10.142.0.16",
         "source.port": 80,
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

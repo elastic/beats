@@ -32,7 +32,7 @@
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "xxx@xxx.xxx"
     },
@@ -76,7 +76,7 @@
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",
@@ -127,7 +127,7 @@
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",
@@ -179,7 +179,7 @@
         "service.type": "googlecloud",
         "source.ip": "192.168.1.1",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.email": "xxx@xxx.xxx",
         "user_agent.device.name": "Other",

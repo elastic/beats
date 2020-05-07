@@ -33,7 +33,7 @@
         "source.geo.region_name": "Virginia",
         "source.ip": "72.21.198.64",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",

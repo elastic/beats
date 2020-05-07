@@ -35,7 +35,7 @@
         "source.geo.region_name": "Chongqing",
         "source.ip": "123.145.67.89",
         "tags": [
-            "cloud"
+            "forwarded"
         ],
         "user.id": "AROAIN5ATK5U7KEXAMPLE:JohnRole1",
         "user_agent.device.name": "Spider",

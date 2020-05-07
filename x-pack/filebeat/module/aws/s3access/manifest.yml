@@ -14,7 +14,7 @@ var:
   - name: session_token
   - name: role_arn
   - name: tags
-    default: [cloud]
+    default: [forwarded]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

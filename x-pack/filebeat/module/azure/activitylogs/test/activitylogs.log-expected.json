@@ -50,7 +50,7 @@
         "service.type": "azure",
         "source.ip": "51.251.141.41",
         "tags": [
-            "cloud"
+            "forwarded"
         ]
     }
 ]

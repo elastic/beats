@@ -12,7 +12,7 @@ var:
   - name: content_type
   - name: api
   - name: tags
-    default: [cloud]
+    default: [forwarded]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

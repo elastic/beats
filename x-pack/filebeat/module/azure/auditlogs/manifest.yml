@@ -12,7 +12,7 @@ var:
   - name: storage_account_key
   - name: resource_manager_endpoint
   - name: tags
-    default: [cloud]
+    default: [forwarded]
 
 ingest_pipeline:
   - ingest/pipeline.json
