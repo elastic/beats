@@ -26,6 +26,11 @@ import (
 	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 )
 
+const (
+	isMonitoringMetricsFlag = 1 << 0
+	isMonitoringLogsFlag    = 1 << 1
+)
+
 // Operator runs Start/Stop/Update operations
 // it is responsible for detecting reconnect to existing processes
 // based on backed up configuration
@@ -40,7 +45,7 @@ type Operator struct {
 	stateResolver  *stateresolver.StateResolver
 	eventProcessor callbackHooks
 	monitor        monitoring.Monitor
-	isMonitoring   bool
+	isMonitoring   int
 
 	apps     map[string]Application
 	appsLock sync.Mutex
