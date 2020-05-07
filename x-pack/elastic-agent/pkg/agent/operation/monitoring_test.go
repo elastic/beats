@@ -43,7 +43,7 @@ func TestGenerateSteps(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
 			operator, _ := getMonitorableTestOperator(t, "tests/scripts", m)
-			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
+			steps := operator.generateMonitoringSteps("8.0", sampleOutput, tc.Config.MonitorLogs, tc.Config.MonitorMetrics)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
 			}
