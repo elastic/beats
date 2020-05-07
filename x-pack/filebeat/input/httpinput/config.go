@@ -37,5 +37,6 @@ func defaultConfig() config {
 	c.ListenAddress = ""
 	c.ListenPort = "8000"
 	c.URL = "/"
+	c.Prefix = "json"
 	return c
 }

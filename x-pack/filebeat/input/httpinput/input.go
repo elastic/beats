@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -47,6 +48,7 @@ type HttpInput struct {
 	httpMux      *http.ServeMux      // Current HTTP Handler
 	httpRequest  http.Request        // Current Request
 	httpResponse http.ResponseWriter // Current ResponseWriter
+	eventObject  *map[string]interface{} // Current event object	 
 }
 
 // NewInput creates a new httpjson input
@@ -151,37 +153,6 @@ func (in *HttpInput) Wait() {
 	in.Stop()
 }
 
-// Create a response to the request
-func (in *HttpInput) apiResponse(w http.ResponseWriter, r *http.Request) {
-
-	// Storing for validation
-	in.httpRequest = *r
-	in.httpResponse = w
-
-	// Validates request, writes response directly on error.
-	objmap := in.validateRequest()
-
-	if objmap == nil || len(objmap) == 0 {
-		in.log.Error("Request could not be processed")
-		return
-	}
-	ok := in.outlet.OnEvent(beat.Event{
-		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			"message": "testing",
-			in.config.Prefix:    objmap,
-		},
-	})
-
-	if !ok {
-		in.log.Error("Failed to send event")
-	}
-
-	// On success, returns the configured response parameters
-	w.Write([]byte(in.config.ResponseBody))
-	w.WriteHeader(in.config.ResponseCode)
-}
-
 func (in *HttpInput) createServer() error {
 	// Merge listening address and port
 	var address strings.Builder
@@ -201,58 +172,130 @@ func (in *HttpInput) createServer() error {
 	return errors.New("SSL settings missing")
 }
 
-func (in *HttpInput) validateRequest() map[string]interface{} {
+// Create a response to the request
+func (in *HttpInput) apiResponse(w http.ResponseWriter, r *http.Request) {
+	var err string
+	var status uint
+
+	// Storing for validation
+	in.httpRequest = *r
+	in.httpResponse = w
+
+	// Validates request, writes response directly on error.
+	status, err = in.createEvent()
+
+	if err != "" || status != 0 {
+		in.sendResponse(status, err)
+		return
+	}
+
+	// On success, returns the configured response parameters
+	in.sendResponse(http.StatusOK, in.config.ResponseBody)
+}
+
+func (in *HttpInput) createEvent() (uint, string) {
+	var err string
+	var status uint
+
+	status, err = in.validateRequest()
+
+	// Check if any of the validations failed, and if so, return them
+	if err != "" || status != 0 {
+		return status, err
+	}
+	
+	// Create the event
+	ok := in.outlet.OnEvent(beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": "testing",
+			in.config.Prefix:    in.eventObject,
+		},
+	})
+
+	// If event cannot be sent
+	if !ok {
+		return http.StatusInternalServerError, in.createErrorMessage("unable to send event")
+	}
+
+	return 0, ""
+}
+
+func (in *HttpInput) validateRequest() (uint, string) {
+	// Only allow POST requests
+	var err string
+	var status uint
+
 	// Check auth settings and credentials
 	if in.config.BasicAuth == true {
-		if in.config.Username == "" || in.config.Password == "" {
-			in.log.Fatal("Username and password required when basicauth is enabled")
-			return nil
-		}
-
-		username, password, _ := in.httpRequest.BasicAuth()
-		if in.config.Username != username || in.config.Password != password {
-			in.httpResponse.WriteHeader(http.StatusUnauthorized)
-			in.httpResponse.Write([]byte(`{"message": "Incorrect username or password"}`))
-			return nil
-		}
+		status, err = in.validateAuth()
 	}
 
-	// Only allow POST requests
-	if in.httpRequest.Method != http.MethodPost {
-		in.httpResponse.WriteHeader(http.StatusMethodNotAllowed)
-		in.httpResponse.Write([]byte(`{"message": "only post request supported"}`))
-		return nil
+	if err != "" && status != 0 {
+		return status, err
 	}
 
+	// Validate headers
+	status, err = in.validateHeader()
+
+	if err != "" && status != 0 {
+		return status, err
+	}
+
+	// Validate body
+	status, err  = in.validateBody()
+
+	if err != "" && status != 0 {
+		return status, err
+	}
+
+	return 0, ""
+
+}
+
+func (in *HttpInput) validateHeader() (uint, string) {
 	// Only allow JSON
 	if in.httpRequest.Header.Get("Content-Type") != "application/json" {
-		in.httpResponse.WriteHeader(http.StatusUnsupportedMediaType)
-		in.httpResponse.Write([]byte(`{"message": "wrong content-type header"}`))
-		return nil
+		return http.StatusUnsupportedMediaType, in.createErrorMessage("wrong content-type header, expecting application/json")
 	}
 
 	// Only accept JSON in return
 	if in.httpRequest.Header.Get("Accept") != "application/json" {
-		in.httpResponse.WriteHeader(http.StatusNotAcceptable)
-		in.httpResponse.Write([]byte(`{"message": "wrong accept header"}`))
-		return nil
+		return http.StatusNotAcceptable, in.createErrorMessage("wrong accept header, expecting application/json")
+	}
+	return 0, ""
+}
+
+func (in *HttpInput) validateAuth() (uint, string) {
+	// Check if username or password is missing
+	if in.config.Username == "" || in.config.Password == "" {
+		return http.StatusUnauthorized, in.createErrorMessage("Username and password required when basicauth is enabled")
 	}
 
-	if in.httpRequest.Body == http.NoBody {
-		in.httpResponse.WriteHeader(http.StatusNotAcceptable)
-		in.httpResponse.Write([]byte(`{"message": "empty body"}`))
-		return nil
+	// Check if username and password combination is correct
+	username, password, _ := in.httpRequest.BasicAuth()
+	if in.config.Username != username || in.config.Password != password {
+		return http.StatusUnauthorized, in.createErrorMessage("Incorrect username or password")
 	}
+
+	return 0, ""
+}
+
+func (in *HttpInput) validateBody() (uint, string) {
+	// Checks if body is empty
+	if in.httpRequest.Body == http.NoBody {
+		return http.StatusNotAcceptable, in.createErrorMessage("body can not be empty")
+	}
+
 
 	// Write full []byte to string
 	body, err := ioutil.ReadAll(in.httpRequest.Body)
 
 	// If body cannot be read
 	if err != nil {
-		in.httpResponse.WriteHeader(http.StatusInternalServerError)
-		in.httpResponse.Write([]byte(`{"message": "failure"}`))
-		return nil
+		return http.StatusInternalServerError, in.createErrorMessage("unable to read body")
 	}
+
 
 	// Declare interface for request body
 	objmap := make(map[string]interface{})
@@ -261,9 +304,28 @@ func (in *HttpInput) validateRequest() map[string]interface{} {
 
 	// If body can be read, but not converted to JSON
 	if err != nil {
-		in.httpResponse.WriteHeader(http.StatusBadRequest)
-		in.httpResponse.Write([]byte(`{"message": "malformed JSON body"}`))
-		return nil
+		return http.StatusBadRequest, in.createErrorMessage("malformed JSON body")
 	}
-	return objmap
+	// Assign the current Unmarshaled object when no errors
+	in.eventObject = &objmap
+
+	return 0, ""
+}
+
+func (in *HttpInput) validateMethod() (uint, string) {
+	// Ensure HTTP method is POST
+	if in.httpRequest.Method != http.MethodPost {
+		return http.StatusMethodNotAllowed, in.createErrorMessage("only POST requests supported")
+	}
+
+	return 0, ""
+}
+
+func (in *HttpInput) createErrorMessage(r string ) string {
+	return fmt.Sprintf(`{"message": "%v"}`, r)
+}
+
+func (in *HttpInput) sendResponse(h uint, b string) {
+	in.httpResponse.WriteHeader(int(h))
+	in.httpResponse.Write([]byte(b))
 }
