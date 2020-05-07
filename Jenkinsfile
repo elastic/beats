@@ -1110,7 +1110,7 @@ def loadConfigEnvVars(){
   if (params.runAllStage || !env.CHANGE_ID?.trim()) {
     env.ONLY_DOCS = 'false'
   } else {
-    env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png)' ], shouldMatchAll: true)
+    env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|png|Jenkinsfile)' ], shouldMatchAll: true)
   }
 }
 
