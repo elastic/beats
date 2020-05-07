@@ -146,9 +146,6 @@ processors:
     field: event.outcome
     value: failure
     if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"      
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - append:
     field: related.ip
     value: "{{source.ip}}"

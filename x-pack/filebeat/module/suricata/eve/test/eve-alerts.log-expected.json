@@ -30,7 +30,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1121,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -107,7 +107,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1121,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -184,7 +184,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1126,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -261,7 +261,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1121,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -338,7 +338,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1121,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -415,7 +415,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1126,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -492,7 +492,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1138,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -569,7 +569,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 0,
         "http.response.status_code": 304,
         "input.type": "log",
@@ -646,7 +646,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2601,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -723,7 +723,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 1241,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -800,7 +800,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2687,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -877,7 +877,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2688,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -954,7 +954,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2601,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1031,7 +1031,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2687,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1108,7 +1108,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2688,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1185,7 +1185,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2687,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1262,7 +1262,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2691,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1339,7 +1339,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 2687,
         "http.response.status_code": 200,
         "input.type": "log",
@@ -1416,7 +1416,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 0,
         "input.type": "log",
         "log.offset": 14767,
@@ -1492,7 +1492,7 @@
             "allowed"
         ],
         "fileset.name": "eve",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 0,
         "input.type": "log",
         "log.offset": 15651,

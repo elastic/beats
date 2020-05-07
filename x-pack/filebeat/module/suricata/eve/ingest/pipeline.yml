@@ -2,10 +2,10 @@
 description: Pipeline for parsing Suricata EVE logs
 
 processors:
-  - lowercase:
-      field: suricata.eve.http.http_method
-      target_field: http.request.method
-      ignore_missing: true
+  - set:
+      value: "{{suricata.eve.http.http_method}}"
+      field: http.request.method
+      if: "ctx?.suricata?.eve?.http?.http_method != null"
   - rename:
       field: suricata.eve.http.status
       target_field: http.response.status_code

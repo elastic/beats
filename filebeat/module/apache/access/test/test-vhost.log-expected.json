@@ -8,7 +8,7 @@
         "event.module": "apache",
         "event.outcome": "failure",
         "fileset.name": "access",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.body.bytes": 499,
         "http.response.status_code": 404,
