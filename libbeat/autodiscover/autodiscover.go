@@ -191,12 +191,7 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	}
 
 	if a.logger.IsDebug() {
-
 		for _, c := range configs {
-			// TODO remove the non private log before merging
-			rc := map[string]interface{}{}
-			c.Unpack(&rc)
-			a.logger.Debugf("Generated config: %+v", rc)
 			a.logger.Debugf("Generated config: %+v", common.DebugString(c, true))
 		}
 	}

@@ -30,25 +30,28 @@ import (
 
 type KubernetesKeystores map[string]Keystore
 
+// KubernetesKeystoresRegistry holds KubernetesKeystores for known namespaces. Once a Keystore for one k8s namespace
+// is initialized it will be reused every time it is needed.
 type KubernetesKeystoresRegistry struct {
 	kubernetesKeystores KubernetesKeystores
 	logger              *logp.Logger
 	client              k8s.Interface
 }
 
-// KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace.
+// KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace
 type KubernetesSecretsKeystore struct {
 	namespace string
 	client    k8s.Interface
 	logger    *logp.Logger
 }
 
-// Factoryk8s Create the right keystore with the configured options.
+// Factoryk8s Create the right keystore with the configured options
 func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (Keystore, error) {
 	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client, logger)
 	return keystore, err
 }
 
+// NewKubernetesKeystoresRegistry initializes a KubernetesKeystoresRegistry
 func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) *KubernetesKeystoresRegistry {
 	return &KubernetesKeystoresRegistry{
 		kubernetesKeystores: KubernetesKeystores{},

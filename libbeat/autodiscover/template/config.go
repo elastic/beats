@@ -27,8 +27,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// Mapper maps config templates with conditions, if a match happens on a discover event
-// the given template will be used as config
+// Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event
+// the given template will be used as config.
+// Mapper also includes the global Keystore object at `keystore` and `kubernetesKeystoresRegistry`, which
+// holds Kubernetes keystores for known namespaces
 type Mapper struct {
 	ConditionMaps               []*ConditionMap
 	keystore                    keystore.Keystore
@@ -76,7 +78,7 @@ func (e Event) GetValue(key string) (interface{}, error) {
 	return val, nil
 }
 
-// GetValue extracts given key from an Event
+// SetKubernetesKeystoresRegistry set the k8sKeystoresRegistry of the Mapper object
 func (c *Mapper) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
 	c.kubernetesKeystoresRegistry = k8sKeystoresRegistry
 }
@@ -126,7 +128,6 @@ func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options []uc
 		ucfg.VarExp,
 	}
 	opts = append(opts, options...)
-	logp.Err("Here are the options %v", options)
 
 	for _, config := range configs {
 		c, err := ucfg.NewFrom(config, opts...)
