@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -58,6 +60,10 @@ type Reporter interface {
 }
 
 type ReporterFactory func(beat.Info, Settings, *common.Config) (Reporter, error)
+
+type hostsCfg struct {
+	Hosts []string `config:"hosts"`
+}
 
 var (
 	defaultConfig = config{}
@@ -111,9 +117,7 @@ func getReporterConfig(
 		// merge reporter config with output config if both are present
 		if outCfg := outputs.Config(); outputs.Name() == name && outCfg != nil {
 			// require monitoring to not configure any hosts if output is configured:
-			hosts := struct {
-				Hosts []string `config:"hosts"`
-			}{}
+			hosts := hostsCfg{}
 			rc.Unpack(&hosts)
 
 			if settings.Format == FormatXPackMonitoringBulk && len(hosts.Hosts) > 0 {
@@ -127,6 +131,13 @@ func getReporterConfig(
 			if err != nil {
 				return "", nil, err
 			}
+
+			// Make sure hosts from reporter configuration get precedence over hosts
+			// from output configuration
+			if err := mergeHosts(merged, outCfg, rc); err != nil {
+				return "", nil, err
+			}
+
 			rc = merged
 		}
 
@@ -154,4 +165,45 @@ func collectSubObject(cfg *common.Config) *common.Config {
 		}
 	}
 	return out
+}
+
+func mergeHosts(merged, outCfg, reporterCfg *common.Config) error {
+	if merged == nil {
+		merged = common.NewConfig()
+	}
+
+	outputHosts := hostsCfg{}
+	if outCfg != nil {
+		if err := outCfg.Unpack(&outputHosts); err != nil {
+			return errw.Wrap(err, "unable to parse hosts from output config")
+		}
+	}
+
+	reporterHosts := hostsCfg{}
+	if reporterCfg != nil {
+		if err := reporterCfg.Unpack(&reporterHosts); err != nil {
+			return errw.Wrap(err, "unable to parse hosts from reporter config")
+		}
+	}
+
+	if len(outputHosts.Hosts) == 0 && len(reporterHosts.Hosts) == 0 {
+		return nil
+	}
+
+	// Give precedence to reporter hosts over output hosts
+	var newHostsCfg *common.Config
+	var err error
+	if len(reporterHosts.Hosts) > 0 {
+		newHostsCfg, err = common.NewConfigFrom(reporterHosts.Hosts)
+	} else {
+		newHostsCfg, err = common.NewConfigFrom(outputHosts.Hosts)
+	}
+	if err != nil {
+		return errw.Wrap(err, "unable to make config from new hosts")
+	}
+
+	if err := merged.SetChild("hosts", -1, newHostsCfg); err != nil {
+		return errw.Wrap(err, "unable to set new hosts into merged config")
+	}
+	return nil
 }
