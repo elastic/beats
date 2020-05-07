@@ -7,12 +7,12 @@ package httpinput
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
-	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -40,15 +40,15 @@ type HttpInput struct {
 	outlet   channel.Outleter // Output of received messages.
 	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
 
-	workerCtx    context.Context     // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc  // Used to signal that the worker should stop.
-	workerOnce   sync.Once           // Guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup      // Waits on worker goroutine.
-	httpServer   *http.Server        // The currently running HTTP instance
-	httpMux      *http.ServeMux      // Current HTTP Handler
-	httpRequest  http.Request        // Current Request
-	httpResponse http.ResponseWriter // Current ResponseWriter
-	eventObject  *map[string]interface{} // Current event object	 
+	workerCtx    context.Context         // Worker goroutine context. It's cancelled when the input stops or the worker exits.
+	workerCancel context.CancelFunc      // Used to signal that the worker should stop.
+	workerOnce   sync.Once               // Guarantees that the worker goroutine is only started once.
+	workerWg     sync.WaitGroup          // Waits on worker goroutine.
+	httpServer   *http.Server            // The currently running HTTP instance
+	httpMux      *http.ServeMux          // Current HTTP Handler
+	httpRequest  http.Request            // Current Request
+	httpResponse http.ResponseWriter     // Current ResponseWriter
+	eventObject  *map[string]interface{} // Current event object
 }
 
 // NewInput creates a new httpjson input
@@ -203,13 +203,13 @@ func (in *HttpInput) createEvent() (uint, string) {
 	if err != "" || status != 0 {
 		return status, err
 	}
-	
+
 	// Create the event
 	ok := in.outlet.OnEvent(beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
-			"message": "testing",
-			in.config.Prefix:    in.eventObject,
+			"message":        "testing",
+			in.config.Prefix: in.eventObject,
 		},
 	})
 
@@ -243,7 +243,7 @@ func (in *HttpInput) validateRequest() (uint, string) {
 	}
 
 	// Validate body
-	status, err  = in.validateBody()
+	status, err = in.validateBody()
 
 	if err != "" && status != 0 {
 		return status, err
@@ -287,7 +287,6 @@ func (in *HttpInput) validateBody() (uint, string) {
 		return http.StatusNotAcceptable, in.createErrorMessage("body can not be empty")
 	}
 
-
 	// Write full []byte to string
 	body, err := ioutil.ReadAll(in.httpRequest.Body)
 
@@ -295,7 +294,6 @@ func (in *HttpInput) validateBody() (uint, string) {
 	if err != nil {
 		return http.StatusInternalServerError, in.createErrorMessage("unable to read body")
 	}
-
 
 	// Declare interface for request body
 	objmap := make(map[string]interface{})
@@ -321,7 +319,7 @@ func (in *HttpInput) validateMethod() (uint, string) {
 	return 0, ""
 }
 
-func (in *HttpInput) createErrorMessage(r string ) string {
+func (in *HttpInput) createErrorMessage(r string) string {
 	return fmt.Sprintf(`{"message": "%v"}`, r)
 }
 

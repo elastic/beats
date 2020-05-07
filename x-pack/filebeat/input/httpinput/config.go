@@ -19,7 +19,7 @@ type config struct {
 	ListenAddress   string `config:"listen_address"`
 	ListenPort      string `config:"listen_port"`
 	URL             string `config:"url"`
-    Prefix          string `config:"prefix"`
+	Prefix          string `config:"prefix"`
 }
 
 func defaultConfig() config {
