@@ -21,3 +21,9 @@ a local cluster inside of your local docker to perform the intergation tests ins
 `kind` cluster will be created and destroy before and after the test. If you would like to
 keep the `kind` cluster running after the test has finished you can set `KIND_SKIP_DELETE=1`
 inside of your environment.
+
+
+## Starting Kubernetes clusters in Cloud providers
+
+The `terraform` directory contains terraform configurations to start Kubernetes
+clusters in cloud providers.
