@@ -80,7 +80,10 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			if err != nil {
 				reporter.Error(err)
 			} else {
-				event := mb.Event{}
+				meta := msg.GetMeta()
+				event := mb.Event{
+					Host: meta["address"].(string),
+				}
 				ns, ok := fields[mb.NamespaceKey].(string)
 				if ok {
 					ns = fmt.Sprintf("http.%s", ns)
