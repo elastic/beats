@@ -73,8 +73,9 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 		o.logger.Debugf("stopping program %v", p)
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
+		} else {
+			o.markStopMonitoring(step.Process)
 		}
-		o.markStopMonitoring(step.Process)
 	}
 
 	return result
