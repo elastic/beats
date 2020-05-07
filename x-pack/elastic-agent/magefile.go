@@ -108,7 +108,6 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
 	params.LDFlags = flagsSet()
 	return devtools.GolangCrossBuild(params)
 }
@@ -117,7 +116,6 @@ func GolangCrossBuildOSS() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
 	params.OutputDir = "build/golang-crossbuild"
 	params.LDFlags = flagsSet()
 	if err := devtools.GolangCrossBuild(params); err != nil {
@@ -142,7 +140,6 @@ func (Build) BinaryOSS() error {
 		"build",
 		"-o", filepath.Join(buildDir, "elastic-agent-oss"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
@@ -153,7 +150,6 @@ func (Build) Binary() error {
 		"build",
 		"-o", filepath.Join(buildDir, "elastic-agent"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
@@ -165,7 +161,6 @@ func (Build) Dev() error {
 		"-tags", "dev",
 		"-o", filepath.Join(buildDir, "elastic-agent"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
