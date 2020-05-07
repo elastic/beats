@@ -45,6 +45,7 @@ type Reader struct {
 	flushMatcher *match.Matcher
 	maxBytes     int // bytes stored in content
 	maxLines     int
+	linesCount   int // configured count_lines
 	separator    []byte
 	last         []byte
 	numLines     int
@@ -74,6 +75,20 @@ var (
 // New creates a new multi-line reader combining stream of
 // line events into stream of multi-line events.
 func New(
+	r reader.Reader,
+	separator string,
+	maxBytes int,
+	config *Config,
+) (*Reader, error) {
+	if config.Type == patternMode || config.Type == nil {
+		return newMultilinePatternReader(r, separator, maxBytes, config)
+	} else if config.Type == countMode {
+		return newMultilineCountReader(r, separator, maxBytes, config)
+	}
+	return nil, fmt.Errorf("unknown multiline type")
+}
+
+func newMultilinePatternReader(
 	r reader.Reader,
 	separator string,
 	maxBytes int,
@@ -131,6 +146,25 @@ func New(
 	return mlr, nil
 }
 
+func newMultilineCountReader(
+	r reader.Reader,
+	separator string,
+	maxBytes int,
+	config *Config,
+) (*Reader, error) {
+	mlr := &Reader{
+		reader:     r,
+		linesCount: config.LinesCount,
+		state:      (*Reader).readFirstCount,
+		maxBytes:   maxBytes,
+		maxLines:   config.LinesCount,
+		separator:  []byte(separator),
+		message:    reader.Message{},
+		logger:     logp.NewLogger("reader_counter_multiline"),
+	}
+	return mlr, nil
+}
+
 // Next returns next multi-line event.
 func (mlr *Reader) Next() (reader.Message, error) {
 	return mlr.state(mlr)
@@ -160,6 +194,68 @@ func (mlr *Reader) readFirst() (reader.Message, error) {
 		mlr.load(message)
 		mlr.setState((*Reader).readNext)
 		return mlr.readNext()
+	}
+}
+
+func (mlr *Reader) readFirstCount() (reader.Message, error) {
+	for {
+		message, err := mlr.reader.Next()
+		if err != nil {
+			return message, err
+		}
+
+		if message.Bytes == 0 {
+			continue
+		}
+
+		// Start new multiline event
+		mlr.clear()
+		mlr.load(message)
+		mlr.setState((*Reader).readNextCount)
+		return mlr.readNextCount()
+	}
+}
+
+func (mlr *Reader) readNextCount() (reader.Message, error) {
+	for {
+		message, err := mlr.reader.Next()
+		if err != nil {
+			// handle error without any bytes returned from reader
+			if message.Bytes == 0 {
+				// no lines buffered -> return error
+				if mlr.numLines == 0 {
+					return reader.Message{}, err
+				}
+
+				// lines buffered, return multiline and error on next read
+				msg := mlr.finalize()
+				mlr.err = err
+				mlr.setState((*Reader).readFailedCount)
+				return msg, nil
+			}
+
+			// handle error with some content being returned by reader and
+			// line matching multiline criteria or no multiline started yet
+			if mlr.message.Bytes == 0 {
+				mlr.addLine(message)
+
+				// return multiline and error on next read
+				msg := mlr.finalize()
+				mlr.err = err
+				mlr.setState((*Reader).readFailedCount)
+				return msg, nil
+			}
+		}
+
+		// if enough lines are aggregated, return multiline event
+		if mlr.message.Bytes > 0 && mlr.numLines == mlr.linesCount {
+			msg := mlr.finalize()
+			mlr.load(message)
+			return msg, nil
+		}
+
+		// add line to current multiline event
+		mlr.addLine(message)
 	}
 }
 
@@ -251,6 +347,13 @@ func (mlr *Reader) readFailed() (reader.Message, error) {
 	return reader.Message{}, err
 }
 
+func (mlr *Reader) readFailedCount() (reader.Message, error) {
+	err := mlr.err
+	mlr.err = nil
+	mlr.resetCountState()
+	return reader.Message{}, err
+}
+
 // load loads the reader with the given message. It is recommend to either
 // run clear or finalize before.
 func (mlr *Reader) load(m reader.Message) {
@@ -336,6 +439,11 @@ func (mlr *Reader) addLine(m reader.Message) {
 // resetState sets state of the reader to readFirst
 func (mlr *Reader) resetState() {
 	mlr.setState((*Reader).readFirst)
+}
+
+// resetCountState sets state of the reader to readFirst
+func (mlr *Reader) resetCountState() {
+	mlr.setState((*Reader).readFirstCount)
 }
 
 // setState sets state to the given function

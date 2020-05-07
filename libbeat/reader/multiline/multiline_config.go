@@ -24,20 +24,66 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
 
+type multilineType uint8
+
+const (
+	patternStr = "pattern"
+	countStr   = "count"
+
+	patternMode multilineType = iota
+	countMode
+)
+
+var (
+	multilineTypes = map[string]multilineType{
+		patternStr: patternMode,
+		countStr:   countMode,
+	}
+)
+
 // Config holds the options of multiline readers.
 type Config struct {
+	Type multilineType `config:"type"`
+
 	Negate       bool           `config:"negate"`
-	Match        string         `config:"match" validate:"required"`
+	Match        string         `config:"match"`
 	MaxLines     *int           `config:"max_lines"`
-	Pattern      *match.Matcher `config:"pattern" validate:"required"`
+	Pattern      *match.Matcher `config:"pattern"`
 	Timeout      *time.Duration `config:"timeout" validate:"positive"`
 	FlushPattern *match.Matcher `config:"flush_pattern"`
+
+	LinesCount int `config:"lines_count" validate:"positive"`
 }
 
 // Validate validates the Config option for multiline reader.
 func (c *Config) Validate() error {
-	if c.Match != "after" && c.Match != "before" {
-		return fmt.Errorf("unknown matcher type: %s", c.Match)
+	if c.Type == patternMode {
+		if c.Match != "after" && c.Match != "before" {
+			return fmt.Errorf("unknown matcher type: %s", c.Match)
+		}
+		if c.Pattern == nil {
+			return fmt.Errorf("multiline.pattern cannot be empty")
+		}
+	} else if c.Type == countMode {
+		if c.LinesCount == 0 {
+			return fmt.Errorf("multiline.lines_count cannot be zero")
+		}
 	}
+	return nil
+}
+
+// Unpack selects the approriate aggregation method for creating multiline events.
+// If it is not configured pattern matching is chosen.
+func (m *multilineType) Unpack(value string) error {
+	if value == "" {
+		*m = patternMode
+		return nil
+	}
+
+	s, ok := multilineTypes[value]
+	if !ok {
+		return fmt.Errorf("unknown multiline type: %s", value)
+	}
+	*m = s
 	return nil
 }
