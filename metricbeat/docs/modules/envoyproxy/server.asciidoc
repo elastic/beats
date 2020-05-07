@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-envoyproxy-server]]
-=== envoyproxy server metricset
+=== Envoyproxy server metricset
 
 include::../../../module/envoyproxy/server/_meta/docs.asciidoc[]
 

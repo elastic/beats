@@ -110,7 +110,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------- Haproxy Module -------------------------------
+#------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
   log:
@@ -269,7 +269,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- Nats Module ---------------------------------
+#--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
   log:

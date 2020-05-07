@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-sql]]
 [role="xpack"]
-== sql module
+== SQL module
 
 beta[]
 
@@ -16,7 +16,7 @@ This is the sql module that fetches metrics from a SQL database. You can define 
 [float]
 === Example configuration
 
-The sql module supports the standard configuration options that are described
+The SQL module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

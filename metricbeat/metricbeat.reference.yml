@@ -555,7 +555,7 @@ metricbeat.modules:
   hosts: ["localhost:10251"]
   period: 10s
 
-#--------------------------------- Kvm Module ---------------------------------
+#--------------------------------- KVM Module ---------------------------------
 - module: kvm
   metricsets: ["dommemstat"]
   enabled: true
@@ -655,7 +655,7 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
-#--------------------------------- Nats Module ---------------------------------
+#--------------------------------- NATS Module ---------------------------------
 - module: nats
   metricsets: ["connections", "routes", "stats", "subscriptions"]
   period: 10s
@@ -821,7 +821,7 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:8080"]
 
-#-------------------------------- Uwsgi Module --------------------------------
+#-------------------------------- UWSGI Module --------------------------------
 - module: uwsgi
   metricsets: ["status"]
   enable: true
