@@ -21,6 +21,8 @@ include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
 
 include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
 
+include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
+
 include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]

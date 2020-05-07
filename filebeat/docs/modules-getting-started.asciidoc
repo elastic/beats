@@ -1,6 +1,8 @@
 :has_module_steps:
 :modulename: system nginx mysql
 
+//TODO: DELETE THIS TOPIC AND REDIRECT IT TO THE GETTING STARTED TOPIC
+
 [[filebeat-modules-quickstart]]
 === Quick start: modules for common log formats
 

@@ -9,6 +9,9 @@
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+[[load-kibana-dashboards]]
+== Load {kib} dashboards
+
 ifdef::has_solutions[]
 TIP: For deeper observability into your infrastructure, you can use the
 Metrics app and the Logs app in {kib}.
@@ -25,11 +28,11 @@ command (as described here) or
 +{beatname_lc}.yml+ config file.
 
 This requires a Kibana endpoint configuration. If you didn't already configure
-a Kibana endpoint, see <<{beatname_lc}-configuration,configure {beatname_uc}>>.
+a Kibana endpoint, see <<setup-kibana-endpoint>>.
 
 Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
-<<{beatname_lc}-configuration>>.
+the <<{beatname_lc}-getting-started>>.
 
 To set up the Kibana dashboards for {beatname_uc}, use the appropriate command
 for your system. The command shown here loads the dashboards from the {beatname_uc}
@@ -106,8 +109,9 @@ PS > .{backslash}{beatname_lc}.exe setup --dashboards
 endif::win_os[]
 
 ifndef::no-output-logstash[]
+[float]
 [[load-dashboards-logstash]]
-==== Set up dashboards for Logstash output
+=== Load dashboards for Logstash output
 
 During dashboard loading, {beatname_uc} connects to Elasticsearch to check
 version information. To load dashboards when the Logstash output is enabled, you

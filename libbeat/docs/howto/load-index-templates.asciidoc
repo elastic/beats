@@ -1,5 +1,5 @@
 [id="{beatname_lc}-template"]
-== Set up the {es} index template
+== Load the {es} index template
 
 {es} uses {ref}/indices-templates.html[index templates] to define:
 
@@ -86,7 +86,7 @@ You can omit the `-E` flags if {es} output is already enabled.
 
 
 If you are connecting to a secured {es} cluster, make sure you've
-configured credentials as described in <<{beatname_lc}-configuration>>.
+configured credentials as described in the <<{beatname_lc}-getting-started>>.
 
 If the host running {beatname_uc} does not have direct connectivity to
 {es}, see <<load-template-manually-alternate>>.

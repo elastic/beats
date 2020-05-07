@@ -1,6 +1,5 @@
 
-To get started with your own {beatname_uc} setup, install and configure these
-related products:
+Install and configure these related products:
 
 * {es} for storing and indexing the data.
 * {kib} for the UI.

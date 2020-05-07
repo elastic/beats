@@ -1,23 +1,43 @@
 [[filebeat-getting-started]]
-== Get started with {beatname_uc}
+== Get started
+
+//TODO: We need to add a separate topic that provides a summary of the different
+//ways to parse log lines: ingest node, dissect processor, Logstash, etc. That
+//is beyond the scope of a quick start, IMO.
 
 ++++
 <titleabbrev>Get started</titleabbrev>
 ++++
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+This guide describes how to get up and running quickly with log collection.
+You'll learn how to:
 
-* <<filebeat-installation>>
-* <<filebeat-configuration>>
-* <<step-filebeat-template>>
-* <<load-kibana-dashboards>>
-* <<filebeat-starting>>
-* <<view-kibana-dashboards>>
-* <<filebeat-modules-quickstart>>
-* <<setup-repositories>>
+* install {beatname_uc} on each system you want to monitor
+* specify the location of your log files
+* parse log data into fields and send it to {es}
+* visualize the log data in {kib}
 
+[float]
+=== Before you begin
+
+You need access to {es} to store and search your data, and {kib}
+to visualize and manage it. 
+
+To get started quickly, spin up a deployment of our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}. The {ess} is available on AWS, GCP, and Azure.
+{ess-trial}[Try out the {ess} for free].
+
+//TODO: Ask cloud-first working group about preferred wording.
+
+Or you can {stack-gs}/get-started-elastic-stack.html[set up the {stack}] on your
+own hardware.
+
+[float]
 [[filebeat-installation]]
-=== Step 1: Install Filebeat
+=== Step 1: Install {beatname_uc}
+
+:release-state: released
 
 include::{libbeat-dir}/shared-download-and-install.asciidoc[]
 
@@ -147,52 +167,11 @@ NOTE: If script execution is disabled on your system, you need to set the execut
 
 endif::[]
 
-[[filebeat-configuration]]
-=== Step 2: Configure Filebeat
+[float]
+[[set-connection]]
+=== Step 2: Set the connection information
 
-TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
-started experience for common log formats. If you are using Filebeat modules,
-skip this section, including the remaining getting started steps, and go
-directly to <<filebeat-modules-quickstart>>.
-
-include::{libbeat-dir}/shared-configuring.asciidoc[]
-
-Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
-default values for most configuration options.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /var/log/*.log
-    #- c:\programdata\elasticsearch\logs\*
--------------------------------------------------------------------------------------
-
-To configure Filebeat:
-
-. Define the path (or paths) to your log files.
-+
-For the most basic Filebeat configuration, you can define a single input with a single path. For example:
-+
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /var/log/*.log
--------------------------------------------------------------------------------------
-+
-The input in this example harvests all files in the path `/var/log/*.log`, which means
-that Filebeat will harvest all files in the directory `/var/log/` that end with `.log`. All patterns supported
-by https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also supported here.
-+
-To fetch all files from a predefined level of subdirectories, the following pattern can be used:
-`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
-fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
-fetch all files in all subdirectories of a directory.
+Connections to {es} and {kib} are required to set up and run {beatname_uc}.
 
 include::{libbeat-dir}/step-configure-output.asciidoc[]
 
@@ -202,28 +181,67 @@ include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
 include::{libbeat-dir}/step-test-config.asciidoc[]
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+[float]
+[[enable-modules]]
+=== Step 3: Enable and configure data collection modules
 
-[[step-filebeat-template]]
-=== Step 3: Load the index template in Elasticsearch
+{beatname_uc} uses modules to collect and parse log data.
 
-include::{libbeat-dir}/shared-template-load.asciidoc[]
+. Look under <<filebeat-modules,modules>> to see what's available for your file type.
++
+Can't find a module for your log file type? You'll need to
+<<configuration-filebeat-options,configure the input>> and parse the log
+messages manually.
 
-[[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
+. From the installation directory, enable one or more modules. For example, the
+following command enables the system, nginx, and mysql modules:
++
+include::./include/enable-modules-command.asciidoc[]
++
+To see a list of enabled and disabled modules, run:
++
+include::./include/list-modules-command.asciidoc[]
 
-include::{libbeat-dir}/dashboards.asciidoc[]
+. In the `.yml` configs under `modules.d`, change the module settings to match
+your environment.
++
+The default log locations are set based on the OS. If your logs aren't in
+default locations, set the `paths` variable. For example:
++
+[source,yaml]
+----
+- module: nginx
+  access:
+    var.paths: ["/var/log/nginx/access.log*"] <1> 
+----
++
+See <<configuration-filebeat-modules>> for more information about setting
+variables and advanced options.
 
+[float]
+[[setup-modules]]
+=== Step 4: Set up assets
+
+{beatname_uc} comes with preconfigured assets for visualizing and parsing log
+data. To set up these assets, the user specified in +{beatname_lc}.yml+ 
+requires extra privileges. For more information, see
+<<privileges-to-setup-beats>>.
+
+To set up {beatname_uc}, from the installation directory, run:
+
+include::./include/setup-command.asciidoc[]
+ 
+
+[float]
 [[filebeat-starting]]
-=== Step 5: Start Filebeat
+=== Step 5: Start {beatname_uc}
 
-Start Filebeat by issuing the appropriate command for your platform. If you
-are accessing a secured Elasticsearch cluster, make sure you've configured
-credentials as described in <<{beatname_lc}-configuration>>.
+Before starting {beatname_uc}, change the user credentials in
+the +{beatname_lc}.yml+ to a user that has restricted privileges,
+especially if you're running {beatname_uc} in a production environment.
+For more information, see <<privileges-to-publish-events>>.
 
-NOTE: If you use an init.d script to start Filebeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
-start Filebeat in the foreground.
+To start {beatname_uc}, run:
 
 *deb and rpm:*
 
@@ -243,7 +261,7 @@ See <<running-on-docker>>.
 sudo chown root filebeat.yml <1>
 sudo ./filebeat -e
 ----------------------------------------------------------------------
-<1> You'll be running Filebeat as root, so you need to change ownership
+<1> You'll be running {beatname_uc} as root, so you need to change ownership
 of the configuration file, or run Filebeat with `--strict.perms=false`
 specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
@@ -258,36 +276,20 @@ include::{libbeat-dir}/shared-brew-run.asciidoc[]
 PS C:\Program Files\Filebeat> Start-Service filebeat
 ----------------------------------------------------------------------
 
-
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
-Filebeat is now ready to send log files to your defined output.
+{beatname_uc} should begin streaming log events to {es}.
 
+[float]
 [[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+=== Step 6: View the {kib} dashboards
 
-To make it easier for you to explore Filebeat data in Kibana, we've created
-example {beatname_uc} dashboards. You loaded the dashboards earlier when you
-ran the `setup` command.
+{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
+data. 
 
 include::{libbeat-dir}/opendashboards.asciidoc[]
 
-These dashboards are designed to work out-of-the box when you use
-<<filebeat-modules-overview,Filebeat modules>>. However, you can also use them
-as examples and {kibana-ref}/dashboard.html[customize] them to meet your needs
-even if you aren't using Filebeat modules.
-
-To populate the example dashboards with data, you need to either
-<<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
-parse the data into the fields expected by the dashboards.
-
-// TODO: Add this section back to the docs when the examples are available.
-// If you are using Logstash, see the
-// {logstash-ref}/logstash-config-for-filebeat-modules.html[configuration examples]
-// in the Logstash documentation for help parsing the log formats supported
-// by the dashboards.
-
-Here is an example of the Filebeat system dashboard:
+Here is an example of the system dashboard:
 
 [role="screenshot"]
 image::./images/kibana-system.png[]
