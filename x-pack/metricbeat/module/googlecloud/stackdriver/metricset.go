@@ -106,7 +106,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
 
-	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.stackDriverConfig)
+	m.metricsMeta, err = m.metricDescriptor(ctx, client, m.config.ProjectID, m.stackDriverConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "error calling metricDescriptor function")
 	}
@@ -218,7 +218,7 @@ func (mc *stackDriverConfig) Validate() error {
 
 // metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
 // (sample period and ingest delay) of each given metric type
-func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, stackDriverConfigs []stackDriverConfig) (map[string]metricMeta, error) {
+func (m MetricSet) metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, stackDriverConfigs []stackDriverConfig) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
 
 	for _, sdc := range stackDriverConfigs {
@@ -238,6 +238,7 @@ func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, proj
 				samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
 				ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
 			}
+			m.Logger().Debugf("metric type = %s, sample period = %s, ingest delay = %s", mt, out.Metadata.SamplePeriod, out.Metadata.IngestDelay)
 		}
 	}
 
