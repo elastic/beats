@@ -3151,7 +3151,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 

@@ -27,7 +27,7 @@
 
     - name: beat.hostname
       type: alias
-      path: agent.hostname
+      path: agent.name
       migration: true
 
     - name: timeseries.instance
