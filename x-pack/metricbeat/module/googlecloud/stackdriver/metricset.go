@@ -188,19 +188,6 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 	return nil
 }
 
-// Validate googlecloud module config
-func (c *config) Validate() error {
-	// storage metricset does not require region or zone config parameter.
-	if c.ServiceName == "storage" {
-		return nil
-	}
-
-	if c.Region == "" && c.Zone == "" {
-		return errors.New("region and zone in Google Cloud config file cannot both be empty")
-	}
-	return nil
-}
-
 // Validate stackdriver related config
 func (mc *stackDriverConfig) Validate() error {
 	gcpAlignerNames := make([]string, 0)
@@ -234,10 +221,16 @@ func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, proj
 				return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
 			}
 
-			metricsWithMeta[mt] = metricMeta{
+			meta := metricMeta{
 				samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
-				ingestDelay:  time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second,
+				ingestDelay:  0 * time.Second,
 			}
+
+			if out.Metadata.IngestDelay != nil {
+				meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+			}
+
+			metricsWithMeta[mt] = meta
 		}
 	}
 
