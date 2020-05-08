@@ -168,9 +168,13 @@ exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadba
 
 The `loadbalancing` metricset comes with two predefined dashboards:
 
+[float]
+==== HTTPS
 For HTTPS load balancing:
 image::./images/metricbeat-googlecloud-load-balancing-https-overview.png[]
 
+[float]
+==== L3
 For L3 load balancing:
 image::./images/metricbeat-googlecloud-load-balancing-l3-overview.png[]
 
