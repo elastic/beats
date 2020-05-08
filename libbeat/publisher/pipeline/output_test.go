@@ -174,9 +174,14 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				// Make sure that all events have eventually been published
 				timeout = 20 * time.Second
-				return waitUntilTrue(timeout, func() bool {
+				success := waitUntilTrue(timeout, func() bool {
 					return numEvents == int(publishedFirst.Load()+publishedLater.Load())
 				})
+				if !success {
+					t.Logf("numBatches = %v, numEvents = %v, publishedFirst = %v, publishedLater = %v",
+						numBatches, numEvents, publishedFirst.Load(), publishedLater.Load())
+				}
+				return success
 			}, &quick.Config{MaxCount: 25})
 
 			if err != nil {
