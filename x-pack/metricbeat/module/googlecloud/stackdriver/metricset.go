@@ -190,8 +190,8 @@ func validatePeriodForGCP(d time.Duration) (err error) {
 
 // Validate googlecloud module config
 func (c *config) Validate() error {
-	// storage metricset does not require region or zone config parameter.
-	if c.ServiceName == "storage" {
+	// storage and loadbalancing metricset does not require region or zone config parameter.
+	if c.ServiceName == "storage" || c.ServiceName == "loadbalancing" {
 		return nil
 	}
 

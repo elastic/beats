@@ -166,6 +166,14 @@ This metricset fetches metrics from https://cloud.google.com/load-balancing/[Loa
 in Google Cloud Platform. The `loadbalancing` metricset contains all metrics
 exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[GCP Load Balancing Monitoring API].
 
+The `loadbalancing` metricset comes with two predefined dashboards:
+
+For HTTPS load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-https-overview.png[]
+
+For L3 load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-l3-overview.png[]
+
 [float]
 === `pubsub`
 This metricset fetches metrics from https://cloud.google.com/pubsub/[Pub/Sub]
