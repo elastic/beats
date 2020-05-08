@@ -18,7 +18,9 @@
 package pipeline
 
 import (
+	"fmt"
 	"math"
+	"strings"
 	"sync"
 	"testing"
 	"testing/quick"
@@ -106,8 +108,10 @@ func TestReplaceClientWorker(t *testing.T) {
 			err := quick.Check(func(i uint) bool {
 				numBatches := 1000 + (i % 100) // between 1000 and 1099
 
+				logger := makeBufLogger(t)
+
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
 				var batches []publisher.Batch
@@ -178,6 +182,7 @@ func TestReplaceClientWorker(t *testing.T) {
 					return numEvents == int(publishedFirst.Load()+publishedLater.Load())
 				})
 				if !success {
+					logger.Flush()
 					t.Logf("numBatches = %v, numEvents = %v, publishedFirst = %v, publishedLater = %v",
 						numBatches, numEvents, publishedFirst.Load(), publishedLater.Load())
 				}
@@ -237,5 +242,42 @@ func TestMakeClientTracer(t *testing.T) {
 	transactions := apmEvents.Transactions
 	if len(transactions) != numBatches {
 		t.Errorf("expected %d traces, got %d", numBatches, len(transactions))
+	}
+}
+
+type bufLogger struct {
+	t     *testing.T
+	lines []string
+}
+
+func (l *bufLogger) Debug(vs ...interface{})              { l.report("DEBUG", vs) }
+func (l *bufLogger) Debugf(fmt string, vs ...interface{}) { l.reportf("DEBUG ", fmt, vs) }
+
+func (l *bufLogger) Info(vs ...interface{})              { l.report("INFO", vs) }
+func (l *bufLogger) Infof(fmt string, vs ...interface{}) { l.reportf("INFO", fmt, vs) }
+
+func (l *bufLogger) Error(vs ...interface{})              { l.report("ERROR", vs) }
+func (l *bufLogger) Errorf(fmt string, vs ...interface{}) { l.reportf("ERROR", fmt, vs) }
+
+func (l *bufLogger) report(level string, vs []interface{}) {
+	str := strings.TrimRight(strings.Repeat("%v ", len(vs)), " ")
+	l.reportf(level, str, vs)
+}
+func (l *bufLogger) reportf(level, str string, vs []interface{}) {
+	str = level + ": " + str
+	line := fmt.Sprintf(str, vs...)
+	l.lines = append(l.lines, line)
+}
+
+func (l *bufLogger) Flush() {
+	for _, line := range l.lines {
+		l.t.Log(line)
+	}
+}
+
+func makeBufLogger(t *testing.T) *bufLogger {
+	return &bufLogger{
+		t:     t,
+		lines: make([]string, 0),
 	}
 }
