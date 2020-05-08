@@ -1,5 +1,61 @@
 # Changelog
 
+#### Version 1.24.1 (2019-10-31)
+
+New Features:
+- Add DescribeLogDirs Request/Response pair
+  ([1520](https://github.com/Shopify/sarama/pull/1520)).
+
+Bug Fixes:
+- Fix ClusterAdmin returning invalid controller ID on DescribeCluster
+  ([1518](https://github.com/Shopify/sarama/pull/1518)).
+- Fix issue with consumergroup not rebalancing when new partition is added
+  ([1525](https://github.com/Shopify/sarama/pull/1525)).
+- Ensure consistent use of read/write deadlines
+  ([1529](https://github.com/Shopify/sarama/pull/1529)).
+
+#### Version 1.24.0 (2019-10-09)
+
+New Features:
+- Add sticky partition assignor
+  ([1416](https://github.com/Shopify/sarama/pull/1416)).
+- Switch from cgo zstd package to pure Go implementation
+  ([1477](https://github.com/Shopify/sarama/pull/1477)).
+
+Improvements:
+- Allow creating ClusterAdmin from client
+  ([1415](https://github.com/Shopify/sarama/pull/1415)).
+- Set KafkaVersion in ListAcls method
+  ([1452](https://github.com/Shopify/sarama/pull/1452)).
+- Set request version in CreateACL ClusterAdmin method
+  ([1458](https://github.com/Shopify/sarama/pull/1458)).
+- Set request version in DeleteACL ClusterAdmin method
+  ([1461](https://github.com/Shopify/sarama/pull/1461)).
+- Handle missed error codes on TopicMetaDataRequest and GroupCoordinatorRequest
+  ([1464](https://github.com/Shopify/sarama/pull/1464)).
+- Remove direct usage of gofork
+  ([1465](https://github.com/Shopify/sarama/pull/1465)).
+- Add support for Go 1.13
+  ([1478](https://github.com/Shopify/sarama/pull/1478)).
+- Improve behavior of NewMockListAclsResponse
+  ([1481](https://github.com/Shopify/sarama/pull/1481)).
+
+Bug Fixes:
+- Fix race condition in consumergroup example
+  ([1434](https://github.com/Shopify/sarama/pull/1434)).
+- Fix brokerProducer goroutine leak
+  ([1442](https://github.com/Shopify/sarama/pull/1442)).
+- Use released version of lz4 library
+  ([1469](https://github.com/Shopify/sarama/pull/1469)).
+- Set correct version in MockDeleteTopicsResponse
+  ([1484](https://github.com/Shopify/sarama/pull/1484)).
+- Fix CLI help message typo
+  ([1494](https://github.com/Shopify/sarama/pull/1494)).
+
+Known Issues:
+- Please **don't** use Zstd, as it doesn't work right now.
+  See https://github.com/Shopify/sarama/issues/1252
+
 #### Version 1.23.1 (2019-07-22)
 
 Bug Fixes:

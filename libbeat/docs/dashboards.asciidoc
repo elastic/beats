@@ -116,7 +116,13 @@ connect to a secured Elasticsearch cluster, you also need to pass Elasticsearch
 credentials.
 
 TIP: The example shows a hard-coded password, but you should store sensitive
-values in the <<keystore,secrets keystore>>.
+values
+ifndef::serverless[]
+in the <<keystore,secrets keystore>>.
+endif::[]
+ifdef::serverless[]
+in environment variables.
+endif::[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*

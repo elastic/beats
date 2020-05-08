@@ -1,0 +1,4 @@
+.drone.sec.yaml
+vendor/
+node_modules/
+dist/

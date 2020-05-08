@@ -70,7 +70,7 @@ processors:
         destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
-        event.outcome: 30
+        panw.panos.action: 30
         network.bytes: 31
         client.bytes: 32
         destination.bytes: 32
@@ -123,7 +123,7 @@ processors:
         destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
-        event.outcome: 30
+        panw.panos.action: 30
         panw.panos.threat.resource: 31
         url.original: 31
         panw.panos.threat.name: 32
@@ -166,3 +166,7 @@ processors:
         - {from: destination.nat.ip, to: panw.panos.destination.nat.ip, type: ip}
         - {from: source.nat.port, to: panw.panos.source.nat.port, type: long}
         - {from: destination.nat.port, to: panw.panos.destination.nat.port, type: long}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

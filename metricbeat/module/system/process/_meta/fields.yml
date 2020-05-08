@@ -91,12 +91,12 @@
           type: long
           format: bytes
           description: >
-            The total virtual memory the process has.
+            The total virtual memory the process has. On Windows this represents the Commit Charge (the total amount of memory that the memory manager has committed for a running process) value in bytes for this process.
         - name: rss.bytes
           type: long
           format: bytes
           description: >
-            The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+            The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
         - name: rss.pct
           type: scaled_float
           format: percent

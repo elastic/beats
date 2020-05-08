@@ -18,11 +18,11 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 )
 
 // ConnectorFunc is an adapter for using ordinary functions as Connector.
@@ -30,7 +30,7 @@ type ConnectorFunc func(*common.Config, beat.ClientConfig) (Outleter, error)
 
 type pipelineConnector struct {
 	parent   *OutletFactory
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 }
 
 // Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.
@@ -96,6 +96,7 @@ func (c *pipelineConnector) ConnectWith(cfg *common.Config, clientCfg beat.Clien
 	clientCfg.Processing.Fields = fields
 	clientCfg.Processing.Processor = procs
 	clientCfg.Processing.KeepNull = config.KeepNull
+	clientCfg.Processing.DisableHost = config.PublisherPipeline.DisableHost
 	client, err := c.pipeline.ConnectWith(clientCfg)
 	if err != nil {
 		return nil, err

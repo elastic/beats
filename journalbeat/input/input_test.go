@@ -24,10 +24,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
-	_ "github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 )
 
 func TestProcessorsForInput(t *testing.T) {
@@ -59,44 +59,46 @@ func TestProcessorsForInput(t *testing.T) {
 		},
 	}
 	for description, test := range testCases {
-		if test.event.Fields == nil {
-			test.event.Fields = common.MapStr{}
-		}
-		config, err := inputConfigFromString(test.configStr)
-		if err != nil {
-			t.Errorf("[%s] %v", description, err)
-			continue
-		}
-		processors, err := processorsForInput(test.beatInfo, config)
-		if err != nil {
-			t.Errorf("[%s] %v", description, err)
-			continue
-		}
-		processedEvent, err := processors.Run(&test.event)
-		// We don't check if err != nil, because we are testing the final outcome
-		// of running the processors, including when some of them fail.
-		if processedEvent == nil {
-			t.Errorf("[%s] Unexpected fatal error running processors: %v\n",
-				description, err)
-		}
-		for key, value := range test.expectedFields {
-			field, err := processedEvent.GetValue(key)
+		t.Run(description, func(t *testing.T) {
+			if test.event.Fields == nil {
+				test.event.Fields = common.MapStr{}
+			}
+			config, err := inputConfigFromString(test.configStr)
 			if err != nil {
-				t.Errorf("[%s] Couldn't get field %s from event: %v", description, key, err)
-				continue
+				t.Errorf("[%s] %v", description, err)
+				return
 			}
-			assert.Equal(t, field, value)
-			fieldStr, ok := field.(string)
-			if !ok {
-				// Note that requiring a string here is just to simplify the test setup,
-				// not a requirement of the underlying api.
-				t.Errorf("[%s] Field [%s] should be a string", description, key)
-				continue
+			processors, err := processorsForInput(test.beatInfo, config)
+			if err != nil {
+				t.Errorf("[%s] %v", description, err)
+				return
 			}
-			if fieldStr != value {
-				t.Errorf("[%s] Event field [%s]: expected [%s], got [%s]", description, key, value, fieldStr)
+			processedEvent, err := processors.Run(&test.event)
+			// We don't check if err != nil, because we are testing the final outcome
+			// of running the processors, including when some of them fail.
+			if processedEvent == nil {
+				t.Errorf("[%s] Unexpected fatal error running processors: %v\n",
+					description, err)
 			}
-		}
+			for key, value := range test.expectedFields {
+				field, err := processedEvent.GetValue(key)
+				if err != nil {
+					t.Errorf("[%s] Couldn't get field %s from event: %v", description, key, err)
+					return
+				}
+				assert.Equal(t, field, value)
+				fieldStr, ok := field.(string)
+				if !ok {
+					// Note that requiring a string here is just to simplify the test setup,
+					// not a requirement of the underlying api.
+					t.Errorf("[%s] Field [%s] should be a string", description, key)
+					return
+				}
+				if fieldStr != value {
+					t.Errorf("[%s] Event field [%s]: expected [%s], got [%s]", description, key, value, fieldStr)
+				}
+			}
+		})
 	}
 }
 
@@ -147,7 +149,7 @@ func (p *setRawIndex) String() string {
 // Helper function to convert from YML input string to an unpacked
 // Config
 func inputConfigFromString(s string) (Config, error) {
-	config := Config{}
+	config := DefaultConfig
 	cfg, err := common.NewConfigFrom(s)
 	if err != nil {
 		return config, err

@@ -22,8 +22,8 @@ package log
 import (
 	"testing"
 
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/common/match"
 
 	"github.com/stretchr/testify/assert"
 )

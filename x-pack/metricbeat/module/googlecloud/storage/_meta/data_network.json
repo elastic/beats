@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "googlecloud"
+    },
+    "event": {
+        "dataset": "googlecloud.storage",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "labels": {
+            "metrics": {
+                "method": "GetBucketMetadata",
+                "response_code": "OK"
+            },
+            "resource": {
+                "bucket_name": "ocp-be-c5kjr-image-registry-us-central1-dsoafnbgctvfimpavswkgn",
+                "location": "us-central1"
+            }
+        },
+        "storage": {
+            "network": {
+                "received_bytes_count": 0
+            }
+        }
+    },
+    "metricset": {
+        "name": "storage",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/googlecloud"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/googlecloud"
 )
 
 // ID returns a generated ID for a Compute resource based on its labels, projectID, zone, timestamp and instance ID
@@ -23,7 +23,7 @@ func (s *metadataCollector) ID(ctx context.Context, in *googlecloud.MetadataColl
 	if in.Timestamp != nil {
 		metadata.ECS.Put("timestamp", in.Timestamp)
 	} else if in.Point != nil {
-		metadata.ECS.Put("timestamp", in.Point.Interval.StartTime)
+		metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
 	} else {
 		return "", errors.New("no timestamp information found")
 	}

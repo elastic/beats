@@ -10,12 +10,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 const stdinName = "stdin"
@@ -24,11 +24,11 @@ const stdinName = "stdin"
 var Bundle = provider.MustCreate(
 	"local",
 	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
-	feature.NewDetails("local events", "allows to trigger events locally.", feature.Experimental),
+	feature.MakeDetails("local events", "allows to trigger events locally.", feature.Experimental),
 ).MustAddFunction(
 	stdinName,
 	NewStdinFunction,
-	feature.NewDetails(stdinName, "read events from stdin", feature.Experimental),
+	feature.MakeDetails(stdinName, "read events from stdin", feature.Experimental),
 ).Bundle()
 
 // StdinFunction reads events from STIN and terminates when stdin is completed.

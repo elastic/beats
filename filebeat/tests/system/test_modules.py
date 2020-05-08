@@ -137,7 +137,7 @@ class Test(BaseTest):
 
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(" ".join(cmd) + "\n")
+        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
         # Use a fixed timezone so results don't vary depending on the environment
         # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
@@ -216,7 +216,7 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
+    host_keys = ["host.name", "agent.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run

@@ -20,11 +20,11 @@ package mage
 import (
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/build"
-	"github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/dashboards"
-	"github.com/elastic/beats/dev-tools/mage/target/docs"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/docs"
 )
 
 func init() {
@@ -56,7 +56,12 @@ func (Update) Config() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func (Update) Dashboards() error {
 	mg.Deps(fb.FieldsYML)
-	return devtools.KibanaDashboards()
+	switch SelectLogic {
+	case devtools.XPackProject:
+		return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), devtools.XPackBeatDir("module"))
+	default:
+		return devtools.KibanaDashboards(devtools.OSSBeatDir("module"))
+	}
 }
 
 // Fields updates all fields files (.go, .yml).

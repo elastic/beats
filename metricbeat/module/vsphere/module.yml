@@ -1,0 +1,5 @@
+dashboards:
+- id: 0ebd0be0-f049-11e9-aaf3-15199b632da7
+  file: metricbeat-vsphere-host.json
+- id: 8a2d1540-f049-11e9-aaf3-15199b632da7
+  file: metricbeat-vsphere-vm.json

@@ -20,9 +20,9 @@ package beater
 import (
 	"sync"
 
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/registrar"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/registrar"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 type registrarLogger struct {

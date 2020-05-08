@@ -70,8 +70,8 @@ processors:
           %{ELBPROCESSINGTIME}
         ELBHTTPLOG: >-
           %{ELBCOMMON}
-          %{NUMBER:http.response.status_code}
-          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code})
+          %{NUMBER:http.response.status_code:long}
+          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code:long})
           %{NUMBER:http.request.body.bytes:long}
           %{NUMBER:http.response.body.bytes:long}
           \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|HTTP/%{NOTSPACE:http.version})\"
@@ -89,6 +89,13 @@ processors:
         ELBV2TYPE: '%{WORD:aws.elb.type}'
         ELBV2LOGVERSION: '%{NOTSPACE}'  # Could be used to support different log versions, only 1.0 exists now
 
+  - set:
+      field: event.kind
+      value: event
+
+  - set:
+      field: cloud.provider
+      value: aws
 
   - set:
       if: 'ctx.http != null'
@@ -96,9 +103,38 @@ processors:
       value: 'http'
 
   - set:
+      if: 'ctx.http != null'
+      field: event.category
+      value: web
+
+  - set:
       if: 'ctx.http == null'
       field: 'aws.elb.protocol'
       value: 'tcp'
+
+  - set:
+      if: 'ctx.http == null'
+      field: event.category
+      value: network
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+      field: event.outcome
+      value: success
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+      field: event.outcome
+      value: failure
+
+  - lowercase:
+      field: http.request.method
+      ignore_missing: true
+
+  - set:
+      if: "ctx?.aws?.elb?.trace_id != null"
+      field: tracing.trace.id
+      value: "{{aws.elb.trace_id}}"
 
   - split:
       field: '_tmp.actions_executed'
@@ -138,6 +174,26 @@ processors:
       field: source.as.organization_name
       target_field: source.as.organization.name
       ignore_missing: true
+
+  - set:
+      field: tls.cipher
+      value: '{{aws.elb.ssl_cipher}}'
+      if: ctx.aws?.elb?.ssl_cipher != null
+
+  - script:
+      lang: painless
+      if: ctx.aws?.elb?.ssl_protocol != null
+      source: >-
+        def parts = ctx.aws.elb.ssl_protocol.splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        if (parts[1].contains(".")) {
+          ctx.tls.version = parts[1];
+        } else {
+          ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
+        }
+        ctx.tls.version_protocol = parts[0].toLowerCase();
 
   - remove:
       field:

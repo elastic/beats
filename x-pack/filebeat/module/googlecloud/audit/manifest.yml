@@ -10,7 +10,7 @@ var:
   - name: subscription_name
     default: filebeat-googlecloud-audit
   - name: credentials_file
-    default: googlecloud-audit-reader-service-identity.json
+  - name: credentials_json
   - name: keep_original_message
     default: false
 ingest_pipeline: ingest/pipeline.yml

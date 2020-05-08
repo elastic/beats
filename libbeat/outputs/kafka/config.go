@@ -20,25 +20,34 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/common/kafka"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
+
+type backoffConfig struct {
+	Init time.Duration `config:"init"`
+	Max  time.Duration `config:"max"`
+}
 
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
 	TLS                *tlscommon.Config         `config:"ssl"`
+	Kerberos           *kerberos.Config          `config:"kerberos"`
 	Timeout            time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata           metaConfig                `config:"metadata"`
 	Key                *fmtstr.EventFormatString `config:"key"`
@@ -53,6 +62,7 @@ type kafkaConfig struct {
 	BulkMaxSize        int                       `config:"bulk_max_size"`
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
 	Username           string                    `config:"username"`
@@ -84,6 +94,7 @@ func defaultConfig() kafkaConfig {
 	return kafkaConfig{
 		Hosts:              nil,
 		TLS:                nil,
+		Kerberos:           nil,
 		Timeout:            30 * time.Second,
 		BulkMaxSize:        2048,
 		BulkFlushFrequency: 0,
@@ -103,10 +114,14 @@ func defaultConfig() kafkaConfig {
 		CompressionLevel: 4,
 		Version:          kafka.Version("1.0.0"),
 		MaxRetries:       3,
-		ClientID:         "beats",
-		ChanBufferSize:   256,
-		Username:         "",
-		Password:         "",
+		Backoff: backoffConfig{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
+		ClientID:       "beats",
+		ChanBufferSize: 256,
+		Username:       "",
+		Password:       "",
 	}
 }
 
@@ -145,8 +160,8 @@ func (c *kafkaConfig) Validate() error {
 	return nil
 }
 
-func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
-	partitioner, err := makePartitioner(config.Partition)
+func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, error) {
+	partitioner, err := makePartitioner(log, config.Partition)
 	if err != nil {
 		return nil, err
 	}
@@ -162,13 +177,29 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
-	tls, err := outputs.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
 	if tls != nil {
 		k.Net.TLS.Enable = true
 		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Kerberos.IsEnabled() {
+		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+
+		k.Net.SASL.Enable = true
+		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
+		k.Net.SASL.GSSAPI = sarama.GSSAPIConfig{
+			AuthType:           int(config.Kerberos.AuthType),
+			KeyTabPath:         config.Kerberos.KeyTabPath,
+			KerberosConfigPath: config.Kerberos.ConfigPath,
+			ServiceName:        config.Kerberos.ServiceName,
+			Username:           config.Kerberos.Username,
+			Password:           config.Kerberos.Password,
+			Realm:              config.Kerberos.Realm,
+		}
 	}
 
 	if config.Username != "" {
@@ -206,7 +237,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 		retryMax = 1000
 	}
 	k.Producer.Retry.Max = retryMax
-	// TODO: k.Producer.Retry.Backoff = ?
+	k.Producer.Retry.BackoffFunc = makeBackoffFunc(config.Backoff)
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
@@ -236,8 +267,28 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
+		log.Errorf("Invalid kafka configuration: %+v", err)
 		return nil, err
 	}
 	return k, nil
+}
+
+// makeBackoffFunc returns a stateless implementation of exponential-backoff-with-jitter. It is conceptually
+// equivalent to the stateful implementation used by other outputs, EqualJitterBackoff.
+func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Duration {
+	maxBackoffRetries := int(math.Ceil(math.Log2(float64(cfg.Max) / float64(cfg.Init))))
+
+	return func(retries, _ int) time.Duration {
+		// compute 'base' duration for exponential backoff
+		dur := cfg.Max
+		if retries < maxBackoffRetries {
+			dur = time.Duration(uint64(cfg.Init) * uint64(1<<retries))
+		}
+
+		// apply about equaly distributed jitter in second half of the interval, such that the wait
+		// time falls into the interval [dur/2, dur]
+		limit := int64(dur / 2)
+		jitter := rand.Int63n(limit + 1)
+		return time.Duration(limit + jitter)
+	}
 }

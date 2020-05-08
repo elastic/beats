@@ -39,8 +39,9 @@ function VPCFlow(keep_original_message) {
     var categorizeEvent = new processor.AddFields({
         target: "event",
         fields: {
-            category: "network_traffic",
-            type: "flow",
+            kind: "event",
+            category: "network",
+            type: "connection",
         },
     });
 
@@ -48,6 +49,7 @@ function VPCFlow(keep_original_message) {
     var saveMetadata = new processor.Convert({
         fields: [
             {from: "json.logName", to: "log.logger"},
+            {from: "json.insertId", to: "event.id"},
         ],
         ignore_missing: true
     });

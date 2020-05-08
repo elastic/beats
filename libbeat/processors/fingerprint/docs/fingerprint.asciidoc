@@ -1,14 +1,18 @@
 [[fingerprint]]
 === Generate a fingerprint of an event
 
+++++
+<titleabbrev>fingerprint</titleabbrev>
+++++
+
 The `fingerprint` processor generates a fingerprint of an event based on a
 specified subset of its fields.
 
 [source,yaml]
 -----------------------------------------------------
 processors:
- - fingerprint:
-     fields: ["field1", "field2", ...]
+  - fingerprint:
+      fields: ["field1", "field2", ...]
 -----------------------------------------------------
 
 The following settings are supported:

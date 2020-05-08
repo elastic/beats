@@ -1,4 +1,4 @@
-The `dynamodb` metricset of aws module allows you to monitor your AWS SNS topic. `dynamodb` metricset fetches a set of values from
+The `dynamodb` metricset of aws module allows you to monitor your AWS DynamoDB database. `dynamodb` metricset fetches a set of values from
 https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html[Amazon DynamoDB Metrics].
 For all other DynamoDB metrics, the aggregation granularity is five minutes.
 

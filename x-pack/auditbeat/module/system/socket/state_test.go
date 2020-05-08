@@ -16,10 +16,11 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/dns"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 type logWrapper testing.T
@@ -48,12 +49,12 @@ func TestTCPConnWithProcess(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
 		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
-		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 0, GID: 20, EUID: 501, EGID: 20},
 		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
 		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
@@ -118,7 +119,130 @@ func TestTCPConnWithProcess(t *testing.T) {
 		"network.type":        "ipv4",
 		"process.pid":         1234,
 		"process.name":        "curl",
+		"user.id":             "0",
+		"user.name":           "root",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
+		"related.ip":          []string{localIP, remoteIP},
+		"related.user":        []string{"root"},
+	} {
+		if !assertValue(t, flow, expected, field) {
+			t.Fatal("expected value not found")
+		}
+	}
+}
+
+func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 443
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Second, 0, 0, time.Second)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		callExecve(meta(1234, 1234, 1), []string{"/usr/bin/curl", "https://example.net/", "-o", "/tmp/site.html"}),
+		&commitCreds{Meta: meta(1234, 1234, 2), UID: 501, GID: 20, EUID: 501, EGID: 20},
+		&execveRet{Meta: meta(1234, 1234, 2), Retval: 1234},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&tcpIPv4ConnectCall{Meta: meta(1234, 1235, 8), Sock: sock, RAddr: rAddr, RPort: rPort},
+		&ipLocalOutCall{
+			Meta:  meta(1234, 1235, 8),
+			Sock:  sock,
+			Size:  20,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+		&tcpConnectResult{Meta: meta(1234, 1235, 9), Retval: 0},
+		&tcpV4DoRcv{
+			Meta:  meta(0, 0, 12),
+			Sock:  sock,
+			Size:  12,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	evs = []event{
+		&inetReleaseCall{Meta: meta(0, 0, 15), Sock: sock},
+		&tcpV4DoRcv{
+			Meta:  meta(0, 0, 17),
+			Sock:  sock,
+			Size:  7,
+			LAddr: lAddr,
+			LPort: lPort,
+			RAddr: rAddr,
+			RPort: rPort,
+		},
+		&doExit{Meta: meta(1234, 1234, 18)},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 2)
+	flow := flows[0]
+	t.Log("read flow 0", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":           localIP,
+		"source.port":         localPort,
+		"source.packets":      uint64(1),
+		"source.bytes":        uint64(20),
+		"client.ip":           localIP,
+		"client.port":         localPort,
+		"destination.ip":      remoteIP,
+		"destination.port":    remotePort,
+		"destination.packets": uint64(1),
+		"destination.bytes":   uint64(12),
+		"server.ip":           remoteIP,
+		"server.port":         remotePort,
+		"network.direction":   "outbound",
+		"network.transport":   "tcp",
+		"network.type":        "ipv4",
+		"process.pid":         1234,
+		"process.name":        "curl",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
+	} {
+		if !assertValue(t, flow, expected, field) {
+			t.Fatal("expected value not found")
+		}
+	}
+
+	// we have a truncated flow with no directionality,
+	// so just report what we can
+	flow = flows[1]
+	t.Log("read flow 1", flow)
+	for field, expected := range map[string]interface{}{
+		"source.ip":         localIP,
+		"source.port":       localPort,
+		"client.ip":         localIP,
+		"client.port":       localPort,
+		"destination.ip":    remoteIP,
+		"destination.port":  remotePort,
+		"server.ip":         remoteIP,
+		"server.port":       remotePort,
+		"network.direction": "unknown",
+		"network.transport": "tcp",
+		"network.type":      "ipv4",
+		"event.type":        []string{"info", "connection"},
+		"event.category":    []string{"network", "network_traffic"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -134,7 +258,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -148,11 +272,9 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 			Sock:     sock,
 			Size:     123,
 			LAddr:    lAddr,
-			RAddr:    rAddr,
-			AltRAddr: 0,
+			AltRAddr: rAddr,
 			LPort:    lPort,
-			RPort:    rPort,
-			AltRPort: 0,
+			AltRPort: rPort,
 		},
 		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
 		&doExit{Meta: meta(1234, 1234, 18)},
@@ -187,6 +309,8 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		"process.pid":         1234,
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -200,7 +324,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, 0, time.Second)
+	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	var packet [256]byte
@@ -257,6 +381,8 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		"process.pid":         1234,
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
+		"event.type":          []string{"info", "connection"},
+		"event.category":      []string{"network", "network_traffic"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -291,6 +417,14 @@ func ipv4(ip string) uint32 {
 		panic("bad ip")
 	}
 	return tracing.MachineEndian.Uint32(netIP)
+}
+
+func ipv6(ip string) (hi uint64, lo uint64) {
+	netIP := net.ParseIP(ip).To16()
+	if netIP == nil {
+		panic("bad ip")
+	}
+	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
 }
 
 func feedEvents(evs []event, st *state, t *testing.T) error {
@@ -514,4 +648,63 @@ func TestDNSTracker(t *testing.T) {
 			{true, proc2, "192.0.2.12", "example.com"},
 		}.Run(t)
 	})
+}
+
+func TestUDPSendMsgAltLogic(t *testing.T) {
+	const expectedIPv4 = "6 probe=0 pid=1234 tid=1235 udp_sendmsg(sock=0x0, size=0, 10.11.12.13:1010 -> 10.20.30.40:1234)"
+	const expectedIPv6 = "6 probe=0 pid=1234 tid=1235 udpv6_sendmsg(sock=0x0, size=0, [fddd::bebe]:1010 -> [fddd::cafe]:1234)"
+	t.Run("ipv4 non-connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("10.20.30.40"),
+			RPort:    be16(1234),
+			AltRAddr: ipv4("192.168.255.255"),
+			AltRPort: be16(555),
+			SIPtr:    0x7fffffff,
+			SIAF:     unix.AF_INET,
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv4 connected", func(t *testing.T) {
+		ev := udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LAddr:    ipv4("10.11.12.13"),
+			LPort:    be16(1010),
+			RAddr:    ipv4("192.168.255.255"),
+			RPort:    be16(555),
+			AltRAddr: ipv4("10.20.30.40"),
+			AltRPort: be16(1234),
+		}
+		assert.Equal(t, expectedIPv4, ev.String())
+	})
+	t.Run("ipv6 non-connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(1234),
+			AltRPort: be16(555),
+			SI6Ptr:   0x7fffffff,
+			SI6AF:    unix.AF_INET6,
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::cafe")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::bad:bad")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
+	t.Run("ipv6 connected", func(t *testing.T) {
+		ev := udpv6SendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			LPort:    be16(1010),
+			RPort:    be16(555),
+			AltRPort: be16(1234),
+		}
+		ev.LAddrA, ev.LAddrB = ipv6("fddd::bebe")
+		ev.RAddrA, ev.RAddrB = ipv6("fddd::bad:bad")
+		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
+		assert.Equal(t, expectedIPv6, ev.String())
+	})
+
 }

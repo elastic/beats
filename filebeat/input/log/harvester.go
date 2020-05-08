@@ -39,21 +39,21 @@ import (
 	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	file_helper "github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/debug"
-	"github.com/elastic/beats/libbeat/reader/multiline"
-	"github.com/elastic/beats/libbeat/reader/readfile"
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
-	"github.com/elastic/beats/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 )
 
 var (
@@ -444,7 +444,7 @@ func (h *Harvester) onMessage(
 
 		if id != "" {
 			meta = common.MapStr{
-				"id": id,
+				"_id": id,
 			}
 		}
 	} else if &text != nil {

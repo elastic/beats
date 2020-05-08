@@ -1,0 +1,4158 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Uses Simple Metric Visualizations",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 22,
+              "i": "22",
+              "w": 17,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "22",
+            "panelRefName": "panel_0",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 22,
+              "i": "23",
+              "w": 22,
+              "x": 17,
+              "y": 0
+            },
+            "panelIndex": "23",
+            "panelRefName": "panel_1",
+            "title": "Group Management Actions [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 22,
+              "i": "25",
+              "w": 9,
+              "x": 39,
+              "y": 0
+            },
+            "panelIndex": "25",
+            "panelRefName": "panel_2",
+            "title": "Event Codes [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "defaultColors": {
+                  "0 - 1": "rgb(247,251,255)",
+                  "1 - 2": "rgb(198,219,239)",
+                  "2 - 3": "rgb(107,174,214)",
+                  "3 - 4": "rgb(33,113,181)"
+                },
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 21,
+              "i": "35",
+              "w": 26,
+              "x": 0,
+              "y": 22
+            },
+            "panelIndex": "35",
+            "panelRefName": "panel_3",
+            "title": "Actions performed over Groups [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "36",
+              "w": 9,
+              "x": 0,
+              "y": 52
+            },
+            "panelIndex": "36",
+            "panelRefName": "panel_4",
+            "title": "Group Creation Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "37",
+              "w": 9,
+              "x": 9,
+              "y": 52
+            },
+            "panelIndex": "37",
+            "panelRefName": "panel_5",
+            "title": "Group Changes Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "38",
+              "w": 9,
+              "x": 18,
+              "y": 52
+            },
+            "panelIndex": "38",
+            "panelRefName": "panel_6",
+            "title": "Group Deletion Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "39",
+              "w": 16,
+              "x": 0,
+              "y": 72
+            },
+            "panelIndex": "39",
+            "panelRefName": "panel_7",
+            "title": "Users Added to Group Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "40",
+              "w": 17,
+              "x": 16,
+              "y": 72
+            },
+            "panelIndex": "40",
+            "panelRefName": "panel_8",
+            "title": "Users Removed From Group Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "42",
+              "w": 15,
+              "x": 33,
+              "y": 72
+            },
+            "panelIndex": "42",
+            "panelRefName": "panel_9",
+            "title": "Group Membership Enumeration Summary [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 22,
+              "i": "43",
+              "w": 21,
+              "x": 27,
+              "y": 43
+            },
+            "panelIndex": "43",
+            "panelRefName": "panel_10",
+            "title": "Logon Details  [Winlogbeat Security]",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "44",
+              "w": 16,
+              "x": 0,
+              "y": 65
+            },
+            "panelIndex": "44",
+            "panelRefName": "panel_11",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "45",
+              "w": 9,
+              "x": 18,
+              "y": 43
+            },
+            "panelIndex": "45",
+            "panelRefName": "panel_12",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "46",
+              "w": 9,
+              "x": 0,
+              "y": 43
+            },
+            "panelIndex": "46",
+            "panelRefName": "panel_13",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "47",
+              "w": 9,
+              "x": 9,
+              "y": 43
+            },
+            "panelIndex": "47",
+            "panelRefName": "panel_14",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "48",
+              "w": 17,
+              "x": 16,
+              "y": 65
+            },
+            "panelIndex": "48",
+            "panelRefName": "panel_15",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "49",
+              "w": 15,
+              "x": 33,
+              "y": 65
+            },
+            "panelIndex": "49",
+            "panelRefName": "panel_16",
+            "title": "",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 21,
+              "i": "50",
+              "w": 22,
+              "x": 26,
+              "y": 22
+            },
+            "panelIndex": "50",
+            "panelRefName": "panel_17",
+            "version": "7.3.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 21,
+              "i": "51",
+              "w": 48,
+              "x": 0,
+              "y": 86
+            },
+            "panelIndex": "51",
+            "panelRefName": "panel_18",
+            "version": "7.3.1"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] Group Management Events - Simple Metrics",
+        "version": 1
+      },
+      "id": "01c54730-fee6-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "b01aaea0-f415-11e9-8405-516218e3d268",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "11b5c0e0-f417-11e9-8405-516218e3d268",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "b948eaf0-f49c-11e9-8405-516218e3d268",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "98884120-f49d-11e9-8405-516218e3d268",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "9e534190-f49d-11e9-8405-516218e3d268",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "ce867840-f49e-11e9-8405-516218e3d268",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "fee83900-f49f-11e9-8405-516218e3d268",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+          "name": "panel_10",
+          "type": "search"
+        },
+        {
+          "id": "a13bf640-fee8-11e9-8405-516218e3d268",
+          "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "5eeaafd0-fee7-11e9-8405-516218e3d268",
+          "name": "panel_12",
+          "type": "visualization"
+        },
+        {
+          "id": "f42f3b20-fee6-11e9-8405-516218e3d268",
+          "name": "panel_13",
+          "type": "visualization"
+        },
+        {
+          "id": "b5f38780-fee6-11e9-8405-516218e3d268",
+          "name": "panel_14",
+          "type": "visualization"
+        },
+        {
+          "id": "1b5f17d0-feea-11e9-8405-516218e3d268",
+          "name": "panel_15",
+          "type": "visualization"
+        },
+        {
+          "id": "0f2f5280-feeb-11e9-8405-516218e3d268",
+          "name": "panel_16",
+          "type": "visualization"
+        },
+        {
+          "id": "24954800-fef0-11e9-8405-516218e3d268",
+          "name": "panel_17",
+          "type": "visualization"
+        },
+        {
+          "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+          "name": "panel_18",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Management Events [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 10,
+            "markdown": "# **Group Management Events**\n\n#### This dashboard shows information about Group Management Events collected by winlogbeat\n#\n#\n#\nEvent | Description|Event | Description\n-- | --|--|--\n|4727|A security-enabled global group was created.|4728|A member was added to a security-enabled global group.| \n|4729|A member was removed from a security-enabled global group.|4730|A security-enabled global group was deleted.| \n|4731|A security-enabled local group was created.|4732|A member was added to a security-enabled local group.|\n|4733|A member was removed from a security-enabled local group.|4734|A security-enabled local group was deleted.|\n|4735|A security-enabled local group was changed.|4737|A security-enabled global group was changed.|\n|4754|A security-enabled universal group was created.| 4755|A security-enabled universal group was changed.| \n|4756|A member was added to a security-enabled universal group.|4757|A member was removed from a security-enabled universal group.| \n|4758|A security-enabled universal group was deleted.| 4764|A group\\'s type was changed.|\n|4799|A security-enabled local group membership was enumerated.|",
+            "openLinksInNewTab": false
+          },
+          "title": "Group Management Events [Winlogbeat Security]",
+          "type": "markdown"
+        }
+      },
+      "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI1LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4731",
+                    "4732",
+                    "4733",
+                    "4734",
+                    "4735",
+                    "4764",
+                    "4799",
+                    "4727",
+                    "4737",
+                    "4728",
+                    "4729",
+                    "4730",
+                    "4754",
+                    "4755",
+                    "4756",
+                    "4757",
+                    "4758"
+                  ],
+                  "type": "phrases",
+                  "value": "4731, 4732, 4733, 4734, 4735, 4764, 4799, 4727, 4737, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Management Events - Event Actions - Donut [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metric": {
+                "accessor": 1,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": true,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Group Management Events - Event Actions - Donut [Winlogbeat Security]",
+          "type": "pie"
+        }
+      },
+      "id": "b01aaea0-f415-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4727",
+                    "4728",
+                    "4729",
+                    "4730",
+                    "4731",
+                    "4732",
+                    "4733",
+                    "4734",
+                    "4735",
+                    "4737",
+                    "4754",
+                    "4755",
+                    "4756",
+                    "4757",
+                    "4758",
+                    "4764",
+                    "4799"
+                  ],
+                  "type": "phrases",
+                  "value": "4727, 4728, 4729, 4730, 4731, 4732, 4733, 4734, 4735, 4737, 4754, 4755, 4756, 4757, 4758, 4764, 4799"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Management Events - Event Actions - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Event Action",
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Event Code",
+                "field": "event.code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 2,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Group Management Events - Event Actions - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "11b5c0e0-f417-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4727",
+                    "4728",
+                    "4729",
+                    "4730",
+                    "4731",
+                    "4732",
+                    "4733",
+                    "4734",
+                    "4735",
+                    "4737",
+                    "4754",
+                    "4755",
+                    "4756",
+                    "4757",
+                    "4758",
+                    "4764",
+                    "4799"
+                  ],
+                  "type": "phrases",
+                  "value": "4727, 4728, 4729, 4730, 4731, 4732, 4733, 4734, 4735, 4737, 4754, 4755, 4756, 4757, 4758, 4764, 4799"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Management Events - Groups vs Actions - Heatmap [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "defaultColors": {
+              "0 - 1": "rgb(247,251,255)",
+              "1 - 2": "rgb(198,219,239)",
+              "2 - 3": "rgb(107,174,214)",
+              "3 - 4": "rgb(33,113,181)"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 15
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "colorSchema": "Blues",
+            "colorsNumber": 4,
+            "colorsRange": [],
+            "dimensions": {
+              "series": [
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "x": {
+                "accessor": 0,
+                "aggType": "terms",
+                "format": {
+                  "id": "terms",
+                  "params": {
+                    "id": "string",
+                    "missingBucketLabel": "Missing",
+                    "otherBucketLabel": "Other"
+                  }
+                },
+                "params": {}
+              },
+              "y": [
+                {
+                  "accessor": 2,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "enableHover": false,
+            "invertColors": false,
+            "legendPosition": "right",
+            "percentageMode": false,
+            "setColorRange": false,
+            "times": [],
+            "type": "heatmap",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "color": "black",
+                  "overwriteColor": false,
+                  "rotate": 0,
+                  "show": true
+                },
+                "scale": {
+                  "defaultYExtents": false,
+                  "type": "linear"
+                },
+                "show": false,
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Group Management Events - Groups vs Actions - Heatmap [Winlogbeat Security]",
+          "type": "heatmap"
+        }
+      },
+      "id": "b948eaf0-f49c-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI4LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4731",
+                    "4727",
+                    "4754"
+                  ],
+                  "type": "phrases",
+                  "value": "4731, 4727, 4754"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Groups Created - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Performed by",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Performer LogonID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 4,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Groups Created - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "98884120-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzI5LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4735",
+                    "4737",
+                    "4755"
+                  ],
+                  "type": "phrases",
+                  "value": "4735, 4737, 4755"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Changes - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Performed by",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Performer LogonID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 4,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Group Changes - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "9e534190-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzMwLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4734",
+                    "4730",
+                    "4758"
+                  ],
+                  "type": "phrases",
+                  "value": "4734, 4730, 4758"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Groups Deleted - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Performed by",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Performer LogonID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 4,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Groups Deleted - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzMxLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4732",
+                    "4728",
+                    "4756"
+                  ],
+                  "type": "phrases",
+                  "value": "4732, 4728, 4756"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Users Added - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "User",
+                "field": "winlog.event_data.MemberName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Performed by",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "6",
+              "params": {
+                "customLabel": "Performed by Logon ID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 4,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 5,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Users Added - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "ce867840-f49e-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzMyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4733",
+                    "4729",
+                    "4757"
+                  ],
+                  "type": "phrases",
+                  "value": "4733, 4729, 4757"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Users Removed from Group - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "User",
+                "field": "winlog.event_data.MemberName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Performed by",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "6",
+              "params": {
+                "customLabel": "Performed by Logon ID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 4,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 5,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Users Removed from Group - Table [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "fee83900-f49f-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzMzLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4799"
+                  ],
+                  "type": "phrases",
+                  "value": "4799"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Enumeration [Winlogbeat Security]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Group",
+                "field": "group.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Domain",
+                "field": "group.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Creator",
+                "field": "winlog.event_data.SubjectUserName",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "Creator LogonID",
+                "field": "winlog.logon.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 3,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metrics": [
+                {
+                  "accessor": 4,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "perPage": 5,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Group Enumeration [Winlogbeat Security]",
+          "type": "table"
+        }
+      },
+      "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzM0LDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "user.name",
+          "source.domain",
+          "source.ip",
+          "winlog.logon.id",
+          "winlog.logon.type"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4624"
+                  ],
+                  "type": "phrases",
+                  "value": "4624"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4624"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Logon Details [Winlogbeat Security]",
+        "version": 1
+      },
+      "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2020-02-04T20:39:02.784Z",
+      "version": "WzkyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4732",
+                    "4728",
+                    "4756"
+                  ],
+                  "type": "phrases",
+                  "value": "4732, 4728, 4756"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Users Added - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Users Added to Groups"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Reds",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Users Added - Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "a13bf640-fee8-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzM2LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4734",
+                    "4730",
+                    "4758"
+                  ],
+                  "type": "phrases",
+                  "value": "4734, 4730, 4758"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Groups Deleted- Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Groups Deleted"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Greens",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Groups Deleted- Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "5eeaafd0-fee7-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzM3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4731",
+                    "4727",
+                    "4754"
+                  ],
+                  "type": "phrases",
+                  "value": "4731, 4727, 4754"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Groups Created - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Groups Created"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Reds",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Groups Created - Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "f42f3b20-fee6-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzM4LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4735",
+                    "4737",
+                    "4755",
+                    "4764"
+                  ],
+                  "type": "phrases",
+                  "value": "4735, 4737, 4755, 4764"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Groups Changes - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Groups Changed"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Greys",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Groups Changes - Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "b5f38780-fee6-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzM5LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4733",
+                    "4727",
+                    "4729"
+                  ],
+                  "type": "phrases",
+                  "value": "4733, 4727, 4729"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Users Removed from Group  - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Users Removed from  Groups"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Greens",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Users Removed from Group  - Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "1b5f17d0-feea-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzQwLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": {
+                    "query": "4799"
+                  },
+                  "type": "phrase",
+                  "value": "4799"
+                },
+                "query": {
+                  "match": {
+                    "event.code": {
+                      "query": "4799",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Membership Enumeration  - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Group Membership Enumerated"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "dimensions": {
+              "metrics": [
+                {
+                  "accessor": 0,
+                  "format": {
+                    "id": "number",
+                    "params": {}
+                  },
+                  "type": "vis_dimension"
+                }
+              ]
+            },
+            "metric": {
+              "colorSchema": "Blues",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000,
+                  "type": "range"
+                }
+              ],
+              "invertColors": true,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "Background",
+              "percentageMode": false,
+              "style": {
+                "bgColor": true,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Group Membership Enumeration  - Simple Metric [Winlogbeat Security]",
+          "type": "metric"
+        }
+      },
+      "id": "0f2f5280-feeb-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzQxLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4731",
+                    "4732",
+                    "4733",
+                    "4734",
+                    "4735",
+                    "4737",
+                    "4764",
+                    "4799",
+                    "4727",
+                    "4728",
+                    "4729",
+                    "4730",
+                    "4754",
+                    "4755",
+                    "4756",
+                    "4757",
+                    "4758"
+                  ],
+                  "type": "phrases",
+                  "value": "4731, 4732, 4733, 4734, 4735, 4737, 4764, 4799, 4727, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Group Management Action Distribution over Time [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-30d",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.action",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "dimensions": {
+              "series": [
+                {
+                  "accessor": 1,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                },
+                {
+                  "accessor": 2,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "x": {
+                "accessor": 0,
+                "aggType": "date_histogram",
+                "format": {
+                  "id": "date",
+                  "params": {
+                    "pattern": "YYYY-MM-DD HH:mm"
+                  }
+                },
+                "params": {
+                  "bounds": {
+                    "max": "2019-11-04T10:56:42.142Z",
+                    "min": "2019-10-05T09:56:42.142Z"
+                  },
+                  "date": true,
+                  "format": "YYYY-MM-DD HH:mm",
+                  "interval": "PT12H"
+                }
+              },
+              "y": [
+                {
+                  "accessor": 3,
+                  "aggType": "count",
+                  "format": {
+                    "id": "number"
+                  },
+                  "params": {}
+                }
+              ]
+            },
+            "grid": {
+              "categoryLines": false
+            },
+            "labels": {
+              "show": true
+            },
+            "legendPosition": "bottom",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Group Management Action Distribution over Time [Winlogbeat Security]",
+          "type": "histogram"
+        }
+      },
+      "id": "24954800-fef0-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "visualization": "7.4.2"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzQyLDFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "event.action",
+          "group.name",
+          "group.domain",
+          "winlog.event_data.SubjectUserName",
+          "user.domain",
+          "host.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.code",
+                  "negate": false,
+                  "params": [
+                    "4731",
+                    "4732",
+                    "4733",
+                    "4734",
+                    "4735",
+                    "4737",
+                    "4764",
+                    "4799",
+                    "4727",
+                    "4728",
+                    "4729",
+                    "4730",
+                    "4754",
+                    "4755",
+                    "4756",
+                    "4757",
+                    "4758"
+                  ],
+                  "type": "phrases",
+                  "value": "4731, 4732, 4733, 4734, 4735, 4737, 4764, 4799, 4727, 4728, 4729, 4730, 4754, 4755, 4756, 4757, 4758"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "event.code": "4731"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4732"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4733"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4734"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4735"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4737"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4764"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4799"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4727"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4728"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4729"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4730"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4754"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4755"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4756"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4757"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "event.code": "4758"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "Group Management Details - Search View [Winlogbeat Security]",
+        "version": 1
+      },
+      "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2020-02-04T20:39:00.715Z",
+      "version": "WzQzLDFd"
+    }
+  ],
+  "version": "7.5.2"
+}

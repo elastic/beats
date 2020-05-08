@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/internal/parse"
+	"github.com/elastic/go-ucfg/parse"
 )
 
 // NewFlagKeyValue implements the flag.Value interface for

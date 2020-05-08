@@ -25,7 +25,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -46,14 +46,14 @@ class HaproxyTest(metricbeat.BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
-        self.assert_no_logged_warnings()
+        self.assert_no_logged_warnings(replace=['SSL/TLS verifications disabled.'])
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             print(evt)
-            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
+            self.assertCountEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
             self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -79,6 +79,27 @@ class HaproxyTest(metricbeat.BaseTest):
             "metricsets": ["stat"],
             "hosts": ["http://%s/stats" % (self.compose_host(port="14568/tcp"))],
             "period": "5s"
+        }])
+        self._test_stat()
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_stat_https(self):
+        """
+        haproxy stat https metricset test
+        """
+        self.render_config_template(modules=[{
+            "name": "haproxy",
+            "metricsets": ["stat"],
+            "hosts": ["https://%s/stats" % (self.compose_host(port="14570/tcp"))],
+            "period": "5s",
+            "extras": {
+                "ssl.certificate_authorities": [os.path.join(os.path.dirname(__file__), '_meta/certs/ca.pem')],
+                "ssl.certificate": os.path.join(os.path.dirname(__file__), '_meta/certs/client.pem'),
+                "ssl.key": os.path.join(os.path.dirname(__file__), '_meta/certs/client.key'),
+                # TODO: verification_mode: "certificate"
+                # compose uses dynamic IP addresses and there are no IP SAN records in the certificate
+                "ssl.verification_mode": "none"
+            }
         }])
         self._test_stat()
 

@@ -1,0 +1,6 @@
+- name: mgr_osd_tree
+  type: group
+  description: >
+    see: osd_tree
+  release: beta
+  fields:

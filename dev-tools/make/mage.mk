@@ -1,13 +1,77 @@
-MAGE_VERSION     ?= v1.8.0
-MAGE_PRESENT     := $(shell mage --version 2> /dev/null | grep $(MAGE_VERSION))
-MAGE_IMPORT_PATH ?= github.com/elastic/beats/vendor/github.com/magefile/mage
-export MAGE_IMPORT_PATH
+# This is a minimal Makefile for Beats that are built with Mage. Its only
+# responsibility is to provide compatibility with existing Jenkins and Travis
+# setups.
 
-.PHONY: mage
-mage:
-ifndef MAGE_PRESENT
-	@echo Installing mage $(MAGE_VERSION) from vendor dir.
-	@go install -ldflags="-X $(MAGE_IMPORT_PATH)/mage.gitTag=$(MAGE_VERSION)" ${MAGE_IMPORT_PATH}
-	@-mage -clean
-endif
-	@true
+#
+# Variables
+#
+.DEFAULT_GOAL := help
+PWD           := $(CURDIR)
+
+#
+# Includes
+#
+include $(ES_BEATS)/dev-tools/make/mage-install.mk
+
+#
+# Targets (alphabetically sorted).
+#
+.PHONY: check
+check: mage
+	mage check
+
+.PHONY: clean
+clean: mage
+	mage clean
+
+fix-permissions:
+
+.PHONY: fmt
+fmt: mage
+	mage fmt
+
+# Default target.
+.PHONY: help
+help:
+	@echo Use mage rather than make. Here are the available mage targets:
+	@mage -l
+
+.PHONY: release
+release: mage
+	mage package
+
+stop-environment:
+
+.PHONY: unit-tests
+unit-tests: mage
+	mage unitTest
+
+.PHONY: integration-tests
+integration-tests: mage
+	rm -f build/TEST-go-integration.out
+	mage goIntegTest || ( cat build/TEST-go-integration.out && false )
+
+.PHONY: system-tests
+system-tests: mage
+	mage pythonIntegTest
+
+.PHONY: testsuite
+testsuite: mage
+	rm -f build/TEST-go-integration.out
+	mage update build unitTest integTest || ( cat build/TEST-go-integration.out && false )
+
+.PHONY: update
+update: mage
+	mage update
+
+.PHONY: crosscompile
+crosscompile: mage
+	mage crossBuild
+
+.PHONY: docs
+docs:
+	mage docs
+
+.PHONY: docs-preview
+docs-preview:
+	PREVIEW=1 $(MAKE) docs

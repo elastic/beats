@@ -27,9 +27,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
 func TestCheckBody(t *testing.T) {
@@ -267,4 +267,63 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 		})
 	}
 
+}
+
+func TestCheckStatus(t *testing.T) {
+
+	var matchTests = []struct {
+		description string
+		status      []uint16
+		statusRec   int
+		result      bool
+	}{
+		{
+			"not match multiple values",
+			[]uint16{200, 301, 302},
+			500,
+			false,
+		},
+		{
+			"match multiple values",
+			[]uint16{200, 301, 302},
+			200,
+			true,
+		},
+		{
+			"not match single value",
+			[]uint16{200},
+			201,
+			false,
+		},
+		{
+			"match single value",
+			[]uint16{200},
+			200,
+			true,
+		},
+	}
+
+	for _, test := range matchTests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(test.statusRec)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			check := checkStatus(test.status)(res)
+
+			if result := (check == nil); result != test.result {
+				if test.result {
+					t.Fatalf("Expected at least one of status: %d to match status: %d", test.status, test.statusRec)
+				} else {
+					t.Fatalf("Did not expect status: %d to match status: %d", test.status, test.statusRec)
+				}
+			}
+		})
+	}
 }

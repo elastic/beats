@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Database Connections",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_1",
             "title": "Insert Latency in Milliseconds",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_2",
             "title": "Select Latency in Milliseconds",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_3",
             "title": "Transaction Blocked",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -93,7 +93,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -109,7 +109,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_5",
             "title": "Insert Throughput in Count/Second",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -125,7 +125,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_6",
             "title": "Select Throughput in Count/Second",
-            "version": "7.4.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {
@@ -141,7 +141,7 @@
             "panelIndex": "132653bc-2669-4e8c-b536-06c680e9acf0",
             "panelRefName": "panel_7",
             "title": "Disk Queue Depth",
-            "version": "7.4.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -843,5 +843,5 @@
       "version": "WzExNTk1LDhd"
     }
   ],
-  "version": "7.4.0"
+  "version": "7.3.0"
 }

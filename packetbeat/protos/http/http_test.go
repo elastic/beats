@@ -30,11 +30,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 type testParser struct {
@@ -988,6 +988,43 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 	if rawMessageObscured < 0 {
 		t.Errorf("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
+}
+
+func TestHttpParser_RedactHeaders(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
+
+	http := httpModForTests(nil)
+	http.redactAuthorization = true
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+	http.redactHeaders = []string{"header-to-redact", "should-not-exist"}
+
+	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
+		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
+		"Content-Type: text/xml; charset=utf-8\r\n" +
+		"SOAPAction: \"\"\r\n" +
+		"Header-To-Redact: sensitive-value\r\n" +
+		"Host: production.example.com\r\n" +
+		"Content-Length: 0\r\n" +
+		"Expect: 100-continue\r\n" +
+		"Accept-Encoding: gzip\r\n" +
+		"X-Forwarded-For: 10.216.89.132\r\n" +
+		"\r\n")
+
+	st := &stream{data: data, message: new(message)}
+
+	ok, _ := testParseStream(http, st, 0)
+
+	http.hideHeaders(st.message)
+
+	assert.True(t, ok)
+	var redactedString common.NetString = []byte("REDACTED")
+	var expectedAcceptEncoding common.NetString = []byte("gzip")
+	assert.Equal(t, redactedString, st.message.headers["header-to-redact"])
+	assert.Equal(t, expectedAcceptEncoding, st.message.headers["accept-encoding"])
+
+	_, invalidHeaderExists := st.message.headers["should-not-exist"]
+	assert.False(t, invalidHeaderExists)
 }
 
 func Test_splitCookiesHeader(t *testing.T) {

@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 const (
@@ -534,14 +534,16 @@ type udpSendMsgCall struct {
 	LPort    uint16           `kprobe:"lport"`
 	RPort    uint16           `kprobe:"rport"`
 	AltRPort uint16           `kprobe:"altrport"`
+	// SIPtr is the struct sockaddr_in pointer.
+	SIPtr uintptr `kprobe:"siptr"`
+	// SIAF is the address family in (struct sockaddr_in*)->sin_family.
+	SIAF uint16 `kprobe:"siaf"`
 }
 
 func (e *udpSendMsgCall) asFlow() flow {
 	raddr, rport := e.RAddr, e.RPort
-	if raddr == 0 {
+	if e.SIPtr == 0 || e.SIAF != unix.AF_INET {
 		raddr = e.AltRAddr
-	}
-	if rport == 0 {
 		rport = e.AltRPort
 	}
 	return flow{
@@ -586,14 +588,16 @@ type udpv6SendMsgCall struct {
 	LPort     uint16           `kprobe:"lport"`
 	RPort     uint16           `kprobe:"rport"`
 	AltRPort  uint16           `kprobe:"altrport"`
+	// SI6Ptr is the struct sockaddr_in6 pointer.
+	SI6Ptr uintptr `kprobe:"si6ptr"`
+	// Si6AF is the address family field ((struct sockaddr_in6*)->sin6_family)
+	SI6AF uint16 `kprobe:"si6af"`
 }
 
 func (e *udpv6SendMsgCall) asFlow() flow {
 	raddra, raddrb, rport := e.RAddrA, e.RAddrB, e.RPort
-	if raddra == 0 && raddrb == 0 {
+	if e.SI6Ptr == 0 || e.SI6AF != unix.AF_INET6 {
 		raddra, raddrb = e.AltRAddrA, e.AltRAddrB
-	}
-	if rport == 0 {
 		rport = e.AltRPort
 	}
 	return flow{

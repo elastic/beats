@@ -16,8 +16,8 @@ var:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_audit.json
 
 ingest_pipeline:
-  - ingest/pipeline.json
-  - ingest/pipeline-json.json
-  - ingest/pipeline-plaintext.json
+  - ingest/pipeline.yml
+  - ingest/pipeline-json.yml
+  - ingest/pipeline-plaintext.yml
 
 input: config/audit.yml

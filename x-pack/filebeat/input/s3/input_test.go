@@ -5,7 +5,9 @@
 package s3
 
 import (
+	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,7 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -26,16 +28,10 @@ type MockS3Client struct {
 	s3iface.ClientAPI
 }
 
-// MockS3ClientErr struct is used for unit tests.
-type MockS3ClientErr struct {
-	s3iface.ClientAPI
-}
-
 var (
 	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
 	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
 	mockSvc      = &MockS3Client{}
-	mockSvcErr   = &MockS3ClientErr{}
 	info         = s3Info{
 		name:   "test-s3-ks",
 		key:    "log2019-06-21-16-16-54",
@@ -51,16 +47,6 @@ func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRe
 			Data: &s3.GetObjectOutput{
 				Body: logBody,
 			},
-			HTTPRequest: httpReq,
-		},
-	}
-}
-
-func (m *MockS3ClientErr) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return s3.GetObjectRequest{
-		Request: &awssdk.Request{
-			Data:        &s3.GetObjectOutput{},
 			HTTPRequest: httpReq,
 		},
 	}
@@ -150,8 +136,22 @@ func TestHandleMessage(t *testing.T) {
 
 func TestNewS3BucketReader(t *testing.T) {
 	p := &s3Input{context: &channelContext{}}
-	reader, err := p.newS3BucketReader(mockSvc, info)
+	s3GetObjectInput := &s3.GetObjectInput{
+		Bucket: awssdk.String(info.name),
+		Key:    awssdk.String(info.key),
+	}
+	req := mockSvc.GetObjectRequest(s3GetObjectInput)
+
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
+	defer cancelFn()
+
+	resp, err := req.Send(ctx)
 	assert.NoError(t, err)
+	reader := bufio.NewReader(resp.Body)
+	defer resp.Body.Close()
+
 	for i := 0; i < 3; i++ {
 		switch i {
 		case 0:
@@ -168,13 +168,6 @@ func TestNewS3BucketReader(t *testing.T) {
 			assert.Equal(t, "", log)
 		}
 	}
-}
-
-func TestNewS3BucketReaderErr(t *testing.T) {
-	p := &s3Input{context: &channelContext{}}
-	reader, err := p.newS3BucketReader(mockSvcErr, info)
-	assert.Error(t, err, "s3 get object response body is empty")
-	assert.Nil(t, reader)
 }
 
 func TestCreateEvent(t *testing.T) {
@@ -194,8 +187,22 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	reader, err := p.newS3BucketReader(mockSvc, s3Info)
+	s3GetObjectInput := &s3.GetObjectInput{
+		Bucket: awssdk.String(info.name),
+		Key:    awssdk.String(info.key),
+	}
+	req := mockSvc.GetObjectRequest(s3GetObjectInput)
+
+	// The Context will interrupt the request if the timeout expires.
+	var cancelFn func()
+	ctx, cancelFn := context.WithTimeout(p.context, p.config.APITimeout)
+	defer cancelFn()
+
+	resp, err := req.Send(ctx)
 	assert.NoError(t, err)
+	reader := bufio.NewReader(resp.Body)
+	defer resp.Body.Close()
+
 	var events []beat.Event
 	for {
 		log, err := reader.ReadString('\n')

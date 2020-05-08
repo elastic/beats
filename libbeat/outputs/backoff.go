@@ -18,12 +18,13 @@
 package outputs
 
 import (
+	"context"
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/backoff"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 type backoffClient struct {
@@ -56,8 +57,8 @@ func (b *backoffClient) Close() error {
 	return err
 }
 
-func (b *backoffClient) Publish(batch publisher.Batch) error {
-	err := b.client.Publish(batch)
+func (b *backoffClient) Publish(ctx context.Context, batch publisher.Batch) error {
+	err := b.client.Publish(ctx, batch)
 	if err != nil {
 		b.client.Close()
 	}

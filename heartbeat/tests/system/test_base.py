@@ -108,7 +108,7 @@ class Test(BaseTest):
         heartbeat_proc.check_kill_and_wait()
         doc = self.read_output()[0]
 
-        assert not doc.has_key("host.name")
+        assert "host.name" not in doc
 
     def run_fields(self, expected, local=None, top=None):
         monitor = {

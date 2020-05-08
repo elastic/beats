@@ -1,0 +1,55 @@
+language: go
+
+go:
+  - "1.13.x"
+  - master
+
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+
+env:
+  global:
+    - secure: "F1MWBFOxaa1vcb0bnjVTuVEzzaqxQykwHVzdeevKGG6qGwBqDoKjzDym1XbWdZkfsu6N2sEz6Xo9wAMQwc1nhBJTufQOKjwqy0zDXsKMF5aouvswqe4eEZ95IU8Ww30jGiw1E4d6RfvTvYOwZszB+vIvqJ7gs8msFr0wJaQUpJk+Qpd5TtNb8poY7J0qQH0GevlNIY5SieM52BbQKodEC9aUUTFYOvoZEOAiLPX/6qS1hvfOIwHEFxXo9jrUSiSyqYZTfEN9CExsO3M5iJQz1ZVvtylXpATcZ6Imo3Q5eL288wTx4VUjL/lrnS1vIkmgG0HWyOYg4FGl9l4TsANGf3EnByBtZmFJ/MLjmqtWQzodvU2wMCseVJ/MQzi6iOkunXccUCLzoh9F3rzbus8lP6io7yknaB/AqKyTj9oBY7AXT9r1wnEmO56XNQu11PK1qu2JeCOzkF52784vh+XNBfPTvJYmJy1c7m1Sys0rta2m6F9c3bZV24ZWPaY7DkfwcT6ytXJP44D6NI1k1cOOwmJ8oJfNkrgNBUTUfd8rKu4alKAG0VB59imTVH25ZYzUdxqiiG+tuXJ4ZG8bvreyfk4qTiF5BqdU0/iqGgEkdn2px7UZd656svLGI9qRodSCFhd7pCHw2UfGakGweRG9cW4GEYdDwHnEx+l2g8vc6EQ="
+    - GO111MODULE=on
+
+install:
+  - go install ./cmd/reviewdog
+  # Install linters.
+  - cd linters
+  - go get golang.org/x/lint/golint
+  - go get github.com/kisielk/errcheck
+  - go get honnef.co/go/tools/cmd/staticcheck
+  - go get github.com/client9/misspell/cmd/misspell
+  - go get mvdan.cc/unparam
+  - go get github.com/mgechev/revive
+  - cd -
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $GOPATH/bin
+  - npm install
+
+before_script:
+  - echo $TRAVIS
+  - echo $TRAVIS_PULL_REQUEST
+  - echo $TRAVIS_PULL_REQUEST_BRANCH
+  - echo $TRAVIS_COMMIT
+  - echo $TRAVIS_PULL_REQUEST_SHA
+  - echo $TRAVIS_REPO_SLUG
+  - echo $TRAVIS_SECURE_ENV_VARS
+  - curl httpbin.org/ip
+
+script:
+  - reviewdog -reporter=github-pr-check
+  - $(npm bin)/textlint -f checkstyle README.md | reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-check -level=info
+  - go test -coverpkg=./... -coverprofile=coverage.txt ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/60344004ff53f5ef37c5
+    on_success: change
+    on_failure: always
+    on_start: never

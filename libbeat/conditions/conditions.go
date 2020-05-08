@@ -20,8 +20,8 @@ package conditions
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const logName = "conditions"
@@ -72,7 +72,7 @@ func NewCondition(config *Config) (Condition, error) {
 		condition, err = NewRangeCondition(config.Range.fields)
 	case config.HasFields != nil:
 		condition = NewHasFieldsCondition(config.HasFields)
-	case config.Network != nil:
+	case config.Network != nil && len(config.Network) > 0:
 		condition, err = NewNetworkCondition(config.Network)
 	case len(config.OR) > 0:
 		var conditionsList []Condition

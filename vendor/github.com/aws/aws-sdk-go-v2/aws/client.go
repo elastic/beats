@@ -8,7 +8,7 @@ import (
 type Metadata struct {
 	ServiceName string
 	ServiceID   string
-	EndpointsID string
+	EndpointsID  string
 	APIVersion  string
 
 	Endpoint      string

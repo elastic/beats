@@ -21,13 +21,15 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"go.elastic.co/apm"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // Global pipeline module for loading the main pipeline from a configuration object
@@ -43,6 +45,7 @@ type Monitors struct {
 	Metrics   *monitoring.Registry
 	Telemetry *monitoring.Registry
 	Logger    *logp.Logger
+	Tracer    *apm.Tracer
 }
 
 // OutputFactory is used by the publisher pipeline to create an output instance.
@@ -166,7 +169,7 @@ func loadOutput(
 func createQueueBuilder(
 	config common.ConfigNamespace,
 	monitors Monitors,
-) (func(queue.Eventer) (queue.Queue, error), error) {
+) (func(queue.ACKListener) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
 		queueType = b
@@ -187,7 +190,7 @@ func createQueueBuilder(
 		monitoring.NewString(queueReg, "name").Set(queueType)
 	}
 
-	return func(eventer queue.Eventer) (queue.Queue, error) {
-		return queueFactory(eventer, monitors.Logger, queueConfig)
+	return func(ackListener queue.ACKListener) (queue.Queue, error) {
+		return queueFactory(ackListener, monitors.Logger, queueConfig)
 	}, nil
 }

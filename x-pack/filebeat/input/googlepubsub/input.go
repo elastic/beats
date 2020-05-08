@@ -15,13 +15,13 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/api/option"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/common/useragent"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -193,25 +193,24 @@ func makeTopicID(project, topic string) string {
 func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	id := topicID + "-" + msg.ID
 
-	fields := common.MapStr{
-		"event": common.MapStr{
-			"id":      id,
-			"created": time.Now().UTC(),
-		},
-		"message": string(msg.Data),
-	}
-	if len(msg.Attributes) > 0 {
-		fields.Put("labels", msg.Attributes)
-	}
-
-	return beat.Event{
+	event := beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
-		Meta: common.MapStr{
-			"id": id,
+		Fields: common.MapStr{
+			"event": common.MapStr{
+				"id":      id,
+				"created": time.Now().UTC(),
+			},
+			"message": string(msg.Data),
 		},
-		Fields:  fields,
 		Private: msg,
 	}
+	event.SetID(id)
+
+	if len(msg.Attributes) > 0 {
+		event.PutValue("labels", msg.Attributes)
+	}
+
+	return event
 }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {

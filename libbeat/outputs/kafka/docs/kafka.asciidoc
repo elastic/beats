@@ -123,12 +123,12 @@ the specified string:
 ------------------------------------------------------------------------------
 output.kafka:
   hosts: ["localhost:9092"]
-  topic: "logs-%{[beat.version]}" 
+  topic: "logs-%{[agent.version]}"
   topics:
-    - topic: "critical-%{[beat.version]}"
+    - topic: "critical-%{[agent.version]}"
       when.contains:
         message: "CRITICAL"
-    - topic: "error-%{[beat.version]}"
+    - topic: "error-%{[agent.version]}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
@@ -139,7 +139,11 @@ This configuration results in topics named +critical-{version}+,
 
 ===== `key`
 
-Optional Kafka event key. If configured, the event key must be unique and can be extracted from the event using a format string.
+Optional formatted string specifying the Kafka event key. If configured, the
+event key can be extracted from the event using a format string.
+
+See the Kafka documentation for the implications of a particular choice of key;
+by default, the key is chosen by the Kafka cluster.
 
 ===== `partition`
 

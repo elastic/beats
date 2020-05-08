@@ -18,28 +18,26 @@
 package memqueue
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type forgetfulProducer struct {
-	broker    *Broker
+	broker    *broker
 	openState openState
 }
 
 type ackProducer struct {
-	broker    *Broker
-	cancel    bool
-	seq       uint32
-	state     produceState
-	openState openState
+	broker       *broker
+	dropOnCancel bool
+	seq          uint32
+	state        produceState
+	openState    openState
 }
 
 type openState struct {
 	log    logger
-	isOpen atomic.Bool
 	done   chan struct{}
 	events chan pushRequest
 }
@@ -53,16 +51,15 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
-		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
 		events: b.events,
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, seq: 1, cancel: dropOnCancel, openState: openState}
+		p := &ackProducer{broker: b, seq: 1, dropOnCancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB
 		return p
@@ -114,7 +111,7 @@ func (p *ackProducer) makeRequest(event publisher.Event) pushRequest {
 func (p *ackProducer) Cancel() int {
 	p.openState.Close()
 
-	if p.cancel {
+	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
 		p.broker.pubCancel <- producerCancelRequest{
 			state: &p.state,
@@ -129,7 +126,6 @@ func (p *ackProducer) Cancel() int {
 }
 
 func (st *openState) Close() {
-	st.isOpen.Store(false)
 	close(st.done)
 }
 

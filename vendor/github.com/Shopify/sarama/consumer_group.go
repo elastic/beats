@@ -63,6 +63,8 @@ type consumerGroup struct {
 	lock      sync.Mutex
 	closed    chan none
 	closeOnce sync.Once
+
+	userData []byte
 }
 
 // NewConsumerGroup creates a new consumer group the given broker addresses and configuration.
@@ -170,6 +172,10 @@ func (c *consumerGroup) Consume(ctx context.Context, topics []string, handler Co
 	} else if err != nil {
 		return err
 	}
+
+	// loop check topic partition numbers changed
+	// will trigger rebalance when any topic partitions number had changed
+	go c.loopCheckPartitionNumbers(topics, sess)
 
 	// Wait for session exit signal
 	<-sess.ctx.Done()
@@ -282,6 +288,7 @@ func (c *consumerGroup) newSession(ctx context.Context, topics []string, handler
 			return nil, err
 		}
 		claims = members.Topics
+		c.userData = members.UserData
 
 		for _, partitions := range claims {
 			sort.Sort(int32Slice(partitions))
@@ -303,9 +310,14 @@ func (c *consumerGroup) joinGroupRequest(coordinator *Broker, topics []string) (
 		req.RebalanceTimeout = int32(c.config.Consumer.Group.Rebalance.Timeout / time.Millisecond)
 	}
 
+	// use static user-data if configured, otherwise use consumer-group userdata from the last sync
+	userData := c.config.Consumer.Group.Member.UserData
+	if len(userData) == 0 {
+		userData = c.userData
+	}
 	meta := &ConsumerGroupMemberMetadata{
 		Topics:   topics,
-		UserData: c.config.Consumer.Group.Member.UserData,
+		UserData: userData,
 	}
 	strategy := c.config.Consumer.Group.Rebalance.Strategy
 	if err := req.AddGroupProtocolMetadata(strategy.Name(), meta); err != nil {
@@ -322,10 +334,20 @@ func (c *consumerGroup) syncGroupRequest(coordinator *Broker, plan BalanceStrate
 		GenerationId: generationID,
 	}
 	for memberID, topics := range plan {
-		err := req.AddGroupAssignmentMember(memberID, &ConsumerGroupMemberAssignment{
-			Topics: topics,
-		})
-		if err != nil {
+		assignment := &ConsumerGroupMemberAssignment{Topics: topics}
+
+		// Include topic assignments in group-assignment userdata for each consumer-group member
+		if c.config.Consumer.Group.Rebalance.Strategy.Name() == StickyBalanceStrategyName {
+			userDataBytes, err := encode(&StickyAssignorUserDataV1{
+				Topics:     topics,
+				Generation: generationID,
+			}, nil)
+			if err != nil {
+				return nil, err
+			}
+			assignment.UserData = userDataBytes
+		}
+		if err := req.AddGroupAssignmentMember(memberID, assignment); err != nil {
 			return nil, err
 		}
 	}
@@ -417,6 +439,50 @@ func (c *consumerGroup) handleError(err error, topic string, partition int32) {
 	} else {
 		Logger.Println(err)
 	}
+}
+
+func (c *consumerGroup) loopCheckPartitionNumbers(topics []string, session *consumerGroupSession) {
+	pause := time.NewTicker(c.config.Consumer.Group.Heartbeat.Interval * 2)
+	defer session.cancel()
+	defer pause.Stop()
+	var oldTopicToPartitionNum map[string]int
+	var err error
+	if oldTopicToPartitionNum, err = c.topicToPartitionNumbers(topics); err != nil {
+		return
+	}
+	for {
+		if newTopicToPartitionNum, err := c.topicToPartitionNumbers(topics); err != nil {
+			return
+		} else {
+			for topic, num := range oldTopicToPartitionNum {
+				if newTopicToPartitionNum[topic] != num {
+					return // trigger the end of the session on exit
+				}
+			}
+		}
+		select {
+		case <-pause.C:
+		case <-c.closed:
+			return
+		}
+	}
+}
+
+func (c *consumerGroup) topicToPartitionNumbers(topics []string) (map[string]int, error) {
+	if err := c.client.RefreshMetadata(topics...); err != nil {
+		Logger.Printf("Consumer Group refresh metadata failed %v", err)
+		return nil, err
+	}
+	topicToPartitionNum := make(map[string]int, len(topics))
+	for _, topic := range topics {
+		if partitionNum, err := c.client.Partitions(topic); err != nil {
+			Logger.Printf("Consumer Group topic %s get partition number failed %v", topic, err)
+			return nil, err
+		} else {
+			topicToPartitionNum[topic] = len(partitionNum)
+		}
+	}
+	return topicToPartitionNum, nil
 }
 
 // --------------------------------------------------------------------

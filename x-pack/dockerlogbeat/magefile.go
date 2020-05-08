@@ -14,46 +14,52 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-
-	"github.com/elastic/beats/dev-tools/mage"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/pkg/errors"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
-var hubID = "elastic"
-var logDriverName = "elastic-logging-plugin"
-var dockerPluginName = filepath.Join(hubID, logDriverName)
-var packageStagingDir = "build/package/"
-var packageEndDir = "build/distributions/"
-var buildDir = filepath.Join(packageStagingDir, logDriverName)
-var dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
-var rootImageName = "rootfsimage"
+const (
+	hubID             = "elastic"
+	logDriverName     = "elastic-logging-plugin"
+	dockerPluginName  = hubID + "/" + logDriverName
+	packageStagingDir = "build/package/"
+	packageEndDir     = "build/distributions/"
+	rootImageName     = "rootfsimage"
+)
+
+var (
+	buildDir         = filepath.Join(packageStagingDir, logDriverName)
+	dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+)
 
 func init() {
 	devtools.BeatLicense = "Elastic License"
 	devtools.BeatDescription = "The Docker Logging Driver is a docker plugin for the Elastic Stack."
+	devtools.Platforms = devtools.Platforms.Filter("linux/amd64")
 }
 
-// getPluginName returns the fully qualified name:version string
+// getPluginName returns the fully qualified name:version string.
 func getPluginName() (string, error) {
-	version, err := mage.BeatQualifiedVersion()
+	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
 		return "", errors.Wrap(err, "error getting beats version")
 	}
@@ -62,11 +68,6 @@ func getPluginName() (string, error) {
 
 // createContainer builds the plugin and creates the container that will later become the rootfs used by the plugin
 func createContainer(ctx context.Context, cli *client.Client) error {
-	goVersion, err := mage.GoVersion()
-	if err != nil {
-		return errors.Wrap(err, "error determining go version")
-	}
-
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "error getting work dir")
@@ -76,16 +77,10 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
 	}
 
-	// change back to the root beats dir so we can send the proper build context to docker
-	err = os.Chdir("../..")
-	if err != nil {
-		return errors.Wrap(err, "error changing directory")
-	}
-
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
-		return errors.Wrap(err, "Error locating temp dir")
+		return errors.Wrap(err, "error locating temp dir")
 	}
 	defer sh.Rm(tmpDir)
 
@@ -102,51 +97,44 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 	defer buildContext.Close()
 
 	buildOpts := types.ImageBuildOptions{
-		BuildArgs:  map[string]*string{"versionString": &goVersion},
-		Target:     "final",
 		Tags:       []string{rootImageName},
-		Dockerfile: "x-pack/dockerlogbeat/Dockerfile",
+		Dockerfile: "Dockerfile",
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
+	if err != nil {
+		return errors.Wrap(err, "error building final container image")
+	}
 	defer buildResp.Body.Close()
-	buf, errBufRead := ioutil.ReadAll(buildResp.Body)
+	// This blocks until the build operation completes
+	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return errors.Wrap(err, "error reading from docker output")
 	}
-	if err != nil {
-		fmt.Printf("Docker response: \n %s\n", string(buf))
-		return errors.Wrap(err, "error building final container image")
-	}
-
-	// move back to the x-pack dir
-	err = os.Chdir(dockerLogBeatDir)
-	if err != nil {
-		return errors.Wrap(err, "error returning to dockerlogbeat dir")
-	}
+	fmt.Printf("%s\n", string(buildStr))
 
 	return nil
 }
 
-// Build builds docker rootfs container root
+// BuildContainer builds docker rootfs container root
 // There's a somewhat complicated process for this:
 // * Create a container to build the plugin itself
 // * Copy that to a bare-bones container that will become the runc container used by docker
 // * Export that container
 // * Unpack the tar from the exported container
 // * send this to the plugin create API endpoint
-func Build(ctx context.Context) error {
+func BuildContainer(ctx context.Context) error {
 	// setup
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
-	mage.CreateDir(packageStagingDir)
-	mage.CreateDir(packageEndDir)
+	devtools.CreateDir(packageStagingDir)
+	devtools.CreateDir(packageEndDir)
 	err = os.MkdirAll(filepath.Join(buildDir, "rootfs"), 0755)
 	if err != nil {
-		return errors.Wrap(err, "Error creating build dir")
+		return errors.Wrap(err, "error creating build dir")
 	}
 
 	err = createContainer(ctx, cli)
@@ -185,12 +173,12 @@ func Build(ctx context.Context) error {
 
 	_, err = io.Copy(file, exportReader)
 	if err != nil {
-		return errors.Wrap(err, "Error writing exported container")
+		return errors.Wrap(err, "error writing exported container")
 	}
 
 	//misc prepare operations
 
-	err = mage.Copy("config.json", filepath.Join(buildDir, "config.json"))
+	err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
 	if err != nil {
 		return errors.Wrap(err, "error copying config.json")
 	}
@@ -221,14 +209,9 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 
 // Uninstall removes working objects and containers
 func Uninstall(ctx context.Context) error {
-	name, err := getPluginName()
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return err
-	}
-
-	cli, err := client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	//check to see if we have a plugin we need to remove
@@ -236,21 +219,25 @@ func Uninstall(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting list of plugins")
 	}
-	oursExists := false
+
+	toRemoveName := ""
 	for _, plugin := range plugins {
 		if strings.Contains(plugin.Name, logDriverName) {
-			oursExists = true
+			toRemoveName = plugin.Name
+			break
 		}
 	}
-	if oursExists {
-		err = cli.PluginDisable(ctx, name, types.PluginDisableOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error disabling plugin")
-		}
-		err = cli.PluginRemove(ctx, name, types.PluginRemoveOptions{Force: true})
-		if err != nil {
-			return errors.Wrap(err, "error removing plugin")
-		}
+	if toRemoveName == "" {
+		return nil
+	}
+
+	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error disabling plugin")
+	}
+	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
+	if err != nil {
+		return errors.Wrap(err, "error removing plugin")
 	}
 
 	return nil
@@ -268,9 +255,9 @@ func Install(ctx context.Context) error {
 		return err
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Error creating docker client")
+		return errors.Wrap(err, "error creating docker client")
 	}
 
 	archiveOpts := &archive.TarOptions{
@@ -297,12 +284,12 @@ func Install(ctx context.Context) error {
 
 // Export exports a "ready" root filesystem and config.json into a tarball
 func Export() error {
-	version, err := mage.BeatQualifiedVersion()
+	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
 		return errors.Wrap(err, "error getting beats version")
 	}
 
-	if mage.Snapshot {
+	if devtools.Snapshot {
 		version = version + "-SNAPSHOT"
 	}
 
@@ -325,8 +312,36 @@ func Export() error {
 	return nil
 }
 
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return devtools.CrossBuild()
+}
+
+// Build builds the base container used by the docker plugin
+func Build() {
+	mg.SerialDeps(CrossBuild, BuildContainer)
+}
+
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.CGO = false
+	buildArgs.Static = true
+	buildArgs.OutputDir = "build/plugin"
+	return devtools.GolangCrossBuild(buildArgs)
+}
+
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
+	start := time.Now()
+	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+
+	if _, enabled := devtools.Platforms.Get("linux/amd64"); !enabled {
+		fmt.Println(">> package: skipping because linux/amd64 is not enabled")
+		return
+	}
+
 	mg.SerialDeps(Build, Export)
 }
 
@@ -335,12 +350,16 @@ func BuildAndInstall() {
 	mg.SerialDeps(Build, Install)
 }
 
-// IntegTest is currently a dummy test for the `testsuite` target
-func IntegTest() {
-	fmt.Printf("There are no Integration tests for The Elastic Log Plugin\n")
-}
-
 // Update is currently a dummy test for the `testsuite` target
 func Update() {
-	fmt.Printf("There is no Update for The Elastic Log Plugin\n")
+	fmt.Println(">> update: There is no Update for The Elastic Log Plugin")
+}
+
+func newDockerClient(ctx context.Context) (*client.Client, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	cli.NegotiateAPIVersion(ctx)
+	return cli, nil
 }

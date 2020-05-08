@@ -20,8 +20,8 @@ package metadata
 import (
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 type pod struct {
@@ -51,7 +51,7 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	out := p.resource.Generate("pod", obj, opts...)
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName)
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {

@@ -23,12 +23,12 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // IPSettings provides common configuration settings for IP resolution and ping
@@ -37,14 +37,6 @@ type IPSettings struct {
 	IPv4 bool     `config:"ipv4"`
 	IPv6 bool     `config:"ipv6"`
 	Mode PingMode `config:"mode"`
-}
-
-// HostJobSettings configures a Job including Host lookups and global fields to be added
-// to every event.
-type HostJobSettings struct {
-	Host   string
-	IP     IPSettings
-	Fields common.MapStr
 }
 
 // PingMode enumeration for configuring `any` or `all` IPs pinging.
@@ -111,7 +103,7 @@ func MakeByIPJob(
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) (jobs.Job, error) {
 	// use ResolveIPAddr to parse the ip into net.IPAddr adding a zone info
-	// if ipv6 is used.
+	// if ipv6 is used. We intentionally do not use a custom resolver here.
 	addr, err := net.ResolveIPAddr("ip", ip.String())
 	if err != nil {
 		return nil, err
@@ -130,39 +122,40 @@ func MakeByIPJob(
 // A pingFactory instance is normally build with MakePingIPFactory,
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByHostJob(
-	settings HostJobSettings,
+	host string,
+	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) (jobs.Job, error) {
-	host := settings.Host
-
 	if ip := net.ParseIP(host); ip != nil {
 		return MakeByIPJob(ip, pingFactory)
 	}
 
-	network := settings.IP.Network()
+	network := ipSettings.Network()
 	if network == "" {
 		return nil, errors.New("pinging hosts requires ipv4 or ipv6 mode enabled")
 	}
 
-	mode := settings.IP.Mode
+	mode := ipSettings.Mode
 
 	if mode == PingAny {
-		return makeByHostAnyIPJob(settings, host, pingFactory), nil
+		return makeByHostAnyIPJob(host, ipSettings, resolver, pingFactory), nil
 	}
 
-	return makeByHostAllIPJob(settings, host, pingFactory), nil
+	return makeByHostAllIPJob(host, ipSettings, resolver, pingFactory), nil
 }
 
 func makeByHostAnyIPJob(
-	settings HostJobSettings,
 	host string,
+	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) jobs.Job {
-	network := settings.IP.Network()
+	network := ipSettings.Network()
 
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		resolveStart := time.Now()
-		ip, err := net.ResolveIPAddr(network, host)
+		ip, err := resolver.ResolveIPAddr(network, host)
 		if err != nil {
 			return nil, err
 		}
@@ -176,11 +169,12 @@ func makeByHostAnyIPJob(
 }
 
 func makeByHostAllIPJob(
-	settings HostJobSettings,
 	host string,
+	ipSettings IPSettings,
+	resolver Resolver,
 	pingFactory func(ip *net.IPAddr) jobs.Job,
 ) jobs.Job {
-	network := settings.IP.Network()
+	network := ipSettings.Network()
 	filter := makeIPFilter(network)
 
 	return func(event *beat.Event) ([]jobs.Job, error) {
@@ -264,35 +258,4 @@ func filterIPs(ips []net.IP, filt func(net.IP) bool) []net.IP {
 		}
 	}
 	return out
-}
-
-// MakeHostJobSettings creates a new HostJobSettings structure without any global
-// event fields.
-func MakeHostJobSettings(host string, ip IPSettings) HostJobSettings {
-	return HostJobSettings{Host: host, IP: ip}
-}
-
-// WithFields adds new event fields to a Job. Existing fields will be
-// overwritten.
-// The fields map will be updated (no copy).
-func (s HostJobSettings) WithFields(m common.MapStr) HostJobSettings {
-	s.AddFields(m)
-	return s
-}
-
-// AddFields adds new event fields to a Job. Existing fields will be
-// overwritten.
-func (s *HostJobSettings) AddFields(m common.MapStr) { addFields(&s.Fields, m) }
-
-func addFields(to *common.MapStr, m common.MapStr) {
-	if m == nil {
-		return
-	}
-
-	fields := *to
-	if fields == nil {
-		fields = common.MapStr{}
-		*to = fields
-	}
-	fields.DeepUpdate(m)
 }

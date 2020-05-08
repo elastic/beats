@@ -149,7 +149,7 @@ written in Go and have no dependencies. Integration tests are also written
 in Go but require the service from which the module collects metrics to also be running.
 System tests for Metricbeat also require the service to be running in most cases and are
 written in Python based on our small Python test framework.
-We use `virtualenv` to deal with Python dependencies.
+We use https://docs.python.org/3/library/venv.html[venv] to deal with Python dependencies.
 You can simply run the command `make python-env`  and then `. build/python-env/bin/activate` .
 
 You should use a combination of the three test types to test your metricsets because

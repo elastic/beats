@@ -25,11 +25,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/template"
 )
 
 type mockClientHandler struct {
@@ -288,7 +288,7 @@ func TestIndexManager_Setup(t *testing.T) {
 		if c.Settings.Index != nil {
 			c.Settings.Index = (map[string]interface{})(common.MapStr(c.Settings.Index).Clone())
 		}
-		if c.Settings.Index != nil {
+		if c.Settings.Source != nil {
 			c.Settings.Source = (map[string]interface{})(common.MapStr(c.Settings.Source).Clone())
 		}
 		return c
@@ -301,6 +301,12 @@ func TestIndexManager_Setup(t *testing.T) {
 			err := cfg.Unpack(&s)
 			if err != nil {
 				panic(err)
+			}
+			if s.Settings.Index != nil && len(s.Settings.Index) == 0 {
+				s.Settings.Index = nil
+			}
+			if s.Settings.Source != nil && len(s.Settings.Source) == 0 {
+				s.Settings.Source = nil
 			}
 		}
 		return &s

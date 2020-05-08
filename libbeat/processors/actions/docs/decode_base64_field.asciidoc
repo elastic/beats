@@ -1,6 +1,10 @@
 [[decode-base64-field]]
 === Decode Base64 fields
 
+++++
+<titleabbrev>decode_base64_field</titleabbrev>
+++++
+
 The `decode_base64_field` processor specifies a field to base64 decode.
 The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
 the origin and `to` the target name of the field.
@@ -11,12 +15,12 @@ processor to drop the field and then rename the field.
 [source,yaml]
 -------
 processors:
-- decode_base64_field:
-    field:
-      from: "field1"
-      to: "field2"
-    ignore_missing: false
-    fail_on_error: true
+  - decode_base64_field:
+      field:
+        from: "field1"
+        to: "field2"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 In the example above:

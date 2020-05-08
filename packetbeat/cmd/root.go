@@ -23,11 +23,11 @@ import (
 	"github.com/spf13/pflag"
 
 	// import protocol modules
-	_ "github.com/elastic/beats/packetbeat/include"
+	_ "github.com/elastic/beats/v7/packetbeat/include"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/packetbeat/beater"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/packetbeat/beater"
 )
 
 // Name of this beat
@@ -44,6 +44,11 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{RunFlags: runFlags, Name: Name})
+	settings := instance.Settings{
+		RunFlags:      runFlags,
+		Name:          Name,
+		HasDashboards: true,
+	}
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
 	RootCmd.AddCommand(genDevicesCommand())
 }

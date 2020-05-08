@@ -14,8 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 )
 
 type testEventAccumulator struct {
@@ -60,18 +63,20 @@ func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, t
 }
 
 func Test_internalBuilder(t *testing.T) {
+	log := logp.NewLogger("elb")
 	lbl := fakeLbl()
 	lbls := []*lbListener{lbl}
 	fetcher := newMockFetcher(lbls, nil)
-	pBus := bus.New("test")
+	pBus := bus.New(log, "test")
 
-	cfg := &Config{
+	cfg := &awsauto.Config{
 		Regions: []string{"us-east-1a", "us-west-1b"},
 		Period:  time.Nanosecond,
 	}
 
 	uuid, _ := uuid.NewV4()
-	provider, err := internalBuilder(uuid, pBus, cfg, fetcher)
+	k, _ := keystore.NewFileKeystore("test")
+	provider, err := internalBuilder(uuid, pBus, cfg, fetcher, k)
 	require.NoError(t, err)
 
 	startListener := pBus.Subscribe("start")
@@ -107,9 +112,15 @@ func Test_internalBuilder(t *testing.T) {
 		"start":    true,
 		"host":     *lbl.lb.DNSName,
 		"port":     *lbl.listener.Port,
+		"aws": common.MapStr{
+			"elb": lbl.toMap(),
+		},
+		"cloud": lbl.toCloudMap(),
 		"meta": common.MapStr{
-			"elb_listener": lbl.toMap(),
-			"cloud":        lbl.toCloudMap(),
+			"aws": common.MapStr{
+				"elb": lbl.toMap(),
+			},
+			"cloud": lbl.toCloudMap(),
 		},
 	}
 

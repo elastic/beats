@@ -20,8 +20,8 @@ package input
 import (
 	"time"
 
-	cfg "github.com/elastic/beats/filebeat/config"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	cfg "github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 var (

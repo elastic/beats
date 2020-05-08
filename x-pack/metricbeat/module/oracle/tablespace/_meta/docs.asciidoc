@@ -1,4 +1,17 @@
-`tablespace` Metricset includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc. The total set of fields available on the Metricset and their description are the following:
+`tablespace` Metricset includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.
+
+[float]
+=== Required database access
+
+To ensure that the module has access to the appropriate metrics, the module requires that you configure a user with access to the following tables:
+
+* SYS.DBA_TEMP_FILES
+* DBA_TEMP_FREE_SPACE
+* dba_data_files
+* dba_free_space
+
+[float]
+=== Description of fields
 
 * *data_file.id*: Tablespace data file unique identifier number. Each data file of a Tablespace has a unique name (and each Tablespace may have more than one data file) but this is not the Tablespace ID.
 * *data_file.name*: Filename of the data file (with the full path)

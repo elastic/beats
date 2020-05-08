@@ -20,13 +20,13 @@ package ccr
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 func init() {
@@ -118,6 +118,16 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 		message = "the CCR feature is available with a platinum Elasticsearch license. " +
 			"You currently have a " + license.Type + " license. " +
 			"Either upgrade your license or remove the ccr metricset from your Elasticsearch module configuration."
+		return
+	}
+
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", errors.Wrap(err, "error determining xpack features")
+	}
+
+	if !xpack.Features.CCR.Enabled {
+		message = "the CCR feature is not enabled on your Elasticsearch cluster."
 		return
 	}
 

@@ -25,12 +25,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var info = elasticsearch.Info{
@@ -43,65 +43,65 @@ var info = elasticsearch.Info{
 func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	file := "./_meta/test/empty.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	file := "./_meta/test/tasks.622.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.NoError(t, err)
-	assert.True(t, len(reporter.GetEvents()) >= 1)
-	assert.Zero(t, len(reporter.GetErrors()))
+	require.NoError(t, err)
+	require.True(t, len(reporter.GetEvents()) >= 1)
+	require.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	file := "./_meta/test/empty.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.Zero(t, len(reporter.GetEvents()))
-	assert.Zero(t, len(reporter.GetErrors()))
+	require.Zero(t, len(reporter.GetEvents()))
+	require.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 	file := "./_meta/test/tasks.622.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.Equal(t, 3, len(reporter.GetEvents()))
-	assert.Zero(t, len(reporter.GetErrors()))
+	require.Equal(t, 3, len(reporter.GetEvents()))
+	require.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	file := "./_meta/test/invalid_required_field.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	file := "./_meta/test/invalid_format.json"
 	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, info, content)
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func TestEventsMappedMatchToContentReceived(t *testing.T) {
@@ -199,7 +199,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 
 	for _, testCase := range testCases {
 		content, err := ioutil.ReadFile(testCase.given)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
 		err = eventsMapping(reporter, info, content)

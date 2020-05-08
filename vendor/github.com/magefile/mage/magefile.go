@@ -1,7 +1,7 @@
 //+build mage
 
 // This is the build script for Mage. The install target is all you really need.
-// The release target is for generating offial releases and is really only
+// The release target is for generating official releases and is really only
 // useful to project admins.
 package main
 
@@ -27,12 +27,20 @@ func Install() error {
 	}
 
 	gocmd := mg.GoCmd()
-	gopath, err := sh.Output(gocmd, "env", "GOPATH")
+	// use GOBIN if set in the environment, otherwise fall back to first path
+	// in GOPATH environment string
+	bin, err := sh.Output(gocmd, "env", "GOBIN")
 	if err != nil {
-		return fmt.Errorf("can't determine GOPATH: %v", err)
+		return fmt.Errorf("can't determine GOBIN: %v", err)
 	}
-	paths := strings.Split(gopath, string([]rune{os.PathListSeparator}))
-	bin := filepath.Join(paths[0], "bin")
+	if bin == "" {
+		gopath, err := sh.Output(gocmd, "env", "GOPATH")
+		if err != nil {
+			return fmt.Errorf("can't determine GOPATH: %v", err)
+		}
+		paths := strings.Split(gopath, string([]rune{os.PathListSeparator}))
+		bin = filepath.Join(paths[0], "bin")
+	}
 	// specifically don't mkdirall, if you have an invalid gopath in the first
 	// place, that's not on us to fix.
 	if err := os.Mkdir(bin, 0700); err != nil && !os.IsExist(err) {

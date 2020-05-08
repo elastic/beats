@@ -21,17 +21,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type service struct {
@@ -124,15 +124,27 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var annotations common.MapStr
 	var kubeMeta common.MapStr
+
+	annotations := make(common.MapStr, 0)
 	rawMeta, ok := event["kubernetes"]
 	if ok {
 		kubeMeta = rawMeta.(common.MapStr)
 		// The builder base config can configure any of the field values of kubernetes if need be.
 		e["kubernetes"] = kubeMeta
 		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			annotations = rawAnn.(common.MapStr)
+			anns, _ := rawAnn.(common.MapStr)
+			if len(anns) != 0 {
+				annotations = anns.Clone()
+			}
+		}
+
+		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+			nsAnn, _ := rawNsAnn.(common.MapStr)
+			if len(nsAnn) != 0 {
+				annotations.DeepUpdateNoOverwrite(nsAnn)
+			}
 		}
 	}
 	if host, ok := event["host"]; ok {
@@ -144,6 +156,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 
 	hints := builder.GenerateHints(annotations, "", s.config.Prefix)
 	s.logger.Debugf("Generated hints %+v", hints)
+
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
@@ -190,6 +203,19 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		safemapstr.Put(annotations, k, v)
 	}
 	kubemeta["annotations"] = annotations
+
+	if s.namespaceWatcher != nil {
+		if rawNs, ok, err := s.namespaceWatcher.Store().GetByKey(svc.Namespace); ok && err == nil {
+			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
+				nsAnns := common.MapStr{}
+
+				for k, v := range namespace.GetAnnotations() {
+					safemapstr.Put(nsAnns, k, v)
+				}
+				kubemeta["namespace_annotations"] = nsAnns
+			}
+		}
+	}
 
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{

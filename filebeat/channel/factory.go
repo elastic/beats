@@ -18,10 +18,10 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 type OutletFactory struct {
@@ -49,6 +49,10 @@ type inputOutletConfig struct {
 	common.EventMetadata `config:",inline"`      // Fields and tags to add to events.
 	Processors           processors.PluginConfig `config:"processors"`
 	KeepNull             bool                    `config:"keep_null"`
+
+	PublisherPipeline struct {
+		DisableHost bool `config:"disable_host"` // Disable addition of host.name.
+	} `config:"publisher_pipeline"`
 
 	// implicit event fields
 	Type        string `config:"type"`         // input.type
@@ -87,7 +91,7 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(p beat.Pipeline) Connector {
+func (f *OutletFactory) Create(p beat.PipelineConnector) Connector {
 	return &pipelineConnector{parent: f, pipeline: p}
 }
 

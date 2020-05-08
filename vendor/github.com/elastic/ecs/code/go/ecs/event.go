@@ -30,9 +30,10 @@ import (
 // log events include a process starting on a host, a network packet being sent
 // from a source to a destination, or a network connection between a client and
 // a server being initiated or closed. A metric is defined as an event
-// containing one or more numerical or categorical measurements and the time at
-// which the measurement was taken. Examples of metric events include memory
-// pressure measured on a host, or vulnerabilities measured on a scanned host.
+// containing one or more numerical measurements and the time at which the
+// measurement was taken. Examples of metric events include memory pressure
+// measured on a host and device temperature. See the `event.kind` definition
+// in this section for additional details about metric and state events.
 type Event struct {
 	// Unique ID to describe the event.
 	ID string `ecs:"id"`
@@ -73,10 +74,19 @@ type Event struct {
 
 	// This is one of four ECS Categorization Fields, and indicates the lowest
 	// level in the ECS category hierarchy.
-	// `event.outcome` simply denotes whether the event represent a success or
-	// a failure. Note that not all events will have an associated outcome. For
-	// example, this field is generally not populated for metric events or
-	// events with `event.type:info`.
+	// `event.outcome` simply denotes whether the event represents a success or
+	// a failure from the perspective of the entity that produced the event.
+	// Note that when a single transaction is described in multiple events,
+	// each event may populate different values of `event.outcome`, according
+	// to their perspective.
+	// Also note that in the case of a compound event (a single event that
+	// contains multiple logical events), this field should be populated with
+	// the value that best captures the overall success or failure from the
+	// perspective of the event producer.
+	// Further note that not all events will have an associated outcome. For
+	// example, this field is generally not populated for metric events, events
+	// with `event.type:info`, or any events for which an outcome does not make
+	// logical sense.
 	Outcome string `ecs:"outcome"`
 
 	// This is one of four ECS Categorization Fields, and indicates the third
@@ -136,7 +146,7 @@ type Event struct {
 
 	// Sequence number of the event.
 	// The sequence number is a value published by some event sources, to make
-	// the exact ordering of events unambiguous, regarless of the timestamp
+	// the exact ordering of events unambiguous, regardless of the timestamp
 	// precision.
 	Sequence int64 `ecs:"sequence"`
 
@@ -185,4 +195,16 @@ type Event struct {
 	// chronologically look like this: `@timestamp` < `event.created` <
 	// `event.ingested`.
 	Ingested time.Time `ecs:"ingested"`
+
+	// Reference URL linking to additional information about this event.
+	// This URL links to a static definition of the this event. Alert events,
+	// indicated by `event.kind:alert`, are a common use case for this field.
+	Reference string `ecs:"reference"`
+
+	// URL linking to an external system to continue investigation of this
+	// event.
+	// This URL links to another system where in-depth investigation of the
+	// specific occurence of this event can take place. Alert events, indicated
+	// by `event.kind:alert`, are a common use case for this field.
+	Url string `ecs:"url"`
 }

@@ -1,5 +1,9 @@
 [[filtering-and-enhancing-data]]
-== Filter and enhance the exported data
+== Filter and enhance data with processors
+
+++++
+<titleabbrev>Processors</titleabbrev>
+++++
 
 include::{libbeat-dir}/processors.asciidoc[]
 
@@ -51,10 +55,10 @@ following configuration:
 [source,yaml]
 ----
 processors:
- - drop_event:
-     when:
+  - drop_event:
+      when:
         equals:
-           http.response.status_code: 200
+          http.response.status_code: 200
 ----
 
 
@@ -63,11 +67,11 @@ If you don't want to export raw data for the successful transactions:
 [source,yaml]
 ----
 processors:
- - drop_fields:
-     when:
+  - drop_fields:
+      when:
         equals:
-           http.response.status_code: 200
-     fields: ["request", "response"]
+          http.response.status_code: 200
+      fields: ["request", "response"]
 ----
 
 include::{libbeat-dir}/processors-using.asciidoc[]
