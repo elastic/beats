@@ -39,6 +39,16 @@ func TestEmptyString(t *testing.T) {
 	assert.Equal(t, errEmpty, err)
 }
 
+func TestInvalidTokenizer(t *testing.T) {
+	const (
+		pattern = "%{id} %{function-\u003e}%{server}"
+		message = `00000043 ViewReceive machine-321    `
+	)
+
+	_, err := New(pattern)
+	assert.Equal(t, errInvalidTokenizer, err)
+}
+
 // JSON tags are used to create a common test file for the `logstash-filter-dissect` and the
 // beat implementation.
 type dissectTest struct {
