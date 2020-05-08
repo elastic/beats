@@ -248,6 +248,7 @@ func TestMakeClientTracer(t *testing.T) {
 type bufLogger struct {
 	t     *testing.T
 	lines []string
+	mu    sync.RWMutex
 }
 
 func (l *bufLogger) Debug(vs ...interface{})              { l.report("DEBUG", vs) }
@@ -266,13 +267,21 @@ func (l *bufLogger) report(level string, vs []interface{}) {
 func (l *bufLogger) reportf(level, str string, vs []interface{}) {
 	str = level + ": " + str
 	line := fmt.Sprintf(str, vs...)
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.lines = append(l.lines, line)
 }
 
 func (l *bufLogger) Flush() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	for _, line := range l.lines {
 		l.t.Log(line)
 	}
+
+	l.lines = make([]string, 0)
 }
 
 func makeBufLogger(t *testing.T) *bufLogger {
