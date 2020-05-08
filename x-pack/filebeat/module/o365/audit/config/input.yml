@@ -59,4 +59,7 @@ processors:
           - id: "{{ .id }}"
             name: "{{ .name }}"
           {{ end }}
-
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

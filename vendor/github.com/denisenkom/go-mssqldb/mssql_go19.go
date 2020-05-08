@@ -11,7 +11,7 @@ import (
 	"time"
 
 	// "github.com/cockroachdb/apd"
-	"cloud.google.com/go/civil"
+	"github.com/golang-sql/civil"
 )
 
 // Type alias provided for compatibility.
@@ -112,6 +112,8 @@ func (c *Conn) CheckNamedValue(nv *driver.NamedValue) error {
 		*v = 0 // By default the return value should be zero.
 		c.returnStatus = v
 		return driver.ErrRemoveArgument
+	case TVP:
+		return nil
 	default:
 		var err error
 		nv.Value, err = convertInputParameter(nv.Value)
@@ -160,6 +162,29 @@ func (s *Stmt) makeParamExtra(val driver.Value) (res param, err error) {
 	case sql.Out:
 		res, err = s.makeParam(val.Dest)
 		res.Flags = fByRevValue
+	case TVP:
+		err = val.check()
+		if err != nil {
+			return
+		}
+		schema, name, errGetName := getSchemeAndName(val.TypeName)
+		if errGetName != nil {
+			return
+		}
+		res.ti.UdtInfo.TypeName = name
+		res.ti.UdtInfo.SchemaName = schema
+		res.ti.TypeId = typeTvp
+		columnStr, tvpFieldIndexes, errCalTypes := val.columnTypes()
+		if errCalTypes != nil {
+			err = errCalTypes
+			return
+		}
+		res.buffer, err = val.encode(schema, name, columnStr, tvpFieldIndexes)
+		if err != nil {
+			return
+		}
+		res.ti.Size = len(res.buffer)
+
 	default:
 		err = fmt.Errorf("mssql: unknown type for %T", val)
 	}

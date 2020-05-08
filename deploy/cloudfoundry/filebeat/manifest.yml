@@ -1,0 +1,10 @@
+applications:
+- name: filebeat
+  memory: 256M
+  instances: 1
+  buildpacks:
+  - binary_buildpack
+  command: ./filebeat -e -c ~/filebeat.yml
+  stack: cflinuxfs3
+  health-check-type: process
+  no-route: true

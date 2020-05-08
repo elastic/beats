@@ -10,5 +10,5 @@ var:
     os.windows:
       - "c:/programdata/MySQL/MySQL Server*/error.log*"
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/error.yml

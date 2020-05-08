@@ -210,7 +210,7 @@ https://docs.docker.com/config/containers/logging/journald/[Docker] are also
 available: 
 
 [horizontal]
-`CONTAINER_ID`::              `conatiner.id_truncated`
+`CONTAINER_ID`::              `container.id_truncated`
 `CONTAINER_ID_FULL`::         `container.id`
 `CONTAINER_NAME`::            `container.name`
 `CONTAINER_PARTIAL_MESSAGE`:: `container.partial`

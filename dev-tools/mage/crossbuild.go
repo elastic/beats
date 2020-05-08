@@ -268,6 +268,7 @@ func (b GolangCrossBuilder) Build() error {
 		"--rm",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
+		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
@@ -295,7 +296,8 @@ func DockerChown(path string) {
 // chownPaths will chown the file and all of the dirs specified in the path.
 func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
-	defer log.Printf("chown took: %v", time.Now().Sub(start))
+	numFixed := 0
+	defer log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -314,10 +316,10 @@ func chownPaths(uid, gid int, path string) error {
 			return nil
 		}
 
-		log.Printf("chown file: %v", name)
 		if err := os.Chown(name, uid, gid); err != nil {
 			return errors.Wrapf(err, "failed to chown path=%v", name)
 		}
+		numFixed++
 		return nil
 	})
 }

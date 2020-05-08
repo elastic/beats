@@ -97,20 +97,26 @@ jobs:
 
     # Metricbeat
     - os: linux
-      env: TARGETS="-C metricbeat unit-tests coverage-report"
+      env: TARGETS="-C metricbeat unit-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
+      before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
+      install: 
+        - .ci/scripts/install-kind.sh
+        - .ci/scripts/install-kubectl.sh
+      env:
+        - TARGETS="-C metricbeat integration-tests"
+        - K8S_VERSION=v1.17.2
+        - KIND_VERSION=v0.7.0
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
+      env: TARGETS="-C metricbeat system-tests"
       go: $TRAVIS_GO_VERSION
       stage: test
-
     - os: osx
-      env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
+      env: TARGETS="-C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
@@ -118,6 +124,18 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
+      env: TARGETS="-C x-pack/metricbeat unit-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat integration-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat system-tests"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
       env: TARGETS="-C x-pack/metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
@@ -158,6 +176,18 @@ jobs:
     # Journalbeat
     - os: linux
       env: TARGETS="-C journalbeat testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
+    # Agent
+    - os: linux
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="-C x-pack/elastic-agent testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      before_install: .ci/scripts/travis_has_changes.sh x-pack/elastic-agent libbeat || travis_terminate 0
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/elastic-agent testsuite"
       go: $TRAVIS_GO_VERSION
       stage: test
 

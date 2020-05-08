@@ -14,6 +14,7 @@ processors:
     target_field: elasticsearch.audit.@timestamp
     formats:
     - yyyy-MM-dd'T'HH:mm:ss,SSS
+    - yyyy-MM-dd'T'HH:mm:ss,SSSZ
     timezone: '{{ event.timezone }}'
 - remove:
     if: ctx.elasticsearch.audit['@timestamp'] == null && ctx.event.timezone != null

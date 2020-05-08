@@ -73,6 +73,7 @@ func TestConfigManager(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -148,6 +149,7 @@ func TestRemoveItems(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -225,6 +227,7 @@ func TestUnEnroll(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -299,6 +302,7 @@ func TestBadConfig(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,

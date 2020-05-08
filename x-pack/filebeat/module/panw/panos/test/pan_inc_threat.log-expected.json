@@ -20,12 +20,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -38,6 +46,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -58,6 +67,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -94,12 +108,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -112,6 +134,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -132,6 +155,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -168,12 +196,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -186,6 +222,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -206,6 +243,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -242,12 +284,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -260,6 +310,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -280,6 +331,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -316,12 +372,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -334,6 +398,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -354,6 +419,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -390,12 +460,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -408,6 +486,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -428,6 +507,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -464,12 +548,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -482,6 +574,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -502,6 +595,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -538,12 +636,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -556,6 +662,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -576,6 +683,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -612,12 +724,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -630,6 +750,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -650,6 +771,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -686,12 +812,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -704,6 +838,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -724,6 +859,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -760,12 +900,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -778,6 +926,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -798,6 +947,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -834,12 +988,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -852,6 +1014,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -872,6 +1035,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -908,12 +1076,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -926,6 +1102,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -946,6 +1123,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -982,12 +1164,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -999,6 +1189,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1019,6 +1210,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1055,12 +1251,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1073,6 +1277,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1093,6 +1298,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1129,12 +1339,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1147,6 +1365,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1167,6 +1386,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1200,12 +1424,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1217,6 +1449,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1237,6 +1470,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "78.159.99.224",
         "server.port": 80,
         "service.type": "panw",
@@ -1273,12 +1511,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1291,6 +1537,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1311,6 +1558,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1347,12 +1599,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1365,6 +1625,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1385,6 +1646,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1421,12 +1687,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1439,6 +1713,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1459,6 +1734,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1495,12 +1775,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1513,6 +1801,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1533,6 +1822,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1569,12 +1863,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1587,6 +1889,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1607,6 +1910,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1643,12 +1951,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1661,6 +1977,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1681,6 +1998,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1717,12 +2039,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1735,6 +2065,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1755,6 +2086,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1791,12 +2127,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1809,6 +2153,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1829,6 +2174,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1865,12 +2215,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1883,6 +2241,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1903,6 +2262,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -1939,12 +2303,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -1957,6 +2329,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -1977,6 +2350,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2013,12 +2391,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2031,6 +2417,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2051,6 +2438,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2087,12 +2479,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2105,6 +2505,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2125,6 +2526,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2161,12 +2567,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2179,6 +2593,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2199,6 +2614,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2235,12 +2655,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2253,6 +2681,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2273,6 +2702,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2309,12 +2743,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2327,6 +2769,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2347,6 +2790,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2383,12 +2831,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2401,6 +2857,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2421,6 +2878,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2454,12 +2916,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2471,6 +2941,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2491,6 +2962,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "69.43.161.167",
         "server.port": 80,
         "service.type": "panw",
@@ -2524,12 +3000,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2541,6 +3025,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2561,6 +3046,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "202.31.187.154",
         "server.port": 80,
         "service.type": "panw",
@@ -2594,12 +3084,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2611,6 +3109,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2631,6 +3130,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "89.111.176.67",
         "server.port": 80,
         "service.type": "panw",
@@ -2667,12 +3171,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2684,6 +3196,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2704,6 +3217,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2737,12 +3255,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2754,6 +3280,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2774,6 +3301,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.73.210.29",
         "server.port": 80,
         "service.type": "panw",
@@ -2807,12 +3339,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2824,6 +3364,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2844,6 +3385,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.73.210.29",
         "server.port": 80,
         "service.type": "panw",
@@ -2880,12 +3426,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2897,6 +3451,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2917,6 +3472,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -2950,12 +3510,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -2967,6 +3535,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -2987,6 +3556,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.73.210.29",
         "server.port": 80,
         "service.type": "panw",
@@ -3020,12 +3594,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3037,6 +3619,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3057,6 +3640,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "89.108.64.156",
         "server.port": 80,
         "service.type": "panw",
@@ -3090,12 +3678,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3107,6 +3703,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3127,6 +3724,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "89.108.64.156",
         "server.port": 80,
         "service.type": "panw",
@@ -3154,10 +3756,15 @@
         "destination.port": 58849,
         "destination.user.name": "crusher",
         "event.action": "spyware_detected",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "drop-all-packets",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -3171,6 +3778,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "drop-all-packets",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3191,6 +3799,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 58849,
         "server.user.name": "crusher",
@@ -3236,12 +3849,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3253,6 +3874,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3273,6 +3895,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "216.8.179.25",
         "server.port": 80,
         "service.type": "panw",
@@ -3306,12 +3933,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3323,6 +3958,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3343,6 +3979,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "69.43.161.154",
         "server.port": 80,
         "service.type": "panw",
@@ -3376,12 +4017,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3393,6 +4042,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3413,6 +4063,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.91.196.252",
         "server.port": 80,
         "service.type": "panw",
@@ -3446,12 +4101,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3463,6 +4126,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3483,6 +4147,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.73.210.29",
         "server.port": 80,
         "service.type": "panw",
@@ -3519,12 +4188,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3536,6 +4213,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3556,6 +4234,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -3592,12 +4275,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3609,6 +4300,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3629,6 +4321,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -3665,12 +4362,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3682,6 +4387,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3702,6 +4408,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -3738,12 +4449,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3755,6 +4474,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "1606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3775,6 +4495,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -3811,12 +4536,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3828,6 +4561,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "1606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3848,6 +4582,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -3875,12 +4614,20 @@
         "destination.port": 54431,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3892,6 +4639,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "1606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3912,6 +4660,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 54431,
         "server.user.name": "crusher",
@@ -3957,12 +4710,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -3974,6 +4735,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "1606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -3994,6 +4756,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -4021,12 +4788,20 @@
         "destination.port": 61220,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4038,6 +4813,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4058,6 +4834,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 61220,
         "server.user.name": "crusher",
@@ -4094,12 +4875,20 @@
         "destination.port": 61726,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4111,6 +4900,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4131,6 +4921,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 61726,
         "server.user.name": "crusher",
@@ -4175,12 +4970,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4192,6 +4995,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4212,6 +5016,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -4239,12 +5048,20 @@
         "destination.port": 60212,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4256,6 +5073,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4276,6 +5094,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60212,
         "server.user.name": "crusher",
@@ -4309,12 +5132,20 @@
         "destination.port": 60392,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4326,6 +5157,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4346,6 +5178,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60392,
         "server.user.name": "crusher",
@@ -4388,12 +5225,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4405,6 +5250,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4425,6 +5271,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "213.180.199.61",
         "server.port": 80,
         "service.type": "panw",
@@ -4458,12 +5309,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4475,6 +5334,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4495,6 +5355,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "213.180.199.61",
         "server.port": 80,
         "service.type": "panw",
@@ -4528,12 +5393,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4545,6 +5418,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4565,6 +5439,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "213.180.199.61",
         "server.port": 80,
         "service.type": "panw",
@@ -4592,12 +5471,20 @@
         "destination.port": 54431,
         "destination.user.name": "crusher",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4609,6 +5496,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4629,6 +5517,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 54431,
         "server.user.name": "crusher",
@@ -4674,12 +5567,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "url_filtering",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "block-url",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4691,6 +5592,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "block-url",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4711,6 +5613,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "crusher",
+            "crusher"
+        ],
+        "rule.name": "rule1",
         "server.ip": "204.232.231.46",
         "server.port": 80,
         "service.type": "panw",
@@ -4747,12 +5654,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4764,6 +5679,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4784,6 +5700,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "207.46.140.46",
         "server.port": 80,
         "service.type": "panw",
@@ -4811,12 +5732,20 @@
         "destination.port": 1039,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4828,6 +5757,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4848,6 +5778,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.6",
         "server.port": 1039,
         "server.user.name": "jordy",
@@ -4884,12 +5819,20 @@
         "destination.port": 1064,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4901,6 +5844,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -4921,6 +5865,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.6",
         "server.port": 1064,
         "server.user.name": "jordy",
@@ -4966,12 +5915,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -4983,6 +5940,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5003,6 +5961,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "65.54.71.11",
         "server.port": 80,
         "service.type": "panw",
@@ -5030,12 +5993,20 @@
         "destination.port": 1071,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5047,6 +6018,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5067,6 +6039,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.6",
         "server.port": 1071,
         "server.user.name": "jordy",
@@ -5106,12 +6083,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5123,6 +6108,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5143,6 +6129,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.85.40.48",
         "server.port": 80,
         "service.type": "panw",
@@ -5170,12 +6161,20 @@
         "destination.port": 57876,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5187,6 +6186,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5207,6 +6207,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 57876,
         "server.user.name": "picard",
@@ -5240,12 +6245,20 @@
         "destination.port": 1082,
         "destination.user.name": "jordy",
         "event.action": "file_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "deny",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5257,6 +6270,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "deny",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5277,6 +6291,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.6",
         "server.port": 1082,
         "server.user.name": "jordy",
@@ -5313,12 +6332,20 @@
         "destination.port": 50986,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5330,6 +6357,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5350,6 +6378,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 50986,
         "server.user.name": "picard",
@@ -5383,12 +6416,20 @@
         "destination.port": 51716,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5400,6 +6441,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5420,6 +6462,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 51716,
         "server.user.name": "picard",
@@ -5453,12 +6500,20 @@
         "destination.port": 52119,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5470,6 +6525,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5490,6 +6546,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 52119,
         "server.user.name": "picard",
@@ -5523,12 +6584,20 @@
         "destination.port": 52411,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5540,6 +6609,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5560,6 +6630,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 52411,
         "server.user.name": "picard",
@@ -5599,12 +6674,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5616,6 +6699,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5636,6 +6720,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "74.125.239.6",
         "server.port": 80,
         "service.type": "panw",
@@ -5663,12 +6752,20 @@
         "destination.port": 53026,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5680,6 +6777,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5700,6 +6798,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 53026,
         "server.user.name": "picard",
@@ -5733,12 +6836,20 @@
         "destination.port": 53809,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5750,6 +6861,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5770,6 +6882,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 53809,
         "server.user.name": "picard",
@@ -5803,12 +6920,20 @@
         "destination.port": 55912,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5820,6 +6945,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5840,6 +6966,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 55912,
         "server.user.name": "picard",
@@ -5873,12 +7004,20 @@
         "destination.port": 55916,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5890,6 +7029,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5910,6 +7050,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 55916,
         "server.user.name": "picard",
@@ -5943,12 +7088,20 @@
         "destination.port": 1046,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -5960,6 +7113,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -5980,6 +7134,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.6",
         "server.port": 1046,
         "server.user.name": "jordy",
@@ -6016,12 +7175,20 @@
         "destination.port": 61734,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6033,6 +7200,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6053,6 +7221,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 61734,
         "server.user.name": "jordy",
@@ -6086,12 +7259,20 @@
         "destination.port": 62292,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6103,6 +7284,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6123,6 +7305,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 62292,
         "server.user.name": "jordy",
@@ -6156,12 +7343,20 @@
         "destination.port": 64669,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6173,6 +7368,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6193,6 +7389,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 64669,
         "server.user.name": "jordy",
@@ -6229,12 +7430,20 @@
         "destination.port": 65265,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6246,6 +7455,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6266,6 +7476,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 65265,
         "server.user.name": "picard",
@@ -6299,12 +7514,20 @@
         "destination.port": 64979,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6316,6 +7539,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6336,6 +7560,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 64979,
         "server.user.name": "picard",
@@ -6369,12 +7598,20 @@
         "destination.port": 49432,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6386,6 +7623,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6406,6 +7644,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 49432,
         "server.user.name": "picard",
@@ -6442,12 +7685,20 @@
         "destination.port": 49722,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6459,6 +7710,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6479,6 +7731,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 49722,
         "server.user.name": "picard",
@@ -6518,12 +7775,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6535,6 +7800,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6555,6 +7821,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "74.125.224.201",
         "server.port": 80,
         "service.type": "panw",
@@ -6582,12 +7853,20 @@
         "destination.port": 50108,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6599,6 +7878,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6619,6 +7899,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 50108,
         "server.user.name": "picard",
@@ -6652,12 +7937,20 @@
         "destination.port": 50387,
         "destination.user.name": "picard",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6669,6 +7962,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6689,6 +7983,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "picard",
+            "picard"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 50387,
         "server.user.name": "picard",
@@ -6728,12 +8027,20 @@
         "destination.nat.port": 0,
         "destination.port": 80,
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6745,6 +8052,7 @@
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6765,6 +8073,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "208.85.40.48",
         "server.port": 80,
         "service.type": "panw",
@@ -6792,12 +8105,20 @@
         "destination.port": 60005,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6809,6 +8130,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6829,6 +8151,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60005,
         "server.user.name": "jordy",
@@ -6862,12 +8189,20 @@
         "destination.port": 60443,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6879,6 +8214,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6899,6 +8235,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60443,
         "server.user.name": "jordy",
@@ -6932,12 +8273,20 @@
         "destination.port": 60822,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -6949,6 +8298,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -6969,6 +8319,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60822,
         "server.user.name": "jordy",
@@ -7002,12 +8357,20 @@
         "destination.port": 61105,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7019,6 +8382,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -7039,6 +8403,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 61105,
         "server.user.name": "jordy",
@@ -7072,12 +8441,20 @@
         "destination.port": 60782,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "alert",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7089,6 +8466,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "alert",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -7109,6 +8487,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 60782,
         "server.user.name": "jordy",
@@ -7142,12 +8525,20 @@
         "destination.port": 61470,
         "destination.user.name": "jordy",
         "event.action": "data_match",
-        "event.category": "security_threat",
+        "event.category": [
+            "security_threat",
+            "intrusion_detection",
+            "network"
+        ],
         "event.dataset": "panw.panos",
+        "event.kind": "alert",
         "event.module": "panw",
-        "event.outcome": "reset-both",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied"
+        ],
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
@@ -7159,6 +8550,7 @@
         "network.direction": "outbound",
         "network.transport": "tcp",
         "observer.serial_number": "01606001116",
+        "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
         "panw.panos.destination.nat.port": 0,
@@ -7179,6 +8571,11 @@
             "0.0.0.0",
             "0.0.0.0"
         ],
+        "related.user": [
+            "jordy",
+            "jordy"
+        ],
+        "rule.name": "rule1",
         "server.ip": "192.168.0.2",
         "server.port": 61470,
         "server.user.name": "jordy",

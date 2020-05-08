@@ -18,12 +18,14 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.1
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
+	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
+	github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
@@ -40,7 +42,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.0.0
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
-	github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f
+	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.1-0.20190620180102-5e25c22bd5d6+incompatible // indirect
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
@@ -83,6 +85,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
+	github.com/google/go-cmp v0.4.0
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2-0.20190416172445-c2e93f3ae59f // indirect
 	github.com/googleapis/gnostic v0.3.1-0.20190624222214-25d8b0b66985 // indirect
@@ -90,6 +93,8 @@ require (
 	github.com/gorilla/mux v1.7.2 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
+	github.com/h2non/filetype v1.0.12
+	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -112,6 +117,7 @@ require (
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/oklog/ulid v1.3.1
 	github.com/opencontainers/go-digest v1.0.0-rc1.0.20190228220655-ac19fd6e7483 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
 	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
@@ -120,7 +126,7 @@ require (
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0
-	github.com/prometheus/procfs v0.0.9-0.20191208103036-42f6e295b56f
+	github.com/prometheus/procfs v0.0.11
 	github.com/prometheus/prometheus v2.5.0+incompatible
 	github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
 	github.com/reviewdog/reviewdog v0.9.17
@@ -130,31 +136,35 @@ require (
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
-	github.com/stretchr/objx v0.1.2-0.20180702103455-b8b73a35e983 // indirect
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
-	github.com/urso/magetools v0.0.0-20200106130147-61080ed7b22b // indirect
+	github.com/urso/ecslog v0.0.1
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.uber.org/atomic v1.3.1
-	go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
-	go.uber.org/zap v1.7.1
+	go.elastic.co/apm v1.7.2
+	go.elastic.co/apm/module/apmelasticsearch v1.7.2
+	go.elastic.co/apm/module/apmhttp v1.7.2
+	go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+	go.uber.org/atomic v1.5.0
+	go.uber.org/multierr v1.3.0
+	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c
+	golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e
 	golang.org/x/text v0.3.2
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
+	google.golang.org/grpc v1.27.1
 	gopkg.in/inf.v0 v0.9.0
-	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
+	gopkg.in/jcmturner/gokrb5.v7 v7.3.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.2.8
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.0.0-20190722141453-b90922c02518
 	k8s.io/apimachinery v0.0.0-20190719140911-bfcf53abc9f8
@@ -172,6 +182,7 @@ replace (
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
+	github.com/google/gopacket => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 )

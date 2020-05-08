@@ -19,12 +19,16 @@ package eslegclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -40,6 +44,10 @@ type BulkIndexAction struct {
 
 type BulkCreateAction struct {
 	Create BulkMeta `json:"create" struct:"create"`
+}
+
+type BulkDeleteAction struct {
+	Delete BulkMeta `json:"delete" struct:"delete"`
 }
 
 type BulkMeta struct {
@@ -59,6 +67,7 @@ type BulkResult json.RawMessage
 // Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 func (conn *Connection) Bulk(
+	ctx context.Context,
 	index, docType string,
 	params map[string]string, body []interface{},
 ) (int, BulkResult, error) {
@@ -69,13 +78,16 @@ func (conn *Connection) Bulk(
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
+		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
 
 	requ, err := newBulkRequest(conn.URL, index, docType, params, enc)
 	if err != nil {
+		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
+	requ.requ = apmhttp.RequestWithContext(ctx, requ.requ)
 
 	return conn.sendBulkRequest(requ)
 }

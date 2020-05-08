@@ -4,3 +4,4 @@ eventhub: {{ .eventhub }}
 consumer_group: {{ .consumer_group }}
 storage_account: {{ .storage_account }}
 storage_account_key: {{ .storage_account_key }}
+resource_manager_endpoint: {{ .resource_manager_endpoint }}

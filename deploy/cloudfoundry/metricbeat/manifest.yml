@@ -1,0 +1,10 @@
+applications:
+  - name: metricbeat
+    memory: 256M
+    instances: 1
+    buildpacks:
+    - binary_buildpack
+    command: ./metricbeat -e -c ~/metricbeat.yml
+    stack: cflinuxfs3
+    health-check-type: process
+    no-route: true

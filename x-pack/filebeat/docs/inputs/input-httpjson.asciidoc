@@ -92,15 +92,30 @@ If the HTTP API returns data in a JSON array, then this option can be set to dec
 from the array. Default: not used.
 
 [float]
+==== `no_http_body`
+
+If set, do not use HTTP request body. Default: false.
+
+[float]
 ==== `pagination.enabled`
 
-This option specifies whether pagination is enabled. Default: false.
+This option specifies whether pagination is enabled. Default: true.
 
 [float]
 ==== `pagination.extra_body_content`
 
 Any additional data that needs to be set in the HTTP pagination request can be specified in
 this JSON blob. Default: not used.
+
+[float]
+==== `pagination.header.field_name`
+
+The field name in the HTTP Header that is used for pagination control. 
+
+[float]
+==== `pagination.header.regex_pattern`
+
+The regular expression pattern to use for retrieving the pagination information from the HTTP Header field specified above.
 
 [float]
 ==== `pagination.id_field`
@@ -119,6 +134,22 @@ Required when pagination is enabled.
 
 This specifies the URL for sending pagination request. Required if the pagination URL is different 
 than the HTTP API URL.
+
+[float]
+==== `rate_limit.limit`
+
+This specifies the field in the HTTP Header of the response that specifies the total limit.
+
+[float]
+==== `rate_limit.remaining`
+
+This specifies the field in the HTTP Header of the response that specifies the remaining quota of the rate limit.
+
+[float]
+==== `rate_limit.reset`
+
+This specifies the field in the HTTP Header of the response that specifies the epoch time 
+when the rate limit will be reset.
 
 [float]
 ==== `ssl`

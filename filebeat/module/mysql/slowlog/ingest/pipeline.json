@@ -61,6 +61,21 @@
       "field": "mysql.slowlog.timestamp",
       "ignore_missing": true
     }
+  }, {
+    "set":{
+      "field": "event.kind",
+      "value": "event"
+    }
+  }, {
+    "append":{
+      "field": "event.category",
+      "value": "database"
+    }
+  }, {
+    "append":{
+      "field": "event.type",
+      "value": "info"
+    }
   }],
   "on_failure" : [{
     "set" : {

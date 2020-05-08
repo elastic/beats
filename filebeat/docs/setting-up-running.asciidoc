@@ -26,6 +26,8 @@ This section includes additional information on how to set up and run
 
 * <<running-on-kubernetes>>
 
+* <<running-on-cloudfoundry>>
+
 * <<running-with-systemd>>
 
 
@@ -40,6 +42,8 @@ include::{libbeat-dir}/command-reference.asciidoc[]
 include::./running-on-docker.asciidoc[]
 
 include::./running-on-kubernetes.asciidoc[]
+
+include::./running-on-cloudfoundry.asciidoc[]
 
 include::{libbeat-dir}/shared-systemd.asciidoc[]
 

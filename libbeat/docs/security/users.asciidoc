@@ -29,11 +29,11 @@ strategy.
 
 IMPORTANT: Setting up {beatname_uc} is an admin-level task that requires extra
 privileges. As a best practice, grant the setup role to administrators only, and
-use a less restrictive role for event publishing.  
+use a more restrictive role for event publishing.
 
 Administrators who set up {beatname_uc} typically need to load mappings,
 dashboards, and other objects used to index data into {es} and visualize it in
-{kib}. 
+{kib}.
 
 To grant users the required privileges:
 
@@ -63,7 +63,7 @@ endif::has_ml_jobs[]
 |Index
 |`manage` on +{beat_default_index_prefix}-*+ indices
 |Set up aliases used by ILM
- 
+
 ifdef::has_ml_jobs[]
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
@@ -78,13 +78,13 @@ NOTE: These instructions assume that you are using the default name for
 match your index naming pattern.
 
 . Assign the *setup role*, along with the following built-in roles, to users who
-need to set up {beatname_uc}: 
+need to set up {beatname_uc}:
 +
 [options="header"]
 |====
 |Role | Purpose
 
-|`kibana_user`
+|`kibana_admin`
 |Load dependencies, such as example dashboards, if available, into {kib}
 
 |`ingest_admin`
@@ -109,9 +109,9 @@ Omit any roles that aren't relevant in your environment.
 {security} provides built-in users and roles for monitoring. The privileges and
 roles needed depend on the method used to collect monitoring data.
 
-[IMPORTANT] 
+[IMPORTANT]
 .Important note for {ecloud} users
-==== 
+====
 Built-in users are not available when running our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
 on {ecloud}. To send monitoring data securely, create a monitoring user and
@@ -152,7 +152,7 @@ If you don't use the +{beat_monitoring_user}+ user:
 |====
 
 . Assign the *monitoring role*, along with the following built-in roles, to
-users who need to monitor {beatname_uc}: 
+users who need to monitor {beatname_uc}:
 +
 [options="header"]
 |====
@@ -184,7 +184,7 @@ If you don't use the `remote_monitoring_user` user:
 . Create a user on the production cluster who will collect and send monitoring
 information.
 
-. Assign the following roles to the user: 
+. Assign the following roles to the user:
 +
 [options="header"]
 |====
@@ -216,7 +216,7 @@ endif::serverless[]
 Users who publish events to {es} need to create and write to {beatname_uc}
 indices. To minimize the privileges required by the writer role, use the
 <<privileges-to-setup-beats,setup role>> to pre-load dependencies. This section
-assumes that you've pre-loaded dependencies. 
+assumes that you've pre-loaded dependencies.
 
 ifndef::no_ilm[]
 When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
@@ -243,7 +243,7 @@ NOTE: The `monitor` cluster privilege and the `create_doc` privilege on
 ifndef::apm-server[]
 |Cluster
 |`monitor`
-|Retrieve cluster details (e.g. version) 
+|Retrieve cluster details (e.g. version)
 endif::apm-server[]
 
 ifndef::no_ilm[]
@@ -283,7 +283,7 @@ endif::apm-server[]
 . Assign the *writer role* to users who will index events into {es}.
 
 [[kibana-user-privileges]]
-==== Grant privileges and roles needed to read {beatname_uc} data
+==== Grant privileges and roles needed to read {beatname_uc} data from {kib}
 
 {kib} users typically need to view dashboards and visualizations that contain
 {beatname_uc} data. These users might also need to create and edit dashboards
@@ -306,6 +306,16 @@ the following privilege:
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
+
+| Spaces
+| `Read` or `All` on Dashboards, Visualize, and Discover
+| Allow the user to view, edit, and create dashboards, as well as browse data.
+
+ifdef::beat_kib_app[]
+| Spaces
+| `Read` or `All` on {beat_kib_app}
+| Allow the use of {beat_kib_app}
+endif::[]
 |====
 
 . Assign the *reader role*, along with the following built-in roles, to
@@ -315,17 +325,16 @@ users who need to read {beatname_uc} data:
 |====
 |Role | Purpose
 
-|`kibana_user` or `kibana_dashboard_only_user`
-|Use {kib}. `kibana_dashboard_only_user` grants read-only access to dashboards.
+| `monitoring_user`
+| Allow users to monitor the health of {beatname_uc} itself. Only assign this role to users who manage {beatname_uc}.
 
 ifdef::has_central_config[]
 |`beats_admin`
 |Create and manage configurations in Beats central management. Only assign this
 role to users who need to use Beats central management.
++
 endif::[]
 |====
-+
-Omit any roles that aren't relevant in your environment.
 endif::apm-server[]
 
 ifdef::apm-server[]
@@ -340,7 +349,7 @@ data:
 |Use the APM UI
 
 |`admin`
-|Read and update APM Agent configuration via Kibana
+|Read and update APM Agent configuration via {kib}
 |====
 endif::apm-server[]
 

@@ -175,33 +175,81 @@ processors:
 
   # Set event.category depending on log type.
  - set:
+     field: event.kind
+     value: event
+     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+ - append:
      field: event.category
-     value: network_traffic
+     value:
+       - network_traffic
+       - network
      if: 'ctx?._temp_?.message_type == "TRAFFIC"'
  - set:
-     field: event.category
-     value: security_threat
+     field: event.kind
+     value: alert
      if: 'ctx?._temp_?.message_type == "THREAT"'
-
+ - append:
+     field: event.category
+     value:
+       - security_threat
+       - intrusion_detection
+       - network
+     if: 'ctx?._temp_?.message_type == "THREAT"'
  - drop:
      if: 'ctx?.event?.category == null'
+ - append:
+     field: event.type
+     value: allowed
+     if: "ctx?.panw?.panos?.action != null && ['alert', 'allow', 'continue'].contains(ctx.panw.panos.action)"
+ - append:
+     field: event.type
+     value: denied
+     if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
+ - set:
+     field: event.outcome
+     value: success
+
 
 # event.action for traffic logs.
  - set:
      field: event.action
      value: flow_started
      if: 'ctx?._temp_?.message_subtype == "start"'
+ - append:
+     field: event.type
+     value:
+       - start
+       - connection
+     if: 'ctx?._temp_?.message_subtype == "start"'
  - set:
      field: event.action
      value: flow_terminated
+     if: 'ctx?._temp_?.message_subtype == "end"'
+ - append:
+     field: event.type
+     value:
+       - end
+       - connection
      if: 'ctx?._temp_?.message_subtype == "end"'
  - set:
      field: event.action
      value: flow_dropped
      if: 'ctx?._temp_?.message_subtype == "drop"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
+     if: 'ctx?._temp_?.message_subtype == "drop"'
  - set:
      field: event.action
      value: flow_denied
+     if: 'ctx?._temp_?.message_subtype == "deny"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
      if: 'ctx?._temp_?.message_subtype == "deny"'
 
 # event.action for threat logs.
@@ -276,21 +324,21 @@ processors:
 # Normalize event.outcome.
 # These values appear in the TRAFFIC docs but look like a mistake.
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'drop-icmp'
-     if: 'ctx?.event?.outcome == "drop icmp" || ctx?.event?.outcome == "drop ICMP"'
+     if: 'ctx?.panw?.panos?.action == "drop icmp" || ctx?.panw?.panos?.action == "drop ICMP"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-both'
-     if: 'ctx?.event?.outcome == "reset both"'
+     if: 'ctx?.panw?.panos?.action == "reset both"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-client'
-     if: 'ctx?.event?.outcome == "reset client"'
+     if: 'ctx?.panw?.panos?.action == "reset client"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-server'
-     if: 'ctx?.event?.outcome == "reset server"'
+     if: 'ctx?.panw?.panos?.action == "reset server"'
 
 # Build related.ip array from src/dest/NAT IPs.
  - append:
@@ -390,6 +438,36 @@ processors:
      field: panw.panos.threat.name
      value: 'URL-filtering'
      if: 'ctx?.panw?.panos?.threat?.id == "9999"'
+
+ - set:
+     field: rule.name
+     value: "{{panw.panos.ruleset}}"
+     if: "ctx?.panw?.panos?.ruleset != null"
+
+ - append:
+     field: related.user
+     value: "{{client.user.name}}"
+     if: "ctx?.client?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{source.user.name}}"
+     if: "ctx?.source?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{server.user.name}}"
+     if: "ctx?.server?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{destination.user.name}}"
+     if: "ctx?.destination?.user?.name != null"
+
+ - append:
+     field: related.hash
+     value: "{{panw.panos.file.hash}}"
+     if: "ctx?.panw?.panos?.file?.hash != null"
 
 # Remove temporary fields.
  - remove:

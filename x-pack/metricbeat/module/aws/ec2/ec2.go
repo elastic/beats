@@ -209,7 +209,11 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
-				events[instanceID].RootFields.Put("cloud.availability_zone", *instanceOutput[instanceID].Placement.AvailabilityZone)
+
+				placement := instanceOutput[instanceID].Placement
+				if placement != nil {
+					events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+				}
 
 				if len(output.Values) > timestampIdx {
 					metricSetFieldResults[instanceID][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
@@ -227,23 +231,28 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				monitoringStates[instanceID] = monitoringState
 
-				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
-				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
-				events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
-				events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
-				events[instanceID].MetricSetFields.Put("instance.core.count", *instanceOutput[instanceID].CpuOptions.CoreCount)
-				events[instanceID].MetricSetFields.Put("instance.threads_per_core", *instanceOutput[instanceID].CpuOptions.ThreadsPerCore)
+				cpuOptions := instanceOutput[instanceID].CpuOptions
+				if cpuOptions != nil {
+					events[instanceID].MetricSetFields.Put("instance.core.count", *cpuOptions.CoreCount)
+					events[instanceID].MetricSetFields.Put("instance.threads_per_core", *cpuOptions.ThreadsPerCore)
+				}
+
 				publicIP := instanceOutput[instanceID].PublicIpAddress
 				if publicIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.public.ip", *publicIP)
 				}
 
-				events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
-				events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 				privateIP := instanceOutput[instanceID].PrivateIpAddress
 				if privateIP != nil {
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
 				}
+
+				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
+				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
+				events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
+				events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
+				events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
+				events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 			}
 		}
 	}

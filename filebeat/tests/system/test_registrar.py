@@ -869,7 +869,7 @@ class Test(BaseTest):
         # Make sure the last file in the registry is the correct one and has the correct offset
         assert data[0]["offset"] == self.input_logs.size(file2)
 
-    @unittest.skip('flaky test https://github.com/elastic/beats/issues/10606')
+    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/10606')
     def test_clean_removed_with_clean_inactive(self):
         """
         Checks that files which were removed, the state is removed
@@ -1088,7 +1088,7 @@ class Test(BaseTest):
         # Wait until inputs are started
         self.wait_until(
             lambda: self.log_contains_count(
-                "Starting input of type: log", logfile="filebeat2.log") >= 1,
+                "Starting input", logfile="filebeat2.log") >= 1,
             max_timeout=10)
 
         filebeat.check_kill_and_wait()

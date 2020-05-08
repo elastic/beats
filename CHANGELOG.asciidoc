@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 - Fix docker network stats when multiple interfaces are configured. {issue}14586[14586] {pull}14825[14825]
 - Fix ListMetrics pagination in aws module. {issue}14926[14926] {pull}14942[14942]
 - Fix CPU count in docker/cpu in cases where no `online_cpus` are reported {pull}15070[15070]
+- Add domain state to kvm module {pull}17673[17673]
 
 [[release-notes-7.5.0]]
 === Beats version 7.5.0

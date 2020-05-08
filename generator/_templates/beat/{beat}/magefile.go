@@ -56,7 +56,9 @@ func Fields() error {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }
 
 // Clean cleans all generated files and build artifacts.
