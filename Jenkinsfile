@@ -1105,12 +1105,21 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
 
-  // Skip all the stages for only the Pull Requests that contain only changes in asciidoc
-  // and png files.
+  // Skip all the stages for changes only related to the documentation
+  env.ONLY_DOCS = isDocChangedOnly()
+}
+
+/**
+  This method verifies if the changeset for the current pull request affect only changes related
+  to documentation, such as asciidoc and png files.
+*/
+def isDocChangedOnly(){
   if (params.runAllStages || !env.CHANGE_ID?.trim()) {
-    env.ONLY_DOCS = 'false'
+    log(level: 'INFO', text: 'Speed build for docs only is disabled for branches/tags or when forcing with the runAllStages parameter.')
+    return 'false'
   } else {
-    env.ONLY_DOCS = isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
+    log(level: "INFO", text: 'Check if the speed build for docs is enabled.')
+    return isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
   }
 }
 
