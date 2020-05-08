@@ -364,7 +364,7 @@ ifdef::autodiscoverNomad[]
 [float]
 ===== Nomad
 
-*Note: This provider is experimental*
+experimental[]
 
 The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
 

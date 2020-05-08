@@ -21,6 +21,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 )
 
+// NomadEventKey is the key under which custom metadata is going
+const NomadEventKey = "nomad"
+
 func init() {
 	autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
 }
@@ -39,7 +42,7 @@ type Provider struct {
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("The nomad autodiscover is beta")
+	cfgwarn.Experimental("The nomad autodiscover is experimental")
 	config := defaultConfig()
 
 	err := c.Unpack(&config)
@@ -164,9 +167,12 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
 			flag:       true,
 			"host":     nodeName,
-			"meta": common.MapStrUnion(allocMeta, common.MapStr{
-				"task": task,
-			}),
+			"nomad":    allocMeta,
+			"meta": common.MapStr{
+				"nomad": common.MapStrUnion(allocMeta, common.MapStr{
+					"task": task,
+				}),
+			},
 		}
 
 		p.publish(event)

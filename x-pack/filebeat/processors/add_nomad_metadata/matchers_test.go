@@ -30,7 +30,7 @@ func TestLogsPathMatcherWithAllocation(t *testing.T) {
 func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult string) {
 	var cfg = common.NewConfig()
 	if cfgLogsPath != "" {
-		cfg.SetString("path", -1, cfgLogsPath)
+		cfg.SetString("logs_path", -1, cfgLogsPath)
 	}
 
 	logMatcher, err := newLogsPathMatcher(*cfg)

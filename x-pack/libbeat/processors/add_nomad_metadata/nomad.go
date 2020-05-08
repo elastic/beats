@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
@@ -36,6 +37,8 @@ func init() {
 
 // New constructs a new add_nomad_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
+	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
+
 	config := defaultNomadAnnotatorConfig()
 
 	err := cfg.Unpack(&config)

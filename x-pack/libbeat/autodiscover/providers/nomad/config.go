@@ -17,7 +17,7 @@ type Config struct {
 	Region         string        `config:"region"`
 	Namespace      string        `config:"namespace"`
 	SecretID       string        `config:"secret_id"`
-	Host           string        `config:"host"`
+	Host           string        `config:"host" validate:"required"`
 	WaitTime       time.Duration `config:"wait_time"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	AllowStale     bool          `config:"allow_stale"`

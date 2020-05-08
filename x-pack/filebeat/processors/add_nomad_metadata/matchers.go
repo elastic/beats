@@ -42,7 +42,7 @@ type LogPathMatcher struct {
 
 func newLogsPathMatcher(cfg common.Config) (add_nomad_metadata.Matcher, error) {
 	config := struct {
-		LogsPath string `config:"path"`
+		LogsPath string `config:"logs_path"`
 	}{
 		LogsPath: defaultLogPath(),
 	}
