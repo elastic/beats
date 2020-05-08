@@ -10,7 +10,6 @@ We enjoy working with contributors to get their code accepted. There are many
 approaches to fixing a problem and it is important to find the best approach
 before writing too much code.
 
-
 The process for contributing to any of the Elastic repositories is similar.
 
 [float]
