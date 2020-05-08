@@ -32,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
@@ -51,8 +50,10 @@ func TestMakeClientWorker(t *testing.T) {
 				numBatches := 300 + (i % 100) // between 300 and 399
 				numEvents := atomic.MakeUint(0)
 
+				logger := makeBufLogger(t)
+
 				wqu := makeWorkQueue()
-				retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
 				var published atomic.Uint
@@ -63,7 +64,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				client := ctor(publishFn)
 
-				worker := makeClientWorker(nilObserver, wqu, client, nil)
+				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
@@ -80,6 +81,7 @@ func TestMakeClientWorker(t *testing.T) {
 					return numEvents == published
 				})
 				if !success {
+					logger.Flush()
 					t.Logf("numBatches = %v, numEvents = %v, published = %v", numBatches, numEvents, published)
 				}
 				return success
@@ -148,7 +150,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(nilObserver, wqu, client, nil)
+				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -173,7 +175,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(nilObserver, wqu, client, nil)
+				makeClientWorker(nilObserver, wqu, client, logger, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
@@ -202,8 +204,10 @@ func TestMakeClientTracer(t *testing.T) {
 	numBatches := 10
 	numEvents := atomic.MakeUint(0)
 
+	logger := makeBufLogger(t)
+
 	wqu := makeWorkQueue()
-	retryer := newRetryer(logp.NewLogger("test"), nilObserver, wqu, nil)
+	retryer := newRetryer(logger, nilObserver, wqu, nil)
 	defer retryer.close()
 
 	var published atomic.Uint
@@ -217,7 +221,7 @@ func TestMakeClientTracer(t *testing.T) {
 	recorder := apmtest.NewRecordingTracer()
 	defer recorder.Close()
 
-	worker := makeClientWorker(nilObserver, wqu, client, recorder.Tracer)
+	worker := makeClientWorker(nilObserver, wqu, client, logger, recorder.Tracer)
 	defer worker.Close()
 
 	for i := 0; i < numBatches; i++ {
@@ -241,6 +245,7 @@ func TestMakeClientTracer(t *testing.T) {
 	apmEvents := recorder.Payloads()
 	transactions := apmEvents.Transactions
 	if len(transactions) != numBatches {
+		logger.Flush()
 		t.Errorf("expected %d traces, got %d", numBatches, len(transactions))
 	}
 }
