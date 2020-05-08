@@ -5,6 +5,7 @@
 FROM {{ .from }}
 
 RUN yum -y --setopt=tsflags=nodocs update && \
+    yum install -y epel-release jq \
     yum clean all
 
 LABEL \

@@ -228,6 +228,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	id := p.ID()
 
+	o.logger.Debugf("operator is looking for %s in app collection: %v", p.ID(), o.apps)
 	if a, ok := o.apps[id]; ok {
 		return a, nil
 	}
