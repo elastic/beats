@@ -1,3 +1,6 @@
+:modulename: system nginx mysql
+:release-state: released
+
 [[filebeat-getting-started]]
 == Get started
 
@@ -20,166 +23,58 @@ You'll learn how to:
 [float]
 === Before you begin
 
-You need access to {es} to store and search your data, and {kib}
-to visualize and manage it. 
+You need {es} for storing and searching your data, and {kib} for visualizing and
+managing it.
 
-To get started quickly, spin up a deployment of our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
-{ecloud}. The {ess} is available on AWS, GCP, and Azure.
-{ess-trial}[Try out the {ess} for free].
+// TODO: We might want to provide the instructions for spinning up a deployment
+// here. See
+// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
+// Or link to the topic that's avaialable for cloud.
 
-//TODO: Ask cloud-first working group about preferred wording.
-
-Or you can {stack-gs}/get-started-elastic-stack.html[set up the {stack}] on your
-own hardware.
+include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
 [[filebeat-installation]]
 === Step 1: Install {beatname_uc}
 
-:release-state: released
+//REVIEWERS: We don't currently say anything about licensing here. Should we?
 
-include::{libbeat-dir}/shared-download-and-install.asciidoc[]
+To download and install {beatname_uc}, use the commands that work with your
+system.
 
-[[deb]]
-*deb:*
+include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 
-ifeval::["{release-state}"=="unreleased"]
+[float]
+[[other-installation-options]]
+==== Other installation options
 
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes,callouts"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-amd64.deb
-sudo dpkg -i filebeat-{version}-amd64.deb
-------------------------------------------------
-
-endif::[]
-
-[[rpm]]
-*rpm:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes,callouts"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-x86_64.rpm
-sudo rpm -vi filebeat-{version}-x86_64.rpm
-------------------------------------------------
-
-endif::[]
-
-[[mac]]
-*mac:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes,callouts"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-darwin-x86_64.tar.gz
-tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-include::{libbeat-dir}/shared-brew-install.asciidoc[]
-
-[[linux]]
-*linux:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes,callouts"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{version}-linux-x86_64.tar.gz
-tar xzvf filebeat-{version}-linux-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-[[docker]]
-*docker:*
-
-See <<running-on-docker, Running on Docker>> for deploying Docker containers.
-
-[[kubernetes]]
-*kubernetes:*
-
-See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
-
-[[cloudfoundry]]
-*cloudfoundry:*
-
-See <<running-on-cloudfoundry, Running on Cloud Foundry>> for deploying with Cloud Foundry.
-
-[[win]]
-*win:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-. Download the Filebeat Windows zip file from the
-https://www.elastic.co/downloads/beats/filebeat[downloads page].
-
-. Extract the contents of the zip file into `C:\Program Files`.
-
-. Rename the `filebeat-<version>-windows` directory to `Filebeat`.
-
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
-
-. From the PowerShell prompt, run the following commands to install Filebeat as a
-Windows service:
-+
-[source,shell]
-----------------------------------------------------------------------
-PS > cd 'C:\Program Files\Filebeat'
-PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
-----------------------------------------------------------------------
-
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`.
-
-endif::[]
+* <<setup-repositories>>
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* <<running-on-docker>>
+* <<running-on-kubernetes>> 
+* <<running-on-cloudfoundry>> 
 
 [float]
 [[set-connection]]
 === Step 2: Set the connection information
 
-Connections to {es} and {kib} are required to set up and run {beatname_uc}.
+Connections to {es} and {kib} are required to set up {beatname_uc}.
 
-include::{libbeat-dir}/step-configure-output.asciidoc[]
+Set the connection information in +{beatname_lc}.yml+:
 
-include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/tab-widgets/set-connection-widget.asciidoc[]
 
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+NOTE: {beatname_uc} supports other <<configuring-output,outputs>>,
+ifndef::no-output-logstash[]
+such as {ls},
+endif::no-output-logstash[]
+but typically you'll send events directly to {es}.
+
+To learn more about required roles and privileges, see
+<<feature-roles>>.
 
 include::{libbeat-dir}/step-test-config.asciidoc[]
+
 
 [float]
 [[enable-modules]]
@@ -187,33 +82,40 @@ include::{libbeat-dir}/step-test-config.asciidoc[]
 
 {beatname_uc} uses modules to collect and parse log data.
 
-. Look under <<filebeat-modules,modules>> to see what's available for your file type.
+. Identify the modules you need to enable.
 +
-Can't find a module for your log file type? You'll need to
-<<configuration-filebeat-options,configure the input>> and parse the log
-messages manually.
+To see the list of available <<filebeat-modules,modules>>,
+run:
++
+--
+include::{libbeat-dir}/tab-widgets/list-modules-widget.asciidoc[]
+--
++
+Can't find a module for your file type? You'll need to
+<<configuration-filebeat-options,configure the input>> manually.
 
 . From the installation directory, enable one or more modules. For example, the
-following command enables the system, nginx, and mysql modules:
+following command enables the `system`, `nginx`, and `mysql` module
+configs:
 +
-include::./include/enable-modules-command.asciidoc[]
+--
+include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
+--
 +
-To see a list of enabled and disabled modules, run:
-+
-include::./include/list-modules-command.asciidoc[]
-
-. In the `.yml` configs under `modules.d`, change the module settings to match
+In the module configs under `modules.d`, change the module settings to match
 your environment.
 +
 The default log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable. For example:
 +
+--
 [source,yaml]
 ----
 - module: nginx
   access:
     var.paths: ["/var/log/nginx/access.log*"] <1> 
 ----
+--
 +
 See <<configuration-filebeat-modules>> for more information about setting
 variables and advanced options.
@@ -229,8 +131,18 @@ requires extra privileges. For more information, see
 
 To set up {beatname_uc}, from the installation directory, run:
 
-include::./include/setup-command.asciidoc[]
- 
+include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
+
+//TODO: This text should be single-sourced
+The <<setup-command,`setup`>> command loads the recommended index template for
+writing to {es} and deploys the sample dashboards (if available) for visualizing
+the data in {kib}. This is a one-time setup step. 
+
+The `-e` flag is optional and sends output to standard error instead of syslog.
+
+The ingest pipelines used to parse log lines are set up automatically the first
+time you run the module, assuming the {es} output is enabled. If you're sending
+events to {ls}, also see <<load-ingest-pipelines>>.
 
 [float]
 [[filebeat-starting]]
@@ -243,42 +155,7 @@ For more information, see <<privileges-to-publish-events>>.
 
 To start {beatname_uc}, run:
 
-*deb and rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
-
-*docker:*
-
-See <<running-on-docker>>.
-
-*mac and linux:*
-
-[source,shell]
-----------------------------------------------------------------------
-sudo chown root filebeat.yml <1>
-sudo ./filebeat -e
-----------------------------------------------------------------------
-<1> You'll be running {beatname_uc} as root, so you need to change ownership
-of the configuration file, or run Filebeat with `--strict.perms=false`
-specified. See
-{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_.
-
-include::{libbeat-dir}/shared-brew-run.asciidoc[]
-
-*win:*
-
-[source,shell]
-----------------------------------------------------------------------
-PS C:\Program Files\Filebeat> Start-Service filebeat
-----------------------------------------------------------------------
-
-By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
-
-{beatname_uc} should begin streaming log events to {es}.
+include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 
 [float]
 [[view-kibana-dashboards]]
@@ -293,3 +170,14 @@ Here is an example of the system dashboard:
 
 [role="screenshot"]
 image::./images/kibana-system.png[]
+
+//Add links to the Logs UI here.
+
+[float]
+=== What's next?
+
+//Highlight the other pillars of observability here.
+
+Now that you have logs streaming into {es}, read Get started with Metricbeat
+to learn how to collect metrics about the systems and services running in your
+infrastructure.

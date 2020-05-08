@@ -1,6 +1,5 @@
-. If you plan to use the sample {kib} dashboards provided with {beatname_uc},
-configure the {kib} endpoint. You can skip this step if {kib} is running on
-the same host as {es}.
+. If you plan to use our preconfigured {kib} dashboards, configure the {kib}
+endpoint. Skip this step if {kib} is running on the same host as {es}.
 +
 [source,yaml]
 ----------------------------------------------------------------------
