@@ -21,11 +21,14 @@ package eslegclient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -145,4 +148,58 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 	if !strings.Contains(err.Error(), "503 Service Unavailable") {
 		t.Errorf("Should return <503 Service Unavailable> instead of %v", err)
 	}
+}
+
+func TestEnforceParameters(t *testing.T) {
+	client, _ := NewConnection(ConnectionSettings{
+		Parameters: map[string]string{"hello": "world"},
+		URL:        "http://localhost",
+		Timeout:    0,
+	})
+	client.Encoder = NewJSONEncoder(nil, false)
+
+	client.HTTP = &reqInspector{
+		assert: func(req *http.Request) (*http.Response, error) {
+			assert.Equal(t, "world", req.URL.Query().Get("hello"))
+			// short circuit others logic.
+			return nil, errors.New("shortcut")
+		},
+	}
+
+	index := "what"
+
+	ops := []map[string]interface{}{
+		{
+			"index": map[string]interface{}{
+				"_index": index,
+				"_type":  "type1",
+				"_id":    "1",
+			},
+		},
+		{
+			"field1": "value1",
+		},
+	}
+
+	body := make([]interface{}, 0, 10)
+	for _, op := range ops {
+		body = append(body, op)
+	}
+
+	params := map[string]string{
+		"refresh": "true",
+	}
+
+	client.Bulk(context.Background(), index, "type1", params, body)
+}
+
+type reqInspector struct {
+	assert func(req *http.Request) (*http.Response, error)
+}
+
+func (r *reqInspector) Do(req *http.Request) (*http.Response, error) {
+	return r.assert(req)
+}
+
+func (r *reqInspector) CloseIdleConnections() {
 }
