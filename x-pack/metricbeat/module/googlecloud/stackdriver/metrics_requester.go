@@ -143,8 +143,8 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
-	currentTime = time.Now().UTC().Add(-time.Duration(10) * time.Hour)
-	fmt.Println("currentTime = ", currentTime)
+	currentTime = time.Now().UTC()
+
 	// When samplePeriod < collectionPeriod, aggregation will be done in ListTimeSeriesRequest.
 	// For example, samplePeriod = 60s, collectionPeriod = 300s, if perSeriesAligner is not given,
 	// ALIGN_MEAN will be used by default.

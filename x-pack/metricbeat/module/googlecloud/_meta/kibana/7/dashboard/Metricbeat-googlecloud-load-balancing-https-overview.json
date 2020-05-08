@@ -253,17 +253,17 @@
       },
       "references": [
         {
-          "id": "1480ad90-9150-11ea-8180-7b0dacd9df87",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "1480ad90-9150-11ea-8180-7b0dacd9df87",
+          "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "1480ad90-9150-11ea-8180-7b0dacd9df87",
+          "id": "metricbeat-*",
           "name": "control_2_index_pattern",
           "type": "index-pattern"
         }
