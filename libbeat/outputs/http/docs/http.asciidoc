@@ -1,0 +1,110 @@
+[[http-output]]
+=== Configure the HTTP output
+
+++++
+<titleabbrev>HTTP</titleabbrev>
+++++
+
+The HTTP output dumps the transactions into HTTP api by POST request where each transaction is in a JSON format.
+Currently, this output is used for custom http log api integration.
+
+To use this output, edit the {beatname_uc} configuration file to disable the {es}
+output by commenting it out, and enable the file output by adding `output.http`.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.http:
+  only_fields: true
+  # only fields set force json codec for body and send
+  # only Fields content, no @metadata
+  # default=false
+  url: 'http://some.example.com:80/foo'
+  # URL for sending POST request
+  max_retries: -1
+  # How many retry fail send: -1=infinite, 0=no retry, default=-1
+  compression: false
+  # Use HTTP client compression? default=false
+  keep_alive: true
+  # HTTP KeepAlive using default=true
+  max_idle_conns: 1
+  # Controls the maximum number of idle (keep-alive) must be 1 and greater
+  # Default=1
+  idle_conn_timeout: 0
+  # Is the maximum amount of time in seconds an idle (keep-alive)
+  # connection will remain idle before closing itself.
+  # Zero means no limit
+  # Default=0
+  response_header_timeout: 100
+  # Specifies the amount of time in milliseconds to wait for a server's response
+  # headers after fully writing the request (including its body, if any).
+  # This time does not include the time to read the response body.
+  # default=100ms
+  username: 'test'
+  # Basic Auth username if empty or none Authorization header not set
+  password: 'password'
+  # Basic Auth password if auth set. If auth set, can't be empty!
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+You can specify the following `output.http` options in the +{beatname_lc}.yml+ config file:
+
+[[url]]
+===== `url`
+
+The URL of HTTP api where POST request sending.
+This option is mandatory.
+
+===== `only_fields`
+
+Set sending only Fields content, no @metadata.Default false.
+
+===== `max_retries`
+
+How many retry for fail send:
+  -1 is infinite
+  0 is no retry
+
+Default -1
+
+===== `compression`
+
+HTTP using gzip compression. Default false.
+
+===== `keep_alive`
+
+HTTP using KeepAlive. Default=true.
+
+===== `max_idle_conns`
+
+Controls the maximum number of idle (keep-alive)
+must be 1 and greater. Default=1
+
+==== `idle_conn_timeout`
+
+Is the maximum amount of time in seconds an idle (keep-alive)
+connection will remain idle before closing itself.
+Zero means no limit. Default=0
+
+==== `response_header_timeout`
+
+Specifies the amount of time in milliseconds to wait for a server's response
+headers after fully writing the request (including its body, if any).
+This time does not include the time to read the response body.
+Default=100ms
+
+==== `username`
+
+Basic Auth username if empty Authorization header not set.
+
+==== `password`
+
+Basic Auth password if auth set. If auth set, can't be empty!
+
+===== `codec`
+
+Output codec configuration. If the `codec` section is missing, events will be json encoded.
+
+See <<configuration-output-codec>> for more information.

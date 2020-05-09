@@ -31,6 +31,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/http"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
