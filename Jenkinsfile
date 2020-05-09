@@ -71,6 +71,10 @@ pipeline {
       }
     }
     stage('Build and Test'){
+      when {
+        beforeAgent true
+        expression { return env.ONLY_DOCS == "false" }
+      }
       failFast false
       parallel {
         stage('Elastic Agent x-pack'){
@@ -1100,6 +1104,23 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
+
+  // Skip all the stages for changes only related to the documentation
+  env.ONLY_DOCS = isDocChangedOnly()
+}
+
+/**
+  This method verifies if the changeset for the current pull request affect only changes related
+  to documentation, such as asciidoc and png files.
+*/
+def isDocChangedOnly(){
+  if (params.runAllStages || !env.CHANGE_ID?.trim()) {
+    log(level: 'INFO', text: 'Speed build for docs only is disabled for branches/tags or when forcing with the runAllStages parameter.')
+    return 'false'
+  } else {
+    log(level: "INFO", text: 'Check if the speed build for docs is enabled.')
+    return isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
+  }
 }
 
 /**
