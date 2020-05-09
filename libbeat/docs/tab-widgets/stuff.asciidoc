@@ -2,7 +2,7 @@
 ++++
 <style>
 .tabs {
-  width: 40em;
+  width: 100%;
   font-family: "lucida grande", sans-serif;
 }
 

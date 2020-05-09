@@ -178,6 +178,8 @@ image::./images/kibana-system.png[]
 
 //Highlight the other pillars of observability here.
 
-Now that you have logs streaming into {es}, read Get started with Metricbeat
+Now that you have logs streaming into {es}....
+
+* read Get started with Metricbeat
 to learn how to collect metrics about the systems and services running in your
 infrastructure.
