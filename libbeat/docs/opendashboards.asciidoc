@@ -15,8 +15,9 @@ Replace `localhost` with the name of the {kib} host.  If you're using an
 https://cloud.elastic.co/[{ecloud}] instance, log in to your cloud account,
 then navigate to the {kib} endpoint in your deployment.
 
-On the *Discover* page, make sure that the predefined +{beatname_lc}-*+ index
-pattern is selected to see {beatname_uc} data.
+In the side navigation, click *Discover*. To see {beatname_uc} data, make sure
+the predefined +{beatname_lc}-*+ index pattern is selected to see {beatname_uc}
+data.
 
 [role="screenshot"]
 image::./images/kibana-created-indexes.png[Discover tab with index selected]
@@ -24,7 +25,8 @@ image::./images/kibana-created-indexes.png[Discover tab with index selected]
 TIP: If you don’t see data in {kib}, try changing the date range to a larger
 range. By default, {kib} shows the last 15 minutes.
 
-Go to the *Dashboard* page and select the dashboard that you want to open.
+In the side navigatino, click *Dashboard* and select the dashboard that you want
+to open.
 
 [role="screenshot"]
 image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
