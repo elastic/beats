@@ -19,7 +19,8 @@ a partial region name like `us-east` or `us-east*`, which will monitor all regio
 `us-east`: `us-east1` and `us-east4`. If both region and zone are configured,
 only region will be used.
 Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP regions]
-for regions that are available in GCP.
+for regions that are available in GCP. If both `region` and `zone` are not
+specified, metrics will be collected from all regions/zones.
 
 * *project_id*: A single string with your GCP Project ID
 

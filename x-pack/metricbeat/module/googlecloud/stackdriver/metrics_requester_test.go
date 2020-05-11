@@ -88,6 +88,12 @@ func TestGetFilterForMetric(t *testing.T) {
 			stackdriverMetricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
+		{
+			"compute service with no region/zone in config",
+			"compute.googleapis.com/firewall/dropped_bytes_count",
+			stackdriverMetricsRequester{config: config{}},
+			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\"",
+		},
 	}
 
 	for _, c := range cases {
