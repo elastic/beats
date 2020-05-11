@@ -5,6 +5,8 @@
 FROM {{ .from }}
 
 RUN yum -y --setopt=tsflags=nodocs update && \
+    yum install epel-release -y
+RUN yum install jq -y \
     yum clean all
 
 LABEL \
@@ -50,9 +52,6 @@ USER {{ .user }}
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
 {{- end }}
-
-RUN yum install epel-release -y
-RUN yum install jq -y
 
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
