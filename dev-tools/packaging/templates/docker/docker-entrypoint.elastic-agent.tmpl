@@ -30,7 +30,7 @@ function enroll(){
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]] && [[ ${FLEET_ENROLLMENT_TOKEN} == 1 ]]; then
       apikey = "${FLEET_ENROLLMENT_TOKEN}"
     else
-      enrollResp=$(curl -X GET  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
@@ -43,7 +43,7 @@ function enroll(){
       local apikeyId=$(echo $enrollResp | jq -r '.list[0].id')
       echo $apikeyId
 
-      enrollResp=$(curl -X GET  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys/$apikeyId \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys/$apikeyId \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
