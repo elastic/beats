@@ -20,15 +20,28 @@ package events
 import "github.com/elastic/beats/v7/libbeat/beat"
 
 const (
-	FieldMetaID       = "_id"
-	FieldMetaIndex    = "index"
+	// FieldMetaID defines the ID for the event. Also see FieldMetaOpType.
+	FieldMetaID = "_id"
+
+	// FieldMetaAlias defines the index alias to use for the event. If set, it takes
+	// precedence over values defined using FieldMetaIndex or FieldMetaRawIndex.
+	FieldMetaAlias = "alias"
+
+	// FieldMetaIndex defines the base index name to use for the event. The value is suffixed
+	// with a Y-m-d value based on the event's timestamp. If set, it takes precedence over the
+	// value defined using FieldMetaRawIndex.
+	FieldMetaIndex = "index"
+
+	// FieldMetaRawIndex defines the raw index name to use for the event. It is used as-is, without
+	// any additional manipulation.
 	FieldMetaRawIndex = "raw_index"
-	FieldMetaAlias    = "alias"
+
+	// FieldMetaPipeline defines the ingest node pipeline to use for this event.
 	FieldMetaPipeline = "pipeline"
 
-	// FieldMetaOpType defines the metadata key name for event operation type.
-	// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, it will assume
-	// either `create` or `index`. See `createEventBulkMeta`. If in doubt, set explicitly.
+	// FieldMetaOpType defines the metadata key name for event operation type to use with the Elasticsearch
+	// Bulk API encoding of the event. The key's value can be an empty string, `create`, `index`, or `delete`.
+	// If empty, `create` will be used if FieldMetaID is set; otherwise `index` will be used.
 	FieldMetaOpType = "op_type"
 
 	FieldMetaOpTypeCreate MetaOpType = iota
