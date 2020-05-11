@@ -76,6 +76,7 @@
   border-radius: 0 0.2em 0.2em 0.2em;
   box-shadow: 0 0 0.2em hsl(219, 1%, 72%);
   background: hsl(220, 43%, 99%);
+  margin-bottom: 1em;
 }
 
 [role="tabpanel"] p {
