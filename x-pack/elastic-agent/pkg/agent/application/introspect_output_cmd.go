@@ -152,7 +152,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		}
 
 		if !programFound {
-			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs.\n",
+			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs",
 				programName,
 				output)
 		}
@@ -160,7 +160,7 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		return nil
 	}
 
-	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs.\n", output)
+	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs", output)
 
 }
 
