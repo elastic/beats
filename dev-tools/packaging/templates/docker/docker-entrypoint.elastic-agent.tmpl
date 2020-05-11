@@ -46,8 +46,6 @@ function enroll(){
 
     ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
 }
-yum install -y epel-release
-yum install -y jq
 
 if [[ -n "${FLEET_SETUP}" ]] && [[ ${FLEET_SETUP} == 1 ]]; then setup; fi
 if [[ -n "${FLEET_ENROLL}" ]] && [[ ${FLEET_ENROLL} == 1 ]]; then enroll; fi

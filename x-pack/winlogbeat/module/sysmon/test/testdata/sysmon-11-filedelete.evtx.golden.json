@@ -1,0 +1,74 @@
+[
+  {
+    "@timestamp": "2020-05-07T07:27:18.722Z",
+    "event": {
+      "code": 23,
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "fields": {
+      "event": {
+        "category": [
+          "file"
+        ],
+        "type": [
+          "deletion"
+        ]
+      }
+    },
+    "file": {
+      "name": "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\lastalive0.dat"
+    },
+    "hash": {
+      "sha1": "115106f5b338c87ae6836d50dd890de3da296367"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{42f11c3b-b2b6-5eb3-18ab-000000000000}",
+      "executable": "C:\\Windows\\System32\\svchost.exe",
+      "name": "svchost.exe",
+      "pid": 776
+    },
+    "rule": {
+      "name": "-"
+    },
+    "sysmon": {
+      "file": {
+        "archived": true,
+        "is_executable": false
+      }
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "name": "LOCAL SERVICE"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_id": 23,
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 2360
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 11,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  }
+]

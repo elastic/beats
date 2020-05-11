@@ -123,8 +123,7 @@ var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
-	// we need to close the default tracer to prevent the beat sending events to localhost:8200
-	apm.DefaultTracer.Close()
+	preventDefaultTracing()
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -142,6 +141,16 @@ func initRand() {
 		seed = n.Int64()
 	}
 	rand.Seed(seed)
+}
+
+func preventDefaultTracing() {
+	// By default, the APM tracer is active. We switch behaviour to not require users to have
+	// an APM Server running, making it opt-in
+	if os.Getenv("ELASTIC_APM_ACTIVE") == "" {
+		os.Setenv("ELASTIC_APM_ACTIVE", "false")
+	}
+	// we need to close the default tracer to prevent the beat sending events to localhost:8200
+	apm.DefaultTracer.Close()
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
