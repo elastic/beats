@@ -153,7 +153,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 }
 
 func TestEnforceParameters(t *testing.T) {
-	// Repare the test bulk request.
+	// Prepare the test bulk request.
 	index := "what"
 
 	ops := []map[string]interface{}{
@@ -252,11 +252,6 @@ func TestEnforceParameters(t *testing.T) {
 			}
 		})
 	}
-
-	// params := map[string]string{
-	// 	"refresh": "true",
-	// }
-
 }
 
 type reqInspector struct {
