@@ -96,7 +96,7 @@ func newLocal(
 		log,
 		router,
 		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring, injectPreferV2Template},
+			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.ConstraintFilter},
 		},
 		monitor,
