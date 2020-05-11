@@ -79,7 +79,7 @@ lines are discarded. The default is 500.
 
 *`multiline.timeout`*:: After the specified timeout, {beatname_uc} sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
-*`multiline.lines_count`*:: The number of lines to aggregate into a single event.
+*`multiline.count_lines`*:: The number of lines to aggregate into a single event.
 
 
 ==== Examples of multiline configuration

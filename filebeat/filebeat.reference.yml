@@ -535,7 +535,7 @@ filebeat.inputs:
   #multiline.type: count
 
   # The number of lines to aggregate into a single event.
-  #multiline.lines_count: 3
+  #multiline.count_lines: 3
 
   # Setting tail_files to true means filebeat starts reading new files at the end
   # instead of the beginning. If this is used in combination with log rotation

@@ -52,7 +52,7 @@ type Config struct {
 	Timeout      *time.Duration `config:"timeout" validate:"positive"`
 	FlushPattern *match.Matcher `config:"flush_pattern"`
 
-	LinesCount int `config:"lines_count" validate:"positive"`
+	LinesCount int `config:"count_lines" validate:"positive"`
 }
 
 // Validate validates the Config option for multiline reader.
@@ -66,7 +66,7 @@ func (c *Config) Validate() error {
 		}
 	} else if c.Type == countMode {
 		if c.LinesCount == 0 {
-			return fmt.Errorf("multiline.lines_count cannot be zero")
+			return fmt.Errorf("multiline.count_lines cannot be zero")
 		}
 	}
 	return nil
