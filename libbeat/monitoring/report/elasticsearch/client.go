@@ -202,13 +202,13 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 	}
 
 	action := common.MapStr{}
-	var opType string
+	var opType events.MetaOpType
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = events.FieldMetaOpTypeIndex
 	} else {
 		opType = events.FieldMetaOpTypeCreate
 	}
-	action[opType] = meta
+	action[opType.String()] = meta
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 

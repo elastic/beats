@@ -29,11 +29,18 @@ const (
 	// FieldMetaOpType defines the metadata key name for event operation type.
 	// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, it will assume
 	// either `create` or `index`. See `createEventBulkMeta`. If in doubt, set explicitly.
-	FieldMetaOpType       = "op_type"
-	FieldMetaOpTypeCreate = "create"
-	FieldMetaOpTypeDelete = "delete"
-	FieldMetaOpTypeIndex  = "index"
+	FieldMetaOpType = "op_type"
+
+	FieldMetaOpTypeCreate MetaOpType = iota
+	FieldMetaOpTypeDelete
+	FieldMetaOpTypeIndex
 )
+
+type MetaOpType int
+
+func (o MetaOpType) String() string {
+	return []string{"create", "delete", "index"}[o]
+}
 
 // GetMetaStringValue returns the value of the given event metadata string field
 func GetMetaStringValue(e beat.Event, key string) (string, error) {

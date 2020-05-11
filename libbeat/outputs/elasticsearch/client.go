@@ -282,7 +282,7 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		if opType, err := events.GetMetaStringValue(*event, events.FieldMetaOpType); err == nil && opType == events.FieldMetaOpTypeDelete {
+		if opType, err := events.GetMetaStringValue(*event, events.FieldMetaOpType); err == nil && opType == events.FieldMetaOpTypeDelete.String() {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
@@ -327,15 +327,15 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if opType == events.FieldMetaOpTypeDelete {
+	if opType == events.FieldMetaOpTypeDelete.String() {
 		if id != "" {
 			return eslegclient.BulkDeleteAction{Delete: meta}, nil
 		} else {
-			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.FieldMetaOpTypeDelete)
+			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.FieldMetaOpTypeDelete.String())
 		}
 	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		if opType == events.FieldMetaOpTypeIndex {
+		if opType == events.FieldMetaOpTypeIndex.String() {
 			return eslegclient.BulkIndexAction{Index: meta}, nil
 		}
 		return eslegclient.BulkCreateAction{Create: meta}, nil
