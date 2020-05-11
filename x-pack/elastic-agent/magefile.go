@@ -108,7 +108,7 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.LDFlags = append(params.LDFlags, flagsSet()...)
+	injectBuildVars(params.Vars)
 	return devtools.GolangCrossBuild(params)
 }
 
@@ -117,7 +117,8 @@ func GolangCrossBuildOSS() error {
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.OutputDir = "build/golang-crossbuild"
-	params.LDFlags = append(params.LDFlags, flagsSet()...)
+	injectBuildVars(params.Vars)
+
 	if err := devtools.GolangCrossBuild(params); err != nil {
 		return err
 	}
@@ -137,11 +138,9 @@ func BuildGoDaemon() error {
 func (Build) BinaryOSS() error {
 	mg.Deps(Prepare.Env)
 	buildArgs := devtools.DefaultBuildArgs()
-	for k, v := range buildVars() {
-		buildArgs.Vars[k] = v
-	}
 	buildArgs.Name = "elastic-agent-oss"
 	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
 
 	return devtools.Build(buildArgs)
 }
@@ -151,10 +150,8 @@ func (Build) Binary() error {
 	mg.Deps(Prepare.Env)
 
 	buildArgs := devtools.DefaultBuildArgs()
-	for k, v := range buildVars() {
-		buildArgs.Vars[k] = v
-	}
 	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
 
 	return devtools.Build(buildArgs)
 }
@@ -520,14 +517,6 @@ func dockerTag() string {
 	return tagBase
 }
 
-func flagsSet() []string {
-	isSnapshot, _ := os.LookupEnv(snapshotEnv)
-
-	return []string{
-		fmt.Sprintf(`"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot=%s"`, isSnapshot),
-	}
-}
-
 func buildVars() map[string]string {
 	vars := make(map[string]string)
 
@@ -535,4 +524,10 @@ func buildVars() map[string]string {
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
 
 	return vars
+}
+
+func injectBuildVars(m map[string]string) {
+	for k, v := range buildVars() {
+		m[k] = v
+	}
 }
