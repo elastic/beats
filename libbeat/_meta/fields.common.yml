@@ -7,6 +7,8 @@
     - name: agent.hostname
       type: alias
       path: agent.name
+      description: >
+        Deprecated - use agent.name or agent.id to identify an agent.
 
     - name: beat.timezone
       type: alias
