@@ -181,7 +181,7 @@ func getProgramsFromConfig(log *logger.Logger, cfg *config.Config) (map[string][
 		log,
 		router,
 		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring, injectPreferV2Template},
+			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.ConstraintFilter},
 		},
 		monitor,
