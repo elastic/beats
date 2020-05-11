@@ -27,7 +27,7 @@ Example config:
 
 [source,yaml]
 ----
-- module: googleclcoud
+- module: googlecloud
   vpcflow:
     enabled: true
     var.project_id: my-gcp-project-id
@@ -72,7 +72,7 @@ Example config:
 
 [source,yaml]
 ----
-- module: googleclcoud
+- module: googlecloud
   firewall:
     enabled: true
     var.project_id: my-gcp-project-id
