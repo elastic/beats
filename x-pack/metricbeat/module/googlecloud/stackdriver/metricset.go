@@ -106,7 +106,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating Stackdriver client")
 	}
 
-	m.metricsMeta, err = metricDescriptor(ctx, client, m.config.ProjectID, m.stackDriverConfig)
+	m.metricsMeta, err = m.metricDescriptor(ctx, client)
 	if err != nil {
 		return nil, errors.Wrap(err, "error calling metricDescriptor function")
 	}
@@ -205,13 +205,13 @@ func (mc *stackDriverConfig) Validate() error {
 
 // metricDescriptor calls ListMetricDescriptorsRequest API to get metric metadata
 // (sample period and ingest delay) of each given metric type
-func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, projectID string, stackDriverConfigs []stackDriverConfig) (map[string]metricMeta, error) {
+func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.MetricClient) (map[string]metricMeta, error) {
 	metricsWithMeta := make(map[string]metricMeta, 0)
 
-	for _, sdc := range stackDriverConfigs {
+	for _, sdc := range m.stackDriverConfig {
 		for _, mt := range sdc.MetricTypes {
 			req := &monitoringpb.ListMetricDescriptorsRequest{
-				Name:   "projects/" + projectID,
+				Name:   "projects/" + m.config.ProjectID,
 				Filter: fmt.Sprintf(`metric.type = "%s"`, mt),
 			}
 
@@ -228,10 +228,12 @@ func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, proj
 			}
 
 			if out.Metadata.SamplePeriod != nil {
+				m.Logger().Debugf("For metric type %s: sample period = %s", mt, out.Metadata.SamplePeriod)
 				meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
 			}
 
 			if out.Metadata.IngestDelay != nil {
+				m.Logger().Debugf("For metric type %s: ingest delay = %s", mt, out.Metadata.IngestDelay)
 				meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
 			}
 
