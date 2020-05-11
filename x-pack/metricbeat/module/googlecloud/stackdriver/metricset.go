@@ -221,9 +221,14 @@ func metricDescriptor(ctx context.Context, client *monitoring.MetricClient, proj
 				return metricsWithMeta, errors.Errorf("Could not make ListMetricDescriptors request: %s: %v", mt, err)
 			}
 
+			// Set samplePeriod default to 60 seconds and ingestDelay default to 0.
 			meta := metricMeta{
-				samplePeriod: time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second,
+				samplePeriod: 60 * time.Second,
 				ingestDelay:  0 * time.Second,
+			}
+
+			if out.Metadata.SamplePeriod != nil {
+				meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
 			}
 
 			if out.Metadata.IngestDelay != nil {
