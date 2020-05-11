@@ -4520,6 +4520,23 @@ type: object
 
 --
 
+[float]
+=== billing
+
+monitor
+
+
+
+*`azure.billing.metrics.*.*`*::
++
+--
+Metrics returned.
+
+
+type: object
+
+--
+
 *`azure.compute_vm.*.*`*::
 +
 --

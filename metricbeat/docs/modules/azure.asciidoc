@@ -196,6 +196,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-azure-billing,billing>>
+
 * <<metricbeat-metricset-azure-compute_vm,compute_vm>>
 
 * <<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>
@@ -211,6 +213,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-azure-monitor,monitor>>
 
 * <<metricbeat-metricset-azure-storage,storage>>
+
+include::azure/billing.asciidoc[]
 
 include::azure/compute_vm.asciidoc[]
 

@@ -52,6 +52,7 @@ github.com/Azure/azure-event-hubs-go/v3/storage
 # github.com/Azure/azure-pipeline-go v0.2.1
 github.com/Azure/azure-pipeline-go/pipeline
 # github.com/Azure/azure-sdk-for-go v37.1.0+incompatible
+github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption
 github.com/Azure/azure-sdk-for-go/services/eventhub/mgmt/2017-04-01/eventhub
 github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights
 github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources
@@ -565,6 +566,7 @@ github.com/golang/snappy
 github.com/google/flatbuffers/go
 # github.com/google/go-cmp v0.4.0
 github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/cmpopts
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
@@ -770,10 +772,14 @@ github.com/santhosh-tekuri/jsonschema/decoders
 github.com/santhosh-tekuri/jsonschema/formats
 github.com/santhosh-tekuri/jsonschema/loader
 github.com/santhosh-tekuri/jsonschema/mediatypes
+# github.com/satori/go.uuid v1.2.0
+github.com/satori/go.uuid
 # github.com/shirou/gopsutil v2.19.11+incompatible
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/internal/common
 github.com/shirou/gopsutil/net
+# github.com/shopspring/decimal v1.2.0
+github.com/shopspring/decimal
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
 # github.com/spf13/cobra v0.0.3
