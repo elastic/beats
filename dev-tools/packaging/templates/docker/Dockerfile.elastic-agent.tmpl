@@ -4,6 +4,7 @@
 
 FROM {{ .from }}
 
+# Installing jq needs to be on a separate layer to be installed correctly
 RUN yum -y --setopt=tsflags=nodocs update && \
     yum install epel-release -y
 RUN yum install jq -y \
