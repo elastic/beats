@@ -5,9 +5,9 @@
 package mixer
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 const (
@@ -48,7 +48,7 @@ var mapping = &prometheus.MetricsMapping{
 	},
 
 	Labels: map[string]prometheus.LabelMap{
-		"handler": prometheus.KeyLabel("handler"),
+		"handler": prometheus.KeyLabel("handler.name"),
 		"variety": prometheus.KeyLabel("variety"),
 	},
 }

@@ -7,17 +7,41 @@
 package cloudwatch
 
 import (
+	"net/http"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
+	regionName  = "us-west-1"
+	timestamp   = time.Now()
+	accountID   = "123456789012"
+	accountName = "test"
+
+	id1    = "cpu"
+	value1 = 0.25
+	label1 = "CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
+
+	id2    = "disk"
+	value2 = 5.0
+	label2 = "DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
+
+	label3 = "CPUUtilization|AWS/EC2|Average"
+	label4 = "DiskReadOps|AWS/EC2|Average"
+
 	instanceID1     = "i-1"
 	instanceID2     = "i-2"
 	namespace       = "AWS/EC2"
@@ -1072,6 +1096,275 @@ func TestCheckStatistics(t *testing.T) {
 			m.CloudwatchConfigs = []Config{{Statistic: c.statisticMethods}}
 			output := m.checkStatistics()
 			assert.Error(t, output)
+		})
+	}
+}
+
+// MockCloudWatchClient struct is used for unit tests.
+type MockCloudWatchClient struct {
+	cloudwatchiface.ClientAPI
+}
+
+// MockCloudWatchClientWithoutDim struct is used for unit tests.
+type MockCloudWatchClientWithoutDim struct {
+	cloudwatchiface.ClientAPI
+}
+
+// MockResourceGroupsTaggingClient is used for unit tests.
+type MockResourceGroupsTaggingClient struct {
+	resourcegroupstaggingapiiface.ClientAPI
+}
+
+func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
+	dim := cloudwatch.Dimension{
+		Name:  &dimName,
+		Value: &instanceID1,
+	}
+	httpReq, _ := http.NewRequest("", "", nil)
+	return cloudwatch.ListMetricsRequest{
+		Request: &awssdk.Request{
+			Data: &cloudwatch.ListMetricsOutput{
+				Metrics: []cloudwatch.Metric{
+					{
+						MetricName: &metricName1,
+						Namespace:  &namespace,
+						Dimensions: []cloudwatch.Dimension{dim},
+					},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+
+	return cloudwatch.GetMetricDataRequest{
+		Request: &awssdk.Request{
+			Data: &cloudwatch.GetMetricDataOutput{
+				MetricDataResults: []cloudwatch.MetricDataResult{
+					{
+						Id:         &id1,
+						Label:      &label1,
+						Values:     []float64{value1},
+						Timestamps: []time.Time{timestamp},
+					},
+					{
+						Id:         &id2,
+						Label:      &label2,
+						Values:     []float64{value2},
+						Timestamps: []time.Time{timestamp},
+					},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return cloudwatch.ListMetricsRequest{
+		Request: &awssdk.Request{
+			Data: &cloudwatch.ListMetricsOutput{
+				Metrics: []cloudwatch.Metric{
+					{
+						MetricName: &metricName1,
+						Namespace:  &namespace,
+					},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+
+	return cloudwatch.GetMetricDataRequest{
+		Request: &awssdk.Request{
+			Data: &cloudwatch.GetMetricDataOutput{
+				MetricDataResults: []cloudwatch.MetricDataResult{
+					{
+						Id:         &id1,
+						Label:      &label3,
+						Values:     []float64{value1},
+						Timestamps: []time.Time{timestamp},
+					},
+					{
+						Id:         &id2,
+						Label:      &label4,
+						Values:     []float64{value2},
+						Timestamps: []time.Time{timestamp},
+					},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return resourcegroupstaggingapi.GetResourcesRequest{
+		Request: &awssdk.Request{
+			Data: &resourcegroupstaggingapi.GetResourcesOutput{
+				PaginationToken: awssdk.String(""),
+				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
+					{
+						ResourceARN: awssdk.String("arn:aws:ec2:us-west-1:123456789012:instance:i-1"),
+						Tags: []resourcegroupstaggingapi.Tag{
+							{
+								Key:   awssdk.String("name"),
+								Value: awssdk.String("test-ec2"),
+							},
+						},
+					},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func TestCreateEventsWithIdentifier(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClient{}
+	listMetricWithStatsTotal := []metricsWithStatistics{{
+		cloudwatch.Metric{
+			Dimensions: []cloudwatch.Dimension{{
+				Name:  awssdk.String("InstanceId"),
+				Value: awssdk.String("i-1"),
+			}},
+			MetricName: awssdk.String("CPUUtilization"),
+			Namespace:  awssdk.String("AWS/EC2"),
+		},
+		[]string{"Average"},
+		nil,
+	}}
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-ec2",
+		},
+	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+
+	metricValue, err := events["i-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value1, metricValue)
+
+	dimension, err := events["i-1"].RootFields.GetValue("aws.dimensions.InstanceId")
+	assert.NoError(t, err)
+	assert.Equal(t, instanceID1, dimension)
+}
+
+func TestCreateEventsWithoutIdentifier(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			cloudwatch.Metric{
+				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+			nil,
+		},
+		{
+			cloudwatch.Metric{
+				MetricName: awssdk.String("DiskReadOps"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+			nil,
+		},
+	}
+
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+
+	expectedID := regionName + accountID + namespace
+	metricValue, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value1, metricValue)
+
+	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value2, dimension)
+}
+
+func TestInsertTags(t *testing.T) {
+	identifier1 := "StandardStorage,test-s3-1"
+	identifier2 := "test-s3-2"
+	tagKey1 := "organization"
+	tagValue1 := "engineering"
+	tagKey2 := "owner"
+	tagValue2 := "foo"
+
+	events := map[string]mb.Event{}
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
+
+	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
+	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey1),
+			Value: awssdk.String(tagValue1),
+		},
+	}
+	resourceTagMap["test-s3-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey2),
+			Value: awssdk.String(tagValue2),
+		},
+	}
+
+	cases := []struct {
+		title            string
+		identifier       string
+		expectedTagKey   string
+		expectedTagValue string
+	}{
+		{
+			"test identifier with storage type and s3 bucket name",
+			identifier1,
+			"aws.tags.organization",
+			tagValue1,
+		},
+		{
+			"test identifier with only s3 bucket name",
+			identifier2,
+			"aws.tags.owner",
+			tagValue2,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			insertTags(events, c.identifier, resourceTagMap)
+			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expectedTagValue, value)
 		})
 	}
 }

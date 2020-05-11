@@ -16,6 +16,7 @@ var:
 ingest_pipeline:
   - ingest/pipeline.yml
   - ingest/fp-pipeline.yml
+  - ingest/cp-pipeline.yml
 
 input: config/input.yml
 

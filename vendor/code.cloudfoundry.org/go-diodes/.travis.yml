@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.x
+  - master
+
+install: |
+  mkdir -p $HOME/gopath/src/code.cloudfoundry.org/go-diodes
+  rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/code.cloudfoundry.org/go-diodes/
+  export TRAVIS_BUILD_DIR=$GOPATH/src/code.cloudfoundry.org/go-diodes
+  go get -t -d -v code.cloudfoundry.org/go-diodes/...
+
+script: go test code.cloudfoundry.org/go-diodes/... --race
+
+matrix:
+  allow_failures:
+  - go: master

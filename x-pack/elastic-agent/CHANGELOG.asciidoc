@@ -1,0 +1,57 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+
+[[release-notes-8.0.0]]
+=== Agent version 8.0.0
+
+
+==== Breaking changes
+- Rename agent to elastic-agent {pull}17391[17391]
+
+==== Bugfixes
+
+- Fixed tests on windows {pull}16922[16922]
+- Fixed installers for SNAPSHOTs and windows {pull}17077[17077]
+- Fixed merge of config {pull}17399[17399]
+- Handle abs paths on windows correctly {pull}17461[17461]
+- Improved cancellation of agent {pull}17318[17318]
+- Rename the User-Agent string from Beats Agent to Elastic Agent. {pull}17765[17765]
+- Fix issues when running `mage package` for all the platforms. {pull}17767[17767]
+- Remove the kbn-version on each request to the Kibana API. {pull}17764[17764]
+- Fixed process spawning on Windows {pull}17751[17751]
+- Fixed injected log path to monitoring beat {pull}17833[17833]
+- Make sure that the Elastic Agent connect over TLS in cloud. {pull}17843[17843]
+- Moved stream.* fields to top of event {pull}17858[17858]
+- Fix an issue where the checkin_frequency, jitter, and backoff options where not configurable. {pull}17843[17843]
+- ECS compliant Elastic agent metadata sent to fleet {pull}18006[18006]
+- Use default output by default {pull}18091[18091]
+- Use /tmp for default monitoring endpoint location for libbeat {pull}18131[18131]
+- Fix panic and flaky tests for the Agent. {pull}18135[18135]
+- Fix default configuration after enroll {pull}18232[18232]
+- Fix make sure the collected logs or metrics include streams information. {pull}18261[18261]
+- Stop monitoring on config change {pull}18284[18284]
+- Fix jq: command not found {pull}18408[18408]
+
+==== New features
+
+- Generate index name in a format type-dataset-namespace {pull}16903[16903]
+- OS agnostic default configuration {pull}17016[17016]
+- Introduced post install hooks {pull}17241[17241]
+- Support for config constraints {pull}17112[17112]
+- Introduced `mage demo` command {pull}17312[17312]
+- Display the stability of the agent at enroll and start.  {pull}17336[17336]
+- Expose stream.* variables in events {pull}17468[17468]
+- Monitoring configuration reloadable {pull}17855[17855]
+- Pack ECS metadata to request payload send to fleet {pull}17894[17894]
+- Allow CLI overrides of paths {pull}17781[17781]
+- Enable Filebeat input: S3, Azureeventhub, cloudfoundry, httpjson, netflow, o365audit. {pull}17909[17909]
+- Configurable log level {pull}18083[18083]
+- Use data subfolder as default for process logs {pull}17960[17960]
+- Do not require unnecessary configuration {pull}18003[18003]
+- Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
+- Enable introspecting configuration {pull}18124[18124]
+- Follow home path for all config files {pull}18161[18161]
+- Use nested objects so fleet can handle metadata correctly {pull}18234[18234]

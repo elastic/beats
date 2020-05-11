@@ -8,6 +8,8 @@ https://redis.io/[Redis].
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 The +{modulename}+ module has two filesets:
 
 * The `log` fileset collects and parses the logs that Redis writes to disk.  
@@ -30,16 +32,6 @@ On Windows, the default paths assume that Redis was installed from the Chocolate
 
 The Redis `slowlog` fileset was tested with Redis 3.0.2 and 2.4.6. We expect compatibility with any
 Redis version newer than 2.2.12, when the SLOWLOG command was added.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-redis.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -92,6 +84,14 @@ left empty, `localhost:6379` is assumed.
 
 The password to use to connect to Redis, in case Redis authentication is enabled
 (the `requirepass` option in the Redis configuration).
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-redis.png[]
 
 :has-dashboards!:
 

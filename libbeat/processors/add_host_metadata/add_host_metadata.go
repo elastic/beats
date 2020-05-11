@@ -24,13 +24,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/metric/system/host"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/libbeat/processors/util"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/host"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -47,6 +47,7 @@ type addHostMetadata struct {
 	data    common.MapStrPointer
 	geoData common.MapStr
 	config  Config
+	logger  *logp.Logger
 }
 
 const (
@@ -63,6 +64,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	p := &addHostMetadata{
 		config: config,
 		data:   common.NewMapStrPointer(nil),
+		logger: logp.NewLogger("add_host_metadata"),
 	}
 	p.loadData()
 
@@ -122,7 +124,7 @@ func (p *addHostMetadata) loadData() error {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
 		if err != nil {
-			logp.Info("Error when getting network information %v", err)
+			p.logger.Infof("Error when getting network information %v", err)
 		}
 
 		if len(ipList) > 0 {

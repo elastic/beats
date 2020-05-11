@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -25,13 +26,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const inputName = "s3"
@@ -181,8 +182,9 @@ func (p *s3Input) Run() {
 
 		awsConfig := p.awsConfig.Copy()
 		awsConfig.Region = regionName
-		svcSQS := sqs.New(awsConfig)
-		svcS3 := s3.New(awsConfig)
+
+		svcSQS := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig))
+		svcS3 := s3.New(awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "s3", regionName, awsConfig))
 
 		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
@@ -201,7 +203,7 @@ func (p *s3Input) run(svcSQS sqsiface.ClientAPI, svcS3 s3iface.ClientAPI, visibi
 			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 				continue
 			}
-			p.logger.Error("failed to receive message from SQS: ", err)
+			p.logger.Error("SQS ReceiveMessageRequest failed: ", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
 		}
@@ -277,7 +279,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 				p.logger.Warn("Processing message failed, updating visibility timeout")
 				err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
-					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 				}
 				p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
@@ -298,7 +300,7 @@ func (p *s3Input) processorKeepAlive(svcSQS sqsiface.ClientAPI, message sqs.Mess
 			// still ongoing, then change visibility timeout.
 			err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
-				p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				p.logger.Error(errors.Wrap(err, "SQS ChangeMessageVisibilityRequest failed"))
 			}
 			p.logger.Infof("Message visibility timeout updated to %v seconds", visibilityTimeout)
 		}
@@ -359,10 +361,16 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
 		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
+			// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
+			filename, err := url.QueryUnescape(record.S3.object.Key)
+			if err != nil {
+				return nil, errors.Wrapf(err, "url.QueryUnescape failed")
+			}
+
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,
-				key:    record.S3.object.Key,
+				key:    filename,
 				arn:    record.S3.bucket.Arn,
 			})
 		} else {
@@ -380,6 +388,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 	defer s3Ctx.done()
 
 	for _, info := range s3Infos {
+		p.logger.Debugf("Processing file from s3 bucket \"%s\" with name \"%s\"", info.name, info.key)
 		err := p.createEventsFromS3Info(svc, info, s3Ctx)
 		if err != nil {
 			err = errors.Wrapf(err, "createEventsFromS3Info failed for %v", info.key)
@@ -410,7 +419,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			// If the SDK can determine the request or retry delay was canceled
 			// by a context the ErrCodeRequestCanceled error will be returned.
 			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				err = errors.Wrap(err, "GetObject request canceled")
+				err = errors.Wrap(err, "S3 GetObjectRequest canceled")
 				p.logger.Error(err)
 				return err
 			}
@@ -420,22 +429,18 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 				return nil
 			}
 		}
-		return errors.Wrap(err, "s3 get object request failed")
+		return errors.Wrap(err, "S3 GetObjectRequest failed")
 	}
 
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
-	// Check content-type
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrap(err, "gzip.NewReader failed")
-			p.logger.Error(err)
-			return err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
+
+	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
+		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
+		p.logger.Error(err)
+		return err
 	}
 
 	// Decode JSON documents when expand_event_list_from_field is given in config
@@ -448,6 +453,18 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			return err
 		}
 		return nil
+	}
+
+	// Check content-type = "application/x-gzip" or filename ends with ".gz"
+	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrap(err, "gzip.NewReader failed")
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
 	}
 
 	// handle s3 objects that are not json content-type
@@ -579,39 +596,40 @@ func (p *s3Input) deleteMessage(queueURL string, messagesReceiptHandle string, s
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
 			return nil
 		}
-		return errors.Wrap(err, "DeleteMessageRequest failed")
+		return errors.Wrap(err, "SQS DeleteMessageRequest failed")
 	}
 	return nil
 }
 
 func createEvent(log string, offset int, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
-	f := common.MapStr{
-		"message": log,
-		"log": common.MapStr{
-			"offset":    int64(offset),
-			"file.path": constructObjectURL(info),
-		},
-		"aws": common.MapStr{
-			"s3": common.MapStr{
-				"bucket": common.MapStr{
-					"name": info.name,
-					"arn":  info.arn},
-				"object.key": info.key,
+	s3Ctx.Inc()
+
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"message": log,
+			"log": common.MapStr{
+				"offset":    int64(offset),
+				"file.path": constructObjectURL(info),
+			},
+			"aws": common.MapStr{
+				"s3": common.MapStr{
+					"bucket": common.MapStr{
+						"name": info.name,
+						"arn":  info.arn},
+					"object.key": info.key,
+				},
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   info.region,
 			},
 		},
-		"cloud": common.MapStr{
-			"provider": "aws",
-			"region":   info.region,
-		},
+		Private: s3Ctx,
 	}
+	event.SetID(objectHash + "-" + fmt.Sprintf("%012d", offset))
 
-	s3Ctx.Inc()
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields:    f,
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Ctx,
-	}
+	return event
 }
 
 func constructObjectURL(info s3Info) string {

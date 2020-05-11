@@ -20,7 +20,7 @@
 package kvm
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetKvm returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/kvm.
+// This is the base64 encoded gzipped contents of module/kvm.
 func AssetKvm() string {
-	return "eJyskDFuwzAMRXed4iN7LqChU9ceQq3YQLBoGrLsQrcvnEZFotByh3Lw4G+//8gzBioWw8oGyCFHsjgNK58MkCiSm8ninbIzgKf5I4UpBxktXgyA7T+w+CWSAT4DRT/ba3DG6JgqeJtcJrK4JFmm2xuF9wi5B3lhJp6zy7+Rxtzl3iKN0u5Zp1V5FGogPaFDrZ95I5ZUdLDucu+zPZW4Og1UviR59YtDs8Zur6uqrC4uPZco4+V/RLSmahGel+3UH1a/CrswPlO79+/f/q+dV/R3AAAA///hct15"
+	return "eJzck79uwyAQxnee4lP2vABDp25V1u60XCNk8FmAU/ntKzeh8p8LrtRm8Q0efOb3/cDcEQ0NGs0lKCC77Enj8PJ6OiggkieTSOONslGApfQeXZcdtxpPCsC4DoFt70kBH468Tfq7cURrAhXwWHnoSOMcue9ubwTeHDIFWQ6BQsom/7Qk5l3urSVRlvsstVSZCy0gNaFNrWudKHAcZLDsMvUZn0K7ODU0fHK04hebZgu7e1lF5WJ8X3Px3J7/R0RKKhZuvdlK/Gb0Mwfj2jW1ev71s/9t5gw9vX99+sswrAj7GIRx2UMnwV7/ipSz07v3FQAA//+i8Gv6"
 }

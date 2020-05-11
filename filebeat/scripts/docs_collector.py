@@ -38,13 +38,13 @@ This file is generated! See scripts/docs_collector.py
         module_file = generated_note
         module_file += "[[filebeat-module-" + module + "]]\n"
 
-        with open(module_doc) as f:
+        with open(module_doc, encoding='utf_8') as f:
             module_file += f.read()
 
         beat_path = os.path.join(module_dir, "_meta")
 
         # Load title from fields.yml
-        with open(beat_path + "/fields.yml") as f:
+        with open(beat_path + "/fields.yml", encoding='utf_8') as f:
             fields = yaml.load(f.read())
             title = fields[0]["title"]
 
@@ -61,8 +61,8 @@ For a description of each field in the module, see the
 """
 
         # Write module docs
-        with open(os.path.abspath("docs") + "/modules/" +
-                  module + ".asciidoc", 'w') as f:
+        docs_path = os.path.join(os.path.abspath("docs"), "modules",  module + ".asciidoc")
+        with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 
     module_list_output = generated_note
@@ -76,7 +76,7 @@ For a description of each field in the module, see the
         module_list_output += "include::modules/" + m + ".asciidoc[]\n"
 
     # Write module link list
-    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
+    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w', encoding='utf_8') as f:
         f.write(module_list_output)
 
 

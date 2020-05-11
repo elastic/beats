@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -29,11 +29,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -150,6 +151,174 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		// Scenarios tested:
+		// Have one set of hints come from the pod and the other come from namespaces
+		// The resultant hints should have a combination of both
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.logs/multiline.pattern":    "^test",
+						"co.elastic.logs/json.keys_under_root": "true",
+						"not.to.include":                       "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.logs/multiline.pattern":    "^test",
+						"co.elastic.logs/json.keys_under_root": "true",
+						"not.to.include":                       "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/module":        "prometheus",
+					}),
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"multiline": common.MapStr{
+							"pattern": "^test",
+						},
+						"json": common.MapStr{
+							"keys_under_root": "true",
+						},
+					},
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+				},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "docker",
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have one set of hints come from the pod and the same keys come from namespaces
+		// The resultant hints should honor only pods and not namespace.
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+						"not.to.include":                   "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "dropwizard",
+						"co.elastic.metrics/period":        "60s",
+						"co.elastic.metrics.foobar/period": "25s",
+					}),
+					"namespace": "ns",
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+						"not.to.include":                   "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "dropwizard",
+						"co.elastic.metrics/period":        "60s",
+						"co.elastic.metrics.foobar/period": "25s",
+					}),
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+				},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "docker",
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have no hints on the pod and have namespace level defaults.
+		// The resultant hints should honor only namespace defaults.
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
+					"container": common.MapStr{
+						"name":    "foobar",
+						"id":      "abc",
+						"runtime": "docker",
+					},
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "15s",
+					},
+				},
+				"container": common.MapStr{
+					"name":    "foobar",
+					"id":      "abc",
+					"runtime": "docker",
+				},
+			},
+		},
 	}
 
 	cfg := defaultConfig()
@@ -164,6 +333,7 @@ func TestGenerateHints(t *testing.T) {
 }
 
 func TestEmitEvent(t *testing.T) {
+	k, _ := keystore.NewFileKeystore("test")
 	name := "filebeat"
 	namespace := "default"
 	podIP := "127.0.0.1"
@@ -227,6 +397,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "127.0.0.1",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "foobar",
@@ -359,6 +530,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "",
@@ -428,6 +600,7 @@ func TestEmitEvent(t *testing.T) {
 				"host":     "127.0.0.1",
 				"id":       cid,
 				"provider": UUID,
+				"keystore": k,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "",
@@ -477,6 +650,7 @@ func TestEmitEvent(t *testing.T) {
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
+				keystore:  k,
 			}
 
 			pod := &pod{

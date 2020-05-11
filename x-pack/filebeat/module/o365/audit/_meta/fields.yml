@@ -1,0 +1,294 @@
+  - name: o365.audit
+    type: group
+    default_field: false
+    description: >
+      Fields from Office 365 Management API audit logs.
+    fields:
+    - name: Actor
+      type: array
+      fields:
+      - name: ID
+        type: keyword
+
+      - name: Type
+        type: keyword
+
+    - name: ActorContextId
+      type: keyword
+
+    - name: ActorIpAddress
+      type: keyword
+
+    - name: ActorUserId
+      type: keyword
+
+    - name: ActorYammerUserId
+      type: keyword
+
+    - name: AlertEntityId
+      type: keyword
+
+    - name: AlertId
+      type: keyword
+
+    - name: AlertLinks
+      type: array
+
+    - name: AlertType
+      type: keyword
+
+    - name: AppId
+      type: keyword
+
+    - name: ApplicationDisplayName
+      type: keyword
+
+    - name: ApplicationId
+      type: keyword
+
+    - name: AzureActiveDirectoryEventType
+      type: keyword
+
+    - name: ExchangeMetaData.*
+      type: object
+
+    - name: Category
+      type: keyword
+
+    - name: ClientAppId
+      type: keyword
+
+    - name: ClientInfoString
+      type: keyword
+
+    - name: ClientIP
+      type: keyword
+
+    - name: ClientIPAddress
+      type: keyword
+
+    - name: Comments
+      type: text
+      norms: false
+
+    - name: CorrelationId
+      type: keyword
+
+    - name: CreationTime
+      type: keyword
+
+    - name: CustomUniqueId
+      type: keyword
+
+    - name: Data
+      type: keyword
+
+    - name: DataType
+      type: keyword
+
+    - name: EntityType
+      type: keyword
+
+    - name: EventData
+      type: keyword
+
+    - name: EventSource
+      type: keyword
+
+    - name: ExceptionInfo.*
+      type: object
+
+    - name: ExtendedProperties.*
+      type: object
+
+    - name: ExternalAccess
+      type: keyword
+
+    - name: GroupName
+      type: keyword
+
+    - name: Id
+      type: keyword
+
+    - name: ImplicitShare
+      type: keyword
+
+    - name: IncidentId
+      type: keyword
+
+    - name: InternalLogonType
+      type: keyword
+
+    - name: InterSystemsId
+      type: keyword
+
+    - name: IntraSystemId
+      type: keyword
+
+    - name: Item.*
+      type: object
+
+    - name: Item.*.*
+      type: object
+
+    - name: ItemName
+      type: keyword
+
+    - name: ItemType
+      type: keyword
+
+    - name: ListId
+      type: keyword
+
+    - name: ListItemUniqueId
+      type: keyword
+
+    - name: LogonError
+      type: keyword
+
+    - name: LogonType
+      type: keyword
+
+    - name: LogonUserSid
+      type: keyword
+
+    - name: MailboxGuid
+      type: keyword
+
+    - name: MailboxOwnerMasterAccountSid
+      type: keyword
+
+    - name: MailboxOwnerSid
+      type: keyword
+
+    - name: MailboxOwnerUPN
+      type: keyword
+
+    - name: Members
+      type: array
+
+    - name: Members.*
+      type: object
+
+    - name: ModifiedProperties.*.*
+      type: object
+
+    - name: Name
+      type: keyword
+
+    - name: ObjectId
+      type: keyword
+
+    - name: Operation
+      type: keyword
+
+    - name: OrganizationId
+      type: keyword
+
+    - name: OrganizationName
+      type: keyword
+
+    - name: OriginatingServer
+      type: keyword
+
+    - name: Parameters.*
+      type: object
+
+    - name: PolicyDetails
+      type: array
+
+    - name: PolicyId
+      type: keyword
+
+    - name: RecordType
+      type: keyword
+
+    - name: ResultStatus
+      type: keyword
+
+    - name: SensitiveInfoDetectionIsIncluded
+      type: keyword
+
+    - name: SharePointMetaData.*
+      type: object
+
+    - name: SessionId
+      type: keyword
+
+    - name: Severity
+      type: keyword
+
+    - name: Site
+      type: keyword
+
+    - name: SiteUrl
+      type: keyword
+
+    - name: Source
+      type: keyword
+
+    - name: SourceFileExtension
+      type: keyword
+
+    - name: SourceFileName
+      type: keyword
+
+    - name: SourceRelativeUrl
+      type: keyword
+
+    - name: Status
+      type: keyword
+
+    - name: SupportTicketId
+      type: keyword
+
+    - name: Target
+      type: array
+      fields:
+      - name: ID
+        type: keyword
+
+      - name: Type
+        type: keyword
+
+    - name: TargetContextId
+      type: keyword
+
+    - name: TargetUserOrGroupName
+      type: keyword
+
+    - name: TargetUserOrGroupType
+      type: keyword
+
+    - name: TeamName
+      type: keyword
+
+    - name: TeamGuid
+      type: keyword
+
+    - name: UniqueSharingId
+      type: keyword
+
+    - name: UserAgent
+      type: keyword
+
+    - name: UserId
+      type: keyword
+
+    - name: UserKey
+      type: keyword
+
+    - name: UserType
+      type: keyword
+
+    - name: Version
+      type: keyword
+
+    - name: WebId
+      type: keyword
+
+    - name: Workload
+      type: keyword
+
+    - name: YammerNetworkId
+      type: keyword

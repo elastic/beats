@@ -230,5 +230,63 @@
 		},
 		"skip": false,
 		"fail": false
+	},
+	{
+		"name": "simple fixed length",
+		"tok": "%{class#1}%{month#2}%{day#2}",
+		"msg": "A0118",
+		"expected": {
+			"class": "A",
+			"month": "01",
+			"day": "18"
+		},
+		"skip": false,
+		"fail": false
+	},
+	{
+		"name": "simple ordered and fixed length field",
+		"tok": "%{+key/3#1}%{+key/1#1} %{+key/2}",
+		"msg": "12 3",
+		"expected": {
+			"key": "2 3 1"
+		},
+		"skip": false,
+		"fail": false
+	},
+	{
+		"name": "simple padding and fixed length field",
+		"tok": "%{+key/3#1}%{+key/1#1->} %{+key/2}",
+		"msg": "12    3",
+		"expected": {
+			"key": "2 3 1"
+		},
+		"skip": false,
+		"fail": false
+	},
+	{
+		"name": "mixed pointer and indirect and fixed length",
+		"tok": "%{*key#5}%{\u0026key#5}",
+		"msg": "helloworld",
+		"expected": {
+			"hello": "world"
+		},
+		"skip": false,
+		"fail": false
+	},
+	{
+		"name": "fails when there is remaining string after the fixed-length key",
+		"tok": "%{class#1}%{month#2}%{day#2}",
+		"msg": "A0118 ",
+		"expected": null,
+		"skip": false,
+		"fail": true
+	},
+	{
+		"name": "fails when there is no enough string for the fixed-length key",
+		"tok": "%{key#10}",
+		"msg": "foobar",
+		"expected": null,
+		"skip": false,
+		"fail": true
 	}
 ]

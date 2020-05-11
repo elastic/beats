@@ -1,7 +1,7 @@
 :modulename: apache mysql
 
 [id="configuration-{beatname_lc}-modules"]
-== Specify which modules to run
+== Enable and run modules
 
 NOTE: Using {beatname_uc} modules is optional. You may decide to
 <<configuration-{beatname_lc}-options,configure inputs manually>> if you are using
@@ -131,7 +131,7 @@ appropriate for your environment. To change the default configurations, you need
 to <<specify-variable-settings,specify variable settings>>.
 
 [[specify-variable-settings]]
-=== Specify variable settings
+=== Configure variable settings
 
 include::./include/set-paths.asciidoc[]
 

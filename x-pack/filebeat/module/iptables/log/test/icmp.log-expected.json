@@ -2,9 +2,16 @@
     {
         "destination.ip": "192.0.2.83",
         "destination.mac": "90:10:28:5f:62:24",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -22,6 +29,10 @@
         "network.community_id": "1:T79jBEYlbFhpnIGt2rOuzIv31hE=",
         "network.transport": "icmp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.0.2.71",
+            "192.0.2.83"
+        ],
         "service.type": "iptables",
         "source.ip": "192.0.2.71",
         "source.mac": "90:10:18:5a:89:2a",

@@ -37,7 +37,7 @@ class TestAutodiscover(filebeat.BaseTest):
         )
 
         with open(os.path.join(self.working_dir, 'busybox.log'), 'wb') as f:
-            f.write('Busybox output 1\n')
+            f.write(b'Busybox output 1\n')
 
         proc = self.start_beat()
         docker_client.images.pull('busybox')
@@ -83,7 +83,7 @@ class TestAutodiscover(filebeat.BaseTest):
         )
 
         with open(os.path.join(self.working_dir, 'busybox.log'), 'wb') as f:
-            f.write('Busybox output 1\n')
+            f.write(b'Busybox output 1\n')
 
         proc = self.start_beat()
         docker_client.images.pull('busybox')

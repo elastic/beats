@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var defaultDetails = &Details{stability: Stable}
+var defaultDetails = Details{Stability: Stable}
 
 func TestRegister(t *testing.T) {
 	f := func() {}

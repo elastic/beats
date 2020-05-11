@@ -18,8 +18,9 @@
 package beat
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/management"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -66,6 +67,8 @@ type Beat struct {
 	Fields []byte // Data from fields.yml
 
 	ConfigManager management.ConfigManager // config manager
+
+	Keystore keystore.Keystore
 }
 
 // BeatConfig struct contains the basic configuration of every beat

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from filebeat import BaseTest
 import os
@@ -93,9 +93,9 @@ class Test(BaseTest):
         rotations = 2
         iterations = 3
         for r in range(rotations):
-            with open(testfile, 'w', 0) as file:
+            with open(testfile, 'wb', 0) as file:
                 for n in range(iterations):
-                    file.write("hello world {}\n".format(r * iterations + n))
+                    file.write(bytes("hello world {}\n".format(r * iterations + n), "utf-8"))
                     time.sleep(0.1)
             os.rename(testfile, testfile + str(time.time()))
 
@@ -662,3 +662,23 @@ class Test(BaseTest):
                 "recursive glob disabled"),
             max_timeout=10)
         filebeat.check_kill_and_wait()
+
+    def test_input_processing_pipeline_disable_host(self):
+        """
+        Check processing_pipeline.disable_host in input config.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            publisher_pipeline={
+                "disable_host": True,
+            },
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("test message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+        assert "host.name" not in output[0]

@@ -27,10 +27,10 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/heartbeat/scheduler/timerqueue"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 const (
@@ -247,8 +247,15 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 	s.stats.waitingTasks.Inc()
 
 	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-	s.limitSem.Acquire(s.ctx, 1)
-	defer s.limitSem.Release(1)
+	// this should block until resources are available.
+	// In the case where the semaphore has free resources immediately
+	// it will not block and will not check the cancelled status of the
+	// context, which is OK, because we check it later anyway.
+	limitErr := s.limitSem.Acquire(jobCtx, 1)
+	s.stats.waitingTasks.Dec()
+	if limitErr == nil {
+		defer s.limitSem.Release(1)
+	}
 
 	// Record the time this task started now that we have a resource to execute with
 	startedAt = time.Now()
@@ -259,7 +266,6 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 		return startedAt
 	default:
 		s.stats.activeTasks.Inc()
-		s.stats.waitingTasks.Dec()
 
 		continuations := task(jobCtx)
 		s.stats.activeTasks.Dec()

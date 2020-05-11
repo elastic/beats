@@ -1,0 +1,34 @@
+[[howto-guides]]
+[role="xpack"]
+= How to guides
+
+[partintro]
+--
+Learn how to perform common {beatname_uc} configuration tasks.
+
+* <<{beatname_lc}-geoip>>
+* <<using-environ-vars>>
+* <<configuring-ingest-node>>
+* <<yaml-tips>>
+
+
+--
+
+[role="xpack"]
+include::{libbeat-dir}/shared-geoip.asciidoc[]
+
+:standalone:
+[role="xpack"]
+include::{libbeat-dir}/shared-env-vars.asciidoc[]
+:standalone!:
+
+[role="xpack"]
+include::{libbeat-dir}/shared-config-ingest.asciidoc[]
+
+:standalone:
+[role="xpack"]
+include::{libbeat-dir}/yaml.asciidoc[]
+:standalone!:
+
+
+

@@ -1,5 +1,5 @@
 - key: kvm
-  title: "kvm"
+  title: "KVM"
   release: beta
   description: >
     kvm module

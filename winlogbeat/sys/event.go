@@ -41,6 +41,7 @@ type Event struct {
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
 	OpcodeRaw       uint8           `xml:"System>Opcode"`
+	KeywordsRaw     HexInt64        `xml:"System>Keywords"`
 	TimeCreated     TimeCreated     `xml:"System>TimeCreated"`
 	RecordID        uint64          `xml:"System>EventRecordID"`
 	Correlation     Correlation     `xml:"System>Correlation"`
@@ -96,7 +97,7 @@ type Execution struct {
 	ProcessorTime uint32 `xml:"ProcessorTime,attr"`
 }
 
-// EventIdentifier is the identifer that the provider uses to identify a
+// EventIdentifier is the identifier that the provider uses to identify a
 // specific event type.
 type EventIdentifier struct {
 	Qualifiers uint16 `xml:"Qualifiers,attr"`
@@ -223,5 +224,23 @@ func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 
 	*v = Version(version)
+	return nil
+}
+
+type HexInt64 uint64
+
+func (v *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
+	}
+
+	num, err := strconv.ParseInt(s, 0, 64)
+	if err != nil {
+		// Ignore invalid version values.
+		return nil
+	}
+
+	*v = HexInt64(num)
 	return nil
 }

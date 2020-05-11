@@ -8,21 +8,20 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"time"
 
 	cloudfunctions "google.golang.org/api/cloudfunctions/v1"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
-	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
-	fngcp "github.com/elastic/beats/x-pack/functionbeat/provider/gcp/gcp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
+	fngcp "github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/gcp"
 )
 
 const (
-	runtime          = "go111"                            // Golang 1.11
+	runtime          = "go113"                            // Golang 1.13
 	archiveURL       = "gs://%s/%s"                       // path to the function archive
 	locationTemplate = "projects/%s/locations/%s"         // full name of the location
 	functionName     = locationTemplate + "/functions/%s" // full name of the functions
@@ -115,7 +114,7 @@ func (d *defaultTemplateBuilder) cloudFunction(name string, config *fngcp.Functi
 		Runtime:             runtime,
 		ServiceAccountEmail: config.ServiceAccountEmail,
 		SourceArchiveUrl:    sourceArchiveURL,
-		Timeout:             config.Timeout.String(),
+		Timeout:             config.Timeout,
 		VpcConnector:        config.VPCConnector,
 	}
 }
@@ -142,8 +141,8 @@ func (d *defaultTemplateBuilder) RawTemplate(name string) (string, error) {
 		},
 	}
 
-	if config.Timeout > 0*time.Second {
-		properties["timeout"] = config.Timeout.String()
+	if config.Timeout != "" {
+		properties["timeout"] = config.Timeout
 	}
 	if config.MemorySize != "" {
 		properties["availableMemoryMb"] = config.MemorySize

@@ -34,6 +34,7 @@ class Test(metricbeat.BaseTest):
         """
         Test redis info metricset
         """
+
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
@@ -50,11 +51,11 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         fields = REDIS_FIELDS + ["process", "os"]
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        self.assertCountEqual(self.de_dot(fields), evt.keys())
         redis_info = evt["redis"]["info"]
-        self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+        self.assertCountEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
+        self.assertCountEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertCountEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -88,9 +89,9 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["keyspace"]
-        self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
+        self.assertCountEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -128,7 +129,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -137,6 +138,7 @@ class Test(metricbeat.BaseTest):
         """
         Test local processors for Redis info event.
         """
+
         fields = ["clients", "cpu"]
         eventFields = ['beat', 'metricset', 'service', 'event']
         eventFields += ['redis.info.' + f for f in fields]
@@ -158,9 +160,9 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
         print(redis_info)
-        self.assertItemsEqual(fields, redis_info.keys())
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+        self.assertCountEqual(fields, redis_info.keys())
+        self.assertCountEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertCountEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())

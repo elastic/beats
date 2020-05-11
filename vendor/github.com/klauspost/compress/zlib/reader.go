@@ -128,7 +128,7 @@ func (z *reader) Close() error {
 }
 
 func (z *reader) Reset(r io.Reader, dict []byte) error {
-	*z = reader{decompressor: z.decompressor}
+	*z = reader{decompressor: z.decompressor, digest: z.digest}
 	if fr, ok := r.(flate.Reader); ok {
 		z.r = fr
 	} else {
@@ -173,6 +173,11 @@ func (z *reader) Reset(r io.Reader, dict []byte) error {
 	} else {
 		z.decompressor.(flate.Resetter).Reset(z.r, dict)
 	}
-	z.digest = adler32.New()
+
+	if z.digest != nil {
+		z.digest.Reset()
+	} else {
+		z.digest = adler32.New()
+	}
 	return nil
 }

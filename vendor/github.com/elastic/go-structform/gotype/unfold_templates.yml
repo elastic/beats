@@ -1,0 +1,119 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import:
+  - "types.yml"
+
+# makeUnfoldType(name, [.base])
+templates.makeUnfoldType: |
+  {{ $name := .name }}
+  {{ $base := default "unfolderErrUnknown" .base }}
+
+  type {{ $name }} struct {
+    {{ $base }}
+  }
+
+  var _singleton{{ $name | capitalize }} = &{{ $name }}{}
+
+  func new{{ $name | capitalize }}() *{{ $name }} {
+    return _singleton{{ $name | capitalize }}
+  }
+
+# makeType(.)  -> invokes makeTypeWithName(name, type)
+templates.makeType: |
+  {{ invoke "makeTypeWithName" "name" (capitalize .) "type" . }}
+
+# makeBoolFns(name, fn)
+templates.onBoolFns: |
+  {{ invoke "onNil" "name" .name "fn" .fn "default" "false" }}
+  {{ invoke "onBool" "name" .name "fn" .fn }}
+
+# makeStringFns(name, fn)
+templates.onStringFns: |
+  {{ invoke "onNil" "name" .name "fn" .fn "default" "\"\"" }}
+  {{ invoke "onString" "name" .name "fn" .fn }}
+
+# makeNumberFns(name, fn)
+templates.onNumberFns: |
+  {{ invoke "onNil" "name" .name "fn" .fn "default" "0" }}
+  {{ invoke "onNumber" "name" .name "type" .type "fn" .fn }}
+
+# onIfcFns(name, fn)
+templates.onIfcFns: |
+  {{ invoke "onNil" "name" .name "fn" .fn "default" "nil" }}
+  {{ invoke "onBool" "name" .name "fn" .fn }}
+  {{ invoke "onString" "name" .name "fn" .fn }}
+  {{ invoke "onNumber" "name" .name "type" "(interface{})" "fn" .fn }}
+
+  func (*{{ .name }} ) OnArrayStart(ctx *unfoldCtx, l int, bt structform.BaseType) error {
+    return unfoldIfcStartSubArray(ctx, l, bt)
+  }
+
+  func (u *{{ .name }}) OnChildArrayDone(ctx *unfoldCtx) error {
+    v, err := unfoldIfcFinishSubArray(ctx)
+    if err == nil {
+      err = u.{{ .fn }}(ctx, v)
+    }
+    return err
+  }
+
+  func (*{{ .name }}) OnObjectStart(ctx *unfoldCtx, l int, bt structform.BaseType) error {
+    return unfoldIfcStartSubMap(ctx, l, bt)
+  }
+
+  func (u *{{ .name }}) OnChildObjectDone(ctx *unfoldCtx) error {
+    v, err := unfoldIfcFinishSubMap(ctx)
+    if err == nil {
+      err = u.{{ .fn }}(ctx, v)
+    }
+    return err
+  }
+
+
+# onBool(name, fn)
+templates.onBool: |
+  func (u *{{ .name }}) OnBool(ctx *unfoldCtx, v bool) error { return u.{{ .fn }} (ctx, v) }
+
+# onString(name, fn)
+templates.onString: |
+  func (u *{{ .name }}) OnString(ctx *unfoldCtx, v string) error { return u.{{ .fn }} (ctx, v) }
+  func (u *{{ .name }}) OnStringRef(ctx *unfoldCtx, v []byte) error {
+    return u.OnString(ctx, string(v))
+  }
+
+
+# onNil(name, fn, default)
+templates.onNil: |
+  func (u *{{ .name }}) OnNil(ctx *unfoldCtx) error {
+    return u.{{ .fn }}(ctx, {{ .default }})
+  }
+
+
+# onNumber(name, fn, type)
+templates.onNumber: |
+  {{ $name := .name }}
+  {{ $fn := .fn }}
+  {{ $type := .type }}
+
+  func (u *{{ $name }}) OnByte(ctx *unfoldCtx, v byte) error {
+    return u.{{ $fn }}(ctx, {{ $type }}(v))
+  }
+  {{ range $t := data.numTypes }}
+    func (u *{{ $name }}) On{{ $t | capitalize}}(ctx *unfoldCtx, v {{ $t }}) error {
+      return u.{{ $fn }}(ctx, {{ $type }}(v))
+    }
+  {{ end }}

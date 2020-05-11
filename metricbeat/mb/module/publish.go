@@ -20,7 +20,7 @@ package module
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // PublishChannels publishes the events read from each channel to the given

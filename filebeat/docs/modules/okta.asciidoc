@@ -1,0 +1,32 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-okta]]
+[role="xpack"]
+
+:modulename: okta
+:has-dashboards: false
+
+== Okta module
+
+beta[]
+
+This is a filebeat module for retrieving system logs from Okta (www.okta.com) via API. 
+
+:has-dashboards!:
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/filebeat-okta-dashboard.png[]
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-okta,exported fields>> section.
+

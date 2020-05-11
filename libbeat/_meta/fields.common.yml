@@ -6,7 +6,9 @@
   fields:
     - name: agent.hostname
       type: keyword
-      description: Hostname of the agent.
+      description: >
+        Deprecated - use agent.name or agent.id to identify an agent.
+        Hostname of the agent.
 
     - name: beat.timezone
       type: alias

@@ -27,10 +27,12 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/metricbeat/helper/dialer"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 )
 
 const (
@@ -92,6 +94,40 @@ func (m *BaseModule) Config() ModuleConfig { return m.config }
 // UnpackConfig unpacks the raw module config to the given object.
 func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
+}
+
+// WithConfig re-configures the module with the given raw configuration and returns a
+// copy of the module.
+// Intended to be called from module factories. Note that if metricsets are specified
+// in the new configuration, those metricsets must already be registered with
+// mb.Registry.
+func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
+	var chkConfig struct {
+		Module string `config:"module"`
+	}
+	if err := config.Unpack(&chkConfig); err != nil {
+		return nil, errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	// Don't allow module name change
+	if chkConfig.Module != "" && chkConfig.Module != m.name {
+		return nil, fmt.Errorf("cannot change module name from %v to %v", m.name, chkConfig.Module)
+	}
+
+	if err := config.SetString("module", -1, m.name); err != nil {
+		return nil, errors.Wrap(err, "unable to set existing module name in new configuration")
+	}
+
+	newBM := &BaseModule{
+		name:      m.name,
+		rawConfig: &config,
+	}
+
+	if err := config.Unpack(&newBM.config); err != nil {
+		return nil, errors.Wrap(err, "error parsing new module configuration")
+	}
+
+	return newBM, nil
 }
 
 // MetricSet interfaces

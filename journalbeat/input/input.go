@@ -21,18 +21,18 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/reader"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Input manages readers and forwards entries from journals.

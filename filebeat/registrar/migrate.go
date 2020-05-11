@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	helper "github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/logp"
+	helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (

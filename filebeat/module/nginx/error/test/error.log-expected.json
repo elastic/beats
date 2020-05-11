@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2016-10-25T14:49:34.000-02:00",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.error",
+        "event.kind": "event",
         "event.module": "nginx",
         "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -16,9 +23,16 @@
     },
     {
         "@timestamp": "2016-10-25T14:50:44.000-02:00",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.error",
+        "event.kind": "event",
         "event.module": "nginx",
         "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -31,9 +45,16 @@
     },
     {
         "@timestamp": "2019-10-30T23:26:34.000-02:00",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.error",
+        "event.kind": "event",
         "event.module": "nginx",
         "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.flags": [
@@ -49,9 +70,16 @@
     },
     {
         "@timestamp": "2019-11-05T14:50:44.000-02:00",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "nginx.error",
+        "event.kind": "event",
         "event.module": "nginx",
         "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",

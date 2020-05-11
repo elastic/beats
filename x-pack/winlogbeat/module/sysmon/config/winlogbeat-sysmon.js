@@ -4,11 +4,11 @@
 
 // Polyfill for String startsWith.
 if (!String.prototype.startsWith) {
-    Object.defineProperty(String.prototype, 'startsWith', {
-        value: function(search, pos) {
+    Object.defineProperty(String.prototype, "startsWith", {
+        value: function (search, pos) {
             pos = !pos || pos < 0 ? 0 : +pos;
             return this.substring(pos, pos + search.length) === search;
-        }
+        },
     });
 }
 
@@ -17,74 +17,45 @@ var sysmon = (function () {
     var processor = require("processor");
     var winlogbeat = require("winlogbeat");
 
-    // Windows error codes for DNS.
-    // https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--9000-11999-
+    // Windows error codes for DNS. This list was generated using
+    // 'go run gen_dns_error_codes.go'.
     var dnsQueryStatusCodes = {
         "0": "SUCCESS",
-        "2329": "DNS_ERROR_RCODE_FORMAT_ERROR",
-        "2330": "DNS_ERROR_RCODE_NXRRSET",
-        "2331": "DNS_ERROR_RCODE_NOTAUTH",
-        "2332": "DNS_ERROR_RCODE_NOTZONE",
-        "2338": "DNS_ERROR_RCODE_BADSIG",
-        "2339": "DNS_ERROR_RCODE_BADKEY",
-        "2390": "DNS_ERROR_NOT_ENOUGH_SIGNING_KEY_DESCRIPTORS",
-        "2391": "DNS_ERROR_UNSUPPORTED_ALGORITHM",
-        "2392": "DNS_ERROR_INVALID_KEY_SIZE",
-        "2393": "DNS_ERROR_SIGNING_KEY_NOT_ACCESSIBLE",
-        "2394": "DNS_ERROR_KSP_DOES_NOT_SUPPORT_PROTECTION",
-        "2395": "DNS_ERROR_UNEXPECTED_DATA_PROTECTION_ERROR",
-        "2396": "DNS_ERROR_UNEXPECTED_CNG_ERROR",
-        "2397": "DNS_ERROR_UNKNOWN_SIGNING_PARAMETER_VERSION",
-        "2398": "DNS_ERROR_KSP_NOT_ACCESSIBLE",
-        "2399": "DNS_ERROR_TOO_MANY_SKDS",
-        "2520": "DNS_ERROR_RCODE",
-        "2521": "DNS_ERROR_UNSECURE_PACKET",
-        "2522": "DNS_REQUEST_PENDING",
-        "2550": "DNS_ERROR_INVALID_IP_ADDRESS",
-        "2551": "DNS_ERROR_INVALID_PROPERTY",
-        "2552": "DNS_ERROR_TRY_AGAIN_LATER",
-        "2553": "DNS_ERROR_NOT_UNIQUE",
-        "2554": "DNS_ERROR_NON_RFC_NAME",
-        "2555": "DNS_STATUS_FQDN",
-        "2556": "DNS_STATUS_DOTTED_NAME",
-        "2557": "DNS_STATUS_SINGLE_PART_NAME",
-        "2558": "DNS_ERROR_INVALID_NAME_CHAR",
-        "2559": "DNS_ERROR_NUMERIC_NAME",
-        "2560": "DNS_ERROR_BACKGROUND_LOADING",
-        "2561": "DNS_ERROR_NOT_ALLOWED_ON_RODC",
-        "2562": "DNS_ERROR_NOT_ALLOWED_UNDER_DNAME",
-        "2563": "DNS_ERROR_DELEGATION_REQUIRED",
-        "2564": "DNS_ERROR_INVALID_POLICY_TABLE",
-        "2581": "DNS_ERROR_ZONE_DOES_NOT_EXIST",
-        "2582": "DNS_ERROR_NO_ZONE_INFO",
-        "2583": "DNS_ERROR_INVALID_ZONE_OPERATION",
-        "2584": "DNS_ERROR_ZONE_CONFIGURATION_ERROR",
-        "2585": "DNS_ERROR_ZONE_HAS_NO_SOA_RECORD",
-        "2586": "DNS_ERROR_ZONE_HAS_NO_NS_RECORDS",
-        "2587": "DNS_ERROR_ZONE_LOCKED",
-        "2588": "DNS_ERROR_ZONE_CREATION_FAILED",
-        "2589": "DNS_ERROR_ZONE_ALREADY_EXISTS",
-        "2590": "DNS_ERROR_NEED_WINS_SERVERS",
-        "2591": "DNS_ERROR_NBSTAT_INIT_FAILED",
-        "2592": "DNS_ERROR_SOA_DELETE_INVALID",
-        "2593": "DNS_ERROR_FORWARDER_ALREADY_EXISTS",
-        "2594": "DNS_ERROR_ZONE_REQUIRES_MASTER_IP",
-        "2595": "DNS_ERROR_ZONE_IS_SHUTDOWN",
-        "2596": "DNS_ERROR_ZONE_LOCKED_FOR_SIGNING",
-        "2617": "DNS_INFO_AXFR_COMPLETE",
-        "2618": "DNS_ERROR_AXFR",
-        "2619": "DNS_INFO_ADDED_LOCAL_WINS",
-        "2649": "DNS_STATUS_CONTINUE_NEEDED",
+        "5": "ERROR_ACCESS_DENIED",
+        "8": "ERROR_NOT_ENOUGH_MEMORY",
+        "13": "ERROR_INVALID_DATA",
+        "14": "ERROR_OUTOFMEMORY",
+        "123": "ERROR_INVALID_NAME",
+        "1214": "ERROR_INVALID_NETNAME",
+        "1223": "ERROR_CANCELLED",
+        "1460": "ERROR_TIMEOUT",
+        "4312": "ERROR_OBJECT_NOT_FOUND",
+        "9001": "DNS_ERROR_RCODE_FORMAT_ERROR",
         "9002": "DNS_ERROR_RCODE_SERVER_FAILURE",
         "9003": "DNS_ERROR_RCODE_NAME_ERROR",
         "9004": "DNS_ERROR_RCODE_NOT_IMPLEMENTED",
         "9005": "DNS_ERROR_RCODE_REFUSED",
         "9006": "DNS_ERROR_RCODE_YXDOMAIN",
         "9007": "DNS_ERROR_RCODE_YXRRSET",
+        "9008": "DNS_ERROR_RCODE_NXRRSET",
+        "9009": "DNS_ERROR_RCODE_NOTAUTH",
+        "9010": "DNS_ERROR_RCODE_NOTZONE",
+        "9016": "DNS_ERROR_RCODE_BADSIG",
+        "9017": "DNS_ERROR_RCODE_BADKEY",
         "9018": "DNS_ERROR_RCODE_BADTIME",
         "9101": "DNS_ERROR_KEYMASTER_REQUIRED",
         "9102": "DNS_ERROR_NOT_ALLOWED_ON_SIGNED_ZONE",
         "9103": "DNS_ERROR_NSEC3_INCOMPATIBLE_WITH_RSA_SHA1",
+        "9104": "DNS_ERROR_NOT_ENOUGH_SIGNING_KEY_DESCRIPTORS",
+        "9105": "DNS_ERROR_UNSUPPORTED_ALGORITHM",
+        "9106": "DNS_ERROR_INVALID_KEY_SIZE",
+        "9107": "DNS_ERROR_SIGNING_KEY_NOT_ACCESSIBLE",
+        "9108": "DNS_ERROR_KSP_DOES_NOT_SUPPORT_PROTECTION",
+        "9109": "DNS_ERROR_UNEXPECTED_DATA_PROTECTION_ERROR",
+        "9110": "DNS_ERROR_UNEXPECTED_CNG_ERROR",
+        "9111": "DNS_ERROR_UNKNOWN_SIGNING_PARAMETER_VERSION",
+        "9112": "DNS_ERROR_KSP_NOT_ACCESSIBLE",
+        "9113": "DNS_ERROR_TOO_MANY_SKDS",
         "9114": "DNS_ERROR_INVALID_ROLLOVER_PERIOD",
         "9115": "DNS_ERROR_INVALID_INITIAL_ROLLOVER_OFFSET",
         "9116": "DNS_ERROR_ROLLOVER_IN_PROGRESS",
@@ -105,19 +76,54 @@ var sysmon = (function () {
         "9501": "DNS_INFO_NO_RECORDS",
         "9502": "DNS_ERROR_BAD_PACKET",
         "9503": "DNS_ERROR_NO_PACKET",
+        "9504": "DNS_ERROR_RCODE",
+        "9505": "DNS_ERROR_UNSECURE_PACKET",
+        "9506": "DNS_REQUEST_PENDING",
         "9551": "DNS_ERROR_INVALID_TYPE",
+        "9552": "DNS_ERROR_INVALID_IP_ADDRESS",
+        "9553": "DNS_ERROR_INVALID_PROPERTY",
+        "9554": "DNS_ERROR_TRY_AGAIN_LATER",
+        "9555": "DNS_ERROR_NOT_UNIQUE",
+        "9556": "DNS_ERROR_NON_RFC_NAME",
+        "9557": "DNS_STATUS_FQDN",
+        "9558": "DNS_STATUS_DOTTED_NAME",
+        "9559": "DNS_STATUS_SINGLE_PART_NAME",
+        "9560": "DNS_ERROR_INVALID_NAME_CHAR",
+        "9561": "DNS_ERROR_NUMERIC_NAME",
         "9562": "DNS_ERROR_NOT_ALLOWED_ON_ROOT_SERVER",
         "9563": "DNS_ERROR_NOT_ALLOWED_UNDER_DELEGATION",
         "9564": "DNS_ERROR_CANNOT_FIND_ROOT_HINTS",
         "9565": "DNS_ERROR_INCONSISTENT_ROOT_HINTS",
         "9566": "DNS_ERROR_DWORD_VALUE_TOO_SMALL",
         "9567": "DNS_ERROR_DWORD_VALUE_TOO_LARGE",
+        "9568": "DNS_ERROR_BACKGROUND_LOADING",
+        "9569": "DNS_ERROR_NOT_ALLOWED_ON_RODC",
+        "9570": "DNS_ERROR_NOT_ALLOWED_UNDER_DNAME",
+        "9571": "DNS_ERROR_DELEGATION_REQUIRED",
+        "9572": "DNS_ERROR_INVALID_POLICY_TABLE",
+        "9573": "DNS_ERROR_ADDRESS_REQUIRED",
+        "9601": "DNS_ERROR_ZONE_DOES_NOT_EXIST",
+        "9602": "DNS_ERROR_NO_ZONE_INFO",
+        "9603": "DNS_ERROR_INVALID_ZONE_OPERATION",
+        "9604": "DNS_ERROR_ZONE_CONFIGURATION_ERROR",
+        "9605": "DNS_ERROR_ZONE_HAS_NO_SOA_RECORD",
+        "9606": "DNS_ERROR_ZONE_HAS_NO_NS_RECORDS",
+        "9607": "DNS_ERROR_ZONE_LOCKED",
+        "9608": "DNS_ERROR_ZONE_CREATION_FAILED",
+        "9609": "DNS_ERROR_ZONE_ALREADY_EXISTS",
         "9610": "DNS_ERROR_AUTOZONE_ALREADY_EXISTS",
         "9611": "DNS_ERROR_INVALID_ZONE_TYPE",
         "9612": "DNS_ERROR_SECONDARY_REQUIRES_MASTER_IP",
         "9613": "DNS_ERROR_ZONE_NOT_SECONDARY",
         "9614": "DNS_ERROR_NEED_SECONDARY_ADDRESSES",
         "9615": "DNS_ERROR_WINS_INIT_FAILED",
+        "9616": "DNS_ERROR_NEED_WINS_SERVERS",
+        "9617": "DNS_ERROR_NBSTAT_INIT_FAILED",
+        "9618": "DNS_ERROR_SOA_DELETE_INVALID",
+        "9619": "DNS_ERROR_FORWARDER_ALREADY_EXISTS",
+        "9620": "DNS_ERROR_ZONE_REQUIRES_MASTER_IP",
+        "9621": "DNS_ERROR_ZONE_IS_SHUTDOWN",
+        "9622": "DNS_ERROR_ZONE_LOCKED_FOR_SIGNING",
         "9651": "DNS_ERROR_PRIMARY_REQUIRES_DATAFILE",
         "9652": "DNS_ERROR_INVALID_DATAFILE_NAME",
         "9653": "DNS_ERROR_DATAFILE_OPEN_FAILURE",
@@ -145,6 +151,10 @@ var sysmon = (function () {
         "9720": "DNS_ERROR_NODE_IS_DNAME",
         "9721": "DNS_ERROR_DNAME_COLLISION",
         "9722": "DNS_ERROR_ALIAS_LOOP",
+        "9751": "DNS_INFO_AXFR_COMPLETE",
+        "9752": "DNS_ERROR_AXFR",
+        "9753": "DNS_INFO_ADDED_LOCAL_WINS",
+        "9801": "DNS_STATUS_CONTINUE_NEEDED",
         "9851": "DNS_ERROR_NO_TCPIP",
         "9852": "DNS_ERROR_NO_DNS_SERVERS",
         "9901": "DNS_ERROR_DP_DOES_NOT_EXIST",
@@ -153,6 +163,60 @@ var sysmon = (function () {
         "9904": "DNS_ERROR_DP_ALREADY_ENLISTED",
         "9905": "DNS_ERROR_DP_NOT_AVAILABLE",
         "9906": "DNS_ERROR_DP_FSMO_ERROR",
+        "9911": "DNS_ERROR_RRL_NOT_ENABLED",
+        "9912": "DNS_ERROR_RRL_INVALID_WINDOW_SIZE",
+        "9913": "DNS_ERROR_RRL_INVALID_IPV4_PREFIX",
+        "9914": "DNS_ERROR_RRL_INVALID_IPV6_PREFIX",
+        "9915": "DNS_ERROR_RRL_INVALID_TC_RATE",
+        "9916": "DNS_ERROR_RRL_INVALID_LEAK_RATE",
+        "9917": "DNS_ERROR_RRL_LEAK_RATE_LESSTHAN_TC_RATE",
+        "9921": "DNS_ERROR_VIRTUALIZATION_INSTANCE_ALREADY_EXISTS",
+        "9922": "DNS_ERROR_VIRTUALIZATION_INSTANCE_DOES_NOT_EXIST",
+        "9923": "DNS_ERROR_VIRTUALIZATION_TREE_LOCKED",
+        "9924": "DNS_ERROR_INVAILD_VIRTUALIZATION_INSTANCE_NAME",
+        "9925": "DNS_ERROR_DEFAULT_VIRTUALIZATION_INSTANCE",
+        "9951": "DNS_ERROR_ZONESCOPE_ALREADY_EXISTS",
+        "9952": "DNS_ERROR_ZONESCOPE_DOES_NOT_EXIST",
+        "9953": "DNS_ERROR_DEFAULT_ZONESCOPE",
+        "9954": "DNS_ERROR_INVALID_ZONESCOPE_NAME",
+        "9955": "DNS_ERROR_NOT_ALLOWED_WITH_ZONESCOPES",
+        "9956": "DNS_ERROR_LOAD_ZONESCOPE_FAILED",
+        "9957": "DNS_ERROR_ZONESCOPE_FILE_WRITEBACK_FAILED",
+        "9958": "DNS_ERROR_INVALID_SCOPE_NAME",
+        "9959": "DNS_ERROR_SCOPE_DOES_NOT_EXIST",
+        "9960": "DNS_ERROR_DEFAULT_SCOPE",
+        "9961": "DNS_ERROR_INVALID_SCOPE_OPERATION",
+        "9962": "DNS_ERROR_SCOPE_LOCKED",
+        "9963": "DNS_ERROR_SCOPE_ALREADY_EXISTS",
+        "9971": "DNS_ERROR_POLICY_ALREADY_EXISTS",
+        "9972": "DNS_ERROR_POLICY_DOES_NOT_EXIST",
+        "9973": "DNS_ERROR_POLICY_INVALID_CRITERIA",
+        "9974": "DNS_ERROR_POLICY_INVALID_SETTINGS",
+        "9975": "DNS_ERROR_CLIENT_SUBNET_IS_ACCESSED",
+        "9976": "DNS_ERROR_CLIENT_SUBNET_DOES_NOT_EXIST",
+        "9977": "DNS_ERROR_CLIENT_SUBNET_ALREADY_EXISTS",
+        "9978": "DNS_ERROR_SUBNET_DOES_NOT_EXIST",
+        "9979": "DNS_ERROR_SUBNET_ALREADY_EXISTS",
+        "9980": "DNS_ERROR_POLICY_LOCKED",
+        "9981": "DNS_ERROR_POLICY_INVALID_WEIGHT",
+        "9982": "DNS_ERROR_POLICY_INVALID_NAME",
+        "9983": "DNS_ERROR_POLICY_MISSING_CRITERIA",
+        "9984": "DNS_ERROR_INVALID_CLIENT_SUBNET_NAME",
+        "9985": "DNS_ERROR_POLICY_PROCESSING_ORDER_INVALID",
+        "9986": "DNS_ERROR_POLICY_SCOPE_MISSING",
+        "9987": "DNS_ERROR_POLICY_SCOPE_NOT_ALLOWED",
+        "9988": "DNS_ERROR_SERVERSCOPE_IS_REFERENCED",
+        "9989": "DNS_ERROR_ZONESCOPE_IS_REFERENCED",
+        "9990": "DNS_ERROR_POLICY_INVALID_CRITERIA_CLIENT_SUBNET",
+        "9991": "DNS_ERROR_POLICY_INVALID_CRITERIA_TRANSPORT_PROTOCOL",
+        "9992": "DNS_ERROR_POLICY_INVALID_CRITERIA_NETWORK_PROTOCOL",
+        "9993": "DNS_ERROR_POLICY_INVALID_CRITERIA_INTERFACE",
+        "9994": "DNS_ERROR_POLICY_INVALID_CRITERIA_FQDN",
+        "9995": "DNS_ERROR_POLICY_INVALID_CRITERIA_QUERY_TYPE",
+        "9996": "DNS_ERROR_POLICY_INVALID_CRITERIA_TIME_OF_DAY",
+        "10054": "WSAECONNRESET",
+        "10055": "WSAENOBUFS",
+        "10060": "WSAETIMEDOUT",
     };
 
     // Windows DNS record type constants.
@@ -220,15 +284,19 @@ var sysmon = (function () {
         "65282": "WINSR",
     };
 
-    var setProcessNameUsingExe = function(evt) {
+    var setProcessNameUsingExe = function (evt) {
         setProcessNameFromPath(evt, "process.executable", "process.name");
     };
 
-    var setParentProcessNameUsingExe = function(evt) {
-        setProcessNameFromPath(evt, "process.parent.executable", "process.parent.name");
+    var setParentProcessNameUsingExe = function (evt) {
+        setProcessNameFromPath(
+            evt,
+            "process.parent.executable",
+            "process.parent.name"
+        );
     };
 
-    var setProcessNameFromPath = function(evt, pathField, nameField) {
+    var setProcessNameFromPath = function (evt, pathField, nameField) {
         var name = evt.Get(nameField);
         if (name) {
             return;
@@ -237,23 +305,27 @@ var sysmon = (function () {
         evt.Put(nameField, path.basename(exe));
     };
 
-    var splitCommandLine = function(evt, field) {
-        var commandLine = evt.Get(field);
+    var splitCommandLine = function (evt, source, target) {
+        var commandLine = evt.Get(source);
         if (!commandLine) {
             return;
         }
-        evt.Put(field, winlogbeat.splitCommandLine(commandLine));
+        evt.Put(target, winlogbeat.splitCommandLine(commandLine));
     };
 
-    var splitProcessArgs = function(evt) {
-        splitCommandLine(evt, "process.args");
+    var splitProcessArgs = function (evt) {
+        splitCommandLine(evt, "process.command_line", "process.args");
     };
 
-    var splitParentProcessArgs = function(evt) {
-        splitCommandLine(evt, "process.parent.args");
+    var splitParentProcessArgs = function (evt) {
+        splitCommandLine(
+            evt,
+            "process.parent.command_line",
+            "process.parent.args"
+        );
     };
 
-    var addUser = function(evt) {
+    var addUser = function (evt) {
         var userParts = evt.Get("winlog.event_data.User").split("\\");
         if (userParts.length === 2) {
             evt.Delete("user");
@@ -263,7 +335,7 @@ var sysmon = (function () {
         }
     };
 
-    var addNetworkDirection = function(evt) {
+    var addNetworkDirection = function (evt) {
         switch (evt.Get("winlog.event_data.Initiated")) {
             case "true":
                 evt.Put("network.direction", "outbound");
@@ -275,7 +347,7 @@ var sysmon = (function () {
         evt.Delete("winlog.event_data.Initiated");
     };
 
-    var addNetworkType = function(evt) {
+    var addNetworkType = function (evt) {
         switch (evt.Get("winlog.event_data.SourceIsIpv6")) {
             case "true":
                 evt.Put("network.type", "ipv6");
@@ -288,10 +360,10 @@ var sysmon = (function () {
         evt.Delete("winlog.event_data.DestinationIsIpv6");
     };
 
-    var addHashes = function(evt, hashField) {
+    var addHashes = function (evt, hashField) {
         var hashes = evt.Get(hashField);
         evt.Delete(hashField);
-        hashes.split(",").forEach(function(hash){
+        hashes.split(",").forEach(function (hash) {
             var parts = hash.split("=");
             if (parts.length !== 2) {
                 return;
@@ -299,26 +371,26 @@ var sysmon = (function () {
 
             var key = parts[0].toLowerCase();
             var value = parts[1].toLowerCase();
-            evt.Put("hash."+key, value);
+            evt.Put("hash." + key, value);
         });
     };
 
-    var splitHashes = function(evt) {
+    var splitHashes = function (evt) {
         addHashes(evt, "winlog.event_data.Hashes");
     };
 
-    var splitHash = function(evt) {
+    var splitHash = function (evt) {
         addHashes(evt, "winlog.event_data.Hash");
     };
 
-    var removeEmptyEventData = function(evt) {
+    var removeEmptyEventData = function (evt) {
         var eventData = evt.Get("winlog.event_data");
         if (eventData && Object.keys(eventData).length === 0) {
             evt.Delete("winlog.event_data");
         }
     };
 
-    var translateDnsQueryStatus = function(evt) {
+    var translateDnsQueryStatus = function (evt) {
         var statusCode = evt.Get("sysmon.dns.status");
         if (!statusCode) {
             return;
@@ -332,12 +404,12 @@ var sysmon = (function () {
 
     // Splits the QueryResults field that contains the DNS responses.
     // Example: "type:  5 f2.taboola.map.fastly.net;::ffff:151.101.66.2;::ffff:151.101.130.2;::ffff:151.101.194.2;::ffff:151.101.2.2;"
-    var splitDnsQueryResults = function(evt) {
+    var splitDnsQueryResults = function (evt) {
         var results = evt.Get("winlog.event_data.QueryResults");
         if (!results) {
             return;
         }
-        results = results.split(';');
+        results = results.split(";");
 
         var answers = [];
         var ips = [];
@@ -347,7 +419,7 @@ var sysmon = (function () {
                 continue;
             }
 
-            if (answer.startsWith('type:')) {
+            if (answer.startsWith("type:")) {
                 var parts = answer.split(/\s+/);
                 if (parts.length !== 3) {
                     throw "unexpected QueryResult format";
@@ -367,7 +439,10 @@ var sysmon = (function () {
                 if (answer.indexOf(":") !== -1) {
                     type = "AAAA";
                 }
-                answers.push({type: type, data: answer});
+                answers.push({
+                    type: type,
+                    data: answer,
+                });
             }
         }
 
@@ -389,27 +464,140 @@ var sysmon = (function () {
         ignore_missing: true,
     });
 
+    var setAdditionalSignatureFields = function (evt) {
+        var signed = evt.Get("winlog.event_data.Signed");
+        if (!signed) {
+            return;
+        }
+        evt.Put("file.code_signature.signed", true);
+        var signatureStatus = evt.Get("winlog.event_data.SignatureStatus");
+        evt.Put("file.code_signature.valid", signatureStatus === "Valid");
+    };
+
+    // https://docs.microsoft.com/en-us/windows/win32/sysinfo/registry-hives
+    var commonRegistryHives = {
+        HKEY_CLASSES_ROOT: "HKCR",
+        HKCR: "HKCR",
+        HKEY_CURRENT_CONFIG: "HKCC",
+        HKCC: "HKCC",
+        HKEY_CURRENT_USER: "HKCU",
+        HKCU: "HKCU",
+        HKEY_DYN_DATA: "HKDD",
+        HKDD: "HKDD",
+        HKEY_LOCAL_MACHINE: "HKLM",
+        HKLM: "HKLM",
+        HKEY_PERFORMANCE_DATA: "HKPD",
+        HKPD: "HKPD",
+        HKEY_USERS: "HKU",
+        HKU: "HKU",
+    };
+
+    var qwordRegex = new RegExp(/QWORD \(((0x\d{8})-(0x\d{8}))\)/, "i");
+    var dwordRegex = new RegExp(/DWORD \((0x\d{8})\)/, "i");
+
+    var setRegistryFields = function (evt) {
+        var path = evt.Get("winlog.event_data.TargetObject");
+        if (!path) {
+            return;
+        }
+        evt.Put("registry.path", path);
+        var pathTokens = path.split("\\");
+        var hive = commonRegistryHives[pathTokens[0]];
+        if (hive) {
+            evt.Put("registry.hive", hive);
+            pathTokens.splice(0, 1);
+            if (pathTokens.length > 0) {
+                evt.Put("registry.key", pathTokens.join("\\"));
+            }
+        }
+        var value = pathTokens[pathTokens.length - 1];
+        evt.Put("registry.value", value);
+        var data = evt.Get("winlog.event_data.Details");
+        if (!data) {
+            return;
+        }
+        // sysmon only returns details of a registry modification
+        // if it's a qword or dword
+        var dataType;
+        var dataValue;
+        var match = qwordRegex.exec(data);
+        if (match && match.length > 0) {
+            var parsedHighByte = parseInt(match[2]);
+            var parsedLowByte = parseInt(match[3]);
+            if (!isNaN(parsedHighByte) && !isNaN(parsedLowByte)) {
+                dataValue = "" + ((parsedHighByte << 8) + parsedLowByte);
+                dataType = "SZ_QWORD";
+            }
+        } else {
+            match = dwordRegex.exec(data);
+            if (match && match.length > 0) {
+                var parsedValue = parseInt(match[1]);
+                if (!isNaN(parsedValue)) {
+                    dataType = "SZ_DWORD";
+                    dataValue = "" + parsedValue;
+                }
+            }
+        }
+        if (dataType) {
+            evt.Put("registry.data.strings", [dataValue]);
+            evt.Put("registry.data.type", dataType);
+        }
+    };
+
+    // Event ID 1 - Process Create.
     var event1 = new processor.Chain()
         .Add(parseUtcTime)
         .AddFields({
-            "fields": {
-                "event.category": "process",
-                "event.type": "process_start",
+            fields: {
+                "event.category": ["process"],
+                "event.type": ["start", "process_start"],
             },
-            "target": "",
+            target: "",
         })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.CommandLine", to: "process.args"},
-                {from: "winlog.event_data.CurrentDirectory", to: "process.working_directory"},
-                {from: "winlog.event_data.ParentProcessGuid", to: "process.parent.entity_id"},
-                {from: "winlog.event_data.ParentProcessId", to: "process.parent.pid", type: "long"},
-                {from: "winlog.event_data.ParentImage", to: "process.parent.executable"},
-                {from: "winlog.event_data.ParentCommandLine", to: "process.parent.args"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.CommandLine",
+                    to: "process.command_line",
+                },
+                {
+                    from: "winlog.event_data.CurrentDirectory",
+                    to: "process.working_directory",
+                },
+                {
+                    from: "winlog.event_data.ParentProcessGuid",
+                    to: "process.parent.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ParentProcessId",
+                    to: "process.parent.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.ParentImage",
+                    to: "process.parent.executable",
+                },
+                {
+                    from: "winlog.event_data.ParentCommandLine",
+                    to: "process.parent.command_line",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -424,15 +612,38 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 2 - File creation time changed.
     var event2 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"],
+                "event.type": ["change"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.TargetFilename", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.TargetFilename",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -442,22 +653,72 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 3 - Network connection detected.
     var event3 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["network"],
+                "event.type": ["connection", "start", "protocol"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.Protocol", to: "network.transport"},
-                {from: "winlog.event_data.SourceIp", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.SourceHostname", to: "source.domain", type: "string"},
-                {from: "winlog.event_data.SourcePort", to: "source.port", type: "long"},
-                {from: "winlog.event_data.DestinationIp", to: "destination.ip", type: "ip"},
-                {from: "winlog.event_data.DestinationHostname", to: "destination.domain", type: "string"},
-                {from: "winlog.event_data.DestinationPort", to: "destination.port", type: "long"},
-                {from: "winlog.event_data.DestinationPortName", to: "network.protocol"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Protocol",
+                    to: "network.transport",
+                },
+                {
+                    from: "winlog.event_data.SourceIp",
+                    to: "source.ip",
+                    type: "ip",
+                },
+                {
+                    from: "winlog.event_data.SourceHostname",
+                    to: "source.domain",
+                    type: "string",
+                },
+                {
+                    from: "winlog.event_data.SourcePort",
+                    to: "source.port",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.DestinationIp",
+                    to: "destination.ip",
+                    type: "ip",
+                },
+                {
+                    from: "winlog.event_data.DestinationHostname",
+                    to: "destination.domain",
+                    type: "string",
+                },
+                {
+                    from: "winlog.event_data.DestinationPort",
+                    to: "destination.port",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.DestinationPortName",
+                    to: "network.protocol",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -471,11 +732,21 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 4 - Sysmon service state changed.
     var event4 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["process"],
+                "event.type": ["change"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -484,21 +755,35 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 5 - Process terminated.
     var event5 = new processor.Chain()
         .Add(parseUtcTime)
         .AddFields({
-            "fields": {
-                "event.category": "process",
-                "event.type": "process_end",
+            fields: {
+                "event.category": ["process"],
+                "event.type": ["end", "process_end"],
             },
-            "target": "",
+            target: "",
         })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -508,48 +793,126 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 6 - Driver loaded.
     var event6 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["driver"],
+                "event.type": ["start"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ImageLoaded", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ImageLoaded",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.Signature",
+                    to: "file.code_signature.subject_name",
+                },
+                {
+                    from: "winlog.event_data.SignatureStatus",
+                    to: "file.code_signature.status",
+                },
+            ],
+            fail_on_error: false,
+        })
+        .Add(setAdditionalSignatureFields)
         .Add(splitHashes)
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 7 - Image loaded.
     var event7 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["process"],
+                "event.type": ["change"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.ImageLoaded", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.ImageLoaded",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.Signature",
+                    to: "file.code_signature.subject_name",
+                },
+                {
+                    from: "winlog.event_data.SignatureStatus",
+                    to: "file.code_signature.status",
+                },
+            ],
+            fail_on_error: false,
+        })
+        .Add(setAdditionalSignatureFields)
         .Add(setProcessNameUsingExe)
         .Add(splitHashes)
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 8 - CreateRemoteThread detected.
     var event8 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.SourceProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.SourceProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.SourceImage", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.SourceProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.SourceProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.SourceImage",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -559,15 +922,32 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 9 - RawAccessRead detected.
     var event9 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.Device", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Device",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -577,15 +957,39 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 10 - Process accessed.
     var event10 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["process"],
+                "event.type": ["access"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.SourceProcessGUID", to: "process.entity_id"},
-                {from: "winlog.event_data.SourceProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.SourceThreadId", to: "process.thread.id", type: "long"},
-                {from: "winlog.event_data.SourceImage", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.SourceProcessGUID",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.SourceProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.SourceThreadId",
+                    to: "process.thread.id",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.SourceImage",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -595,15 +999,38 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 11 - File created.
     var event11 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"],
+                "event.type": ["creation"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.TargetFilename", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.TargetFilename",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -613,66 +1040,134 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 12 - Registry object added or deleted.
     var event12 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 13 - Registry value set.
     var event13 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 14 - Registry object renamed.
     var event14 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(setRegistryFields)
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 15 - File stream created.
     var event15 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"],
+                "event.type": ["access"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.TargetFilename", to: "file.path"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.TargetFilename",
+                    to: "file.path",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -683,11 +1178,15 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 16 - Sysmon config state changed.
     var event16 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -696,15 +1195,38 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 17 - Pipe Created.
     var event17 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"], // pipes are files
+                "event.type": ["creation"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.PipeName", to: "file.name"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.PipeName",
+                    to: "file.name",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -714,15 +1236,38 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 18 - Pipe Connected.
     var event18 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"], // pipes are files
+                "event.type": ["access"],
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.PipeName", to: "file.name"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.PipeName",
+                    to: "file.name",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -732,11 +1277,15 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 19 - WmiEventFilter activity detected.
     var event19 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -746,12 +1295,19 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 20 - WmiEventConsumer activity detected.
     var event20 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.Destination", to: "process.executable"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.Destination",
+                    to: "process.executable",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -762,11 +1318,15 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 21 - WmiEventConsumerToFilter activity detected.
     var event21 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -776,16 +1336,45 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 22 - DNSEvent (DNS query).
     var event22 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["network"],
+                "event.type": ["connection", "protocol", "info"],
+            },
+            network: {
+                protocol: "dns",
+            },
+        })
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ProcessGuid", to: "process.entity_id"},
-                {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
-                {from: "winlog.event_data.Image", to: "process.executable"},
-                {from: "winlog.event_data.QueryName", to: "dns.question.name"},
-                {from: "winlog.event_data.QueryStatus", to: "sysmon.dns.status"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.QueryName",
+                    to: "dns.question.name",
+                },
+                {
+                    from: "winlog.event_data.QueryStatus",
+                    to: "sysmon.dns.status",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -803,12 +1392,76 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 23 - FileDelete (A file delete was detected).
+    var event23 = new processor.Chain()
+        .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"], // pipes are files
+                "event.type": ["deletion"],
+            },
+        })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.RuleName",
+                    to: "rule.name",
+                },
+                {
+                    from: "winlog.event_data.TargetFilename",
+                    to: "file.name",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Archived",
+                    to: "sysmon.file.archived",
+                    type: "boolean",
+                },
+                {
+                    from: "winlog.event_data.IsExecutable",
+                    to: "sysmon.file.is_executable",
+                    type: "boolean",
+                },
+            ],
+            mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Add(addUser)
+        .Add(splitHashes)
+        .Add(setProcessNameUsingExe)
+        .Add(removeEmptyEventData)
+        .Build();
+
+    // Event ID 255 - Error report.
     var event255 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
             fields: [
-                {from: "winlog.event_data.UtcTime", to: "@timestamp"},
-                {from: "winlog.event_data.ID", to: "error.code"},
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ID",
+                    to: "error.code",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
@@ -818,78 +1471,34 @@ var sysmon = (function () {
         .Build();
 
     return {
-        // Event ID 1 - Process Create.
         1: event1.Run,
-
-        // Event ID 2 - File creation time changed.
         2: event2.Run,
-
-        // Event ID 3 - Network connection detected.
         3: event3.Run,
-
-        // Event ID 4 - Sysmon service state changed.
         4: event4.Run,
-
-        // Event ID 5 - Process terminated.
         5: event5.Run,
-
-        // Event ID 6 - Driver loaded.
         6: event6.Run,
-
-        // Event ID 7 - Image loaded.
         7: event7.Run,
-
-        // Event ID 8 - CreateRemoteThread detected.
         8: event8.Run,
-
-        // Event ID 9 - RawAccessRead detected.
         9: event9.Run,
-
-        // Event ID 10 - Process accessed.
         10: event10.Run,
-
-        // Event ID 11 - File created.
         11: event11.Run,
-
-        // Event ID 12 - Registry object added or deleted.
         12: event12.Run,
-
-        // Event ID 13 - Registry value set.
         13: event13.Run,
-
-        // Event ID 14 - Registry object renamed.
         14: event14.Run,
-
-        // Event ID 15 - File stream created.
         15: event15.Run,
-
-        // Event ID 16 - Sysmon config state changed.
         16: event16.Run,
-
-        // Event ID 17 - Pipe Created.
         17: event17.Run,
-
-        // Event ID 18 - Pipe Connected.
         18: event18.Run,
-
-        // Event ID 19 - WmiEventFilter activity detected.
         19: event19.Run,
-
-        // Event ID 20 - WmiEventConsumer activity detected.
         20: event20.Run,
-
-        // Event ID 21 - WmiEventConsumerToFilter activity detected.
         21: event21.Run,
-
-        // Event ID 22 - DNSEvent (DNS query).
         22: event22.Run,
-
-        // Event ID 255 - Error report.
+        23: event23.Run,
         255: event255.Run,
 
-        process: function(evt) {
+        process: function (evt) {
             var event_id = evt.Get("winlog.event_id");
-            var processor= this[event_id];
+            var processor = this[event_id];
             if (processor === undefined) {
                 throw "unexpected sysmon event_id";
             }

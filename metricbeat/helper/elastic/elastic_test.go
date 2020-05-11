@@ -22,8 +22,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -97,7 +100,7 @@ func TestFixTimestampField(t *testing.T) {
 		{
 			"converts float64s in scientific notation to ints",
 			map[string]interface{}{
-				"foo": 1.571284349E12,
+				"foo": 1.571284349e12,
 			},
 			map[string]interface{}{
 				"foo": 1571284349000,
@@ -139,4 +142,87 @@ func TestFixTimestampField(t *testing.T) {
 			assert.Equal(t, test.ExpectedValue, test.OriginalValue)
 		})
 	}
+}
+
+func TestConfigureModule(t *testing.T) {
+	mockRegistry := mb.NewRegister()
+
+	const moduleName = "test_module"
+
+	err := mockRegistry.AddMetricSet(moduleName, "foo", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "bar", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "qux", mockMetricSetFactory)
+	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "baz", mockMetricSetFactory)
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		initConfig             metricSetConfig
+		xpackEnabledMetricsets []string
+		newConfig              metricSetConfig
+	}{
+		"no_xpack_enabled": {
+			metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"foo", "bar"},
+			},
+			[]string{"baz", "qux", "foo"},
+			metricSetConfig{
+				Module:     moduleName,
+				MetricSets: []string{"foo", "bar"},
+			},
+		},
+		"xpack_enabled": {
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"foo", "bar"},
+			},
+			[]string{"baz", "qux", "foo"},
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"baz", "qux", "foo"},
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg := common.MustNewConfigFrom(test.initConfig)
+			m, _, err := mb.NewModule(cfg, mockRegistry)
+			require.NoError(t, err)
+
+			bm, ok := m.(*mb.BaseModule)
+			if !ok {
+				require.Fail(t, "expecting module to be base module")
+			}
+
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, logp.L())
+			require.NoError(t, err)
+
+			var newConfig metricSetConfig
+			err = newM.UnpackConfig(&newConfig)
+			require.NoError(t, err)
+			require.Equal(t, test.newConfig, newConfig)
+		})
+	}
+}
+
+type mockMetricSet struct {
+	mb.BaseMetricSet
+}
+
+func (m *mockMetricSet) Fetch(r mb.ReporterV2) error { return nil }
+
+type metricSetConfig struct {
+	Module       string   `config:"module"`
+	MetricSets   []string `config:"metricsets"`
+	XPackEnabled bool     `config:"xpack.enabled"`
+}
+
+func mockMetricSetFactory(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &mockMetricSet{base}, nil
 }

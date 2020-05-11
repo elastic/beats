@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 
 	"github.com/stretchr/testify/require"
 

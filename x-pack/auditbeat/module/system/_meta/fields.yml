@@ -30,11 +30,6 @@
   - name: process
     type: group
     fields:
-    - name: entity_id
-      type: keyword
-      description: >
-        ID uniquely identifying the process. It is computed as a SHA-256 hash of the
-        host ID, PID, and process start time.
     - name: hash
       type: group
       description: >

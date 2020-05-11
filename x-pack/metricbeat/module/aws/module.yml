@@ -7,3 +7,6 @@ metricsets:
   - sns
   - lambda
   - dynamodb
+  - vpn
+  - transitgateway
+  - natgateway

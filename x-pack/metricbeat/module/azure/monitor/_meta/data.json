@@ -1,57 +1,46 @@
 {
-    "@timestamp":"2019-08-20T13:52:00.000Z",
-    "service":{
-        "type":"azure"
-    },
-    "azure":{
-        "subscriptionID":"123456-qwer-1234-5678-12345678",
-        "metrics":{
-            "percentage_cpu":{
-                "min":1.86,
-                "max":2.8,
-                "avg":2.535
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "metrics": {
+            "data_usage": {
+                "total": 0
+            },
+            "document_count": {
+                "total": 0
+            },
+            "document_quota": {
+                "total": 53687091200
             }
         },
-        "resource":{
-            "name":"vmwindows",
-            "type":"Microsoft.Compute/virtualMachines"
+        "namespace": "Microsoft.DocumentDb/databaseAccounts",
+        "resource": {
+            "group": "obs-infrastructure",
+            "tags": {
+                "defaultExperience": "Core (SQL)"
+            },
+            "type": "Microsoft.DocumentDb/databaseAccounts"
         },
-        "namespace":"Microsoft.Compute/virtualMachines"
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "timegrain": "PT5M"
     },
-    "cloud":{
-        "provider":"azure",
-        "region":"westeurope"
-    },
-    "metricset":{
-        "name":"monitor"
-    },
-    "event":{
-        "module":"azure",
-        "duration":40189255100,
-        "dataset":"azure.monitor"
-    },
-    "ecs":{
-        "version":"1.0.1"
-    },
-    "host":{
-        "name":"DESKTOP-RFOOE09",
-        "architecture":"x86_64",
-        "os":{
-            "family":"windows",
-            "name":"Windows 10 Pro",
-            "kernel":"10.0.17134.950 (WinBuild.160101.0800)",
-            "build":"17134.950",
-            "platform":"windows",
-            "version":"10.0"
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "name": "obsaccount"
         },
-        "id":"123456-qwer-1234-5678-12345678",
-        "hostname":"DESKTOP-RFOOE09"
+        "provider": "azure",
+        "region": "westeurope"
     },
-    "agent":{
-        "ephemeral_id":"123456-qwer-1234-5678-12345678",
-        "hostname":"DESKTOP-RFOOE09",
-        "id":"123456-qwer-1234-5678-12345678",
-        "version":"8.0.0",
-        "type":"metricbeat"
+    "event": {
+        "dataset": "azure.monitor",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "monitor",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
     }
 }

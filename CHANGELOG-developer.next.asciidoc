@@ -28,6 +28,24 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
 - Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
+- Python 3 is required now to run python tests and tools. {pull}14798[14798]
+- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
+- The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
+- `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
+- Require logger as first parameter for `outputs.transport.transport#ProxyDialer` and `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
+
+- The `libbeat/outputs/transport` package has been moved to `libbeat/common/transport`. {pull}16734[16734]
+- The `libbeat/outputs/tls.go` file has been removed. All exported symbols in that file (`libbeat/outputs.*`) are now available as `libbeat/common/tlscommon.*`. {pull}16734[16734]
+- The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
+- Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
+- Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
+- Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
+- Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
+- The way configuration files are generated has changed to make it easier to customize parts
+  of the config without requiring changes to libbeat config templates. Generation is now
+  fully based on Go text/template and no longer uses file concatenation to generate the config.
+  Your magefile.go will require a change to adapt the devtool API. See the pull request for
+  more details. {pull}18148[18148]
 
 ==== Bugfixes
 
@@ -65,3 +83,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
 - Fix dropped errors in the tests for the metricbeat Azure module. {pull}13773[13773]
 - New mage target for Functionbeat: generate pkg folder to make manager easier. {pull}15580[15880]
+- Add support for MODULE environment variable in `mage goIntegTest` in metricbeat to run integration tests for a single module. {pull}17147[17147]
+- Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
+- Add fields validation for histogram subfields. {pull}17759[17759]
+- Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]

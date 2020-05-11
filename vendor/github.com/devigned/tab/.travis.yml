@@ -1,0 +1,17 @@
+language: go
+sudo: false
+go:
+  - 1.x
+  - 1.11.x
+before_install:
+  - cd ${TRAVIS_HOME}
+  - export GO111MODULE=auto
+  - go get -u github.com/mattn/goveralls
+  - go get -u golang.org/x/tools/cmd/cover
+  - go get -u github.com/fzipp/gocyclo
+  - go get -u golang.org/x/lint/golint
+  - cd ${TRAVIS_BUILD_DIR}
+script:
+  - export GO111MODULE=on
+  - make test-cover
+  - goveralls -coverprofile=cover.out -service=travis-ci

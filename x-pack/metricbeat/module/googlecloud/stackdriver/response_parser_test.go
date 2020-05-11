@@ -5,7 +5,10 @@
 package stackdriver
 
 import (
+	"testing"
+
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
@@ -64,4 +67,33 @@ var metrics = []string{
 	"compute.googleapis.com/instance/cpu/utilization",
 	"compute.googleapis.com/instance/disk/read_bytes_count",
 	"compute.googleapis.com/http/server/response_latencies",
+}
+
+func TestCleanMetricNameString(t *testing.T) {
+	cases := []struct {
+		title              string
+		metricType         string
+		aligner            string
+		expectedMetricName string
+	}{
+		{
+			"test construct metric name with ALIGN_MEAN aligner",
+			"compute.googleapis.com/instance/cpu/usage_time",
+			"ALIGN_MEAN",
+			"instance.cpu.usage_time.avg",
+		},
+		{
+			"test construct metric name with ALIGN_NONE aligner",
+			"compute.googleapis.com/instance/cpu/utilization",
+			"ALIGN_NONE",
+			"instance.cpu.utilization.value",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			metricName := cleanMetricNameString(c.metricType, c.aligner)
+			assert.Equal(t, c.expectedMetricName, metricName)
+		})
+	}
 }

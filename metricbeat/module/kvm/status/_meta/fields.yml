@@ -1,0 +1,23 @@
+- name: status
+  type: group
+  description: >
+    status
+  release: beta
+  fields:
+      - name: stat
+        type: group
+        description: >
+          Memory stat
+        fields:
+          - name: state
+            type: keyword
+            description: >
+              domain state
+      - name: id
+        type: long
+        description: >
+          Domain id
+      - name: name
+        type: keyword
+        description: >
+          Domain name

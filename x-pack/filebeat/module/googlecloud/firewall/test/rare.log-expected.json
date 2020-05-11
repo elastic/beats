@@ -5,11 +5,16 @@
         "destination.domain": "local-adrian-test",
         "destination.ip": "10.128.0.16",
         "destination.port": 80,
-        "event.category": "firewall-rule",
+        "event.action": "firewall-rule",
+        "event.category": "network",
         "event.dataset": "googlecloud.firewall",
+        "event.id": "1dobeotg13df9f5",
+        "event.kind": "event",
         "event.module": "googlecloud",
-        "event.outcome": "deny",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
         "fileset.name": "firewall",
         "googlecloud.destination.instance.project_id": "local-test",
         "googlecloud.destination.instance.region": "us-central1",
@@ -29,7 +34,6 @@
             }
         ],
         "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
         "googlecloud.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
@@ -52,6 +56,7 @@
             "10.142.0.10",
             "10.128.0.16"
         ],
+        "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "googlecloud",
         "source.address": "10.142.0.10",
         "source.domain": "test-es",
@@ -64,11 +69,16 @@
         "destination.domain": "test-es",
         "destination.ip": "10.128.0.10",
         "destination.port": 57794,
-        "event.category": "firewall-rule",
+        "event.action": "firewall-rule",
+        "event.category": "network",
         "event.dataset": "googlecloud.firewall",
+        "event.id": "1dobeotg13df9f7",
+        "event.kind": "event",
         "event.module": "googlecloud",
-        "event.outcome": "deny",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
         "fileset.name": "firewall",
         "googlecloud.destination.instance.project_id": "remote-beats",
         "googlecloud.destination.instance.region": "us-east1",
@@ -88,7 +98,6 @@
             }
         ],
         "googlecloud.firewall.rule_details.priority": 1000,
-        "googlecloud.firewall.rule_details.reference": "network:default/firewall:adrian-test-3",
         "googlecloud.firewall.rule_details.source_range": [
             "0.0.0.0/0"
         ],
@@ -111,6 +120,7 @@
             "10.142.0.16",
             "10.128.0.10"
         ],
+        "rule.name": "network:default/firewall:adrian-test-3",
         "service.type": "googlecloud",
         "source.address": "10.142.0.16",
         "source.domain": "local-adrian-test",

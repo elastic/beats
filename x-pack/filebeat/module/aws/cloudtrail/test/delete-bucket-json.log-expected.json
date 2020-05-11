@@ -26,6 +26,7 @@
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "192.0.2.1",
+        "source.ip": "192.0.2.1",
         "user.id": "AIDAQRSTUVWXYZEXAMPLE:devdsk",
         "user_agent.device.name": "Spider",
         "user_agent.name": "aws-cli",

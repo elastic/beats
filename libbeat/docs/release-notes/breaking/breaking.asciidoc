@@ -10,6 +10,9 @@ changes, but there are breaking changes between major versions (e.g. 6.x to
 7.x) is not recommended.
 
 See the following topics for a description of breaking changes:
+* <<breaking-changes-7.8>>
+
+* <<breaking-changes-7.7>>
 
 * <<breaking-changes-7.6>>
 
@@ -24,6 +27,10 @@ See the following topics for a description of breaking changes:
 * <<breaking-changes-7.1>>
 
 * <<breaking-changes-7.0>>
+
+include::breaking-7.8.asciidoc[]
+
+include::breaking-7.7.asciidoc[]
 
 include::breaking-7.6.asciidoc[]
 

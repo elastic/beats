@@ -27,8 +27,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 func load(t *testing.T, from interface{}) *common.Config {
@@ -50,7 +51,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		&ModuleConfig{Module: "auditd"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -115,7 +116,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -139,7 +140,7 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -395,7 +396,7 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, "5.2.0", true)
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true)
 	assert.NoError(t, err)
 	assert.NotNil(t, reg)
 

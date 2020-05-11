@@ -365,7 +365,7 @@ func (s diffStats) String() string {
 	// Pluralize the name (adjusting for some obscure English grammar rules).
 	name := s.Name
 	if sum > 1 {
-		name = name + "s"
+		name += "s"
 		if strings.HasSuffix(name, "ys") {
 			name = name[:len(name)-2] + "ies" // e.g., "entrys" => "entries"
 		}

@@ -18,9 +18,14 @@
 package kafka
 
 import (
+	"fmt"
+	"math"
 	"testing"
+	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestConfigAcceptValid(t *testing.T) {
@@ -34,6 +39,26 @@ func TestConfigAcceptValid(t *testing.T) {
 			"compression": "lz4",
 			"version":     "1.0.0",
 		},
+		"Kerberos with keytab": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "keytab",
+				"username":     "elastic",
+				"keytab":       "/etc/krb5kcd/kafka.keytab",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+		"Kerberos with user and password pair": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "password",
+				"username":     "elastic",
+				"password":     "changeme",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
 	}
 
 	for name, test := range tests {
@@ -45,9 +70,64 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(cfg); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
+		})
+	}
+}
+
+func TestConfigInvalid(t *testing.T) {
+	tests := map[string]common.MapStr{
+		"Kerberos with invalid auth_type": common.MapStr{
+			"kerberos": common.MapStr{
+				"auth_type":    "invalid_auth_type",
+				"config_path":  "/etc/path/config",
+				"service_name": "HTTP/elastic@ELASTIC",
+				"realm":        "ELASTIC",
+			},
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c := common.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			_, err := readConfig(c)
+			if err == nil {
+				t.Fatalf("Can create test configuration from invalid input")
+			}
+		})
+	}
+}
+
+func TestBackoffFunc(t *testing.T) {
+	testutil.SeedPRNG(t)
+	tests := map[int]backoffConfig{
+		15: {Init: 1 * time.Second, Max: 60 * time.Second},
+		7:  {Init: 2 * time.Second, Max: 20 * time.Second},
+		4:  {Init: 5 * time.Second, Max: 7 * time.Second},
+	}
+
+	for numRetries, backoffCfg := range tests {
+		t.Run(fmt.Sprintf("%v_retries", numRetries), func(t *testing.T) {
+			backoffFn := makeBackoffFunc(backoffCfg)
+
+			prevBackoff := backoffCfg.Init
+			for retries := 1; retries <= numRetries; retries++ {
+				backoff := prevBackoff * 2
+
+				expectedBackoff := math.Min(float64(backoff), float64(backoffCfg.Max))
+				actualBackoff := backoffFn(retries, 50)
+
+				if !((expectedBackoff/2 <= float64(actualBackoff)) && (float64(actualBackoff) <= expectedBackoff)) {
+					t.Fatalf("backoff '%v' not in expected range [%v, %v] (retries: %v)", actualBackoff, expectedBackoff/2, expectedBackoff, retries)
+				}
+
+				prevBackoff = backoff
+			}
+
 		})
 	}
 }

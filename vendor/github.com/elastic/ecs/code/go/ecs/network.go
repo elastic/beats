@@ -92,4 +92,11 @@ type Network struct {
 	// If `source.packets` and `destination.packets` are known,
 	// `network.packets` is their sum.
 	Packets int64 `ecs:"packets"`
+
+	// Network.inner fields are added in addition to network.vlan fields to
+	// describe  the innermost VLAN when q-in-q VLAN tagging is present.
+	// Allowed fields include  vlan.id and vlan.name. Inner vlan fields are
+	// typically used when sending traffic with multiple 802.1q encapsulations
+	// to a network sensor (e.g. Zeek, Wireshark.)
+	Inner map[string]interface{} `ecs:"inner"`
 }

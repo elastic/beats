@@ -20,7 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -86,6 +86,30 @@ func TestHandleMessage(t *testing.T) {
 				{
 					name: "test-s3-ks-2",
 					key:  "server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA",
+				},
+			},
+		},
+		{
+			"sqs message with event source aws:s3, event name ObjectCreated:Put and encoded filename",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"year%3D2020/month%3D05/test1.txt\"}}}]}"),
+			},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "year=2020/month=05/test1.txt",
+				},
+			},
+		},
+		{
+			"sqs message with event source aws:s3, event name ObjectCreated:Put and gzip filename",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"428152502467_CloudTrail_us-east-2_20191219T1655Z_WXCas1PVnOaTpABD.json.gz\"}}}]}"),
+			},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "428152502467_CloudTrail_us-east-2_20191219T1655Z_WXCas1PVnOaTpABD.json.gz",
 				},
 			},
 		},

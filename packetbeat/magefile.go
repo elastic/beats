@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"regexp"
@@ -31,25 +30,23 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -192,24 +189,6 @@ func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
 // -----------------------------------------------------------------------------
 // Customizations specific to Packetbeat.
 // - Config file contains an OS specific device name (affects darwin, windows).
@@ -280,7 +259,7 @@ var crossBuildDeps = map[string]func() error{
 
 // buildLibpcapFromSource builds libpcap from source because the library needs
 // to be compiled with -fPIC.
-// See https://github.com/elastic/beats/pull/4217.
+// See https://github.com/elastic/beats/v7/pull/4217.
 func buildLibpcapFromSource(params map[string]string) error {
 	tarFile, err := devtools.DownloadFile(libpcapURL, "/libpcap")
 	if err != nil {
@@ -422,7 +401,7 @@ func generateWin64StaticWinpcap() error {
 
 	// Notes: We are using absolute path to make sure the files
 	// are available for x-pack build.
-	// Ref: https://github.com/elastic/beats/issues/1259
+	// Ref: https://github.com/elastic/beats/v7/issues/1259
 	defer devtools.DockerChown(devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
 	return devtools.RunCmds(
 		// Requires mingw-w64-tools.

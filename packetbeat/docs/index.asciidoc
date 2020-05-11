@@ -41,6 +41,8 @@ include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+include::{docdir}/howto/howto.asciidoc[]
+
 include::./fields.asciidoc[]
 
 include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]

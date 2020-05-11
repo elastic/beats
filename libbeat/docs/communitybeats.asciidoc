@@ -78,6 +78,7 @@ https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/nfvsap/natsbeat[natsbeat]:: Collects data from NATS monitoring endpoints
 https://github.com/radoondas/netatmobeat[netatmobeat]:: Reads data from Netatmo weather station.
+https://github.com/hmschreck/netbeat[netbeat]:: Reads configurable data from SNMP-enabled devices.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
 https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.

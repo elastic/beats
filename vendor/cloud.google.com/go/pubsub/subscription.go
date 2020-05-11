@@ -31,8 +31,8 @@ import (
 	"golang.org/x/sync/errgroup"
 	pb "google.golang.org/genproto/googleapis/pubsub/v1"
 	fmpb "google.golang.org/genproto/protobuf/field_mask"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Subscription is a reference to a PubSub subscription.
@@ -116,12 +116,79 @@ type PushConfig struct {
 
 	// Endpoint configuration attributes. See https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions#pushconfig for more details.
 	Attributes map[string]string
+
+	// AuthenticationMethod is used by push endpoints to verify the source
+	// of push requests.
+	// It can be used with push endpoints that are private by default to
+	// allow requests only from the Cloud Pub/Sub system, for example.
+	// This field is optional and should be set only by users interested in
+	// authenticated push.
+	//
+	// It is EXPERIMENTAL and a part of a closed alpha that may not be
+	// accessible to all users. This field is subject to change or removal
+	// without notice.
+	AuthenticationMethod AuthenticationMethod
 }
 
 func (pc *PushConfig) toProto() *pb.PushConfig {
-	return &pb.PushConfig{
+	if pc == nil {
+		return nil
+	}
+	pbCfg := &pb.PushConfig{
 		Attributes:   pc.Attributes,
 		PushEndpoint: pc.Endpoint,
+	}
+	if authMethod := pc.AuthenticationMethod; authMethod != nil {
+		switch am := authMethod.(type) {
+		case *OIDCToken:
+			pbCfg.AuthenticationMethod = am.toProto()
+		default: // TODO: add others here when GAIC adds more definitions.
+		}
+	}
+	return pbCfg
+}
+
+// AuthenticationMethod is used by push points to verify the source of push requests.
+// This interface defines fields that are part of a closed alpha that may not be accessible
+// to all users.
+type AuthenticationMethod interface {
+	isAuthMethod() bool
+}
+
+// OIDCToken allows PushConfigs to be authenticated using
+// the OpenID Connect protocol https://openid.net/connect/
+type OIDCToken struct {
+	// Audience to be used when generating OIDC token. The audience claim
+	// identifies the recipients that the JWT is intended for. The audience
+	// value is a single case-sensitive string. Having multiple values (array)
+	// for the audience field is not supported. More info about the OIDC JWT
+	// token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3
+	// Note: if not specified, the Push endpoint URL will be used.
+	Audience string
+
+	// The service account email to be used for generating the OpenID Connect token.
+	// The caller of:
+	//  * CreateSubscription
+	//  * UpdateSubscription
+	//  * ModifyPushConfig
+	// calls must have the iam.serviceAccounts.actAs permission for the service account.
+	// See https://cloud.google.com/iam/docs/understanding-roles#service-accounts-roles.
+	ServiceAccountEmail string
+}
+
+var _ AuthenticationMethod = (*OIDCToken)(nil)
+
+func (oidcToken *OIDCToken) isAuthMethod() bool { return true }
+
+func (oidcToken *OIDCToken) toProto() *pb.PushConfig_OidcToken_ {
+	if oidcToken == nil {
+		return nil
+	}
+	return &pb.PushConfig_OidcToken_{
+		OidcToken: &pb.PushConfig_OidcToken{
+			Audience:            oidcToken.Audience,
+			ServiceAccountEmail: oidcToken.ServiceAccountEmail,
+		},
 	}
 }
 
@@ -153,8 +220,10 @@ type SubscriptionConfig struct {
 	// *default policy* with `ttl` of 31 days will be used. The minimum allowed
 	// value for `expiration_policy.ttl` is 1 day.
 	//
+	// Use time.Duration(0) to indicate that the subscription should never expire.
+	//
 	// It is EXPERIMENTAL and subject to change or removal without notice.
-	ExpirationPolicy time.Duration
+	ExpirationPolicy optional.Duration
 
 	// The set of labels for the subscription.
 	Labels map[string]string
@@ -162,11 +231,8 @@ type SubscriptionConfig struct {
 
 func (cfg *SubscriptionConfig) toProto(name string) *pb.Subscription {
 	var pbPushConfig *pb.PushConfig
-	if cfg.PushConfig.Endpoint != "" || len(cfg.PushConfig.Attributes) != 0 {
-		pbPushConfig = &pb.PushConfig{
-			Attributes:   cfg.PushConfig.Attributes,
-			PushEndpoint: cfg.PushConfig.Endpoint,
-		}
+	if cfg.PushConfig.Endpoint != "" || len(cfg.PushConfig.Attributes) != 0 || cfg.PushConfig.AuthenticationMethod != nil {
+		pbPushConfig = cfg.PushConfig.toProto()
 	}
 	var retentionDuration *durpb.Duration
 	if cfg.RetentionDuration != 0 {
@@ -200,18 +266,38 @@ func protoToSubscriptionConfig(pbSub *pb.Subscription, c *Client) (SubscriptionC
 			return SubscriptionConfig{}, err
 		}
 	}
-	return SubscriptionConfig{
-		Topic:       newTopic(c, pbSub.Topic),
-		AckDeadline: time.Second * time.Duration(pbSub.AckDeadlineSeconds),
-		PushConfig: PushConfig{
-			Endpoint:   pbSub.PushConfig.PushEndpoint,
-			Attributes: pbSub.PushConfig.Attributes,
-		},
+	subC := SubscriptionConfig{
+		Topic:               newTopic(c, pbSub.Topic),
+		AckDeadline:         time.Second * time.Duration(pbSub.AckDeadlineSeconds),
 		RetainAckedMessages: pbSub.RetainAckedMessages,
 		RetentionDuration:   rd,
 		Labels:              pbSub.Labels,
 		ExpirationPolicy:    expirationPolicy,
-	}, nil
+	}
+	pc := protoToPushConfig(pbSub.PushConfig)
+	if pc != nil {
+		subC.PushConfig = *pc
+	}
+	return subC, nil
+}
+
+func protoToPushConfig(pbPc *pb.PushConfig) *PushConfig {
+	if pbPc == nil {
+		return nil
+	}
+	pc := &PushConfig{
+		Endpoint:   pbPc.PushEndpoint,
+		Attributes: pbPc.Attributes,
+	}
+	if am := pbPc.AuthenticationMethod; am != nil {
+		if oidcToken, ok := am.(*pb.PushConfig_OidcToken_); ok && oidcToken != nil && oidcToken.OidcToken != nil {
+			pc.AuthenticationMethod = &OIDCToken{
+				Audience:            oidcToken.OidcToken.GetAudience(),
+				ServiceAccountEmail: oidcToken.OidcToken.GetServiceAccountEmail(),
+			}
+		}
+	}
+	return pc
 }
 
 // ReceiveSettings configure the Receive method.
@@ -301,7 +387,7 @@ func (s *Subscription) Exists(ctx context.Context) (bool, error) {
 	if err == nil {
 		return true, nil
 	}
-	if grpc.Code(err) == codes.NotFound {
+	if status.Code(err) == codes.NotFound {
 		return false, nil
 	}
 	return false, err
@@ -335,7 +421,7 @@ type SubscriptionConfigToUpdate struct {
 	RetentionDuration time.Duration
 
 	// If non-zero, Expiration is changed.
-	ExpirationPolicy time.Duration
+	ExpirationPolicy optional.Duration
 
 	// If non-nil, the current set of labels is completely
 	// replaced by the new set.
@@ -382,7 +468,7 @@ func (s *Subscription) updateRequest(cfg *SubscriptionConfigToUpdate) *pb.Update
 		psub.MessageRetentionDuration = ptypes.DurationProto(cfg.RetentionDuration)
 		paths = append(paths, "message_retention_duration")
 	}
-	if cfg.ExpirationPolicy != 0 {
+	if cfg.ExpirationPolicy != nil {
 		psub.ExpirationPolicy = expirationPolicyToProto(cfg.ExpirationPolicy)
 		paths = append(paths, "expiration_policy")
 	}
@@ -407,21 +493,31 @@ const (
 )
 
 func (cfg *SubscriptionConfigToUpdate) validate() error {
-	if cfg == nil || cfg.ExpirationPolicy == 0 {
+	if cfg == nil || cfg.ExpirationPolicy == nil {
 		return nil
 	}
-	if policy, min := cfg.ExpirationPolicy, minExpirationPolicy; policy < min {
-		return fmt.Errorf("invalid expiration policy(%q) < minimum(%q)", policy, min)
+	policy, min := optional.ToDuration(cfg.ExpirationPolicy), minExpirationPolicy
+	if policy == 0 || policy >= min {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("invalid expiration policy(%q) < minimum(%q)", policy, min)
 }
 
-func expirationPolicyToProto(expirationPolicy time.Duration) *pb.ExpirationPolicy {
-	if expirationPolicy == 0 {
+func expirationPolicyToProto(expirationPolicy optional.Duration) *pb.ExpirationPolicy {
+	if expirationPolicy == nil {
 		return nil
 	}
+
+	dur := optional.ToDuration(expirationPolicy)
+	var ttl *durpb.Duration
+	// As per:
+	//    https://godoc.org/google.golang.org/genproto/googleapis/pubsub/v1#ExpirationPolicy.Ttl
+	// if ExpirationPolicy.Ttl is set to nil, the expirationPolicy is toggled to NEVER expire.
+	if dur != 0 {
+		ttl = ptypes.DurationProto(dur)
+	}
 	return &pb.ExpirationPolicy{
-		Ttl: ptypes.DurationProto(expirationPolicy),
+		Ttl: ttl,
 	}
 }
 

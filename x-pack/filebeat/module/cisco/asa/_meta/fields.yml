@@ -85,3 +85,15 @@
     type: short
     description: >
       ICMP code.
+
+  - name: connection_type
+    type: keyword
+    default_field: false
+    description: >
+      The VPN connection type
+
+  - name: dap_records
+    default_field: false
+    type: keyword
+    description: >
+      The assigned DAP records

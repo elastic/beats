@@ -1,6 +1,10 @@
 [[add-tags]]
 === Add tags
 
+++++
+<titleabbrev>add_tags</titleabbrev>
+++++
+
 The `add_tags` processor adds tags to a list of tags. If the target field already exists,
 the tags are appended to the existing list of tags.
 
@@ -13,9 +17,9 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_tags:
-    tags: [web, production]
-    target: "environment"
+  - add_tags:
+      tags: [web, production]
+      target: "environment"
 ------------------------------------------------------------------------------
 
 Adds the environment field to every event:

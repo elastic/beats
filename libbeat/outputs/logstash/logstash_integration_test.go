@@ -20,6 +20,7 @@
 package logstash
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,14 +30,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outest"
-	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 )
 
 const (
@@ -49,7 +51,7 @@ const (
 )
 
 type esConnection struct {
-	*elasticsearch.Client
+	*eslegclient.Connection
 	t     *testing.T
 	index string
 }
@@ -100,13 +102,12 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      host,
-		Index:    indexSel,
 		Username: username,
 		Password: password,
 		Timeout:  60 * time.Second,
-	}, nil)
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +127,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	es := &esConnection{}
 	es.t = t
-	es.Client = client
+	es.Connection = client
 	es.index = index
 	return es
 }
@@ -301,7 +302,7 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 			},
 		},
 	)
-	ls.Publish(batch)
+	ls.Publish(context.Background(), batch)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -563,7 +564,7 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	t.Publish(outest.NewBatch(event))
+	t.Publish(context.Background(), outest.NewBatch(event))
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
@@ -577,7 +578,7 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 		wg.Done()
 	}
 
-	t.Publish(batch)
+	t.Publish(context.Background(), batch)
 	wg.Wait()
 	return ok
 }

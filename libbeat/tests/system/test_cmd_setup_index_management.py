@@ -77,7 +77,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # try deleting policy needs to raise an error as it is in use
@@ -191,7 +190,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -211,7 +209,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -229,7 +226,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")

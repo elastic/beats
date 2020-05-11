@@ -25,13 +25,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/mb"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -41,31 +43,9 @@ func init() {
 	}
 }
 
-// NewModule creates a new module after performing validation.
+// NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := validateXPackMetricsets(base); err != nil {
-		return nil, err
-	}
-
-	return &base, nil
-}
-
-// Validate that correct metricsets have been specified if xpack.enabled = true.
-func validateXPackMetricsets(base mb.BaseModule) error {
-	config := struct {
-		Metricsets   []string `config:"metricsets"`
-		XPackEnabled bool     `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return err
-	}
-
-	// Nothing to validate if xpack.enabled != true
-	if !config.XPackEnabled {
-		return nil
-	}
-
-	expectedXPackMetricsets := []string{
+	xpackEnabledMetricSets := []string{
 		"ccr",
 		"enrich",
 		"cluster_stats",
@@ -76,12 +56,7 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 		"node_stats",
 		"shard",
 	}
-
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
-	}
-
-	return nil
+	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
 }
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
@@ -89,6 +64,9 @@ var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
 var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
+
+// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
+var BulkStatsAvailableVersion = common.MustNewVersion("7.8.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -133,6 +111,14 @@ type License struct {
 type licenseWrapper struct {
 	License License `json:"license"`
 }
+
+var BulkStatsDict = c.Dict("bulk", s.Schema{
+	"total_operations":     c.Int("total_operations"),
+	"total_time_in_millis": c.Int("total_time_in_millis"),
+	"total_size_in_bytes":  c.Int("total_size_in_bytes"),
+	"avg_time_in_millis":   c.Int("avg_time_in_millis"),
+	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
+}, c.DictOptional)
 
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
@@ -363,6 +349,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+type XPack struct {
+	Features struct {
+		CCR struct {
+			Enabled bool `json:"enabled"`
+		} `json:"CCR"`
+	} `json:"features"`
+}
+
+// GetXPack returns information about xpack features.
+func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
+	content, err := fetchPath(http, resetURI, "_xpack", "")
+
+	if err != nil {
+		return XPack{}, err
+	}
+
+	var xpack XPack
+	err = json.Unmarshal(content, &xpack)
+	return xpack, err
+}
+
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
@@ -437,8 +444,13 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// Global cache for license information. Assumption is that license information changes infrequently.
-var licenseCache = &_licenseCache{}
+var (
+	// Global cache for license information. Assumption is that license information changes infrequently.
+	licenseCache = &_licenseCache{}
+
+	// LicenseCacheEnabled controls whether license caching is enabled or not. Intended for test use.
+	LicenseCacheEnabled = true
+)
 
 type _licenseCache struct {
 	sync.RWMutex
@@ -460,6 +472,10 @@ func (c *_licenseCache) get() *License {
 }
 
 func (c *_licenseCache) set(license *License, ttl time.Duration) {
+	if !LicenseCacheEnabled {
+		return
+	}
+
 	c.Lock()
 	defer c.Unlock()
 
