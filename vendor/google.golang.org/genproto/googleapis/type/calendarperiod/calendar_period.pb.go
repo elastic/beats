@@ -83,7 +83,9 @@ func init() {
 	proto.RegisterEnum("google.type.CalendarPeriod", CalendarPeriod_name, CalendarPeriod_value)
 }
 
-func init() { proto.RegisterFile("google/type/calendar_period.proto", fileDescriptor_52aec33199a3da0e) }
+func init() {
+	proto.RegisterFile("google/type/calendar_period.proto", fileDescriptor_52aec33199a3da0e)
+}
 
 var fileDescriptor_52aec33199a3da0e = []byte{
 	// 248 bytes of a gzipped FileDescriptorProto

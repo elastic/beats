@@ -594,6 +594,8 @@ func (c *Client) Run(ctx context.Context, q *Query) *Iterator {
 }
 
 // Iterator is the result of running a query.
+//
+// It is not safe for concurrent use.
 type Iterator struct {
 	ctx    context.Context
 	client *Client

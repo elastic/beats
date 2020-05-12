@@ -7,6 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/pkg/errors"
+
 )
 
 var (
@@ -65,6 +66,18 @@ type RtlUserProcessParameters struct {
 	DllPath                UnicodeString
 	ImagePathName          UnicodeString
 	CommandLine            UnicodeString
+}
+
+type MemoryBasicInformation struct {
+	BaseAddress       uint64
+	AllocationBase    uint64
+	AllocationProtect uint32
+	Allignment        uint32
+	RegionSize        uint64
+	State             uint32
+	Protect           uint32
+	Type              uint32
+	Allignment2       uint32
 }
 
 func (dt DriveType) String() string {
@@ -283,6 +296,7 @@ func GetProcessMemoryInfo(handle syscall.Handle) (ProcessMemoryCountersEx, error
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms683217(v=vs.85).aspx
 func GetProcessImageFileName(handle syscall.Handle) (string, error) {
 	buffer := make([]uint16, MAX_PATH)
+
 	_, err := _GetProcessImageFileName(handle, &buffer[0], uint32(len(buffer)))
 	if err != nil {
 		return "", errors.Wrap(err, "GetProcessImageFileName failed")
@@ -579,6 +593,7 @@ func GetTickCount64() (uptime uint64, err error) {
 	}
 	return uptime, nil
 }
+
 
 // Windows API calls
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx

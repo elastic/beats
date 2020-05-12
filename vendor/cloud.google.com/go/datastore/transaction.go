@@ -41,6 +41,9 @@ type transactionSettings struct {
 func newTransactionSettings(opts []TransactionOption) *transactionSettings {
 	s := &transactionSettings{attempts: 3}
 	for _, o := range opts {
+		if o == nil {
+			panic("nil TransactionOption")
+		}
 		o.apply(s)
 	}
 	return s

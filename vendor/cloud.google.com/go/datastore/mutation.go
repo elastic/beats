@@ -24,6 +24,9 @@ import (
 type Mutation struct {
 	key *Key // needed for transaction PendingKeys and to dedup deletions
 	mut *pb.Mutation
+
+	// err is set to a Datastore or gRPC error, if Mutation is not valid
+	// (see https://godoc.org/google.golang.org/grpc/codes).
 	err error
 }
 
@@ -32,9 +35,9 @@ func (m *Mutation) isDelete() bool {
 	return ok
 }
 
-// NewInsert creates a mutation that will save the entity src into the datastore with
-// key k, returning an error if k already exists.
-// See Client.Put for valid values of src.
+// NewInsert creates a Mutation that will save the entity src into the
+// datastore with key k. If k already exists, calling Mutate with the
+// Mutation will lead to a gRPC codes.AlreadyExists error.
 func NewInsert(k *Key, src interface{}) *Mutation {
 	if !k.valid() {
 		return &Mutation{err: ErrInvalidKey}
@@ -49,7 +52,7 @@ func NewInsert(k *Key, src interface{}) *Mutation {
 	}
 }
 
-// NewUpsert creates a mutation that saves the entity src into the datastore with key
+// NewUpsert creates a Mutation that saves the entity src into the datastore with key
 // k, whether or not k exists. See Client.Put for valid values of src.
 func NewUpsert(k *Key, src interface{}) *Mutation {
 	if !k.valid() {
@@ -65,8 +68,10 @@ func NewUpsert(k *Key, src interface{}) *Mutation {
 	}
 }
 
-// NewUpdate creates a mutation that replaces the entity in the datastore with key k,
-// returning an error if k does not exist. See Client.Put for valid values of src.
+// NewUpdate creates a Mutation that replaces the entity in the datastore with
+// key k. If k does not exist, calling Mutate with the Mutation will lead to a
+// gRPC codes.NotFound error.
+// See Client.Put for valid values of src.
 func NewUpdate(k *Key, src interface{}) *Mutation {
 	if !k.valid() {
 		return &Mutation{err: ErrInvalidKey}
@@ -84,7 +89,7 @@ func NewUpdate(k *Key, src interface{}) *Mutation {
 	}
 }
 
-// NewDelete creates a mutation that deletes the entity with key k.
+// NewDelete creates a Mutation that deletes the entity with key k.
 func NewDelete(k *Key) *Mutation {
 	if !k.valid() {
 		return &Mutation{err: ErrInvalidKey}

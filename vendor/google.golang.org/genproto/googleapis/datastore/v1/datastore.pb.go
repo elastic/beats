@@ -1493,11 +1493,11 @@ var fileDescriptor_9ad66bfcb30c1b57 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // DatastoreClient is the client API for Datastore service.
 //
@@ -1523,10 +1523,10 @@ type DatastoreClient interface {
 }
 
 type datastoreClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewDatastoreClient(cc *grpc.ClientConn) DatastoreClient {
+func NewDatastoreClient(cc grpc.ClientConnInterface) DatastoreClient {
 	return &datastoreClient{cc}
 }
 

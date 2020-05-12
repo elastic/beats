@@ -1,0 +1,19 @@
+# Container-based Precise due to `sudo: false`
+sudo: false
+language: go
+go:
+ - 1.x
+ - tip
+
+matrix:
+  allow_failures:
+    - go: tip
+
+before_install:
+  - mkdir -p $HOME/gopath/src/sourcegraph.com/sourcegraph
+  - mv $TRAVIS_BUILD_DIR $HOME/gopath/src/sourcegraph.com/sourcegraph/appdash
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/sourcegraph.com/sourcegraph/appdash
+script:
+  - diff -u <(echo -n) <(gofmt -d -s .)
+  - go vet -all .
+  - go test -v -race ./...

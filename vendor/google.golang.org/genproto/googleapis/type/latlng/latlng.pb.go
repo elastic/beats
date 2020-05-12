@@ -79,7 +79,9 @@ func init() {
 	proto.RegisterType((*LatLng)(nil), "google.type.LatLng")
 }
 
-func init() { proto.RegisterFile("google/type/latlng.proto", fileDescriptor_a087c9a103c281a9) }
+func init() {
+	proto.RegisterFile("google/type/latlng.proto", fileDescriptor_a087c9a103c281a9)
+}
 
 var fileDescriptor_a087c9a103c281a9 = []byte{
 	// 168 bytes of a gzipped FileDescriptorProto

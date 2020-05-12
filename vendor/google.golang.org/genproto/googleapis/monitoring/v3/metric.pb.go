@@ -201,7 +201,9 @@ func init() {
 	proto.RegisterType((*TimeSeries)(nil), "google.monitoring.v3.TimeSeries")
 }
 
-func init() { proto.RegisterFile("google/monitoring/v3/metric.proto", fileDescriptor_c76199a3d2c4c21e) }
+func init() {
+	proto.RegisterFile("google/monitoring/v3/metric.proto", fileDescriptor_c76199a3d2c4c21e)
+}
 
 var fileDescriptor_c76199a3d2c4c21e = []byte{
 	// 441 bytes of a gzipped FileDescriptorProto

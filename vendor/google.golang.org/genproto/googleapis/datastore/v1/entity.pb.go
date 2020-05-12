@@ -617,7 +617,9 @@ func init() {
 	proto.RegisterMapType((map[string]*Value)(nil), "google.datastore.v1.Entity.PropertiesEntry")
 }
 
-func init() { proto.RegisterFile("google/datastore/v1/entity.proto", fileDescriptor_ecbfdafa45100300) }
+func init() {
+	proto.RegisterFile("google/datastore/v1/entity.proto", fileDescriptor_ecbfdafa45100300)
+}
 
 var fileDescriptor_ecbfdafa45100300 = []byte{
 	// 780 bytes of a gzipped FileDescriptorProto

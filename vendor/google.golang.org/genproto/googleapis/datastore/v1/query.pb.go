@@ -1063,7 +1063,9 @@ func init() {
 	proto.RegisterType((*QueryResultBatch)(nil), "google.datastore.v1.QueryResultBatch")
 }
 
-func init() { proto.RegisterFile("google/datastore/v1/query.proto", fileDescriptor_927b394a72d2bc0d) }
+func init() {
+	proto.RegisterFile("google/datastore/v1/query.proto", fileDescriptor_927b394a72d2bc0d)
+}
 
 var fileDescriptor_927b394a72d2bc0d = []byte{
 	// 1313 bytes of a gzipped FileDescriptorProto

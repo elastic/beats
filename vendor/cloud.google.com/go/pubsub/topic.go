@@ -97,7 +97,7 @@ type PublishSettings struct {
 
 // DefaultPublishSettings holds the default values for topics' PublishSettings.
 var DefaultPublishSettings = PublishSettings{
-	DelayThreshold: 1 * time.Millisecond,
+	DelayThreshold: 10 * time.Millisecond,
 	CountThreshold: 100,
 	ByteThreshold:  1e6,
 	Timeout:        60 * time.Second,
@@ -386,11 +386,18 @@ var errTopicStopped = errors.New("pubsub: Stop has been called for this topic")
 // need to be stopped by calling t.Stop(). Once stopped, future calls to Publish
 // will immediately return a PublishResult with an error.
 func (t *Topic) Publish(ctx context.Context, msg *Message) *PublishResult {
-	// TODO(jba): if this turns out to take significant time, try to approximate it.
-	// Or, convert the messages to protos in Publish, instead of in the service.
-	msg.size = proto.Size(&pb.PubsubMessage{
-		Data:       msg.Data,
-		Attributes: msg.Attributes,
+	// Use a PublishRequest with only the Messages field to calculate the size
+	// of an individual message. This accurately calculates the size of the
+	// encoded proto message by accounting for the length of an individual
+	// PubSubMessage and Data/Attributes field.
+	// TODO(hongalex): if this turns out to take significant time, try to approximate it.
+	msg.size = proto.Size(&pb.PublishRequest{
+		Messages: []*pb.PubsubMessage{
+			{
+				Data:       msg.Data,
+				Attributes: msg.Attributes,
+			},
+		},
 	})
 	r := &PublishResult{ready: make(chan struct{})}
 	t.initBundler()
@@ -502,7 +509,8 @@ func (t *Topic) initBundler() {
 	}
 	t.bundler.BufferedByteLimit = bufferedByteLimit
 
-	t.bundler.BundleByteLimit = MaxPublishRequestBytes
+	// Set the bundler's max size per payload, accounting for topic name's overhead.
+	t.bundler.BundleByteLimit = MaxPublishRequestBytes - calcFieldSizeString(t.name)
 	// Unless overridden, allow many goroutines per CPU to call the Publish RPC concurrently.
 	// The default value was determined via extensive load testing (see the loadtest subdirectory).
 	if t.PublishSettings.NumGoroutines > 0 {

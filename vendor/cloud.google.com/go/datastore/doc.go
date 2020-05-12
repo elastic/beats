@@ -88,9 +88,11 @@ GetMulti, PutMulti and DeleteMulti are batch versions of the Get, Put and
 Delete functions. They take a []*Key instead of a *Key, and may return a
 datastore.MultiError when encountering partial failure.
 
-Mutate generalizes PutMulti and DeleteMulti to a sequence of any Datastore mutations.
-It takes a series of mutations created with NewInsert, NewUpdate, NewUpsert and
-NewDelete and applies them atomically.
+Mutate generalizes PutMulti and DeleteMulti to a sequence of any Datastore
+mutations. It takes a series of mutations created with NewInsert, NewUpdate,
+NewUpsert and NewDelete and applies them. Datastore.Mutate uses
+non-transactional mode; if atomicity is required, use Transaction.Mutate
+instead.
 
 
 Properties

@@ -173,9 +173,6 @@ func (s *pullStream) Recv() (*pb.StreamingPullResponse, error) {
 		var err error
 		recordStat(s.ctx, StreamResponseCount, 1)
 		res, err = spc.Recv()
-		if err == nil {
-			recordStat(s.ctx, PullCount, int64(len(res.ReceivedMessages)))
-		}
 		return err
 	}, gax.WithRetry(func() gax.Retryer { return &streamingPullRetryer{defaultRetryer: &defaultRetryer{}} }))
 	return res, err

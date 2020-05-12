@@ -486,7 +486,9 @@ func init() {
 	proto.RegisterMapType((map[string]string)(nil), "google.api.Metric.LabelsEntry")
 }
 
-func init() { proto.RegisterFile("google/api/metric.proto", fileDescriptor_927eaac1a24f8abb) }
+func init() {
+	proto.RegisterFile("google/api/metric.proto", fileDescriptor_927eaac1a24f8abb)
+}
 
 var fileDescriptor_927eaac1a24f8abb = []byte{
 	// 661 bytes of a gzipped FileDescriptorProto

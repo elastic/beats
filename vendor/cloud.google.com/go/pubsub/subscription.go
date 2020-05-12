@@ -123,10 +123,6 @@ type PushConfig struct {
 	// allow requests only from the Cloud Pub/Sub system, for example.
 	// This field is optional and should be set only by users interested in
 	// authenticated push.
-	//
-	// It is EXPERIMENTAL and a part of a closed alpha that may not be
-	// accessible to all users. This field is subject to change or removal
-	// without notice.
 	AuthenticationMethod AuthenticationMethod
 }
 
@@ -221,12 +217,18 @@ type SubscriptionConfig struct {
 	// value for `expiration_policy.ttl` is 1 day.
 	//
 	// Use time.Duration(0) to indicate that the subscription should never expire.
-	//
-	// It is EXPERIMENTAL and subject to change or removal without notice.
 	ExpirationPolicy optional.Duration
 
 	// The set of labels for the subscription.
 	Labels map[string]string
+
+	// DeadLetterPolicy specifies the conditions for dead lettering messages in
+	// a subscription. If not set, dead lettering is disabled.
+	//
+	// It is EXPERIMENTAL and a part of a closed alpha that may not be
+	// accessible to all users. This field is subject to change or removal
+	// without notice.
+	DeadLetterPolicy *DeadLetterPolicy
 }
 
 func (cfg *SubscriptionConfig) toProto(name string) *pb.Subscription {
@@ -238,6 +240,10 @@ func (cfg *SubscriptionConfig) toProto(name string) *pb.Subscription {
 	if cfg.RetentionDuration != 0 {
 		retentionDuration = ptypes.DurationProto(cfg.RetentionDuration)
 	}
+	var pbDeadLetter *pb.DeadLetterPolicy
+	if cfg.DeadLetterPolicy != nil {
+		pbDeadLetter = cfg.DeadLetterPolicy.toProto()
+	}
 	return &pb.Subscription{
 		Name:                     name,
 		Topic:                    cfg.Topic.name,
@@ -247,6 +253,7 @@ func (cfg *SubscriptionConfig) toProto(name string) *pb.Subscription {
 		MessageRetentionDuration: retentionDuration,
 		Labels:                   cfg.Labels,
 		ExpirationPolicy:         expirationPolicyToProto(cfg.ExpirationPolicy),
+		DeadLetterPolicy:         pbDeadLetter,
 	}
 }
 
@@ -266,6 +273,7 @@ func protoToSubscriptionConfig(pbSub *pb.Subscription, c *Client) (SubscriptionC
 			return SubscriptionConfig{}, err
 		}
 	}
+	dlp := protoToDLP(pbSub.DeadLetterPolicy)
 	subC := SubscriptionConfig{
 		Topic:               newTopic(c, pbSub.Topic),
 		AckDeadline:         time.Second * time.Duration(pbSub.AckDeadlineSeconds),
@@ -273,6 +281,7 @@ func protoToSubscriptionConfig(pbSub *pb.Subscription, c *Client) (SubscriptionC
 		RetentionDuration:   rd,
 		Labels:              pbSub.Labels,
 		ExpirationPolicy:    expirationPolicy,
+		DeadLetterPolicy:    dlp,
 	}
 	pc := protoToPushConfig(pbSub.PushConfig)
 	if pc != nil {
@@ -300,6 +309,35 @@ func protoToPushConfig(pbPc *pb.PushConfig) *PushConfig {
 	return pc
 }
 
+// DeadLetterPolicy specifies the conditions for dead lettering messages in
+// a subscription.
+//
+// It is EXPERIMENTAL and a part of a closed alpha that may not be
+// accessible to all users.
+type DeadLetterPolicy struct {
+	DeadLetterTopic     string
+	MaxDeliveryAttempts int
+}
+
+func (dlp *DeadLetterPolicy) toProto() *pb.DeadLetterPolicy {
+	if dlp == nil {
+		return nil
+	}
+	return &pb.DeadLetterPolicy{
+		DeadLetterTopic:     dlp.DeadLetterTopic,
+		MaxDeliveryAttempts: int32(dlp.MaxDeliveryAttempts),
+	}
+}
+func protoToDLP(pbDLP *pb.DeadLetterPolicy) *DeadLetterPolicy {
+	if pbDLP == nil {
+		return nil
+	}
+	return &DeadLetterPolicy{
+		DeadLetterTopic:     pbDLP.GetDeadLetterTopic(),
+		MaxDeliveryAttempts: int(pbDLP.MaxDeliveryAttempts),
+	}
+}
+
 // ReceiveSettings configure the Receive method.
 // A zero ReceiveSettings will result in values equivalent to DefaultReceiveSettings.
 type ReceiveSettings struct {
@@ -311,6 +349,16 @@ type ReceiveSettings struct {
 	// extension beyond the initial receipt may be disabled by specifying a
 	// duration less than 0.
 	MaxExtension time.Duration
+
+	// MaxExtensionPeriod is the maximum duration by which to extend the ack
+	// deadline at a time. The ack deadline will continue to be extended by up
+	// to this duration until MaxExtension is reached. Setting MaxExtensionPeriod
+	// bounds the maximum amount of time before a message redelivery in the
+	// event the subscriber fails to extend the deadline.
+	//
+	// MaxExtensionPeriod configuration can be disabled by specifying a
+	// duration less than (or equal to) 0.
+	MaxExtensionPeriod time.Duration
 
 	// MaxOutstandingMessages is the maximum number of unprocessed messages
 	// (unacknowledged but not yet expired). If MaxOutstandingMessages is 0, it
@@ -370,7 +418,8 @@ var minAckDeadline = 10 * time.Second
 
 // DefaultReceiveSettings holds the default values for ReceiveSettings.
 var DefaultReceiveSettings = ReceiveSettings{
-	MaxExtension:           10 * time.Minute,
+	MaxExtension:           60 * time.Minute,
+	MaxExtensionPeriod:     -1,
 	MaxOutstandingMessages: 1000,
 	MaxOutstandingBytes:    1e9, // 1G
 	NumGoroutines:          1,
@@ -423,6 +472,12 @@ type SubscriptionConfigToUpdate struct {
 	// If non-zero, Expiration is changed.
 	ExpirationPolicy optional.Duration
 
+	// If non-nil, DeadLetterPolicy is changed.
+	//
+	// It is EXPERIMENTAL and a part of a closed alpha that may not be
+	// accessible to all users.
+	DeadLetterPolicy *DeadLetterPolicy
+
 	// If non-nil, the current set of labels is completely
 	// replaced by the new set.
 	// This field has beta status. It is not subject to the stability guarantee
@@ -471,6 +526,10 @@ func (s *Subscription) updateRequest(cfg *SubscriptionConfigToUpdate) *pb.Update
 	if cfg.ExpirationPolicy != nil {
 		psub.ExpirationPolicy = expirationPolicyToProto(cfg.ExpirationPolicy)
 		paths = append(paths, "expiration_policy")
+	}
+	if cfg.DeadLetterPolicy != nil {
+		psub.DeadLetterPolicy = cfg.DeadLetterPolicy.toProto()
+		paths = append(paths, "dead_letter_policy")
 	}
 	if cfg.Labels != nil {
 		psub.Labels = cfg.Labels
@@ -656,7 +715,7 @@ func (s *Subscription) receive(ctx context.Context, po *pullOptions, fc *flowCon
 	// The iterator does not use the context passed to Receive. If it did, canceling
 	// that context would immediately stop the iterator without waiting for unacked
 	// messages.
-	iter := newMessageIterator(s.c.subc, s.name, po)
+	iter := newMessageIterator(s.c.subc, s.name, &s.ReceiveSettings.MaxExtensionPeriod, po)
 
 	// We cannot use errgroup from Receive here. Receive might already be calling group.Wait,
 	// and group.Wait cannot be called concurrently with group.Go. We give each receive() its

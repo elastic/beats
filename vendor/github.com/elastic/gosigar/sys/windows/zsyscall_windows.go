@@ -41,6 +41,7 @@ var (
 	modpsapi    = windows.NewLazySystemDLL("psapi.dll")
 	modntdll    = windows.NewLazySystemDLL("ntdll.dll")
 	modadvapi32 = windows.NewLazySystemDLL("advapi32.dll")
+	moduser32  = windows.NewLazySystemDLL("user32.dll")
 
 	procGlobalMemoryStatusEx             = modkernel32.NewProc("GlobalMemoryStatusEx")
 	procGetLogicalDriveStringsW          = modkernel32.NewProc("GetLogicalDriveStringsW")
