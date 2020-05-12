@@ -83,7 +83,7 @@ grouped in the following categories:
 
 --
 [[exported-fields-activemq]]
-== activemq fields
+== ActiveMQ fields
 
 activemq module
 
@@ -1509,7 +1509,7 @@ type: long
 --
 
 [[exported-fields-aws]]
-== aws fields
+== AWS fields
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 
@@ -3385,7 +3385,7 @@ type: keyword
 
 
 [[exported-fields-azure]]
-== azure fields
+== Azure fields
 
 azure module
 
@@ -4911,7 +4911,7 @@ alias to: cloud.region
 --
 
 [[exported-fields-cloudfoundry]]
-== cloudfoundry fields
+== Cloudfoundry fields
 
 Cloud Foundry module
 
@@ -5183,7 +5183,7 @@ type: keyword
 --
 
 [[exported-fields-consul]]
-== consul fields
+== Consul fields
 
 Consul module
 
@@ -5302,7 +5302,7 @@ type: long
 --
 
 [[exported-fields-coredns]]
-== coredns fields
+== Coredns fields
 
 coredns Module
 
@@ -15703,7 +15703,7 @@ type: keyword
 --
 
 [[exported-fields-envoyproxy]]
-== envoyproxy fields
+== Envoyproxy fields
 
 envoyproxy module
 
@@ -18530,7 +18530,7 @@ IBM MQ module
 
 
 [[exported-fields-iis]]
-== iis fields
+== IIS fields
 
 iis module
 
@@ -18587,7 +18587,7 @@ type: keyword
 --
 
 [[exported-fields-istio]]
-== istio fields
+== Istio fields
 
 istio Module
 
@@ -24544,7 +24544,7 @@ type: long
 --
 
 [[exported-fields-kvm]]
-== kvm fields
+== KVM fields
 
 kvm module
 
@@ -29954,7 +29954,7 @@ type: long
 --
 
 [[exported-fields-nats]]
-== Nats fields
+== NATS fields
 
 nats Module
 
@@ -34262,7 +34262,7 @@ Redis metrics collected from Redis Enterprise Server.
 
 
 [[exported-fields-sql]]
-== sql fields
+== SQL fields
 
 SQL module fetches metrics from a SQL database
 
@@ -38179,7 +38179,7 @@ type: long
 --
 
 [[exported-fields-traefik]]
-== traefik fields
+== Traefik fields
 
 Traefik reverse proxy / load balancer metrics
 
@@ -38247,7 +38247,7 @@ type: object
 --
 
 [[exported-fields-uwsgi]]
-== uwsgi fields
+== uWSGI fields
 
 uwsgi module
 
