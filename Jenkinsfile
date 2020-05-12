@@ -1133,6 +1133,8 @@ def isDocChangedOnly(){
   name of the changed module so we can skip tests for all other modules
 **/
 def moduleToTest() {
+  log(level: 'INFO', text: "right inside moduleToTest")
+
   if (params.runAllStages || !env.CHANGE_ID?.trim()) {
     log(level: 'INFO', text: 'Speed build for specific module only is disabled for branches/tags or when forcing with the runAllStages parameter.')
     return 'false'
