@@ -111,7 +111,7 @@ pipeline {
             script {
               def tasks = [:]
               windowsVersions.each { os ->
-                tasks[os] = { mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest", os) }
+                tasks[os] = mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest", os)
               }
               parallel(tasks)
             }
@@ -183,7 +183,7 @@ pipeline {
             script {
               def tasks = [:]
               windowsVersions.each { os ->
-                tasks[os] = { mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest", os) }
+                tasks[os] = mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest", os)
               }
               parallel(tasks)
             }
@@ -229,7 +229,7 @@ pipeline {
                 script {
                   def tasks = [:]
                   windowsVersions.each { os ->
-                    tasks[os] = { mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest", os) }
+                    tasks[os] = mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest", os)
                   }
                   parallel(tasks)
                 }
@@ -282,7 +282,7 @@ pipeline {
                 script {
                   def tasks = [:]
                   windowsVersions.each { os ->
-                    tasks[os] = { mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest", os) }
+                    tasks[os] = mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest", os)
                   }
                   parallel(tasks)
                 }
@@ -455,7 +455,7 @@ pipeline {
             script {
               def tasks = [:]
               windowsVersions.each { os ->
-                tasks[os] = { mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest", os) }
+                tasks[os] = mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest", os)
               }
               parallel(tasks)
             }
@@ -522,7 +522,7 @@ pipeline {
                 script {
                   def tasks = [:]
                   windowsVersions.each { os ->
-                    tasks[os] = { mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest", os) }
+                    tasks[os] = mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest", os)
                   }
                   parallel(tasks)
                 }
@@ -542,7 +542,7 @@ pipeline {
             script {
               def tasks = [:]
               windowsVersions.each { os ->
-                tasks[os] = { mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest", os) }
+                tasks[os] = mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest", os)
               }
               parallel(tasks)
             }
@@ -591,7 +591,7 @@ pipeline {
                 script {
                   def tasks = [:]
                   windowsVersions.each { os ->
-                    tasks[os] = { mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest", "build unitTest", os) }
+                    tasks[os] = mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest", "build unitTest", os)
                   }
                   parallel(tasks)
                 }
@@ -750,7 +750,6 @@ def mageTargetWin(String context, String directory, String target) {
         dumpFilteredEnvironment()
         dumpMageWin()
       }
-
       def verboseFlag = params.debug ? "-v" : ""
       dir(directory) {
         bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
