@@ -1169,6 +1169,7 @@ def filesChanged() {
   def to = params.get('to', env.GIT_BASE_COMMIT)
 
   def output = sh(script: "git diff --name-only ${from}...${to}", returnStdout: true)
+  log(level: 'INFO', text: output)
   return output.split('\n')
 }
 
