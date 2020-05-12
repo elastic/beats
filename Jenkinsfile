@@ -659,6 +659,17 @@ pipeline {
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
+  // The directory will fix the known issue when searching the generated test files
+  // in a massive repo.
+  // For such, the directory is the one when using the target -C <directory>
+  // Otherwise, it will use the ** glob pattern
+  def directory = '**'
+  if (target.contains('-C ')) {
+    directory = target.replaceAll('.*-C ', '').split(' ')[0]
+    if (!fileExists("${directory}/Makefile")) {
+      directory = '**'
+    }
+  }
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, directory: directory) {
       whenTrue(params.debug) {
