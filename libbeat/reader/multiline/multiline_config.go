@@ -62,11 +62,11 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("unknown matcher type: %s", c.Match)
 		}
 		if c.Pattern == nil {
-			return fmt.Errorf("multiline.pattern cannot be empty")
+			return fmt.Errorf("multiline.pattern cannot be empty when pattern based matching is selected")
 		}
 	} else if c.Type == countMode {
 		if c.LinesCount == 0 {
-			return fmt.Errorf("multiline.count_lines cannot be zero")
+			return fmt.Errorf("multiline.count_lines cannot be zero when count based is selected")
 		}
 	}
 	return nil
