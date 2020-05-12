@@ -142,7 +142,7 @@ The `-e` flag is optional and sends output to standard error instead of syslog.
 
 The ingest pipelines used to parse log lines are set up automatically the first
 time you run the module, assuming the {es} output is enabled. If you're sending
-events to {ls}, also see <<load-ingest-pipelines>>.
+events to {ls}, you need to <<load-ingest-pipelines>>.
 
 [float]
 [[filebeat-starting]]
@@ -159,7 +159,7 @@ include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 
 [float]
 [[view-kibana-dashboards]]
-=== Step 6: View the {kib} dashboards
+=== Step 6: View your data in {kib}
 
 {beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
 data. 
@@ -171,15 +171,19 @@ Here is an example of the system dashboard:
 [role="screenshot"]
 image::./images/kibana-system.png[]
 
-//Add links to the Logs UI here.
+For deeper observability into your infrastructure, use the
+Metrics app in {kib} to tail your log data in real-time. See the
+{metrics-guide}[Metrics Monitoring Guide].
 
 [float]
 === What's next?
 
 //Highlight the other pillars of observability here.
 
-Now that you have logs streaming into {es}....
+Now that you have log data streaming into {es}, unify it with data from other
+sources:
 
-* read Get started with Metricbeat
-to learn how to collect metrics about the systems and services running in your
-infrastructure.
+* Add infrastructure metrics. See Get started with {metricbeat} to learn how!
+* Add uptime info. See GetSta
+* 
+
