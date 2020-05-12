@@ -4,8 +4,10 @@
 
 FROM {{ .from }}
 
+# Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
 RUN yum -y --setopt=tsflags=nodocs update && \
-    yum install -y epel-release jq \
+    yum install epel-release -y && \
+    yum install jq -y && \
     yum clean all
 
 LABEL \
