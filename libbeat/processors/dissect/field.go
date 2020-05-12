@@ -19,6 +19,9 @@ package dissect
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors/convert"
 	"strconv"
 	"strings"
 )
@@ -28,6 +31,7 @@ type field interface {
 	IsGreedy() bool
 	Ordinal() int
 	Key() string
+	DataType() string
 	ID() int
 	Apply(b string, m Map)
 	String() string
@@ -39,6 +43,7 @@ type baseField struct {
 	key     string
 	ordinal int
 	greedy  bool
+	dataType string
 }
 
 func (f baseField) IsGreedy() bool {
@@ -56,6 +61,9 @@ func (f baseField) Ordinal() int {
 func (f baseField) Key() string {
 	return f.key
 }
+func (f baseField) DataType() string {
+	return f.dataType
+}
 
 func (f baseField) ID() int {
 	return f.id
@@ -66,7 +74,7 @@ func (f baseField) IsSaveable() bool {
 }
 
 func (f baseField) String() string {
-	return fmt.Sprintf("field: %s, ordinal: %d, greedy: %v", f.key, f.ordinal, f.IsGreedy())
+	return fmt.Sprintf("field: %s, ordinal: %d, greedy: %v, dataType: %s", f.key, f.ordinal, f.IsGreedy(), f.DataType())
 }
 
 // normalField is a simple key reference like this: `%{key}`
@@ -80,7 +88,32 @@ type normalField struct {
 }
 
 func (f normalField) Apply(b string, m Map) {
-	m[f.Key()] = b
+	if len(f.dataType) == 0 {
+		m[f.Key()] = b
+	} else {
+		config:= common.MapStr{
+			"fields": []common.MapStr{
+				{"from": f.Key(), "to": f.Key(), "type": f.DataType()},
+			},
+		}
+		processor, err := convert.New(common.MustNewConfigFrom(config))
+		if err != nil {
+			fmt.Errorf("%s\n", err)
+		} else {
+			input := beat.Event{
+				Fields: common.MapStr{
+					f.Key(): b,
+				},
+			}
+			result, err := processor.Run(&input)
+			if err == nil {
+				v, err := result.GetValue(f.Key())
+				if err == nil {
+					m[f.Key()] = v
+				}
+			}
+		}
+	}
 }
 
 // skipField is an skip field without a name like this: `%{}`, this is often used to
@@ -150,7 +183,7 @@ type indirectField struct {
 func (f indirectField) Apply(b string, m Map) {
 	v, ok := m[f.Key()]
 	if ok {
-		m[v] = b
+		m[v.(string)] = b
 		return
 	}
 }
@@ -175,7 +208,7 @@ type appendField struct {
 func (f appendField) Apply(b string, m Map) {
 	v, ok := m[f.Key()]
 	if ok {
-		m[f.Key()] = v + f.JoinString() + b
+		m[f.Key()] = v.(string) + f.JoinString() + b
 		return
 	}
 	m[f.Key()] = b
@@ -261,6 +294,20 @@ func newIndirectField(id int, key string) indirectField {
 }
 
 func newNormalField(id int, key string, ordinal int, greedy bool) normalField {
+	parts := strings.Split(key, "|")
+	if len(parts) > 1 {
+		return normalField{
+			baseField{
+				id:      id,
+				key:     parts[0],
+				ordinal: ordinal,
+				greedy:  greedy,
+				dataType: parts[1],
+			},
+		}
+	} else {
+		key = parts[0]
+	}
 	return normalField{
 		baseField{
 			id:      id,

@@ -33,6 +33,83 @@ func TestNoToken(t *testing.T) {
 	assert.Equal(t, errInvalidTokenizer, err)
 }
 
+func TestDissectConversion(t *testing.T) {
+	tests := []struct {
+		Name     string
+		Tok      string
+		Msg      string
+		Expected map[string]interface{}
+		Fail     bool
+	}{
+		{
+			Name: "Convert 1 value",
+			Tok:  "id=%{id|integer} msg=\"%{message}\"",
+			Msg:  "id=7736 msg=\"Single value OK\"}",
+			Expected: map[string]interface{}{
+				"id":      int32(7736),
+				"message": "Single value OK",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Convert multiple values values",
+			Tok:  "id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
+			Msg:  "id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}",
+			Expected: map[string]interface{}{
+				"id":       int32(7736),
+				"status":   int32(202),
+				"duration": float32(0.975),
+				"uptime":   int64(1588975628),
+				"success":  true,
+				"message":  "Request accepted",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Missing data type, drop fields",
+			Tok:  "id=%{id|} status=%{status|} msg=\"%{message}\"",
+			Msg:  "id=1857 status=404 msg=\"File not found\"}",
+			Expected: map[string]interface{}{
+				"id":      "1857",
+				"message": "File not found",
+				"status":  "404",
+			},
+			Fail: false,
+		},
+		{
+			Name: "Invalid data type, drop fields",
+			Tok:  "id=%{id|xyz} status=%{status|abc} msg=\"%{message}\"",
+			Msg:  "id=1945 status=500 msg=\"Internal server error\"}",
+			Expected: map[string]interface{}{
+				"message": "Internal server error",
+			},
+			Fail: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			d, err := New(test.Tok)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			if test.Fail {
+				_, err := d.Dissect(test.Msg)
+				assert.Error(t, err)
+				return
+			}
+
+			r, err := d.Dissect(test.Msg)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			assert.Equal(t, test.Expected, r)
+		})
+	}
+}
+
 func TestEmptyString(t *testing.T) {
 	d, err := New("%{hello}")
 	_, err = d.Dissect("")

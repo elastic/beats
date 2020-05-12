@@ -20,7 +20,7 @@ package dissect
 import "fmt"
 
 // Map  represents the keys and their values extracted with the defined tokenizer.
-type Map = map[string]string
+type Map = map[string]interface{}
 
 // positions represents the start and end position of the keys found in the string.
 type positions []position
