@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Add a switch to the driver definition on SQL module to use pretty names. {pull}17378[17378]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
+- Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
 
 *Packetbeat*
 
