@@ -660,7 +660,7 @@ pipeline {
 
 def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(true) {
+    withBeatsEnv(archive: true, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -675,7 +675,7 @@ def makeTarget(String context, String target, boolean clean = true) {
 
 def mageTarget(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(true) {
+    withBeatsEnv(archive: true, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -691,7 +691,7 @@ def mageTarget(String context, String directory, String target) {
 
 def mageTargetWin(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin() {
+    withBeatsEnvWin(directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -705,7 +705,9 @@ def mageTargetWin(String context, String directory, String target) {
   }
 }
 
-def withBeatsEnv(boolean archive, Closure body) {
+def withBeatsEnv(Map params [:], Closure body) {
+  def archive = params.get('archive', true)
+  def directory = params.get('directory', '.')
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
 
@@ -738,8 +740,8 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}/**/build/TEST*.xml")
+            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/**/build/TEST*.out")
           }
         }
         reportCoverage()
@@ -748,7 +750,8 @@ def withBeatsEnv(boolean archive, Closure body) {
   }
 }
 
-def withBeatsEnvWin(Closure body) {
+def withBeatsEnvWin(Map params [:], Closure body) {
+  def directory = params.get('directory', '.')
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
@@ -772,8 +775,8 @@ def withBeatsEnvWin(Closure body) {
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
-          archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}\\**\\build\\TEST*.xml")
+          archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}\\build\\TEST*.out")
         }
       }
     }
@@ -877,7 +880,7 @@ def k8sTest(versions){
     stage("k8s ${v}"){
       withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
         withGithubNotify(context: "K8s ${v}") {
-          withBeatsEnv(false) {
+          withBeatsEnv(archive: false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
             sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
             sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
@@ -1001,7 +1004,7 @@ def terraformApply(String directory) {
 //   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
 def startCloudTestEnv(String name, environments = []) {
   withCloudTestEnv() {
-    withBeatsEnv(false) {
+    withBeatsEnv(archive: false) {
       def runAll = params.runAllCloudTests
       try {
         for (environment in environments) {
@@ -1026,7 +1029,7 @@ def startCloudTestEnv(String name, environments = []) {
 def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
-      withBeatsEnv(false) {
+      withBeatsEnv(archive: false) {
         unstash "terraform-${stashName}"
         retry(2) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
