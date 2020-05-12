@@ -705,7 +705,7 @@ def mageTargetWin(String context, String directory, String target) {
   }
 }
 
-def withBeatsEnv(Map params [:], Closure body) {
+def withBeatsEnv(Map params = [:], Closure body) {
   def archive = params.get('archive', true)
   def directory = params.get('directory', '**')
   def os = goos()
@@ -750,7 +750,7 @@ def withBeatsEnv(Map params [:], Closure body) {
   }
 }
 
-def withBeatsEnvWin(Map params [:], Closure body) {
+def withBeatsEnvWin(Map params = [:], Closure body) {
   def directory = params.get('directory', '**')
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
