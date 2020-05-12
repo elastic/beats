@@ -1140,9 +1140,7 @@ def moduleToTest() {
 
   def modulePattern = /beat\/module\/([^\/]+)/
   def module = ""
-  log(level: 'INFO', text: "before filesChanged() call")
   filesChanged().each{ String file ->
-    log(level: 'INFO', text: "inside filesChanged() results loop, file: " + file)
     matches = file =~ modulePattern
     if (matches.size == 2) {
       matchedModule = matches[1]
@@ -1155,15 +1153,14 @@ def moduleToTest() {
         return ""
       }
     }
-    log(level: 'INFO', text: matches)
   }
 
   return module
 }
 
 /**
- TODO: add error checking for from/to.
  TODO: move into https://github.com/elastic/apm-pipeline-library/ and potentially reuse in isGitRegionMatch definition.
+ TODO: add error checking for from/to.
 **/
 def filesChanged(Map params = [:]) {
   def from = params.get('from', env.CHANGE_TARGET?.trim() ? "origin/${env.CHANGE_TARGET}" : env.GIT_PREVIOUS_COMMIT)
