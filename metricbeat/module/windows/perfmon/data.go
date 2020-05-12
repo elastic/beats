@@ -48,8 +48,8 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 							"error", val.Err.Error, logp.Namespace("perfmon"), "query", counterPath)
 						continue
 					}
-					// The counter has a negative value or the counter was successfully found, but the data returned is not valid. T
-					// his error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
+					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
+					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
 					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
 						re.log.Debugw("Counter value retrieval returned",

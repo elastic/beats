@@ -54,6 +54,7 @@ type CounterValue struct {
 	Err         CounterValueError
 }
 
+// CounterValueError contains the performance counter error.
 type CounterValueError struct {
 	Error   error
 	CStatus uint32
@@ -246,6 +247,9 @@ func getCounterValue(counter *Counter) CounterValue {
 		_, value, err := PdhGetFormattedCounterValueLong(counter.handle)
 		if err != nil {
 			counterValue.Err.Error = err
+			if value != nil {
+				counterValue.Err.CStatus = value.CStatus
+			}
 		} else {
 			counterValue.Measurement = value.Value
 		}
