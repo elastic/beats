@@ -608,7 +608,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             aliases = []
 
             for item in doc:
-                subfields, subdictfields, subaliases = extract_fields(item.get("fields"), "")
+                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
                 aliases.extend(subaliases)
