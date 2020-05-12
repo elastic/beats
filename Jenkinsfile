@@ -707,7 +707,7 @@ def mageTargetWin(String context, String directory, String target) {
 
 def withBeatsEnv(Map params [:], Closure body) {
   def archive = params.get('archive', true)
-  def directory = params.get('directory', '.')
+  def directory = params.get('directory', '**')
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
 
@@ -740,8 +740,8 @@ def withBeatsEnv(Map params [:], Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}/**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/**/build/TEST*.out")
+            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}/build/TEST*.xml")
+            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/build/TEST*.out")
           }
         }
         reportCoverage()
@@ -751,7 +751,7 @@ def withBeatsEnv(Map params [:], Closure body) {
 }
 
 def withBeatsEnvWin(Map params [:], Closure body) {
-  def directory = params.get('directory', '.')
+  def directory = params.get('directory', '**')
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
@@ -775,7 +775,7 @@ def withBeatsEnvWin(Map params [:], Closure body) {
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}\\**\\build\\TEST*.xml")
+          junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "${directory}\\build\\TEST*.xml")
           archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}\\build\\TEST*.out")
         }
       }
