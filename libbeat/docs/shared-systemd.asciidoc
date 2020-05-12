@@ -6,7 +6,7 @@ systemd. On these systems, you can manage {beatname_uc} by using the usual
 systemd commands.
 
 ifdef::apm-server[]
-We recommend that the {beatname_lc} process is run as a non-root user.
+We recommend that the {beatname_pkg} process is run as a non-root user.
 Therefore, that is the default setup for {beatname_uc}'s DEB package and RPM installation.
 endif::apm-server[]
 
@@ -16,12 +16,12 @@ Use `systemctl` to start or stop {beatname_uc}:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-sudo systemctl start {beatname_lc}
+sudo systemctl start {beatname_pkg}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-sudo systemctl stop {beatname_lc}
+sudo systemctl stop {beatname_pkg}
 ------------------------------------------------
 
 By default, the {beatname_uc} service starts automatically when the system
@@ -29,12 +29,12 @@ boots. To enable or disable auto start use:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-sudo systemctl enable {beatname_lc}
+sudo systemctl enable {beatname_pkg}
 ------------------------------------------------
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-sudo systemctl disable {beatname_lc}
+sudo systemctl disable {beatname_pkg}
 ------------------------------------------------
 
 
@@ -44,14 +44,14 @@ To get the service status, use `systemctl`:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-systemctl status {beatname_lc}
+systemctl status {beatname_pkg}
 ------------------------------------------------
 
 Logs are stored by default in journald. To view the Logs, use `journalctl`:
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
-journalctl -u {beatname_lc}.service
+journalctl -u {beatname_pkg}.service
 ------------------------------------------------
 
 [float]
@@ -69,10 +69,10 @@ override to change the default options.
 |=======================================
 
 To override these variables, create a drop-in unit file in the
-+/etc/systemd/system/{beatname_lc}.service.d+ directory.
++/etc/systemd/system/{beatname_pkg}.service.d+ directory.
 
 For example a file with the following content placed in
-+/etc/systemd/system/{beatname_lc}.service.d/debug.conf+
++/etc/systemd/system/{beatname_pkg}.service.d/debug.conf+
 would override `BEAT_LOG_OPTS` to enable debug for Elasticsearch output.
 
 ["source", "systemd", subs="attributes"]
@@ -87,12 +87,12 @@ the service:
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
 systemctl daemon-reload
-systemctl restart {beatname_lc}
+systemctl restart {beatname_pkg}
 ------------------------------------------------
 
 NOTE: It is recommended that you use a configuration management tool to
 include drop-in unit files. If you need to add a drop-in manually, use
-+systemctl edit {beatname_lc}.service+.
++systemctl edit {beatname_pkg}.service+.
 
 ifdef::apm-server[]
 include::{docdir}/config-ownership.asciidoc[]
