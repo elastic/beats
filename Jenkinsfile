@@ -1144,16 +1144,16 @@ def moduleToTest() {
   filesChanged().each{ String file ->
     log(level: 'INFO', text: "inside filesChanged() results loop, file: " + file)
     matches = (file =~ modulePattern).findAll()
-      if (matches.size() == 1) {
-        matchedModule = matches[0]
-        if (module == "") {
-          // Module not initialized; initialize it with matched module.
-          module = matchedModule
-        } else if (module != matchedModule) {
-          // Module already initialized and is different from matched module. Multiple
-          // modules were changed, so don't return any specific module.
-          return ""
-        }
+    if (matches.size() == 1) {
+      matchedModule = matches[0]
+      if (module == "") {
+        // Module not initialized; initialize it with matched module.
+        module = matchedModule
+      } else if (module != matchedModule) {
+        // Module already initialized and is different from matched module. Multiple
+        // modules were changed, so don't return any specific module.
+        return ""
+      }
     }
   }
 
