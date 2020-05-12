@@ -709,7 +709,7 @@ def mageTargetWin(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
     def tasks = [:]
     windowsVersions.each { os ->
-      tasks[os] = mageTargetWin(context, directory, target, os)
+      tasks["${context}-${os}"] = mageTargetWin(context, directory, target, os)
     }
     parallel(tasks)
   }
