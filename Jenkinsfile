@@ -1143,9 +1143,9 @@ def moduleToTest() {
   log(level: 'INFO', text: "before filesChanged() call")
   filesChanged().each{ String file ->
     log(level: 'INFO', text: "inside filesChanged() results loop, file: " + file)
-    matches = file.findAll(modulePattern)
-    if (matches.size() == 1) {
-      matchedModule = matches[0]
+    matches = file =~ modulePattern
+    if (matches.size() == 2) {
+      matchedModule = matches[1]
       if (module == "") {
         // Module not initialized; initialize it with matched module.
         module = matchedModule
@@ -1155,6 +1155,7 @@ def moduleToTest() {
         return ""
       }
     }
+    log(level: 'INFO', text: matches)
   }
 
   return module
