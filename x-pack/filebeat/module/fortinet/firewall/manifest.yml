@@ -1,14 +1,14 @@
 module_version: 1.0
 
 var:
-  - name: syslog_host
+  - name: host
     default: localhost
   - name: tags
     default: [fortinet-firewall]
-  - name: syslog_port
+  - name: port
     default: 9004
   - name: input
-    default: syslog
+    default: udp
 
 ingest_pipeline:
   - ingest/pipeline.yml
