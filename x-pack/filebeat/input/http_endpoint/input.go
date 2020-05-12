@@ -112,16 +112,13 @@ func (in *HttpEndpoint) Run() {
 	in.workerOnce.Do(func() {
 		in.workerWg.Add(1)
 		go in.run()
-		in.workerWg.Done()
 	})
 }
 
 func (in *HttpEndpoint) run() {
+	defer in.workerWg.Done()
 	defer in.log.Infof("%v worker has stopped.", inputName)
-	err := in.server.Start()
-	if err != nil {
-		return
-	}
+	in.server.Start()
 
 	return
 }
@@ -154,7 +151,7 @@ func (in *HttpEndpoint) sendEvent() (uint, string) {
 		},
 	})
 	if !event {
-		return http.StatusInternalServerError, in.createErrorMessage("unable to send event")
+		return http.StatusInternalServerError, in.createErrorMessage("Unable to send event")
 	}
 
 	return 0, ""
@@ -189,11 +186,11 @@ func (in *HttpEndpoint) validateRequest() (uint, string) {
 // Validate that only supported Accept and Content type headers are used
 func (in *HttpEndpoint) validateHeader() (uint, string) {
 	if in.httpRequest.Header.Get("Content-Type") != "application/json" {
-		return http.StatusUnsupportedMediaType, in.createErrorMessage("wrong content-type header, expecting application/json")
+		return http.StatusUnsupportedMediaType, in.createErrorMessage("Wrong Content-Type header, expecting application/json")
 	}
 
 	if in.httpRequest.Header.Get("Accept") != "application/json" {
-		return http.StatusNotAcceptable, in.createErrorMessage("wrong accept header, expecting application/json")
+		return http.StatusNotAcceptable, in.createErrorMessage("Wrong Accept header, expecting application/json")
 	}
 	return 0, ""
 }
@@ -216,12 +213,12 @@ func (in *HttpEndpoint) validateAuth() (uint, string) {
 func (in *HttpEndpoint) validateBody() (uint, string) {
 	var isObject string
 	if in.httpRequest.Body == http.NoBody {
-		return http.StatusNotAcceptable, in.createErrorMessage("body can not be empty")
+		return http.StatusNotAcceptable, in.createErrorMessage("Body cannot be empty")
 	}
 
 	body, err := ioutil.ReadAll(in.httpRequest.Body)
 	if err != nil {
-		return http.StatusInternalServerError, in.createErrorMessage("unable to read body")
+		return http.StatusInternalServerError, in.createErrorMessage("Unable to read body")
 	}
 
 	isObject = in.isObjectOrList(body)
@@ -232,7 +229,7 @@ func (in *HttpEndpoint) validateBody() (uint, string) {
 	objmap := make(map[string]interface{})
 	err = json.Unmarshal(body, &objmap)
 	if err != nil {
-		return http.StatusBadRequest, in.createErrorMessage("malformed JSON body")
+		return http.StatusBadRequest, in.createErrorMessage("Malformed JSON body")
 	}
 
 	in.eventObject = &objmap
@@ -243,7 +240,7 @@ func (in *HttpEndpoint) validateBody() (uint, string) {
 // Ensure only valid HTTP Methods used
 func (in *HttpEndpoint) validateMethod() (uint, string) {
 	if in.httpRequest.Method != http.MethodPost {
-		return http.StatusMethodNotAllowed, in.createErrorMessage("only POST requests supported")
+		return http.StatusMethodNotAllowed, in.createErrorMessage("Only POST requests supported")
 	}
 
 	return 0, ""
@@ -258,7 +255,7 @@ func (in *HttpEndpoint) isObjectOrList(b []byte) string {
 	if len(obj) > 0 && obj[0] == '{' {
 		return "object"
 	}
-	
+
 	if len(obj) > 0 && obj[0] == '[' {
 		return "list"
 	}

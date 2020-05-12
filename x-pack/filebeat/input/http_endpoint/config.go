@@ -11,7 +11,6 @@ import (
 // Config contains information about httpjson configuration
 type config struct {
 	TLS             *tlscommon.ServerConfig `config:"ssl"`
-	ClientAuth      bool                    `config:"ssl.client_auth"`
 	BasicAuth       bool                    `config:"basic_auth"`
 	Username        string                  `config:"username"`
 	Password        string                  `config:"password"`
