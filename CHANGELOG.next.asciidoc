@@ -413,6 +413,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Explicitly set ECS version in all Filebeat modules. {pull}19198[19198]
 - Add new mode to multiline reader to aggregate constant number of lines {pull}18352[18352]
 - Add automatic retries and exponential backoff to httpjson input. {pull}18956[18956]
+- Improve ECS categorization field mappings in traefik module. {issue}16183[16183] {pull}19379[19379]
 
 *Heartbeat*
 
