@@ -1143,7 +1143,7 @@ def moduleToTest() {
   log(level: 'INFO', text: "before filesChanged() call")
   filesChanged().each{ String file ->
     log(level: 'INFO', text: "inside filesChanged() results loop, file: " + file)
-    matches = (file =~ modulePattern).findAll()
+    matches = file.findAll(modulePattern)
     if (matches.size() == 1) {
       matchedModule = matches[0]
       if (module == "") {
@@ -1169,7 +1169,6 @@ def filesChanged(Map params = [:]) {
   def to = params.get('to', env.GIT_BASE_COMMIT)
 
   def output = sh(script: "git diff --name-only ${from}...${to}", returnStdout: true)
-  log(level: 'INFO', text: output)
   return output.split('\n')
 }
 
