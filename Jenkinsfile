@@ -1140,6 +1140,7 @@ def moduleToTest() {
 
   def modulePattern = /beat\/module\/([^\/]+)/
   def module = ""
+  log(level: 'INFO', text: "before filesChanged() call")
   filesChanged().each{ String file ->
     matches = (file =~ modulePattern).findAll()
       if (matches.size() == 1) {
