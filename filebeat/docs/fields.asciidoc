@@ -46,7 +46,6 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
-* <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-o365>>
 * <<exported-fields-okta>>
@@ -65,7 +64,7 @@ grouped in the following categories:
 
 --
 [[exported-fields-activemq]]
-== activemq fields
+== ActiveMQ fields
 
 Module for parsing ActiveMQ log files.
 
@@ -12867,7 +12866,7 @@ example: Critical
 --
 
 [[exported-fields-elasticsearch]]
-== elasticsearch fields
+== Elasticsearch fields
 
 elasticsearch Module
 
@@ -14201,7 +14200,7 @@ type: long
 --
 
 [[exported-fields-haproxy]]
-== haproxy fields
+== HAProxy fields
 
 haproxy Module
 
@@ -18273,7 +18272,7 @@ alias to: source.ip
 --
 
 [[exported-fields-nats]]
-== nats fields
+== NATS fields
 
 Module for parsing NATS log files.
 
@@ -21601,12 +21600,6 @@ type: long
 type: short
 
 --
-
-[[exported-fields-netflow-module]]
-== NetFlow fields
-
-Module for receiving NetFlow and IPFIX flow records over UDP. The module does not add fields beyond what the netflow input provides.
-
 
 [[exported-fields-nginx]]
 == Nginx fields
