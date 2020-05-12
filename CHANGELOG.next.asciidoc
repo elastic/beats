@@ -222,6 +222,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 
 *Packetbeat*
 
