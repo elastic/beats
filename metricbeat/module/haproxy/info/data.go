@@ -33,12 +33,20 @@ import (
 
 var (
 	schema = s.Schema{
-		"processes":   c.Int("Nbproc"),
-		"process_num": c.Int("ProcessNum"),
-		"pid":         c.Int("Pid"),
-		"ulimit_n":    c.Int("UlimitN"),
-		"tasks":       c.Int("Tasks"),
-		"run_queue":   c.Int("RunQueue"),
+		"threads":            c.Int("Nbthread"),
+		"processes":          c.Int("Nbproc"),
+		"process_num":        c.Int("ProcessNum"),
+		"pid":                c.Int("Pid"),
+		"ulimit_n":           c.Int("UlimitN"),
+		"tasks":              c.Int("Tasks"),
+		"run_queue":          c.Int("RunQueue"),
+		"stopping":           c.Int("Stopping"),
+		"jobs":               c.Int("Jobs"),
+		"unstoppable_jobs":   c.Int("UnstoppableJobs"),
+		"listeners":          c.Int("Listeners"),
+		"dropped_logs":       c.Int("DroppedLogs"),
+		"busy_polling":       c.Int("BusyPolling"),
+		"failed_resolutions": c.Int("FailedResolutions"),
 
 		"uptime": s.Object{
 			"sec": c.Int("UptimeSec"),
@@ -48,6 +56,24 @@ var (
 			"max": s.Object{
 				"bytes": c.Int("MemMax"),
 			},
+		},
+
+		"peers": s.Object{
+			"active":    c.Int("ActivePeers"),
+			"connected": c.Int("ConnectedPeers"),
+		},
+
+		"bytes": s.Object{
+			"out": s.Object{
+				"total": c.Int("TotalBytesOut"),
+				"rate":  c.Int("BytesOutRate"),
+			},
+		},
+
+		"pool": s.Object{
+			"allocated": c.Int("PoolAlloc"),
+			"used":      c.Int("PoolUsed"),
+			"failed":    c.Int("PoolFailed"),
 		},
 
 		"compress": s.Object{
