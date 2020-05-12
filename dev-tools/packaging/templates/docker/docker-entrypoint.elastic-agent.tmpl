@@ -30,13 +30,15 @@ function enroll(){
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]] && [[ ${FLEET_ENROLLMENT_TOKEN} == 1 ]]; then
       apikey = "${FLEET_ENROLLMENT_TOKEN}"
     else
-      configsResp=$(curl -X GET  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/agent_configs \
-              -H 'Content-Type: application/json' \
-              -H 'kbn-xsrf: true' \
-              -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme})
+      if [[ -z "${FLEET_CONFIG_ID}" ]]; then
+        configsResp=$(curl -X GET  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/agent_configs \
+                -H 'Content-Type: application/json' \
+                -H 'kbn-xsrf: true' \
+                -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme})
 
-      configId=$(echo "$configsResp" | jq -r '.items | map(select(.name | contains("Default"))) | .[0].id')
-      default=${configId:-default}
+        configId=$(echo "$configsResp" | jq -r '.items | map(select(.name | contains("Default"))) | .[0].id')
+        default=${configId:-default}
+      fi
 
       enrollResp=$(curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \
