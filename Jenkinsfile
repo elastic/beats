@@ -108,13 +108,7 @@ pipeline {
             }
           }
           steps {
-            script {
-              def tasks = [:]
-              windowsVersions.each { os ->
-                tasks[os] = mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest", os)
-              }
-              parallel(tasks)
-            }
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
           }
         }
 
@@ -180,13 +174,7 @@ pipeline {
             }
           }
           steps {
-            script {
-              def tasks = [:]
-              windowsVersions.each { os ->
-                tasks[os] = mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest", os)
-              }
-              parallel(tasks)
-            }
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -226,13 +214,7 @@ pipeline {
                 }
               }
               steps {
-                script {
-                  def tasks = [:]
-                  windowsVersions.each { os ->
-                    tasks[os] = mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest", os)
-                  }
-                  parallel(tasks)
-                }
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
               }
             }
           }
@@ -279,13 +261,7 @@ pipeline {
                 }
               }
               steps {
-                script {
-                  def tasks = [:]
-                  windowsVersions.each { os ->
-                    tasks[os] = mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest", os)
-                  }
-                  parallel(tasks)
-                }
+                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
               }
             }
           }
@@ -452,13 +428,7 @@ pipeline {
             }
           }
           steps {
-            script {
-              def tasks = [:]
-              windowsVersions.each { os ->
-                tasks[os] = mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest", os)
-              }
-              parallel(tasks)
-            }
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -519,13 +489,7 @@ pipeline {
                 }
               }
               steps {
-                script {
-                  def tasks = [:]
-                  windowsVersions.each { os ->
-                    tasks[os] = mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest", os)
-                  }
-                  parallel(tasks)
-                }
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
               }
             }
           }
@@ -539,13 +503,7 @@ pipeline {
             }
           }
           steps {
-            script {
-              def tasks = [:]
-              windowsVersions.each { os ->
-                tasks[os] = mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest", os)
-              }
-              parallel(tasks)
-            }
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
           }
         }
         stage('Functionbeat'){
@@ -588,13 +546,7 @@ pipeline {
                 }
               }
               steps {
-                script {
-                  def tasks = [:]
-                  windowsVersions.each { os ->
-                    tasks[os] = mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest", "build unitTest", os)
-                  }
-                  parallel(tasks)
-                }
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
               }
             }
           }
@@ -735,26 +687,31 @@ def mageTarget(String context, String directory, String target) {
   }
 }
 
-def mageTargetWin(String context, String directory, String target, String os) {
+def mageTargetWin(String context, String directory, String target, String label) {
   return {
-    node("windows-immutable && ${os}"){
-      mageTargetWin(context, directory, target)
+    log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
+    node("windows-immutable && ${label}"){
+      withBeatsEnvWin() {
+        whenTrue(params.debug) {
+          dumpFilteredEnvironment()
+          dumpMageWin()
+        }
+        def verboseFlag = params.debug ? "-v" : ""
+        dir(directory) {
+          bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+        }
+      }
     }
   }
 }
 
 def mageTargetWin(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin() {
-      whenTrue(params.debug) {
-        dumpFilteredEnvironment()
-        dumpMageWin()
-      }
-      def verboseFlag = params.debug ? "-v" : ""
-      dir(directory) {
-        bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
-      }
+    def tasks = [:]
+    windowsVersions.each { os ->
+      tasks[os] = mageTargetWin(context, directory, target, os)
     }
+    parallel(tasks)
   }
 }
 
