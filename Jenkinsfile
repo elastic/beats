@@ -1109,6 +1109,9 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Define the module to test, if a single module was changed
+  env.MODULE = moduleToTest()
 }
 
 /**
@@ -1123,6 +1126,48 @@ def isDocChangedOnly(){
     log(level: "INFO", text: 'Check if the speed build for docs is enabled.')
     return isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
   }
+}
+
+/**
+  Often developers focus on changes to a specific module in a single PR. If that's the case, this function will return the
+  name of the changed module so we can skip tests for all other modules
+**/
+def moduleToTest() {
+  if (params.runAllStages || !env.CHANGE_ID?.trim()) {
+    log(level: 'INFO', text: 'Speed build for specific module only is disabled for branches/tags or when forcing with the runAllStages parameter.')
+    return 'false'
+  }
+
+  def modulePattern = /beat\/module\/([^\/]+)/
+  def module = ""
+  filesChanged().each{ String file ->
+    matches = (file =~ modulePattern).findAll()
+      if (matches.size() == 1) {
+        matchedModule = matches[0]
+        if (module == "") {
+          // Module not initialized; initialize it with matched module.
+          module = matchedModule
+        } else if (module != matchedModule) {
+          // Module already initialized and is different from matched module. Multiple
+          // modules were changed, so don't return any specific module.
+          return ""
+        }
+    }
+  }
+
+  return module
+}
+
+/**
+ TODO: add error checking for from/to.
+ TODO: move into https://github.com/elastic/apm-pipeline-library/ and potentially reuse in isGitRegionMatch definition.
+**/
+def filesChanged() {
+  def from = params.get('from', env.CHANGE_TARGET?.trim() ? "origin/${env.CHANGE_TARGET}" : env.GIT_PREVIOUS_COMMIT)
+  def to = params.get('to', env.GIT_BASE_COMMIT)
+
+  def output = sh(script: "git diff --name-only ${from}...${to}", returnStdout: true)
+  return output.split('\n')
 }
 
 /**
