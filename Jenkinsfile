@@ -1164,7 +1164,7 @@ def moduleToTest() {
  TODO: add error checking for from/to.
  TODO: move into https://github.com/elastic/apm-pipeline-library/ and potentially reuse in isGitRegionMatch definition.
 **/
-def filesChanged() {
+def filesChanged(Map params = [:]) {
   def from = params.get('from', env.CHANGE_TARGET?.trim() ? "origin/${env.CHANGE_TARGET}" : env.GIT_PREVIOUS_COMMIT)
   def to = params.get('to', env.GIT_BASE_COMMIT)
 
