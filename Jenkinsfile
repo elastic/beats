@@ -9,6 +9,12 @@ import groovy.transform.Field
 */
 @Field def stashedTestReports = [:]
 
+
+/**
+ List of supported windows versions to be tested with
+*/
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012', 'windows-7', 'windows-7-32-bit', 'windows-2008', 'windows-2008-r2', 'windows-10']
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
@@ -94,7 +100,6 @@ pipeline {
         }
 
         stage('Elastic Agent x-pack Windows'){
-          agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -103,7 +108,13 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
+            script {
+              def tasks = [:]
+              windowsVersions.each { os ->
+                tasks[os] = { mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest", os) }
+              }
+              parallel(tasks)
+            }
           }
         }
 
@@ -161,7 +172,6 @@ pipeline {
           }
         }
         stage('Filebeat Windows'){
-          agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -170,7 +180,13 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+            script {
+              def tasks = [:]
+              windowsVersions.each { os ->
+                tasks[os] = { mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest", os) }
+              }
+              parallel(tasks)
+            }
           }
         }
         stage('Heartbeat'){
@@ -202,7 +218,6 @@ pipeline {
               }
             }
             stage('Heartbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -211,7 +226,13 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
+                script {
+                  def tasks = [:]
+                  windowsVersions.each { os ->
+                    tasks[os] = { mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest", os) }
+                  }
+                  parallel(tasks)
+                }
               }
             }
           }
@@ -250,7 +271,6 @@ pipeline {
               }
             }
             stage('Auditbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -259,7 +279,13 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
+                script {
+                  def tasks = [:]
+                  windowsVersions.each { os ->
+                    tasks[os] = { mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest", os) }
+                  }
+                  parallel(tasks)
+                }
               }
             }
           }
@@ -418,7 +444,6 @@ pipeline {
           }
         }
         stage('Metricbeat Windows'){
-          agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -427,7 +452,13 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+            script {
+              def tasks = [:]
+              windowsVersions.each { os ->
+                tasks[os] = { mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest", os) }
+              }
+              parallel(tasks)
+            }
           }
         }
         stage('Packetbeat'){
@@ -480,7 +511,6 @@ pipeline {
               }
             }
             stage('Winlogbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -489,13 +519,18 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
+                script {
+                  def tasks = [:]
+                  windowsVersions.each { os ->
+                    tasks[os] = { mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest", os) }
+                  }
+                  parallel(tasks)
+                }
               }
             }
           }
         }
         stage('Winlogbeat Windows x-pack'){
-          agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -504,7 +539,13 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            script {
+              def tasks = [:]
+              windowsVersions.each { os ->
+                tasks[os] = { mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest", os) }
+              }
+              parallel(tasks)
+            }
           }
         }
         stage('Functionbeat'){
@@ -539,7 +580,6 @@ pipeline {
               }
             }
             stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -548,7 +588,13 @@ pipeline {
                 }
               }
               steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+                script {
+                  def tasks = [:]
+                  windowsVersions.each { os ->
+                    tasks[os] = { mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest", "build unitTest", os) }
+                  }
+                  parallel(tasks)
+                }
               }
             }
           }
@@ -685,6 +731,14 @@ def mageTarget(String context, String directory, String target) {
       dir(directory) {
         sh(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
       }
+    }
+  }
+}
+
+def mageTargetWin(String context, String directory, String target, String os) {
+  return {
+    node("windows-immutable && ${os}"){
+      mageTargetWin(context, directory, target)
     }
   }
 }
