@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixing `ingress_controller.` fields to be of type keyword instead of text. {issue}17834[17834]
 - Fixed typo in log message. {pull}17897[17897]
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Unescape file name from SQS message. {pull}18370[18370]
 
 *Heartbeat*
 
@@ -176,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Add a switch to the driver definition on SQL module to use pretty names. {pull}17378[17378]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
+- Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
 
 *Packetbeat*
 
@@ -394,6 +396,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
 - Remove requirement to connect as sysdba in Oracle module {issue}15846[15846] {pull}18182[18182]
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
+- Add client address to events from http server module {pull}18336[18336]
+- Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 
 *Packetbeat*
 
