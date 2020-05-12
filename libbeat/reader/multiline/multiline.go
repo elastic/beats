@@ -80,7 +80,7 @@ func New(
 	maxBytes int,
 	config *Config,
 ) (*Reader, error) {
-	if config.Type == patternMode || config.Type == nil {
+	if config.Type == patternMode {
 		return newMultilinePatternReader(r, separator, maxBytes, config)
 	} else if config.Type == countMode {
 		return newMultilineCountReader(r, separator, maxBytes, config)
