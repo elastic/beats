@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -443,6 +444,13 @@ func (Demo) NoEnroll() error {
 }
 
 func runAgent(env map[string]string) error {
+	prevPlatforms := os.Getenv("PLATFORMS")
+	defer os.Setenv("PLATFORMS", prevPlatforms)
+
+	// setting this improves build time
+	os.Setenv("PLATFORMS", "+all linux/amd64")
+	devtools.Platforms = devtools.NewPlatformList("+all linux/amd64")
+
 	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
@@ -455,7 +463,6 @@ func runAgent(env map[string]string) error {
 	if !strings.Contains(dockerImageOut, tag) {
 		// produce docker package
 		packageAgent([]string{
-			"linux-x86.tar.gz",
 			"linux-x86_64.tar.gz",
 		}, devtools.UseElasticAgentDemoPackaging)
 
@@ -471,7 +478,11 @@ func runAgent(env map[string]string) error {
 	}
 
 	// prepare env variables
-	var envs []string
+	envs := []string{
+		// providing default kibana to be fixed for os-es if not provided
+		"KIBANA_HOST=http://localhost:5601",
+	}
+
 	envs = append(envs, os.Environ()...)
 	for k, v := range env {
 		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
@@ -485,6 +496,9 @@ func runAgent(env map[string]string) error {
 			continue
 		}
 
+		// fix value
+		e = fmt.Sprintf("%s=%s", parts[0], fixOsEnv(parts[0], parts[1]))
+
 		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
 	}
 
@@ -493,6 +507,7 @@ func runAgent(env map[string]string) error {
 }
 
 func packageAgent(requiredPackages []string, packagingFn func()) {
+
 	version, found := os.LookupEnv("BEAT_VERSION")
 	if !found {
 		version = release.Version()
@@ -539,4 +554,16 @@ func dockerTag() string {
 	}
 
 	return tagBase
+}
+
+func fixOsEnv(k, v string) string {
+	switch k {
+	case "KIBANA_HOST":
+		// network host works in a weird way here
+		if runtime.GOOS == "darwin" || runtime.GOOS == "windows" {
+			return strings.Replace(strings.ToLower(v), "localhost", "host.docker.internal", 1)
+		}
+	}
+
+	return v
 }
