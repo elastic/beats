@@ -69,7 +69,7 @@ pipeline {
     stage('Lint'){
       options { skipDefaultCheckout() }
       steps {
-        makeTarget("Lint", "check")
+        makeTarget(context: "Lint", target: "check", archive: false)
       }
     }
     stage('Build and Test'){
@@ -131,7 +131,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
+            makeTarget(context: "Filebeat oss Linux", target: "-C filebeat testsuite")
           }
         }
         stage('Filebeat x-pack'){
@@ -185,7 +185,7 @@ pipeline {
           stages {
             stage('Heartbeat oss'){
               steps {
-                makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
+                makeTarget(context: "Heartbeat oss Linux", target: "-C heartbeat testsuite")
               }
             }
             stage('Heartbeat Mac OS X'){
@@ -228,12 +228,12 @@ pipeline {
           stages {
             stage('Auditbeat Linux'){
               steps {
-                makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
+                makeTarget(context: "Auditbeat oss Linux", target: "-C auditbeat testsuite")
               }
             }
             stage('Auditbeat crosscompile'){
               steps {
-                makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
+                makeTarget(context: "Auditbeat oss crosscompile", target: "-C auditbeat crosscompile")
               }
             }
             stage('Auditbeat Mac OS X'){
@@ -289,17 +289,17 @@ pipeline {
           stages {
             stage('Libbeat oss'){
               steps {
-                makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
+                makeTarget(context: "Libbeat oss Linux", target: "-C libbeat testsuite")
               }
             }
             stage('Libbeat crosscompile'){
               steps {
-                makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
+                makeTarget(context: "Libbeat oss crosscompile", target: "-C libbeat crosscompile")
               }
             }
             stage('Libbeat stress-tests'){
               steps {
-                makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
+                makeTarget(context: "Libbeat stress-tests", target: "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
               }
             }
           }
@@ -314,7 +314,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Libbeat x-pack Linux", "-C x-pack/libbeat testsuite")
+            makeTarget(context: "Libbeat x-pack Linux", target: "-C x-pack/libbeat testsuite")
           }
         }
         stage('Metricbeat OSS Unit tests'){
@@ -401,7 +401,7 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Metricbeat OSS crosscompile", "-C metricbeat crosscompile")
+            makeTarget(context: "Metricbeat OSS crosscompile", target: "-C metricbeat crosscompile")
           }
         }
         stage('Metricbeat Mac OS X'){
@@ -442,7 +442,7 @@ pipeline {
           stages {
             stage('Packetbeat oss'){
               steps {
-                makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
+                makeTarget(context: "Packetbeat oss Linux", target: "-C packetbeat testsuite")
               }
             }
           }
@@ -476,7 +476,7 @@ pipeline {
           stages {
             stage('Winlogbeat oss'){
               steps {
-                makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
+                makeTarget(context: "Winlogbeat oss crosscompile", target: "-C winlogbeat crosscompile")
               }
             }
             stage('Winlogbeat Windows'){
@@ -521,7 +521,7 @@ pipeline {
               steps {
                 mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
                 withEnv(["GO_VERSION=1.13.1"]){
-                  makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
+                  makeTarget(context: "Functionbeat x-pack Linux", target: "-C x-pack/functionbeat test-gcp-functions")
                 }
               }
             }
@@ -565,7 +565,7 @@ pipeline {
           stages {
             stage('Journalbeat oss'){
               steps {
-                makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
+                makeTarget(context: "Journalbeat Linux", target: "-C journalbeat testsuite")
               }
             }
           }
@@ -584,8 +584,8 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
+                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test")
+                  makeTarget(context: "Generators Metricbeat Linux", target: "-C generator/_templates/metricbeat test-package")
                 }
               }
             }
@@ -593,8 +593,8 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
+                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test")
+                  makeTarget(context: "Generators Beat Linux", target: "-C generator/_templates/beat test-package")
                 }
               }
             }
@@ -610,7 +610,7 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+                  makeTarget(context: "Generators Metricbeat Mac OS X", target: "-C generator/_templates/metricbeat test")
                 }
               }
             }
@@ -626,7 +626,7 @@ pipeline {
               steps {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                  makeTarget(context: "Generators Beat Mac OS X", target: "-C generator/_templates/beat test")
                 }
               }
             }
@@ -658,7 +658,11 @@ pipeline {
   }
 }
 
-def makeTarget(String context, String target, boolean clean = true) {
+def makeTarget(Map params = [:]) {
+  def context = params.get('context')
+  def target = params.get('target')
+  def archive = params.get('archive', true)
+  def clean = params.get('clean', true)
   // The directory will fix the known issue when searching the generated test files
   // in a massive repo.
   // For such, the directory is the one when using the target -C <directory>
@@ -671,7 +675,7 @@ def makeTarget(String context, String target, boolean clean = true) {
     }
   }
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, directory: directory) {
+    withBeatsEnv(archive: archive, directory: directory) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
