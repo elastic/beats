@@ -255,7 +255,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-            "searchSourceJSON": {}
+          "searchSourceJSON": {}
         },
         "title": "Storage Total Bytes [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
@@ -338,13 +338,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Storage Object Count [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
@@ -427,14 +421,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
+          "searchSourceJSON": {},
         "title": "Storage API Request Count [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
         "version": 1,
