@@ -16,6 +16,7 @@ var sysmon = (function () {
     var path = require("path");
     var processor = require("processor");
     var winlogbeat = require("winlogbeat");
+    var net = require("net");
 
     // Windows error codes for DNS. This list was generated using
     // 'go run gen_dns_error_codes.go'.
@@ -432,17 +433,19 @@ var sysmon = (function () {
             } else {
                 // Convert V4MAPPED addresses.
                 answer = answer.replace("::ffff:", "");
-                ips.push(answer);
+                if (net.isIP(answer)) {
+                    ips.push(answer);
 
-                // Synthesize record type based on IP address type.
-                var type = "A";
-                if (answer.indexOf(":") !== -1) {
-                    type = "AAAA";
+                    // Synthesize record type based on IP address type.
+                    var type = "A";
+                    if (answer.indexOf(":") !== -1) {
+                        type = "AAAA";
+                    }
+                    answers.push({
+                        type: type,
+                        data: answer,
+                    });
                 }
-                answers.push({
-                    type: type,
-                    data: answer,
-                });
             }
         }
 
