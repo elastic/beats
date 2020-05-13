@@ -331,7 +331,7 @@ func createEventBulkMeta(
 		if id != "" {
 			return eslegclient.BulkDeleteAction{Delete: meta}, nil
 		} else {
-			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete.String())
+			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
 		}
 	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
