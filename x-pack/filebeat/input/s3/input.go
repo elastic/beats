@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -360,10 +361,16 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	var s3Infos []s3Info
 	for _, record := range msg.Records {
 		if record.EventSource == "aws:s3" && strings.HasPrefix(record.EventName, "ObjectCreated:") {
+			// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
+			filename, err := url.QueryUnescape(record.S3.object.Key)
+			if err != nil {
+				return nil, errors.Wrapf(err, "url.QueryUnescape failed")
+			}
+
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
 				name:   record.S3.bucket.Name,
-				key:    record.S3.object.Key,
+				key:    filename,
 				arn:    record.S3.bucket.Arn,
 			})
 		} else {
@@ -381,6 +388,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 	defer s3Ctx.done()
 
 	for _, info := range s3Infos {
+		p.logger.Debugf("Processing file from s3 bucket \"%s\" with name \"%s\"", info.name, info.key)
 		err := p.createEventsFromS3Info(svc, info, s3Ctx)
 		if err != nil {
 			err = errors.Wrapf(err, "createEventsFromS3Info failed for %v", info.key)
