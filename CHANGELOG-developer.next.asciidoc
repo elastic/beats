@@ -39,6 +39,13 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
 - Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
 - Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
+- Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
+- Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
+- The way configuration files are generated has changed to make it easier to customize parts
+  of the config without requiring changes to libbeat config templates. Generation is now
+  fully based on Go text/template and no longer uses file concatenation to generate the config.
+  Your magefile.go will require a change to adapt the devtool API. See the pull request for
+  more details. {pull}18148[18148]
 
 ==== Bugfixes
 
@@ -78,3 +85,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - New mage target for Functionbeat: generate pkg folder to make manager easier. {pull}15580[15880]
 - Add support for MODULE environment variable in `mage goIntegTest` in metricbeat to run integration tests for a single module. {pull}17147[17147]
 - Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
+- Add fields validation for histogram subfields. {pull}17759[17759]
+- Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]

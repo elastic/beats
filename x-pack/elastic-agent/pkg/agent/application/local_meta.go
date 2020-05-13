@@ -5,21 +5,20 @@
 package application
 
 import (
-	"os"
-	"runtime"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-func metadata() (map[string]interface{}, error) {
-	hostname, err := os.Hostname()
+func metadata() (*info.ECSMeta, error) {
+	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return nil, err
 	}
 
-	return map[string]interface{}{
-		"platform": runtime.GOOS,
-		"version":  release.Version(),
-		"host":     hostname,
-	}, nil
+	meta, err := agentInfo.ECSMetadata()
+	if err != nil {
+		return nil, errors.New(err, "failed to gather host metadata")
+	}
+
+	return meta, nil
 }

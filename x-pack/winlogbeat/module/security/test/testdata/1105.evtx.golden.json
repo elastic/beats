@@ -3,10 +3,13 @@
     "@timestamp": "2019-11-07T16:22:14.8425353Z",
     "event": {
       "action": "auditlog-archieved",
+      "category": "iam",
       "code": 1105,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Eventlog"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Eventlog",
+      "type": "admin"
     },
     "host": {
       "name": "WIN-41OB2LO92CR.wlbeat.local"

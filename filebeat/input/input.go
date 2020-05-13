@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mitchellh/hashstructure"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -52,7 +50,6 @@ type Runner struct {
 	input    Input
 	done     chan struct{}
 	wg       *sync.WaitGroup
-	ID       uint64
 	Once     bool
 	beatDone chan struct{}
 }
@@ -75,13 +72,6 @@ func New(
 
 	var err error
 	if err = conf.Unpack(&input.config); err != nil {
-		return nil, err
-	}
-
-	var h map[string]interface{}
-	conf.Unpack(&h)
-	input.ID, err = hashstructure.Hash(h, nil)
-	if err != nil {
 		return nil, err
 	}
 
@@ -111,7 +101,6 @@ func New(
 // Start starts the input
 func (p *Runner) Start() {
 	p.wg.Add(1)
-	logp.Info("Starting input of type: %v; ID: %d ", p.config.Type, p.ID)
 
 	onceWg := sync.WaitGroup{}
 	if p.Once {
@@ -164,8 +153,6 @@ func (p *Runner) Stop() {
 }
 
 func (p *Runner) stop() {
-	logp.Info("Stopping Input: %d", p.ID)
-
 	// In case of once, it will be waited until harvesters close itself
 	if p.Once {
 		p.input.Wait()
@@ -175,5 +162,5 @@ func (p *Runner) stop() {
 }
 
 func (p *Runner) String() string {
-	return fmt.Sprintf("input [type=%s, ID=%d]", p.config.Type, p.ID)
+	return fmt.Sprintf("input [type=%s]", p.config.Type)
 }

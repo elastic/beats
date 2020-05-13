@@ -114,8 +114,10 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		log, _ := logger.New()
 		rep := getReporter(agentInfo, log, t)
 
+		ctx, cancel := context.WithCancel(context.Background())
+
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			settings,
 			agentInfo,
@@ -127,7 +129,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		)
 
 		go gateway.Start()
-		defer gateway.Stop()
+		defer cancel()
 
 		require.NoError(t, err)
 
@@ -240,9 +242,10 @@ func TestFleetGateway(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
+		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			settings,
 			agentInfo,
@@ -254,7 +257,7 @@ func TestFleetGateway(t *testing.T) {
 		)
 
 		go gateway.Start()
-		defer gateway.Stop()
+		defer cancel()
 
 		require.NoError(t, err)
 
@@ -324,9 +327,10 @@ func TestFleetGateway(t *testing.T) {
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
+		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New()
 		gateway, err := newFleetGatewayWithScheduler(
-			context.Background(),
+			ctx,
 			log,
 			&fleetGatewaySettings{
 				Duration: d,
@@ -370,8 +374,9 @@ func TestFleetGateway(t *testing.T) {
 		// 1. Gateway will check the API on boot.
 		// 2. WaitTick() will block for 20 minutes.
 		// 3. Stop will should unblock the wait.
-		gateway.Stop()
+		cancel()
 	})
+
 }
 
 func TestRetriesOnFailures(t *testing.T) {

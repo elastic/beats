@@ -26,6 +26,7 @@ _Beats Platform Reference_ for more about the structure of the config file.
 The following topics describe how to configure Heartbeat:
 
 * <<configuration-heartbeat-options>>
+* <<monitors-scheduler>>
 * <<configuration-general-options>>
 * <<configuration-path>>
 * <<configuring-output>>
@@ -43,6 +44,8 @@ The following topics describe how to configure Heartbeat:
 --
 
 include::./heartbeat-options.asciidoc[]
+
+include::./heartbeat-scheduler.asciidoc[]
 
 include::./heartbeat-general-options.asciidoc[]
 

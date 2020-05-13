@@ -36,7 +36,8 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+
 
 type: keyword
 
@@ -7568,6 +7569,24 @@ These are the event fields specific to the Sysmon module.
 Windows status code returned for the DNS query.
 
 type: keyword
+
+--
+
+*`sysmon.file.archived`*::
++
+--
+Indicates if the deleted file was archived.
+
+type: boolean
+
+--
+
+*`sysmon.file.is_executable`*::
++
+--
+Indicates if the deleted file was an executable.
+
+type: boolean
 
 --
 

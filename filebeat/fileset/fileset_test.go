@@ -56,7 +56,7 @@ func TestLoadManifestNginx(t *testing.T) {
 	manifest, err := fs.readManifest()
 	assert.NoError(t, err)
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
-	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/default.json"})
+	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/pipeline.yml"})
 	assert.Equal(t, manifest.Input, "config/nginx-access.yml")
 
 	vars := manifest.Vars
@@ -189,7 +189,7 @@ func TestGetInputConfigNginx(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
 }
 
 func TestGetInputConfigNginxOverrides(t *testing.T) {
@@ -217,7 +217,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 				pipelineID, err := c.String("pipeline", -1)
 				assert.NoError(t, err)
-				assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+				assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
 			},
 		},
 		"pipeline": {
@@ -276,7 +276,7 @@ func TestGetPipelineNginx(t *testing.T) {
 	assert.Len(t, pipelines, 1)
 
 	pipeline := pipelines[0]
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipeline.id)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipeline.id)
 	assert.Contains(t, pipeline.contents, "description")
 	assert.Contains(t, pipeline.contents, "processors")
 }

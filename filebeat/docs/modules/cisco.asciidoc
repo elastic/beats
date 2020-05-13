@@ -294,7 +294,7 @@ parameters on your Elasticsearch cluster:
 - {ref}/circuit-breaker.html#script-compilation-circuit-breaker[script.max_compilations_rate]:
   Increase to at least `100/5m`.
 
-- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache_max_size]:
+- {ref}/modules-scripting-using.html#modules-scripting-using-caching[script.cache.max_size]:
   Increase to at least `200` if using both filesets or other script-heavy modules.
 
 [float]

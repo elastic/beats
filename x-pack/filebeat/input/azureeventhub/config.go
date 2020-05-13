@@ -17,6 +17,8 @@ type azureInputConfig struct {
 	SAName      string `config:"storage_account"`
 	SAKey       string `config:"storage_account_key"`
 	SAContainer string `config:"storage_account_container"`
+	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
+	OverrideEnvironment string `config:"resource_manager_endpoint"`
 }
 
 const ephContainerName = "filebeat"

@@ -191,14 +191,17 @@ func pushCredentials(w io.Writer, c *Creds) error {
 
 	credbytes, err := yaml.Marshal(c)
 	if err != nil {
-		return err
+		return errors.New(err, "decoding credentials")
 	}
 
 	_, err = w.Write(credbytes)
+	if err != nil {
+		return errors.New(err, "passing credentials failed")
+	}
 
 	// this gives beat with grpc a bit of time to spin up a goroutine and start a server.
 	// should be ok until we come up with more clever solution.
 	// Issue: https://github.com/elastic/beats/v7/issues/15634
 	<-time.After(1500 * time.Millisecond)
-	return err
+	return nil
 }

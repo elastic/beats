@@ -28,7 +28,7 @@ func (r *FleetUserAgentRoundTripper) RoundTrip(req *http.Request) (*http.Respons
 // NewFleetUserAgentRoundTripper returns a  FleetUserAgentRoundTripper that actually wrap the
 // existing UserAgentRoundTripper with a specific string.
 func NewFleetUserAgentRoundTripper(wrapped http.RoundTripper, version string) http.RoundTripper {
-	const name = "Beat Agent"
+	const name = "Elastic Agent"
 	return &FleetUserAgentRoundTripper{
 		rt: kibana.NewUserAgentRoundTripper(wrapped, name+" v"+version),
 	}

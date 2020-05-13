@@ -39,3 +39,7 @@ x-pack/dockerlogbeat/temproot.tar
 *.test
 *.prof
 *.pyc
+
+# Terraform
+*.terraform
+*.tfstate*

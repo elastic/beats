@@ -31,6 +31,8 @@ func (p *Protocol) Unpack(from string) error {
 	if from != "https" && from != "http" {
 		return fmt.Errorf("invalid protocol %s, accepted values are 'http' and 'https'", from)
 	}
+
+	*p = Protocol(from)
 	return nil
 }
 

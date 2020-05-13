@@ -3,10 +3,16 @@
     "@timestamp": "2019-10-22T11:32:14.8941288Z",
     "event": {
       "action": "removed-member-from-group",
+      "category": "iam",
       "code": 4733,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "group"
+      ]
     },
     "group": {
       "domain": "WLBEAT",

@@ -15,6 +15,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
@@ -57,7 +58,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 		}
 	}()
 
-	if err := a.monitor.Prepare(a.uid, a.gid); err != nil {
+	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -80,7 +81,8 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 		a.limiter.Add()
 	}
 
-	spec.Args = a.monitor.EnrichArgs(spec.Args)
+	spec.Args = injectLogLevel(a.logLevel, spec.Args)
+	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args)
 
 	// specify beat name to avoid data lock conflicts
 	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
@@ -113,6 +115,27 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	return nil
 }
 
+func injectLogLevel(logLevel string, args []string) []string {
+	var level string
+	// Translate to level beat understands
+	switch logLevel {
+	case "trace":
+		level = "debug"
+	case "info":
+		level = "info"
+	case "debug":
+		level = "debug"
+	case "error":
+		level = "error"
+	}
+
+	if args == nil || level == "" {
+		return args
+	}
+
+	return append(args, "-E", "logging.level="+level)
+}
+
 func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
 	const (
 		rounds        int           = 3
@@ -135,7 +158,7 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 	for round := 1; round <= rounds; round++ {
 		for retry := 1; retry <= retries; retry++ {
-			c, cancelFn := context.WithTimeout(context.Background(), retryTimeout)
+			c, cancelFn := context.WithTimeout(a.bgContext, retryTimeout)
 			err := checkFn(c, a.state.ProcessInfo.Address)
 			if err == nil {
 				cancelFn()
@@ -145,12 +168,21 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 
 			// do not wait on last
 			if retry != retries {
-				<-time.After(retryTimeout)
+				select {
+				case <-time.After(retryTimeout):
+				case <-a.bgContext.Done():
+					return nil
+				}
 			}
 		}
+
 		// do not wait on last
 		if round != rounds {
-			time.After(time.Duration(round) * roundsTimeout)
+			select {
+			case <-time.After(time.Duration(round) * roundsTimeout):
+			case <-a.bgContext.Done():
+				return nil
+			}
 		}
 	}
 
@@ -201,12 +233,7 @@ func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *aut
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	wd := ""
-	if w, err := os.Getwd(); err == nil {
-		wd = w
-	}
-
-	dataPath := filepath.Join(wd, "data", pipelineID, id)
+	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }
 

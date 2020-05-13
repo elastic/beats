@@ -5,6 +5,7 @@
 package tokenbucket
 
 import (
+	"context"
 	"sync"
 	"testing"
 	"time"
@@ -22,6 +23,7 @@ func TestTokenBucket(t *testing.T) {
 		stepper := scheduler.NewStepper()
 
 		b, err := newTokenBucketWithScheduler(
+			context.Background(),
 			bucketSize,
 			dropAmount,
 			stepper,
@@ -37,6 +39,7 @@ func TestTokenBucket(t *testing.T) {
 		stepper := scheduler.NewStepper()
 
 		b, err := newTokenBucketWithScheduler(
+			context.Background(),
 			bucketSize,
 			dropAmount,
 			stepper,
@@ -53,6 +56,7 @@ func TestTokenBucket(t *testing.T) {
 		stepper := scheduler.NewStepper()
 
 		b, err := newTokenBucketWithScheduler(
+			context.Background(),
 			bucketSize,
 			dropAmount,
 			stepper,
@@ -88,6 +92,7 @@ func TestTokenBucket(t *testing.T) {
 	t.Run("When we use a timer scheduler we can unblock", func(t *testing.T) {
 		d := 1 * time.Second
 		b, err := NewTokenBucket(
+			context.Background(),
 			bucketSize,
 			dropAmount,
 			d,

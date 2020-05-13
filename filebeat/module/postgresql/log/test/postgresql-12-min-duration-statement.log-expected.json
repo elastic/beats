@@ -1,0 +1,239 @@
+[
+    {
+        "@timestamp": "2020-04-16T10:48:36.677Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 327000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "2020-04-16 12:48:36.677 CEST [34492] LOG:  duration: 0.327 ms  statement: select 1;",
+        "postgresql.log.query": "select 1;",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:48:36.677 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:48:40.316Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 320000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 84,
+        "message": "2020-04-16 12:48:40.316 CEST [34492] LOG:  duration: 0.320 ms  statement: select version();",
+        "postgresql.log.query": "select version();",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:48:40.316 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:48:44.696Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "ERROR",
+        "log.offset": 176,
+        "message": "column \"name\" does not exist at character 8",
+        "postgresql.log.timestamp": "2020-04-16 12:48:44.696 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:48:44.696Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "STATEMENT",
+        "log.offset": 265,
+        "message": "select name from user;",
+        "postgresql.log.timestamp": "2020-04-16 12:48:44.696 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:49:16.871Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3431000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 337,
+        "message": "2020-04-16 12:49:16.871 CEST [34492] LOG:  duration: 3.431 ms  statement: CREATE TABLE weather (\n\t    city            varchar(80),\n\t    temp_lo         int,\n\t    temp_hi         int,\n\t    prcp            real,\n\t    date            date\n\t);",
+        "postgresql.log.query": "CREATE TABLE weather (\n\t    city            varchar(80),\n\t    temp_lo         int,\n\t    temp_hi         int,\n\t    prcp            real,\n\t    date            date\n\t);",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:49:16.871 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:49:19.866Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "ERROR",
+        "log.offset": 577,
+        "message": "relation \"weather\" already exists",
+        "postgresql.log.timestamp": "2020-04-16 12:49:19.866 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:49:54.907Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 3039000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 656,
+        "message": "2020-04-16 12:49:54.907 CEST [34492] LOG:  duration: 3.039 ms  statement: SELECT pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c WHERE c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(c.relname),1,2)='we' AND pg_catalog.pg_table_is_visible(c.oid) AND c.relnamespace <> (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = 'pg_catalog')\n\tUNION\n\tSELECT pg_catalog.quote_ident(n.nspname) || '.' FROM pg_catalog.pg_namespace n WHERE substring(pg_catalog.quote_ident(n.nspname) || '.',1,2)='we' AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) > 1\n\tUNION\n\tSELECT pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c, pg_catalog.pg_namespace n WHERE c.relnamespace = n.oid AND c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname),1,2)='we' AND substring(pg_catalog.quote_ident(n.nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(n.nspname))+1) AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) = 1\n\tLIMIT 1000",
+        "postgresql.log.query": "SELECT pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c WHERE c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(c.relname),1,2)='we' AND pg_catalog.pg_table_is_visible(c.oid) AND c.relnamespace <> (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = 'pg_catalog')\n\tUNION\n\tSELECT pg_catalog.quote_ident(n.nspname) || '.' FROM pg_catalog.pg_namespace n WHERE substring(pg_catalog.quote_ident(n.nspname) || '.',1,2)='we' AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) > 1\n\tUNION\n\tSELECT pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname) FROM pg_catalog.pg_class c, pg_catalog.pg_namespace n WHERE c.relnamespace = n.oid AND c.relkind IN ('r', 'S', 'v', 'm', 'f', 'p') AND substring(pg_catalog.quote_ident(n.nspname) || '.' || pg_catalog.quote_ident(c.relname),1,2)='we' AND substring(pg_catalog.quote_ident(n.nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(n.nspname))+1) AND (SELECT pg_catalog.count(*) FROM pg_catalog.pg_namespace WHERE substring(pg_catalog.quote_ident(nspname) || '.',1,2) = substring('we',1,pg_catalog.length(pg_catalog.quote_ident(nspname))+1)) = 1\n\tLIMIT 1000",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:49:54.907 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:49:55.464Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 179000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2066,
+        "message": "2020-04-16 12:49:55.464 CEST [34492] LOG:  duration: 0.179 ms  statement: select * From weather ;",
+        "postgresql.log.query": "select * From weather ;",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:49:55.464 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:50:05.322Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 1661000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2164,
+        "message": "2020-04-16 12:50:05.322 CEST [34492] LOG:  duration: 1.661 ms  statement: INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');",
+        "postgresql.log.query": "INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:50:05.322 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:50:06.741Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 144000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2312,
+        "message": "2020-04-16 12:50:06.741 CEST [34492] LOG:  duration: 0.144 ms  statement: select * From weather ;",
+        "postgresql.log.query": "select * From weather ;",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2020-04-16 12:50:06.741 CEST",
+        "process.pid": 34492,
+        "service.type": "postgresql"
+    }
+]

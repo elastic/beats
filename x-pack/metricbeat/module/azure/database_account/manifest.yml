@@ -9,39 +9,71 @@ input:
       resource_type: "Microsoft.DocumentDb/databaseAccounts"
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-      "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
-      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
-      "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
-                "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
+      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
+               "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
+          value: "*"
+      - name: ["TotalRequestUnits", "TotalRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
+        - name: "StatusCode"
           value: "*"
       - name: ["CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT1M"
         dimensions:
         - name: "DatabaseName"
+          value: "*"
+      - name: [ "GremlinDatabaseDelete", "GremlinDatabaseThroughputUpdate", "GremlinDatabaseUpdate", "GremlinGraphDelete","GremlinGraphThroughputUpdate", "GremlinGraphUpdate",
+        "MongoCollectionDelete", "MongoCollectionThroughputUpdate", "MongoCollectionUpdate", "MongoDBDatabaseUpdate", "MongoDatabaseDelete", "MongoDatabaseThroughputUpdate",
+        "CassandraKeyspaceDelete", "CassandraKeyspaceThroughputUpdate", "CassandraKeyspaceUpdate","CassandraTableDelete", "CassandraTableThroughputUpdate", "CassandraTableUpdate",
+        "SqlContainerDelete", "SqlContainerThroughputUpdate", "SqlContainerUpdate", "SqlDatabaseDelete", "SqlDatabaseThroughputUpdate", "SqlDatabaseUpdate", "TableTableDelete",
+                "TableTableThroughputUpdate","TableTableUpdate"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        dimensions:
+        - name: "ResourceName"
           value: "*"
     - resource_id: ""
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-                "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
-      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests",
-                "MongoRequestCharge", "MongoRequests", "MongoRequestsCount", "MongoRequestsDelete","MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate",
-                "ProvisionedThroughput", "TotalRequestUnits", "TotalRequests"]
+      - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
+               "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
+          value: "*"
+      - name: ["TotalRequestUnits", "TotalRequests"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        timegrain: "PT5M"
+        dimensions:
+        - name: "DatabaseName"
+          value: "*"
+        - name: "StatusCode"
           value: "*"
       - name: ["CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         timegrain: "PT1M"
         dimensions:
         - name: "DatabaseName"
+          value: "*"
+      - name: [ "GremlinDatabaseDelete", "GremlinDatabaseThroughputUpdate", "GremlinDatabaseUpdate", "GremlinGraphDelete","GremlinGraphThroughputUpdate", "GremlinGraphUpdate",
+                "MongoCollectionDelete", "MongoCollectionThroughputUpdate", "MongoCollectionUpdate", "MongoDBDatabaseUpdate", "MongoDatabaseDelete", "MongoDatabaseThroughputUpdate",
+                "CassandraKeyspaceDelete", "CassandraKeyspaceThroughputUpdate", "CassandraKeyspaceUpdate","CassandraTableDelete", "CassandraTableThroughputUpdate", "CassandraTableUpdate",
+                "SqlContainerDelete", "SqlContainerThroughputUpdate", "SqlContainerUpdate", "SqlDatabaseDelete", "SqlDatabaseThroughputUpdate", "SqlDatabaseUpdate", "TableTableDelete",
+                "TableTableThroughputUpdate","TableTableUpdate"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+        dimensions:
+        - name: "ResourceName"
           value: "*"
 

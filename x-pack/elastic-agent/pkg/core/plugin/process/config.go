@@ -19,3 +19,12 @@ type Config struct {
 
 	// TODO: cgroups and namespaces
 }
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *Config {
+	return &Config{
+		MinPortNumber: 10000,
+		MaxPortNumber: 30000,
+		SpawnTimeout:  30 * time.Second,
+	}
+}

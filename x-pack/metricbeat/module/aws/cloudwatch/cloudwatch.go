@@ -19,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
@@ -52,6 +53,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
+	logger            *logp.Logger
 	CloudwatchConfigs []Config `config:"metrics" validate:"nonzero,required"`
 }
 
@@ -123,6 +125,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		MetricSet:         metricSet,
+		logger:            logp.NewLogger(metricsetName),
 		CloudwatchConfigs: config.CloudwatchMetrics,
 	}, nil
 }
@@ -142,10 +145,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricDetailTotal and namespaceDetailTotal from configuration
 	listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
+	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
+	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
 
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.MetricSet.RegionsList {
+			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
 
@@ -160,6 +166,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
 
+			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
+
 			err = reportEvents(eventsWithIdentifier, report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
@@ -168,6 +176,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
+		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
@@ -179,9 +188,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create events based on namespaceDetailTotal from configuration
 		for namespace, namespaceDetails := range namespaceDetailTotal {
+			m.logger.Debugf("Collected metrics from namespace %s", namespace)
+
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
-				m.Logger().Info(err.Error())
+				m.logger.Info(err.Error())
 				continue
 			}
 
@@ -198,6 +209,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
+
+			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
 			err = reportEvents(eventsWithIdentifier, report)
 			if err != nil {
@@ -448,12 +461,14 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 	// Construct metricDataQueries
 	metricDataQueries := createMetricDataQueries(listMetricWithStatsTotal, m.Period)
+	m.logger.Debugf("Number of MetricDataQueries = %d", len(metricDataQueries))
 	if len(metricDataQueries) == 0 {
 		return events, nil
 	}
 
 	// Use metricDataQueries to make GetMetricData API calls
 	metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+	m.logger.Debugf("Number of metricDataResults = %d", len(metricDataResults))
 	if err != nil {
 		return events, errors.Wrap(err, "GetMetricDataResults failed")
 	}
@@ -496,7 +511,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.
-			m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
+			m.logger.Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 		}
 
 		if len(tagsFilter) != 0 && len(resourceTagMap) == 0 {

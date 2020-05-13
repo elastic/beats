@@ -1,0 +1,4 @@
+---
+requiredLabels:
+  - missingLabel: needs_team
+    regex: Team:.+

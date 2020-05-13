@@ -49,7 +49,7 @@ var appPoolCounters = map[string]string{
 	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
 	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
 	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_byte":                 "\\Process(w3wp*)\\Private Bytes",
+	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
 	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
 	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
 	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
