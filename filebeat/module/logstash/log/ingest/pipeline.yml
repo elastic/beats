@@ -3,21 +3,25 @@ processors:
 - rename:
     field: '@timestamp'
     target_field: event.created
-- grok:
+- set:
+    field: is_json
+    value: true
+- json:
     field: message
-    patterns:
-      - ^%{CHAR:first_char}
-    pattern_definitions:
-      CHAR: .
+    target_field: logstash.log
+    on_failure:
+      - set:
+          field: is_json
+          value: false
 - pipeline:
-    if: ctx.first_char != '{'
-    name: '{< IngestPipeline "pipeline-plaintext" >}'
-- pipeline:
-    if: ctx.first_char == '{'
+    if: ctx.is_json == true
     name: '{< IngestPipeline "pipeline-json" >}'
+- pipeline:
+    if: ctx.is_json == false
+    name: '{< IngestPipeline "pipeline-plaintext" >}'
 - remove:
     field:
-      - first_char
+      - is_json
 on_failure:
   - set:
       field: error.message
