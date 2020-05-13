@@ -45,18 +45,6 @@ const (
 	FieldMetaOpType = "op_type"
 )
 
-type OpType int
-
-const (
-	OpTypeCreate OpType = iota
-	OpTypeDelete
-	OpTypeIndex
-)
-
-func (o OpType) String() string {
-	return []string{"create", "delete", "index"}[o]
-}
-
 // GetMetaStringValue returns the value of the given event metadata string field
 func GetMetaStringValue(e beat.Event, key string) (string, error) {
 	tmp, err := e.Meta.GetValue(key)
