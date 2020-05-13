@@ -29,7 +29,8 @@ pipeline {
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
-    disableConcurrentBuilds()
+    quietPeriod(10)
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
@@ -53,6 +54,7 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
