@@ -255,13 +255,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+            "searchSourceJSON": {}
         },
         "title": "Storage Total Bytes [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
