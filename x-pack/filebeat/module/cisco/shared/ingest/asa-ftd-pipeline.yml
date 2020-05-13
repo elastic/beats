@@ -1277,6 +1277,16 @@ processors:
       ignore_missing: true
 
 on_failure:
+  # Copy any fields under _temp_.cisco to its final destination. Those can help
+  # with diagnosing the failure.
+  - rename:
+      field: _temp_.cisco
+      target_field: "cisco.{< .internal_prefix >}"
+      ignore_failure: true
+  # Remove _temp_ to avoid adding a lot of unnecessary fields to the index.
+  - remove:
+      field: _temp_
+      ignore_missing: true
   - append:
       field: "error.message"
       value: "{{ _ingest.on_failure_message }}"
