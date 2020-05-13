@@ -669,18 +669,11 @@ pipeline {
   <target format>:
     - foo -C directory/subdirectory target
     - foo target
-
-  _NOTE_: This method should call from the WORKSPACE path. This is the way we
-          can ensure the -C directory matches with an existing Makefile in that
-          particular directory.
 */
 def targetDirectory(String target) {
   def directory = '**'
   if (target.contains('-C ')) {
     directory = target.replaceAll('.*-C ', '').split(' ')[0]
-    if (!fileExists("${env.BASE_DIR}/${directory}/Makefile")) {
-      directory = '**'
-    }
   }
   return directory
 }
