@@ -25,14 +25,15 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[OpTypeCreate-0]
-	_ = x[OpTypeIndex-1]
-	_ = x[OpTypeDelete-2]
+	_ = x[OpTypeDefault-0]
+	_ = x[OpTypeCreate-1]
+	_ = x[OpTypeIndex-2]
+	_ = x[OpTypeDelete-3]
 }
 
-const _OpType_name = "createindexdelete"
+const _OpType_name = "defaultcreateindexdelete"
 
-var _OpType_index = [...]uint8{0, 6, 11, 17}
+var _OpType_index = [...]uint8{0, 7, 13, 18, 24}
 
 func (i OpType) String() string {
 	if i < 0 || i >= OpType(len(_OpType_index)-1) {
