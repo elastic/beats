@@ -345,12 +345,12 @@ func createEventBulkMeta(
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
 	if event.Meta != nil {
-		if pipeline, exists := event.Meta[events.FieldMetaPipeline]; exists {
-			if p, ok := pipeline.(string); ok {
-				return p, nil
-			}
+		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
+		if err != nil {
 			return "", errors.New("pipeline metadata is no string")
 		}
+
+		return pipeline, nil
 	}
 
 	if pipelineSel != nil {
