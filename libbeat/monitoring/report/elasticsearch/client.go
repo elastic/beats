@@ -204,9 +204,9 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 	action := common.MapStr{}
 	var opType events.MetaOpType
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
-		opType = events.FieldMetaOpTypeIndex
+		opType = events.OpTypeIndex
 	} else {
-		opType = events.FieldMetaOpTypeCreate
+		opType = events.OpTypeCreate
 	}
 	action[opType.String()] = meta
 

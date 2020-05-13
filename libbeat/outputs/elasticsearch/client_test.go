@@ -369,12 +369,12 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		caseMessage, _ := cases[i]["message"].(string)
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
-			validOpTypes := []string{e.FieldMetaOpTypeCreate.String(), ""}
+			validOpTypes := []string{e.OpTypeCreate.String(), ""}
 			require.Contains(t, validOpTypes, caseOpType, caseMessage)
 		case eslegclient.BulkIndexAction:
-			require.Equal(t, e.FieldMetaOpTypeIndex.String(), caseOpType, caseMessage)
+			require.Equal(t, e.OpTypeIndex.String(), caseOpType, caseMessage)
 		case eslegclient.BulkDeleteAction:
-			require.Equal(t, e.FieldMetaOpTypeDelete.String(), caseOpType, caseMessage)
+			require.Equal(t, e.OpTypeDelete.String(), caseOpType, caseMessage)
 		default:
 			require.FailNow(t, "unknown type")
 		}

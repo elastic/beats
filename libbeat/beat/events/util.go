@@ -43,10 +43,12 @@ const (
 	// Bulk API encoding of the event. The key's value can be an empty string, `create`, `index`, or `delete`.
 	// If empty, `create` will be used if FieldMetaID is set; otherwise `index` will be used.
 	FieldMetaOpType = "op_type"
+)
 
-	FieldMetaOpTypeCreate MetaOpType = iota
-	FieldMetaOpTypeDelete
-	FieldMetaOpTypeIndex
+const (
+	OpTypeCreate MetaOpType = iota
+	OpTypeDelete
+	OpTypeIndex
 )
 
 type MetaOpType int
