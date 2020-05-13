@@ -58,3 +58,22 @@ func GetMetaStringValue(e beat.Event, key string) (string, error) {
 
 	return "", nil
 }
+
+// GetOpType returns the event's op_type, if set
+func GetOpType(e beat.Event) OpType {
+	opType, err := GetMetaStringValue(e, FieldMetaOpType)
+	if err != nil {
+		return OpTypeDefault
+	}
+
+	switch opType {
+	case "create":
+		return OpTypeCreate
+	case "index":
+		return OpTypeIndex
+	case "delete":
+		return OpTypeDelete
+	default:
+		return OpTypeDefault
+	}
+}
