@@ -658,22 +658,40 @@ pipeline {
   }
 }
 
+/**
+  Given a make target then look for the -C directory if any, otherwise it will
+  return the '**' glob, to be used when searching for the files to be achieved
+  and junit shown.
+
+  This is the workaround when looking for files with the pattern **, so let's
+  use the folder where the search should look from.
+
+  <target format>:
+    - foo -C directory/subdirectory target
+    - foo target
+
+  _NOTE_: This method should call from the WORKSPACE path. This is the way we
+          can ensure the -C directory matches with an existing Makefile in that
+          particular directory.
+*/
+def targetDirectory(String target) {
+  def directory = '**'
+  if (target.contains('-C ')) {
+    directory = target.replaceAll('.*-C ', '').split(' ')[0]
+    if (!fileExists("${env.BASE_DIR}/${directory}/Makefile")) {
+      directory = '**'
+    }
+  }
+  return directory
+}
+
 def makeTarget(Map args = [:]) {
   def context = args.get('context')
   def target = args.get('target')
   def archive = args.get('archive', true)
   def clean = args.get('clean', true)
-  // The directory will fix the known issue when searching the generated test files
-  // in a massive repo.
-  // For such, the directory is the one when using the target -C <directory>
-  // Otherwise, it will use the ** glob pattern
-  def directory = '**'
-  if (target.contains('-C ')) {
-    directory = target.replaceAll('.*-C ', '').split(' ')[0]
-    if (!fileExists("${directory}/Makefile")) {
-      directory = '**'
-    }
-  }
+  def directory = targetDirectory(target)
+  log(level: 'INFO', text: "makeTarget(context: ${context}, target: ${target}, archive: ${archive}, clean: ${clean}, directory: ${directory})")
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: archive, directory: directory) {
       whenTrue(params.debug) {
