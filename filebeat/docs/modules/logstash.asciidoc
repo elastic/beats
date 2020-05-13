@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 
 == Logstash module
 
-The +{modulename}+ module parse logstash regular logs and the slow log, it will support the plain text format
+The +{modulename}+ modules parse logstash regular logs and the slow log, it will support the plain text format
 and the JSON format.
 
 include::../include/what-happens.asciidoc[]
