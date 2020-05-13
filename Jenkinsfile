@@ -1196,11 +1196,15 @@ def runbld() {
 def stashV2(Map args = [:]) {
   def name = args.name
   def filename = "${name}.zip"
-  def command = "tar -czf ${filename} ."
+  def folder = '.artefacts'
+  dir(folder) {
+    log(level: 'DEBUG', text: 'stashV2: create artefacts folder to fix the tar: file changed as we read it.')
+  }
+  def command = "tar -czf"
   if(isUnix()) {
-    sh(label: 'Archive', script: command)
+    sh(label: 'Archive', script: "${command} ${folder}/${filename} --exclude=${folder} . ; mv ${folder}/${filename} ${filename}")
   } else {
-    bat(label: 'Archive', script: command)
+    bat(label: 'Archive', script: "${command} ${folder}\\${filename} --exclude=${folder} . && move ${folder}\\${filename} ${filename}")
   }
   googleStorageUpload(
     bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}",
