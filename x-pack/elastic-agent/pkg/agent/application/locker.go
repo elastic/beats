@@ -14,12 +14,15 @@ import (
 
 const lockFileName = "agent.lock"
 
+// ErrAppAlreadyRunning error returned when another elastic-agent is already holding the lock.
 var ErrAppAlreadyRunning = fmt.Errorf("another elastic-agent is already running")
 
+// AppLocker locks the agent.lock file inside the provided directory.
 type AppLocker struct {
 	lock *flock.Flock
 }
 
+// NewAppLocker creates an AppLocker that locks the agent.lock file inside the provided directory.
 func NewAppLocker(dir string) *AppLocker {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		_ = os.Mkdir(dir, 0755)
@@ -29,6 +32,7 @@ func NewAppLocker(dir string) *AppLocker {
 	}
 }
 
+// TryLock tries to grab the lock file and returns error if it cannot.
 func (a *AppLocker) TryLock() error {
 	locked, err := a.lock.TryLock()
 	if err != nil {
@@ -40,6 +44,7 @@ func (a *AppLocker) TryLock() error {
 	return nil
 }
 
+// Unlock releases the lock file.
 func (a *AppLocker) Unlock() error {
 	return a.lock.Unlock()
 }
