@@ -1194,6 +1194,7 @@ def runbld() {
 }
 
 def stashV2(Map args = [:]) {
+  // TODO: zip does not compress the .git folder let' see what's going on
   zip dir: '', glob: '', zipFile: "${args.name}.tgz"
   googleStorageUpload(
     bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${args.name}",
@@ -1212,4 +1213,6 @@ def unstashV2(String id) {
     pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${id}/"
   )
   unzip dir: '', glob: '', quiet: true, zipFile: "${id}.tgz"
+  // Fixes the permission denied :S
+  sh(label: 'Fix permissions', script: 'chmod -R 0755 .')
 }
