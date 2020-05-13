@@ -21,6 +21,8 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    JOB_GCS_BUCKET = 'beats-ci-temp'
+    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -1192,9 +1194,21 @@ def runbld() {
 }
 
 def stashV2(Map args = [:]) {
-  stash(args)
+  zip dir: '', glob: '', zipFile: "${args.name}.tgz"
+  googleStorageUpload(
+    bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${args.name}",
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pattern: "${args.name}.tgz",
+    sharedPublicly: false,
+    showInline: true
+  )
 }
 
 def unstashV2(String id) {
-  unstash(id)
+  googleStorageDownload(
+    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${id}/${id}.tgz",
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    localDirectory: ''
+  )
+  unzip dir: '', glob: '', quiet: true, zipFile: "${id}.tgz"
 }
