@@ -1208,7 +1208,8 @@ def unstashV2(String id) {
   googleStorageDownload(
     bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${id}/${id}.tgz",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    localDirectory: ''
+    localDirectory: '',
+    pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${id}/"
   )
   unzip dir: '', glob: '', quiet: true, zipFile: "${id}.tgz"
 }
