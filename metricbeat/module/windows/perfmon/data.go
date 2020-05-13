@@ -42,13 +42,23 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			for ind, val := range values {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-				if val.Err != nil && !re.executed {
-					re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-						"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-					continue
+				if val.Err.Error != nil {
+					if !re.executed {
+						re.log.Debugw("Ignoring the first measurement because the data isn't ready",
+							"error", val.Err.Error, logp.Namespace("perfmon"), "query", counterPath)
+						continue
+					}
+					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
+					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
+					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
+					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+						re.log.Debugw("Counter value retrieval returned",
+							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("perfmon"), "query", counterPath)
+						continue
+					}
 				}
 				var eventKey string
-				if re.config.GroupMeasurements && val.Err == nil {
+				if re.config.GroupMeasurements && val.Err.Error == nil {
 					// Send measurements with the same instance label as part of the same event
 					eventKey = val.Instance
 				} else {
@@ -60,7 +70,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 				if _, ok := eventMap[eventKey]; !ok {
 					eventMap[eventKey] = &mb.Event{
 						MetricSetFields: common.MapStr{},
-						Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
+						Error:           errors.Wrapf(val.Err.Error, "failed on query=%v", counterPath),
 					}
 					if val.Instance != "" {
 						//will ignore instance counter
@@ -100,10 +110,17 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 			for _, val := range values {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-				if val.Err != nil && !re.executed {
-					re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-						"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-					continue
+				if val.Err.Error != nil {
+					if !re.executed {
+						re.log.Debugw("Ignoring the first measurement because the data isn't ready",
+							"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
+						continue
+					}
+					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+						re.log.Debugw("Counter value retrieval returned",
+							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("perfmon"), "query", counterPath)
+						continue
+					}
 				}
 				if val.Measurement == nil {
 					continue

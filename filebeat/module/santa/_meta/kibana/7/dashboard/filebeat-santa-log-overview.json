@@ -269,7 +269,7 @@
                             "id": "1",
                             "params": {
                                 "customLabel": "Hosts Reporting",
-                                "field": "agent.hostname"
+                                "field": "agent.name"
                             },
                             "schema": "metric",
                             "type": "cardinality"
@@ -373,7 +373,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname",
+                    "agent.name",
                     "process.executable",
                     "user.name",
                     "certificate.common_name"

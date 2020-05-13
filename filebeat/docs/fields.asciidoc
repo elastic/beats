@@ -67,7 +67,7 @@ grouped in the following categories:
 
 --
 [[exported-fields-activemq]]
-== activemq fields
+== ActiveMQ fields
 
 Module for parsing ActiveMQ log files.
 
@@ -3113,10 +3113,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
 
-type: keyword
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -3153,7 +3155,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -17414,7 +17416,7 @@ example: Critical
 --
 
 [[exported-fields-elasticsearch]]
-== elasticsearch fields
+== Elasticsearch fields
 
 elasticsearch Module
 
@@ -23069,7 +23071,7 @@ type: long
 --
 
 [[exported-fields-haproxy]]
-== haproxy fields
+== HAProxy fields
 
 haproxy Module
 
@@ -27141,7 +27143,7 @@ alias to: source.ip
 --
 
 [[exported-fields-nats]]
-== nats fields
+== NATS fields
 
 Module for parsing NATS log files.
 

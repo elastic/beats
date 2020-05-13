@@ -54,6 +54,19 @@ func (e *Event) SetID(id string) {
 	e.Meta["_id"] = id
 }
 
+func (e *Event) GetMetaStringValue(key string) (string, error) {
+	tmp, err := e.Meta.GetValue(key)
+	if err != nil {
+		return "", err
+	}
+
+	if s, ok := tmp.(string); ok {
+		return s, nil
+	}
+
+	return "", nil
+}
+
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {
 		return e.Timestamp, nil

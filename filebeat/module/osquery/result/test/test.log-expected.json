@@ -33,7 +33,11 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1514472008",
+        "related.user": [
+            "tsg"
+        ],
         "rule.name": "pack_it-compliance_mounts",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     }
 ]

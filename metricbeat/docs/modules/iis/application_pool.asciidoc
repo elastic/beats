@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-iis-application_pool]]
-=== iis application_pool metricset
+=== IIS application_pool metricset
 
 beta[]
 

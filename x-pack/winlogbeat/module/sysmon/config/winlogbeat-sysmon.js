@@ -16,6 +16,7 @@ var sysmon = (function () {
     var path = require("path");
     var processor = require("processor");
     var winlogbeat = require("winlogbeat");
+    var net = require("net");
 
     // Windows error codes for DNS. This list was generated using
     // 'go run gen_dns_error_codes.go'.
@@ -432,17 +433,19 @@ var sysmon = (function () {
             } else {
                 // Convert V4MAPPED addresses.
                 answer = answer.replace("::ffff:", "");
-                ips.push(answer);
+                if (net.isIP(answer)) {
+                    ips.push(answer);
 
-                // Synthesize record type based on IP address type.
-                var type = "A";
-                if (answer.indexOf(":") !== -1) {
-                    type = "AAAA";
+                    // Synthesize record type based on IP address type.
+                    var type = "A";
+                    if (answer.indexOf(":") !== -1) {
+                        type = "AAAA";
+                    }
+                    answers.push({
+                        type: type,
+                        data: answer,
+                    });
                 }
-                answers.push({
-                    type: type,
-                    data: answer,
-                });
             }
         }
 
@@ -1392,6 +1395,63 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
+    // Event ID 23 - FileDelete (A file delete was detected).
+    var event23 = new processor.Chain()
+        .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                "event.category": ["file"], // pipes are files
+                "event.type": ["deletion"],
+            },
+        })
+        .Convert({
+            fields: [
+                {
+                    from: "winlog.event_data.UtcTime",
+                    to: "@timestamp",
+                },
+                {
+                    from: "winlog.event_data.ProcessGuid",
+                    to: "process.entity_id",
+                },
+                {
+                    from: "winlog.event_data.ProcessId",
+                    to: "process.pid",
+                    type: "long",
+                },
+                {
+                    from: "winlog.event_data.RuleName",
+                    to: "rule.name",
+                },
+                {
+                    from: "winlog.event_data.TargetFilename",
+                    to: "file.name",
+                },
+                {
+                    from: "winlog.event_data.Image",
+                    to: "process.executable",
+                },
+                {
+                    from: "winlog.event_data.Archived",
+                    to: "sysmon.file.archived",
+                    type: "boolean",
+                },
+                {
+                    from: "winlog.event_data.IsExecutable",
+                    to: "sysmon.file.is_executable",
+                    type: "boolean",
+                },
+            ],
+            mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Add(addUser)
+        .Add(splitHashes)
+        .Add(setProcessNameUsingExe)
+        .Add(removeEmptyEventData)
+        .Build();
+
     // Event ID 255 - Error report.
     var event255 = new processor.Chain()
         .Add(parseUtcTime)
@@ -1436,6 +1496,7 @@ var sysmon = (function () {
         20: event20.Run,
         21: event21.Run,
         22: event22.Run,
+        23: event23.Run,
         255: event255.Run,
 
         process: function (evt) {
