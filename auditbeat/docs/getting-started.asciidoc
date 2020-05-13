@@ -284,7 +284,7 @@ To make it easier for you to start auditing the activities of users and
 processes on your system, we have created example {beatname_uc} dashboards.
 You loaded the dashboards earlier when you ran the `setup` command.
 
-include::{libbeat-dir}/opendashboards.asciidoc[]
+include::{libbeat-dir}/shared/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

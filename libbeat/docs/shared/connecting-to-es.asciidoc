@@ -2,40 +2,15 @@ Connections to {es} and {kib} are required to set up {beatname_uc}.
 
 Set the connection information in +{beatname_lc}.yml+:
 
-//TODO: Move on the included files below to a single file.
+include::{libbeat-dir}/tab-widgets/set-connection-widget.asciidoc[]
 
-. Set the location of you {es} cluster.
-+
---
-include::{libbeat-dir}/tab-widgets/set-location-widget.asciidoc[]
---
-+
 NOTE: {beatname_uc} supports other <<configuring-output,outputs>>,
 ifndef::no-output-logstash[]
 such as {ls},
 endif::no-output-logstash[]
 but typically you'll send events directly to {es}.
 
-. Specify a user who has the credentials needed to set up {beatname_uc}.
-+
---
-include::{libbeat-dir}/tab-widgets/credentials-widget.asciidoc[]
---
-+
-To learn more about security, see
-<<securing-{beatname_lc},Secure {beatname_uc}>>.
-
-. If you plan to use our preconfigured {kib} dashboards, configure the {kib}
-endpoint. Skip this step if {kib} is running on the same host as {es}.
-+
-[source,yaml]
-----------------------------------------------------------------------
-setup.kibana:
-  host: "mykibanahost:5601" <1>
-----------------------------------------------------------------------
-<1> The hostname and port of the machine where {kib} is running,
-for example, `mykibanahost:5601`. If you specify a path after the port number,
-include the scheme and port: `http://mykibanahost:5601/path`.
+To learn more about required roles and privileges, see
+<<feature-roles>>.
 
 include::{libbeat-dir}/step-test-config.asciidoc[]
-

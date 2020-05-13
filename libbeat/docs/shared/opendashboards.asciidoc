@@ -1,0 +1,30 @@
+{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
+data. 
+
+To open the dashboards:
+
+. Launch {kib}:
++
+--
+include::{libbeat-dir}/tab-widgets/open-kibana-widget.asciidoc[]
+--
+
+. In the side navigation, click *Discover*. To see {beatname_uc} data, make
+sure the predefined +{beatname_lc}-*+ index pattern is selected.
++
+--
+[role="screenshot"]
+image::./images/kibana-created-indexes.png[Discover tab with index selected]
+
+TIP: If you don’t see data in {kib}, try changing the date range to a larger
+range. By default, {kib} shows the last 15 minutes.
+
+--
+
+. In the side navigation, click *Dashboard*, then select the dashboard that you
+want to open.
++
+--
+[role="screenshot"]
+image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+--
