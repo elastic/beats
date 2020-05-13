@@ -4,6 +4,9 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
+- json:
+    field: message
+    target_field: logstash.log
 - convert:
     field: logstash.log.timeMillis
     type: string
