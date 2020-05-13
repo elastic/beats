@@ -45,15 +45,15 @@ const (
 	FieldMetaOpType = "op_type"
 )
 
+type OpType int
+
 const (
-	OpTypeCreate MetaOpType = iota
+	OpTypeCreate OpType = iota
 	OpTypeDelete
 	OpTypeIndex
 )
 
-type MetaOpType int
-
-func (o MetaOpType) String() string {
+func (o OpType) String() string {
 	return []string{"create", "delete", "index"}[o]
 }
 

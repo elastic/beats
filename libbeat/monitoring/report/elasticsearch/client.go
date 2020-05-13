@@ -202,7 +202,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 	}
 
 	action := common.MapStr{}
-	var opType events.MetaOpType
+	var opType events.OpType
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = events.OpTypeIndex
 	} else {
