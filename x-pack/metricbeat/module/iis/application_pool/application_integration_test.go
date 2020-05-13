@@ -8,9 +8,8 @@
 package application_pool
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/test"
 
@@ -26,7 +25,10 @@ func TestFetch(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	assert.NotEmpty(t, events)
+	if events != nil {
+		assert.NotEmpty(t, events)
+	}
+
 }
 
 func TestData(t *testing.T) {
