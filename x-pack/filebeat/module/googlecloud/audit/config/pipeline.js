@@ -98,6 +98,8 @@ function Audit(keep_original_message) {
 
             {from: "json.serviceName", to: "googlecloud.audit.service_name"},
 
+            {from: "json.status", to: "googlecloud.audit.status"},
+
         ],
         mode: "rename",
         ignore_missing: true,
