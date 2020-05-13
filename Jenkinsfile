@@ -1195,41 +1195,41 @@ def runbld() {
 
 def stashV2(Map args = [:]) {
   def name = args.name
-  def zipFile = "${name}.zip"
-  def zipCommand = "jar -cfM ${zipFile} ."
+  def filename = "${name}.zip"
+  def command = "tar -czf ${filename} ."
   if(isUnix()) {
-    sh(label: 'Zip', script: zipCommand)
+    sh(label: 'Archive', script: command)
   } else {
-    bat(label: 'Zip', script: zipCommand)
+    bat(label: 'Archive', script: command)
   }
   googleStorageUpload(
     bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pattern: "${zipFile}",
+    pattern: "${filename}",
     sharedPublicly: false,
     showInline: true
   )
   if(isUnix()) {
-    sh(label: 'Delete zip', script: "rm ${zipFile}", returnStatus: true)
+    sh(label: 'Delete zip', script: "rm ${filename}", returnStatus: true)
   } else {
-    bat(label: 'Delete zip', script: "del ${zipFile}", returnStatus: true)
+    bat(label: 'Delete zip', script: "del ${filename}", returnStatus: true)
   }
 }
 
 def unstashV2(String name) {
-  def zipFile = "${name}.zip"
-  def unzipCommand = "jar -xf ${zipFile}"
+  def filename = "${name}.zip"
+  def command = "tar -xpf ${filename}"
   googleStorageDownload(
-    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}/${zipFile}",
+    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}/${filename}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     localDirectory: '',
     pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${name}/"
   )
   if(isUnix()) {
-    unzipCommand += "; rm ${zipFile} ; chmod -R 0755 ."
-    sh(label: 'Unzip', script: unzipCommand)
+    command += "; rm ${filename}"
+    sh(label: 'Extract', script: command)
   } else {
-    bat(label: 'Unzip', script: unzipCommand)
-    bat(label: 'Delete zip', script: "del ${zipFile}", returnStatus: true)
+    bat(label: 'Extract', script: command)
+    bat(label: 'Delete zip', script: "del ${filename}", returnStatus: true)
   }
 }
