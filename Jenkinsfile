@@ -1196,7 +1196,8 @@ def runbld() {
 def stashV2(Map args = [:]) {
   def name = args.name
   def filename = "${name}.zip"
-  def command = "tar -czf ${filename} ."
+  writeFile file: "${filename}", text: ''
+  def command = "tar --exclude=${filename} -czf ${filename} ."
   if(isUnix()) {
     sh(label: 'Archive', script: command)
   } else {
