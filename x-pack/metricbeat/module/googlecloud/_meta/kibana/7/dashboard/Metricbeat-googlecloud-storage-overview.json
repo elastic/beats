@@ -421,7 +421,8 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {},
+            "searchSourceJSON": {}
+        },
         "title": "Storage API Request Count [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
         "version": 1,
