@@ -1194,25 +1194,42 @@ def runbld() {
 }
 
 def stashV2(Map args = [:]) {
-  // TODO: zip does not compress the .git folder let' see what's going on
-  zip dir: '', glob: '**/*.*', zipFile: "${args.name}.tgz"
+  def name = args.name
+  def zipFile = "${name}.zip"
+  def zipCommand = "jar -cfM ${zipFile} ."
+  if(isUnix()) {
+    sh(label: 'Zip', script: zipCommand)
+  } else {
+    bat(label: 'Zip', script: zipCommand)
+  }
   googleStorageUpload(
-    bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${args.name}",
+    bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pattern: "${args.name}.tgz",
+    pattern: "${zipFile}",
     sharedPublicly: false,
     showInline: true
   )
+  if(isUnix()) {
+    sh(label: 'Delete zip', script: "rm ${zipFile}", returnStatus: true)
+  } else {
+    bat(label: 'Delete zip', script: "del ${zipFile}", returnStatus: true)
+  }
 }
 
-def unstashV2(String id) {
+def unstashV2(String name) {
+  def zipFile = "${name}.zip"
+  def unzipCommand = "jar -xf ${zipFile}"
   googleStorageDownload(
-    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${id}/${id}.tgz",
+    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}/${zipFile}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     localDirectory: '',
-    pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${id}/"
+    pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${name}/"
   )
-  unzip dir: '', glob: '', quiet: true, zipFile: "${id}.tgz"
-  // Fixes the permission denied :S
-  sh(label: 'Fix permissions', script: 'chmod -R 0755 .')
+  if(isUnix()) {
+    sh(label: 'Unzip', script: unzipCommand)
+    sh(label: 'Delete zip', script: "rm ${zipFile}", returnStatus: true)
+  } else {
+    bat(label: 'Unzip', script: unzipCommand)
+    bat(label: 'Delete zip', script: "del ${zipFile}", returnStatus: true)
+  }
 }
