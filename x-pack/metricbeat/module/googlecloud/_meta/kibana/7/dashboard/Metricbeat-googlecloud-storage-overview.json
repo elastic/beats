@@ -499,13 +499,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Storage Network Received Bytes [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
@@ -571,13 +565,7 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Storage Network Sent Bytes [Metricbeat GoogleCloud]",
         "uiStateJSON": {},
