@@ -346,6 +346,9 @@ func createEventBulkMeta(
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
+		if err == common.ErrKeyNotFound {
+			return "", nil
+		}
 		if err != nil {
 			return "", errors.New("pipeline metadata is no string")
 		}
