@@ -1195,7 +1195,7 @@ def runbld() {
 
 def stashV2(Map args = [:]) {
   // TODO: zip does not compress the .git folder let' see what's going on
-  zip dir: '', glob: '', zipFile: "${args.name}.tgz"
+  zip dir: '', glob: '**/*.*', zipFile: "${args.name}.tgz"
   googleStorageUpload(
     bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${args.name}",
     credentialsId: "${JOB_GCS_CREDENTIALS}",
