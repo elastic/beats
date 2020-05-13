@@ -8,8 +8,9 @@
 package application_pool
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/test"
 
