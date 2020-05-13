@@ -658,11 +658,11 @@ pipeline {
   }
 }
 
-def makeTarget(Map params = [:]) {
-  def context = params.get('context')
-  def target = params.get('target')
-  def archive = params.get('archive', true)
-  def clean = params.get('clean', true)
+def makeTarget(Map args = [:]) {
+  def context = args.get('context')
+  def target = args.get('target')
+  def archive = args.get('archive', true)
+  def clean = args.get('clean', true)
   // The directory will fix the known issue when searching the generated test files
   // in a massive repo.
   // For such, the directory is the one when using the target -C <directory>
