@@ -1226,8 +1226,8 @@ def unstashV2(String name) {
     pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${name}/"
   )
   if(isUnix()) {
+    unzipCommand += "; rm ${zipFile} ; chmod -R 0755 ."
     sh(label: 'Unzip', script: unzipCommand)
-    sh(label: 'Delete zip', script: "rm ${zipFile}", returnStatus: true)
   } else {
     bat(label: 'Unzip', script: unzipCommand)
     bat(label: 'Delete zip', script: "del ${zipFile}", returnStatus: true)
