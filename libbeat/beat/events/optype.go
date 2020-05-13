@@ -21,7 +21,7 @@ type OpType int
 
 //go:generate stringer -linecomment -type OpType
 const (
-	OpTypeDefault OpType = iota //default
+	OpTypeDefault OpType = iota //
 	OpTypeCreate                //create
 	OpTypeIndex                 // index
 	OpTypeDelete                // delete

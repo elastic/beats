@@ -31,9 +31,9 @@ func _() {
 	_ = x[OpTypeDelete-3]
 }
 
-const _OpType_name = "defaultcreateindexdelete"
+const _OpType_name = "createindexdelete"
 
-var _OpType_index = [...]uint8{0, 7, 13, 18, 24}
+var _OpType_index = [...]uint8{0, 0, 6, 11, 17}
 
 func (i OpType) String() string {
 	if i < 0 || i >= OpType(len(_OpType_index)-1) {
