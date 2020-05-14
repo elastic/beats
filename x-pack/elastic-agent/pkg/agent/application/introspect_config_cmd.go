@@ -53,7 +53,7 @@ func (c *IntrospectConfigCmd) introspectConfig() error {
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
-		return errors.New("no fleet config retrieved yet")
+		return fmt.Errorf("no fleet config retrieved yet")
 	}
 
 	return printMapStringConfig(fleetConfig)
