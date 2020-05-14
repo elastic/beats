@@ -34,6 +34,7 @@
 - Fix make sure the collected logs or metrics include streams information. {pull}18261[18261]
 - Stop monitoring on config change {pull}18284[18284]
 - Fix jq: command not found {pull}18408[18408]
+- Avoid Chown on windows {pull}18512[18512]
 
 ==== New features
 
