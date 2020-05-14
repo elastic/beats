@@ -1250,7 +1250,12 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 		nil,
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-
+	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-ec2",
+		},
+	}
 	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)

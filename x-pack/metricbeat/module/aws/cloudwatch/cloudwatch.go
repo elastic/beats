@@ -290,6 +290,12 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
+		// If tags_filter on metricset level is given, overwrite tags in
+		// cloudwatch metrics with tags_filter.
+		if m.MetricSet.TagsFilter != nil {
+			config.Tags = m.MetricSet.TagsFilter
+		}
+
 		// If there is no statistic method specified, then use the default.
 		if config.Statistic == nil {
 			config.Statistic = defaultStatistics
