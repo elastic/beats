@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/journalbeat/config"
+
+	// Register includes.
 	_ "github.com/elastic/beats/v7/journalbeat/include"
 
 	// Add dedicated processors

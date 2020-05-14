@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 
+	// Register includes.
 	_ "github.com/elastic/beats/v7/filebeat/include"
 
 	// Add filebeat level processors

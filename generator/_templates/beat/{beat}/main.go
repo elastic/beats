@@ -5,6 +5,7 @@ import (
 
 	"{beat_path}/cmd"
 
+	// Make sure all your modules and metricsets are linked in this file
 	_ "{beat_path}/include"
 )
 
