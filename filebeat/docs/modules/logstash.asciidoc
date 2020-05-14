@@ -84,6 +84,11 @@ image::./images/kibana-logstash-log.png[]
 [role="screenshot"]
 image::./images/kibana-logstash-slowlog.png[]
 
+[float]
+=== Known issues
+When using the `log` fileset to parse plaintext logs, if a multiline plaintext log contains an embedded JSON objct such that
+the JSON object starts on a new line, the fileset may not parse the multiline plaintext log event correctly.
+
 :has-dashboards!:
 
 :fileset_ex!:
