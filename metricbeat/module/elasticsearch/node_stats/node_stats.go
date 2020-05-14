@@ -47,7 +47,11 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get the stats from the local node
+<<<<<<< HEAD
 	ms, err := elasticsearch.NewMetricSet(base, "") // servicePath will be set in Fetch()
+=======
+	ms, err := elasticsearch.NewMetricSet(base, nodeLocalStatsPath)
+>>>>>>> Set correct service URI
 	if err != nil {
 		return nil, err
 	}
