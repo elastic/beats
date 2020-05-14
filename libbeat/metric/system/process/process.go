@@ -221,7 +221,6 @@ func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
 
 // GetProcMemPercentage returns process memory usage as a percent of total memory usage
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
-	// in unit tests, total_phymem is set to a value greater than zero
 	if totalPhyMem == 0 {
 		return 0
 	}

@@ -78,7 +78,7 @@ func GetSwap() (*SwapStat, error) {
 	// this can provoke too big values for used swap.
 	// Workaround this by assuming that all swap is free in that case.
 	if swap.Free > swap.Total || swap.Used > swap.Total {
-		logger := logp.NewLogger("GetSwap")
+		logger := logp.NewLogger("memory")
 		logger.Debugf("memory",
 			"Unexpected values for swap memory - total: %v free: %v used: %v.  Setting swap used to 0.",
 			swap.Total, swap.Free, swap.Used)

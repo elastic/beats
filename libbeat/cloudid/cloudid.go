@@ -149,7 +149,7 @@ func (c *CloudID) decodeCloudAuth() error {
 // settings.
 func OverwriteSettings(cfg *common.Config) error {
 
-	logger := logp.NewLogger("OverwriteSettings")
+	logger := logp.NewLogger("cloudid")
 	cloudID, _ := cfg.String("cloud.id", -1)
 	cloudAuth, _ := cfg.String("cloud.auth", -1)
 
@@ -158,7 +158,7 @@ func OverwriteSettings(cfg *common.Config) error {
 		return nil
 	}
 
-	logger.Debugf("cloudid", "cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
+	logger.Debugf("cloud.id: %s, cloud.auth: %s", cloudID, cloudAuth)
 	if cloudID == "" {
 		return errors.New("cloud.auth specified but cloud.id is empty. Please specify both")
 	}
