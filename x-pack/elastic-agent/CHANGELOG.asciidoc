@@ -55,4 +55,5 @@
 - Enable introspecting configuration {pull}18124[18124]
 - Follow home path for all config files {pull}18161[18161]
 - Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
+- More clear output of inspect command {pull}18405[18405]
 - Pick up version from libbeat {pull}18350[18350]
