@@ -35,6 +35,7 @@ import (
 
 var importAPI = "/api/kibana/dashboards/import"
 
+// KibanaLoader loads Kibana files
 type KibanaLoader struct {
 	client       *kibana.Client
 	config       *Config
@@ -145,6 +146,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	return loader.client.ImportJSON(importAPI, params, content)
 }
 
+// Close closes the client
 func (loader KibanaLoader) Close() error {
 	return loader.client.Close()
 }
@@ -153,6 +155,7 @@ func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {
-		logp.Debug("dashboards", msg, a...)
+		logger := logp.NewLogger("dashboards")
+		logger.Debugf("%s %v", msg, a)
 	}
 }
