@@ -39,22 +39,22 @@ include::../include/config-option-intro.asciidoc[]
   firewall:
     enabled: true
     var.input: udp
-    var.host: 0.0.0.0
-    var.port: 9004
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9004
 ----
 
 include::../include/var-paths.asciidoc[]
 
 *`var.input`*::
 
-The protocol to use, can be either the value `tcp` or `udp`.
+The input to use, can be either the value `tcp`, `udp` or `file`.
 
-*`var.host`*::
+*`var.syslog_host`*::
 
 The interface to listen to all syslog traffic. Defaults to localhost.
 Set to 0.0.0.0 to bind to all available interfaces.
 
-*`var.port`*::
+*`var.syslog_port`*::
 
 The port to listen for syslog traffic. Defaults to 9004.
 

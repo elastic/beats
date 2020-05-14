@@ -1,11 +1,11 @@
 module_version: 1.0
 
 var:
-  - name: host
+  - name: syslog_host
     default: localhost
   - name: tags
     default: [fortinet-firewall]
-  - name: port
+  - name: syslog_port
     default: 9004
   - name: input
     default: udp
