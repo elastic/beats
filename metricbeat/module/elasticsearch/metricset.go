@@ -38,19 +38,19 @@ var (
 	}.Build()
 )
 
-type hostsMode int
+type HostsMode int
 
 const (
 	// Indicates that each item in the hosts list points to a distinct Elasticsearch node in a
 	// cluster.
-	HostsModeNode hostsMode = iota
+	HostsModeNode HostsMode = iota
 
 	// Indicates that each item in the hosts lists points to a endpoint for a distinct Elasticsearch
 	// cluster (e.g. a load-balancing proxy) fronting the cluster.
 	HostsModeCluster
 )
 
-func (h *hostsMode) Unpack(str string) error {
+func (h *HostsMode) Unpack(str string) error {
 	switch str {
 	case "node":
 		*h = HostsModeNode
@@ -70,7 +70,7 @@ type MetricSet struct {
 	servicePath string
 	*helper.HTTP
 	XPack     bool
-	HostsMode hostsMode
+	HostsMode HostsMode
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -83,7 +83,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 
 	config := struct {
 		XPack     bool      `config:"xpack.enabled"`
-		HostsMode hostsMode `config:"hosts_mode"`
+		HostsMode HostsMode `config:"hosts_mode"`
 	}{
 		XPack:     false,
 		HostsMode: HostsModeNode,
