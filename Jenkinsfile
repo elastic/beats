@@ -393,6 +393,19 @@ pipeline {
             }
           }
         }
+        stage('Metricbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build test")
+          }
+        }
         stage('Metricbeat crosscompile'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
