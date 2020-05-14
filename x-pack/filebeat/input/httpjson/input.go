@@ -201,7 +201,10 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 	return "", nil
 }
 
-// getRateLimit get the rate limit value if specified in the HTTP Header of the response
+// getRateLimit get the rate limit value if specified in the HTTP Header of the response,
+// and returns an init64 value in seconds since unix epoch for rate limit reset time.
+// When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
+// returns 0 for the epoch value.
 func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 	if rateLimit != nil {
 		if rateLimit.Remaining != "" {

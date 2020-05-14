@@ -334,6 +334,7 @@ func TestCreateRequestInfoFromBody(t *testing.T) {
 	}
 }
 
+// Test getRateLimit function with a remaining quota, expect to receive 0, nil.
 func TestGetRateLimitCase1(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
@@ -350,6 +351,7 @@ func TestGetRateLimitCase1(t *testing.T) {
 	}
 }
 
+// Test getRateLimit function with a past time, expect to receive 0, nil.
 func TestGetRateLimitCase2(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "10")
@@ -366,6 +368,7 @@ func TestGetRateLimitCase2(t *testing.T) {
 	}
 }
 
+// Test getRateLimit function with a time yet to come, expect to receive <reset-value>, nil.
 func TestGetRateLimitCase3(t *testing.T) {
 	epoch := time.Now().Unix() + 100
 	header := make(http.Header)
