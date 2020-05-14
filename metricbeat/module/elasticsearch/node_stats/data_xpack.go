@@ -188,7 +188,10 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	// TODO: call GET _nodes/_master?filter_path=nodes.*.name to figure out the ID of the master node
-	masterNodeID := "TODO"
+	masterNodeID, err := elasticsearch.GetMasterNodeID(m.HTTP, m.HTTP.GetURI())
+	if err != nil {
+		return err
+	}
 
 	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
