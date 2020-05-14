@@ -20,23 +20,28 @@ package kubernetes
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
-	"github.com/ericchiang/k8s"
-	appsv1 "github.com/ericchiang/k8s/apis/apps/v1beta1"
-	"github.com/ericchiang/k8s/apis/core/v1"
-	extv1 "github.com/ericchiang/k8s/apis/extensions/v1beta1"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// Max back off time for retries
-const maxBackoff = 30 * time.Second
+const (
+	add    = "add"
+	update = "update"
+	delete = "delete"
+)
 
-func filterByNode(node string) k8s.Option {
-	return k8s.QueryParam("fieldSelector", "spec.nodeName="+node)
-}
+var (
+	accessor = meta.NewAccessor()
+)
 
 // Watcher watches Kubernetes resources events
 type Watcher interface {
@@ -48,6 +53,9 @@ type Watcher interface {
 
 	// AddEventHandler add event handlers for corresponding event type watched
 	AddEventHandler(ResourceEventHandler)
+
+	// Store returns the store object for the watcher
+	Store() cache.Store
 }
 
 // WatchOptions controls watch behaviors
@@ -60,237 +68,161 @@ type WatchOptions struct {
 	Namespace string
 }
 
+type item struct {
+	object interface{}
+	state  string
+}
+
 type watcher struct {
-	client              *k8s.Client
-	options             WatchOptions
-	lastResourceVersion string
-	ctx                 context.Context
-	stop                context.CancelFunc
-	resourceList        k8s.ResourceList
-	k8sResourceFactory  func() k8s.Resource
-	items               func() []k8s.Resource
-	handler             ResourceEventHandler
-	logger              *logp.Logger
+	client   kubernetes.Interface
+	informer cache.SharedInformer
+	store    cache.Store
+	queue    workqueue.RateLimitingInterface
+	ctx      context.Context
+	stop     context.CancelFunc
+	handler  ResourceEventHandler
+	logger   *logp.Logger
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
-func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Watcher, error) {
+func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
+	var store cache.Store
+	var queue workqueue.RateLimitingInterface
+
+	informer, objType, err := NewInformer(client, resource, opts, indexers)
+	if err != nil {
+		return nil, err
+	}
+
+	store = informer.GetStore()
+	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())
+
 	w := &watcher{
-		client:              client,
-		options:             options,
-		lastResourceVersion: "0",
-		ctx:                 ctx,
-		stop:                cancel,
-		logger:              logp.NewLogger("kubernetes"),
+		client:   client,
+		informer: informer,
+		store:    store,
+		queue:    queue,
+		ctx:      ctx,
+		stop:     cancel,
+		logger:   logp.NewLogger("kubernetes"),
+		handler:  NoOpEventHandlerFuncs{},
 	}
-	switch resource.(type) {
-	// add resource type which you want to support watching here
-	// note that you might need add Register like event in types.go init func
-	// if types were not registered by k8s library
-	// k8s.Register("", "v1", "events", true, &v1.Event{})
-	// k8s.RegisterList("", "v1", "events", true, &v1.EventList{})
-	case *Pod:
-		list := &v1.PodList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &v1.Pod{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
+
+	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(o interface{}) {
+			w.enqueue(o, add)
+		},
+		DeleteFunc: func(o interface{}) {
+			w.enqueue(o, delete)
+		},
+		UpdateFunc: func(o, n interface{}) {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				w.enqueue(n, update)
 			}
-			return rs
-		}
-	case *Event:
-		list := &v1.EventList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &v1.Event{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
-			}
-			return rs
-		}
-	case *Node:
-		list := &v1.NodeList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &v1.Node{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
-			}
-			return rs
-		}
-	case *Deployment:
-		list := &appsv1.DeploymentList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.Deployment{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
-			}
-			return rs
-		}
-	case *ReplicaSet:
-		list := &extv1.ReplicaSetList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &extv1.ReplicaSet{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
-			}
-			return rs
-		}
-	case *StatefulSet:
-		list := &appsv1.StatefulSetList{}
-		w.resourceList = list
-		w.k8sResourceFactory = func() k8s.Resource { return &appsv1.StatefulSet{} }
-		w.items = func() []k8s.Resource {
-			rs := make([]k8s.Resource, 0, len(list.Items))
-			for _, item := range list.Items {
-				rs = append(rs, item)
-			}
-			return rs
-		}
-	default:
-		return nil, fmt.Errorf("unsupported resource type for watching %T", resource)
-	}
+		},
+	})
+
 	return w, nil
 }
 
+// AddEventHandler adds a resource handler to process each request that is coming into the watcher
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
 }
 
-func (w *watcher) buildOpts() []k8s.Option {
-	options := []k8s.Option{k8s.ResourceVersion(w.lastResourceVersion)}
-	if w.options.Node != "" {
-		options = append(options, filterByNode(w.options.Node))
-	}
-	return options
-}
-
-func (w *watcher) sync() error {
-	ctx, cancel := context.WithTimeout(w.ctx, w.options.SyncTimeout)
-	defer cancel()
-
-	logp.Info("kubernetes: Performing a resource sync for %T", w.resourceList)
-	err := w.client.List(ctx, w.options.Namespace, w.resourceList, w.buildOpts()...)
-	if err != nil {
-		logp.Err("kubernetes: Performing a resource sync err %s for %T", err.Error(), w.resourceList)
-		return err
-	}
-
-	w.logger.Debugf("Got %v items from the resource sync", len(w.items()))
-	for _, item := range w.items() {
-		w.onAdd(item)
-	}
-
-	w.logger.Debugf("Done syncing %v items from the resource sync", len(w.items()))
-	// Store last version
-	w.lastResourceVersion = w.resourceList.GetMetadata().GetResourceVersion()
-
-	logp.Info("kubernetes: %s", "Resource sync done")
-	return nil
-}
-
-func (w *watcher) onAdd(obj Resource) {
-	w.handler.OnAdd(obj)
-}
-
-func (w *watcher) onUpdate(obj Resource) {
-	w.handler.OnUpdate(obj)
-}
-
-func (w *watcher) onDelete(obj Resource) {
-	w.handler.OnDelete(obj)
+// Store returns the store object for the resource that is being watched
+func (w *watcher) Store() cache.Store {
+	return w.store
 }
 
 // Start watching pods
 func (w *watcher) Start() error {
-	// Make sure that events don't flow into the annotator before informer is fully set up
-	// Sync initial state:
-	err := w.sync()
-	if err != nil {
-		w.Stop()
-		return err
+	go w.informer.Run(w.ctx.Done())
+
+	if !cache.WaitForCacheSync(w.ctx.Done(), w.informer.HasSynced) {
+		return fmt.Errorf("kubernetes informer unable to sync cache")
 	}
 
-	// Watch for new changes
-	go w.watch()
+	w.logger.Debugf("cache sync done")
+
+	//TODO: Do we run parallel workers for this? It is useful when we run metricbeat as one instance per cluster?
+
+	// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
+	go wait.Until(func() {
+		for w.process(w.ctx) {
+		}
+	}, time.Second*1, w.ctx.Done())
 
 	return nil
 }
 
-func (w *watcher) watch() {
-	// Failures counter, do exponential backoff on retries
-	var failures uint
-
-	for {
-		select {
-		case <-w.ctx.Done():
-			logp.Info("kubernetes: %s", "Watching API for resource events stopped")
-			return
-		default:
-		}
-
-		logp.Info("kubernetes: %s", "Watching API for resource events")
-
-		watcher, err := w.client.Watch(w.ctx, w.options.Namespace, w.k8sResourceFactory(), w.buildOpts()...)
-		if err != nil {
-			//watch failures should be logged and gracefully failed over as metadata retrieval
-			//should never stop.
-			logp.Err("kubernetes: Watching API error %v", err)
-			backoff(failures)
-			failures++
-			continue
-		}
-
-		for {
-			r := w.k8sResourceFactory()
-			eventType, err := watcher.Next(r)
-			if err != nil {
-				watcher.Close()
-				switch err {
-				case io.EOF:
-					logp.Debug("kubernetes", "EOF while watching API")
-				case io.ErrUnexpectedEOF:
-					logp.Info("kubernetes: Unexpected EOF while watching API")
-				default:
-					// This is an error event which can be recovered by moving to the latest resource version
-					logp.Err("kubernetes: Watching API error %v, ignoring event and moving to most recent resource version", err)
-					w.lastResourceVersion = ""
-
-				}
-				break
-			}
-			failures = 0
-			switch eventType {
-			case k8s.EventAdded:
-				w.onAdd(r)
-			case k8s.EventModified:
-				w.onUpdate(r)
-			case k8s.EventDeleted:
-				w.onDelete(r)
-			default:
-				logp.Err("kubernetes: Watching API error with event type %s", eventType)
-			}
-		}
-	}
-}
-
 func (w *watcher) Stop() {
+	w.queue.ShutDown()
 	w.stop()
 }
-func backoff(failures uint) {
-	wait := 1 << failures * time.Second
-	if wait > maxBackoff {
-		wait = maxBackoff
+
+// enqueue takes the most recent object that was received, figures out the namespace/name of the object
+// and adds it to the work queue for processing.
+func (w *watcher) enqueue(obj interface{}, state string) {
+	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
+	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+	if err != nil {
+		return
 	}
-	time.Sleep(wait)
+
+	w.queue.Add(&item{key, state})
+}
+
+// process gets the top of the work queue and processes the object that is received.
+func (w *watcher) process(ctx context.Context) bool {
+	keyObj, quit := w.queue.Get()
+	if quit {
+		return false
+	}
+
+	err := func(obj interface{}) error {
+		defer w.queue.Done(obj)
+
+		var entry *item
+		var ok bool
+		if entry, ok = obj.(*item); !ok {
+			w.queue.Forget(obj)
+			utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
+			return nil
+		}
+
+		key := entry.object.(string)
+
+		o, exists, err := w.store.GetByKey(key)
+		if err != nil {
+			return nil
+		}
+		if !exists {
+			return nil
+		}
+
+		switch entry.state {
+		case add:
+			w.handler.OnAdd(o)
+		case update:
+			w.handler.OnUpdate(o)
+		case delete:
+			w.handler.OnDelete(o)
+		}
+
+		return nil
+	}(keyObj)
+
+	if err != nil {
+		utilruntime.HandleError(err)
+		return true
+	}
+
+	return true
 }

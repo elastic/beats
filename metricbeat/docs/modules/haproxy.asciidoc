@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-haproxy]]
@@ -59,8 +59,13 @@ metricbeat.modules:
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
+  username : "admin"
+  password : "admin"
   enabled: true
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

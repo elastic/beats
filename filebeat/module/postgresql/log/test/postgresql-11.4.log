@@ -1,0 +1,29 @@
+2019-07-23 12:06:24.406 UTC [25] LOG:  00000: database system was interrupted; last known up at 2019-07-23 12:03:20 UTC
+2019-07-23 12:06:24.406 UTC [25] LOCATION:  StartupXLOG, xlog.c:6388
+2019-07-23 12:06:24.478 UTC [25] LOG:  00000: database system was not properly shut down; automatic recovery in progress
+2019-07-23 12:06:24.478 UTC [25] LOCATION:  StartupXLOG, xlog.c:6879
+2019-07-23 12:06:24.485 UTC [25] LOG:  00000: redo starts at 0/1651398
+2019-07-23 12:06:24.485 UTC [25] LOCATION:  StartupXLOG, xlog.c:7150
+2019-07-23 12:06:24.485 UTC [25] LOG:  00000: invalid record length at 0/16513D0: wanted 24, got 0
+2019-07-23 12:06:24.485 UTC [25] LOCATION:  ReadRecord, xlog.c:4233
+2019-07-23 12:06:24.485 UTC [25] LOG:  00000: redo done at 0/1651398
+2019-07-23 12:06:24.485 UTC [25] LOCATION:  StartupXLOG, xlog.c:7422
+2019-07-23 12:06:24.507 UTC [1] LOG:  00000: database system is ready to accept connections
+2019-07-23 12:06:24.507 UTC [1] LOCATION:  reaper, postmaster.c:2889
+2019-07-23 12:06:30.536 UTC [44] LOG:  00000: connection received: host=[local]
+2019-07-23 12:06:30.536 UTC [44] LOCATION:  BackendInitialize, postmaster.c:4206
+2019-07-23 12:06:30.537 UTC [44] LOG:  00000: connection authorized: user=postgres database=postgres
+2019-07-23 12:06:30.537 UTC [44] LOCATION:  PerformAuthentication, postinit.c:279
+2019-07-23 12:06:33.732 UTC [44] LOG:  00000: statement: show config_filel;
+2019-07-23 12:06:33.732 UTC [44] LOCATION:  exec_simple_query, postgres.c:975
+2019-07-23 12:06:33.732 UTC [44] ERROR:  42704: unrecognized configuration parameter "config_filel"
+2019-07-23 12:06:33.732 UTC [44] LOCATION:  GetConfigOptionByName, guc.c:8342
+2019-07-23 12:06:33.732 UTC [44] STATEMENT:  show config_filel;
+2019-07-23 12:06:34.877 UTC [44] LOG:  00000: statement: show config_file;
+2019-07-23 12:06:34.877 UTC [44] LOCATION:  exec_simple_query, postgres.c:975
+2019-07-23 12:06:34.878 UTC [44] LOG:  00000: duration: 0.524 ms
+2019-07-23 12:06:34.878 UTC [44] LOCATION:  exec_simple_query, postgres.c:1219
+2019-07-23 12:09:57.563 UTC [44] LOG:  00000: statement: SELECT * FROM pg_catalog.pg_tables;
+2019-07-23 12:09:57.563 UTC [44] LOCATION:  exec_simple_query, postgres.c:975
+2019-07-23 12:09:57.565 UTC [44] LOG:  00000: duration: 2.139 ms
+2019-07-23 12:09:57.565 UTC [44] LOCATION:  exec_simple_query, postgres.c:1219

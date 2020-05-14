@@ -35,7 +35,7 @@ processors:
           to: "network.transport"
 
         - from: "zeek.connection.service"
-          to: "network.application"
+          to: "network.protocol"
 
         - from: "zeek.connection.uid"
           to: "zeek.session_id"
@@ -54,22 +54,52 @@ processors:
 
         - from: "zeek.connection.conn_state"
           to: "zeek.connection.state"
-          
+
+        - from: "zeek.connection.orig_l2_addr"
+          to: "source.mac"
+
+        - from: "zeek.connection.resp_l2_addr"
+          to: "destination.mac"
+
       ignore_missing: true
       fail_on_error: false
+
+  - rename:
+      when.equals.network.transport: icmp
+      fields:
+        - from: "source.port"
+          to: "zeek.connection.icmp.type"
+
+        - from: "destination.port"
+          to: "zeek.connection.icmp.code"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
 {{ if .community_id }}
   - if:
       equals.network.transport: icmp
     then:
       community_id:
         fields:
-          source_ip: source.address
-          destination_ip: destination.address
-          icmp_type: source.port
-          icmp_code: destination.port
+          icmp_type: zeek.connection.icmp.type
+          icmp_code: zeek.connection.icmp.code
     else:
       community_id:
-        fields:
-          source_ip: source.address
-          destination_ip: destination.address
 {{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

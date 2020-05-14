@@ -5,6 +5,7 @@
 package scripts
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -38,7 +39,7 @@ func getCredentialsUsingMFA() {
 	}
 
 	req := stsSvc.GetSessionTokenRequest(&getSessionTokenInput)
-	tempToken, err := req.Send()
+	tempToken, err := req.Send(context.TODO())
 	if err != nil {
 		fmt.Println("GetSessionToken failed: ", err)
 	}

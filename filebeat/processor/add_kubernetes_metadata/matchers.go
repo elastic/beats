@@ -23,9 +23,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
 
 func init() {
@@ -45,6 +45,7 @@ const pathSeparator = string(os.PathSeparator)
 type LogPathMatcher struct {
 	LogsPath     string
 	ResourceType string
+	logger       *logp.Logger
 }
 
 func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
@@ -67,10 +68,11 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 	}
 	resourceType := config.ResourceType
 
-	logp.Debug("kubernetes", "logs_path matcher log path: %s", logPath)
-	logp.Debug("kubernetes", "logs_path matcher resource type: %s", resourceType)
+	log := logp.NewLogger("kubernetes")
+	log.Debugf("logs_path matcher log path: %s", logPath)
+	log.Debugf("logs_path matcher resource type: %s", resourceType)
 
-	return &LogPathMatcher{LogsPath: logPath, ResourceType: resourceType}, nil
+	return &LogPathMatcher{LogsPath: logPath, ResourceType: resourceType, logger: log}, nil
 }
 
 // Docker container ID is a 64-character-long hexadecimal string
@@ -83,10 +85,10 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	value, err := event.GetValue("log.file.path")
 	if err == nil {
 		source := value.(string)
-		logp.Debug("kubernetes", "Incoming log.file.path value: %s", source)
+		f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 		if !strings.Contains(source, f.LogsPath) {
-			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+			f.logger.Errorf("Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
 			return ""
 		}
 
@@ -101,11 +103,11 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 				if len(pathDirs) > podUIDPos {
 					podUID := strings.Split(source, pathSeparator)[podUIDPos]
 
-					logp.Debug("kubernetes", "Using pod uid: %s", podUID)
+					f.logger.Debugf("Using pod uid: %s", podUID)
 					return podUID
 				}
 
-				logp.Debug("kubernetes", "Error extracting pod uid - source value contains matcher's logs_path, however it is too short to contain a Pod UID.")
+				f.logger.Error("Error extracting pod uid - source value contains matcher's logs_path, however it is too short to contain a Pod UID.")
 			}
 		} else {
 			// In case of the Kubernetes log path "/var/log/containers/",
@@ -113,7 +115,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 			if strings.HasPrefix(f.LogsPath, containerLogsPath()) && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
 				containerIDEnd := sourceLen - 4
 				cid := source[containerIDEnd-containerIdLen : containerIDEnd]
-				logp.Debug("kubernetes", "Using container id: %s", cid)
+				f.logger.Debugf("Using container id: %s", cid)
 				return cid
 			}
 
@@ -121,11 +123,11 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 			// However we need to check the length to prevent "slice bound out of range" runtime errors.
 			if sourceLen >= logsPathLen+containerIdLen {
 				cid := source[logsPathLen : logsPathLen+containerIdLen]
-				logp.Debug("kubernetes", "Using container id: %s", cid)
+				f.logger.Debugf("Using container id: %s", cid)
 				return cid
 			}
 
-			logp.Debug("kubernetes", "Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
+			f.logger.Error("Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
 		}
 	}
 

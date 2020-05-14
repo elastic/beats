@@ -117,46 +117,44 @@ func (p Path) Last() *PathComponent {
 }
 
 // GetFrom takes a map and fetches the given Path from it.
-func (p Path) GetFrom(m interface{}) (value interface{}, exists bool) {
+func (p Path) GetFrom(source reflect.Value) (result reflect.Value, exists bool) {
 	// nil values are handled specially. If we're fetching from a nil
 	// there's one case where it exists, when comparing it to another nil.
-	if m == nil {
+	if (source.Kind() == reflect.Map || source.Kind() == reflect.Slice) && source.IsNil() {
 		// since another nil would be scalar, we just check that the
 		// path length is 0.
-		return nil, len(p) == 0
+		return source, len(p) == 0
 	}
 
-	value = m
+	result = source
 	exists = true
 	for _, pc := range p {
-		rt := reflect.TypeOf(value)
-		switch rt.Kind() {
+		switch result.Kind() {
 		case reflect.Map:
-			converted := llreflect.InterfaceToMap(value)
-			value, exists = converted[pc.Key]
-		case reflect.Slice:
-			converted := llreflect.InterfaceToSliceOfInterfaces(value)
-			if pc.Index < len(converted) {
-				exists = true
-				value = converted[pc.Index]
+			result = llreflect.ChaseValue(result.MapIndex(reflect.ValueOf(pc.Key)))
+			exists = result != reflect.Value{}
+		case reflect.Slice, reflect.Array:
+			if pc.Index < result.Len() {
+				result = llreflect.ChaseValue(result.Index(pc.Index))
+				exists = result != reflect.Value{}
 			} else {
+				result = reflect.ValueOf(nil)
 				exists = false
-				value = nil
 			}
 		default:
 			// If this case has been reached this means the expected type, say a map,
 			// is actually something else, like a string or an array. In this case we
-			// simply say the value doesn't exist. From a practical perspective this is
+			// simply say the result doesn't exist. From a practical perspective this is
 			// the right behavior since it will cause validation to fail.
-			return nil, false
+			return reflect.ValueOf(nil), false
 		}
 
 		if exists == false {
-			return nil, exists
+			return reflect.ValueOf(nil), exists
 		}
 	}
 
-	return value, exists
+	return result, exists
 }
 
 var arrMatcher = regexp.MustCompile("\\[(\\d+)\\]")

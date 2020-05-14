@@ -19,14 +19,14 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/tests/compose"
-	"github.com/elastic/beats/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 const (
@@ -37,7 +37,7 @@ const (
 
 var once sync.Once
 
-func testSetup(t *testing.T) *pubsub.Client {
+func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	t.Helper()
 
 	host := os.Getenv("PUBSUB_EMULATOR_HOST")
@@ -55,46 +55,52 @@ func testSetup(t *testing.T) *pubsub.Client {
 
 	once.Do(func() {
 		logp.TestingSetup()
+
+		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
+		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
+
+		// Sanity check the emulator.
+		resp, err := httpClient.Get("http://" + host)
+		if err != nil {
+			t.Fatalf("pubsub emulator at %s is not healthy: %v", host, err)
+		}
+		defer resp.Body.Close()
+
+		_, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal("failed to read response", err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("pubsub emulator is not healthy, got status code %d", resp.StatusCode)
+		}
 	})
 
-	// Sanity check the emulator.
-	resp, err := http.Get("http://" + host)
-	if err != nil {
-		t.Fatalf("pubsub emulator at %s is not healthy: %v", host, err)
-	}
-	_, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal("failed to read response", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("pubsub emulator is not healthy, got status code %d", resp.StatusCode)
-	}
-
-	client, err := pubsub.NewClient(context.Background(), emulatorProjectID)
+	ctx, cancel := context.WithCancel(context.Background())
+	client, err := pubsub.NewClient(ctx, emulatorProjectID)
 	if err != nil {
 		t.Fatalf("failed to create client: %v", err)
 	}
 
 	resetPubSub(t, client)
-	return client
+	return client, cancel
 }
 
 func resetPubSub(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Clear topics.
 	topics := client.Topics(ctx)
 	for {
-		sub, err := topics.Next()
+		topic, err := topics.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		if err = sub.Delete(ctx); err != nil {
-			t.Fatalf("failed to delete topic %v: %v", sub.ID(), err)
+		if err = topic.Delete(ctx); err != nil {
+			t.Fatalf("failed to delete topic %v: %v", topic.ID(), err)
 		}
 	}
 
@@ -116,9 +122,10 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 }
 
 func createTopic(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
-	topic := client.Topic(emulatorTopic)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
+	topic := client.Topic(emulatorTopic)
 	exists, err := topic.Exists(ctx)
 	if err != nil {
 		t.Fatalf("failed to check if topic exists: %v", err)
@@ -132,8 +139,11 @@ func createTopic(t *testing.T, client *pubsub.Client) {
 }
 
 func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	topic := client.Topic(emulatorTopic)
+	defer topic.Stop()
 
 	messageIDs := make([]string, numMsgs)
 	for i := 0; i < numMsgs; i++ {
@@ -153,7 +163,8 @@ func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string 
 }
 
 func createSubscription(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	sub := client.Subscription(emulatorSubscription)
 	exists, err := sub.Exists(ctx)
@@ -192,22 +203,27 @@ func defaultTestConfig() *common.Config {
 			"name":   emulatorSubscription,
 			"create": true,
 		},
-		"credentials_file": "NONE FOR EMULATOR TESTING",
+		"credentials_file": "testdata/fake.json",
 	})
 }
 
 func isInDockerIntegTestEnv() bool {
-	return os.Getenv("BEATS_DOCKER_INTEGRATION_TEST_ENV") != ""
+	return os.Getenv("BEATS_INSIDE_INTEGRATION_TEST_ENV") != ""
 }
 
 func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
+	runTestWithACKer(t, cfg, ackEvent, run)
+}
+
+func runTestWithACKer(t *testing.T, cfg *common.Config, acker acker, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	if !isInDockerIntegTestEnv() {
 		// Don't test goroutines when using our compose.EnsureUp.
 		defer resources.NewGoroutinesChecker().Check(t)
 	}
 
 	// Create pubsub client for setting up and communicating to emulator.
-	client := testSetup(t)
+	client, clientCancel := testSetup(t)
+	defer clientCancel()
 	defer client.Close()
 
 	// Simulate input.Context from Filebeat input runner.
@@ -215,10 +231,15 @@ func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, i
 	defer close(inputCtx.Done)
 
 	// Stub outlet for receiving events generated by the input.
-	eventOutlet := newStubOutlet()
+	eventOutlet := newStubOutlet(acker)
 	defer eventOutlet.Close()
 
-	in, err := NewInput(cfg, eventOutlet.outlet, inputCtx)
+	connector := channel.ConnectorFunc(func(_ *common.Config, cliCfg beat.ClientConfig) (channel.Outleter, error) {
+		eventOutlet.setClientConfig(cliCfg)
+		return eventOutlet, nil
+	})
+
+	in, err := NewInput(cfg, connector, inputCtx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -234,21 +255,44 @@ func newInputContext() input.Context {
 	}
 }
 
+type acker func(beat.Event, beat.ClientConfig) bool
+
 type stubOutleter struct {
 	sync.Mutex
-	cond   *sync.Cond
-	done   bool
-	Events []beat.Event
+	cond      *sync.Cond
+	done      bool
+	Events    []beat.Event
+	clientCfg beat.ClientConfig
+	acker     acker
 }
 
-func newStubOutlet() *stubOutleter {
-	o := &stubOutleter{}
+func newStubOutlet(acker acker) *stubOutleter {
+	o := &stubOutleter{
+		acker: acker,
+	}
 	o.cond = sync.NewCond(o)
 	return o
 }
 
-func (o *stubOutleter) outlet(_ *common.Config, _ *common.MapStrPointer) (channel.Outleter, error) {
-	return o, nil
+func ackEvent(ev beat.Event, cfg beat.ClientConfig) bool {
+	switch {
+	case cfg.ACKCount != nil:
+		cfg.ACKCount(1)
+	case cfg.ACKEvents != nil:
+		evs := [1]interface{}{ev.Private}
+		cfg.ACKEvents(evs[:])
+	case cfg.ACKLastEvent != nil:
+		cfg.ACKLastEvent(ev.Private)
+	default:
+		return false
+	}
+	return true
+}
+
+func (o *stubOutleter) setClientConfig(cfg beat.ClientConfig) {
+	o.Lock()
+	defer o.Unlock()
+	o.clientCfg = cfg
 }
 
 func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
@@ -278,11 +322,14 @@ func (o *stubOutleter) Close() error {
 
 func (o *stubOutleter) Done() <-chan struct{} { return nil }
 
-func (o *stubOutleter) OnEvent(data *util.Data) bool {
+func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	o.Lock()
 	defer o.Unlock()
-	o.Events = append(o.Events, data.Event)
-	o.cond.Broadcast()
+	acked := o.acker(event, o.clientCfg)
+	if acked {
+		o.Events = append(o.Events, event)
+		o.cond.Broadcast()
+	}
 	return !o.done
 }
 
@@ -355,6 +402,67 @@ func TestSubscriptionCreate(t *testing.T) {
 		}
 		input.Stop()
 
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestRunStop(t *testing.T) {
+	cfg := defaultTestConfig()
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		input.Run()
+		input.Stop()
+		input.Run()
+		input.Stop()
+	})
+}
+
+func TestEndToEndACK(t *testing.T) {
+	cfg := defaultTestConfig()
+
+	var count atomic.Int
+	seen := make(map[string]struct{})
+	// ACK every other message
+	halfAcker := func(ev beat.Event, clientConfig beat.ClientConfig) bool {
+		msg := ev.Private.(*pubsub.Message)
+		seen[msg.ID] = struct{}{}
+		if count.Inc()&1 != 0 {
+			// Nack will result in the Message being redelivered more quickly than if it were allowed to expire.
+			msg.Nack()
+			return false
+		}
+		return ackEvent(ev, clientConfig)
+	}
+
+	runTestWithACKer(t, cfg, halfAcker, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		createTopic(t, client)
+		createSubscription(t, client)
+
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		const numMsgs = 10
+		publishMessages(t, client, numMsgs)
+		events, ok := out.waitForEvents(numMsgs)
+		if !ok {
+			t.Fatalf("Expected %d events, but got %d.", 1, len(events))
+		}
+
+		// Assert that all messages were eventually received
+		assert.Len(t, events, len(seen))
+		got := make(map[string]struct{})
+		for _, ev := range events {
+			msg := ev.Private.(*pubsub.Message)
+			got[msg.ID] = struct{}{}
+		}
+		for id := range seen {
+			_, exists := got[id]
+			assert.True(t, exists)
+		}
+		input.Stop()
+		out.Close()
 		if err := group.Wait(); err != nil {
 			t.Fatal(err)
 		}

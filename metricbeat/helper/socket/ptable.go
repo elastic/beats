@@ -23,7 +23,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
@@ -141,13 +140,19 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 	k := 0
 	euid := uint32(os.Geteuid())
 	for i := 0; i < len(procs); i++ {
-		p := t.fs.Path(strconv.Itoa(procs[i].PID))
-		info, err := os.Stat(p)
+		p, err := t.fs.Proc(procs[i].PID)
 		if err != nil {
 			continue
 		}
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		if !ok || stat.Uid != euid {
+		status, err := p.NewStatus()
+		if err != nil {
+			continue
+		}
+		currentEUID, err := strconv.Atoi(status.UIDs[1])
+		if err != nil {
+			continue
+		}
+		if uint32(currentEUID) != euid {
 			continue
 		}
 		procs[k] = procs[i]

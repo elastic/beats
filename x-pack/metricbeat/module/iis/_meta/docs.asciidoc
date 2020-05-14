@@ -1,0 +1,50 @@
+This is the iis module.
+
+IIS (Internet Information Services) is a secure, reliable, and scalable Web server that provides an easy to manage platform for developing and hosting Web applications and services.
+
+The `iis` module will periodically retrieve IIS related metrics using performance counters such as:
+
+ - System/Process counters like the the overall server and CPU usage for the IIS Worker Process and memory (currently used and available memory for the IIS Worker Process).
+ - IIS performance counters like Web Service: Bytes Received/Sec, Web Service: Bytes Sent/Sec, etc, which are helpful to track to identify potential spikes in traffic.
+ - Web Service Cache counters in order to monitor user mode cache and output cache.
+
+
+The `iis` module mericsets are `webserver`, `website` and `application_pool`.
+
+[source,yaml]
+----
+- module: iis
+  metricsets:
+    - webserver
+    - website
+    - application_pool
+  enabled: true
+  period: 10s
+
+ # filter on application pool names
+ # application_pool.name: []
+----
+
+[float]
+== Metricsets
+
+[float]
+=== `webserver`
+A light metricset using the windows perfmon metricset as the base metricset.
+This metricset allows users to retrieve aggregated metrics for the entire webserver,
+
+[float]
+=== `website`
+A light metricset using the windows perfmon metricset as the base metricset.
+This metricset will collect metrics of specific sites, users can configure which websites they want to monitor, else, all are considered.
+
+[float]
+=== `application_pool`
+This metricset will collect metrics of specific application pools, users can configure which websites they want to monitor, else, all are considered.
+
+
+[float]
+=== Module-specific configuration notes
+
+`application_pool.name`:: []string, users can specify the application pools they would like to monitor.
+

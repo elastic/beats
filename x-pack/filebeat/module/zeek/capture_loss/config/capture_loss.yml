@@ -1,0 +1,24 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.capture_loss"
+
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

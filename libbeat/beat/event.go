@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // FlagField fields used to keep information or errors when events are parsed.
@@ -51,7 +51,20 @@ func (e *Event) SetID(id string) {
 	if e.Meta == nil {
 		e.Meta = common.MapStr{}
 	}
-	e.Meta["id"] = id
+	e.Meta["_id"] = id
+}
+
+func (e *Event) GetMetaStringValue(key string) (string, error) {
+	tmp, err := e.Meta.GetValue(key)
+	if err != nil {
+		return "", err
+	}
+
+	if s, ok := tmp.(string); ok {
+		return s, nil
+	}
+
+	return "", nil
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
@@ -123,4 +136,11 @@ func metadataKey(key string) (string, bool) {
 		return subKey[1:], true
 	}
 	return "", false
+}
+
+// SetErrorWithOption sets jsonErr value in the event fields according to addErrKey value.
+func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
+	if addErrKey {
+		e.Fields["error"] = jsonErr
+	}
 }

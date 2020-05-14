@@ -20,10 +20,10 @@ package idxmgmt
 import (
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type mockILMSupport struct {
@@ -69,12 +69,17 @@ func (m *mockILMSupport) Policy() ilm.Policy {
 	return args.Get(0).(ilm.Policy)
 }
 
+func onOverwrite() onCall { return makeOnCall("Overwrite") }
+func (m *mockILMSupport) Overwrite() bool {
+	return m.Called().Bool(0)
+}
+
 func (m *mockILMSupport) Manager(_ ilm.ClientHandler) ilm.Manager {
 	return m
 }
 
-func onEnabled() onCall { return makeOnCall("Enabled") }
-func (m *mockILMSupport) Enabled() (bool, error) {
+func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
+func (m *mockILMSupport) CheckEnabled() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }

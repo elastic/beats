@@ -24,9 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/go-lookslike/isdef"
+
+	"github.com/elastic/go-lookslike"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (
@@ -66,36 +69,36 @@ func TestCreateEvent(t *testing.T) {
 	event := createEvent(time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
 
 	// Validate the contents of the event.
-	validate := mapval.MustCompile(mapval.Map{
-		"source": mapval.Map{
+	validate := lookslike.MustCompile(map[string]interface{}{
+		"source": map[string]interface{}{
 			"mac":     "01:02:03:04:05:06",
 			"ip":      "203.0.113.3",
 			"port":    port1,
 			"bytes":   uint64(10),
 			"packets": uint64(1),
 		},
-		"destination": mapval.Map{
+		"destination": map[string]interface{}{
 			"mac":     "06:05:04:03:02:01",
 			"ip":      "198.51.100.2",
 			"port":    port2,
 			"bytes":   uint64(460),
 			"packets": uint64(2),
 		},
-		"flow": mapval.Map{
-			"id":    mapval.KeyPresent,
+		"flow": map[string]interface{}{
+			"id":    isdef.KeyPresent,
 			"final": true,
-			"vlan":  mapval.KeyPresent,
+			"vlan":  isdef.KeyPresent,
 		},
-		"network": mapval.Map{
+		"network": map[string]interface{}{
 			"bytes":     uint64(470),
 			"packets":   uint64(3),
 			"type":      "ipv4",
 			"transport": "tcp",
 		},
-		"event": mapval.Map{
-			"start":    mapval.KeyPresent,
-			"end":      mapval.KeyPresent,
-			"duration": mapval.KeyPresent,
+		"event": map[string]interface{}{
+			"start":    isdef.KeyPresent,
+			"end":      isdef.KeyPresent,
+			"duration": isdef.KeyPresent,
 			"dataset":  "flow",
 		},
 		"type": "flow",

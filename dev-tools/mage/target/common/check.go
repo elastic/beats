@@ -20,7 +20,7 @@ package common
 import (
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 var checkDeps []interface{}
@@ -38,4 +38,9 @@ func Check() {
 	deps = append(deps, checkDeps...)
 	deps = append(deps, devtools.Check)
 	mg.SerialDeps(deps...)
+}
+
+// CheckLicenseHeaders checks license headers
+func CheckLicenseHeaders() {
+	mg.Deps(devtools.CheckLicenseHeaders)
 }

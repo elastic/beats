@@ -2,53 +2,156 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
-            "dimensions": {
-                "DBInstanceIdentifier": "test1"
-            },
-            "metrics": {
-                "ActiveTransactions": 0,
-                "AuroraBinlogReplicaLag": 0,
-                "AuroraReplicaLagMaximum": 18.62599983215332,
-                "AuroraReplicaLagMinimum": 18.62599983215332,
-                "BinLogDiskUsage": 0,
-                "BlockedTransactions": 0,
-                "BufferCacheHitRatio": 100,
-                "CPUUtilization": 3.2,
-                "CommitLatency": 7.324593333333333,
-                "CommitThroughput": 0.49995937707131555,
-                "DDLLatency": 0,
-                "DDLThroughput": 0,
-                "DMLLatency": 0.15980666666666668,
-                "DMLThroughput": 0.49995937707131555,
-                "DatabaseConnections": 0,
-                "Deadlocks": 0,
-                "DeleteLatency": 0,
-                "DeleteThroughput": 0,
-                "EngineUptime": 5698620,
-                "FreeLocalStorage": 30215283507.2,
-                "FreeableMemory": 4574632345.6,
-                "InsertLatency": 0.15980666666666668,
-                "InsertThroughput": 0.49995937707131555,
-                "LoginFailures": 0,
-                "NetworkReceiveThroughput": 0.6999953344221976,
-                "NetworkThroughput": 1.3999906688443953,
-                "NetworkTransmitThroughput": 0.6999953344221976,
-                "Queries": 8.796891844051007,
-                "ResultSetCacheHitRatio": 0,
-                "SelectLatency": 0.17348499249549354,
-                "SelectThroughput": 3.0864647634387916,
-                "UpdateLatency": 0,
-                "UpdateThroughput": 0
-            },
             "namespace": "AWS/RDS"
         },
-        "tags": {
-            "workload-type": "other"
+        "dimensions": {
+            "EngineName": "mariadb"
+        },
+        "rds": {
+            "metrics": {
+                "BinLogDiskUsage": {
+                    "avg": 2803,
+                    "count": 5,
+                    "max": 3007,
+                    "min": 2752,
+                    "sum": 14015
+                },
+                "CPUCreditBalance": {
+                    "avg": 144,
+                    "count": 1,
+                    "max": 144,
+                    "min": 144,
+                    "sum": 144
+                },
+                "CPUCreditUsage": {
+                    "avg": 0.062006,
+                    "count": 1,
+                    "max": 0.062006,
+                    "min": 0.062006,
+                    "sum": 0.062006
+                },
+                "CPUSurplusCreditBalance": {
+                    "avg": 0,
+                    "count": 1,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "CPUSurplusCreditsCharged": {
+                    "avg": 0,
+                    "count": 1,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "CPUUtilization": {
+                    "avg": 1.2662313605690698,
+                    "count": 5,
+                    "max": 1.66666666666667,
+                    "min": 1.01694915255224,
+                    "sum": 6.331156802845349
+                },
+                "DatabaseConnections": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DiskQueueDepth": {
+                    "avg": 0.00009332666777759262,
+                    "count": 5,
+                    "max": 0.0002666666666666667,
+                    "min": 0,
+                    "sum": 0.0004666333388879631
+                },
+                "FreeStorageSpace": {
+                    "avg": 20402470912,
+                    "count": 5,
+                    "max": 20402470912,
+                    "min": 20402470912,
+                    "sum": 102012354560
+                },
+                "FreeableMemory": {
+                    "avg": 446488576,
+                    "count": 5,
+                    "max": 446668800,
+                    "min": 446275584,
+                    "sum": 2232442880
+                },
+                "NetworkReceiveThroughput": {
+                    "avg": 407.83898884048796,
+                    "count": 5,
+                    "max": 499.9416676388727,
+                    "min": 354.27742870952153,
+                    "sum": 2039.1949442024397
+                },
+                "NetworkTransmitThroughput": {
+                    "avg": 2667.0383202542657,
+                    "count": 5,
+                    "max": 3228.9489909846857,
+                    "min": 2274.512091465142,
+                    "sum": 13335.191601271328
+                },
+                "ReadIOPS": {
+                    "avg": 0.2333294445092582,
+                    "count": 5,
+                    "max": 1.166647222546291,
+                    "min": 0,
+                    "sum": 1.166647222546291
+                },
+                "ReadLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "ReadThroughput": {
+                    "avg": 136.53333333333333,
+                    "count": 5,
+                    "max": 682.6666666666666,
+                    "min": 0,
+                    "sum": 682.6666666666666
+                },
+                "SwapUsage": {
+                    "avg": 5287936,
+                    "count": 5,
+                    "max": 5287936,
+                    "min": 5287936,
+                    "sum": 26439680
+                },
+                "WriteIOPS": {
+                    "avg": 0.27999083424342597,
+                    "count": 5,
+                    "max": 0.6999883335277746,
+                    "min": 0,
+                    "sum": 1.39995417121713
+                },
+                "WriteLatency": {
+                    "avg": 0.00009062937062937063,
+                    "count": 5,
+                    "max": 0.0003076923076923077,
+                    "min": 0,
+                    "sum": 0.00045314685314685316
+                },
+                "WriteThroughput": {
+                    "avg": 2621.2741374938682,
+                    "count": 5,
+                    "max": 7441.066666666667,
+                    "min": 0,
+                    "sum": 13106.370687469342
+                }
+            }
         }
     },
     "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
         "provider": "aws",
-        "region": "us-east-2"
+        "region": "ap-southeast-1"
     },
     "event": {
         "dataset": "aws.cloudwatch",
@@ -56,10 +159,10 @@
         "module": "aws"
     },
     "metricset": {
-        "name": "cloudwatch"
+        "name": "cloudwatch",
+        "period": 10000
     },
     "service": {
-        "name": "cloudwatch",
-        "type": "cloudwatch"
+        "type": "aws"
     }
 }

@@ -1,5 +1,5 @@
 ifndef::has_module_steps[]
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 . Configure the output. {beatname_uc} supports a variety of
 <<configuring-output,outputs>>, but typically you'll either send events directly
 to {es}, or to {ls} for additional processing.
@@ -7,15 +7,15 @@ to {es}, or to {ls} for additional processing.
 To send output directly to {es} (without using {ls}), set the location of the
 {es} installation:
 +
-endif::only-elasticsearch[]
-ifdef::only-elasticsearch[]
-. Configure the  {es} output by setting the location of the {es} installation:
+endif::[]
+ifdef::no-output-logstash[]
+. Configure the {es} output by setting the location of the {es} installation:
 +
-endif::only-elasticsearch[]
+endif::[]
 endif::has_module_steps[]
 * If you're running our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service]
-on Elastic Cloud, specify your <<configure-cloud-id,Cloud ID>>. For example:
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
+on {ecloud}, specify your <<configure-cloud-id,Cloud ID>>. For example:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -32,12 +32,12 @@ output.elasticsearch:
 ----------------------------------------------------------------------
 ifndef::has_module_steps[]
 +
-ifndef::only-elasticsearch[]
+ifndef::no-output-logstash[]
 To send output to {ls}, 
 <<logstash-output,Configure the {ls} output>> instead. For all other
 outputs, see <<configuring-output>>.
-endif::only-elasticsearch[]
-ifdef::only-elasticsearch[]
-{es} is currently the only output supported by {beatname_uc}.
-endif::only-elasticsearch[]
+endif::[]
+ifdef::no-output-logstash[]
+For more information, see <<configuring-output>>.
+endif::[]
 endif::has_module_steps[]

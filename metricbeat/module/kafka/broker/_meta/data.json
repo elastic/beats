@@ -1,0 +1,82 @@
+{
+    "@timestamp": "2019-10-30T14:22:37.475Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "agent": {
+        "ephemeral_id": "f08b3bea-3631-4aaf-b35d-4cef29aeeb06",
+        "hostname": "MBP.lan",
+        "id": "79dd1677-1bea-4efd-9131-e8ca464eddf0",
+        "version": "8.0.0",
+        "type": "metricbeat"
+    },
+    "ecs": {
+        "version": "1.2.0"
+    },
+    "metricset": {
+        "name": "broker",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:8779",
+        "type": "kafka"
+    },
+    "kafka": {
+        "broker": {
+            "request": {
+                "fetch": {
+                    "failed_per_second": 0
+                },
+                "channel": {
+                    "queue": {
+                        "size": 0
+                    }
+                },
+                "produce": {
+                    "failed_per_second": 0
+                }
+            },
+            "replication": {
+                "leader_elections": 0,
+                "unclean_leader_elections": 0
+            },
+            "session": {
+                "zookeeper": {
+                    "expire": 0,
+                    "readonly": 0,
+                    "sync": 0.00017675970397749868,
+                    "disconnect": 0
+                }
+            },
+            "topic": {
+                "net": {
+                    "bytes_out": 0,
+                    "bytes_rejected": 0,
+                    "bytes_in": 0
+                },
+                "messages_in": 0
+            }
+        }
+    },
+    "event": {
+        "dataset": "kafka.broker",
+        "module": "kafka",
+        "duration": 7870293
+    },
+    "host": {
+        "name": "MBP.lan",
+        "hostname": "MBP.lan",
+        "architecture": "x86_64",
+        "os": {
+            "version": "10.14.6",
+            "family": "darwin",
+            "name": "Mac OS X",
+            "kernel": "18.7.0",
+            "build": "18G95",
+            "platform": "darwin"
+        },
+        "id": "883134FF-0EC4-5E1B-9F9E-FD06FB681D84"
+    }
+}

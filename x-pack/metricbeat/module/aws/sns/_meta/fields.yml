@@ -1,0 +1,42 @@
+- name: sns
+  type: group
+  description: >
+    `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: PublishSize.avg
+          type: double
+          description: The size of messages published.
+        - name: SMSSuccessRate.avg
+          type: double
+          description: The rate of successful SMS message deliveries.
+        - name: NumberOfMessagesPublished.sum
+          type: long
+          description: The number of messages published to your Amazon SNS topics.
+        - name: NumberOfNotificationsDelivered.sum
+          type: long
+          description: The number of messages successfully delivered from your Amazon SNS topics to subscribing endpoints.
+        - name: NumberOfNotificationsFailed.sum
+          type: long
+          description: The number of messages that Amazon SNS failed to deliver.
+        - name: NumberOfNotificationsFilteredOut.sum
+          type: long
+          description: The number of messages that were rejected by subscription filter policies.
+        - name: NumberOfNotificationsFilteredOut-InvalidAttributes.sum
+          type: long
+          description: The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid - for example, because the attribute JSON is incorrectly formatted.
+        - name: NumberOfNotificationsFilteredOut-NoMessageAttributes.sum
+          type: long
+          description: The number of messages that were rejected by subscription filter policies because the messages have no attributes.
+        - name: NumberOfNotificationsRedrivenToDlq.sum
+          type: long
+          description: The number of messages that have been moved to a dead-letter queue.
+        - name: NumberOfNotificationsFailedToRedriveToDlq.sum
+          type: long
+          description: The number of messages that couldn't be moved to a dead-letter queue.
+        - name: SMSMonthToDateSpentUSD.sum
+          type: long
+          description: The charges you have accrued since the start of the current calendar month for sending SMS messages.

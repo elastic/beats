@@ -22,23 +22,21 @@ package status
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 570, "elasticsearch", "kibana")
+	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, mtest.GetConfig("status"))
+	f := mbtest.NewReportingMetricSetV2Error(t, mtest.GetConfig("status", service.Host(), false))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
+	require.Empty(t, errs)
+	require.NotEmpty(t, events)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("kibana", "status").Fields.StringToPrint())

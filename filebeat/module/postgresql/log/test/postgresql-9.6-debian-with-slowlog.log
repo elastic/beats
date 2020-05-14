@@ -59,3 +59,6 @@
 2017-07-31 13:46:02.670 CEST [5502] postgres@c$lients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());
 2017-07-31 13:46:23.016 CEST [5502] postgres@_clients$db LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());
 2017-07-31 13:46:55.637 CEST [5502] postgres@clients_db LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);
+2019-05-06 19:00:04.511 UTC [913763] elastic@opbeans LOG:  duration: 0.753 ms  statement: SELECT p.id, p.sku, p.name, p.stock, t.name AS type_name FROM products p LEFT JOIN product_types t ON p.type_id=t.id
+    FROM orders JOIN customers ON orders.customer_id=customers.id
+    FROM products JOIN product_types ON type_id=product_types.id

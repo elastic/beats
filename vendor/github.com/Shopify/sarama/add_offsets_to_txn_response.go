@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//AddOffsetsToTxnResponse is a response type for adding offsets to txns
 type AddOffsetsToTxnResponse struct {
 	ThrottleTime time.Duration
 	Err          KError

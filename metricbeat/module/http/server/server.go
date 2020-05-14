@@ -20,9 +20,9 @@ package server
 import (
 	"fmt"
 
-	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
-	"github.com/elastic/beats/metricbeat/helper/server/http"
-	"github.com/elastic/beats/metricbeat/mb"
+	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/beats/v7/metricbeat/helper/server/http"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // init registers the MetricSet with the central registry.
@@ -65,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Run method provides the Graphite server with a reporter with which events can be reported.
+// Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
 	m.server.Start()
@@ -80,7 +80,10 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			if err != nil {
 				reporter.Error(err)
 			} else {
-				event := mb.Event{}
+				meta := msg.GetMeta()
+				event := mb.Event{
+					Host: meta["address"].(string),
+				}
 				ns, ok := fields[mb.NamespaceKey].(string)
 				if ok {
 					ns = fmt.Sprintf("http.%s", ns)

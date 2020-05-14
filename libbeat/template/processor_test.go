@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 func TestProcessor(t *testing.T) {
@@ -34,6 +34,7 @@ func TestProcessor(t *testing.T) {
 	pEsVersion2 := &Processor{EsVersion: *common.MustNewVersion("2.0.0")}
 	pEsVersion64 := &Processor{EsVersion: *common.MustNewVersion("6.4.0")}
 	pEsVersion63 := &Processor{EsVersion: *common.MustNewVersion("6.3.6")}
+	pEsVersion76 := &Processor{EsVersion: *common.MustNewVersion("7.6.0")}
 
 	tests := []struct {
 		output   common.MapStr
@@ -300,6 +301,14 @@ func TestProcessor(t *testing.T) {
 			output:   migrationP.alias(&mapping.Field{Type: "alias", AliasPath: "a.f", MigrationAlias: true}),
 			expected: common.MapStr{"path": "a.f", "type": "alias"},
 		},
+		{
+			output:   p.histogram(&mapping.Field{Type: "histogram"}),
+			expected: nil,
+		},
+		{
+			output:   pEsVersion76.histogram(&mapping.Field{Type: "histogram"}),
+			expected: common.MapStr{"type": "histogram"},
+		},
 	}
 
 	for _, test := range tests {
@@ -522,7 +531,7 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.Process(fields, "", output)
+	err = p.Process(fields, nil, output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -570,7 +579,7 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.Process(fields, "", output)
+	err = p.Process(fields, nil, output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -588,4 +597,82 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessDefaultField(t *testing.T) {
+	// NOTE: This package stores global state. It must be cleared before this test.
+	defaultFields = nil
+
+	var (
+		enableDefaultField  = true
+		disableDefaultField = false
+	)
+
+	fields := mapping.Fields{
+		// By default foo will be included in default_field.
+		mapping.Field{
+			Name: "foo",
+			Type: "keyword",
+		},
+		// bar is explicitly set to be included in default_field.
+		mapping.Field{
+			Name:         "bar",
+			Type:         "keyword",
+			DefaultField: &enableDefaultField,
+		},
+		// baz is explicitly set to be excluded from default_field.
+		mapping.Field{
+			Name:         "baz",
+			Type:         "keyword",
+			DefaultField: &disableDefaultField,
+		},
+		mapping.Field{
+			Name:         "nested",
+			Type:         "group",
+			DefaultField: &enableDefaultField,
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "bar",
+					Type: "keyword",
+				},
+			},
+		},
+		// The nested group is disabled default_field but one of the children
+		// has explicitly requested to be included.
+		mapping.Field{
+			Name:         "nested",
+			Type:         "group",
+			DefaultField: &disableDefaultField,
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name:         "foo",
+					Type:         "keyword",
+					DefaultField: &enableDefaultField,
+				},
+				mapping.Field{
+					Name: "baz",
+					Type: "keyword",
+				},
+			},
+		},
+	}
+
+	version, err := common.NewVersion("7.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version}
+	output := common.MapStr{}
+	if err = p.Process(fields, nil, output); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Len(t, defaultFields, 4)
+	assert.Contains(t, defaultFields,
+		"foo",
+		"bar",
+		"nested.foo",
+		"nested.bar",
+	)
 }

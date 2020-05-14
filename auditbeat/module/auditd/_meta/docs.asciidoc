@@ -130,6 +130,10 @@ following example shows all configuration options with their default values.
   backpressure_strategy: auto
 ----
 
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
+
 *`socket_type`*:: This optional setting controls the type of
 socket that {beatname_uc} uses to receive events from the kernel. The two
 options are `unicast` and `multicast`.
@@ -184,7 +188,8 @@ setting is primarily used for development and debugging purposes.
 installed to the kernel. There should be one rule per line. Comments can be
 embedded in the string using `#` as a prefix. The format for rules is the same
 used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
-(`-w`) and syscall rules (`-a` or `-A`).
+(`-w`) and syscall rules (`-a` or `-A`). For more information, see
+<<audit-rules>>.
 
 *`audit_rule_files`*:: A list of files to load audit rules from. This files are
 loaded after the rules declared in `audit_rules` are loaded. Wildcards are
@@ -213,7 +218,10 @@ time.
 - `none`: No backpressure mitigation measures are enabled.
 --
 
+include::{docdir}/auditbeat-options.asciidoc[]
+
 [float]
+[[audit-rules]]
 === Audit rules
 
 The audit rules are where you configure the activities that are audited. These

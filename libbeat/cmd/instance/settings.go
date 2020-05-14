@@ -20,11 +20,11 @@ package instance
 import (
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 )
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
@@ -32,9 +32,10 @@ type Settings struct {
 	Name            string
 	IndexPrefix     string
 	Version         string
+	HasDashboards   bool
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
-	ConfigOverrides *common.Config
+	ConfigOverrides []cfgfile.ConditionalOverride
 
 	DisableConfigResolver bool
 
@@ -43,4 +44,6 @@ type Settings struct {
 	ILM             ilm.SupportFactory
 
 	Processing processing.SupportFactory
+
+	Umask *int
 }

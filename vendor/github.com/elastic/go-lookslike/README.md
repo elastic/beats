@@ -7,7 +7,7 @@ This library is here to help you with all your data validation needs. It's ideal
 ## Quick Links
 
 * [GoDoc](https://godoc.org/github.com/elastic/go-lookslike) for this library.
-* [Runnable Examples](https://github.com/elastic/go-lookslike/blob/master/lookslike/doc_test.go).
+* [Runnable Examples](https://github.com/elastic/go-lookslike/blob/master/doc_test.go).
 
 ## Install
 
@@ -25,7 +25,7 @@ If using govendor run:
 
 ## Real World Usage Examples
 
-lookslike was created to improve the testing of various structures in [elastic/beats](https://github.com/elastic/beats). Searching the tests for `lookslike` will show real world usage.
+lookslike was created to improve the testing of various structures in [elastic/beats](https://github.com/elastic/beats/search?q=lookslike.MustCompile&unscoped_q=lookslike.MustCompile). Searching the tests for `lookslike.MustCompile` will show real world usage.
 
 ## Call for More `isdef`s!
 

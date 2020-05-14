@@ -9,12 +9,13 @@ type LicenseType int
 
 //go:generate stringer -type=LicenseType -linecomment=true
 const (
-	OSS      LicenseType = iota // Open source
-	Trial                       // Trial
-	Basic                       // Basic
-	Standard                    // Standard
-	Gold                        // Gold
-	Platinum                    // Platinum
+	OSS        LicenseType = iota // Open source
+	Trial                         // Trial
+	Basic                         // Basic
+	Standard                      // Standard
+	Gold                          // Gold
+	Platinum                      // Platinum
+	Enterprise                    // Enterprise
 )
 
 // State of the license can be active or inactive.
@@ -25,3 +26,18 @@ const (
 	Inactive State = iota
 	Active
 )
+
+var stateLookup = map[string]State{
+	"inactive": Inactive,
+	"active":   Active,
+}
+
+var licenseLookup = map[string]LicenseType{
+	"oss":        OSS,
+	"trial":      Trial,
+	"standard":   Standard,
+	"basic":      Basic,
+	"gold":       Gold,
+	"platinum":   Platinum,
+	"enterprise": Enterprise,
+}

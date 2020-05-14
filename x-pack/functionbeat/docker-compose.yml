@@ -4,8 +4,6 @@ services:
     build: ${PWD}/.
     depends_on:
       - proxy_dep
-    env_file:
-      - ${PWD}/build/test.env
     working_dir: /go/src/github.com/elastic/beats/x-pack/functionbeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/

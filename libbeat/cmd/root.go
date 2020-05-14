@@ -25,9 +25,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
 func init() {
@@ -76,7 +76,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
 	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
 	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
-	rootCmd.VersionCmd = genVersionCmd(settings)
+	rootCmd.VersionCmd = GenVersionCmd(settings)
 	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
 	// Root command is an alias for run
@@ -88,6 +88,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("e"))
+	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))

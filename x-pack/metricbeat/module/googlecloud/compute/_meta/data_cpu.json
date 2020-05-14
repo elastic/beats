@@ -1,0 +1,62 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "instance": {
+            "id": "1174463293187628268",
+            "name": "gke-observability-8--observability-8--bc1afd95-ngmh"
+        },
+        "machine": {
+            "type": "n1-standard-4"
+        },
+        "provider": "googlecloud"
+    },
+    "cloud.availability_zone": "europe-west1-c",
+    "event": {
+        "dataset": "googlecloud.compute",
+        "duration": 115000,
+        "module": "googlecloud"
+    },
+    "googlecloud": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 181
+                },
+                "dropped_packets_count": {
+                    "value": 3
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 4
+                    },
+                    "usage_time": {
+                        "value": 63.478293027728796
+                    },
+                    "utilization": {
+                        "value": 0.26449288761553663
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {
+            "user": {
+                "goog-gke-node": ""
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "googlecloud"
+    }
+}

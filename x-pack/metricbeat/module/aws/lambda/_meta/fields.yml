@@ -1,0 +1,48 @@
+- name: lambda
+  type: group
+  description: >
+    `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: Invocations.avg
+          type: double
+          description: The number of times your function code is executed, including successful executions and executions that result in a function error.
+        - name: Errors.avg
+          type: double
+          description: The number of invocations that result in a function error.
+        - name: DeadLetterErrors.avg
+          type: double
+          description: For asynchronous invocation, the number of times Lambda attempts to send an event to a dead-letter queue but fails.
+        - name: DestinationDeliveryFailures.avg
+          type: double
+          description: For asynchronous invocation, the number of times Lambda attempts to send an event to a destination but fails.
+        - name: Duration.avg
+          type: double
+          description: The amount of time that your function code spends processing an event.
+        - name: Throttles.avg
+          type: double
+          description: The number of invocation requests that are throttled.
+        - name: IteratorAge.avg
+          type: double
+          description: For event source mappings that read from streams, the age of the last record in the event.
+        - name: ConcurrentExecutions.avg
+          type: double
+          description: The number of function instances that are processing events.
+        - name: UnreservedConcurrentExecutions.avg
+          type: double
+          description: For an AWS Region, the number of events that are being processed by functions that don't have reserved concurrency.
+        - name: ProvisionedConcurrentExecutions.max
+          type: long
+          description: The number of function instances that are processing events on provisioned concurrency.
+        - name: ProvisionedConcurrencyUtilization.max
+          type: long
+          description: For a version or alias, the value of ProvisionedConcurrentExecutions divided by the total amount of provisioned concurrency allocated.
+        - name: ProvisionedConcurrencyInvocations.sum
+          type: long
+          description: The number of times your function code is executed on provisioned concurrency.
+        - name: ProvisionedConcurrencySpilloverInvocations.sum
+          type: long
+          description: The number of times your function code is executed on standard concurrency when all provisioned concurrency is in use.

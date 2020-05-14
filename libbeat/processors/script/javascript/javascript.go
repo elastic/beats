@@ -26,22 +26,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dop251/goja"
 	"github.com/pkg/errors"
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 type jsProcessor struct {
 	Config
-	s          *session
-	sourceFile string
-	stats      *processorStats
+	sessionPool *sessionPool
+	sourceProg  *goja.Program
+	sourceFile  string
+	stats       *processorStats
 }
 
 // New constructs a new Javascript processor.
@@ -78,16 +80,23 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (processors.Processor, er
 		return nil, annotateError(c.Tag, err)
 	}
 
-	s, err := newSession(sourceFile, sourceCode, c)
+	// Validate processor source code.
+	prog, err := goja.Compile(sourceFile, string(sourceCode), true)
+	if err != nil {
+		return nil, err
+	}
+
+	pool, err := newSessionPool(prog, c)
 	if err != nil {
 		return nil, annotateError(c.Tag, err)
 	}
 
 	return &jsProcessor{
-		Config:     c,
-		s:          s,
-		sourceFile: sourceFile,
-		stats:      getStats(c.Tag, reg),
+		Config:      c,
+		sessionPool: pool,
+		sourceProg:  prog,
+		sourceFile:  sourceFile,
+		stats:       getStats(c.Tag, reg),
 	}, nil
 }
 
@@ -156,17 +165,23 @@ func annotateError(id string, err error) error {
 // Run executes the processor on the given it event. It invokes the
 // process function defined in the Javascript source.
 func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	run := p.s.runProcessFunc
-	if p.stats != nil {
-		run = p.runWithStats
+	s := p.sessionPool.Get()
+	defer p.sessionPool.Put(s)
+
+	var rtn *beat.Event
+	var err error
+
+	if p.stats == nil {
+		rtn, err = s.runProcessFunc(event)
+	} else {
+		rtn, err = p.runWithStats(s, event)
 	}
-	rtn, err := run(event)
 	return rtn, annotateError(p.Tag, err)
 }
 
-func (p *jsProcessor) runWithStats(event *beat.Event) (*beat.Event, error) {
+func (p *jsProcessor) runWithStats(s *session, event *beat.Event) (*beat.Event, error) {
 	start := time.Now()
-	event, err := p.s.runProcessFunc(event)
+	event, err := s.runProcessFunc(event)
 	elapsed := time.Since(start)
 
 	p.stats.processTime.Update(int64(elapsed))

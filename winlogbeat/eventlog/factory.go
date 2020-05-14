@@ -24,11 +24,11 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root",
-	"tags", "processors"}
+	"tags", "processors", "index"}
 
 // ConfigCommon is the common configuration data used to instantiate a new
 // EventLog. Each implementation is free to support additional configuration
@@ -45,23 +45,19 @@ type validator interface {
 func readConfig(
 	c *common.Config,
 	config interface{},
-	validKeys []string,
+	validKeys common.StringSet,
 ) error {
 	if err := c.Unpack(config); err != nil {
-		return fmt.Errorf("Failed unpacking config. %v", err)
+		return fmt.Errorf("failed unpacking config. %v", err)
 	}
 
 	var errs multierror.Errors
 	if len(validKeys) > 0 {
-		sort.Strings(validKeys)
-
 		// Check for invalid keys.
 		for _, k := range c.GetFields() {
-			k = strings.ToLower(k)
-			i := sort.SearchStrings(validKeys, k)
-			if i >= len(validKeys) || validKeys[i] != k {
-				errs = append(errs, fmt.Errorf("Invalid event log key '%s' "+
-					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+			if !validKeys.Has(k) {
+				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
+					"found. Valid keys are %s", k, strings.Join(validKeys.ToSlice(), ", ")))
 			}
 		}
 	}

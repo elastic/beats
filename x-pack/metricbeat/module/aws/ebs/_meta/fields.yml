@@ -1,0 +1,42 @@
+- name: ebs
+  type: group
+  description: >
+    `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+  release: ga
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: VolumeReadBytes.avg
+          type: double
+          description: Average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
+        - name: VolumeWriteBytes.avg
+          type: double
+          description: Average size of each write operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
+        - name: VolumeReadOps.avg
+          type: double
+          description: The total number of read operations in a specified period of time.
+        - name: VolumeWriteOps.avg
+          type: double
+          description: The total number of write operations in a specified period of time.
+        - name: VolumeQueueLength.avg
+          type: double
+          description: The number of read and write operation requests waiting to be completed in a specified period of time.
+        - name: VolumeThroughputPercentage.avg
+          type: double
+          description: The percentage of I/O operations per second (IOPS) delivered of the total IOPS provisioned for an Amazon EBS volume. Used with Provisioned IOPS SSD volumes only.
+        - name: VolumeConsumedReadWriteOps.avg
+          type: double
+          description: The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time. Used with Provisioned IOPS SSD volumes only.
+        - name: BurstBalance.avg
+          type: double
+          description: Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only. Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.
+        - name: VolumeTotalReadTime.sum
+          type: double
+          description: The total number of seconds spent by all read operations that completed in a specified period of time.
+        - name: VolumeTotalWriteTime.sum
+          type: double
+          description: The total number of seconds spent by all write operations that completed in a specified period of time.
+        - name: VolumeIdleTime.sum
+          type: double
+          description: The total number of seconds in a specified period of time when no read or write operations were submitted.

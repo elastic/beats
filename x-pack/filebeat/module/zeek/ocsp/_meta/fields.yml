@@ -1,0 +1,68 @@
+- name: ocsp
+  type: group
+  default_field: false
+  description: |
+    Fields exported by the Zeek OCSP log
+    Online Certificate Status Protocol (OCSP). Only created if policy script is loaded.
+  fields:
+    - name: file_id
+      type: keyword
+      description: |
+        File id of the OCSP reply.
+    - name: hash
+      type: group
+      fields:
+        - name: algorithm
+          type: keyword
+          description: |
+            Hash algorithm used to generate issuerNameHash and issuerKeyHash.
+
+        - name: issuer
+          type: group
+          fields:
+            - name: name
+              type: keyword
+              description: |
+                Hash of the issuer's distingueshed name.
+
+            - name: key
+              type: keyword
+              description: |
+                Hash of the issuer's public key.
+
+    - name: serial_number
+      type: keyword
+      description: |
+        Serial number of the affected certificate.
+
+    - name: status
+      type: keyword
+      description: |
+        Status of the affected certificate.
+
+    - name: revoke
+      type: group
+      fields:
+        - name: time
+          type: date
+          description: |
+            Time at which the certificate was revoked.
+
+        - name: reason
+          type: keyword
+          description: |
+            Reason for which the certificate was revoked.
+
+    - name: update
+      type: group
+      fields:
+        - name: this
+          type: date
+          description: |
+            The time at which the status being shows is known to have been correct.
+
+        - name: next
+          type: date
+          description: |
+            The latest time at which new information about the status of the certificate will be available.
+

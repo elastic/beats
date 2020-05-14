@@ -315,7 +315,7 @@
                         }
                     }
                 },
-                "title": "AWS Region Filter",
+                "title": "Region Filter [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -374,7 +374,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Instance State ECS",
+                "title": "EC2 Instance State [Metricbeat AWS] ECS",
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -430,7 +430,7 @@
                         "legendPosition": "right",
                         "type": "pie"
                     },
-                    "title": "AWS EC2 Instance State ECS",
+                    "title": "EC2 Instance State [Metricbeat AWS] ECS",
                     "type": "pie"
                 }
             },
@@ -461,7 +461,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 CPU Utilization ECS",
+                "title": "EC2 CPU Utilization [Metricbeat AWS] ECS",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -544,7 +544,7 @@
                         }
                     }
                 },
-                "title": "AWS S3 Total Error 4xx",
+                "title": "S3 Total Error 4xx [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -619,7 +619,7 @@
                         }
                     }
                 },
-                "title": "AWS S3 Total Error 5xx",
+                "title": "S3 Total Error 5xx [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -695,7 +695,7 @@
                         }
                     }
                 },
-                "title": "AWS SQS Empty Receives Top5",
+                "title": "SQS Empty Receives Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -769,7 +769,7 @@
                         }
                     }
                 },
-                "title": "AWS SQS Messages Delayed Top5",
+                "title": "SQS Messages Delayed Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -843,7 +843,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch ELB Request Count Top5",
+                "title": "Cloudwatch ELB Request Count Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -873,7 +873,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.RequestCount",
+                                        "field": "aws.elb.metrics.RequestCount",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "sum"
                                     }
@@ -882,7 +882,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                                "terms_field": "aws.dimensions.LoadBalancerName",
                                 "terms_size": "5"
                             }
                         ],
@@ -916,7 +916,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch ELB Latency",
+                "title": "Cloudwatch ELB Latency [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -953,7 +953,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.Latency",
+                                        "field": "aws.elb.metrics.Latency",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "avg"
                                     }
@@ -965,7 +965,7 @@
                                 "split_mode": "terms",
                                 "stacked": "none",
                                 "steps": 0,
-                                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                                "terms_field": "aws.dimensions.LoadBalancerName",
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "terms_size": "5"
                             }
@@ -1000,7 +1000,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch ELB Unhealthy Host Count",
+                "title": "Cloudwatch ELB Unhealthy Host Count [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1035,7 +1035,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.UnHealthyHostCount",
+                                        "field": "aws.elb.metrics.UnHealthyHostCount",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "sum"
                                     }
@@ -1044,7 +1044,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
+                                "terms_field": "aws.dimensions.LoadBalancerName",
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "terms_size": "5"
                             }
@@ -1079,7 +1079,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch Lambda Invocations Top5",
+                "title": "Cloudwatch Lambda Invocations Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1114,7 +1114,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.Invocations",
+                                        "field": "aws.lambda.metrics.Invocations",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "avg"
                                     }
@@ -1123,7 +1123,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                                "terms_field": "aws.dimensions.FunctionName",
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "terms_size": "5"
                             }
@@ -1158,7 +1158,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch Lambda Errors Top5",
+                "title": "Cloudwatch Lambda Errors Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1193,7 +1193,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.Errors",
+                                        "field": "aws.lambda.metrics.Errors",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "avg"
                                     }
@@ -1202,7 +1202,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                                "terms_field": "aws.dimensions.FunctionName",
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "terms_size": "5"
                             }
@@ -1237,7 +1237,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch Lambda Throttles Top5",
+                "title": "Cloudwatch Lambda Throttles Top5 [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1272,7 +1272,7 @@
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.Throttles",
+                                        "field": "aws.lambda.metrics.Throttles",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "avg"
                                     }
@@ -1281,7 +1281,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.FunctionName",
+                                "terms_field": "aws.dimensions.FunctionName",
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "terms_size": "5"
                             }
@@ -1316,7 +1316,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch ECS CPU Available",
+                "title": "Cloudwatch ECS CPU Available [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1342,19 +1342,19 @@
                                 "chart_type": "line",
                                 "color": "#68BC00",
                                 "fill": "0",
-                                "filter": "(aws.cloudwatch.namespace:\"AWS/ECS\") AND (_exists_: aws.cloudwatch.metrics.CPUReservation) AND (_exists_: aws.cloudwatch.metrics.CPUUtilization)",
+                                "filter": "(aws.cloudwatch.namespace:\"AWS/ECS\") AND (_exists_: aws.ecs.metrics.CPUReservation) AND (_exists_: aws.ecs.metrics.CPUUtilization)",
                                 "formatter": "percent",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                                 "label": "",
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.CPUUtilization",
+                                        "field": "aws.ecs.metrics.CPUUtilization",
                                         "id": "17f8ddf0-830d-11e9-9f3d-ed346f48a007",
                                         "type": "sum"
                                     },
                                     {
-                                        "field": "aws.cloudwatch.metrics.CPUReservation",
+                                        "field": "aws.ecs.metrics.CPUReservation",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "sum"
                                     },
@@ -1380,7 +1380,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.ClusterName",
+                                "terms_field": "aws.dimensions.ClusterName",
                                 "terms_order_by": "_key",
                                 "terms_size": "5"
                             }
@@ -1415,7 +1415,7 @@
                         }
                     }
                 },
-                "title": "AWS Cloudwatch ECS Memory Available",
+                "title": "Cloudwatch ECS Memory Available [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -1441,19 +1441,19 @@
                                 "chart_type": "line",
                                 "color": "#68BC00",
                                 "fill": "0",
-                                "filter": "(aws.cloudwatch.namespace:\"AWS/ECS\") AND (_exists_: aws.cloudwatch.metrics.MemoryReservation) AND (_exists_: aws.cloudwatch.metrics.MemoryUtilization)",
+                                "filter": "(aws.cloudwatch.namespace:\"AWS/ECS\") AND (_exists_: aws.ecs.metrics.MemoryReservation) AND (_exists_: aws.ecs.metrics.MemoryUtilization)",
                                 "formatter": "percent",
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                                 "label": "",
                                 "line_width": 1,
                                 "metrics": [
                                     {
-                                        "field": "aws.cloudwatch.metrics.MemoryUtilization",
+                                        "field": "aws.ecs.metrics.MemoryUtilization",
                                         "id": "17f8ddf0-830d-11e9-9f3d-ed346f48a007",
                                         "type": "sum"
                                     },
                                     {
-                                        "field": "aws.cloudwatch.metrics.MemoryReservation",
+                                        "field": "aws.ecs.metrics.MemoryReservation",
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                         "type": "sum"
                                     },
@@ -1479,7 +1479,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "aws.cloudwatch.dimensions.ClusterName",
+                                "terms_field": "aws.dimensions.ClusterName",
                                 "terms_order_by": "_key",
                                 "terms_size": "5",
                                 "value_template": "{{value}}"

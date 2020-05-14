@@ -6,7 +6,8 @@
             "module": "php_fpm"
         },
         "metricset": {
-            "name": "pool"
+            "name": "pool",
+            "period": 10000
         },
         "php_fpm": {
             "pool": {

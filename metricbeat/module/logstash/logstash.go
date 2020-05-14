@@ -19,14 +19,16 @@ package logstash
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -36,40 +38,9 @@ func init() {
 	}
 }
 
-// NewModule creates a new module after performing validation.
+// NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if err := validateXPackMetricsets(base); err != nil {
-		return nil, err
-	}
-
-	return &base, nil
-}
-
-// Validate that correct metricsets have been specified if xpack.enabled = true.
-func validateXPackMetricsets(base mb.BaseModule) error {
-	config := struct {
-		Metricsets   []string `config:"metricsets"`
-		XPackEnabled bool     `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return err
-	}
-
-	// Nothing to validate if xpack.enabled != true
-	if !config.XPackEnabled {
-		return nil
-	}
-
-	expectedXPackMetricsets := []string{
-		"node",
-		"node_stats",
-	}
-
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
-	}
-
-	return nil
+	return elastic.NewModule(&base, []string{"node", "node_stats"}, logp.NewLogger(ModuleName))
 }
 
 // ModuleName is the name of this module.
@@ -92,7 +63,10 @@ type graph struct {
 }
 
 type graphContainer struct {
-	Graph *graph `json:"graph,omitempty"`
+	Graph   *graph `json:"graph,omitempty"`
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	Hash    string `json:"hash"`
 }
 
 // PipelineState represents the state (shape) of a Logstash pipeline
@@ -130,20 +104,24 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
-// GetPipelines returns the list of pipelines running on a Logstash node
-func GetPipelines(m *MetricSet) ([]PipelineState, error) {
+// GetPipelines returns the list of pipelines running on a Logstash node and,
+// optionally, an override cluster UUID.
+func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
-		return nil, errors.Wrap(err, "could not fetch node pipelines")
+		return nil, "", errors.Wrap(err, "could not fetch node pipelines")
 	}
 
 	pipelinesResponse := struct {
+		Monitoring struct {
+			ClusterID string `json:"cluster_uuid"`
+		} `json:"monitoring"`
 		Pipelines map[string]PipelineState `json:"pipelines"`
 	}{}
 
 	err = json.Unmarshal(content, &pipelinesResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not parse node pipelines response")
+		return nil, "", errors.Wrap(err, "could not parse node pipelines response")
 	}
 
 	var pipelines []PipelineState
@@ -152,11 +130,49 @@ func GetPipelines(m *MetricSet) ([]PipelineState, error) {
 		pipelines = append(pipelines, pipeline)
 	}
 
-	return pipelines, nil
+	return pipelines, pipelinesResponse.Monitoring.ClusterID, nil
 }
 
-// GetVersion returns the version of the Logstash node
-func GetVersion(m *MetricSet) (*common.Version, error) {
+// CheckPipelineGraphAPIsAvailable returns an error if pipeline graph APIs are not
+// available in the version of the Logstash node.
+func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
+	logstashVersion, err := m.getVersion()
+	if err != nil {
+		return err
+	}
+
+	arePipelineGraphAPIsAvailable := elastic.IsFeatureAvailable(logstashVersion, PipelineGraphAPIsAvailableVersion)
+
+	if !arePipelineGraphAPIsAvailable {
+		const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), PipelineGraphAPIsAvailableVersion, logstashVersion)
+	}
+
+	return nil
+}
+
+// GetVertexClusterUUID returns the correct cluster UUID value for the given Elasticsearch
+// vertex from a Logstash pipeline. If the vertex has no cluster UUID associated with it,
+// the given override cluster UUID is returned.
+func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
+	c, ok := vertex["cluster_uuid"]
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	clusterUUID, ok := c.(string)
+	if !ok {
+		return overrideClusterUUID
+	}
+
+	if clusterUUID == "" {
+		return overrideClusterUUID
+	}
+
+	return clusterUUID
+}
+
+func (m *MetricSet) getVersion() (*common.Version, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
@@ -173,12 +189,6 @@ func GetVersion(m *MetricSet) (*common.Version, error) {
 	}
 
 	return response.Version, nil
-}
-
-// ArePipelineGraphAPIsAvailable returns whether Logstash APIs that returns pipeline graphs
-// are available in the given version of Logstash
-func ArePipelineGraphAPIsAvailable(currentLogstashVersion *common.Version) bool {
-	return elastic.IsFeatureAvailable(currentLogstashVersion, PipelineGraphAPIsAvailableVersion)
 }
 
 func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {

@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Config is put into a different package to prevent cyclic imports in case
+// it is needed in several locations
+
 package config
 
 import (
@@ -9,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestNameMustBeUnique(t *testing.T) {

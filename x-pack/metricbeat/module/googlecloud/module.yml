@@ -1,0 +1,6 @@
+name: googlecloud
+metricsets:
+  - compute
+  - pubsub
+  - loadbalancing
+  - storage

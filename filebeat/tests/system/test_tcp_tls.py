@@ -1,6 +1,7 @@
 from filebeat import BaseTest
 import socket
 import ssl
+import unittest
 from os import path
 from nose.tools import raises, assert_raises
 
@@ -72,7 +73,7 @@ class Test(BaseTest):
         tls.connect((config.get('host'), config.get('port')))
 
         for n in range(0, NUMBER_OF_EVENTS):
-            tls.send("Hello World: " + str(n) + "\n")
+            tls.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 
         self.wait_until(lambda: self.output_count(
             lambda x: x >= NUMBER_OF_EVENTS))
@@ -160,7 +161,13 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
                               ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
+
         tls.connect((config.get('host'), config.get('port')))
+        # In TLS 1.3 authentication failures are not detected by the initial
+        # connection and handshake. For the client to detect that authentication
+        # has failed (at least in python) it must wait for a server response
+        # so that the failure can be reported as an exception when it arrives.
+        tls.recv(1)
 
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
@@ -207,7 +214,7 @@ class Test(BaseTest):
         tls.connect((config.get('host'), config.get('port')))
 
         for n in range(0, NUMBER_OF_EVENTS):
-            tls.send("Hello World: " + str(n) + "\n")
+            tls.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 
         self.wait_until(lambda: self.output_count(
             lambda x: x >= NUMBER_OF_EVENTS))
@@ -260,7 +267,7 @@ class Test(BaseTest):
         # no events should be written on disk.
         with assert_raises(IOError):
             for n in range(0, 100000):
-                sock.send("Hello World: " + str(n) + "\n")
+                sock.send(bytes("Hello World: " + str(n) + "\n", "utf-8"))
 
         filebeat.check_kill_and_wait()
 

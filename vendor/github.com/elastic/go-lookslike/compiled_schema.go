@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/llpath"
 	"github.com/elastic/go-lookslike/llresult"
+	"reflect"
 )
 
 type flatValidator struct {
@@ -35,11 +36,16 @@ type CompiledSchema []flatValidator
 func (cs CompiledSchema) Check(actual interface{}) *llresult.Results {
 	res := llresult.NewResults()
 	for _, pv := range cs {
-		actualV, actualKeyExists := pv.path.GetFrom(actual)
+		actualVal, actualKeyExists := pv.path.GetFrom(reflect.ValueOf(actual))
+		var actualInter interface{}
+		zero := reflect.Value{}
+		if actualVal != zero {
+			actualInter = actualVal.Interface()
+		}
 
 		if !pv.isDef.Optional || pv.isDef.Optional && actualKeyExists {
 			var checkRes *llresult.Results
-			checkRes = pv.isDef.Check(pv.path, actualV, actualKeyExists)
+			checkRes = pv.isDef.Check(pv.path, actualInter, actualKeyExists)
 			res.Merge(checkRes)
 		}
 	}

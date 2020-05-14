@@ -106,13 +106,6 @@
         "value" : "{{source.address}}",
         "if": "ctx.source?.address != null"
       } 
-    },
-    {
-      "geoip": {
-        "field": "destination.ip",
-        "target_field": "destination.geo",
-        "if": "ctx.destination?.ip != null"
-      }
     }
   ],
   "on_failure" : [{ 

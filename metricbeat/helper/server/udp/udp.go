@@ -23,10 +23,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper/server"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type UdpServer struct {
@@ -99,9 +99,12 @@ func (g *UdpServer) watchMetrics() {
 			continue
 		}
 
+		bufCopy := make([]byte, length)
+		copy(bufCopy, buffer)
+
 		g.eventQueue <- &UdpEvent{
 			event: common.MapStr{
-				server.EventDataKey: buffer[:length],
+				server.EventDataKey: bufCopy,
 			},
 			meta: server.Meta{
 				"client_ip": addr.IP.String(),

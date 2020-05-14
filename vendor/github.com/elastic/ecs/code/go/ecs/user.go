@@ -24,7 +24,7 @@ package ecs
 // Fields can have one entry or multiple entries. If a user has more than one
 // id, provide an array that includes all of them.
 type User struct {
-	// One or multiple unique identifiers of the user.
+	// Unique identifiers of the user.
 	ID string `ecs:"id"`
 
 	// Short name or login of the user.
@@ -40,4 +40,8 @@ type User struct {
 	// Useful if `user.id` or `user.name` contain confidential information and
 	// cannot be used.
 	Hash string `ecs:"hash"`
+
+	// Name of the directory the user is a member of.
+	// For example, an LDAP or Active Directory domain name.
+	Domain string `ecs:"domain"`
 }

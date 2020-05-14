@@ -1,0 +1,39 @@
+- key: cloudfoundry
+  title: Cloud Foundry
+  description: >
+    Cloud Foundry information collected from Cloud Foundry.
+  short_config: false
+  anchor: cloudfoundry-processor
+  fields:
+    - name: cloudfoundry
+      type: group
+      fields:
+        - name: app.id
+          type: keyword
+          description: >
+            Cloud Foundry application ID
+
+        - name: app.name
+          type: keyword
+          description: >
+            Cloud Foundry application name
+
+        - name: space.id
+          type: keyword
+          description: >
+            Cloud Foundry space name
+
+        - name: space.name
+          type: keyword
+          description: >
+            Cloud Foundry space name
+
+        - name: org.id
+          type: keyword
+          description: >
+            Cloud Foundry organization ID
+
+        - name: org.name
+          type: keyword
+          description: >
+            Cloud Foundry organization name

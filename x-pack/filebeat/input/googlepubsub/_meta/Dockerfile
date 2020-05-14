@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:stretch
 
 RUN \
     apt-get update \

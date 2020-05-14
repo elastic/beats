@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of CoreDNS",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -72,7 +72,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Coredns Overview Dashboard",
+        "title": "[Filebeat CoreDNS] Overview",
         "version": 1
       },
       "id": "53aa1f70-443e-11e9-8548-ab7fbe04f038",
@@ -118,7 +118,7 @@
             }
           }
         },
-        "title": "Top Domains [Coredns]",
+        "title": "Top Domains [Filebeat CoreDNS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -162,7 +162,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Top Domains [Coredns]",
+          "title": "Top Domains [Filebeat CoreDNS]",
           "type": "tagcloud"
         }
       },
@@ -172,7 +172,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -194,7 +194,7 @@
             }
           }
         },
-        "title": "Total DNS Queries [Coredns]",
+        "title": "Total DNS Queries [Filebeat CoreDNS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -235,7 +235,7 @@
             },
             "type": "metric"
           },
-          "title": "Total DNS Queries [Coredns]",
+          "title": "Total DNS Queries [Filebeat CoreDNS]",
           "type": "metric"
         }
       },
@@ -245,7 +245,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -267,7 +267,7 @@
             }
           }
         },
-        "title": "Unique Domains [Coredns]",
+        "title": "Unique Domains [Filebeat CoreDNS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -334,7 +334,7 @@
             },
             "type": "metric"
           },
-          "title": "Unique Domains [Coredns]",
+          "title": "Unique Domains [Filebeat CoreDNS]",
           "type": "metric"
         }
       },
@@ -344,7 +344,7 @@
       },
       "references": [
         {
-          "id": "8d890080-413c-11e9-8548-ab7fbe04f038",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
@@ -365,7 +365,7 @@
             }
           }
         },
-        "title": "Time Series Visualizer [Coredns]",
+        "title": "Time Series Visualizer [Filebeat CoreDNS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -446,7 +446,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Time Series Visualizer [Coredns]",
+          "title": "Time Series Visualizer [Filebeat CoreDNS]",
           "type": "metrics"
         }
       },

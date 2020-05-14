@@ -1,0 +1,47 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.traceroute"
+
+        - from: "zeek.traceroute.src"
+          to: "source.address"
+
+        - from: "zeek.traceroute.dst"
+          to: "destination.address"
+
+        - from: "zeek.traceroute.proto"
+          to: "network.transport"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - info
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

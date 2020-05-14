@@ -18,6 +18,7 @@ exclude_files: [".gz$"]
 tags: {{.tags}}
 
 processors:
+  - add_locale: ~
   - script:
       lang: javascript
       id: cisco_ios

@@ -37,22 +37,22 @@ Apr 30 2013 09:23:41: %ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst 
 Apr 30 2013 09:23:43: %ASA-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.46(49840) -> outside/192.0.0.88(40443) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Apr 30 2013 09:23:43: %ASA-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Apr 15 2018 09:34:34 EDT: %ASA-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
-Dec 11 2018 08:01:24 <IP> %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)
-Dec 11 2018 08:01:24 <IP> %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)
-Dec 11 2018 08:01:24 <IP> %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
-Dec 11 2018 08:01:24 <IP> %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
-Dec 11 2018 08:01:31 <IP> %ASA-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
-Dec 11 2018 08:01:31 <IP> %ASA-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
-Dec 11 2018 08:01:31 <IP> %ASA-6-302014: Teardown TCP connection 447236 for outside:192.0.2.222/1234 to dmz:192.168.1.34/5678 duration 0:00:00 bytes 14804 TCP FINs
-Dec 11 2018 08:01:38 <IP> %ASA-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs
-Dec 11 2018 08:01:38 <IP> %ASA-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs
-Dec 11 2018 08:01:38 <IP> %ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside
-Dec 11 2018 08:01:38 <IP> %ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside
-Dec 11 2018 08:01:39 <IP> %ASA-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group "dmz" [0x123a465e, 0x8c20f21]
-Dec 11 2018 08:01:53 <IP> %ASA-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)
-Dec 11 2018 08:01:53 <IP> %ASA-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)
-Dec 11 2018 08:01:53 <IP> %ASA-6-302014: Teardown TCP connection 447237 for outside:192.0.2.222/1234 to dmz:10.10.10.10/1235 duration 23:59:59 bytes 11420 TCP FINs
-Aug 15 2012 23:30:09 %ASA-6-302016: Teardown UDP connection 40 for outside:10.44.4.4/500 to inside:10.44.2.2/500 duration 0:02:02 bytes 1416
+Dec 11 2018 08:01:24 <IP>: %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)
+Dec 11 2018 08:01:24 <IP>: %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)
+Dec 11 2018 08:01:24 <IP>: %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
+Dec 11 2018 08:01:24 <IP>: %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
+Dec 11 2018 08:01:31 <IP>: %ASA-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
+Dec 11 2018 08:01:31 <IP>: %ASA-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
+Dec 11 2018 08:01:31 <IP>: %ASA-6-302014: Teardown TCP connection 447236 for outside:192.0.2.222/1234 to dmz:192.168.1.34/5678 duration 0:00:00 bytes 14804 TCP FINs
+Dec 11 2018 08:01:38 <IP>: %ASA-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs
+Dec 11 2018 08:01:38 <IP>: %ASA-6-302014: Teardown TCP connection 447234 for outside:192.0.2.222/1234 to dmz:192.168.1.35/5678 duration 0:01:08 bytes 134781 TCP FINs
+Dec 11 2018 08:01:38 <IP>: %ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside
+Dec 11 2018 08:01:38 <IP>: %ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside
+Dec 11 2018 08:01:39 <IP>: %ASA-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group "dmz" [0x123a465e, 0x8c20f21]
+Dec 11 2018 08:01:53 <IP>: %ASA-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)
+Dec 11 2018 08:01:53 <IP>: %ASA-6-302013: Built outbound TCP connection 447237 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:192.168.1.34/65000 (192.168.1.34/65000)
+Dec 11 2018 08:01:53 <IP>: %ASA-6-302014: Teardown TCP connection 447237 for outside:192.0.2.222/1234 to dmz:10.10.10.10/1235 duration 23:59:59 bytes 11420 TCP FINs
+Aug 15 2012 23:30:09 : %ASA-6-302016 Teardown UDP connection 40 for outside:10.44.4.4/500 to inside:10.44.2.2/500 duration 0:02:02 bytes 1416
 Sep 12 2014 06:50:53 GIFRCHN01 : %ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic
 Sep 12 2014 06:51:01 GIFRCHN01 : %ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic
 Sep 12 2014 06:51:05 GIFRCHN01 : %ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic

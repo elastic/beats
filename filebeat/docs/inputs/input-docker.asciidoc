@@ -7,7 +7,7 @@
 <titleabbrev>Docker</titleabbrev>
 ++++
 
-deprecated[7.2.0, Use `container` input instead.]
+deprecated:[7.2.0, Use `container` input instead.]
 
 Use the `docker` input to read logs from Docker containers.
 

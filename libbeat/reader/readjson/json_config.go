@@ -20,6 +20,7 @@ package readjson
 // Config holds the options a JSON reader.
 type Config struct {
 	MessageKey          string `config:"message_key"`
+	DocumentID          string `config:"document_id"`
 	KeysUnderRoot       bool   `config:"keys_under_root"`
 	OverwriteKeys       bool   `config:"overwrite_keys"`
 	AddErrorKey         bool   `config:"add_error_key"`

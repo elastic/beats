@@ -13,10 +13,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var metricsetName = "s3_request"
@@ -26,9 +25,7 @@ var metricsetName = "s3_request"
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -42,8 +39,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The aws s3_request metricset is beta.")
-
 	moduleConfig := aws.Config{}
 	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
 		return nil, err
@@ -80,7 +75,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(awsConfig)
+
+		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "monitoring", regionName, awsConfig))
+
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			m.Logger().Error(err.Error())
@@ -109,7 +107,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Create Cloudwatch Events for s3_request
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
-			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName)
+			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName, m.AccountName, m.AccountID)
 			if err != nil {
 				m.Logger().Error(err.Error())
 				event.Error = err
@@ -131,7 +129,7 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	for _, output := range listMetricsOutputs {
 		for _, dim := range output.Dimensions {
 			if *dim.Name == "BucketName" {
-				if aws.StringInSlice(*dim.Value, bucketNames) {
+				if exists, _ := aws.StringInSlice(*dim.Value, bucketNames); exists {
 					continue
 				}
 				bucketNames = append(bucketNames, *dim.Value)
@@ -174,7 +172,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	dailyMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {
-		if aws.StringInSlice(*listMetric.MetricName, dailyMetricNames) {
+		if exists, _ := aws.StringInSlice(*listMetric.MetricName, dailyMetricNames); exists {
 			continue
 		}
 
@@ -188,13 +186,8 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 }
 
 // CreateS3Events creates s3_request and s3_daily_storage events from Cloudwatch metric data.
-func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
+func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, accountName string, accountID string) (event mb.Event, err error) {
+	event = aws.InitEvent(regionName, accountName, accountID)
 
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -222,7 +215,7 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 		return
 	}
 
-	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+	event.RootFields.Put("aws.s3.bucket.name", bucketName)
 	return
 }

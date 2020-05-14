@@ -7,20 +7,22 @@
 package rds
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 // MockRDSClient struct is used for unit tests.
 type MockRDSClient struct {
-	rdsiface.RDSAPI
+	rdsiface.ClientAPI
 }
 
 var (
@@ -44,8 +46,8 @@ func TestCreateMetricDataQuery(t *testing.T) {
 		Namespace:  &namespace,
 	}
 
-	metricDataQuery := createMetricDataQuery(metric, index, dbInstanceArn, period)
-	assert.Equal(t, "arn:aws:rds:us-east-2:627959692251:db:test1 Queries", *metricDataQuery.Label)
+	metricDataQuery := createMetricDataQuery(metric, index, period)
+	assert.Equal(t, "Queries", *metricDataQuery.Label)
 	assert.Equal(t, "Average", *metricDataQuery.MetricStat.Stat)
 	assert.Equal(t, metricName, *metricDataQuery.MetricStat.Metric.MetricName)
 	assert.Equal(t, namespace, *metricDataQuery.MetricStat.Metric.Namespace)
@@ -53,6 +55,7 @@ func TestCreateMetricDataQuery(t *testing.T) {
 }
 
 func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstancesInput) rds.DescribeDBInstancesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return rds.DescribeDBInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &rds.DescribeDBInstancesOutput{
@@ -66,6 +69,22 @@ func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstance
 					},
 				},
 			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockRDSClient) ListTagsForResourceRequest(input *rds.ListTagsForResourceInput) rds.ListTagsForResourceRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return rds.ListTagsForResourceRequest{
+		Request: &awssdk.Request{
+			Data: &rds.ListTagsForResourceOutput{
+				TagList: []rds.Tag{
+					{Key: awssdk.String("dept.name"), Value: awssdk.String("eng.software")},
+					{Key: awssdk.String("created-by"), Value: awssdk.String("foo")},
+				},
+			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -77,7 +96,7 @@ func TestConstructLabel(t *testing.T) {
 	}{
 		{
 			[]cloudwatch.Dimension{},
-			"arn:aws:rds:us-east-2:627959692251:db:test1 Queries",
+			"Queries",
 		},
 		{
 			[]cloudwatch.Dimension{
@@ -86,7 +105,7 @@ func TestConstructLabel(t *testing.T) {
 					Value: &dbInstanceClass,
 				},
 			},
-			"arn:aws:rds:us-east-2:627959692251:db:test1 Queries DatabaseClass db.r5.large",
+			"Queries DatabaseClass db.r5.large",
 		},
 		{
 			[]cloudwatch.Dimension{
@@ -99,24 +118,26 @@ func TestConstructLabel(t *testing.T) {
 					Value: &dimValue2,
 				},
 			},
-			"arn:aws:rds:us-east-2:627959692251:db:test1 Queries DatabaseClass db.r5.large Role READER",
+			"Queries DatabaseClass db.r5.large Role READER",
 		},
 	}
 	for _, c := range cases {
-		assert.Equal(t, c.expectedLabel, constructLabel(c.dimensions, dbInstanceArn, metricName))
+		assert.Equal(t, c.expectedLabel, constructLabel(c.dimensions, metricName))
 	}
 }
 
 func TestGetDBInstancesPerRegion(t *testing.T) {
 	mockSvc := &MockRDSClient{}
-	dbInstanceARNs, dbDetailsMap, err := getDBInstancesPerRegion(mockSvc)
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
 	if err != nil {
 		t.FailNow()
 	}
 
-	assert.Equal(t, 1, len(dbInstanceARNs))
+	assert.Equal(t, 1, len(dbInstanceIDs))
 	assert.Equal(t, 1, len(dbDetailsMap))
-	assert.Equal(t, dbInstanceArn, dbInstanceARNs[0])
 
 	dbInstanceMap := DBDetails{
 		dbArn:              dbInstanceArn,
@@ -124,8 +145,92 @@ func TestGetDBInstancesPerRegion(t *testing.T) {
 		dbAvailabilityZone: availabilityZone,
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
 	}
-	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceARNs[0]])
+	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithTagsFilter(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "created-by", Value: "foo"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 1, len(dbDetailsMap))
+
+	dbInstanceMap := DBDetails{
+		dbArn:              dbInstanceArn,
+		dbClass:            dbInstanceClass,
+		dbAvailabilityZone: availabilityZone,
+		dbIdentifier:       dbInstanceIdentifier,
+		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
+	}
+	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithDotInTag(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "dept.name", Value: "eng.software"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 1, len(dbDetailsMap))
+
+	dbInstanceMap := DBDetails{
+		dbArn:              dbInstanceArn,
+		dbClass:            dbInstanceClass,
+		dbAvailabilityZone: availabilityZone,
+		dbIdentifier:       dbInstanceIdentifier,
+		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
+	}
+	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithNoMatchingTagsFilter(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "dept.name", Value: "accounting"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 0, len(dbDetailsMap))
 }
 
 func TestConstructMetricQueries(t *testing.T) {
@@ -152,11 +257,11 @@ func TestConstructMetricQueries(t *testing.T) {
 	}
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric1, listMetric2}
-	metricDataQueries := constructMetricQueries(listMetricsOutput, dbInstanceArn, period)
+	metricDataQueries := constructMetricQueries(listMetricsOutput, period)
 	assert.Equal(t, 2, len(metricDataQueries))
 
 	assert.Equal(t, "rds0", *metricDataQueries[0].Id)
-	assert.Equal(t, "arn:aws:rds:us-east-2:627959692251:db:test1 Queries DatabaseClass db.r5.large", *metricDataQueries[0].Label)
+	assert.Equal(t, "Queries DatabaseClass db.r5.large", *metricDataQueries[0].Label)
 	assert.Equal(t, "Queries", *metricDataQueries[0].MetricStat.Metric.MetricName)
 	assert.Equal(t, "AWS/RDS", *metricDataQueries[0].MetricStat.Metric.Namespace)
 	assert.Equal(t, []cloudwatch.Dimension{dim1}, metricDataQueries[0].MetricStat.Metric.Dimensions)
@@ -164,7 +269,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	assert.Equal(t, "Average", *metricDataQueries[0].MetricStat.Stat)
 
 	assert.Equal(t, "rds1", *metricDataQueries[1].Id)
-	assert.Equal(t, "arn:aws:rds:us-east-2:627959692251:db:test1 Queries Role READER", *metricDataQueries[1].Label)
+	assert.Equal(t, "Queries Role READER", *metricDataQueries[1].Label)
 	assert.Equal(t, "Queries", *metricDataQueries[1].MetricStat.Metric.MetricName)
 	assert.Equal(t, "AWS/RDS", *metricDataQueries[1].MetricStat.Metric.Namespace)
 	assert.Equal(t, []cloudwatch.Dimension{dim2}, metricDataQueries[1].MetricStat.Metric.Dimensions)

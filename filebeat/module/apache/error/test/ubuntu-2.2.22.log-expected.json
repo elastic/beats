@@ -1,8 +1,12 @@
 [
     {
-        "@timestamp": "2016-12-26T16:17:53.000Z",
+        "@timestamp": "2016-12-26T16:17:53.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "notice",
@@ -11,9 +15,13 @@
         "service.type": "apache"
     },
     {
-        "@timestamp": "2016-12-26T16:22:00.000Z",
+        "@timestamp": "2016-12-26T16:22:00.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -24,9 +32,13 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:22:08.000Z",
+        "@timestamp": "2016-12-26T16:22:08.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -37,9 +49,13 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:22:08.000Z",
+        "@timestamp": "2016-12-26T16:22:08.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -50,9 +66,13 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:22:10.000Z",
+        "@timestamp": "2016-12-26T16:22:10.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -63,9 +83,13 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:22:13.000Z",
+        "@timestamp": "2016-12-26T16:22:13.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -76,9 +100,13 @@
         "source.ip": "192.168.33.1"
     },
     {
-        "@timestamp": "2016-12-26T16:22:17.000Z",
+        "@timestamp": "2016-12-26T16:22:17.000-02:00",
+        "event.category": "web",
         "event.dataset": "apache.error",
+        "event.kind": "event",
         "event.module": "apache",
+        "event.timezone": "-02:00",
+        "event.type": "error",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",

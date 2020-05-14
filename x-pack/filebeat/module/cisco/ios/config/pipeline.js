@@ -101,14 +101,17 @@ var ciscoIOS = (function() {
             ],
             ignore_missing: true,
         })
-        .Timestamp({
-            field: "_tmp.timestamp",
-            target_field: "@timestamp",
-            layouts: [
-                'Jan _2 15:04:05.999',
-                'Jan _2 15:04:05.999 MST',
-            ],
-            ignore_missing: true,
+        .Add(function(evt) {
+            processor.Timestamp({
+                field: "_tmp.timestamp",
+                target_field: "@timestamp",
+                timezone: evt.Get("event.timezone"),
+                layouts: [
+                    'Jan _2 15:04:05.999',
+                    'Jan _2 15:04:05.999 MST',
+                ],
+                ignore_missing: true,
+            }).Run(evt);
         })
         .Add(function(evt) {
             evt.Delete("_tmp");
@@ -118,13 +121,15 @@ var ciscoIOS = (function() {
     var processMessage = new processor.Chain()
         // Parse the header of the message that is common to all messages.
         .Dissect({
-            "tokenizer": "%{}%%{cisco.ios.facility}-%{event.severity}-%{event.code}: %{_message}",
+            "tokenizer": "%{}%%{cisco.ios.facility}-%{_event_severity}-%{event.code}: %{_message}",
             "field": "message",
             "target_prefix": "",
         })
         .Add(function(evt) {
             evt.Delete("message");
             evt.Rename("_message", "message");
+            evt.Delete("event.severity");
+            evt.Rename("_event_severity", "event.severity");
         })
         .Convert({
             fields: [

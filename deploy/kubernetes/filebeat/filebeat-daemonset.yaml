@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
@@ -6,6 +6,9 @@ metadata:
   labels:
     k8s-app: filebeat
 spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
   template:
     metadata:
       labels:
@@ -13,6 +16,8 @@ spec:
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:%VERSION%

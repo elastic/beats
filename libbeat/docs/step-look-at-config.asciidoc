@@ -1,2 +1,2 @@
-Before starting {beatname_uc}, you should look at the configuration options in the
-configuration file. For more information about these options, see <<configuring-howto-{beatname_lc}>>.
+For more information about configuring {beatname_uc}, see
+<<configuring-howto-{beatname_lc}>>.

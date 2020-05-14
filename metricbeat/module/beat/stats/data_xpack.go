@@ -23,11 +23,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/beat"
 )
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte) error {
@@ -83,5 +83,23 @@ func (m *MetricSet) getClusterUUID() (string, error) {
 		return "", errors.Wrap(err, "could not get state information")
 	}
 
-	return state.Outputs.Elasticsearch.ClusterUUID, nil
+	clusterUUID := state.Monitoring.ClusterUUID
+	if clusterUUID != "" {
+		return clusterUUID, nil
+	}
+
+	if state.Output.Name != "elasticsearch" {
+		return "", nil
+	}
+
+	clusterUUID = state.Outputs.Elasticsearch.ClusterUUID
+	if clusterUUID == "" {
+		// Output is ES but cluster UUID could not be determined. No point sending monitoring
+		// data with empty cluster UUID since it will not be associated with the correct ES
+		// production cluster. Log error instead.
+		return "", beat.ErrClusterUUID
+	}
+
+	return clusterUUID, nil
+
 }

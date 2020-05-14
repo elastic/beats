@@ -6,12 +6,13 @@ package tablespace
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
@@ -78,9 +79,9 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
-				m.checkNullInt64(out, key, "space.total.bytes", tempFreeSpaceTable.TablespaceSize)
-				m.checkNullInt64(out, key, "space.used.bytes", tempFreeSpaceTable.UsedSpaceBytes)
-				m.checkNullInt64(out, key, "space.free.bytes", tempFreeSpaceTable.FreeSpace)
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.UsedSpaceBytes})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.FreeSpace})
 			}
 		}
 	}
@@ -99,8 +100,8 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
 				if name == freeSpaceTable.TablespaceName {
-					m.checkNullInt64(out, key, "space.free.bytes", freeSpaceTable.TotalFreeBytes)
-					m.checkNullInt64(out, key, "space.used.bytes", freeSpaceTable.TotalUsedBytes)
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalFreeBytes})
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalUsedBytes})
 				}
 			}
 		}
@@ -115,34 +116,13 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]common.MapStr
 
 	_, _ = output[d.hash()].Put("name", d.eventKey())
 
-	m.checkNullString(output, d.hash(), "data_file.name", d.FileName)
-	m.checkNullInt64(output, d.hash(), "data_file.id", d.FileID)
-	m.checkNullInt64(output, d.hash(), "data_file.size.bytes", d.FileSizeBytes)
-	m.checkNullInt64(output, d.hash(), "data_file.size.max.bytes", d.MaxFileSizeBytes)
-	m.checkNullInt64(output, d.hash(), "data_file.size.free.bytes", d.AvailableForUserBytes)
-	m.checkNullString(output, d.hash(), "data_file.status", d.Status)
-	m.checkNullString(output, d.hash(), "data_file.online_status", d.OnlineStatus)
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{NullString: d.FileName})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{NullString: d.FileName})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.status", &oracle.StringValue{NullString: d.Status})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.online_status", &oracle.StringValue{NullString: d.OnlineStatus})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.id", &oracle.Int64Value{NullInt64: d.FileID})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.bytes", &oracle.Int64Value{NullInt64: d.FileSizeBytes})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{NullInt64: d.MaxFileSizeBytes})
+	oracle.SetSqlValueWithParentKey(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{NullInt64: d.AvailableForUserBytes})
 
-}
-
-// checkNullInt64 avoid setting an invalid 0 long value on Metricbeat event
-func (m *MetricSet) checkNullInt64(output map[string]common.MapStr, parentKey, field string, nullInt64 sql.NullInt64) {
-	if nullInt64.Valid {
-		if _, ok := output[parentKey]; ok {
-			if _, err := output[parentKey].Put(field, nullInt64.Int64); err != nil {
-				m.Logger().Debug(err)
-			}
-		}
-	}
-}
-
-// checkNullString avoid setting an invalid empty string value on Metricbeat event
-func (m *MetricSet) checkNullString(output map[string]common.MapStr, parentKey, field string, nullString sql.NullString) {
-	if nullString.Valid {
-		if _, ok := output[parentKey]; ok {
-			if _, err := output[parentKey].Put(field, nullString.String); err != nil {
-				m.Logger().Debug(err)
-			}
-		}
-	}
 }

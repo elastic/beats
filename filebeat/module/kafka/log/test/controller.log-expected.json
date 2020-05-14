@@ -1,9 +1,11 @@
 [
     {
-        "@timestamp": "2017-08-04T10:48:21.048Z",
+        "@timestamp": "2017-08-04T10:48:21.048-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ControllerEventManager$ControllerEventThread",
@@ -14,10 +16,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.063Z",
+        "@timestamp": "2017-08-04T10:48:21.063-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -28,10 +32,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.064Z",
+        "@timestamp": "2017-08-04T10:48:21.064-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -42,10 +48,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.082Z",
+        "@timestamp": "2017-08-04T10:48:21.082-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -56,10 +64,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.085Z",
+        "@timestamp": "2017-08-04T10:48:21.085-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -70,10 +80,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.154Z",
+        "@timestamp": "2017-08-04T10:48:21.154-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ReplicaStateMachine",
@@ -84,10 +96,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.156Z",
+        "@timestamp": "2017-08-04T10:48:21.156-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.PartitionStateMachine",
@@ -98,10 +112,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.157Z",
+        "@timestamp": "2017-08-04T10:48:21.157-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -112,10 +128,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.165Z",
+        "@timestamp": "2017-08-04T10:48:21.165-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.PartitionStateMachine",
@@ -126,10 +144,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:22.588Z",
+        "@timestamp": "2017-08-04T11:44:22.588-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -140,10 +160,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.094Z",
+        "@timestamp": "2017-08-04T11:44:25.094-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ControllerEventManager$ControllerEventThread",
@@ -154,10 +176,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.095Z",
+        "@timestamp": "2017-08-04T11:44:25.095-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ControllerEventManager$ControllerEventThread",
@@ -168,10 +192,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.097Z",
+        "@timestamp": "2017-08-04T11:44:25.097-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ControllerEventManager$ControllerEventThread",
@@ -182,10 +208,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.099Z",
+        "@timestamp": "2017-08-04T11:44:25.099-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -196,10 +224,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.100Z",
+        "@timestamp": "2017-08-04T11:44:25.100-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.KafkaController",
@@ -210,10 +240,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.105Z",
+        "@timestamp": "2017-08-04T11:44:25.105-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.PartitionStateMachine",
@@ -224,10 +256,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.111Z",
+        "@timestamp": "2017-08-04T11:44:25.111-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.ReplicaStateMachine",
@@ -238,10 +272,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.112Z",
+        "@timestamp": "2017-08-04T11:44:25.112-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",
@@ -252,10 +288,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.112Z",
+        "@timestamp": "2017-08-04T11:44:25.112-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",
@@ -266,10 +304,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T11:44:25.113Z",
+        "@timestamp": "2017-08-04T11:44:25.113-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.controller.RequestSendThread",

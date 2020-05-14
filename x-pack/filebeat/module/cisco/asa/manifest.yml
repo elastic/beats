@@ -19,8 +19,13 @@ var:
     min_elasticsearch_version:
       version: 6.1.0
       value: false
+    # These flags are used internally by the shared pipeline
+  - name: internal_prefix
+    default: asa
+  - name: internal_PREFIX
+    default: ASA
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline: ../shared/ingest/asa-ftd-pipeline.yml
 input: config/input.yml
 
 requires.processors:

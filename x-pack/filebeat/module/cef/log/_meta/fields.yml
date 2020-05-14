@@ -1,0 +1,293 @@
+- name: forcepoint
+  type: group
+  default_field: false
+  description: >
+    Fields for Forcepoint Custom String mappings
+  fields:
+    - name: virus_id
+      type: keyword
+      description: >
+        Virus ID
+
+
+- name: checkpoint
+  type: group
+  default_field: false
+  description: >
+    Fields for Check Point custom string mappings.
+  fields:
+    - name: app_risk
+      type: keyword
+      overwrite: true
+      description: Application risk.
+
+    - name: app_severity
+      type: keyword
+      overwrite: true
+      description: Application threat severity.
+
+    - name: app_sig_id
+      type: keyword
+      overwrite: true
+      description: The signature ID which the application was detected by.
+
+    - name: auth_method
+      type: keyword
+      overwrite: true
+      description: Password authentication protocol used.
+
+    - name: category
+      type: keyword
+      overwrite: true
+      description: Category.
+
+    - name: confidence_level
+      type: integer
+      overwrite: true
+      description: Confidence level determined.
+
+    - name: connectivity_state
+      type: keyword
+      overwrite: true
+      description: Connectivity state.
+
+    - name: cookie
+      type: keyword
+      overwrite: true
+      description: IKE cookie.
+
+    - name: dst_phone_number
+      type: keyword
+      overwrite: true
+      description: Destination IP-Phone.
+
+    - name: email_control
+      type: keyword
+      overwrite: true
+      description: Engine name.
+
+    - name: email_id
+      type: keyword
+      overwrite: true
+      description: Internal email ID.
+
+    - name: email_recipients_num
+      type: long
+      overwrite: true
+      description: Number of recipients.
+
+    - name: email_session_id
+      type: keyword
+      overwrite: true
+      description: Internal email session ID.
+
+    - name: email_spool_id
+      overwrite: true
+      type: keyword
+
+      description: Internal email spool ID.
+
+    - name: email_subject
+      type: keyword
+      overwrite: true
+      description: Email subject.
+
+    - name: event_count
+      type: long
+      overwrite: true
+      description: Number of events associated with the log.
+
+    - name: frequency
+      type: keyword
+      overwrite: true
+      description: Scan frequency.
+
+    - name: icmp_type
+      type: long
+      overwrite: true
+      description: ICMP type.
+
+    - name: icmp_code
+      type: long
+      overwrite: true
+      description: ICMP code.
+
+    - name: identity_type
+      type: keyword
+      overwrite: true
+      description: Identity type.
+
+    - name: incident_extension
+      type: keyword
+      overwrite: true
+      description: Format of original data.
+
+    - name: integrity_av_invoke_type
+      type: keyword
+      overwrite: true
+      description: Scan invoke type.
+
+    - name: malware_family
+      type: keyword
+      overwrite: true
+      description: Malware family.
+
+    - name: peer_gateway
+      type: ip
+      overwrite: true
+      description: Main IP of the peer Security Gateway.
+
+    - name: performance_impact
+      type: integer
+      overwrite: true
+      description: Protection performance impact.
+
+    - name: protection_id
+      type: keyword
+      overwrite: true
+      description: Protection malware ID.
+
+    - name: protection_name
+      type: keyword
+      overwrite: true
+      description: Specific signature name of the attack.
+
+    - name: protection_type
+      type: keyword
+      overwrite: true
+      description: Type of protection used to detect the attack.
+
+    - name: scan_result
+      type: keyword
+      overwrite: true
+      description: Scan result.
+
+    - name: sensor_mode
+      type: keyword
+      overwrite: true
+      description: Sensor mode.
+
+    - name: severity
+      type: keyword
+      overwrite: true
+      description: Threat severity.
+
+    - name: spyware_name
+      type: keyword
+      overwrite: true
+      description: Spyware name.
+
+    - name: spyware_status
+      type: keyword
+      overwrite: true
+      description: Spyware status.
+
+    - name: subs_exp
+      type: date
+      overwrite: true
+      description: The expiration date of the subscription.
+
+    - name: tcp_flags
+      type: keyword
+      overwrite: true
+      description: TCP packet flags.
+
+    - name: termination_reason
+      type: keyword
+      overwrite: true
+      description: Termination reason.
+
+    - name: update_status
+      type: keyword
+      overwrite: true
+      description: Update status.
+
+    - name: user_status
+      type: keyword
+      overwrite: true
+      description: User response.
+
+    - name: uuid
+      type: keyword
+      overwrite: true
+      description: External ID.
+
+    - name: virus_name
+      type: keyword
+      overwrite: true
+      description: Virus name.
+
+    - name: voip_log_type
+      type: keyword
+      overwrite: true
+      description: VoIP log types.
+
+- name: cef.extensions
+  type: group
+  default_field: false
+  description: >
+    Extra vendor-specific extensions.
+  fields:
+
+    - name: cp_app_risk
+      type: keyword
+
+    - name: cp_severity
+      type: keyword
+
+    - name: ifname
+      type: keyword
+
+    - name: inzone
+      type: keyword
+
+    - name: layer_uuid
+      type: keyword
+
+    - name: layer_name
+      type: keyword
+
+    - name: logid
+      type: keyword
+
+    - name: loguid
+      type: keyword
+
+    - name: match_id
+      type: keyword
+
+    - name: nat_addtnl_rulenum
+      type: keyword
+
+    - name: nat_rulenum
+      type: keyword
+
+    - name: origin
+      type: keyword
+
+    - name: originsicname
+      type: keyword
+
+    - name: outzone
+      type: keyword
+
+    - name: parent_rule
+      type: keyword
+
+    - name: product
+      type: keyword
+
+    - name: rule_action
+      type: keyword
+
+    - name: rule_uid
+      type: keyword
+
+    - name: sequencenum
+      type: keyword
+
+    - name: service_id
+      type: keyword
+
+    - name: version
+      type: keyword

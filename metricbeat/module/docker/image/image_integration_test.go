@@ -15,12 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration
+
 package image
 
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {

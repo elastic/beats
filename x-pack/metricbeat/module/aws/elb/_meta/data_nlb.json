@@ -1,0 +1,51 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/NetworkELB"
+        },
+        "dimensions": {
+            "AvailabilityZone": "us-east-1b",
+            "LoadBalancer": "net/filebeat-aws-elb-test-tcp-lb/f0bd7ccbc9695b88"
+        },
+        "networkelb": {
+            "metrics": {
+                "NewFlowCount": {
+                    "sum": 0
+                },
+                "ProcessedBytes": {
+                    "sum": 0
+                },
+                "TCP_Client_Reset_Count": {
+                    "sum": 0
+                },
+                "TCP_ELB_Reset_Count": {
+                    "sum": 0
+                },
+                "TCP_Target_Reset_Count": {
+                    "sum": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

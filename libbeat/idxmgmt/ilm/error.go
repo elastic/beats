@@ -38,6 +38,7 @@ var (
 	ErrRequestFailed         = errors.New("request failed")
 	ErrAliasAlreadyExists    = errors.New("alias already exists")
 	ErrAliasCreateFailed     = errors.New("failed to create write alias")
+	ErrInvalidAlias          = errors.New("invalid alias")
 	ErrOpNotAvailable        = errors.New("operation not available")
 )
 

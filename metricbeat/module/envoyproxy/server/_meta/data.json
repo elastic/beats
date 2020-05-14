@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "envoyproxy": {
         "server": {
             "cluster_manager": {
@@ -14,11 +10,11 @@
                 "warming_clusters": 0
             },
             "filesystem": {
-                "flushed_by_timer": 15,
+                "flushed_by_timer": 9,
                 "reopen_failed": 0,
-                "write_buffered": 151,
-                "write_completed": 31,
-                "write_total_buffered": 518
+                "write_buffered": 85,
+                "write_completed": 18,
+                "write_total_buffered": 1306
             },
             "http2": {},
             "listener_manager": {
@@ -43,11 +39,11 @@
                 "days_until_first_cert_expiring": 2147483647,
                 "hot_restart_epoch": 0,
                 "live": 1,
-                "memory_allocated": 3302416,
+                "memory_allocated": 3299760,
                 "memory_heap_size": 4194304,
                 "parent_connections": 0,
                 "total_connections": 0,
-                "uptime": 150,
+                "uptime": 95,
                 "version": 4151803,
                 "watchdog_mega_miss": 0,
                 "watchdog_miss": 0
@@ -63,10 +59,11 @@
         "module": "envoyproxy"
     },
     "metricset": {
-        "name": "server"
+        "name": "server",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:9901",
+        "address": "172.18.0.2:9901",
         "type": "envoyproxy"
     }
 }

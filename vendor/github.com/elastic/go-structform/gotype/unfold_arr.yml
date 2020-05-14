@@ -165,6 +165,5 @@ templates.arrIfc: |
     {{ end }}
     default:
       panic("invalid type code")
-      return nil, nil, nil
     }
   }

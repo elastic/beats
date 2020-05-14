@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -29,10 +28,21 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
 	devtools.Platforms = devtools.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
@@ -40,6 +50,8 @@ func init() {
 
 const (
 	libsystemdDevPkgName = "libsystemd-dev"
+	libsystemdPkgName    = "libsystemd0"
+	libgcryptPkgName     = "libgcrypt20"
 )
 
 // Build builds the Beat binary.
@@ -76,11 +88,6 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -110,20 +117,6 @@ func Fields() error {
 	return devtools.GenerateFieldsYAML()
 }
 
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-}
-
 // -----------------------------------------------------------------------------
 // Customizations specific to Journalbeat.
 // - Install required headers on builders for different architectures.
@@ -149,46 +142,46 @@ var (
 )
 
 func installLinuxAMD64() error {
-	return installDependencies(libsystemdDevPkgName, "")
+	return installDependencies("", libsystemdDevPkgName)
 }
 
 func installLinuxARM64() error {
-	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
+	return installDependencies("arm64", libsystemdDevPkgName+":arm64")
 }
 
 func installLinuxARMHF() error {
-	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
+	return installDependencies("armhf", libsystemdDevPkgName+":armhf")
 }
 
 func installLinuxARMLE() error {
-	return installDependencies(libsystemdDevPkgName+":armel", "armel")
+	return installDependencies("armel", libsystemdDevPkgName+":armel")
 }
 
 func installLinux386() error {
-	return installDependencies(libsystemdDevPkgName+":i386", "i386")
+	return installDependencies("i386", libsystemdDevPkgName+":i386", libsystemdPkgName+":i386", libgcryptPkgName+":i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(libsystemdDevPkgName+":mips", "mips")
+	return installDependencies("mips", libsystemdDevPkgName+":mips")
 }
 
 func installLinuxMIPS64LE() error {
-	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
+	return installDependencies("mips64el", libsystemdDevPkgName+":mips64el")
 }
 
 func installLinuxMIPSLE() error {
-	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
+	return installDependencies("mipsel", libsystemdDevPkgName+":mipsel")
 }
 
 func installLinuxPPC64LE() error {
-	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
+	return installDependencies("ppc64el", libsystemdDevPkgName+":ppc64el")
 }
 
 func installLinuxS390X() error {
-	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
+	return installDependencies("s390x", libsystemdDevPkgName+":s390x")
 }
 
-func installDependencies(pkg, arch string) error {
+func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
@@ -200,7 +193,16 @@ func installDependencies(pkg, arch string) error {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	params := append([]string{"install", "-y",
+		"--no-install-recommends",
+
+		// Journalbeat is built with old versions of Debian that don't update
+		// their repositories, so they have expired keys.
+		// Allow unauthenticated packages.
+		// This was not enough: "-o", "Acquire::Check-Valid-Until=false",
+		"--allow-unauthenticated",
+	}, pkgs...)
+	return sh.Run("apt-get", params...)
 }
 
 func selectImage(platform string) (string, error) {
@@ -229,5 +231,7 @@ func selectImage(platform string) (string, error) {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }

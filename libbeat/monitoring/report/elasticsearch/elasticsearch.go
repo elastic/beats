@@ -24,23 +24,20 @@ import (
 	"math/rand"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/outputs"
-	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	"github.com/elastic/beats/libbeat/publisher/pipeline"
-	"github.com/elastic/beats/libbeat/publisher/processing"
-	"github.com/elastic/beats/libbeat/publisher/queue"
-	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 )
 
 type reporter struct {
@@ -60,9 +57,7 @@ type reporter struct {
 	out []outputs.NetworkClient
 }
 
-const selector = "monitoring"
-
-var debugf = logp.MakeDebug(selector)
+const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
@@ -84,6 +79,7 @@ func defaultConfig(settings report.Settings) config {
 		Headers:          nil,
 		Username:         "beats_system",
 		Password:         "",
+		APIKey:           "",
 		ProxyURL:         "",
 		CompressionLevel: 0,
 		TLS:              nil,
@@ -98,7 +94,8 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.FormatXPackMonitoringBulk,
+		Format:      report.FormatXPackMonitoringBulk,
+		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -113,10 +110,16 @@ func defaultConfig(settings report.Settings) config {
 }
 
 func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) (report.Reporter, error) {
-	log := logp.L().Named(selector)
+	log := logp.NewLogger(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
+	}
+
+	// Unset username which is set by default, even if no password is set
+	if config.APIKey != "" {
+		config.Username = ""
+		config.Password = ""
 	}
 
 	// check endpoint availability on startup only every 30 seconds
@@ -126,7 +129,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		windowSize = 1
 	}
 
-	proxyURL, err := parseProxyURL(config.ProxyURL)
+	proxyURL, err := common.ParseURL(config.ProxyURL)
 	if err != nil {
 		return nil, err
 	}
@@ -163,11 +166,11 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(e queue.Eventer) (queue.Queue, error) {
-		return memqueue.NewBroker(log,
+	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+		return memqueue.NewQueue(log,
 			memqueue.Settings{
-				Eventer: e,
-				Events:  20,
+				ACKListener: ackListener,
+				Events:      20,
 			}), nil
 	}
 
@@ -229,8 +232,8 @@ func (r *reporter) Stop() {
 }
 
 func (r *reporter) initLoop(c config) {
-	debugf("Start monitoring endpoint init loop.")
-	defer debugf("Finish monitoring endpoint init loop.")
+	r.logger.Debug("Start monitoring endpoint init loop.")
+	defer r.logger.Debug("Finish monitoring endpoint init loop.")
 
 	log := r.logger
 
@@ -245,10 +248,10 @@ func (r *reporter) initLoop(c config) {
 			break
 		} else {
 			if !logged {
-				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying.")
+				log.Info("Failed to connect to Elastic X-Pack Monitoring. Either Elasticsearch X-Pack monitoring is not enabled or Elasticsearch is not available. Will keep retrying. Error: ", err)
 				logged = true
 			}
-			debugf("Monitoring could not connect to elasticsearch, failed with %v", err)
+			r.logger.Debugf("Monitoring could not connect to Elasticsearch, failed with %+v", err)
 		}
 
 		select {
@@ -261,12 +264,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -286,7 +289,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 
 		snapshot := makeSnapshot(monitoring.GetNamespace(namespace).GetRegistry())
 		if snapshot == nil {
-			debugf("Empty snapshot.")
+			log.Debug("Empty snapshot.")
 			continue
 		}
 
@@ -305,7 +308,9 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		clusterUUID := getClusterUUID()
+		if clusterUUID == "" {
+			clusterUUID = getClusterUUID()
+		}
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}
@@ -322,7 +327,7 @@ func makeClient(
 	host string,
 	params map[string]string,
 	proxyURL *url.URL,
-	tlsConfig *transport.TLSConfig,
+	tlsConfig *tlscommon.TLSConfig,
 	config *config,
 ) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
@@ -330,19 +335,18 @@ func makeClient(
 		return nil, err
 	}
 
-	esClient, err := esout.NewClient(esout.ClientSettings{
+	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
 		Proxy:            proxyURL,
 		TLS:              tlsConfig,
 		Username:         config.Username,
 		Password:         config.Password,
+		APIKey:           config.APIKey,
 		Parameters:       params,
 		Headers:          config.Headers,
-		Index:            outil.MakeSelector(outil.ConstSelectorExpr("_xpack")),
-		Pipeline:         nil,
 		Timeout:          config.Timeout,
 		CompressionLevel: config.CompressionLevel,
-	}, nil)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -358,22 +362,6 @@ func closing(log *logp.Logger, c io.Closer) {
 	if err := c.Close(); err != nil {
 		log.Warnf("Closed failed with: %v", err)
 	}
-}
-
-// TODO: make this reusable. Same definition in elasticsearch monitoring module
-func parseProxyURL(raw string) (*url.URL, error) {
-	if raw == "" {
-		return nil, nil
-	}
-
-	url, err := url.Parse(raw)
-	if err == nil && strings.HasPrefix(url.Scheme, "http") {
-		return url, err
-	}
-
-	// Proxy was bogus. Try prepending "http://" to it and
-	// see if that parses correctly.
-	return url.Parse("http://" + raw)
 }
 
 func makeMeta(beat beat.Info) common.MapStr {

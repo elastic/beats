@@ -8,46 +8,52 @@ processors:
 
 # Set @timestamp to the time when the entry was generated at the data plane.
  - date:
+     if: "ctx.event.timezone == null"
      field: "_temp_.generated_time"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null"
-    field: "@timestamp"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null"
+     field: "_temp_.generated_time"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.created is the time the event was received at the management plane.
  - date:
+     if: "ctx.event.timezone == null && ctx.event.created != null "
      field: "event.created"
      target_field: "event.created"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null && ctx.event.created != null "
-    field: "event.created"
-    target_field: "event.created"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null && ctx.event.created != null "
+     field: "event.created"
+     target_field: "event.created"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.start (traffic only) is the time the session started.
  - date:
+     if: "ctx.event.timezone == null && ctx.event.start != null"
      field: "event.start"
      target_field: "event.start"
-     ignore_failure: true
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
  - date:
-    if: "ctx.event.timezone != null && ctx.event.start != null"
-    field: "event.start"
-    target_field: "event.start"
-    formats: ["ISO8601"]
-    timezone: "{{ event.timezone }}"
-    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+     if: "ctx.event.timezone != null && ctx.event.start != null"
+     field: "event.start"
+     target_field: "event.start"
+     timezone: "{{ event.timezone }}"
+     formats:
+       - "yyyy/MM/dd HH:mm:ss"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # convert integer fields as the output of the CSV processor is always a string.
  - convert: { type: long, ignore_missing: true, field: client.bytes }
@@ -67,8 +73,8 @@ processors:
  - convert: { type: long, ignore_missing: true, field: event.duration }
  - convert: { type: long, ignore_missing: true, field: _temp_.labels }
  - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
- - convert: { type: long, ignore_missing: true, field: panw.panos.source.nat.port }
- - convert: { type: long, ignore_missing: true, field: panw.panos.destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: destination.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
@@ -169,33 +175,81 @@ processors:
 
   # Set event.category depending on log type.
  - set:
+     field: event.kind
+     value: event
+     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+ - append:
      field: event.category
-     value: network_traffic
+     value:
+       - network_traffic
+       - network
      if: 'ctx?._temp_?.message_type == "TRAFFIC"'
  - set:
-     field: event.category
-     value: security_threat
+     field: event.kind
+     value: alert
      if: 'ctx?._temp_?.message_type == "THREAT"'
-
+ - append:
+     field: event.category
+     value:
+       - security_threat
+       - intrusion_detection
+       - network
+     if: 'ctx?._temp_?.message_type == "THREAT"'
  - drop:
      if: 'ctx?.event?.category == null'
+ - append:
+     field: event.type
+     value: allowed
+     if: "ctx?.panw?.panos?.action != null && ['alert', 'allow', 'continue'].contains(ctx.panw.panos.action)"
+ - append:
+     field: event.type
+     value: denied
+     if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
+ - set:
+     field: event.outcome
+     value: success
+
 
 # event.action for traffic logs.
  - set:
      field: event.action
      value: flow_started
      if: 'ctx?._temp_?.message_subtype == "start"'
+ - append:
+     field: event.type
+     value:
+       - start
+       - connection
+     if: 'ctx?._temp_?.message_subtype == "start"'
  - set:
      field: event.action
      value: flow_terminated
+     if: 'ctx?._temp_?.message_subtype == "end"'
+ - append:
+     field: event.type
+     value:
+       - end
+       - connection
      if: 'ctx?._temp_?.message_subtype == "end"'
  - set:
      field: event.action
      value: flow_dropped
      if: 'ctx?._temp_?.message_subtype == "drop"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
+     if: 'ctx?._temp_?.message_subtype == "drop"'
  - set:
      field: event.action
      value: flow_denied
+     if: 'ctx?._temp_?.message_subtype == "deny"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
      if: 'ctx?._temp_?.message_subtype == "deny"'
 
 # event.action for threat logs.
@@ -270,21 +324,21 @@ processors:
 # Normalize event.outcome.
 # These values appear in the TRAFFIC docs but look like a mistake.
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'drop-icmp'
-     if: 'ctx?.event?.outcome == "drop icmp" || ctx?.event?.outcome == "drop ICMP"'
+     if: 'ctx?.panw?.panos?.action == "drop icmp" || ctx?.panw?.panos?.action == "drop ICMP"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-both'
-     if: 'ctx?.event?.outcome == "reset both"'
+     if: 'ctx?.panw?.panos?.action == "reset both"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-client'
-     if: 'ctx?.event?.outcome == "reset client"'
+     if: 'ctx?.panw?.panos?.action == "reset client"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-server'
-     if: 'ctx?.event?.outcome == "reset server"'
+     if: 'ctx?.panw?.panos?.action == "reset server"'
 
 # Build related.ip array from src/dest/NAT IPs.
  - append:
@@ -298,15 +352,15 @@ processors:
      value:
        - '{{destination.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.source?.nat?.ip != null'
+     if: 'ctx?.source?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.source.nat.ip}}'
+       - '{{source.nat.ip}}'
  - append:
-     if: 'ctx?.panw?.panos?.destination?.nat?.ip != null'
+     if: 'ctx?.destination?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{panw.panos.destination.nat.ip}}'
+       - '{{destination.nat.ip}}'
 
 # Geolocation for source.
  - geoip:
@@ -319,6 +373,52 @@ processors:
      if: 'ctx?.destination?.ip != null'
      field: destination.ip
      target_field: destination.geo
+
+# IP Autonomous System (AS) Lookup
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: source.ip
+     target_field: source.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - geoip:
+     database_file: GeoLite2-ASN.mmdb
+     field: destination.ip
+     target_field: destination.as
+     properties:
+       - asn
+       - organization_name
+     ignore_missing: true
+ - rename:
+     field: source.as.asn
+     target_field: source.as.number
+     ignore_missing: true
+ - rename:
+     field: source.as.organization_name
+     target_field: source.as.organization.name
+     ignore_missing: true
+ - rename:
+     field: destination.as.asn
+     target_field: destination.as.number
+     ignore_missing: true
+ - rename:
+     field: destination.as.organization_name
+     target_field: destination.as.organization.name
+     ignore_missing: true
+
+# Set source|destination.geo.name from panw's srcloc|dstloc
+ - rename:
+     if: 'ctx.source?.geo?.name == null'
+     field: _temp_.srcloc
+     target_field: source.geo.name
+     ignore_missing: true
+ - rename:
+     if: 'ctx.destination?.geo?.name == null'
+     field: _temp_.dstloc
+     target_field: destination.geo.name
+     ignore_missing: true
 
 # Append NAT community_id to network.community_id
  - append:
@@ -338,6 +438,36 @@ processors:
      field: panw.panos.threat.name
      value: 'URL-filtering'
      if: 'ctx?.panw?.panos?.threat?.id == "9999"'
+
+ - set:
+     field: rule.name
+     value: "{{panw.panos.ruleset}}"
+     if: "ctx?.panw?.panos?.ruleset != null"
+
+ - append:
+     field: related.user
+     value: "{{client.user.name}}"
+     if: "ctx?.client?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{source.user.name}}"
+     if: "ctx?.source?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{server.user.name}}"
+     if: "ctx?.server?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{destination.user.name}}"
+     if: "ctx?.destination?.user?.name != null"
+
+ - append:
+     field: related.hash
+     value: "{{panw.panos.file.hash}}"
+     if: "ctx?.panw?.panos?.file?.hash != null"
 
 # Remove temporary fields.
  - remove:

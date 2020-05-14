@@ -35,7 +35,7 @@ class Test(BaseTest):
 """
 
         # Use default of \n and stripping \r
-        if delimiter is not "":
+        if delimiter != "":
             input_raw += "\n  line_delimiter: {}".format(delimiter)
 
         input_raw = input_raw.format(host, port)
@@ -53,7 +53,7 @@ class Test(BaseTest):
         sock.connect((host, port))
 
         for n in range(0, 2):
-            sock.send("Hello World: " + str(n) + delimiter)
+            sock.send(bytes("Hello World: " + str(n) + delimiter, "utf-8"))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 

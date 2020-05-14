@@ -38,6 +38,8 @@ ec2:DescribeInstances
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+sts:GetCallerIdentity
+iam:ListAccountAliases
 ----
 
 [float]
@@ -46,3 +48,24 @@ cloudwatch:ListMetrics
 The aws ec2 metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - ec2
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
+----
+
+`tags_filter` can be specified to only collect metrics with certain tag keys/values.
+For example, with the configuration example above, ec2 metricset will only collect
+metrics from EC2 instances that have tag key equals "Organization" and tag value
+equals to "Engineering".

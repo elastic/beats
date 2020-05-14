@@ -1,8 +1,15 @@
 [
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -14,8 +21,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -27,8 +41,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -40,8 +61,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.677Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -53,8 +81,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.724Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -66,8 +101,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.724Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -79,8 +121,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.744Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -92,8 +141,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:55.170Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -105,8 +161,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:55.487Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -118,8 +181,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -131,8 +201,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -144,8 +221,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -157,8 +241,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -170,8 +261,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -183,8 +281,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.688Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -196,8 +301,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -209,8 +321,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -222,8 +341,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -235,8 +361,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -248,8 +381,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:55.170Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -261,8 +401,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:56.180Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -274,8 +421,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:15:42.095Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -287,8 +441,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -300,8 +461,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -313,8 +481,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.688Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -326,8 +501,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -339,8 +521,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -352,8 +541,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:44:56.657Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -365,8 +561,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:55.487Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -378,8 +581,15 @@
     },
     {
         "@timestamp": "2018-02-05T12:50:56.180Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -391,8 +601,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:11:41.401Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -404,8 +621,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.605Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -417,8 +641,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.605Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -430,8 +661,15 @@
     },
     {
         "@timestamp": "2018-02-05T13:49:45.606Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -443,8 +681,15 @@
     },
     {
         "@timestamp": "2019-03-07T15:10:26.960Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "mongodb.log",
+        "event.kind": "event",
         "event.module": "mongodb",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "I",
@@ -452,6 +697,48 @@
         "message": "Successfully connected to dbbox7:27017, took 10ms (1 connections now open to dbbox7:27017)",
         "mongodb.log.component": "ASIO",
         "mongodb.log.context": "NetworkInterfaceASIO-Replication-0",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2020-03-31T21:19:46.942Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "change",
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "E",
+        "log.offset": 4132,
+        "message": "** ERROR: A write operation resulted in an error. E11000 duplicate key error index: test.people.$_id_ dup key: { : 0 }",
+        "mongodb.log.component": "WRITE",
+        "mongodb.log.context": "initandlisten",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2020-03-31T21:19:47.420Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.type": [
+            "info",
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "E",
+        "log.offset": 4305,
+        "message": "** ERROR: No connection could be made because the target machine actively refused it 127.0.0.1:27017 at System.Net.Sockets.Socket.EndConnect",
+        "mongodb.log.component": "NETWORK",
+        "mongodb.log.context": "initandlisten",
         "service.type": "mongodb"
     }
 ]

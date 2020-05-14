@@ -1,4 +1,4 @@
-include::{libbeat-dir}/docs/shared-docker.asciidoc[]
+include::{libbeat-dir}/shared-docker.asciidoc[]
 
 [float]
 ==== Required network capabilities

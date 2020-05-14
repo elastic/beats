@@ -1,4 +1,5 @@
-FROM memcached:1.4.35-alpine
+ARG MEMCACHED_VERSION
+FROM memcached:${MEMCACHED_VERSION}-alpine
 
 USER root
 RUN apk update

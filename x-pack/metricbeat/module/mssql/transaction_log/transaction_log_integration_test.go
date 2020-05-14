@@ -11,17 +11,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mtest "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/testing"
 )
 
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
-	compose.EnsureUp(t, "mssql")
+	service := compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("transaction_log"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "transaction_log"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

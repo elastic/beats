@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux darwin windows
+
 package event
 
 import (
@@ -26,10 +28,10 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -94,13 +96,21 @@ func (m *MetricSet) Run(ctx context.Context, reporter mb.ReporterV2) {
 				m.reportEvent(reporter, event)
 
 			case err := <-errors:
+				// An error can be received on context cancellation, don't reconnect
+				// if context is done.
+				select {
+				case <-ctx.Done():
+					m.logger.Debug("docker", "Event watcher stopped")
+					return
+				default:
+				}
 				// Restart watch call
-				m.logger.Error("Error watching for docker events: %v", err)
+				m.logger.Errorf("Error watching for docker events: %v", err)
 				time.Sleep(1 * time.Second)
 				break WATCH
 
 			case <-ctx.Done():
-				m.logger.Debug("docker", "event watcher stopped")
+				m.logger.Debug("docker", "Event watcher stopped")
 				return
 			}
 		}

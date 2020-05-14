@@ -53,9 +53,9 @@ class TestAutodiscover(BaseTest):
             for tag in container.image.tags:
                 if matcher.search(tag):
                     network_settings = container.attrs['NetworkSettings']
-                    host = network_settings['Networks'].values()[
+                    host = list(network_settings['Networks'].values())[
                         0]['IPAddress']
-                    port = network_settings['Ports'].keys()[0].split("/")[0]
+                    port = list(network_settings['Ports'].keys())[0].split("/")[0]
                     # Check metadata and docker fields are added
                     # We don't check all the docker fields because this is really the responsibility
                     # of libbeat's autodiscovery code.

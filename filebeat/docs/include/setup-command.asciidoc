@@ -20,6 +20,13 @@
 ./{beatname_lc} setup -e
 ----
 
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e
+----
+
 *win:*
 
 ["source","sh",subs="attributes"]

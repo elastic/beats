@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-02-08T04:00:47.272Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.22",
@@ -12,6 +11,7 @@
         "event.outcome": "deny",
         "event.sequence": 585917,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -37,7 +37,6 @@
         ]
     },
     {
-        "@timestamp": "2019-02-09T04:00:47.272Z",
         "cisco.ios.access_list": "INBOUND-ON-F11",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.2",
@@ -49,6 +48,7 @@
         "event.outcome": "deny",
         "event.sequence": 585918,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "igmp.type": 20,
@@ -75,7 +75,6 @@
         ]
     },
     {
-        "@timestamp": "2019-02-10T04:00:47.272Z",
         "cisco.ios.access_list": "171",
         "cisco.ios.facility": "SEC",
         "destination.address": "255.255.255.255",
@@ -87,6 +86,7 @@
         "event.outcome": "deny",
         "event.sequence": 585919,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -112,7 +112,6 @@
         ]
     },
     {
-        "@timestamp": "2019-05-03T19:11:32.619Z",
         "cisco.ios.access_list": "ACL-IPv6-E0/0-IN/10",
         "cisco.ios.facility": "IPV6",
         "destination.address": "2001:DB8:1000::1",
@@ -125,6 +124,7 @@
         "event.outcome": "allow",
         "event.sequence": 585920,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -151,7 +151,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:41:39.326Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -164,6 +163,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663303,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -190,7 +190,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:41:44.921Z",
         "cisco.ios.access_list": "151",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.2",
@@ -202,6 +201,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663304,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "icmp.code": 4,
@@ -229,7 +229,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:41:51.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -242,6 +241,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663305,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -268,7 +268,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:41:55.222Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -287,6 +286,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663306,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -313,7 +313,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:41:57.328Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -326,6 +325,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663307,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -352,7 +352,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:03.334Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -365,6 +364,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663308,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -391,7 +391,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:09.332Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -404,6 +403,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663309,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -430,7 +430,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:15.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -443,6 +442,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663310,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -469,7 +469,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:21.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -482,6 +481,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663311,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -508,7 +508,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:27.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -521,6 +520,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663312,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -547,13 +547,13 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:28.374Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
         "event.module": "cisco",
         "event.sequence": 1663313,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -567,7 +567,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:33.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -580,6 +579,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663314,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -606,7 +606,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:39.338Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -619,6 +618,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663315,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -645,7 +645,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:45.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -658,6 +657,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663316,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -684,7 +684,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:47.466Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -703,6 +702,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663317,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -729,7 +729,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:51.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -742,6 +741,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663318,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -768,7 +768,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:42:57.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -781,6 +780,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663319,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -807,7 +807,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:03.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -820,6 +819,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663320,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -846,7 +846,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:08.454Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -865,6 +864,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663321,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -891,7 +891,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:15.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -904,6 +903,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663322,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -930,7 +930,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:20.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "8.8.8.8",
@@ -949,6 +948,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663323,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -975,7 +975,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:21.348Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.195",
@@ -988,6 +987,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663324,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1020,13 +1020,13 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:28.403Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
         "event.module": "cisco",
         "event.sequence": 1663325,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1040,7 +1040,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:28.403Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.1",
@@ -1052,6 +1051,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663326,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "icmp.code": 3,
@@ -1079,7 +1079,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:29.451Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -1098,6 +1097,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663327,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1124,7 +1124,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:33.352Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1137,6 +1136,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663328,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1163,7 +1163,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:39.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1176,6 +1175,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663329,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1202,7 +1202,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:44.173Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1215,6 +1214,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663330,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1241,7 +1241,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:45.356Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
@@ -1254,6 +1253,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663331,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",
@@ -1280,7 +1280,6 @@
         ]
     },
     {
-        "@timestamp": "2019-06-20T02:43:50.473Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -1299,6 +1298,7 @@
         "event.outcome": "deny",
         "event.sequence": 1663332,
         "event.severity": 6,
+        "event.timezone": "-02:00",
         "event.type": "firewall",
         "fileset.name": "ios",
         "input.type": "log",

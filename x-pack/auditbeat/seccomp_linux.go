@@ -7,7 +7,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/elastic/beats/libbeat/common/seccomp"
+	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 )
 
 func init() {
@@ -17,6 +17,11 @@ func init() {
 		// requirements beyond the default policy from libbeat so whitelist
 		// these additional syscalls.
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "umask", "mremap"); err != nil {
+			panic(err)
+		}
+
+		// The system/socket dataset uses additional syscalls
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "perf_event_open", "eventfd2", "ppoll", "mount", "umount2"); err != nil {
 			panic(err)
 		}
 	}

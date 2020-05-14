@@ -23,10 +23,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/plugin"
+	"github.com/elastic/beats/v7/heartbeat/hbregistry"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/plugin"
 )
 
 type pluginBuilder struct {
@@ -38,19 +38,16 @@ type pluginBuilder struct {
 
 var pluginKey = "heartbeat.monitor"
 
-var statsRegistry = monitoring.Default.NewRegistry("heartbeat")
-var stateRegistry = monitoring.GetNamespace("state").GetRegistry().NewRegistry("heartbeat")
-
 // stateGlobalRecorder records statistics across all plugin types
-var stateGlobalRecorder = newRootGaugeRecorder(stateRegistry)
+var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
 func statsForPlugin(pluginName string) registryRecorder {
 	return multiRegistryRecorder{
 		recorders: []registryRecorder{
 			// state (telemetry)
-			newPluginGaugeRecorder(pluginName, stateRegistry),
+			newPluginGaugeRecorder(pluginName, hbregistry.TelemetryRegistry),
 			// Record global monitors / endpoints count
-			newPluginCountersRecorder(pluginName, statsRegistry),
+			newPluginCountersRecorder(pluginName, hbregistry.StatsRegistry),
 			// When stats for this plugin are updated, update the global stats as well
 			stateGlobalRecorder,
 		},

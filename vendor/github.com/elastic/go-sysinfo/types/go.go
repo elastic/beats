@@ -17,6 +17,7 @@
 
 package types
 
+// GoInfo contains info about the go runtime
 type GoInfo struct {
 	OS       string `json:"os"`
 	Arch     string `json:"arch"`

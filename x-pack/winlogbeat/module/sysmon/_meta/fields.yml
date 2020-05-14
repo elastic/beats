@@ -1,0 +1,18 @@
+- key: sysmon
+  title: "Sysmon module"
+  description: >
+    These are the event fields specific to the Sysmon module.
+  release: beta
+  fields:
+
+    - name: sysmon.dns.status
+      type: keyword
+      description: Windows status code returned for the DNS query.
+
+    - name: sysmon.file.archived
+      type: boolean
+      description: Indicates if the deleted file was archived.
+
+    - name: sysmon.file.is_executable
+      type: boolean
+      description: Indicates if the deleted file was an executable.

@@ -1,0 +1,110 @@
+[
+    {
+        "event": {
+            "dataset": "ibmmq.qmgr",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "qmgr",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60794",
+                "job": "prometheus"
+            },
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "ibmmq.qmgr",
+            "duration": 115000,
+            "module": "ibmmq"
+        },
+        "metricset": {
+            "name": "qmgr",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:60794",
+                "job": "ibmmq",
+                "qmgr": "QM1"
+            },
+            "metrics": {
+                "ibmmq_qmgr_commit_total": 0,
+                "ibmmq_qmgr_destructive_get_bytes_total": 7812,
+                "ibmmq_qmgr_destructive_get_total": 23,
+                "ibmmq_qmgr_durable_subscription_alter_total": 0,
+                "ibmmq_qmgr_durable_subscription_create_total": 0,
+                "ibmmq_qmgr_durable_subscription_delete_total": 0,
+                "ibmmq_qmgr_durable_subscription_resume_total": 0,
+                "ibmmq_qmgr_expired_message_total": 0,
+                "ibmmq_qmgr_failed_browse_total": 0,
+                "ibmmq_qmgr_failed_mqcb_total": 0,
+                "ibmmq_qmgr_failed_mqclose_total": 0,
+                "ibmmq_qmgr_failed_mqconn_mqconnx_total": 0,
+                "ibmmq_qmgr_failed_mqget_total": 16,
+                "ibmmq_qmgr_failed_mqinq_total": 0,
+                "ibmmq_qmgr_failed_mqopen_total": 0,
+                "ibmmq_qmgr_failed_mqput1_total": 0,
+                "ibmmq_qmgr_failed_mqput_total": 0,
+                "ibmmq_qmgr_failed_mqset_total": 0,
+                "ibmmq_qmgr_failed_mqsubrq_total": 0,
+                "ibmmq_qmgr_failed_subscription_create_alter_resume_total": 0,
+                "ibmmq_qmgr_failed_subscription_delete_total": 0,
+                "ibmmq_qmgr_failed_topic_mqput_mqput1_total": 0,
+                "ibmmq_qmgr_log_logical_written_bytes_total": 0,
+                "ibmmq_qmgr_log_physical_written_bytes_total": 0,
+                "ibmmq_qmgr_mqcb_total": 0,
+                "ibmmq_qmgr_mqclose_total": 0,
+                "ibmmq_qmgr_mqconn_mqconnx_total": 0,
+                "ibmmq_qmgr_mqctl_total": 0,
+                "ibmmq_qmgr_mqdisc_total": 0,
+                "ibmmq_qmgr_mqinq_total": 4,
+                "ibmmq_qmgr_mqopen_total": 0,
+                "ibmmq_qmgr_mqput_mqput1_bytes_total": 1860,
+                "ibmmq_qmgr_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_mqset_total": 0,
+                "ibmmq_qmgr_mqstat_total": 0,
+                "ibmmq_qmgr_mqsubrq_total": 0,
+                "ibmmq_qmgr_non_durable_subscription_create_total": 0,
+                "ibmmq_qmgr_non_durable_subscription_delete_total": 0,
+                "ibmmq_qmgr_non_persistent_message_browse_bytes_total": 0,
+                "ibmmq_qmgr_non_persistent_message_browse_total": 0,
+                "ibmmq_qmgr_non_persistent_message_destructive_get_total": 23,
+                "ibmmq_qmgr_non_persistent_message_get_bytes_total": 7812,
+                "ibmmq_qmgr_non_persistent_message_mqput1_total": 0,
+                "ibmmq_qmgr_non_persistent_message_mqput_total": 6,
+                "ibmmq_qmgr_non_persistent_message_put_bytes_total": 1860,
+                "ibmmq_qmgr_non_persistent_topic_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_persistent_message_browse_bytes_total": 0,
+                "ibmmq_qmgr_persistent_message_browse_total": 0,
+                "ibmmq_qmgr_persistent_message_destructive_get_total": 0,
+                "ibmmq_qmgr_persistent_message_get_bytes_total": 0,
+                "ibmmq_qmgr_persistent_message_mqput1_total": 0,
+                "ibmmq_qmgr_persistent_message_mqput_total": 0,
+                "ibmmq_qmgr_persistent_message_put_bytes_total": 0,
+                "ibmmq_qmgr_persistent_topic_mqput_mqput1_total": 0,
+                "ibmmq_qmgr_published_to_subscribers_bytes_total": 1224,
+                "ibmmq_qmgr_published_to_subscribers_message_total": 6,
+                "ibmmq_qmgr_purged_queue_total": 0,
+                "ibmmq_qmgr_rollback_total": 0,
+                "ibmmq_qmgr_topic_mqput_mqput1_total": 6,
+                "ibmmq_qmgr_topic_put_bytes_total": 1224
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "ibmmq"
+        }
+    }
+]

@@ -7,7 +7,11 @@ package test
 import (
 	"testing"
 
-	"github.com/elastic/beats/x-pack/winlogbeat/module"
+	"github.com/elastic/beats/v7/x-pack/winlogbeat/module"
+
+	// Register required processors.
+	_ "github.com/elastic/beats/v7/libbeat/cmd/instance"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
 // Ignore these fields so that the tests will pass if Sysmon is not installed.

@@ -35,7 +35,7 @@ func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
 	return ucfg.NewFrom(m, opts...)
 }
 
-// NewConfigWithFile loads a new configuration object from an external JSON file.
+// NewConfigWithFile loads a new configuration object from an external YAML file.
 func NewConfigWithFile(name string, opts ...ucfg.Option) (*ucfg.Config, error) {
 	input, err := ioutil.ReadFile(name)
 	if err != nil {

@@ -7,7 +7,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -33,7 +36,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -41,7 +45,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -67,7 +74,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -75,7 +83,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -101,7 +112,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -109,7 +121,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -135,7 +150,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -143,7 +159,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -169,7 +188,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -177,7 +197,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -203,7 +226,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -211,7 +235,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -237,7 +264,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -245,7 +273,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -271,7 +302,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -279,7 +311,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -305,7 +340,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -313,7 +349,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -339,7 +378,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -347,7 +387,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -373,7 +416,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -381,7 +425,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -407,7 +454,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -415,7 +463,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -441,7 +492,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -449,7 +501,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -475,7 +530,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2017-02-14T11:09:59Z",
@@ -483,7 +539,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -509,7 +568,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

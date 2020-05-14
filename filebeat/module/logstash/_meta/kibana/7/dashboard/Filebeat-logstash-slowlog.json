@@ -459,7 +459,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Logstash Slowlogs", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
@@ -526,7 +526,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Slowlogs [Filebeat Logstash] ECS", 
+                "title": "[Filebeat Logstash] Slowlogs ECS", 
                 "uiStateJSON": {
                     "P-4": {
                         "vis": {

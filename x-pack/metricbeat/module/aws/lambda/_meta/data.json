@@ -1,0 +1,48 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "namespace": "AWS/Lambda"
+        },
+        "dimensions": {
+            "FunctionName": "ec2-owner-tagger-serverless",
+            "Resource": "ec2-owner-tagger-serverless"
+        },
+        "lambda": {
+            "metrics": {
+                "Duration": {
+                    "avg": 8218.073333333334
+                },
+                "Errors": {
+                    "avg": 1
+                },
+                "Invocations": {
+                    "avg": 1
+                },
+                "Throttles": {
+                    "avg": 0
+                }
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "627959692251",
+            "name": "elastic-test"
+        },
+        "provider": "aws",
+        "region": "us-west-2"
+    },
+    "event": {
+        "dataset": "aws.lambda",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "lambda",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}

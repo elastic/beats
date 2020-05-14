@@ -8,8 +8,8 @@ Before doing these steps, verify that {es} and {kib} are running and
 that {es} is ready to receive data from {beatname_uc}.
 
 If you're running our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
-Elastic Cloud, or you've enabled security in {es} and {kib}, you need to specify
+https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
+{ecloud}, or you've enabled security in {es} and {kib}, you need to specify
 additional connection information before setting up and running the module. See
 <<filebeat-modules-quickstart>> for the complete setup.
 

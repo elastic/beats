@@ -1,8 +1,18 @@
 [
     {
         "@timestamp": "2019-03-24T13:44:25.484Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-013169",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -13,8 +23,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:27.924Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010453",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -25,8 +45,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:29.065Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-013170",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -37,8 +67,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:31.085Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010116",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -49,8 +89,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:31.533Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010068",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -61,8 +111,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:31.534Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-011810",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -73,8 +133,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:31.555Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-013172",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -85,8 +155,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:33.236Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010910",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -97,8 +177,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:34.072Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010116",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -109,8 +199,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:34.406Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010068",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
@@ -121,8 +221,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:34.420Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010931",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",
@@ -133,8 +243,18 @@
     },
     {
         "@timestamp": "2019-03-24T13:44:34.572Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-011323",
         "event.dataset": "mysql.error",
+        "event.kind": "event",
         "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "System",

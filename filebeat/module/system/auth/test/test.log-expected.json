@@ -1,18 +1,30 @@
 [
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "success",
-        "event.timezone": "+00:00",
-        "event.type": "authentication_success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "authentication_success",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 0,
         "process.name": "sshd",
         "process.pid": 3402,
+        "related.ip": [
+            "10.0.2.2"
+        ],
+        "related.user": [
+            "vagrant"
+        ],
         "service.type": "system",
         "source.ip": "10.0.2.2",
         "source.port": 63673,
@@ -23,18 +35,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "success",
-        "event.timezone": "+00:00",
-        "event.type": "authentication_success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "authentication_success",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 152,
         "process.name": "sshd",
         "process.pid": 7483,
+        "related.ip": [
+            "192.168.33.1"
+        ],
+        "related.user": [
+            "vagrant"
+        ],
         "service.type": "system",
         "source.ip": "192.168.33.1",
         "source.port": 58803,
@@ -44,18 +68,30 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "+00:00",
-        "event.type": "authentication_failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 254,
         "process.name": "sshd",
         "process.pid": 3430,
+        "related.ip": [
+            "10.0.2.2"
+        ],
+        "related.user": [
+            "test"
+        ],
         "service.type": "system",
         "source.ip": "10.0.2.2",
         "system.auth.ssh.event": "Invalid",
@@ -63,19 +99,33 @@
     },
     {
         "event.action": "ssh_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "+00:00",
-        "event.type": "authentication_failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "authentication_failure",
+            "info"
+        ],
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 324,
         "process.name": "sshd",
         "process.pid": 5774,
+        "related.ip": [
+            "116.31.116.24"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "system",
+        "source.as.number": 134764,
+        "source.as.organization.name": "CHINANET Guangdong province network",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
         "source.geo.location.lat": 23.1167,
@@ -90,13 +140,17 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 420,
         "process.name": "sudo",
+        "related.user": [
+            "vagrant"
+        ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
         "system.auth.sudo.pwd": "/home/vagrant",
@@ -106,31 +160,44 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
         "log.offset": 522,
         "process.name": "sshd",
         "process.pid": 18406,
+        "related.ip": [
+            "123.57.245.163"
+        ],
         "service.type": "system",
+        "source.as.number": 37963,
+        "source.as.organization.name": "Hangzhou Alibaba Advertising Co.,Ltd.",
+        "source.geo.city_name": "Hangzhou",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
-        "source.geo.location.lat": 34.7725,
-        "source.geo.location.lon": 113.7266,
+        "source.geo.location.lat": 30.294,
+        "source.geo.location.lon": 120.1619,
+        "source.geo.region_iso_code": "CN-ZJ",
+        "source.geo.region_name": "Zhejiang",
         "source.ip": "123.57.245.163",
         "system.auth.ssh.dropped_ip": "123.57.245.163"
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 617,
         "process.name": "sudo",
+        "related.user": [
+            "vagrant"
+        ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/cat /var/log/secure",
         "system.auth.sudo.pwd": "/home/vagrant",
@@ -140,13 +207,17 @@
     },
     {
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
         "log.offset": 736,
         "process.name": "sudo",
+        "related.user": [
+            "tsg"
+        ],
         "service.type": "system",
         "system.auth.sudo.command": "/bin/ls",
         "system.auth.sudo.error": "user NOT in sudoers",
@@ -156,9 +227,18 @@
         "user.name": "tsg"
     },
     {
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "auth",
         "group.id": "48",
         "group.name": "apache",
@@ -170,9 +250,18 @@
         "service.type": "system"
     },
     {
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "+00:00",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "auth",
         "group.id": "48",
         "host.hostname": "localhost",
@@ -180,6 +269,9 @@
         "log.offset": 934,
         "process.name": "useradd",
         "process.pid": 6995,
+        "related.user": [
+            "apache"
+        ],
         "service.type": "system",
         "system.auth.useradd.home": "/usr/share/httpd",
         "system.auth.useradd.shell": "/sbin/nologin",

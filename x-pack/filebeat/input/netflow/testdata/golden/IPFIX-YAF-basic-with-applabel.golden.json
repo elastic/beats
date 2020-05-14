@@ -14,9 +14,15 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2016-12-25T13:03:38Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "QMH_S2K9KdI",
@@ -53,25 +59,32 @@
           "vlan_id": 0
         },
         "network": {
-          "bytes": 532,
+          "bytes": 332,
           "community_id": "1:3NQ+f2IICsvUP3F8oQM9Js9FO6Q=",
           "direction": "unknown",
           "iana_number": 17,
-          "packets": 6,
+          "packets": 4,
           "transport": "udp"
         },
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "172.16.32.201",
+            "172.16.32.100"
+          ]
+        },
         "source": {
           "bytes": 132,
           "ip": "172.16.32.201",
           "locality": "private",
-          "packets": 200,
+          "packets": 2,
           "port": 46086
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-25T12:58:38Z",
@@ -86,9 +99,15 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2016-12-25T12:58:38Z",
-          "kind": "event"
+          "kind": "event",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "YlvEOsG0NHc",
@@ -131,25 +150,32 @@
           "vlan_id": 0
         },
         "network": {
-          "bytes": 356,
+          "bytes": 264,
           "community_id": "1:H1pHO7CtjIP7Q5Rljq4l4EH1wf4=",
           "direction": "unknown",
           "iana_number": 6,
-          "packets": 8,
+          "packets": 6,
           "transport": "tcp"
         },
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "172.16.32.100",
+            "172.16.32.215"
+          ]
+        },
         "source": {
           "bytes": 172,
           "ip": "172.16.32.100",
           "locality": "private",
-          "packets": 92,
+          "packets": 4,
           "port": 63499
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     },
     {
       "Timestamp": "2016-12-25T13:03:33Z",
@@ -157,7 +183,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2016-12-25T13:03:33Z",
           "kind": "event"
         },
@@ -193,7 +222,8 @@
           "ip": "192.0.2.1"
         }
       },
-      "Private": null
+      "Private": null,
+      "TimeSeries": false
     }
   ]
 }

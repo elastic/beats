@@ -268,7 +268,7 @@
         }, 
         {
             "attributes": {
-                "description": "", 
+                "description": "Overview of Logstash logs", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
@@ -324,7 +324,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Logstash Logs [Filebeat Logstash] ECS", 
+                "title": "[Filebeat Logstash] Logstash Logs ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 

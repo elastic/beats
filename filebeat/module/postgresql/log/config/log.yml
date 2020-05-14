@@ -5,6 +5,11 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 multiline:
-  pattern: '^[-0-9]* '
+  pattern: '^\d{4}-\d{2}-\d{2} '
   negate: true
   match: after
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

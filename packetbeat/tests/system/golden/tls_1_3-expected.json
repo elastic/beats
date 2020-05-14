@@ -1,0 +1,115 @@
+[
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "client.ip": "192.168.1.36",
+        "client.port": 60946,
+        "destination.domain": "play.google.com",
+        "destination.ip": "216.58.201.174",
+        "destination.port": 443,
+        "event.category": "network_traffic",
+        "event.dataset": "tls",
+        "event.duration": 12280000,
+        "event.kind": "event",
+        "network.community_id": "1:hfsK5r0tJm7av4j7BtSxA6oH9xA=",
+        "network.protocol": "tls",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "server.domain": "play.google.com",
+        "server.ip": "216.58.201.174",
+        "server.port": 443,
+        "source.ip": "192.168.1.36",
+        "source.port": 60946,
+        "status": "OK",
+        "tls.cipher": "TLS_AES_128_GCM_SHA256",
+        "tls.client.ja3": "d470a3fa301d80227bc5650c75567d25",
+        "tls.client.server_name": "play.google.com",
+        "tls.client.supported_ciphers": [
+            "TLS_AES_128_GCM_SHA256",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "TLS_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_3DES_EDE_CBC_SHA"
+        ],
+        "tls.detailed.client_certificate_requested": false,
+        "tls.detailed.client_hello.extensions._unparsed_": [
+            "23",
+            "renegotiation_info",
+            "status_request",
+            "51",
+            "45",
+            "28",
+            "41"
+        ],
+        "tls.detailed.client_hello.extensions.application_layer_protocol_negotiation": [
+            "h2",
+            "http/1.1"
+        ],
+        "tls.detailed.client_hello.extensions.ec_points_formats": [
+            "uncompressed"
+        ],
+        "tls.detailed.client_hello.extensions.server_name_indication": [
+            "play.google.com"
+        ],
+        "tls.detailed.client_hello.extensions.signature_algorithms": [
+            "ecdsa_secp256r1_sha256",
+            "ecdsa_secp384r1_sha384",
+            "ecdsa_secp521r1_sha512",
+            "rsa_pss_sha256",
+            "rsa_pss_sha384",
+            "rsa_pss_sha512",
+            "rsa_pkcs1_sha256",
+            "rsa_pkcs1_sha384",
+            "rsa_pkcs1_sha512",
+            "ecdsa_sha1",
+            "rsa_pkcs1_sha1"
+        ],
+        "tls.detailed.client_hello.extensions.supported_groups": [
+            "x25519",
+            "secp256r1",
+            "secp384r1",
+            "secp521r1",
+            "ffdhe2048",
+            "ffdhe3072"
+        ],
+        "tls.detailed.client_hello.extensions.supported_versions": [
+            "TLS 1.3",
+            "TLS 1.2",
+            "TLS 1.1",
+            "TLS 1.0"
+        ],
+        "tls.detailed.client_hello.session_id": "5d2b9f80d34143b5764ba6b23e1d4f9d1f172148b6fd83c81f42663459eaf6f6",
+        "tls.detailed.client_hello.supported_compression_methods": [
+            "NULL"
+        ],
+        "tls.detailed.client_hello.version": "3.3",
+        "tls.detailed.resumption_method": "id",
+        "tls.detailed.server_hello.extensions._unparsed_": [
+            "41",
+            "51"
+        ],
+        "tls.detailed.server_hello.extensions.supported_versions": "TLS 1.3",
+        "tls.detailed.server_hello.selected_compression_method": "NULL",
+        "tls.detailed.server_hello.session_id": "5d2b9f80d34143b5764ba6b23e1d4f9d1f172148b6fd83c81f42663459eaf6f6",
+        "tls.detailed.server_hello.version": "3.3",
+        "tls.detailed.version": "TLS 1.3",
+        "tls.established": true,
+        "tls.resumed": true,
+        "tls.version": "1.3",
+        "tls.version_protocol": "tls",
+        "type": "tls"
+    }
+]

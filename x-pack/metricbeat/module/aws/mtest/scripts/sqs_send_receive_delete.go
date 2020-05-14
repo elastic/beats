@@ -5,6 +5,7 @@
 package scripts
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -14,18 +15,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 )
 
-func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
+func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
 	// ListQueues
 	listQueuesInput := &sqs.ListQueuesInput{}
 	req := svc.ListQueuesRequest(listQueuesInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		return nil, err
 	}
 	return output.QueueUrls, nil
 }
 
-func sendMessages(qURL string, svc sqsiface.SQSAPI, idx int) error {
+func sendMessages(qURL string, svc sqsiface.ClientAPI, idx int) error {
 	sendMessageInput := &sqs.SendMessageInput{
 		DelaySeconds: aws.Int64(10),
 		MessageAttributes: map[string]sqs.MessageAttributeValue{
@@ -47,7 +48,7 @@ func sendMessages(qURL string, svc sqsiface.SQSAPI, idx int) error {
 	}
 
 	req := svc.SendMessageRequest(sendMessageInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func sendMessages(qURL string, svc sqsiface.SQSAPI, idx int) error {
 	return nil
 }
 
-func receiveMessages(qURL string, svc sqsiface.SQSAPI) ([]sqs.Message, error) {
+func receiveMessages(qURL string, svc sqsiface.ClientAPI) ([]sqs.Message, error) {
 	receiveMessageInput := &sqs.ReceiveMessageInput{
 		QueueUrl:            &qURL,
 		MaxNumberOfMessages: aws.Int64(10),
@@ -64,7 +65,7 @@ func receiveMessages(qURL string, svc sqsiface.SQSAPI) ([]sqs.Message, error) {
 		//WaitTimeSeconds:     aws.Int64(0),
 	}
 	req := svc.ReceiveMessageRequest(receiveMessageInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		return nil, err
 	}
@@ -73,18 +74,18 @@ func receiveMessages(qURL string, svc sqsiface.SQSAPI) ([]sqs.Message, error) {
 	return output.Messages, nil
 }
 
-func deleteMessage(qURL string, svc sqsiface.SQSAPI, message sqs.Message) error {
+func deleteMessage(qURL string, svc sqsiface.ClientAPI, message sqs.Message) error {
 	deleteMessageInput := &sqs.DeleteMessageInput{
 		QueueUrl:      &qURL,
 		ReceiptHandle: message.ReceiptHandle,
 	}
 	reqD := svc.DeleteMessageRequest(deleteMessageInput)
-	output, err := reqD.Send()
+	output, err := reqD.Send(context.TODO())
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("DeleteMessage: ", output.SDKResponseMetadata().Request.RequestID)
+	fmt.Println("DeleteMessage: ", output.SDKResponseMetdata().Request.RequestID)
 	return nil
 }
 

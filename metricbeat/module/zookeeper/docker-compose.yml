@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  zookeeper:
+    image: docker.elastic.co/integrations-ci/beats-zookeeper:${ZOOKEEPER_VERSION:-3.5.5}-1
+    build:
+      context: ./_meta
+      args:
+        ZOOKEEPER_VERSION: ${ZOOKEEPER_VERSION:-3.5.5}
+    ports:
+      - 2181

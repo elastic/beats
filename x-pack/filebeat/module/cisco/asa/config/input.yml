@@ -1,8 +1,8 @@
 {{ if eq .input "syslog" }}
 
-type: syslog
-protocol.udp:
-  host: "{{.syslog_host}}:{{.syslog_port}}"
+type: udp
+udp:
+host: "{{.syslog_host}}:{{.syslog_port}}"
 
 {{ else if eq .input "file" }}
 

@@ -40,8 +40,6 @@ func Usage(path string) (*UsageStat, error) {
 }
 
 func UsageWithContext(ctx context.Context, path string) (*UsageStat, error) {
-	ret := &UsageStat{}
-
 	lpFreeBytesAvailable := int64(0)
 	lpTotalNumberOfBytes := int64(0)
 	lpTotalNumberOfFreeBytes := int64(0)
@@ -53,7 +51,7 @@ func UsageWithContext(ctx context.Context, path string) (*UsageStat, error) {
 	if diskret == 0 {
 		return nil, err
 	}
-	ret = &UsageStat{
+	ret := &UsageStat{
 		Path:        path,
 		Total:       uint64(lpTotalNumberOfBytes),
 		Free:        uint64(lpTotalNumberOfFreeBytes),

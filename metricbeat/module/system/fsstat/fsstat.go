@@ -22,10 +22,10 @@ package fsstat
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/system/filesystem"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
 
 	"github.com/pkg/errors"
 )
@@ -80,10 +80,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	for _, fs := range fss {
 		stat, err := filesystem.GetFileSystemStat(fs)
 		if err != nil {
-			m.Logger().Debug("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
-		m.Logger().Debug("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
+		m.Logger().Debugf("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
 
 		totalFiles += stat.Files
 		totalSize += stat.Total

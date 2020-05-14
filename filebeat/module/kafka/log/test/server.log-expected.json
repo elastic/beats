@@ -1,9 +1,11 @@
 [
     {
-        "@timestamp": "2017-08-04T10:48:20.377Z",
+        "@timestamp": "2017-08-04T10:48:20.377-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.server.KafkaServer",
@@ -14,10 +16,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.379Z",
+        "@timestamp": "2017-08-04T10:48:20.379-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.server.KafkaServer",
@@ -28,10 +32,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.400Z",
+        "@timestamp": "2017-08-04T10:48:20.400-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ZooKeeper",
@@ -42,10 +48,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.400Z",
+        "@timestamp": "2017-08-04T10:48:20.400-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ZooKeeper",
@@ -56,10 +64,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.401Z",
+        "@timestamp": "2017-08-04T10:48:20.401-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ZooKeeper",
@@ -70,10 +80,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.413Z",
+        "@timestamp": "2017-08-04T10:48:20.413-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.I0Itec.zkclient.ZkClient",
@@ -84,10 +96,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.415Z",
+        "@timestamp": "2017-08-04T10:48:20.415-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ClientCnxn",
@@ -98,10 +112,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.420Z",
+        "@timestamp": "2017-08-04T10:48:20.420-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ClientCnxn",
@@ -112,10 +128,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.457Z",
+        "@timestamp": "2017-08-04T10:48:20.457-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.apache.zookeeper.ClientCnxn",
@@ -126,10 +144,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.458Z",
+        "@timestamp": "2017-08-04T10:48:20.458-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "org.I0Itec.zkclient.ZkClient",
@@ -140,10 +160,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.748Z",
+        "@timestamp": "2017-08-04T10:48:20.748-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.server.BrokerMetadataCheckpoint",
@@ -154,10 +176,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.800Z",
+        "@timestamp": "2017-08-04T10:48:20.800-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.server.ClientQuotaManager$ThrottledRequestReaper",
@@ -168,10 +192,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.866Z",
+        "@timestamp": "2017-08-04T10:48:20.866-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.log.LogManager",
@@ -182,10 +208,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:20.873Z",
+        "@timestamp": "2017-08-04T10:48:20.873-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.log.LogManager",
@@ -196,10 +224,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.062Z",
+        "@timestamp": "2017-08-04T10:48:21.062-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper",
@@ -210,10 +240,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.063Z",
+        "@timestamp": "2017-08-04T10:48:21.063-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.utils.ZKCheckedEphemeral",
@@ -224,10 +256,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.095Z",
+        "@timestamp": "2017-08-04T10:48:21.095-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.coordinator.group.GroupMetadataManager",
@@ -238,10 +272,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.127Z",
+        "@timestamp": "2017-08-04T10:48:21.127-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.coordinator.transaction.ProducerIdManager",
@@ -252,10 +288,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.162Z",
+        "@timestamp": "2017-08-04T10:48:21.162-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.coordinator.transaction.TransactionCoordinator",
@@ -266,10 +304,12 @@
         "service.type": "kafka"
     },
     {
-        "@timestamp": "2017-08-04T10:48:21.167Z",
+        "@timestamp": "2017-08-04T10:48:21.167-02:00",
         "event.dataset": "kafka.log",
+        "event.kind": "event",
         "event.module": "kafka",
-        "event.timezone": "+00:00",
+        "event.timezone": "-02:00",
+        "event.type": "info",
         "fileset.name": "log",
         "input.type": "log",
         "kafka.log.class": "kafka.coordinator.transaction.TransactionMarkerChannelManager",

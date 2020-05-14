@@ -101,7 +101,7 @@
     - name: iostat.request.avg_size
       type: float
       description: >
-          The average size (in sectors) of the requests that were issued to the device.
+          The average size (in bytes) of the requests that were issued to the device.
 
     - name: iostat.queue.avg_size
       type: float

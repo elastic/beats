@@ -138,12 +138,12 @@ class TestCommands(metricbeat.BaseTest):
         assert exit_code == 0
         try:
             assert any((
-                self.log_contains("ERROR error making http request"),
+                self.log_contains("ERROR error fetching status"),
                 self.log_contains("ERROR timeout waiting for an event"),
             ))
         except:
             # Print log to help debugging this if error message changes
-            print self.get_log()
+            print(self.get_log())
             raise
         assert self.log_contains("cpu...OK")
         assert self.log_contains("memory...OK")
@@ -180,7 +180,7 @@ class TestCommands(metricbeat.BaseTest):
         open(path, 'a').close()
 
     def write_system_yml(self):
-        with open(self.working_dir + "/modules.d/system.yml", "wb") as f:
+        with open(self.working_dir + "/modules.d/system.yml", "w") as f:
             f.write("""
 - module: system
   period: 10s
@@ -189,7 +189,7 @@ class TestCommands(metricbeat.BaseTest):
     - memory""")
 
     def write_nginx_yml(self):
-        with open(self.working_dir + "/modules.d/nginx.yml", "wb") as f:
+        with open(self.working_dir + "/modules.d/nginx.yml", "w") as f:
             f.write("""
 - module: nginx
   period: 10s

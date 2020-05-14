@@ -55,3 +55,25 @@ func TryToInt(number interface{}) (int, bool) {
 	}
 	return rtn, true
 }
+
+// TryToFloat64 tries to coerce the given interface to an float64. It accepts
+// a float32, float64, or string. On success it returns the float64 value and
+// true.
+func TryToFloat64(number interface{}) (float64, bool) {
+	var rtn float64
+	switch v := number.(type) {
+	case float32:
+		rtn = float64(v)
+	case float64:
+		rtn = v
+	case string:
+		var err error
+		rtn, err = strconv.ParseFloat(v, 64)
+		if err != nil {
+			return 0, false
+		}
+	default:
+		return 0, false
+	}
+	return rtn, true
+}

@@ -1,0 +1,3 @@
+{"ts":1387554250.647295,"uid":"CNJBX5FQdL62VUUP1","id.orig_h":"10.180.156.249","id.orig_p":45921,"id.resp_h":"38.229.70.20","id.resp_p":8000,"command":"USER","value":"xxxxx","addl":"+iw xxxxx XxxxxxXxxx "}
+{"ts":1387554250.647295,"uid":"CNJBX5FQdL62VUUP1","id.orig_h":"10.180.156.249","id.orig_p":45921,"id.resp_h":"38.229.70.20","id.resp_p":8000,"user":"xxxxx","command":"NICK","value":"molochtest","addl":"+iw xxxxx XxxxxxXxxx "}
+{"ts":1387554250.706387,"uid":"CNJBX5FQdL62VUUP1","id.orig_h":"10.180.156.249","id.orig_p":45921,"id.resp_h":"38.229.70.20","id.resp_p":8000,"nick":"molochtest","user":"xxxxx","command":"JOIN","value":"#moloch-fpc","addl":" with channel key: \u0027-\u0027"}

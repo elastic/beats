@@ -1,0 +1,32 @@
+- name: consumer
+  type: group
+  description: Consumer metrics from Kafka Consumer JMX
+  release: beta
+  fields:
+    - name: mbean
+      description: Mbean that this event is related to
+      type: keyword
+    - name: fetch_rate
+      description: The minimum rate at which the consumer sends fetch requests to a broker
+      type: float
+    - name: bytes_consumed
+      description: The average number of bytes consumed for a specific topic per second
+      type: float
+    - name: records_consumed
+      description: The average number of records consumed per second for a specific topic
+      type: float
+    - name: in.bytes_per_sec
+      description: The rate of bytes coming in to the consumer
+      type: float
+    - name: max_lag
+      description: The maximum consumer lag
+      type: float
+    - name: zookeeper_commits
+      description: The rate of offset commits to ZooKeeper
+      type: float
+    - name: kafka_commits
+      description: The rate of offset commits to Kafka
+      type: float
+    - name: messages_in
+      description: The rate of consumer message consumption
+      type: float

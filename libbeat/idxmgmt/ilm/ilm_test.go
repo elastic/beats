@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestDefaultSupport_Init(t *testing.T) {
@@ -52,6 +52,19 @@ func TestDefaultSupport_Init(t *testing.T) {
 		}
 	})
 
+	t.Run("with an empty rollover_alias", func(t *testing.T) {
+		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.Error(t, err)
+	})
+
 	t.Run("with custom config", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
@@ -74,6 +87,47 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
 
+	t.Run("with custom alias config with fieldref", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "alias-%{[agent.version]}",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("with default alias", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":      true,
+				"pattern":      "01",
+				"check_exists": false,
+				"overwrite":    true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
 	t.Run("load external policy", func(t *testing.T) {
 		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			common.MapStr{"policy_file": "testfiles/custom.json"},
@@ -85,11 +139,11 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 	cases := map[string]struct {
-		calls []onCall
-		cfg   map[string]interface{}
-		b     bool
-		fail  error
-		err   bool
+		calls   []onCall
+		cfg     map[string]interface{}
+		enabled bool
+		fail    error
+		err     bool
 	}{
 		"disabled via config": {
 			cfg: map[string]interface{}{"enabled": false},
@@ -103,14 +157,14 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			calls: []onCall{
 				onCheckILMEnabled(ModeAuto).Return(true, nil),
 			},
-			b: true,
+			enabled: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
 				onCheckILMEnabled(ModeEnabled).Return(true, nil),
 			},
-			cfg: map[string]interface{}{"enabled": true},
-			b:   true,
+			cfg:     map[string]interface{}{"enabled": true},
+			enabled: true,
 		},
 		"fail enabled": {
 			calls: []onCall{
@@ -137,7 +191,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
-			b, err := m.Enabled()
+			enabled, err := m.CheckEnabled()
 
 			if test.fail == nil && !test.err {
 				require.NoError(t, err)
@@ -149,7 +203,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 				assert.Equal(t, test.fail, ErrReason(err))
 			}
 
-			assert.Equal(t, test.b, b)
+			assert.Equal(t, test.enabled, enabled)
 			h.AssertExpectations(t)
 		})
 	}
@@ -210,7 +264,7 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
-		Name: "test-9.9.9",
+		Name: "test",
 		Body: DefaultPolicy,
 	}
 
@@ -251,11 +305,6 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{"name": "test"}
-			}
-
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
 			created, err := m.EnsurePolicy(test.overwrite)

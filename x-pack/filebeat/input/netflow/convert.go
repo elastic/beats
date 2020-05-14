@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash/v2"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/flowhash"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
 var (
@@ -66,8 +66,11 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	ecsEvent := common.MapStr{
 		"created":  flow.Timestamp,
 		"kind":     "event",
-		"category": "network_traffic",
+		"category": []string{"network_traffic", "network"},
 		"action":   flow.Fields["type"],
+	}
+	if ecsEvent["action"] == "netflow_flow" {
+		ecsEvent["type"] = []string{"connection"}
 	}
 	// ECS Fields -- device
 	ecsDevice := common.MapStr{}
@@ -155,9 +158,10 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	}
 
 	flowDirection, hasFlowDirection := getKeyUint64(flow.Fields, "flowDirection")
-	// ECS Fields -- source and destination
+	// ECS Fields -- source, destination & related.ip
 	ecsSource := common.MapStr{}
 	ecsDest := common.MapStr{}
+	var relatedIP []net.IP
 
 	// Populate first with WLAN fields
 	if hasFlowDirection {
@@ -189,6 +193,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	// Regular IPv4 fields
 	if ip, found := getKeyIP(flow.Fields, "sourceIPv4Address"); found {
 		ecsSource["ip"] = ip
+		relatedIP = append(relatedIP, ip)
 		ecsSource["locality"] = getIPLocality(ip).String()
 	}
 	if sourcePort, found := getKeyUint64(flow.Fields, "sourceTransportPort"); found {
@@ -201,6 +206,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	// ECS Fields -- destination
 	if ip, found := getKeyIP(flow.Fields, "destinationIPv4Address"); found {
 		ecsDest["ip"] = ip
+		relatedIP = append(relatedIP, ip)
 		ecsDest["locality"] = getIPLocality(ip).String()
 	}
 	if destPort, found := getKeyUint64(flow.Fields, "destinationTransportPort"); found {
@@ -245,43 +251,28 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		ecsNetwork["transport"] = IPProtocol(proto).String()
 		ecsNetwork["iana_number"] = proto
 	}
-	countBytes, hasBytes := getKeyUint64(flow.Fields, "octetDeltaCount")
-	if !hasBytes {
-		countBytes, hasBytes = getKeyUint64(flow.Fields, "octetTotalCount")
-	}
-	countPkts, hasPkts := getKeyUint64(flow.Fields, "packetDeltaCount")
-	if !hasPkts {
-		countPkts, hasPkts = getKeyUint64(flow.Fields, "packetTotalCount")
-	}
-	revBytes, hasRevBytes := getKeyUint64(flow.Fields, "reverseOctetDeltaCount")
-	if !hasRevBytes {
-		revBytes, hasRevBytes = getKeyUint64(flow.Fields, "reverseOctetTotalCount")
-	}
-	revPkts, hasRevPkts := getKeyUint64(flow.Fields, "reversePacketDeltaCount")
-	if !hasRevPkts {
-		revPkts, hasRevPkts = getKeyUint64(flow.Fields, "reversePacketTotalCount")
+	countBytes, hasBytes := getKeyUint64Alternatives(flow.Fields, "octetDeltaCount", "octetTotalCount", "initiatorOctets")
+	countPkts, hasPkts := getKeyUint64Alternatives(flow.Fields, "packetDeltaCount", "packetTotalCount", "initiatorPackets")
+	revBytes, hasRevBytes := getKeyUint64Alternatives(flow.Fields, "reverseOctetDeltaCount", "reverseOctetTotalCount", "responderOctets")
+	revPkts, hasRevPkts := getKeyUint64Alternatives(flow.Fields, "reversePacketDeltaCount", "reversePacketTotalCount", "responderPackets")
+
+	if hasRevBytes {
+		ecsDest["bytes"] = revBytes
 	}
 
-	if hasRevBytes || hasRevPkts {
-		if hasBytes {
-			ecsSource["bytes"] = countBytes
-			ecsDest["bytes"] = revBytes
-		}
-		if hasPkts {
-			ecsSource["packets"] = revBytes
-			ecsDest["packets"] = revPkts
-		}
-		countBytes += revBytes
-		countPkts += revPkts
+	if hasRevPkts {
+		ecsDest["packets"] = revPkts
 	}
 
 	if hasBytes {
+		ecsSource["bytes"] = countBytes
 		if hasRevBytes {
 			countBytes += revBytes
 		}
 		ecsNetwork["bytes"] = countBytes
 	}
 	if hasPkts {
+		ecsSource["packets"] = countPkts
 		if hasRevPkts {
 			countPkts += revPkts
 		}
@@ -328,6 +319,9 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	if len(ecsNetwork) > 0 {
 		event.Fields["network"] = ecsNetwork
 	}
+	if len(relatedIP) > 0 {
+		event.Fields["related"] = common.MapStr{"ip": relatedIP}
+	}
 	return
 }
 
@@ -337,6 +331,18 @@ func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
 		return
 	}
 	value, found = iface.(uint64)
+	return
+}
+
+func getKeyUint64Alternatives(dict record.Map, keys ...string) (value uint64, found bool) {
+	var iface interface{}
+	for _, key := range keys {
+		if iface, found = dict[key]; found {
+			if value, found = iface.(uint64); found {
+				return
+			}
+		}
+	}
 	return
 }
 
@@ -445,7 +451,7 @@ func (p IPProtocol) String() string {
 }
 
 func flowID(srcIP, dstIP net.IP, srcPort, dstPort uint16, proto uint8) string {
-	h := xxhash.New64()
+	h := xxhash.New()
 	// Both flows will have the same ID.
 	if srcPort >= dstPort {
 		h.Write(srcIP)

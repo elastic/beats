@@ -19,7 +19,7 @@ def read_input():
     global protocol, plugin_type, plugin_var
 
     if protocol == "":
-        protocol = raw_input("Protocol Name [exampletcp]: ") or "exampletcp"
+        protocol = input("Protocol Name [exampletcp]: ") or "exampletcp"
 
     protocol = protocol.lower()
 

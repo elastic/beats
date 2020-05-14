@@ -1,25 +1,28 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
         "info": {
             "containers": {
                 "paused": 0,
-                "running": 29,
-                "stopped": 19,
-                "total": 48
+                "running": 2,
+                "stopped": 12,
+                "total": 14
             },
-            "id": "V727:GUJU:KXA5:Y5YS:RYFT:6IYQ:GQN7:IGGT:O4YO:NRU3:ZIRV:MHEJ",
-            "images": 168
+            "id": "VF5E:SKD6:YFIG:VDGO:JU3M:ZT2N:4E6B:7IOL:5QOS:M3HT:EM7E:VL22",
+            "images": 425
         }
     },
+    "event": {
+        "dataset": "docker.info",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
         "name": "info",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
     }
 }

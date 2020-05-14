@@ -1,0 +1,90 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: ntlm
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.ntlm"
+
+        - from: "zeek.ntlm.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.ntlm.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.ntlm.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.ntlm.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.ntlm.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.ntlm.domainname"
+          to: "zeek.ntlm.domain"
+
+        - from: "zeek.ntlm.server_dns_computer_name"
+          to: "zeek.ntlm.server.name.dns"
+
+        - from: "zeek.ntlm.server_nb_computer_name"
+          to: "zeek.ntlm.server.name.netbios"
+
+        - from: "zeek.ntlm.server_tree_name"
+          to: "zeek.ntlm.server.name.tree"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "zeek.ntlm.username", to: "user.name"}
+        - {from: "zeek.ntlm.domain", to: "user.domain"}
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - authentication
+          - network
+        type:
+          - info
+          - connection
+  - if:
+      equals:
+        zeek.ntlm.success: true
+    then:
+      - add_fields:
+          target: event
+          fields:
+            outcome: success
+  - if:
+      equals:
+        zeek.ntlm.success: false
+    then:
+      - add_fields:
+          target: event
+          fields:
+            outcome: failure
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

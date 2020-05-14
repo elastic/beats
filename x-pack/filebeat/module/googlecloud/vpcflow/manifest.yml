@@ -10,8 +10,9 @@ var:
   - name: subscription_name
     default: filebeat-googlecloud-vpcflow
   - name: credentials_file
-    default: googlecloud-vpcflow-reader-service-identity.json
-
+  - name: credentials_json
+  - name: keep_original_message
+    default: false
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
 

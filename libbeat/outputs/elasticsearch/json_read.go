@@ -20,12 +20,12 @@ package elasticsearch
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 )
 
 // SAX like json parser. But instead of relying on callbacks, state machine
 // returns raw item plus entity. On top of state machine additional helper methods
-// like expectDict, expectArray, nextFieldName and nextInt are available for
+// like ExpectDict, ExpectArray, nextFieldName and nextInt are available for
 // low-level parsing/stepping through a json document.
 //
 // Due to parser simply stepping through the input buffer, almost no additional
@@ -168,7 +168,8 @@ func (r *jsonReader) popState() {
 	}
 }
 
-func (r *jsonReader) expectDict() error {
+// ExpectDict checks if the next entity is a json object
+func (r *jsonReader) ExpectDict() error {
 	e, _, err := r.step()
 
 	if err != nil {
@@ -182,7 +183,8 @@ func (r *jsonReader) expectDict() error {
 	return nil
 }
 
-func (r *jsonReader) expectArray() error {
+// ExpectArray checks if the next entity is a json array
+func (r *jsonReader) ExpectArray() error {
 	e, _, err := r.step()
 	if err != nil {
 		return err

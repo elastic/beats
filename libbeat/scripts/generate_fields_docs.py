@@ -6,6 +6,8 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
+    if "skipdocs" in section:
+        return
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
 
@@ -53,7 +55,7 @@ def document_field(output, field, field_path):
     output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
-        output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
+        output.write("\ndeprecated:[{}]\n\n".format(field["deprecated"]))
 
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
@@ -90,7 +92,7 @@ def fields_to_asciidoc(input, output, beat):
 
     output.write("""
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -136,7 +138,8 @@ grouped in the following categories:
         if "anchor" not in section:
             section["anchor"] = section["key"]
 
-        output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
+        if "skipdocs" not in section:
+            output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
     output.write("\n--\n")
 
     # Sort alphabetically by key
@@ -165,10 +168,10 @@ if __name__ == "__main__":
     es_beats = args.es_beats
 
     # Read fields.yml
-    with open(fields_yml) as f:
+    with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
+    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

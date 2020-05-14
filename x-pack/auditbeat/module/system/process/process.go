@@ -13,18 +13,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OneOfOne/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/auditbeat/helper/hasher"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -66,6 +66,21 @@ func (action eventAction) String() string {
 	}
 }
 
+func (action eventAction) Type() string {
+	switch action {
+	case eventActionExistingProcess:
+		return "info"
+	case eventActionProcessStarted:
+		return "start"
+	case eventActionProcessStopped:
+		return "end"
+	case eventActionProcessError:
+		return "info"
+	default:
+		return "info"
+	}
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -98,7 +113,7 @@ type Process struct {
 
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
-	h := xxhash.New64()
+	h := xxhash.New()
 	h.WriteString(strconv.Itoa(p.Info.PID))
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
@@ -319,8 +334,10 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"kind":   eventType,
-				"action": action.String(),
+				"kind":     eventType,
+				"category": []string{"process"},
+				"type":     []string{action.Type()},
+				"action":   action.String(),
 			},
 			"process": process.toMapStr(),
 			"message": processMessage(process, action),

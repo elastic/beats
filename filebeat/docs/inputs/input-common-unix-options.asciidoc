@@ -1,0 +1,53 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by Filebeat inputs that use the Unix inputsource
+//// If you add IDs to sections, make sure you use attributes to create
+//// unique IDs for each input that includes this file. Use the format:
+//// [id="{beatname_lc}-input-{type}-option-name"]
+//////////////////////////////////////////////////////////////////////////
+[float]
+[id="{beatname_lc}-input-{type}-unix-max-message-size"]
+==== `max_message_size`
+
+The maximum size of the message received over the socket. The default is `20MiB`.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-path"]
+==== `path`
+
+The path to the Unix socket that will receive event streams.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-group"]
+==== `group`
+
+The group ownership of the Unix socket that will be created by Filebeat.
+The default is the primary group name for the user Filebeat is running as.
+This option is ignored on Windows.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-mode"]
+==== `mode`
+
+The file mode of the Unix socket that will be created by Filebeat. This is
+expected to be a file mode as an octal string. The default value is the system
+default (generally `0755`).
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-line-delimiter"]
+==== `line_delimiter`
+
+Specify the characters used to split the incoming events. The default is '\n'.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-max-connections"]
+==== `max_connections`
+
+The at most number of connections to accept at any given point in time.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-timeout"]
+==== `timeout`
+
+The number of seconds of inactivity before a connection is closed. The default is `300s`.
+
+See <<configuration-ssl>> for more information.

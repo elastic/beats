@@ -1,0 +1,19 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "cache"
+    jmx.mappings:
+      - mbean: 'Catalina:context=*,host=*,name=Cache,type=WebResourceRoot'
+        attributes:
+          - attr: hitCount
+            field: hit.total
+          - attr: size
+            field: size.total.kb
+          - attr: maxSize
+            field: size.max.kb
+          - attr: lookupCount
+            field: lookup.total
+          - attr: ttl
+            field: ttl.ms

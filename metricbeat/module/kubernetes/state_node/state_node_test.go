@@ -22,22 +22,22 @@ package state_node
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "state_node",
 		ptest.TestCases{
 			{
-				MetricsFile:  "../_meta/test/kube-state-metrics",
-				ExpectedFile: "./_meta/test/kube-state-metrics.expected",
+				MetricsFile:  "../_meta/test/ksm.v1.3.0",
+				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
 			},
 			{
-				MetricsFile:  "../_meta/test/kube-state-metrics.v1.3.0",
-				ExpectedFile: "./_meta/test/kube-state-metrics.v1.3.0.expected",
+				MetricsFile:  "../_meta/test/ksm.v1.8.0",
+				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
 			},
 		},
 	)

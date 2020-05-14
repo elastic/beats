@@ -1,0 +1,65 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: smb
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.smb_files"
+
+        - from: "zeek.smb_files.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.smb_files.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.smb_files.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.smb_files.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.smb_files.uid"
+          to: "zeek.session_id"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "zeek.smb_files.action", to: "event.action"}
+        - {from: "zeek.smb_files.name", to: "file.name"}
+        - {from: "zeek.smb_files.size", to: "file.size"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+          - file
+        type:
+          - connection
+          - protocol
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

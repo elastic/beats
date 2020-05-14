@@ -11,18 +11,24 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
+	"regexp"
+	"strings"
+	"sync"
 	"testing"
 
+	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors/script/javascript"
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 
 	// Register javascript modules.
-	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
+	_ "github.com/elastic/beats/v7/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -109,6 +115,10 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 
 		for _, r := range records {
 			record := r.ToEvent()
+
+			// Validate fields in event against fields.yml.
+			assertFieldsAreDocumented(t, record.Fields)
+
 			record.Delete("event.created")
 			record.Delete("log.file")
 
@@ -146,8 +156,31 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 		return
 	}
 	for i, e := range events {
-		assert.EqualValues(t, expected[i], normalize(t, e))
+		assertEqual(t, expected[i], normalize(t, e))
 	}
+}
+
+// assertEqual asserts that the two objects are deeply equal. If not it will
+// error the test and output a diff of the two objects' JSON representation.
+func assertEqual(t testing.TB, expected, actual interface{}) bool {
+	t.Helper()
+
+	if reflect.DeepEqual(expected, actual) {
+		return true
+	}
+
+	expJSON, _ := json.MarshalIndent(expected, "", "  ")
+	actJSON, _ := json.MarshalIndent(actual, "", "  ")
+
+	diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+		A:        difflib.SplitLines(string(expJSON)),
+		B:        difflib.SplitLines(string(actJSON)),
+		FromFile: "Expected",
+		ToFile:   "Actual",
+		Context:  1,
+	})
+	t.Errorf("Expected and actual are different:\n%s", diff)
+	return false
 }
 
 func writeGolden(t testing.TB, source string, events []common.MapStr) {
@@ -179,6 +212,9 @@ func readGolden(t testing.TB, source string) []common.MapStr {
 		t.Fatal(err)
 	}
 
+	for _, e := range events {
+		lowercaseGUIDs(e)
+	}
 	return events
 }
 
@@ -193,7 +229,8 @@ func normalize(t testing.TB, m common.MapStr) common.MapStr {
 		t.Fatal(err)
 	}
 
-	return out
+	// Lowercase the GUIDs in case tests are run Windows < 2019.
+	return lowercaseGUIDs(out)
 }
 
 func filterEvent(m common.MapStr, ignores []string) common.MapStr {
@@ -201,4 +238,54 @@ func filterEvent(m common.MapStr, ignores []string) common.MapStr {
 		m.Delete(f)
 	}
 	return m
+}
+
+var uppercaseGUIDRegex = regexp.MustCompile(`^{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}}$`)
+
+// lowercaseGUIDs finds string fields that look like GUIDs and converts the hex
+// from uppercase to lowercase. Prior to Windows 2019, GUIDs used uppercase hex
+// (contrary to RFC 4122).
+func lowercaseGUIDs(m common.MapStr) common.MapStr {
+	for k, v := range m.Flatten() {
+		str, ok := v.(string)
+		if !ok {
+			continue
+		}
+		if uppercaseGUIDRegex.MatchString(str) {
+			m.Put(k, strings.ToLower(str))
+		}
+	}
+	return m
+}
+
+var (
+	loadDocumentedFieldsOnce sync.Once
+	documentedFields         []string
+)
+
+// assertFieldsAreDocumented validates that all fields contained in the event
+// are documented in a fields.yml file.
+func assertFieldsAreDocumented(t testing.TB, m common.MapStr) {
+	t.Helper()
+
+	loadDocumentedFieldsOnce.Do(func() {
+		fieldsYml, err := mapping.LoadFieldsYaml("../../../build/fields/fields.all.yml")
+		if err != nil {
+			t.Fatal("Failed to load generated fields.yml data. Try running 'mage update'.", err)
+		}
+		documentedFields = fieldsYml.GetKeys()
+	})
+
+	for eventFieldName := range m.Flatten() {
+		found := false
+		for _, documentedFieldName := range documentedFields {
+			if strings.HasPrefix(eventFieldName, documentedFieldName) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			assert.Fail(t, "Field not documented", "Key '%v' found in event is not documented.", eventFieldName)
+		}
+	}
 }

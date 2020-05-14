@@ -92,6 +92,8 @@
     {
         "@timestamp": "2019-04-11T00:51:07.980Z",
         "destination.address": "151.101.66.217",
+        "destination.as.number": 54113,
+        "destination.as.organization.name": "Fastly",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,

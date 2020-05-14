@@ -20,14 +20,20 @@ import (
 
 //go:generate rm -fr zoneinfo
 //go:generate unzip -q $GOROOT/lib/time/zoneinfo.zip -d zoneinfo/
-//go:generate go get 4d63.com/embedfiles
-//go:generate embedfiles -out=zoneinfo.go -pkg=tz zoneinfo/
+//go:generate go run 4d63.com/embedfiles -out=zoneinfo.go -pkg=tz zoneinfo/
 
 func tzData(name string) ([]byte, bool) {
 	data, ok := files["zoneinfo/"+name]
 	return data, ok
 }
 
+// LoadLocation loads timezone data from embedded tzinfo and does not rely on
+// the operating system providing tzdata.
+//
+// Same as time.LoadLocation if name is "" or "UTC", time.UTC is returned, and
+// if name is "Local", time.Local is returned.
+//
+// Returns an error if the name is unknown.
 func LoadLocation(name string) (*time.Location, error) {
 	if name == "" || name == "UTC" || name == "Local" {
 		return time.LoadLocation(name)

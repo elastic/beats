@@ -192,7 +192,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Overview [Filebeat MongoDB] ECS", 
+                "title": "[Filebeat MongoDB] Overview ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 

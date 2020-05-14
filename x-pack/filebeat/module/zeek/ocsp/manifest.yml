@@ -1,0 +1,15 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/ocsp.log
+    os.linux:
+      - /var/log/bro/current/ocsp.log
+    os.darwin:
+      - /usr/local/var/logs/current/ocsp.log
+  - name: tags
+    default: [zeek.ocsp]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/ocsp.yml

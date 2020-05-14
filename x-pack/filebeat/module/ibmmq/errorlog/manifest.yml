@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/mqm/*.LOG*
+      - /var/mqm/qmgrs/*/*.LOG*
+    os.windows:
+      - C:\ProgramData\IBM\MQ\errors\*.LOG*
+      - C:\ProgramData\IBM\MQ\qmgrs\*\errors\*.LOG*
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/errorlog.yml

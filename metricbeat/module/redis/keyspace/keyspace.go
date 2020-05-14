@@ -20,9 +20,9 @@ package keyspace
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/redis"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/redis"
 )
 
 var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
@@ -50,8 +50,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	conn := m.Connection()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+		}
+	}()
+
 	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("keyspace", m.Connection())
+	info, err := redis.FetchRedisInfo("keyspace", conn)
 	if err != nil {
 		return errors.Wrap(err, "Failed to fetch redis info for keyspaces")
 	}

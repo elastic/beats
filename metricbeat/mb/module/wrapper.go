@@ -24,12 +24,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/libbeat/testing"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Expvar metric names.
@@ -65,6 +65,8 @@ type metricSetWrapper struct {
 	mb.MetricSet
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
+
+	periodic bool // Set to true if this metricset is a periodic fetcher
 }
 
 // stats bundles common metricset stats.
@@ -76,30 +78,37 @@ type stats struct {
 	events   *monitoring.Int // Total events published.
 }
 
-// NewWrapper create a new Module and its associated MetricSets based
-// on the given configuration.
+// NewWrapper creates a new module and its associated metricsets based on the given configuration.
 func NewWrapper(config *common.Config, r *mb.Register, options ...Option) (*Wrapper, error) {
-	module, metricsets, err := mb.NewModule(config, r)
+	module, metricSets, err := mb.NewModule(config, r)
 	if err != nil {
 		return nil, err
 	}
+	return createWrapper(module, metricSets, options...)
+}
 
+// NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
+func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, options ...Option) (*Wrapper, error) {
+	return createWrapper(module, []mb.MetricSet{metricSet}, options...)
+}
+
+func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Option) (*Wrapper, error) {
 	wrapper := &Wrapper{
 		Module:     module,
-		metricSets: make([]*metricSetWrapper, len(metricsets)),
+		metricSets: make([]*metricSetWrapper, len(metricSets)),
 	}
+
 	for _, applyOption := range options {
 		applyOption(wrapper)
 	}
 
-	for i, ms := range metricsets {
+	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
-			MetricSet: ms,
+			MetricSet: metricSet,
 			module:    wrapper,
-			stats:     getMetricSetStats(wrapper.Name(), ms.Name()),
+			stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
 		}
 	}
-
 	return wrapper, nil
 }
 
@@ -208,6 +217,9 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
 func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
+	// Indicate that it has been started as periodic fetcher
+	msw.periodic = true
+
 	// Fetch immediately.
 	msw.fetch(ctx, reporter)
 
@@ -366,6 +378,9 @@ func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
 		event.Took = time.Since(r.start)
+	}
+	if r.msw.periodic {
+		event.Period = r.msw.Module().Config().Period
 	}
 
 	if event.Timestamp.IsZero() {

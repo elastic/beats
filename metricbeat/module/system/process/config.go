@@ -18,8 +18,8 @@
 package process
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 )
 
 // Config stores the system/process config options
@@ -37,7 +37,7 @@ type Config struct {
 // Validate checks for depricated config options
 func (c Config) Validate() error {
 	if c.CPUTicks != nil {
-		cfgwarn.Deprecate("6.1", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
+		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
 	}
 	return nil
 }

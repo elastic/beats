@@ -23,13 +23,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/journalbeat/checkpoint"
-	"github.com/elastic/beats/journalbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/journalbeat/checkpoint"
+	"github.com/elastic/beats/v7/journalbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ToEventTestCase struct {
@@ -54,6 +54,45 @@ func TestToEvent(t *testing.T) {
 			expectedFields: common.MapStr{
 				"host": common.MapStr{
 					"boot_id": "123456",
+				},
+			},
+		},
+		// 'syslog.pid' field without user append
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": int64(123456),
+				},
+			},
+		},
+		// 'syslog.pid' field with user append
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456,root",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": int64(123456),
+				},
+			},
+		},
+		// 'syslog.pid' field empty
+		ToEventTestCase{
+			entry: sdjournal.JournalEntry{
+				Fields: map[string]string{
+					sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "",
+				},
+			},
+			expectedFields: common.MapStr{
+				"syslog": common.MapStr{
+					"pid": "",
 				},
 			},
 		},

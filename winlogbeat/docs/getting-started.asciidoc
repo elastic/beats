@@ -1,7 +1,11 @@
 [[winlogbeat-getting-started]]
-== Getting Started With Winlogbeat
+== Get started with {beatname_uc}
 
-include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
+
+include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
 * <<winlogbeat-installation>>
 * <<winlogbeat-configuration>>
@@ -15,7 +19,7 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 === Step 1: Install Winlogbeat
 
 *Before you begin*: If you haven't installed the {stack}, do that now. See
-{stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+{stack-gs}/get-started-elastic-stack.html[Get started with the {stack}].
 
 . Download the Winlogbeat zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
@@ -95,11 +99,11 @@ To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
-include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/step-configure-output.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
 
-include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
 . After you save your configuration file, test it with the following command.
 +
@@ -111,17 +115,17 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 [[config-winlogbeat-logstash]]
 === Step 3: Configure Winlogbeat to use Logstash
 
-include::{libbeat-dir}/docs/shared-logstash-config.asciidoc[]
+include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
 
 [[winlogbeat-template]]
 === Step 4: Load the index template in Elasticsearch
 
-include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 5: Set up the Kibana dashboards
 
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+include::{libbeat-dir}/dashboards.asciidoc[]
 
 [[winlogbeat-starting]]
 === Step 6: Start Winlogbeat
@@ -164,7 +168,7 @@ To make it easier for you to start monitoring your servers in Kibana, we have
 created example {beatname_uc} dashboards. You loaded the dashboards earlier
 when you ran the `setup` command.
 
-include::{libbeat-dir}/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

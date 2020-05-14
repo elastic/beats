@@ -1,11 +1,11 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-graphite]]
 == Graphite module
 
-This is the graphite Module.
+This is the Graphite module.
 
 The default metricset is `server`.
 

@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "stan.channels",
+        "duration": 115000,
+        "module": "stan"
+    },
+    "metricset": {
+        "name": "channels",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:32770",
+        "type": "stan"
+    },
+    "stan": {
+        "channels": {
+            "bytes": 1023999504,
+            "depth": 977951,
+            "first_seq": 6166399,
+            "last_seq": 7144430,
+            "messages": 978032,
+            "name": "bar"
+        },
+        "cluster": {
+            "id": "test-cluster"
+        },
+        "server": {
+            "id": "mNKuLCRmOZD79arLFAXiaJ"
+        }
+    }
+}

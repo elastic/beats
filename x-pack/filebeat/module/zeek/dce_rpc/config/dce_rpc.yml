@@ -1,0 +1,62 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: dce_rpc
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.dce_rpc"
+
+        - from: "zeek.dce_rpc.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.dce_rpc.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.dce_rpc.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.dce_rpc.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.dce_rpc.uid"
+          to: "zeek.session_id"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - connection
+          - protocol
+          - info
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

@@ -22,13 +22,13 @@ import (
 
 	"strings"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
@@ -36,13 +36,16 @@ func init() {
 }
 
 const (
-	module     = "module"
-	namespace  = "namespace"
-	hosts      = "hosts"
-	metricsets = "metricsets"
-	period     = "period"
-	timeout    = "timeout"
-	ssl        = "ssl"
+	module      = "module"
+	namespace   = "namespace"
+	hosts       = "hosts"
+	metricsets  = "metricsets"
+	period      = "period"
+	timeout     = "timeout"
+	ssl         = "ssl"
+	metricspath = "metrics_path"
+	username    = "username"
+	password    = "password"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
@@ -81,6 +84,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	}
 
 	modulesConfig := m.getModules(hints)
+	// here we handle raw configs if provided
 	if modulesConfig != nil {
 		configs := []*common.Config{}
 		for _, cfg := range modulesConfig {
@@ -90,7 +94,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, false)
 
 	}
 
@@ -110,6 +114,9 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	ival := m.getPeriod(hints)
 	sslConf := m.getSSLConfig(hints)
 	procs := m.getProcessors(hints)
+	metricspath := m.getMetricPath(hints)
+	username := m.getUsername(hints)
+	password := m.getPassword(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
@@ -125,21 +132,30 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if ns != "" {
 		moduleConfig["namespace"] = ns
 	}
+	if metricspath != "" {
+		moduleConfig["metrics_path"] = metricspath
+	}
+	if username != "" {
+		moduleConfig["username"] = username
+	}
+	if password != "" {
+		moduleConfig["password"] = password
+	}
 
-	logp.Debug("hints.builder", "generated config: %v", moduleConfig.String())
+	logp.Debug("hints.builder", "generated config: %v", moduleConfig)
 
 	// Create config object
 	cfg, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: +%v", *cfg)
+	logp.Debug("hints.builder", "generated config: %+v", common.DebugString(cfg, true))
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, config)
+	return template.ApplyConfigTemplate(event, config, false)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -187,6 +203,18 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string,
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {
 	return builder.GetHintString(hints, m.Key, namespace)
+}
+
+func (m *metricHints) getMetricPath(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, metricspath)
+}
+
+func (m *metricHints) getUsername(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, username)
+}
+
+func (m *metricHints) getPassword(hints common.MapStr) string {
+	return builder.GetHintString(hints, m.Key, password)
 }
 
 func (m *metricHints) getPeriod(hints common.MapStr) string {

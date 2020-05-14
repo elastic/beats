@@ -43,6 +43,8 @@ type Test struct {
 	Result   Result
 	Output   []string
 
+	SubtestIndent string
+
 	// Time is deprecated, use Duration instead.
 	Time int // in milliseconds
 }
@@ -59,12 +61,14 @@ type Benchmark struct {
 
 var (
 	regexStatus   = regexp.MustCompile(`--- (PASS|FAIL|SKIP): (.+) \((\d+\.\d+)(?: seconds|s)\)`)
+	regexIndent   = regexp.MustCompile(`^([ \t]+)---`)
 	regexCoverage = regexp.MustCompile(`^coverage:\s+(\d+\.\d+)%\s+of\s+statements(?:\sin\s.+)?$`)
 	regexResult   = regexp.MustCompile(`^(ok|FAIL)\s+([^ ]+)\s+(?:(\d+\.\d+)s|\(cached\)|(\[\w+ failed]))(?:\s+coverage:\s+(\d+\.\d+)%\sof\sstatements(?:\sin\s.+)?)?$`)
 	// regexBenchmark captures 3-5 groups: benchmark name, number of times ran, ns/op (with or without decimal), B/op (optional), and allocs/op (optional).
-	regexBenchmark = regexp.MustCompile(`^(Benchmark[^ -]+)(?:-\d+\s+|\s+)(\d+)\s+(\d+|\d+\.\d+)\sns/op(?:\s+(\d+)\sB/op)?(?:\s+(\d+)\sallocs/op)?`)
-	regexOutput    = regexp.MustCompile(`(    )*\t(.*)`)
-	regexSummary   = regexp.MustCompile(`^(PASS|FAIL|SKIP)$`)
+	regexBenchmark       = regexp.MustCompile(`^(Benchmark[^ -]+)(?:-\d+\s+|\s+)(\d+)\s+(\d+|\d+\.\d+)\sns/op(?:\s+(\d+)\sB/op)?(?:\s+(\d+)\sallocs/op)?`)
+	regexOutput          = regexp.MustCompile(`(    )*\t(.*)`)
+	regexSummary         = regexp.MustCompile(`^(PASS|FAIL|SKIP)$`)
+	regexPackageWithTest = regexp.MustCompile(`^# ([^\[\]]+) \[[^\]]+\]$`)
 )
 
 // Parse parses go test output from reader r and returns a report with the
@@ -86,9 +90,6 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 
 	// current test
 	var cur string
-
-	// keep track if we've already seen a summary for the current test
-	var seenSummary bool
 
 	// coverage percentage report for current package
 	var coveragePct string
@@ -124,7 +125,6 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 
 			// clear the current build package, so output lines won't be added to that build
 			capturedPackage = ""
-			seenSummary = false
 		} else if matches := regexBenchmark.FindStringSubmatch(line); len(matches) == 6 {
 			bytes, _ := strconv.Atoi(matches[4])
 			allocs, _ := strconv.Atoi(matches[5])
@@ -152,9 +152,10 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 					Result: FAIL,
 					Output: packageCaptures[matches[2]],
 				})
-			} else if matches[1] == "FAIL" && len(tests) == 0 && len(buffers[cur]) > 0 {
-				// This package didn't have any tests, but it failed with some
-				// output. Create a dummy test with the output.
+			} else if matches[1] == "FAIL" && !containsFailures(tests) && len(buffers[cur]) > 0 {
+				// This package didn't have any failing tests, but still it
+				// failed with some output. Create a dummy test with the
+				// output.
 				tests = append(tests, &Test{
 					Name:   "Failure",
 					Result: FAIL,
@@ -195,6 +196,11 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 			} else {
 				test.Result = FAIL
 			}
+
+			if matches := regexIndent.FindStringSubmatch(line); len(matches) == 2 {
+				test.SubtestIndent = matches[1]
+			}
+
 			test.Output = buffers[cur]
 
 			test.Name = matches[2]
@@ -215,16 +221,33 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 			test.Output = append(test.Output, matches[2])
 		} else if strings.HasPrefix(line, "# ") {
 			// indicates a capture of build output of a package. set the current build package.
-			capturedPackage = line[2:]
+			packageWithTestBinary := regexPackageWithTest.FindStringSubmatch(line)
+			if packageWithTestBinary != nil {
+				// Sometimes, the text after "# " shows the name of the test binary
+				// ("<package>.test") in addition to the package
+				// e.g.: "# package/name [package/name.test]"
+				capturedPackage = packageWithTestBinary[1]
+			} else {
+				capturedPackage = line[2:]
+			}
 		} else if capturedPackage != "" {
 			// current line is build failure capture for the current built package
 			packageCaptures[capturedPackage] = append(packageCaptures[capturedPackage], line)
 		} else if regexSummary.MatchString(line) {
-			// don't store any output after the summary
-			seenSummary = true
-		} else if !seenSummary {
+			// unset current test name so any additional output after the
+			// summary is captured separately.
+			cur = ""
+		} else {
 			// buffer anything else that we didn't recognize
 			buffers[cur] = append(buffers[cur], line)
+
+			// if we have a current test, also append to its output
+			test := findTest(tests, cur)
+			if test != nil {
+				if strings.HasPrefix(line, test.SubtestIndent+"    ") {
+					test.Output = append(test.Output, strings.TrimPrefix(line, test.SubtestIndent+"    "))
+				}
+			}
 		}
 	}
 
@@ -269,6 +292,15 @@ func findTest(tests []*Test, name string) *Test {
 		}
 	}
 	return nil
+}
+
+func containsFailures(tests []*Test) bool {
+	for _, test := range tests {
+		if test.Result == FAIL {
+			return true
+		}
+	}
+	return false
 }
 
 // Failures counts the number of failed tests in this report

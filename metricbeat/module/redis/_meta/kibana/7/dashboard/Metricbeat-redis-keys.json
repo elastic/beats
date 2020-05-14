@@ -12,7 +12,7 @@
             }
           }
         },
-        "title": "Keyspace selector [Redis] ECS",
+        "title": "Keyspace selector [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -22,7 +22,7 @@
               {
                 "fieldName": "redis.keyspace.id",
                 "id": "1545388837304",
-                "indexPattern": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                "indexPattern": "metricbeat-*",
                 "label": "Keyspace",
                 "options": {
                   "dynamicOptions": true,
@@ -39,7 +39,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "Keyspace selector [Redis] ECS",
+          "title": "Keyspace selector [Metricbeat Redis] ECS",
           "type": "input_control_vis"
         }
       },
@@ -61,7 +61,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.type",
                   "negate": false,
                   "params": {
@@ -81,14 +81,14 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Lists length [Redis] ECS",
+        "title": "Lists length [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -228,7 +228,7 @@
               }
             ]
           },
-          "title": "Lists length [Redis] ECS",
+          "title": "Lists length [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -243,14 +243,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Keys by type [Redis] ECS",
+        "title": "Keys by type [Metricbeat Redis] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -377,7 +377,7 @@
               }
             ]
           },
-          "title": "Keys by type [Redis] ECS",
+          "title": "Keys by type [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -399,7 +399,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.type",
                   "negate": false,
                   "params": {
@@ -419,14 +419,14 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Average string key size [Redis] ECS",
+        "title": "Average string key size [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -548,7 +548,7 @@
               }
             ]
           },
-          "title": "Average string key size [Redis] ECS",
+          "title": "Average string key size [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -570,7 +570,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.key.expire.ttl",
                   "negate": false,
                   "params": {
@@ -588,14 +588,14 @@
                 }
               }
             ],
-            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "index": "metricbeat-*",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Average keys TTL [Redis] ECS",
+        "title": "Average keys TTL [Metricbeat Redis] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -734,7 +734,7 @@
               }
             ]
           },
-          "title": "Average keys TTL [Redis] ECS",
+          "title": "Average keys TTL [Metricbeat Redis] ECS",
           "type": "line"
         }
       },
@@ -758,7 +758,7 @@
                   "alias": null,
                   "controlledBy": "1545388837304",
                   "disabled": false,
-                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "index": "metricbeat-*",
                   "key": "redis.keyspace.id",
                   "negate": false,
                   "params": [

@@ -11,32 +11,55 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var (
 	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,139}$"
 	functionRE      = regexp.MustCompile(functionPattern)
-)
+	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"path.data":              "/tmp",
+		"path.logs":              "/tmp/logs",
+		"keystore.path":          "/tmp/functionbeat.keystore",
+		"setup.template.enabled": true,
+		"queue.mem": map[string]interface{}{
+			"flush.min_events": 10,
+			"flush.timeout":    "0.01s",
+		},
+	})
+	functionLoggingOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"logging.to_stderr": true,
+		"logging.to_files":  false,
+	})
+	logstashOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"output.logstash.pipelining": 0,
+	})
 
-// ConfigOverrides overrides the defaults provided by libbeat.
-var ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
-	"path.data":              "/tmp",
-	"path.logs":              "/tmp/logs",
-	"logging.to_stderr":      true,
-	"logging.to_files":       false,
-	"setup.template.enabled": true,
-	"queue.mem": map[string]interface{}{
-		"events":           "${output.elasticsearch.bulk_max_size}",
-		"flush.min_events": 10,
-		"flush.timeout":    "0.01s",
-	},
-	"output.elasticsearch.bulk_max_size": 50,
-})
+	// Overrides overrides the default configuration provided by libbeat.
+	Overrides = []cfgfile.ConditionalOverride{
+		cfgfile.ConditionalOverride{
+			Check:  always,
+			Config: configOverrides,
+		},
+		cfgfile.ConditionalOverride{
+			Check:  isLogstash,
+			Config: logstashOverrides,
+		},
+	}
+
+	functionOverride = cfgfile.ConditionalOverride{
+		Check:  always,
+		Config: functionLoggingOverrides,
+	}
+
+	// FunctionOverrides contain logging settings
+	FunctionOverrides = append(Overrides, functionOverride)
+)
 
 // Config default configuration for Functionbeat.
 type Config struct {
-	Provider *common.ConfigNamespace `config:"provider" validate:"required"`
+	Provider *common.Config `config:"provider" validate:"required"`
 }
 
 // ProviderConfig is a generic configured used by providers.
@@ -57,6 +80,22 @@ var DefaultConfig = Config{}
 // DefaultFunctionConfig is the default configuration for new function.
 var DefaultFunctionConfig = FunctionConfig{
 	Enabled: true,
+}
+
+var always = func(_ *common.Config) bool {
+	return true
+}
+
+var isLogstash = func(cfg *common.Config) bool {
+	return isOutput(cfg, "logstash")
+}
+
+func isOutput(cfg *common.Config, name string) bool {
+	outputCfg, err := cfg.Child("output", -1)
+	if err != nil {
+		return false
+	}
+	return outputCfg.HasField(name)
 }
 
 type functionName string

@@ -22,7 +22,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 type NetService struct {
@@ -71,22 +71,22 @@ func (n *NetService) getNetworkStatsPerContainer(rawStats []docker.Stat, dedot b
 	formattedStats := []NetStats{}
 	for _, myStats := range rawStats {
 		for nameInterface, rawnNetStats := range myStats.Stats.Networks {
-			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, &rawnNetStats, &myStats, dedot))
+			formattedStats = append(formattedStats, n.getNetworkStats(nameInterface, rawnNetStats, myStats, dedot))
 		}
 	}
 
 	return formattedStats
 }
 
-func (n *NetService) getNetworkStats(nameInterface string, rawNetStats *types.NetworkStats, myRawstats *docker.Stat, dedot bool) NetStats {
-	newNetworkStats := createNetRaw(myRawstats.Stats.Read, rawNetStats)
+func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.NetworkStats, myRawstats docker.Stat, dedot bool) NetStats {
+	newNetworkStats := createNetRaw(myRawstats.Stats.Read, &rawNetStats)
 	oldNetworkStat, exist := n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface]
 
 	netStats := NetStats{
 		Container:     docker.NewContainer(myRawstats.Container, dedot),
 		Time:          myRawstats.Stats.Read,
 		NameInterface: nameInterface,
-		Total:         rawNetStats,
+		Total:         &rawNetStats,
 	}
 
 	if exist {

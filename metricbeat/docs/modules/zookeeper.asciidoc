@@ -1,12 +1,12 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-zookeeper]]
 == ZooKeeper module
 
 The ZooKeeper module fetches statistics from the ZooKeeper service. The default
-metricset is `mntr` and `server`.
+metricsets are `mntr` and `server`.
 
 [float]
 === Compatibility

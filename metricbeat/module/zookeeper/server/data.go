@@ -24,11 +24,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var latencyCapturer = regexp.MustCompile(`(\d+)/(\d+)/(\d+)`)
@@ -53,7 +54,14 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) 
 	output := common.MapStr{}
 
 	version := versionCapturer.FindStringSubmatch(scanner.Text())[1]
-	output.Put("version_date", dateCapturer.FindStringSubmatch(scanner.Text())[1])
+	dateString := dateCapturer.FindStringSubmatch(scanner.Text())[1]
+
+	date, err := time.Parse("01/02/2006 03:04 GMT", dateString)
+	if err != nil {
+		logger.Debugf("error trying to parse date '%s'", dateString)
+	} else {
+		output.Put("version_date", date.Format(time.RFC3339))
+	}
 
 	for scanner.Scan() {
 		line := scanner.Text()

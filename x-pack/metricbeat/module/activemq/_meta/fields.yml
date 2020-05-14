@@ -1,0 +1,10 @@
+- key: activemq
+  title: "ActiveMQ"
+  release: ga
+  description: >
+    activemq module
+  fields:
+    - name: activemq
+      type: group
+      description: >
+      fields:

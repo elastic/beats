@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -35,8 +35,7 @@ func TestCreateEvent(t *testing.T) {
 	message := []byte(hello)
 	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
 
-	data := createEvent(message, mt)
-	event := data.GetEvent()
+	event := createEvent(message, mt)
 
 	m, err := event.GetValue("message")
 	assert.NoError(t, err)

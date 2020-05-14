@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  phpfpm:
+    image: docker.elastic.co/integrations-ci/beats-phpfpm:${PHPFPM_VERSION:-7.1}-1
+    build: 
+      context: ./_meta
+      args:
+        PHPFPM_VERSION: ${PHPFPM_VERSION:-7.1}
+    ports:
+      - 81

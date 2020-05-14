@@ -1,9 +1,16 @@
 [
     {
         "@timestamp": "2017-07-31T11:36:42.585Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -15,9 +22,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.605Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -29,9 +43,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.615Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -43,9 +64,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.616Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -57,9 +85,16 @@
     },
     {
         "@timestamp": "2017-07-31T11:36:42.956Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -68,15 +103,25 @@
         "postgresql.log.database": "unknown",
         "postgresql.log.timestamp": "2017-07-31 13:36:42.956 CEST",
         "process.pid": 4980,
+        "related.user": [
+            "unknown"
+        ],
         "service.type": "postgresql",
         "user.name": "unknown"
     },
     {
         "@timestamp": "2017-07-31T11:36:43.557Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 37118000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -87,17 +132,28 @@
         "message": "2017-07-31 13:36:43.557 CEST [4983] postgres@postgres LOG:  duration: 37.118 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
         "postgresql.log.database": "postgres",
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:43.557 CEST",
         "process.pid": 4983,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:36:44.104Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 2895000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -108,17 +164,28 @@
         "message": "2017-07-31 13:36:44.104 CEST [4986] postgres@postgres LOG:  duration: 2.895 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
         "postgresql.log.database": "postgres",
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:44.104 CEST",
         "process.pid": 4986,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:36:44.642Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 2809000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -129,16 +196,27 @@
         "message": "2017-07-31 13:36:44.642 CEST [4989] postgres@postgres LOG:  duration: 2.809 ms  statement: SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
         "postgresql.log.database": "postgres",
         "postgresql.log.query": "SELECT d.datname as \"Name\",\n\t       pg_catalog.pg_get_userbyid(d.datdba) as \"Owner\",\n\t       pg_catalog.pg_encoding_to_char(d.encoding) as \"Encoding\",\n\t       d.datcollate as \"Collate\",\n\t       d.datctype as \"Ctype\",\n\t       pg_catalog.array_to_string(d.datacl, E'\\n') AS \"Access privileges\"\n\tFROM pg_catalog.pg_database d\n\tORDER BY 1;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:36:44.642 CEST",
         "process.pid": 4989,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:16.249Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "FATAL",
@@ -147,14 +225,24 @@
         "postgresql.log.database": "users",
         "postgresql.log.timestamp": "2017-07-31 13:39:16.249 CEST",
         "process.pid": 5407,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:17.945Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "FATAL",
@@ -163,15 +251,25 @@
         "postgresql.log.database": "user",
         "postgresql.log.timestamp": "2017-07-31 13:39:17.945 CEST",
         "process.pid": 5500,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:21.025Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 37598000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -182,17 +280,28 @@
         "message": "2017-07-31 13:39:21.025 CEST [5404] postgres@postgres LOG:  duration: 37.598 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
         "postgresql.log.database": "postgres",
         "postgresql.log.query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:21.025 CEST",
         "process.pid": 5404,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:31.619Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 9482000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -200,17 +309,28 @@
         "message": "2017-07-31 13:39:31.619 CEST [5502] postgres@clients LOG:  duration: 9.482 ms  statement: select * from clients;",
         "postgresql.log.database": "clients",
         "postgresql.log.query": "select * from clients;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:31.619 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:39:40.147Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 765000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -218,17 +338,28 @@
         "message": "2017-07-31 13:39:40.147 CEST [5502] postgres@clients LOG:  duration: 0.765 ms  statement: select id from clients;",
         "postgresql.log.database": "clients",
         "postgresql.log.query": "select id from clients;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:39:40.147 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:40:54.310Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 26082001,
+        "event.duration": 26082000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -239,17 +370,28 @@
         "message": "2017-07-31 13:40:54.310 CEST [5502] postgres@clients LOG:  duration: 26.082 ms  statement: SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
         "postgresql.log.database": "clients",
         "postgresql.log.query": "SELECT n.nspname as \"Schema\",\n\t  c.relname as \"Name\",\n\t  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as \"Type\",\n\t  pg_catalog.pg_get_userbyid(c.relowner) as \"Owner\"\n\tFROM pg_catalog.pg_class c\n\t     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace\n\tWHERE c.relkind IN ('r','')\n\t      AND n.nspname <> 'pg_catalog'\n\t      AND n.nspname <> 'information_schema'\n\t      AND n.nspname !~ '^pg_toast'\n\t  AND pg_catalog.pg_table_is_visible(c.oid)\n\tORDER BY 1,2;",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:40:54.310 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:43:22.645Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
-        "event.duration": 36161999,
+        "event.duration": 36162000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -257,17 +399,28 @@
         "message": "2017-07-31 13:43:22.645 CEST [5502] postgres@clients LOG:  duration: 36.162 ms  statement: create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);",
         "postgresql.log.database": "clients",
         "postgresql.log.query": "create table cats(name varchar(50) primary key, toy varchar (50) not null, born timestamp not null);",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:43:22.645 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:02.670Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 10540000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -275,17 +428,28 @@
         "message": "2017-07-31 13:46:02.670 CEST [5502] postgres@c$lients LOG:  duration: 10.540 ms  statement: insert into cats(name, toy, born) values('kate', 'ball', now());",
         "postgresql.log.database": "c$lients",
         "postgresql.log.query": "insert into cats(name, toy, born) values('kate', 'ball', now());",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:02.670 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:23.016Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 5156000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -293,17 +457,28 @@
         "message": "2017-07-31 13:46:23.016 CEST [5502] postgres@_clients$db LOG:  duration: 5.156 ms  statement: insert into cats(name, toy, born) values('frida', 'horse', now());",
         "postgresql.log.database": "_clients$db",
         "postgresql.log.query": "insert into cats(name, toy, born) values('frida', 'horse', now());",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:23.016 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
         "@timestamp": "2017-07-31T11:46:55.637Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 25871000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -311,9 +486,45 @@
         "message": "2017-07-31 13:46:55.637 CEST [5502] postgres@clients_db LOG:  duration: 25.871 ms  statement: create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);",
         "postgresql.log.database": "clients_db",
         "postgresql.log.query": "create table dogs(name varchar(50) primary key, owner varchar (50) not null, born timestamp not null);",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.timestamp": "2017-07-31 13:46:55.637 CEST",
         "process.pid": 5502,
+        "related.user": [
+            "postgres"
+        ],
         "service.type": "postgresql",
         "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2019-05-06T19:00:04.511Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 753000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 4266,
+        "message": "2019-05-06 19:00:04.511 UTC [913763] elastic@opbeans LOG:  duration: 0.753 ms  statement: SELECT p.id, p.sku, p.name, p.stock, t.name AS type_name FROM products p LEFT JOIN product_types t ON p.type_id=t.id\n    FROM orders JOIN customers ON orders.customer_id=customers.id\n    FROM products JOIN product_types ON type_id=product_types.id",
+        "postgresql.log.database": "opbeans",
+        "postgresql.log.query": "SELECT p.id, p.sku, p.name, p.stock, t.name AS type_name FROM products p LEFT JOIN product_types t ON p.type_id=t.id\n    FROM orders JOIN customers ON orders.customer_id=customers.id\n    FROM products JOIN product_types ON type_id=product_types.id",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.timestamp": "2019-05-06 19:00:04.511 UTC",
+        "process.pid": 913763,
+        "related.user": [
+            "elastic"
+        ],
+        "service.type": "postgresql",
+        "user.name": "elastic"
     }
 ]

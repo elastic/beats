@@ -1,6 +1,5 @@
-[float]
 [[bandwidth-throttling]]
-=== Need to limit bandwidth used by {beatname_uc}?
+=== {beatname_uc} uses too much bandwidth
 
 If you need to limit bandwidth usage, we recommend that you configure the network stack on your OS to perform
 bandwidth throttling.

@@ -1,0 +1,1 @@
+This is the citadel metricset of the module istio. This metricset collects Citadel-specific metrics.

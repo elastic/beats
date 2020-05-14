@@ -1,0 +1,25 @@
+{{header "Paths"}}
+
+# The home path for the {{.BeatName | title}} installation. This is the default base path
+# for all other path settings and for miscellaneous files that come with the
+# distribution (for example, the sample dashboards).
+# If not set by a CLI flag or in the configuration file, the default for the
+# home path is the location of the binary.
+#path.home:
+
+# The configuration path for the {{.BeatName | title}} installation. This is the default
+# base path for configuration files, including the main YAML configuration file
+# and the Elasticsearch template file. If not set by a CLI flag or in the
+# configuration file, the default for the configuration path is the home path.
+#path.config: ${path.home}
+
+# The data path for the {{.BeatName | title}} installation. This is the default base path
+# for all the files in which {{.BeatName | title}} needs to store its data. If not set by a
+# CLI flag or in the configuration file, the default for the data path is a data
+# subdirectory inside the home path.
+#path.data: ${path.home}/data
+
+# The logs path for a {{.BeatName | title}} installation. This is the default location for
+# the Beat's log files. If not set by a CLI flag or in the configuration file,
+# the default for the logs path is a logs subdirectory inside the home path.
+#path.logs: ${path.home}/logs

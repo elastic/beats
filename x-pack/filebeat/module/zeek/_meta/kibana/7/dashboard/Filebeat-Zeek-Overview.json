@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of Zeek",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -124,7 +124,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "Zeek Overview Dashboard",
+        "title": "[Filebeat Zeek] Overview",
         "version": 1
       },
       "id": "7cbb5410-3700-11e9-aa6d-ff445a78330c",
@@ -190,7 +190,7 @@
             }
           }
         },
-        "title": "Destination Geo [Zeek]",
+        "title": "Destination Geo [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -253,7 +253,7 @@
               }
             }
           },
-          "title": "Destination Geo [Zeek]",
+          "title": "Destination Geo [Filebeat Zeek]",
           "type": "tile_map"
         }
       },
@@ -285,7 +285,7 @@
             }
           }
         },
-        "title": "Network Transport [Zeek]",
+        "title": "Network Transport [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -337,7 +337,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Transport [Zeek]",
+          "title": "Network Transport [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -369,7 +369,7 @@
             }
           }
         },
-        "title": "Network Application [Zeek]",
+        "title": "Network Application [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -421,7 +421,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Application [Zeek]",
+          "title": "Network Application [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -453,7 +453,7 @@
             }
           }
         },
-        "title": "Network Traffic Direction [Zeek]",
+        "title": "Network Traffic Direction [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -505,7 +505,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Traffic Direction [Zeek]",
+          "title": "Network Traffic Direction [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -537,7 +537,7 @@
             }
           }
         },
-        "title": "Top DNS Domains [Zeek]",
+        "title": "Top DNS Domains [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -589,7 +589,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top DNS Domains [Zeek]",
+          "title": "Top DNS Domains [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -621,7 +621,7 @@
             }
           }
         },
-        "title": "Top URL Domains [Zeek]",
+        "title": "Top URL Domains [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -688,7 +688,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top URL Domains [Zeek]",
+          "title": "Top URL Domains [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -720,7 +720,7 @@
             }
           }
         },
-        "title": "Top SSL Servers [Zeek]",
+        "title": "Top SSL Servers [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -772,7 +772,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top SSL Servers [Zeek]",
+          "title": "Top SSL Servers [Filebeat Zeek]",
           "type": "pie"
         }
       },
@@ -803,7 +803,7 @@
             }
           }
         },
-        "title": "Number of Sessions Overtime [Zeek]",
+        "title": "Number of Sessions Overtime [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -841,7 +841,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Number of Sessions Overtime [Zeek]",
+          "title": "Number of Sessions Overtime [Filebeat Zeek]",
           "type": "metrics"
         }
       },

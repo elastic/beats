@@ -9,7 +9,7 @@ services:
       retries: 300
       interval: 1s
     environment:
-    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"

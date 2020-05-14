@@ -12,11 +12,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 func TestMessageWithOptions(t *testing.T) {
@@ -81,7 +81,7 @@ func TestMessageWithOptions(t *testing.T) {
 
 func TestOptionTemplates(t *testing.T) {
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
-	key := v9.MakeSessionKey(addr)
+	key := v9.MakeSessionKey(addr, 1234)
 
 	t.Run("Single options template", func(t *testing.T) {
 		proto := New(config.Defaults())
@@ -107,7 +107,7 @@ func TestOptionTemplates(t *testing.T) {
 		s, found := v9proto.Session.Sessions[key]
 		assert.True(t, found)
 		assert.Len(t, s.Templates, 1)
-		opt := s.GetTemplate(1234, 999)
+		opt := s.GetTemplate(999)
 		assert.NotNil(t, opt)
 		assert.Equal(t, 1, opt.ScopeFields)
 	})
@@ -144,7 +144,7 @@ func TestOptionTemplates(t *testing.T) {
 		assert.True(t, found)
 		assert.Len(t, s.Templates, 2)
 		for _, id := range []uint16{998, 999} {
-			opt := s.GetTemplate(1234, id)
+			opt := s.GetTemplate(id)
 			assert.NotNil(t, opt)
 			assert.True(t, opt.ScopeFields > 0)
 		}

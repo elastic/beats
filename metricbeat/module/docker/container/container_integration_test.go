@@ -22,14 +22,12 @@ package container
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	f := mbtest.NewFetcher(t, getConfig())
+	f.WriteEvents(t, "")
 }
 
 func getConfig() map[string]interface{} {

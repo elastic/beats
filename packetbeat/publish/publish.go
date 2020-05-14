@@ -22,11 +22,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/packetbeat/pb"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/packetbeat/pb"
 )
 
 type TransactionPublisher struct {
@@ -86,6 +86,7 @@ func (p *TransactionPublisher) CreateReporter(
 	meta := struct {
 		Event      common.EventMetadata    `config:",inline"`
 		Processors processors.PluginConfig `config:"processors"`
+		KeepNull   bool                    `config:"keep_null"`
 	}{}
 	if err := config.Unpack(&meta); err != nil {
 		return nil, err
@@ -100,6 +101,7 @@ func (p *TransactionPublisher) CreateReporter(
 		Processing: beat.ProcessingConfig{
 			EventMetadata: meta.Event,
 			Processor:     processors,
+			KeepNull:      meta.KeepNull,
 		},
 	}
 	if p.canDrop {

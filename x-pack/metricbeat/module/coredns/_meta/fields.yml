@@ -1,8 +1,8 @@
 - key: coredns
-  title: "coredns"
+  title: "Coredns"
   description: >
     coredns Module
-  release: beta
+  release: ga
   fields:
     - name: coredns
       type: group

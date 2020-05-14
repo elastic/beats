@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  mysql:
+    extends:
+      file: ../../../../metricbeat/module/mysql/docker-compose.yml
+      service: mysql
+
+  postgresql:
+    extends:
+      file: ../../../../metricbeat/module/postgresql/docker-compose.yml
+      service: postgresql

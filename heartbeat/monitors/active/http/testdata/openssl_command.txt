@@ -1,0 +1,1 @@
+openssl req -x509 -sha256 -nodes -days 7300 -newkey rsa:2048 -keyout privateKey.key -out certificate.crt

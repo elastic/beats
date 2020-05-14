@@ -26,18 +26,17 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
 	GoImportsLocalPrefix = "github.com/elastic"
-
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
 )
 
 // Format adds license headers, formats .go files with goimports, and formats
@@ -52,10 +51,12 @@ func Format() {
 }
 
 // GoImports executes goimports against all .go files in and below the CWD. It
-// ignores vendor/ directories.
+// ignores vendor/ and generator/_templates/ directories.
 func GoImports() error {
 	goFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return filepath.Ext(path) == ".go" && !strings.Contains(path, "vendor/")
+		return filepath.Ext(path) == ".go" &&
+			!strings.Contains(path, "vendor/") &&
+			!strings.Contains(path, "generator/_templates/")
 	})
 	if err != nil {
 		return err
@@ -65,8 +66,19 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if err := sh.Run("go", "get", GoImportsImportPath); err != nil {
-		return err
+	if UseVendor {
+		if err := gotool.Install(
+			gotool.Install.Vendored(),
+			gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+		); err != nil {
+			return err
+		}
+	} else {
+		if err := gotool.Get(
+			gotool.Get.Package(filepath.Join(GoImportsImportPath)),
+		); err != nil {
+			return err
+		}
 	}
 
 	args := append(
@@ -114,11 +126,13 @@ func PythonAutopep8() error {
 // AddLicenseHeaders adds license headers to .go files. It applies the
 // appropriate license header based on the value of devtools.BeatLicense.
 func AddLicenseHeaders() error {
+	if os.Getenv("CHECK_HEADERS_DISABLED") != "" {
+		return nil
+	}
+
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", GoLicenserImportPath); err != nil {
-		return err
-	}
+	mg.Deps(InstallGoLicenser)
 
 	var license string
 	switch BeatLicense {
@@ -130,5 +144,6 @@ func AddLicenseHeaders() error {
 		return errors.Errorf("unknown license type %v", BeatLicense)
 	}
 
-	return sh.RunV("go-licenser", "-license", license)
+	licenser := gotool.Licenser
+	return licenser(licenser.License(license))
 }

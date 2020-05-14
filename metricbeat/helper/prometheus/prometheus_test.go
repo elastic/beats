@@ -26,8 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 const (
@@ -164,6 +165,15 @@ metrics_force_propagation_ms_sum{kind="jedi"} 50
 metrics_force_propagation_ms_count{kind="jedi"} 651
 
 `
+
+	promGaugeLabeled = `
+# TYPE metrics_that_inform_labels gauge
+metrics_that_inform_labels{label1="I am 1", label2="I am 2"} 1
+metrics_that_inform_labels{label1="I am 1", label3="I am 3"} 1
+# TYPE metrics_that_use_labels gauge
+metrics_that_use_labels{label1="I am 1"} 20
+
+`
 )
 
 type mockFetcher struct {
@@ -176,14 +186,15 @@ var _ = httpfetcher(&mockFetcher{})
 // returns the mockFetcher.Response contents
 func (m mockFetcher) FetchResponse() (*http.Response, error) {
 	return &http.Response{
-		Header: make(http.Header),
-		Body:   ioutil.NopCloser(bytes.NewReader([]byte(m.response))),
+		StatusCode: 200,
+		Header:     make(http.Header),
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(m.response))),
 	}, nil
 }
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}}
+	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -858,11 +869,73 @@ func TestPrometheusKeyLabels(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			testName:           "Test gauge InfoMetrics using ExtendedInfoMetric",
+			prometheusResponse: promGaugeLabeled,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "metrics.other_labels"}),
+					"metrics_that_use_labels":    Metric("metrics.value"),
+				},
+				Labels: map[string]LabelMap{
+					"label1": KeyLabel("metrics.label1"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"value":  20.0,
+						"label1": "I am 1",
+						"other_labels": common.MapStr{
+							"label2": "I am 2",
+							"label3": "I am 3",
+						},
+					},
+				},
+			},
+		},
+
+		{
+			testName:           "Test gauge InfoMetrics using ExtendedInfoMetric and extra fields",
+			prometheusResponse: promGaugeLabeled,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{
+						StoreNonMappedLabels:     true,
+						NonMappedLabelsPlacement: "metrics.other_labels",
+						ExtraFields: common.MapStr{
+							"metrics.extra.field1": "extra1",
+							"metrics.extra.field2": "extra2",
+						}}),
+					"metrics_that_use_labels": Metric("metrics.value"),
+				},
+				Labels: map[string]LabelMap{
+					"label1": KeyLabel("metrics.label1"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"value":  20.0,
+						"label1": "I am 1",
+						"other_labels": common.MapStr{
+							"label2": "I am 2",
+							"label3": "I am 3",
+						},
+						"extra": common.MapStr{
+							"field1": "extra1",
+							"field2": "extra2",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
 		p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

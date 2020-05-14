@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  rabbitmq:
+    image: docker.elastic.co/integrations-ci/beats-rabbitmq:${RABBITMQ_VERSION:-3.7.4}-1
+    build:
+      context: ./_meta
+      args:
+        RABBITMQ_VERSION: ${RABBITMQ_VERSION:-3.7.4}
+    ports:
+      - 15672

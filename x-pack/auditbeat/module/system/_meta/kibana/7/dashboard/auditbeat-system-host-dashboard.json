@@ -625,7 +625,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "dfce2b60-18c7-11e9-9094-c50574723088",
+                  "index": "auditbeat-*",
                   "key": "event.dataset",
                   "negate": false,
                   "params": {

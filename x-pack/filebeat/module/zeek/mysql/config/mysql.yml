@@ -1,0 +1,76 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: tcp
+  network.protocol: mysql
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.mysql"
+
+        - from: "zeek.mysql.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.mysql.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.mysql.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.mysql.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.mysql.uid"
+          to: "zeek.session_id"
+
+      ignore_missing: true
+      fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "zeek.mysql.cmd", to: "event.action"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - database
+          - network
+        type:
+          - connection
+          - protocol
+  - if:
+      equals:
+        zeek.mysql.success: true
+    then:
+      - add_fields:
+          target: event
+          fields:
+            outcome: success
+    else:
+      - add_fields:
+          target: event
+          fields:
+            outcome: failure
+{{ if .community_id }}
+  - community_id:
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

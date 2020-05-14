@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  # Dummy container for docker tests, so there is a container with
+  # healthcheck generating events
+  docker:
+    image: alpine
+    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
+    healthcheck:
+      interval: 1s
+      test: ["CMD", "true"]
+

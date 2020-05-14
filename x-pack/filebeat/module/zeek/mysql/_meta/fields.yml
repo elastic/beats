@@ -1,0 +1,30 @@
+- name: mysql
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek MySQL log.
+  fields:
+    - name: cmd
+      type: keyword
+      description: |
+        The command that was issued.
+
+    - name: arg
+      type: keyword
+      description: |
+        The argument issued to the command.
+
+    - name: success
+      type: boolean
+      description: |
+        Whether the command succeeded.
+
+    - name: rows
+      type: integer
+      description: |
+        The number of affected rows, if any.
+
+    - name: response
+      type: keyword
+      description: |
+        Server message, if any.

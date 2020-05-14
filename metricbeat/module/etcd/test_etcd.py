@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 import metricbeat
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['etcd']
 
@@ -24,7 +25,3 @@ class Test(metricbeat.BaseTest):
         etcd metricset tests
         """
         self.check_metricset("etcd", metricset, self.get_hosts(), ['etcd.' + metricset])
-
-
-class Test_3_2(Test):
-    COMPOSE_SERVICES = ['etcd_3_2']

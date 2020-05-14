@@ -44,7 +44,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"linux/armv5", CGOSupported | CrossBuildSupported},
 	{"linux/armv6", CGOSupported | CrossBuildSupported},
 	{"linux/armv7", CGOSupported | CrossBuildSupported},
-	{"linux/arm64", CGOSupported | CrossBuildSupported},
+	{"linux/arm64", CGOSupported | CrossBuildSupported | Default},
 	{"linux/mips", CGOSupported | CrossBuildSupported},
 	{"linux/mips64", CGOSupported | CrossBuildSupported},
 	{"linux/mips64le", CGOSupported | CrossBuildSupported},

@@ -1,0 +1,1 @@
+{"ts":1573030980.989353,"uid":"Ctefoj1tgOPt4D0EK2","id.orig_h":"192.168.1.1","id.orig_p":37598,"id.resp_h":"198.41.0.4","id.resp_p":53,"seen.indicator":"198.41.0.4","seen.indicator_type":"Intel::ADDR","seen.where":"Conn::IN_RESP","seen.node":"worker-1-2","matched":["Intel::ADDR"],"sources":["ETPRO Rep: AbusedTLD Score: 127"]}

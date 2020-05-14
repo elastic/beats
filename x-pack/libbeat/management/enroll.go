@@ -11,11 +11,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 const accessTokenKey = "management.accesstoken"
@@ -34,6 +36,8 @@ func Enroll(
 	if err != nil {
 		return err
 	}
+
+	cfgwarn.Deprecate("8.0.0", "Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
 
 	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.ID, enrollmentToken)
 	if err != nil {
@@ -55,8 +59,14 @@ func Enroll(
 
 	ts := time.Now()
 
+	// This timestamp format is a variation of RFC3339 replacing colons with
+	// slashes so that it can be used as part of a filename in all OSes.
+	// (Colon is not a valid character for filenames in Windows).
+	// Also removed the TZ-offset as that can cause a plus sign to be output.
+	const fsSafeTimestamp = "2006-01-02T15-04-05"
+
 	// backup current settings:
-	backConfigFile := configFile + "." + ts.Format(time.RFC3339) + ".bak"
+	backConfigFile := configFile + "." + ts.Format(fsSafeTimestamp) + ".bak"
 	fmt.Println("Saving a copy of current settings to " + backConfigFile)
 	err = file.SafeFileRotate(backConfigFile, configFile)
 	if err != nil {
@@ -78,16 +88,22 @@ func Enroll(
 }
 
 func storeAccessToken(beat *instance.Beat, accessToken string) error {
-	keystore := beat.Keystore()
-	if !keystore.IsPersisted() {
-		if err := keystore.Create(false); err != nil {
+	keyStore := beat.Keystore()
+
+	wKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		return err
+	}
+
+	if !keyStore.IsPersisted() {
+
+		if err := wKeystore.Create(false); err != nil {
 			return errors.Wrap(err, "error creating keystore")
 		}
 	}
-
-	if err := keystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
+	if err := wKeystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
 		return errors.Wrap(err, "error storing the access token")
 	}
 
-	return keystore.Save()
+	return wKeystore.Save()
 }

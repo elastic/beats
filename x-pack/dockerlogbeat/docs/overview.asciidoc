@@ -1,0 +1,19 @@
+[[log-driver-overview]]
+[role="xpack"]
+== {log-driver} overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+experimental[]
+
+The {log-driver} is a Docker plugin that sends container logs to the
+https://www.elastic.co/elastic-stack[{stack}], where you can search, analyze,
+and visualize the data in real time.
+
+The {log-driver} is built on top of the https://www.elastic.co/beats[{beats}]
+platform and supports many of the features and outputs supported by the
+{beats} shippers.
+
+Beat users: see <<log-driver-limitations>>.

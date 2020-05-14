@@ -18,9 +18,12 @@
 package monitors
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
@@ -28,10 +31,12 @@ var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
 
 // MonitorPluginInfo represents the generic configuration options around a monitor plugin.
 type MonitorPluginInfo struct {
-	ID      string `config:"id"`
-	Name    string `config:"name"`
-	Type    string `config:"type" validate:"required"`
-	Enabled bool   `config:"enabled"`
+	ID       string             `config:"id"`
+	Name     string             `config:"name"`
+	Type     string             `config:"type" validate:"required"`
+	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
+	Timeout  time.Duration      `config:"timeout"`
+	Enabled  bool               `config:"enabled"`
 }
 
 func pluginInfo(config *common.Config) (MonitorPluginInfo, error) {

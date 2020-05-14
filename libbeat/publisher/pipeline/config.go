@@ -21,9 +21,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Config object for loading a pipeline instance via Load.
@@ -41,7 +41,7 @@ func validateClientConfig(c *beat.ClientConfig) error {
 	withDrop := false
 
 	switch m := c.PublishMode; m {
-	case beat.DefaultGuarantees, beat.GuaranteedSend:
+	case beat.DefaultGuarantees, beat.GuaranteedSend, beat.OutputChooses:
 	case beat.DropIfFull:
 		withDrop = true
 	default:

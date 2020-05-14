@@ -1,0 +1,59 @@
+- name: citadel
+  type: group
+  description: >
+    Contains statistics related to the Istio Citadel service
+  release: beta
+  fields:
+    - name: grpc.method
+      type: keyword
+      description: >
+        The grpc method
+    - name: grpc.service
+      type: keyword
+      description: >
+        The grpc service
+    - name: grpc.type
+      type: keyword
+      description: >
+        The type of the respective grpc service
+
+    - name: secret_controller_svc_acc_created_cert.count
+      type: long
+      description: >
+        The number of certificates created due to service account creation.
+    - name: server_root_cert_expiry_seconds
+      type: float
+      description: >
+        The unix timestamp, in seconds, when Citadel root cert will expire. We set it to negative in case of internal error.
+    - name: grpc.server.handled
+      type: long
+      description: >
+        Total number of RPCs completed on the server, regardless of success or failure.
+    - name: grpc.server.msg.received
+      type: long
+      description: >
+        Total number of RPC stream messages received on the server.
+    - name: grpc.server.msg.sent
+      type: long
+      description: >
+        Total number of gRPC stream messages sent by the server.
+    - name: grpc.server.started
+      type: long
+      description: >
+        Total number of RPCs started on the server.
+
+    - name: grpc.server.handling.latency.ms.bucket.*
+      type: object
+      object_type: long
+      description: >
+        The response latency (milliseconds) of gRPC that had been application-level handled by the server.
+    - name: grpc.server.handling.latency.ms.sum
+      type: long
+      format: duration
+      description: >
+        The response latency of gRPC, sum of latencies in milliseconds
+    - name: grpc.server.handling.latency.ms.count
+      type: long
+      description: >
+        The response latency of gRPC, number of metrics
+

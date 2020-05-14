@@ -20,19 +20,18 @@
 package expvar
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if !assert.NoError(t, err) {
@@ -41,9 +40,9 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
@@ -55,29 +54,11 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":           "golang",
 		"metricsets":       []string{"expvar"},
 		"expvar.namespace": "metricbeat",
-		"hosts":            []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":            []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("GOLANG_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("GOLANG_PORT")
-
-	if len(port) == 0 {
-		port = "6060"
-	}
-	return port
 }

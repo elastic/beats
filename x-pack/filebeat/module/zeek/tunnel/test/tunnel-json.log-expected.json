@@ -1,0 +1,46 @@
+[
+    {
+        "@timestamp": "2018-12-10T01:34:26.743Z",
+        "destination.address": "132.16.110.133",
+        "destination.as.number": 427,
+        "destination.as.organization.name": "Air Force Systems Networking",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "132.16.110.133",
+        "destination.port": 8080,
+        "event.action": "Tunnel::DISCOVER",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.tunnel",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "tunnel",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.ip": [
+            "132.16.146.79",
+            "132.16.110.133"
+        ],
+        "service.type": "zeek",
+        "source.address": "132.16.146.79",
+        "source.as.number": 427,
+        "source.as.organization.name": "Air Force Systems Networking",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "132.16.146.79",
+        "source.port": 0,
+        "tags": [
+            "zeek.tunnel"
+        ],
+        "zeek.tunnel.action": "Tunnel::DISCOVER",
+        "zeek.tunnel.type": "Tunnel::HTTP"
+    }
+]

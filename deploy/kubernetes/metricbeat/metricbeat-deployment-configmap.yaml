@@ -41,6 +41,8 @@ data:
         - state_replicaset
         - state_pod
         - state_container
+        - state_cronjob
+        - state_resourcequota
         # Uncomment this to get k8s events:
         #- event
       period: 10s

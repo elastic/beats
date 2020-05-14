@@ -20,7 +20,12 @@
 package sniffer
 
 import (
+	"fmt"
+	"syscall"
 	"time"
+	"unsafe"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/afpacket"
@@ -28,14 +33,36 @@ import (
 )
 
 type afpacketHandle struct {
-	TPacket *afpacket.TPacket
+	TPacket                      *afpacket.TPacket
+	promiscPreviousState         bool
+	promiscPreviousStateDetected bool
+	device                       string
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration) (*afpacketHandle, error) {
+	timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
 
-	h := &afpacketHandle{}
 	var err error
+	var promiscEnabled bool
+
+	if autoPromiscMode {
+		promiscEnabled, err = isPromiscEnabled(device)
+		if err != nil {
+			logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
+		}
+
+		if !promiscEnabled {
+			if setPromiscErr := setPromiscMode(device, true); setPromiscErr != nil {
+				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
+			}
+		}
+	}
+
+	h := &afpacketHandle{
+		promiscPreviousState:         promiscEnabled,
+		device:                       device,
+		promiscPreviousStateDetected: autoPromiscMode && err == nil,
+	}
 
 	if device == "any" {
 		h.TPacket, err = afpacket.NewTPacket(
@@ -69,4 +96,51 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
+	// previous state detected only if auto mode was on
+	if h.promiscPreviousStateDetected {
+		if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
+			logp.Warn("Failed to reset promiscuous mode for device '%s'. Your device might be in promiscuous mode.: %v", h.device, err)
+		}
+	}
+}
+
+func isPromiscEnabled(device string) (bool, error) {
+	if device == "any" {
+		return false, nil
+	}
+
+	s, e := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, 0)
+	if e != nil {
+		return false, e
+	}
+
+	defer syscall.Close(s)
+
+	var ifreq struct {
+		name  [syscall.IFNAMSIZ]byte
+		flags uint16
+	}
+
+	copy(ifreq.name[:], []byte(device))
+	_, _, ep := syscall.Syscall(syscall.SYS_IOCTL, uintptr(s), syscall.SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifreq)))
+	if ep != 0 {
+		return false, fmt.Errorf("ioctl command SIOCGIFFLAGS failed to get device flags for %v: return code %d", device, ep)
+	}
+
+	return ifreq.flags&uint16(syscall.IFF_PROMISC) != 0, nil
+}
+
+// setPromiscMode enables promisc mode if configured.
+// this makes maintenance for user simpler without any additional manual steps
+// issue [700](https://github.com/elastic/beats/issues/700)
+func setPromiscMode(device string, enabled bool) error {
+	if device == "any" {
+		logp.Warn("Cannot set promiscuous mode to device 'any'")
+		return nil
+	}
+
+	// SetLsfPromisc is marked as deprecated but used to improve readability (bpf)
+	// and avoid Cgo (pcap)
+	// TODO: replace with x/net/bpf or pcap
+	return syscall.SetLsfPromisc(device, enabled)
 }

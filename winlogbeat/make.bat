@@ -6,6 +6,6 @@ REM
 REM After running this once you may invoke mage.exe directly.
 
 WHERE mage
-IF %ERRORLEVEL% NEQ 0 go install github.com/elastic/beats/vendor/github.com/magefile/mage
+IF %ERRORLEVEL% NEQ 0 go install -mod=vendor github.com/magefile/mage
 
 mage %*

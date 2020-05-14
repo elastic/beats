@@ -1,0 +1,32 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "threading"
+    jmx.mappings:
+      - mbean: 'Catalina:name=*,type=ThreadPool'
+        attributes:
+          - attr: currentThreadsBusy
+            field: busy
+          - attr: maxThreads
+            field: max
+          - attr: currentThreadCount
+            field: current
+          - attr: keepAliveCount
+            field: keep_alive.total
+          - attr: keepAliveTimeout
+            field: keep_alive.timeout.ms
+
+      - mbean: 'java.lang:type=Threading'
+        attributes:
+          - attr: TotalStartedThreadCount
+            field: started.total
+          - attr: CurrentThreadUserTime
+            field: user.time.ms
+          - attr: CurrentThreadCpuTime
+            field: cpu.time.ms
+          - attr: ThreadCount
+            field: total
+          - attr: PeakThreadCount
+            field: peak

@@ -24,22 +24,23 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/aerospike"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	service := compose.EnsureUp(t, "aerospike")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "aerospike")
+	service := compose.EnsureUp(t, "aerospike")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -50,10 +51,10 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "aerospike",
 		"metricsets": []string{"namespace"},
-		"hosts":      []string{aerospike.GetAerospikeEnvHost() + ":" + aerospike.GetAerospikeEnvPort()},
+		"hosts":      []string{host},
 	}
 }

@@ -1,0 +1,94 @@
+[[log-driver-usage-examples]]
+== {log-driver} usage examples
+
+++++
+<titleabbrev>Usage examples</titleabbrev>
+++++
+
+experimental[]
+
+The following examples show common configurations for the {log-driver}.
+
+[float]
+=== Send Docker logs to {es} 
+
+*Docker run command:*
+
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt output.elasticsearch.hosts="myhost:9200" \
+           --log-opt output.elasticsearch.protocol="https" \
+           --log-opt output.elasticsearch.username="myusername" \
+           --log-opt output.elasticsearch.password="mypassword" \
+           --log-opt output.elasticsearch.index="elastic-log-driver-%{+yyyy.MM.dd}" \
+           -it debian:jessie /bin/bash
+----
+
+*Daemon configuration:*
+
+["source","json",subs="attributes"]
+----
+{
+  "log-driver" : "elastic/{log-driver-alias}:{version}",
+  "log-opts" : {
+    "output.elasticsearch.hosts" : "myhost:9200",
+    "output.elasticsearch.protocol" : "https",
+    "output.elasticsearch.username" : "myusername",
+    "output.elasticsearch.password" : "mypassword",
+    "output.elasticsearch.index" : "elastic-log-driver-%{+yyyy.MM.dd}"
+  }
+}
+----
+
+[float]
+=== Send Docker logs to {ess} on {ecloud}
+
+*Docker run command:*
+
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt cloud.id="MyElasticStack:daMbY2VudHJhbDekZ2NwLmN4b3VkLmVzLmliJDVkYmQwtGJiYjs0NTRiN4Q5ODJmNGUwm1IxZmFkNjM5JDFiNjdkMDE4MTgxMTQzNTM5ZGFiYWJjZmY0OWIyYWE5" \
+           --log-opt cloud.auth="myusername:mypassword" \
+           --log-opt output.elasticsearch.index="elastic-log-driver-%{+yyyy.MM.dd}" \
+           -it debian:jessie /bin/bash
+----
+
+*Daemon configuration:*
+
+["source","json",subs="attributes"]
+----
+{
+  "log-driver" : "elastic/{log-driver-alias}:{version}",
+  "log-opts" : {
+    "cloud.id" : "MyElasticStack:daMbY2VudHJhbDekZ2NwLmN4b3VkLmVzLmliJDVkYmQwtGJiYjs0NTRiN4Q5ODJmNGUwm1IxZmFkNjM5JDFiNjdkMDE4MTgxMTQzNTM5ZGFiYWJjZmY0OWIyYWE5",
+    "cloud.auth" : "myusername:mypassword",
+    "output.elasticsearch.index" : "elastic-log-driver-%{+yyyy.MM.dd}"
+  }
+}
+----
+
+[float]
+=== Send Docker logs to {ls}
+
+*Docker run command:*
+
+["source","sh",subs="attributes"]
+----
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt output.logstash.hosts="myhost:5044" \
+           -it debian:jessie /bin/bash
+----
+
+*Daemon configuration:*
+
+["source","json",subs="attributes"]
+----
+{
+  "log-driver" : "elastic/{log-driver-alias}:{version}",
+  "log-opts" : {
+    "output.logstash.hosts" : "myhost:5044"
+  }
+}
+----

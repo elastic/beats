@@ -1,0 +1,91 @@
+default: true
+input:
+  module: jolokia
+  metricset: jmx
+  defaults:
+    namespace: "broker"
+    hosts: ["localhost:8779"]
+    path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+    jmx.mappings:
+      - mbean: 'kafka.network:type=RequestChannel,name=RequestQueueSize'
+        attributes:
+          - attr: Value
+            field: request.channel.queue.size
+      - mbean: 'kafka.server:name=FailedProduceRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.produce.failed_per_second
+      - mbean: 'kafka.server:name=FailedFetchRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.fetch.failed_per_second
+      - mbean: 'kafka.server:name=FailedProduceRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.produce.failed
+      - mbean: 'kafka.server:name=FailedFetchRequestsPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: request.fetch.failed
+      - mbean: 'kafka.controller:name=LeaderElectionRateAndTimeMs,type=ControllerStats'
+        attributes:
+          - attr: MeanRate
+            field: replication.leader_elections
+      - mbean: 'kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec'
+        attributes:
+          - attr: MeanRate
+            field: replication.unclean_leader_elections
+      - mbean: 'kafka.server:name=ZooKeeperDisconnectsPerSec,type=SessionExpireListener'
+        attributes:
+          - attr: MeanRate
+            field: session.zookeeper.disconnect
+      - mbean: 'kafka.server:name=ZooKeeperExpiresPerSec,type=SessionExpireListener'
+        attributes:
+          - attr: MeanRate
+            field: session.zookeeper.expire
+      - mbean: 'kafka.server:name=ZooKeeperReadOnlyConnectsPerSec,type=SessionExpireListener'
+        attributes:
+          - attr: MeanRate
+            field: session.zookeeper.readonly
+      - mbean: 'kafka.server:name=ZooKeeperSyncConnectsPerSec,type=SessionExpireListener'
+        attributes:
+          - attr: MeanRate
+            field: session.zookeeper.sync
+      - mbean: 'kafka.log:type=LogFlushStats,name=LogFlushRateAndTimeMs'
+        attributes:
+          - attr: MeanRate
+            field: log.flush_rate
+      - mbean: 'kafka.server:name=BytesRejectedPerSec,topic=*,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: topic.net.rejected.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesInPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
+        attributes:
+          - attr: MeanRate
+            field: topic.net.in.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesOutPerSec,topic=*,type=BrokerTopicMetrics,topic=*'
+        attributes:
+          - attr: MeanRate
+            field: topic.net.out.bytes_per_sec
+      - mbean: 'kafka.server:type=BrokerTopicMetrics,topic=*,name=MessagesInPerSec,topic=*'
+        attributes:
+          - attr: MeanRate
+            field: topic.messages_in
+      - mbean: 'kafka.server:name=BytesRejectedPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.rejected.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesInPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.in.bytes_per_sec
+      - mbean: 'kafka.server:name=BytesOutPerSec,type=BrokerTopicMetrics'
+        attributes:
+          - attr: MeanRate
+            field: net.out.bytes_per_sec
+      - mbean: 'kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec'
+        attributes:
+          - attr: MeanRate
+            field: messages_in
+
+

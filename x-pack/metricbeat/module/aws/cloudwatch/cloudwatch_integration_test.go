@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package cloudwatch
 
@@ -11,15 +12,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("cloudwatch", "300s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "cloudwatch", "300s")
 
 	config = addCloudwatchMetricsToConfig(config)
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -32,16 +30,11 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("cloudwatch", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "cloudwatch", "300s")
 
 	config = addCloudwatchMetricsToConfig(config)
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }
 
 func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]interface{} {
@@ -49,6 +42,6 @@ func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]inte
 	cloudwatchMetric := map[string]interface{}{}
 	cloudwatchMetric["namespace"] = "AWS/RDS"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
-	config["cloudwatch_metrics"] = cloudwatchMetricsConfig
+	config["metrics"] = cloudwatchMetricsConfig
 	return config
 }

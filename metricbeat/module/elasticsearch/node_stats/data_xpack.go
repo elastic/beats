@@ -25,12 +25,12 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -49,6 +49,7 @@ var (
 				"index_time_in_millis":    c.Int("index_time_in_millis"),
 				"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
 			}),
+			"bulk": elasticsearch.BulkStatsDict,
 			"search": c.Dict("search", s.Schema{
 				"query_total":          c.Int("query_total"),
 				"query_time_in_millis": c.Int("query_time_in_millis"),
@@ -89,7 +90,7 @@ var (
 					"1m":  c.Float("1m", s.Optional),
 					"5m":  c.Float("5m", s.Optional),
 					"15m": c.Float("15m", s.Optional),
-				}),
+				}, c.DictOptional), // No load average reported by ES on Windows
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
 				"cpuacct": c.Dict("cpuacct", s.Schema{
@@ -141,7 +142,8 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"analyze":    c.Dict("analyze", threadPoolStatsSchema),
+			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema),
 			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),

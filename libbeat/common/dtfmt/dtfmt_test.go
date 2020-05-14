@@ -98,6 +98,11 @@ func TestFormat(t *testing.T) {
 		{mkDateTime(2017, 1, 2, 4, 6, 7, 123),
 			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
 			"2017-01-02T04:06:07.123Z"},
+
+		// beats timestamp
+		{mkDateTimeWithLocation(2017, 1, 2, 4, 6, 7, 123, time.FixedZone("PST", -8*60*60)),
+			"yyyy-MM-dd'T'HH:mm:ss.SSSz",
+			"2017-01-02T04:06:07.123-08:00"},
 	}
 
 	for i, test := range tests {
@@ -123,5 +128,9 @@ func mkTime(h, m, s, S int) time.Time {
 }
 
 func mkDateTime(y, M, d, h, m, s, S int) time.Time {
-	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, time.UTC)
+	return mkDateTimeWithLocation(y, M, d, h, m, s, S, time.UTC)
+}
+
+func mkDateTimeWithLocation(y, M, d, h, m, s, S int, l *time.Location) time.Time {
+	return time.Date(y, time.Month(M), d, h, m, s, S*1000000, l)
 }

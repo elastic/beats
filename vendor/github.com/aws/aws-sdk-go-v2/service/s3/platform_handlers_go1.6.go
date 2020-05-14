@@ -6,7 +6,7 @@ import (
 	request "github.com/aws/aws-sdk-go-v2/aws"
 )
 
-func platformRequestHandlers(c *S3, r *request.Request) {
+func platformRequestHandlers(c *Client, r *request.Request) {
 	if r.Operation.HTTPMethod == "PUT" && !c.Disable100Continue {
 		// 100-Continue should only be used on put requests.
 		r.Handlers.Sign.PushBack(add100Continue)

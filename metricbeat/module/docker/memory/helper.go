@@ -18,8 +18,8 @@
 package memory
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 // MemoryData contains parsed container memory info
@@ -33,6 +33,8 @@ type MemoryData struct {
 	TotalRssP float64
 	Usage     uint64
 	UsageP    float64
+	//Raw stats from the cgroup subsystem
+	Stats map[string]uint64
 	//Windows-only memory stats
 	Commit            uint64
 	CommitPeak        uint64
@@ -49,7 +51,7 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 		//during this time, there doesn't appear to be any meaningful data,
 		// and Limit will never be 0 unless the container is not running
 		//and there's no cgroup data, and CPU usage should be greater than 0 for any running container.
-		if containerStats.Stats.MemoryStats.Limit == 0 && containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
+		if containerStats.Stats.MemoryStats.Limit == 0 || containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
 			continue
 		}
 		formattedStats = append(formattedStats, s.getMemoryStats(containerStats, dedot))
@@ -70,6 +72,7 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 		TotalRssP: float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Usage:     myRawStat.Stats.MemoryStats.Usage,
 		UsageP:    float64(myRawStat.Stats.MemoryStats.Usage) / float64(myRawStat.Stats.MemoryStats.Limit),
+		Stats:     myRawStat.Stats.MemoryStats.Stats,
 		//Windows memory statistics
 		Commit:            myRawStat.Stats.MemoryStats.Commit,
 		CommitPeak:        myRawStat.Stats.MemoryStats.CommitPeak,

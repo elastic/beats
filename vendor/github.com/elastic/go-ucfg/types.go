@@ -26,7 +26,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/elastic/go-ucfg/internal/parse"
+	"github.com/elastic/go-ucfg/parse"
 )
 
 type value interface {
@@ -523,7 +523,7 @@ func (r *refDynValue) getValue(
 	}
 	previousErr := err
 
-	str, err := ref.resolveEnv(p.ctx.getParent(), opts)
+	str, parseCfg, err := ref.resolveEnv(p.ctx.getParent(), opts)
 	if err != nil {
 		// TODO(ph): Not everything is an Error, will do some cleanup in another PR.
 		if v, ok := previousErr.(Error); ok {
@@ -533,7 +533,7 @@ func (r *refDynValue) getValue(
 		}
 		return nil, err
 	}
-	return parseValue(p, opts, str)
+	return parseValue(p, opts, str, parseCfg)
 }
 
 func (s spliceDynValue) getValue(
@@ -546,19 +546,19 @@ func (s spliceDynValue) getValue(
 		return nil, err
 	}
 
-	return parseValue(p, opts, str)
+	return parseValue(p, opts, str, parse.DefaultConfig)
 }
 
 func (s spliceDynValue) String() string {
 	return "<splice>"
 }
 
-func parseValue(p *cfgPrimitive, opts *options, str string) (value, error) {
+func parseValue(p *cfgPrimitive, opts *options, str string, parseCfg parse.Config) (value, error) {
 	if opts.noParse {
 		return nil, raiseNoParse(p.ctx, p.meta())
 	}
 
-	ifc, err := parse.Value(str)
+	ifc, err := parse.ValueWithConfig(str, parseCfg)
 	if err != nil {
 		return nil, err
 	}
