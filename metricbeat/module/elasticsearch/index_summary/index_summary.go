@@ -67,8 +67,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
-	// Not master, no event sent
-	if !isMaster {
+	// Not master and we're talking to a set of ES nodes, not clusters == no event sent
+	if !isMaster && m.HostsMode == elasticsearch.HostsModeNode {
 		m.Logger().Debug("trying to fetch index summary stats from a non-master node")
 		return nil
 	}

@@ -36,13 +36,26 @@ var (
 	}.Build()
 )
 
+type hostsMode int
+
+const (
+	// Indicates that each item in the hosts list points to a distinct Elasticsearch node in a
+	// cluster.
+	HostsModeNode hostsMode = iota
+
+	// Indicates that each item in the hosts lists points to a endpoint for a distinct Elasticsearch
+	// cluster (e.g. a load-balancing proxy) fronting the cluster.
+	HostsModeCluster
+)
+
 // MetricSet can be used to build other metric sets that query RabbitMQ
 // management plugin
 type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	XPack bool
+	XPack     bool
+	HostsMode hostsMode
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -54,9 +67,11 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack bool `config:"xpack.enabled"`
+		XPack     bool      `config:"xpack.enabled"`
+		HostsMode hostsMode `config:"hosts_mode"`
 	}{
-		XPack: false,
+		XPack:     false,
+		HostsMode: HostsModeNode,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -67,6 +82,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.XPack,
+		config.HostsMode,
 	}
 
 	ms.SetServiceURI(servicePath)
