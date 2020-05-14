@@ -51,6 +51,12 @@ metricbeat.modules:
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
+
+  # Set to cluster to treat each item in the hosts list as an endpoint for
+  # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
+  # Set to node (default) to treat each item in the hosts list as an individual
+  # node in the Elasticsearch cluster.
+  #hosts_mode: node
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
