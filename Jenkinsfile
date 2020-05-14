@@ -59,7 +59,7 @@ pipeline {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        stashV2(allowEmpty: true, name: 'source', useDefaultExcludes: false)
+        stashV2('source')
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
@@ -1017,7 +1017,7 @@ def startCloudTestEnv(String name, environments = []) {
         // Archive terraform states in case manual cleanup is needed.
         archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
-      stashV2(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
     }
   }
 }
@@ -1029,7 +1029,7 @@ def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
       withBeatsEnv(false) {
-        unstashV2("terraform-${stashName}")
+        unstash("terraform-${stashName}")
         retry(2) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
@@ -1165,7 +1165,7 @@ def junitAndStore(Map params = [:]){
   junit(params)
   // STAGE_NAME env variable could be null in some cases, so let's use the currentmilliseconds
   def stageName = env.STAGE_NAME ? env.STAGE_NAME.replaceAll("[\\W]|_",'-') : "uncategorized-${new java.util.Date().getTime()}"
-  stashV2(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
+  stash(includes: params.testResults, allowEmpty: true, name: stageName, useDefaultExcludes: true)
   stashedTestReports[stageName] = stageName
 }
 
@@ -1178,7 +1178,7 @@ def runbld() {
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
-            unstashV2(v)
+            unstash(v)
           }
         }
         sh(label: 'Process JUnit reports with runbld',
@@ -1193,8 +1193,7 @@ def runbld() {
   }
 }
 
-def stashV2(Map args = [:]) {
-  def name = args.name
+def stashV2(String name) {
   def filename = "${name}.zip"
   writeFile file: "${filename}", text: ''
   def command = "tar --exclude=${filename} -czf ${filename} ."
