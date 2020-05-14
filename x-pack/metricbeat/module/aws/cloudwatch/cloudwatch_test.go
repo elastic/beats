@@ -1250,12 +1250,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 		nil,
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: "test-ec2",
-		},
-	}
+
 	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
@@ -1311,6 +1306,46 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value2, dimension)
+}
+
+func TestCreateEventsWithTagsFilter(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClient{}
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			cloudwatch.Metric{
+				Dimensions: []cloudwatch.Dimension{{
+					Name:  awssdk.String("InstanceId"),
+					Value: awssdk.String("i-1"),
+				}},
+				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+			[]aws.Tag{
+				{Key: "name", Value: "test-ec2"},
+			},
+		},
+	}
+
+	// Specify a tag filter that does not match the tag for i-1
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "foo",
+		},
+	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(events))
 }
 
 func TestInsertTags(t *testing.T) {
