@@ -20,9 +20,9 @@ package syslog
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 )
 
 type config struct {
@@ -33,7 +33,7 @@ type config struct {
 	SyslogProgram  string                `config:"default_syslog_program"`
 	SyslogPriority uint64                `config:"default_syslog_priority"`
 	SyslogSeverity uint64                `config:"default_syslog_severity"`
-	TLS            *outputs.TLSConfig    `config:"tls"`
+	TLS            *tlscommon.Config     `config:"tls"`
 	Proxy          transport.ProxyConfig `config:",inline"`
 	Backoff        Backoff               `config:"backoff"`
 	Codec          codec.Config          `config:"codec"`
