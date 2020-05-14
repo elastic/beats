@@ -35,6 +35,7 @@
 - Ensure that the beats uses the params prefer_v2_templates on bulk request. {pull}18318[18318]
 - Stop monitoring on config change {pull}18284[18284]
 - Fix jq: command not found {pull}18408[18408]
+- Avoid Chown on windows {pull}18512[18512]
 
 ==== New features
 
