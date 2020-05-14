@@ -2,18 +2,23 @@
 data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
-<<privileges-to-setup-beats>>,privileges needed to set up {beatname_uc}>>.
+<<privileges-to-setup-beats,privileges needed to set up {beatname_uc}>>.
 
 . From the installation directory, run:
 +
+--
 include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
+--
++
+`-e` is optional and sends output to standard error instead of syslog.
 
-This command loads the recommended index template for
-writing to {es}
 ifndef::no_dashboards[]
+This step loads the recommended index template for writing to {es}
 and deploys the sample dashboards (if available) for visualizing
-the data in {kib}
+the data in {kib}.
 endif::no_dashboards[]
-. This is a one-time setup step. 
 
-The `-e` flag is optional and sends output to standard error instead of syslog.
+ifdef::no_dashboards[]
+This step loads the recommended index template for writing to {es}.
+endif::no_dashboards[]
+

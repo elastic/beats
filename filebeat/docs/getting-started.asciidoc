@@ -117,9 +117,10 @@ include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 include::{libbeat-dir}/shared/setup.asciidoc[]
 
-The ingest pipelines used to parse log lines are set up automatically the first
-time you run the module and connect to {es}. If you're sending events to {ls},
-you need to <<load-ingest-pipelines>>.
+This step does not load the ingest pipelines used to parse log lines. By
+default, ingest pipelines are set up automatically the first time you run the
+module and connect to {es}. If you're sending events to {ls}, you need to
+<<load-ingest-pipelines>>.
 
 // REVIEWERS: I wonder if we should even mention Logstash in this guide. I think
 // it might be better to have a full topic in the  how-to section that describes
