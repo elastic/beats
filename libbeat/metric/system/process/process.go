@@ -387,7 +387,7 @@ func (procStats *Stats) matchProcess(name string) bool {
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
-	procStats.logger = logp.NewLogger("Stats")
+	procStats.logger = logp.NewLogger("processes")
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {
@@ -439,7 +439,7 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	procStats.ProcsMap = newProcs
 
 	processes = procStats.includeTopProcesses(processes)
-	procStats.logger.Debugf("processes", "Filtered top processes down to %d processes", len(processes))
+	procStats.logger.Debugf("Filtered top processes down to %d processes", len(processes))
 
 	procs := make([]common.MapStr, 0, len(processes))
 	for _, process := range processes {
@@ -480,18 +480,18 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	process, err := newProcess(pid, cmdline, env)
 	if err != nil {
-		procStats.logger.Debugf("processes", "Skip process pid=%d: %v", pid, err)
+		procStats.logger.Debugf("Skip process pid=%d: %v", pid, err)
 		return nil
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		procStats.logger.Debugf("processes", "Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
+		procStats.logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
 		return nil
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		procStats.logger.Debugf("processes", "Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
+		procStats.logger.Debugf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
 		return nil
 	}
 
