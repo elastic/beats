@@ -451,7 +451,7 @@ func runAgent(env map[string]string) error {
 	os.Setenv("PLATFORMS", "+all linux/amd64")
 	devtools.Platforms = devtools.NewPlatformList("+all linux/amd64")
 
-	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
 	dockerImageOut, err := sh.Output("docker", "image", "ls")
