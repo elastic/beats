@@ -27,15 +27,15 @@ import (
 
 	"go.elastic.co/apm"
 
-	"github.com/elastic/beats/v7/libbeat/testing"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -68,15 +68,7 @@ type bulkResultStats struct {
 
 const (
 	defaultEventType = "doc"
-	opTypeCreate     = "create"
-	opTypeDelete     = "delete"
-	opTypeIndex      = "index"
 )
-
-// opTypeKey defines the metadata key name for event operation type.
-// The key's value can be an empty string, `create`, `index`, or `delete`. If empty, it will assume
-// either `create` or `index`. See `createEventBulkMeta`. If in doubt, set explicitly.
-const opTypeKey = "op_type"
 
 // NewClient instantiates a new client.
 func NewClient(
@@ -290,7 +282,7 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		if opType, err := event.GetMetaStringValue(opTypeKey); err == nil && opType == opTypeDelete {
+		if opType := events.GetOpType(*event); opType == events.OpTypeDelete {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
@@ -325,8 +317,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	id, _ := event.GetMetaStringValue("_id")
-	opType, _ := event.GetMetaStringValue(opTypeKey)
+	id, _ := events.GetMetaStringValue(*event, events.FieldMetaID)
+	opType := events.GetOpType(*event)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
@@ -335,15 +327,15 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
-	if opType == opTypeDelete {
+	if opType == events.OpTypeDelete {
 		if id != "" {
 			return eslegclient.BulkDeleteAction{Delete: meta}, nil
 		} else {
-			return nil, fmt.Errorf("%s %s requires _id", opTypeKey, opTypeDelete)
+			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
 		}
 	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		if opType == opTypeIndex {
+		if opType == events.OpTypeIndex {
 			return eslegclient.BulkIndexAction{Index: meta}, nil
 		}
 		return eslegclient.BulkCreateAction{Create: meta}, nil
@@ -353,12 +345,15 @@ func createEventBulkMeta(
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
 	if event.Meta != nil {
-		if pipeline, exists := event.Meta["pipeline"]; exists {
-			if p, ok := pipeline.(string); ok {
-				return p, nil
-			}
+		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
+		if err == common.ErrKeyNotFound {
+			return "", nil
+		}
+		if err != nil {
 			return "", errors.New("pipeline metadata is no string")
 		}
+
+		return pipeline, nil
 	}
 
 	if pipelineSel != nil {
