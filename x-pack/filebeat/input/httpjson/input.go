@@ -222,6 +222,9 @@ func getRateLimit(header http.Header, rateLimit *RateLimit) (int64, error) {
 				if err != nil {
 					return 0, errors.Wrapf(err, "failed to parse rate-limit reset value")
 				}
+				if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+					return 0, nil
+				}
 				return epoch, nil
 			}
 		}
@@ -236,13 +239,10 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 		return err
 	}
 	if epoch == 0 {
+		in.log.Debugf("Rate Limit: No need to apply rate limit.")
 		return nil
 	}
 	t := time.Unix(epoch, 0)
-	if t.Sub(time.Now()) < 0 {
-		in.log.Debugf("Rate Limit: The rate limit time has already passed.")
-		return nil
-	}
 	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
 	ticker := time.NewTicker(time.Until(t))
 	defer ticker.Stop()
