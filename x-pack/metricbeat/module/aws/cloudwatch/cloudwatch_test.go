@@ -146,6 +146,7 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	m := MetricSet{}
+	m.MetricSet = &aws.MetricSet{Period: 5}
 	resourceTypeFiltersEC2 := map[string][]aws.Tag{}
 	resourceTypeFiltersEC2["ec2:instance"] = nil
 
