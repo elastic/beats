@@ -149,6 +149,19 @@ pipeline {
             mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
           }
         }
+        stage('Filebeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "update build test")
+          }
+        }
         stage('Filebeat Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
