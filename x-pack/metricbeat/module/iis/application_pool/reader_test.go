@@ -48,7 +48,7 @@ func TestGetProcessIds(t *testing.T) {
 		{
 			Instance:    "w3wp#1",
 			Measurement: 124.00,
-			Err:         nil,
+			Err:         pdh.CounterValueError{},
 		},
 	}
 	counterList := make(map[string][]pdh.CounterValue)
