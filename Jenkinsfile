@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/stashv2') _
 
 import groovy.transform.Field
 
@@ -59,7 +59,7 @@ pipeline {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        stashV2('source')
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
@@ -724,7 +724,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
-    unstashV2('source')
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -765,7 +765,7 @@ def withBeatsEnvWin(Closure body) {
     "RACE_DETECTOR=true",
   ]){
     deleteDir()
-    unstashV2('source')
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -1190,46 +1190,5 @@ def runbld() {
           '''.stripIndent())  // stripIdent() requires '''/
       }
     }
-  }
-}
-
-def stashV2(String name) {
-  def filename = "${name}.zip"
-  writeFile file: "${filename}", text: ''
-  def command = "tar --exclude=${filename} -czf ${filename} ."
-  if(isUnix()) {
-    sh(label: 'Archive', script: command)
-  } else {
-    bat(label: 'Archive', script: command)
-  }
-  googleStorageUpload(
-    bucket: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}",
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pattern: "${filename}",
-    sharedPublicly: false,
-    showInline: true
-  )
-  if(isUnix()) {
-    sh(label: 'Delete zip', script: "rm ${filename}", returnStatus: true)
-  } else {
-    bat(label: 'Delete zip', script: "del ${filename}", returnStatus: true)
-  }
-}
-
-def unstashV2(String name) {
-  def filename = "${name}.zip"
-  def command = "tar -xpf ${filename}"
-  googleStorageDownload(
-    bucketUri: "gs://${JOB_GCS_BUCKET}/${JOB_NAME}-${BUILD_NUMBER}/${name}/${filename}",
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    localDirectory: '',
-    pathPrefix: "${JOB_NAME}-${BUILD_NUMBER}/${name}/"
-  )
-  if(isUnix()) {
-    command += "; rm ${filename}"
-    sh(label: 'Extract', script: command)
-  } else {
-    bat(label: 'Extract', script: command)
-    bat(label: 'Delete zip', script: "del ${filename}", returnStatus: true)
   }
 }
