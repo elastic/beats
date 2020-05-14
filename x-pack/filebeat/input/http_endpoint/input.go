@@ -134,10 +134,7 @@ func (in *HttpEndpoint) Wait() {
 
 // Validates the incoming request and creates a new event upon success
 func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) (uint, string) {
-	var err string
-	var status uint
-
-	status, err = in.validateRequest(w, r)
+	status, err := in.validateRequest(w, r)
 	if err != "" || status != 0 {
 		return status, err
 	}
@@ -157,17 +154,14 @@ func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) (uint,
 
 // Runs all validations for each request
 func (in *HttpEndpoint) validateRequest(w http.ResponseWriter, r *http.Request) (uint, string) {
-	var err string
-	var status uint
-
 	if in.config.BasicAuth {
-		status, err = in.validateAuth(w, r)
-	}
-	if err != "" && status != 0 {
-		return status, err
+		status, err := in.validateAuth(w, r)
+		if err != "" && status != 0 {
+			return status, err
+		}
 	}
 
-	status, err = in.validateHeader(w, r)
+	status, err := in.validateHeader(w, r)
 	if err != "" && status != 0 {
 		return status, err
 	}
@@ -209,7 +203,6 @@ func (in *HttpEndpoint) validateAuth(w http.ResponseWriter, r *http.Request) (ui
 
 // Validates that body is not empty, not a list of objects and valid JSON
 func (in *HttpEndpoint) validateBody(w http.ResponseWriter, r *http.Request) (uint, string) {
-	var isObject string
 	if r.Body == http.NoBody {
 		return http.StatusNotAcceptable, in.createErrorMessage("Body cannot be empty")
 	}
@@ -219,7 +212,7 @@ func (in *HttpEndpoint) validateBody(w http.ResponseWriter, r *http.Request) (ui
 		return http.StatusInternalServerError, in.createErrorMessage("Unable to read body")
 	}
 
-	isObject = in.isObjectOrList(body)
+	isObject := in.isObjectOrList(body)
 	if isObject == "list" {
 		return http.StatusBadRequest, in.createErrorMessage("List of JSON objects is not supported")
 	}
@@ -268,11 +261,8 @@ func (in *HttpEndpoint) sendResponse(w http.ResponseWriter, h uint, b string) {
 
 // Validates incoming requests and sends a new event upon success
 func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
-	var err string
-	var status uint
-
 	// This triggers both validation and event creation
-	status, err = in.sendEvent(w, r)
+	status, err := in.sendEvent(w, r)
 	if err != "" || status != 0 {
 		in.sendResponse(w, status, err)
 		return
