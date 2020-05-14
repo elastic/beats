@@ -18,6 +18,8 @@
 package elasticsearch
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -47,6 +49,19 @@ const (
 	// cluster (e.g. a load-balancing proxy) fronting the cluster.
 	HostsModeCluster
 )
+
+func (h *hostsMode) Unpack(str string) error {
+	switch str {
+	case "node":
+		*h = HostsModeNode
+	case "cluster":
+		*h = HostsModeCluster
+	default:
+		return fmt.Errorf("invalid hosts_mode: %v", str)
+	}
+
+	return nil
+}
 
 // MetricSet can be used to build other metric sets that query RabbitMQ
 // management plugin
