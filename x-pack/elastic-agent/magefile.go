@@ -507,7 +507,6 @@ func runAgent(env map[string]string) error {
 }
 
 func packageAgent(requiredPackages []string, packagingFn func()) {
-
 	version, found := os.LookupEnv("BEAT_VERSION")
 	if !found {
 		version = release.Version()
