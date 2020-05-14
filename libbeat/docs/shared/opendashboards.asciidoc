@@ -1,6 +1,3 @@
-{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
-data. 
-
 To open the dashboards:
 
 . Launch {kib}:
@@ -28,3 +25,6 @@ want to open.
 [role="screenshot"]
 image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
 --
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.

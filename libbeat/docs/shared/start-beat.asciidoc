@@ -1,5 +1,5 @@
-Before starting {beatname_uc}, change the user credentials in
-the +{beatname_lc}.yml+ to a user that has restricted privileges,
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who has restricted privileges,
 especially if you're running {beatname_uc} in a production environment.
 For more information, see <<privileges-to-publish-events>>.
 

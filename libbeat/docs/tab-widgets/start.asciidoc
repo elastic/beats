@@ -1,4 +1,4 @@
-{beatname_lc}// tag::deb[]
+// tag::deb[]
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo service {beatname_lc} start
@@ -95,7 +95,7 @@ in the _Beats Platform Reference_.
 // end::linux[]
 
 // tag::win[]
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 PS C:{backslash}Program Files{backslash}{beatname_lc}> Start-Service {beatname_lc}
 ----------------------------------------------------------------------

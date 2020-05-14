@@ -1,2 +1,8 @@
-For more information about configuring {beatname_uc}, see
-<<configuring-howto-{beatname_lc}>>.
+For more information about configuring {beatname_uc}, also see:
+
+* <<configuring-howto-{beatname_lc},Configure {beatname_uc}>>
+* {beats-ref}/config-file-format.html[Config file format]
+ifeval::["{beatname_lc}"!="apm-server"]
+* The full reference configuration file, +{beatname_lc}.reference.yml+, which
+shows all non-deprecated options. 
+endif::[]

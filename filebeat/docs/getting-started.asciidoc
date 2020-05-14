@@ -1,6 +1,8 @@
 :modulename: system nginx mysql
 :release-state: released
 
+//TODO: Remove release-state definition before merging.
+
 [[filebeat-getting-started]]
 == Get started
 
@@ -12,7 +14,7 @@
 <titleabbrev>Get started</titleabbrev>
 ++++
 
-This guide describes how to get up and running quickly with log collection.
+This guide describes how to get started quickly with log collection.
 You'll learn how to:
 
 * install {beatname_uc} on each system you want to monitor
@@ -39,8 +41,10 @@ include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 //REVIEWERS: We don't currently say anything about licensing here. Should we?
 
+Install {beatname_uc} on all the servers you want to monitor.
+
 To download and install {beatname_uc}, use the commands that work with your
-system.
+system:
 
 include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 
@@ -85,8 +89,8 @@ configs:
 --
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
-+
-In the module configs under `modules.d`, change the module settings to match
+
+. In the module configs under `modules.d`, change the module settings to match
 your environment.
 +
 The default log locations are set based on the OS. If your logs aren't in
@@ -100,12 +104,8 @@ default locations, set the `paths` variable. For example:
     var.paths: ["/var/log/nginx/access.log*"] <1> 
 ----
 --
-+
-See <<configuration-filebeat-modules>> for more information about setting
-variables and advanced options.
 
-// REVIEWERS: I've collapsed the content about setting up Beats into one section
-// to make the setup easier and moved the detailed content to "how-to" topics.
+include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [float]
 [[setup-modules]]
@@ -131,6 +131,9 @@ include::{libbeat-dir}/shared/start-beat.asciidoc[]
 [float]
 [[view-kibana-dashboards]]
 === Step 6: View your data in {kib}
+
+{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
+data. 
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[]
 
