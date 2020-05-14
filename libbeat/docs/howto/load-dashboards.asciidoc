@@ -45,7 +45,7 @@ If you've configured the Logstash output, see
 endif::[]
 
 ifdef::requires-sudo[]
-include::../../libbeat/docs/shared-note-sudo.asciidoc[]
+include::{libbeat-dir}/shared-note-sudo.asciidoc[]
 endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]

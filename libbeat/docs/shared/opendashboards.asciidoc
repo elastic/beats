@@ -1,3 +1,9 @@
+// tag::open-dashboards-intro[]
+{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
+data. You loaded the dashboards earlier when you ran the `setup` command.
+// end::open-dashboards-intro[]
+
+// tag::open-dashboards[]
 To open the dashboards:
 
 . Launch {kib}:
@@ -28,3 +34,4 @@ image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
+// end::open-dashboards[]

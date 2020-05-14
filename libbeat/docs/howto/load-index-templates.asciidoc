@@ -108,7 +108,7 @@ ifdef::no-output-logstash[]
 endif::[]
 
 ifdef::requires-sudo[]
-include::./shared-note-sudo.asciidoc[]
+include::{libbeat-dir}/shared-note-sudo.asciidoc[]
 endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]

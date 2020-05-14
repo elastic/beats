@@ -84,12 +84,10 @@ auditbeat.modules:
   - /etc
 -------------------------------------
 
-include::{libbeat-dir}/step-test-config.asciidoc[]
-
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
 [float]
-[[setup-modules]]
+[[setup-assets]]
 === Step 4: Set up assets
 
 include::{libbeat-dir}/shared/setup.asciidoc[]
@@ -98,8 +96,16 @@ include::{libbeat-dir}/shared/setup.asciidoc[]
 [id="{beatname_lc}-starting"]
 === Step 5: Start {beatname_uc}
 
-include::{libbeat-dir}/shared/start-beat.asciidoc[]
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who has restricted privileges,
+especially if you're running {beatname_uc} in a production environment.
+For more information, see <<privileges-to-publish-events>>.
 
+To start {beatname_uc}, run:
+
+include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
+
+{beatname_uc} should begin streaming events to {es}.
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
 
@@ -115,7 +121,7 @@ To make it easier for you to start auditing the activities of users and
 processes on your system, {beatname_uc} comes with preconfigured dashboards and
 UIs for visualizing your data.
 
-include::{libbeat-dir}/shared/opendashboards.asciidoc[]
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
 Example dashboard:
 

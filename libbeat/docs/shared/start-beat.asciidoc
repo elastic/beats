@@ -1,8 +1,0 @@
-Before starting {beatname_uc}, modify the user credentials in
-+{beatname_lc}.yml+ and specify a user who has restricted privileges,
-especially if you're running {beatname_uc} in a production environment.
-For more information, see <<privileges-to-publish-events>>.
-
-To start {beatname_uc}, run:
-
-include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]

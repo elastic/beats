@@ -14,8 +14,8 @@ include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-deploying>>
 * <<view-kibana-dashboards>>
 
+[float]
 [id="{beatname_lc}-installation"]
-[role="xpack"]
 === Step 1: Download {beatname_uc}
 
 The {beatname_uc} distribution contains the command line tools, configuration
@@ -81,8 +81,8 @@ https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
 
 endif::[]
 
+[float]
 [id="{beatname_lc}-configuration"]
-[role="xpack"]
 === Step 2: Configure {beatname_uc}
 
 Before deploying {beatname_uc} to your cloud provider, you need to specify
@@ -160,17 +160,15 @@ include::{libbeat-dir}/step-configure-output.asciidoc[]
 
 include::{libbeat-dir}/step-configure-credentials.asciidoc[]
 
-include::{libbeat-dir}/step-test-config.asciidoc[]
-
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
-[id="{beatname_lc}-template"]
-[role="xpack"]
-=== Step 3: Load the index template in Elasticsearch
+[float]
+[[setup-assets]]
+=== Step 4: Set up assets
 
-:allplatforms:
-include::{libbeat-dir}/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared/setup.asciidoc[]
 
+[float]
 [id="{beatname_lc}-deploying"]
 [role="xpack"]
 === Step 4: Deploy {beatname_uc}
@@ -182,6 +180,7 @@ deployment infrastructure>>.
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
 
+[float]
 [[deploy-to-aws]]
 ==== Deploy to AWS
 
@@ -234,6 +233,7 @@ output.
 +
 If deployment fails, see <<faq>> for help troubleshooting.
 
+[float]
 [[deploy-to-gcp]]
 ==== Deploy to Google Cloud Platform
 
@@ -288,9 +288,9 @@ to the configured output.
 +
 If deployment fails, see <<faq>> for help troubleshooting.
 
+[float]
 [[view-kibana-dashboards]]
-[role="xpack"]
-=== Step 5: View your data in Kibana
+=== Step 5: View your data in {kib}
 
 There are currently no example dashboards available for {beatname_uc}.
 

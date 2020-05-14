@@ -1,0 +1,34 @@
+//TODO: Use attributes for app names.
+
+// tag::obs-intro[]
+Learn how to unify your logs, metrics, uptime, and application performance data:
+// end::obs-intro[]
+
+// tag::add-metrics[]
+* Add infrastructure metrics:
+{metricbeat-ref}/metricbeat-getting-started.html[Get started with {metricbeat}]
+// end::add-metrics[]
+// tag::add-logs[]
+* Add logs:
+{filebeat-ref}/filebeat-getting-started.html[Get started with {filebeat}]
+// end::add-logs[]
+// tag::add-uptime[]
+* Add uptime info:
+{heartbeat-ref}/heartbeat-getting-started.html[Get Started with {heartbeat}]
+// end::add-uptime[]
+// tag::add-apm[]
+* Add application metrics:
+{apm-get-started-ref}/index.html[APM overview]
+// end::add-apm[]
+
+// tag::obs-apps[]
+Then use the Observability apps in {kib} to search across all your data:
+
+** Explore metrics about systems and services across your ecosystem: 
+{kibana-ref}/xpack-infra[Metrics app]
+** Drill down into related log data and tail your logs in real time:
+{kibana-ref}/xpack-logs.html[Logs app]
+** Monitor availability issues across your apps and services:
+{kibana-ref}/xpack-infra[Uptime app]
+** Monitor application performance: {kibana-ref}/xpack-apm.html[APM app]
+// end::obs-apps[]

@@ -7,7 +7,7 @@ This guide describes how to configure {beatname_uc} manually. When possible,
 use <<filebeat-modules-overview,Filebeat modules>> for the fastest getting
 started experience.
 
-include::{libbeat-dir}/shared-configuring.asciidoc[]
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 Here is a sample of the `filebeat` section of the `filebeat.yml` file. Filebeat uses predefined
 default values for most configuration options.

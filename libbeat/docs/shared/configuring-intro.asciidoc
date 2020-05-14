@@ -1,5 +1,8 @@
 
-To configure {beatname_uc}, you edit the configuration file. The default
+TIP: To get started quickly, read
+<<{beatname_lc}-getting-started,Get started with {beatname_uc}>>.
+
+To configure {beatname_uc}, edit the configuration file. The default
 configuration file is called  +{beatname_lc}.yml+. The location of the file
 varies by platform. To locate the file, see <<directory-layout>>. 
 
@@ -11,3 +14,5 @@ endif::[]
 TIP: See the
 {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
+
+The following topics describe how to configure {beatname_uc}:

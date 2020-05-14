@@ -1,7 +1,7 @@
 Connections to {es} and {kib} are required to set up {beatname_uc}.
 
-Set the connection information in +{beatname_lc}.yml+. To locate the file, see
-<<directory-layout>>. 
+Set the connection information in +{beatname_lc}.yml+. To locate this
+configuration file, see <<directory-layout>>.
 
 include::{libbeat-dir}/tab-widgets/set-connection-widget.asciidoc[]
 

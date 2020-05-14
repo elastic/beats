@@ -6,6 +6,8 @@
 --
 Learn how to perform common {beatname_uc} configuration tasks.
 
+* <<{beatname_lc}-template>>
+* <<change-index-name>>
 * <<{beatname_lc}-geoip>>
 * <<using-environ-vars>>
 * <<configuring-ingest-node>>
@@ -13,6 +15,12 @@ Learn how to perform common {beatname_uc} configuration tasks.
 
 
 --
+
+[role="xpack"]
+include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/shared-geoip.asciidoc[]

@@ -1,3 +1,7 @@
+:release-state: released
+
+//TODO: Remove release-state definition before merging.
+
 [[packetbeat-getting-started]]
 == Get started with {beatname_uc}
 
@@ -6,22 +10,41 @@
 ++++
 
 The best way to understand the value of a network packet analytics system like
-Packetbeat is to try it on your own traffic.
+{Packetbeat} is to try it on your own traffic.
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+This guide describes how to get started quickly with network packets analytics.
+You'll learn how to:
 
-* <<packetbeat-installation>>
-* <<packetbeat-configuration>>
-* <<packetbeat-template>>
-* <<load-kibana-dashboards>>
-* <<packetbeat-starting>>
-* <<view-kibana-dashboards>>
-* <<setup-repositories>>
+//TODO: Update this
 
+* install {beatname_uc} on each system you want to monitor
+* specify the network devices and protocols to sniff
+* parse the packet data into fields and send it to {es}
+* visualize the packet data in {kib}
+
+[float]
+=== Before you begin
+
+You need {es} for storing and searching your data, and {kib} for visualizing and
+managing it.
+
+// TODO: We might want to provide the instructions for spinning up a deployment
+// here. See
+// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
+// Or link to the topic that's available for cloud.
+
+include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
+
+[float]
 [[packetbeat-installation]]
 === Step 1: Install Packetbeat
 
-include::{libbeat-dir}/shared-download-and-install.asciidoc[]
+Install {beatname_uc} on all the servers you want to monitor.
+
+To download and install {beatname_uc}, use the commands that work with your
+system:
+
+//TODO: ADD WIDGETS and other installation options section
 
 [[deb]]
 *deb:*
@@ -152,10 +175,19 @@ Before starting Packetbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Packetbeat\packetbeat.yml` or `/etc/packetbeat/packetbeat.yml`. For
 more information about these options, see <<configuring-howto-packetbeat>>.
 
-[[packetbeat-configuration]]
-=== Step 2: Configure Packetbeat
 
-include::{libbeat-dir}/shared-configuring.asciidoc[]
+[float]
+[[set-connection]]
+=== Step 2: Set the connection information
+
+include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
+
+
+[float]
+[[packetbeat-configuration]]
+=== Step 3: Configure sniffing
+
+include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 To configure Packetbeat:
 
@@ -237,105 +269,52 @@ packetbeat.protocols:
 
 ----------------------------------------------------------------------
 +
-include::{libbeat-dir}/step-configure-output.asciidoc[]
-
-include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
-
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
-
-include::{libbeat-dir}/step-test-config.asciidoc[]
-
 include::{libbeat-dir}/step-look-at-config.asciidoc[]
 
-[[packetbeat-template]]
-=== Step 3: Load the index template in Elasticsearch
+[float]
+[[setup-assets]]
+=== Step 4: Set up assets
 
-include::{libbeat-dir}/shared-template-load.asciidoc[]
+include::{libbeat-dir}/shared/setup.asciidoc[]
 
-[[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
-
-include::{libbeat-dir}/dashboards.asciidoc[]
-
+[float]
 [[packetbeat-starting]]
 === Step 5: Start Packetbeat
 
-Run Packetbeat by issuing the command that is appropriate for your platform. If
-you are accessing a secured Elasticsearch cluster, make sure you've configured
-credentials as described in <<{beatname_lc}-configuration>>.
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who has restricted privileges,
+especially if you're running {beatname_uc} in a production environment.
+For more information, see <<privileges-to-publish-events>>.
 
-NOTE: If you use an init.d script to start Packetbeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
-start Packetbeat in the foreground.
+To start {beatname_uc}, run:
 
-*deb and rpm:*
+include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
+{beatname_uc} should begin streaming data to {es}.
 
-*docker:*
-
-See <<running-on-docker>>.
-
-*mac and linux:*
-
-[source,shell]
-----------------------------------------------------------------------
-sudo chown root packetbeat.yml <1>
-sudo ./packetbeat -e
-----------------------------------------------------------------------
-<1> You'll be running Packetbeat as root, so you need to change ownership of the
-configuration file, or run Packetbeat with `--strict.perms=false` specified. See
-{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
-the _Beats Platform Reference_.
-
-include::{libbeat-dir}/shared-brew-run.asciidoc[]
-
-*win:*
-
-[source,shell]
-----------------------------------------------------------------------
-PS C:\Program Files\Packetbeat> Start-Service packetbeat
-----------------------------------------------------------------------
-
-By default the log files are stored in `C:\ProgramData\packetbeat\Logs`.
-
-==== Test the Packetbeat installation
-
-Packetbeat is now ready to capture data from your network traffic. You can test
-that it works by creating a simple HTTP request. For example:
-
-[source,shell]
-----------------------------------------------------------------------
-curl http://www.elastic.co/ > /dev/null
-----------------------------------------------------------------------
-
-Now verify that the data is present in Elasticsearch by issuing the following command:
-
-[source,shell]
-----------------------------------------------------------------------
-curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
-----------------------------------------------------------------------
-
-Make sure that you replace `localhost:9200` with the address of your Elasticsearch
-instance. The command should return data about the HTTP transaction you just created.
-
+[float]
 [[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+=== Step 6: View your data in {kib}
 
-To make it easier for you to get application performance insights
-from packet data, we have created example {beatname_uc} dashboards. You loaded
-the dashboards earlier when you ran the `setup` command.
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
-include::{libbeat-dir}/shared/opendashboards.asciidoc[]
-
-The dashboards are provided as examples. We recommend that you
-{kibana-ref}/dashboard.html[customize] them to meet your needs.
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
 TIP: To populate the client locations map in the overview dashboard, follow the
 steps described in <<{beatname_lc}-geoip>>.
 
 [role="screenshot"]
 image::./images/packetbeat-statistics.png[Packetbeat statistics]
+
+[float]
+=== What's next?
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-intro]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]
