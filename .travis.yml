@@ -116,7 +116,13 @@ jobs:
       stage: test
     - os: linux
       before_install: .ci/scripts/travis_has_changes.sh metricbeat libbeat || travis_terminate 0
-      env: TARGETS="-C metricbeat integration-tests"
+      install: 
+        - .ci/scripts/install-kind.sh
+        - .ci/scripts/install-kubectl.sh
+      env:
+        - TARGETS="-C metricbeat integration-tests"
+        - K8S_VERSION=v1.17.2
+        - KIND_VERSION=v0.7.0
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux

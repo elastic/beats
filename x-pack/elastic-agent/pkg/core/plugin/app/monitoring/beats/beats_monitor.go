@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"unicode"
 
@@ -139,7 +140,7 @@ func (b *Monitor) Prepare(process, pipelineID string, uid, gid int) error {
 			}
 		}
 
-		if err := os.Chown(drop, uid, gid); err != nil {
+		if err := changeOwner(drop, uid, gid); err != nil {
 			return err
 		}
 	}
@@ -228,4 +229,13 @@ func isWindowsPath(path string) bool {
 		return false
 	}
 	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
+}
+
+func changeOwner(path string, uid, gid int) error {
+	if runtime.GOOS == "windows" {
+		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
+		return nil
+	}
+
+	return os.Chown(path, uid, gid)
 }

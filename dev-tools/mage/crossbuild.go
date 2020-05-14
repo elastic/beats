@@ -297,7 +297,9 @@ func DockerChown(path string) {
 func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
 	numFixed := 0
-	defer log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+	defer func() {
+		log.Printf("chown took: %v, changed %d files", time.Now().Sub(start), numFixed)
+	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
 		if err != nil {

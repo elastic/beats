@@ -91,7 +91,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		hb.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, false)
 	}
 
 	tempCfg := common.MapStr{}
@@ -121,7 +121,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event) []*common.Config {
 	}
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs)
+	return template.ApplyConfigTemplate(event, configs, false)
 }
 
 func (hb *heartbeatHints) getType(hints common.MapStr) common.MapStr {

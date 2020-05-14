@@ -89,12 +89,27 @@ func (d *Dissector) extract(s string) (positions, error) {
 	// move through all the other delimiters, until we have consumed all of them.
 	for dl.Next() != nil {
 		start = offset
-		end = dl.Next().IndexOf(s, offset)
-		if end == -1 {
-			return nil, fmt.Errorf(
-				"could not find delimiter: `%s` in remaining: `%s`, (offset: %d)",
-				dl.Delimiter(), s[offset:], offset,
-			)
+
+		// corresponding field of the delimiter
+		field := d.parser.fields[d.parser.fieldsIdMap[i]]
+
+		// for fixed-length field, just step the same size of its length
+		if field.IsFixedLength() {
+			end = offset + field.Length()
+			if end > len(s) {
+				return nil, fmt.Errorf(
+					"field length is grater than string length: remaining: `%s`, (offset: %d), field: %s",
+					s[offset:], offset, field,
+				)
+			}
+		} else {
+			end = dl.Next().IndexOf(s, offset)
+			if end == -1 {
+				return nil, fmt.Errorf(
+					"could not find delimiter: `%s` in remaining: `%s`, (offset: %d)",
+					dl.Delimiter(), s[offset:], offset,
+				)
+			}
 		}
 
 		offset = end
@@ -118,6 +133,13 @@ func (d *Dissector) extract(s string) (positions, error) {
 		dl = dl.Next()
 	}
 
+	field := d.parser.fields[d.parser.fieldsIdMap[i]]
+
+	if field.IsFixedLength() && offset+field.Length() != len(s) {
+		return nil, fmt.Errorf("last fixed length key `%s` (length: %d) does not fit into remaining: `%s`, (offset: %d)",
+			field, field.Length(), s, offset,
+		)
+	}
 	// If we have remaining contents and have not captured all the requested fields
 	if offset < len(s) && i < len(d.parser.fields) {
 		positions[i] = position{start: offset, end: len(s)}

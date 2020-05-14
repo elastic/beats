@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -27,8 +27,8 @@ type globalFlags struct {
 
 // Config returns path which identifies configuration file.
 func (f *globalFlags) Config() string {
-	if len(f.PathConfigFile) == 0 {
-		return filepath.Join(application.HomePath(), defaultConfig)
+	if len(f.PathConfigFile) == 0 || f.PathConfigFile == defaultConfig {
+		return filepath.Join(paths.Home(), defaultConfig)
 	}
 	return f.PathConfigFile
 }
@@ -61,6 +61,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(newRunCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newIntrospectCommandWithArgs(flags, args, streams))
 
 	return cmd
 }

@@ -24,10 +24,6 @@ import (
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
 
-type managementCfg struct {
-	Management *config.Config `config:"management"`
-}
-
 type apiClient interface {
 	Send(
 		method string,
@@ -61,7 +57,7 @@ func newManaged(
 		return nil, err
 	}
 
-	path := fleetAgentConfigPath()
+	path := info.AgentConfigFile()
 
 	// TODO(ph): Define the encryption password.
 	store := storage.NewEncryptedDiskStore(path, []byte(""))
@@ -92,7 +88,7 @@ func newManaged(
 	}
 
 	// Extract only management related configuration.
-	managementCfg := &managementCfg{}
+	managementCfg := &Config{}
 	if err := rawConfig.Unpack(managementCfg); err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("fail to unpack configuration from %s", path),
@@ -149,9 +145,9 @@ func newManaged(
 	batchedAcker := newLazyAcker(acker)
 
 	// Create the action store that will persist the last good policy change on disk.
-	actionStore, err := newActionStore(log, storage.NewDiskStore(fleetActionStoreFile()))
+	actionStore, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
 	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", fleetActionStoreFile()))
+		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
 	}
 	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
 
@@ -212,7 +208,6 @@ func (m *Managed) Start() error {
 func (m *Managed) Stop() error {
 	defer m.log.Info("Agent is stopped")
 	m.cancelCtxFn()
-	m.gateway.Stop()
 	return nil
 }
 

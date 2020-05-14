@@ -49,7 +49,7 @@ var appPoolCounters = map[string]string{
 	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
 	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
 	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_byte":                 "\\Process(w3wp*)\\Private Bytes",
+	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
 	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
 	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
 	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
@@ -150,10 +150,20 @@ func (re *Reader) fetch(names []string) ([]mb.Event, error) {
 			for _, val := range value {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
-				if val.Err != nil && !re.hasRun {
-					re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-						"error", val.Err, logp.Namespace("website"), "query", counterPath)
-					continue
+				if val.Err.Error != nil {
+					if !re.hasRun {
+						re.log.Debugw("Ignoring the first measurement because the data isn't ready",
+							"error", val.Err, logp.Namespace("application_pool"), "query", counterPath)
+						continue
+					}
+					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
+					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
+					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
+					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+						re.log.Debugw("Counter value retrieval returned",
+							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("application_pool"), "query", counterPath)
+						continue
+					}
 				}
 				if val.Instance == appPool.Name {
 					events[appPool.Name].MetricSetFields.Put(appPool.counters[counterPath], val.Measurement)

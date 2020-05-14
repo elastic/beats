@@ -32,7 +32,10 @@ type wrappedConfig struct {
 
 // NewMonitor creates a monitor based on a process configuration.
 func NewMonitor(config *config.Config) (Monitor, error) {
-	cfg := &wrappedConfig{}
+	cfg := &wrappedConfig{
+		DownloadConfig: artifact.DefaultConfig(),
+	}
+
 	if err := config.Unpack(&cfg); err != nil {
 		return nil, err
 	}

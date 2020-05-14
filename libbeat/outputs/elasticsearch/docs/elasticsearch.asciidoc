@@ -676,3 +676,11 @@ for HTTPS-based connections. If the `ssl` section is missing, the host CAs are u
 Elasticsearch.
 
 See <<configuration-ssl>> for more information.
+
+===== `kebreros`
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.
+
+include::{libbeat-dir}/shared-kerberos-config.asciidoc[]

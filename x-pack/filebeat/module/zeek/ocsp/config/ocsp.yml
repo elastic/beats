@@ -60,3 +60,7 @@ processors:
       target: event
       fields:
         kind: event
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

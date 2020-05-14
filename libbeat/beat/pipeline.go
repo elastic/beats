@@ -110,6 +110,9 @@ type ProcessingConfig struct {
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool
 
+	// Disables the addition of host.name if it was enabled for the publisher.
+	DisableHost bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
