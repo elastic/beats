@@ -108,7 +108,7 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
 	return devtools.GolangCrossBuild(params)
 }
 
@@ -117,7 +117,8 @@ func GolangCrossBuildOSS() error {
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
 	params.OutputDir = "build/golang-crossbuild"
-	params.LDFlags = flagsSet()
+	injectBuildVars(params.Vars)
+
 	if err := devtools.GolangCrossBuild(params); err != nil {
 		return err
 	}
@@ -136,32 +137,23 @@ func BuildGoDaemon() error {
 // BinaryOSS build the fleet artifact.
 func (Build) BinaryOSS() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent-oss"),
-		"-ldflags", flags(),
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.Name = "elastic-agent-oss"
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Binary build the fleet artifact.
 func (Build) Binary() error {
 	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-	)
-}
 
-// Dev make a special build with the Dev tags.
-func (Build) Dev() error {
-	mg.Deps(Prepare.Env)
-	return RunGo(
-		"build",
-		"-tags", "dev",
-		"-o", filepath.Join(buildDir, "elastic-agent"),
-		"-ldflags", flags(),
-	)
+	buildArgs := devtools.DefaultBuildArgs()
+	buildArgs.OutputDir = buildDir
+	injectBuildVars(buildArgs.Vars)
+
+	return devtools.Build(buildArgs)
 }
 
 // Clean up dev environment.
@@ -323,22 +315,6 @@ func commitID() string {
 		return "cannot retrieve hash"
 	}
 	return commitID
-}
-
-func flags() string {
-	return strings.Join(flagsSet(), " ")
-}
-
-func flagsSet() []string {
-	ts := time.Now().Format(time.RFC3339)
-	commitID := commitID()
-	isSnapshot, _ := os.LookupEnv(snapshotEnv)
-
-	return []string{
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.buildTime=%s"`, ts),
-		fmt.Sprintf(`-X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.commit=%s"`, commitID),
-		fmt.Sprintf(` -X "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot=%s"`, isSnapshot),
-	}
 }
 
 // Update is an alias for executing fields, dashboards, config, includes.
@@ -539,4 +515,19 @@ func dockerTag() string {
 	}
 
 	return tagBase
+}
+
+func buildVars() map[string]string {
+	vars := make(map[string]string)
+
+	isSnapshot, _ := os.LookupEnv(snapshotEnv)
+	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	return vars
+}
+
+func injectBuildVars(m map[string]string) {
+	for k, v := range buildVars() {
+		m[k] = v
+	}
 }
