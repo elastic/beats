@@ -239,6 +239,10 @@ func (in *HttpjsonInput) applyRateLimit(ctx context.Context, header http.Header,
 		return nil
 	}
 	t := time.Unix(epoch, 0)
+	if t.Sub(time.Now()) < 0 {
+		in.log.Debugf("Rate Limit: The rate limit time has already passed.")
+		return nil
+	}
 	in.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
 	ticker := time.NewTicker(time.Until(t))
 	defer ticker.Stop()
