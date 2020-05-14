@@ -341,6 +341,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
+- Improve ECS categorization field mappings in cisco module. {issue}16028[16028] {pull}18537[18537]
 
 *Heartbeat*
 
