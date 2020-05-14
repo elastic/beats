@@ -489,6 +489,12 @@ metricbeat.modules:
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
 
+  # Set to cluster to treat each item in the hosts list as an endpoint for
+  # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
+  # Set to node (default) to treat each item in the hosts list as an individual
+  # node in the Elasticsearch cluster.
+  #hosts_mode: node
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
