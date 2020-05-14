@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -55,10 +56,11 @@ type Provider struct {
 	stoppers      map[string]*time.Timer
 	stopTrigger   chan *dockerContainerMetadata
 	logger        *logp.Logger
+	keystore      keystore.Keystore
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
@@ -115,6 +117,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
 		logger:        logger,
+		keystore:      keystore,
 	}, nil
 }
 
@@ -303,6 +306,8 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 }
 
 func (d *Provider) publish(event bus.Event) {
+	// attach keystore to the event to be consumed by the static configs
+	event["keystore"] = d.keystore
 	// Try to match a config
 	if config := d.templates.GetConfig(event); config != nil {
 		event["config"] = config

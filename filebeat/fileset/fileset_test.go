@@ -30,8 +30,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+func makeTestInfo(version string) beat.Info {
+	return beat.Info{
+		IndexPrefix: "filebeat",
+		Version:     version,
+	}
+}
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
 	modulesPath, err := filepath.Abs("../module")
@@ -48,7 +56,7 @@ func TestLoadManifestNginx(t *testing.T) {
 	manifest, err := fs.readManifest()
 	assert.NoError(t, err)
 	assert.Equal(t, manifest.ModuleVersion, "1.0")
-	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/default.json"})
+	assert.Equal(t, manifest.IngestPipeline, []string{"ingest/pipeline.yml"})
 	assert.Equal(t, manifest.Input, "config/nginx-access.yml")
 
 	vars := manifest.Vars
@@ -60,7 +68,7 @@ func TestLoadManifestNginx(t *testing.T) {
 func TestGetBuiltinVars(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 
-	vars, err := fs.getBuiltinVars("6.6.0")
+	vars, err := fs.getBuiltinVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	assert.IsType(t, vars["hostname"], "a-mac-with-esc-key")
@@ -77,7 +85,7 @@ func TestEvaluateVarsNginx(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -100,7 +108,7 @@ func TestEvaluateVarsNginxOverride(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, "no_plugins", vars["pipeline"])
@@ -113,7 +121,7 @@ func TestEvaluateVarsMySQL(t *testing.T) {
 	fs.manifest, err = fs.readManifest()
 	assert.NoError(t, err)
 
-	vars, err := fs.evaluateVars("6.6.0")
+	vars, err := fs.evaluateVars(makeTestInfo("6.6.0"))
 	assert.NoError(t, err)
 
 	builtin := vars["builtin"].(map[string]interface{})
@@ -171,7 +179,7 @@ func TestResolveVariable(t *testing.T) {
 
 func TestGetInputConfigNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read("5.2.0"))
+	assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	cfg, err := fs.getInputConfig()
 	assert.NoError(t, err)
@@ -181,7 +189,7 @@ func TestGetInputConfigNginx(t *testing.T) {
 	assert.True(t, cfg.HasField("pipeline"))
 	pipelineID, err := cfg.String("pipeline", -1)
 	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
 }
 
 func TestGetInputConfigNginxOverrides(t *testing.T) {
@@ -209,7 +217,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 				pipelineID, err := c.String("pipeline", -1)
 				assert.NoError(t, err)
-				assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
+				assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipelineID)
 			},
 		},
 		"pipeline": {
@@ -236,7 +244,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 			})
 			assert.NoError(t, err)
 
-			assert.NoError(t, fs.Read("5.2.0"))
+			assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 			cfg, err := fs.getInputConfig()
 			assert.NoError(t, err)
@@ -260,7 +268,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
-	assert.NoError(t, fs.Read("5.2.0"))
+	assert.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	version := common.MustNewVersion("5.2.0")
 	pipelines, err := fs.GetPipelines(*version)
@@ -268,7 +276,7 @@ func TestGetPipelineNginx(t *testing.T) {
 	assert.Len(t, pipelines, 1)
 
 	pipeline := pipelines[0]
-	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipeline.id)
+	assert.Equal(t, "filebeat-5.2.0-nginx-access-pipeline", pipeline.id)
 	assert.Contains(t, pipeline.contents, "description")
 	assert.Contains(t, pipeline.contents, "processors")
 }

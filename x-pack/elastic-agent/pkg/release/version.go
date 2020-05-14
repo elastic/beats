@@ -10,7 +10,7 @@ import (
 )
 
 // version is the current version of the elastic-agent.
-var version = "8.0.0"
+var version = "7.8.0"
 
 // buildHash is the hash of the current build.
 var commit = "<unknown>"

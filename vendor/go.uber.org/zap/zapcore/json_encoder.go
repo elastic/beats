@@ -44,10 +44,15 @@ func getJSONEncoder() *jsonEncoder {
 }
 
 func putJSONEncoder(enc *jsonEncoder) {
+	if enc.reflectBuf != nil {
+		enc.reflectBuf.Free()
+	}
 	enc.EncoderConfig = nil
 	enc.buf = nil
 	enc.spaced = false
 	enc.openNamespaces = 0
+	enc.reflectBuf = nil
+	enc.reflectEnc = nil
 	_jsonPool.Put(enc)
 }
 
@@ -56,6 +61,10 @@ type jsonEncoder struct {
 	buf            *buffer.Buffer
 	spaced         bool // include spaces after colons and commas
 	openNamespaces int
+
+	// for encoding generic values by reflection
+	reflectBuf *buffer.Buffer
+	reflectEnc *json.Encoder
 }
 
 // NewJSONEncoder creates a fast, low-allocation JSON encoder. The encoder
@@ -124,13 +133,41 @@ func (enc *jsonEncoder) AddInt64(key string, val int64) {
 	enc.AppendInt64(val)
 }
 
+func (enc *jsonEncoder) resetReflectBuf() {
+	if enc.reflectBuf == nil {
+		enc.reflectBuf = bufferpool.Get()
+		enc.reflectEnc = json.NewEncoder(enc.reflectBuf)
+
+		// For consistency with our custom JSON encoder.
+		enc.reflectEnc.SetEscapeHTML(false)
+	} else {
+		enc.reflectBuf.Reset()
+	}
+}
+
+var nullLiteralBytes = []byte("null")
+
+// Only invoke the standard JSON encoder if there is actually something to
+// encode; otherwise write JSON null literal directly.
+func (enc *jsonEncoder) encodeReflected(obj interface{}) ([]byte, error) {
+	if obj == nil {
+		return nullLiteralBytes, nil
+	}
+	enc.resetReflectBuf()
+	if err := enc.reflectEnc.Encode(obj); err != nil {
+		return nil, err
+	}
+	enc.reflectBuf.TrimNewline()
+	return enc.reflectBuf.Bytes(), nil
+}
+
 func (enc *jsonEncoder) AddReflected(key string, obj interface{}) error {
-	marshaled, err := json.Marshal(obj)
+	valueBytes, err := enc.encodeReflected(obj)
 	if err != nil {
 		return err
 	}
 	enc.addKey(key)
-	_, err = enc.buf.Write(marshaled)
+	_, err = enc.buf.Write(valueBytes)
 	return err
 }
 
@@ -213,12 +250,12 @@ func (enc *jsonEncoder) AppendInt64(val int64) {
 }
 
 func (enc *jsonEncoder) AppendReflected(val interface{}) error {
-	marshaled, err := json.Marshal(val)
+	valueBytes, err := enc.encodeReflected(val)
 	if err != nil {
 		return err
 	}
 	enc.addElementSeparator()
-	_, err = enc.buf.Write(marshaled)
+	_, err = enc.buf.Write(valueBytes)
 	return err
 }
 
@@ -226,6 +263,12 @@ func (enc *jsonEncoder) AppendString(val string) {
 	enc.addElementSeparator()
 	enc.buf.AppendByte('"')
 	enc.safeAddString(val)
+	enc.buf.AppendByte('"')
+}
+
+func (enc *jsonEncoder) AppendTimeLayout(time time.Time, layout string) {
+	enc.buf.AppendByte('"')
+	enc.buf.AppendTime(time, layout)
 	enc.buf.AppendByte('"')
 }
 

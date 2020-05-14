@@ -1,45 +1,42 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "mssql.performance",
         "duration": 115000,
         "module": "mssql"
     },
     "metricset": {
-        "name": "performance"
+        "name": "performance",
+        "period": 10000
     },
     "mssql": {
         "performance": {
             "active_temp_tables": 0,
-            "batch_requests_per_sec": 24249,
+            "batch_requests_per_sec": 3355,
             "buffer": {
                 "cache_hit": {
-                    "pct": 0.14
+                    "pct": 0.22
                 },
-                "checkpoint_pages_per_sec": 182,
-                "database_pages": 1892,
+                "checkpoint_pages_per_sec": 295,
+                "database_pages": 2152,
                 "page_life_expectancy": {
-                    "sec": 8201
+                    "sec": 1400
                 },
-                "target_pages": 3194880
+                "target_pages": 3178496
             },
-            "compilations_per_sec": 7379,
-            "connections_reset_per_sec": 2179,
-            "lock_waits_per_sec": 3,
-            "logins_per_sec": 7346,
-            "logouts_per_sec": 7339,
-            "page_splits_per_sec": 45,
-            "recompilations_per_sec": 0,
+            "compilations_per_sec": 1151,
+            "connections_reset_per_sec": 88,
+            "lock_waits_per_sec": 6,
+            "logins_per_sec": 1105,
+            "logouts_per_sec": 1103,
+            "page_splits_per_sec": 14,
+            "recompilations_per_sec": 2,
             "transactions": 0,
-            "user_connections": 7
+            "user_connections": 2
         }
     },
     "service": {
-        "address": "172.26.0.2",
+        "address": "172.23.0.2:1433",
         "type": "mssql"
     }
 }

@@ -51,6 +51,9 @@ type config struct {
 	// CgroupPrefix is the prefix where the container id is inside cgroup
 	CgroupPrefixes []string `config:"cgroup_prefixes"`
 
+	// CgroupRegex is the regular expression that captures the container id from cgroup path
+	CgroupRegex string `config:"cgroup_regex"`
+
 	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
 	// set to 0 to disable the cgroup cache
 	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`

@@ -1,6 +1,6 @@
 name: Metricbeat
 cmd: metricbeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"]
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
 configurable: grpc
 post_install:
   - move_file:
@@ -8,6 +8,10 @@ post_install:
       target: "modules.d/system.yml.disabled"
 rules:
 - inject_index:
+    type: metrics
+
+- inject_stream_processor:
+    on_conflict: insert_after
     type: metrics
 
 - extract_list_items:
@@ -20,14 +24,17 @@ rules:
     rules:
     - copy_all_to_list:
         to: streams
-        overwrite: false
-        except: ["streams", "id", "enabled"]
+        on_conflict: noop
+        except: ["streams", "id", "enabled", "processors"]
+    - copy_to_list:
+        item: processors
+        to: streams
+        on_conflict: insert_before
 
 - extract_list_items:
     path: inputsstreams
     item: streams
     to: inputs
-
 
 - filter_values_with_regexp:
     key: type

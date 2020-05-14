@@ -4,7 +4,6 @@
 4d63.com/tz
 # cloud.google.com/go v0.51.0
 cloud.google.com/go
-cloud.google.com/go/civil
 cloud.google.com/go/compute/metadata
 cloud.google.com/go/functions/metadata
 cloud.google.com/go/iam
@@ -118,6 +117,8 @@ github.com/akavel/rsrc/ico
 github.com/andrewkroh/sys/windows/svc/eventlog
 # github.com/antlr/antlr4 v0.0.0-20200326173327-a4c66dc863bb
 github.com/antlr/antlr4/runtime/Go/antlr
+# github.com/armon/go-radix v1.0.0
+github.com/armon/go-radix
 # github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 github.com/armon/go-socks5
 # github.com/aws/aws-lambda-go v1.6.0
@@ -318,9 +319,11 @@ github.com/coreos/pkg/dlopen
 github.com/davecgh/go-spew/spew
 # github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892
 github.com/davecgh/go-xdr/xdr2
-# github.com/denisenkom/go-mssqldb v0.0.0-20181014144952-4e0d7dc8888f
+# github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 github.com/denisenkom/go-mssqldb
 github.com/denisenkom/go-mssqldb/internal/cp
+github.com/denisenkom/go-mssqldb/internal/decimal
+github.com/denisenkom/go-mssqldb/internal/querytext
 # github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 github.com/devigned/tab
 # github.com/dgrijalva/jwt-go v3.2.1-0.20190620180102-5e25c22bd5d6+incompatible
@@ -387,6 +390,9 @@ github.com/docker/go-metrics
 github.com/docker/go-plugins-helpers/sdk
 # github.com/docker/go-units v0.4.0
 github.com/docker/go-units
+# github.com/docker/spdystream v0.0.0-20160310174837-449fdfce4d96
+github.com/docker/spdystream
+github.com/docker/spdystream/spdy
 # github.com/dop251/goja v0.0.0-00010101000000-000000000000 => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 github.com/dop251/goja
 github.com/dop251/goja/ast
@@ -518,6 +524,8 @@ github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
+# github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe
+github.com/golang-sql/civil
 # github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7
 github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.3.2
@@ -575,9 +583,14 @@ github.com/gorilla/websocket
 github.com/grpc-ecosystem/grpc-gateway/internal
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
-# github.com/hashicorp/errwrap v0.0.0-20141028054710-7554cd9344ce
+# github.com/h2non/filetype v1.0.12
+github.com/h2non/filetype
+github.com/h2non/filetype/matchers
+github.com/h2non/filetype/matchers/isobmff
+github.com/h2non/filetype/types
+# github.com/hashicorp/errwrap v1.0.0
 github.com/hashicorp/errwrap
-# github.com/hashicorp/go-multierror v0.0.0-20161216184304-ed905158d874
+# github.com/hashicorp/go-multierror v1.0.0
 github.com/hashicorp/go-multierror
 # github.com/hashicorp/go-uuid v1.0.1
 github.com/hashicorp/go-uuid
@@ -699,7 +712,7 @@ github.com/prometheus/client_model/go
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.0.9-0.20191208103036-42f6e295b56f
+# github.com/prometheus/procfs v0.0.11
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
@@ -733,6 +746,12 @@ github.com/samuel/go-thrift/parser
 github.com/sanathkr/go-yaml
 # github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522
 github.com/sanathkr/yaml
+# github.com/santhosh-tekuri/jsonschema v1.2.4
+github.com/santhosh-tekuri/jsonschema
+github.com/santhosh-tekuri/jsonschema/decoders
+github.com/santhosh-tekuri/jsonschema/formats
+github.com/santhosh-tekuri/jsonschema/loader
+github.com/santhosh-tekuri/jsonschema/mediatypes
 # github.com/shirou/gopsutil v2.19.11+incompatible
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/internal/common
@@ -745,10 +764,11 @@ github.com/spf13/cobra
 github.com/spf13/pflag
 # github.com/stretchr/objx v0.2.0
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.4.0
+# github.com/stretchr/testify v1.5.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
+github.com/stretchr/testify/suite
 # github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 github.com/tsg/go-daemon
 # github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
@@ -804,6 +824,35 @@ github.com/yuin/gopher-lua
 github.com/yuin/gopher-lua/ast
 github.com/yuin/gopher-lua/parse
 github.com/yuin/gopher-lua/pm
+# go.elastic.co/apm v1.7.2
+go.elastic.co/apm
+go.elastic.co/apm/apmconfig
+go.elastic.co/apm/apmtest
+go.elastic.co/apm/internal/apmcontext
+go.elastic.co/apm/internal/apmhostutil
+go.elastic.co/apm/internal/apmhttputil
+go.elastic.co/apm/internal/apmlog
+go.elastic.co/apm/internal/apmschema
+go.elastic.co/apm/internal/apmstrings
+go.elastic.co/apm/internal/apmversion
+go.elastic.co/apm/internal/configutil
+go.elastic.co/apm/internal/iochan
+go.elastic.co/apm/internal/pkgerrorsutil
+go.elastic.co/apm/internal/ringbuffer
+go.elastic.co/apm/internal/wildcard
+go.elastic.co/apm/model
+go.elastic.co/apm/stacktrace
+go.elastic.co/apm/transport
+go.elastic.co/apm/transport/transporttest
+# go.elastic.co/apm/module/apmelasticsearch v1.7.2
+go.elastic.co/apm/module/apmelasticsearch
+# go.elastic.co/apm/module/apmhttp v1.7.2
+go.elastic.co/apm/module/apmhttp
+# go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+go.elastic.co/ecszap
+go.elastic.co/ecszap/internal
+# go.elastic.co/fastjson v1.0.0
+go.elastic.co/fastjson
 # go.opencensus.io v0.22.2
 go.opencensus.io
 go.opencensus.io/internal
@@ -822,11 +871,13 @@ go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
-# go.uber.org/atomic v1.3.1
+# go.uber.org/atomic v1.5.0
 go.uber.org/atomic
-# go.uber.org/multierr v1.1.1-0.20170829224307-fb7d312c2c04
+# go.uber.org/multierr v1.3.0
 go.uber.org/multierr
-# go.uber.org/zap v1.7.1
+# go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee
+go.uber.org/tools/update-license
+# go.uber.org/zap v1.14.0
 go.uber.org/zap
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/bufferpool
@@ -836,9 +887,13 @@ go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest/observer
 # golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
 golang.org/x/crypto/blake2b
+golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/curve25519
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
+golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/md4
 golang.org/x/crypto/openpgp
 golang.org/x/crypto/openpgp/armor
@@ -849,7 +904,10 @@ golang.org/x/crypto/openpgp/s2k
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/pkcs12
 golang.org/x/crypto/pkcs12/internal/rc2
+golang.org/x/crypto/poly1305
 golang.org/x/crypto/sha3
+golang.org/x/crypto/ssh
+golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/exp v0.0.0-20191227195350-da58074b4299
 golang.org/x/exp/apidiff
@@ -888,7 +946,7 @@ golang.org/x/oauth2/jwt
 # golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c
+# golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -1048,6 +1106,8 @@ gopkg.in/inf.v0
 gopkg.in/jcmturner/aescts.v1
 # gopkg.in/jcmturner/dnsutils.v1 v1.0.1
 gopkg.in/jcmturner/dnsutils.v1
+# gopkg.in/jcmturner/goidentity.v3 v3.0.0
+gopkg.in/jcmturner/goidentity.v3
 # gopkg.in/jcmturner/gokrb5.v7 v7.3.0
 gopkg.in/jcmturner/gokrb5.v7/asn1tools
 gopkg.in/jcmturner/gokrb5.v7/client
@@ -1078,6 +1138,8 @@ gopkg.in/jcmturner/gokrb5.v7/keytab
 gopkg.in/jcmturner/gokrb5.v7/krberror
 gopkg.in/jcmturner/gokrb5.v7/messages
 gopkg.in/jcmturner/gokrb5.v7/pac
+gopkg.in/jcmturner/gokrb5.v7/service
+gopkg.in/jcmturner/gokrb5.v7/spnego
 gopkg.in/jcmturner/gokrb5.v7/types
 # gopkg.in/jcmturner/rpc.v1 v1.1.0
 gopkg.in/jcmturner/rpc.v1/mstypes
@@ -1182,6 +1244,8 @@ k8s.io/apimachinery/pkg/util/clock
 k8s.io/apimachinery/pkg/util/diff
 k8s.io/apimachinery/pkg/util/errors
 k8s.io/apimachinery/pkg/util/framer
+k8s.io/apimachinery/pkg/util/httpstream
+k8s.io/apimachinery/pkg/util/httpstream/spdy
 k8s.io/apimachinery/pkg/util/intstr
 k8s.io/apimachinery/pkg/util/json
 k8s.io/apimachinery/pkg/util/naming
@@ -1194,6 +1258,7 @@ k8s.io/apimachinery/pkg/util/wait
 k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
+k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
 # k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
 k8s.io/client-go/discovery
@@ -1250,8 +1315,11 @@ k8s.io/client-go/tools/clientcmd/api/latest
 k8s.io/client-go/tools/clientcmd/api/v1
 k8s.io/client-go/tools/metrics
 k8s.io/client-go/tools/pager
+k8s.io/client-go/tools/portforward
 k8s.io/client-go/tools/reference
+k8s.io/client-go/tools/watch
 k8s.io/client-go/transport
+k8s.io/client-go/transport/spdy
 k8s.io/client-go/util/cert
 k8s.io/client-go/util/connrotation
 k8s.io/client-go/util/flowcontrol

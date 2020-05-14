@@ -184,6 +184,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				"agent": common.MapStr{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
 					"hostname":     "test.host.name",
+					"name":         "test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
 					"type":         "test",
 					"version":      "0.1",

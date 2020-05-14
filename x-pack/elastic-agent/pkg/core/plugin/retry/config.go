@@ -21,10 +21,21 @@ type Config struct {
 	RetriesCount int `yaml:"retriesCount" config:"retriesCount"`
 	// Delay specifies delay in ms between retries. Default is 30s
 	Delay time.Duration `yaml:"delay" config:"delay"`
-	// MaxDelay specifies maximum delay in ms between retries. Default is 300s
+	// MaxDelay specifies maximum delay in ms between retries. Default is 300s (5min)
 	MaxDelay time.Duration `yaml:"maxDelay" config:"maxDelay"`
 	// Exponential determines whether delay is treated as exponential.
 	// With 30s delay and 3 retries: 30, 60, 120s
 	// Default is false
 	Exponential bool `yaml:"exponential" config:"exponential"`
+}
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *Config {
+	return &Config{
+		Enabled:      false,
+		RetriesCount: 3,
+		Delay:        30 * time.Second,
+		MaxDelay:     5 * time.Minute,
+		Exponential:  false,
+	}
 }

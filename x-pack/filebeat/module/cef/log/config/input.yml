@@ -24,3 +24,7 @@ processors:
   - decode_cef:
       field: event.original
   - community_id:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

@@ -23,3 +23,9 @@ custom_definitions:
 {{ if .detect_sequence_reset}}
 detect_sequence_reset: {{.detect_sequence_reset}}
 {{end}}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

@@ -662,3 +662,23 @@ class Test(BaseTest):
                 "recursive glob disabled"),
             max_timeout=10)
         filebeat.check_kill_and_wait()
+
+    def test_input_processing_pipeline_disable_host(self):
+        """
+        Check processing_pipeline.disable_host in input config.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            publisher_pipeline={
+                "disable_host": True,
+            },
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("test message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+        assert "host.name" not in output[0]

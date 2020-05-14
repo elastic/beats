@@ -45,7 +45,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		return errors.New(ErrAppNotRunning)
 	}
 
-	retryFn := func() error {
+	retryFn := func(ctx context.Context) error {
 		a.appLock.Lock()
 		defer a.appLock.Unlock()
 
@@ -68,6 +68,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 			return errors.New(ErrClientNotConfigurable, errors.TypeApplication)
 		}
 
+		a.logger.Debugf("configuring application %s: %s", a.Name(), string(rawYaml))
 		err = configClient.Config(ctx, string(rawYaml))
 
 		if netErr, ok := err.(net.Error); ok && (netErr.Timeout() || netErr.Temporary()) {
@@ -79,5 +80,5 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		return retry.ErrorMakeFatal(err)
 	}
 
-	return retry.Do(a.retryConfig, retryFn)
+	return retry.Do(ctx, a.retryConfig, retryFn)
 }

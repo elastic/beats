@@ -123,7 +123,7 @@ endif
 #
 # Includes
 #
-include $(ES_BEATS)/dev-tools/make/mage.mk
+include $(ES_BEATS)/dev-tools/make/mage-install.mk
 
 ### BUILDING ###
 
@@ -201,7 +201,8 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	GOFLAGS="${INSTALL_FLAG}" \
+		$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
@@ -211,7 +212,8 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	GOFLAGS="${INSTALL_FLAG}" \
+		$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
@@ -225,7 +227,7 @@ integration-tests-environment: prepare-tests build-image
 	  -e RACE_DETECTOR=$(RACE_DETECTOR) \
 	  -e DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} \
 	  -e TEST_ENVIRONMENT=${TEST_ENVIRONMENT} \
-	  -e BEATS_DOCKER_INTEGRATION_TEST_ENV=${BEATS_DOCKER_INTEGRATION_TEST_ENV} \
+	  -e BEATS_INSIDE_INTEGRATION_TEST_ENV=${BEATS_INSIDE_INTEGRATION_TEST_ENV} \
 	  -e GOFLAGS=${INSTALL_FLAG} \
 	  beat make integration-tests
 
@@ -356,7 +358,7 @@ update: python-env fields collect config ## @build Update expects the most recen
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
+	go run ${INSTALL_FLAG} ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
 endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)

@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event":{
+      "dataset":"kvm.status",
+      "module":"kvm",
+      "duration":4012216
+   },
+   "metricset":{
+      "name":"status"
+   },
+   "service":{
+      "address":"unix:///var/run/libvirt/libvirt-sock",
+      "type":"kvm"
+   },
+   "kvm":{
+      "status":{
+         "stat":{
+            "state":"running"
+         },
+         "id":1,
+         "name":"generic-2"
+      }
+   }
+}

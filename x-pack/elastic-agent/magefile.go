@@ -20,15 +20,16 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
-
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 const (
@@ -43,10 +44,12 @@ const (
 // Aliases for commands required by master makefile
 var Aliases = map[string]interface{}{
 	"build": Build.All,
+	"demo":  Demo.Enroll,
 }
 
 func init() {
 	common.RegisterCheckDeps(Update, Check.All)
+	test.RegisterDeps(UnitTest)
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
@@ -69,6 +72,9 @@ type Prepare mg.Namespace
 
 // Format automatically format the code.
 type Format mg.Namespace
+
+// Demo runs agent out of container.
+type Demo mg.Namespace
 
 // Env returns information about the environment.
 func (Prepare) Env() {
@@ -102,7 +108,6 @@ func (Build) GenerateConfig() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuildOSS() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
 	params.LDFlags = flagsSet()
 	return devtools.GolangCrossBuild(params)
 }
@@ -111,7 +116,6 @@ func GolangCrossBuildOSS() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	params := devtools.DefaultGolangCrossBuildArgs()
-	params.InputFiles = []string{"cmd/elastic-agent/elastic-agent.go"}
 	params.OutputDir = "build/golang-crossbuild"
 	params.LDFlags = flagsSet()
 	if err := devtools.GolangCrossBuild(params); err != nil {
@@ -136,7 +140,6 @@ func (Build) BinaryOSS() error {
 		"build",
 		"-o", filepath.Join(buildDir, "elastic-agent-oss"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
@@ -147,7 +150,6 @@ func (Build) Binary() error {
 		"build",
 		"-o", filepath.Join(buildDir, "elastic-agent"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
@@ -159,7 +161,6 @@ func (Build) Dev() error {
 		"-tags", "dev",
 		"-o", filepath.Join(buildDir, "elastic-agent"),
 		"-ldflags", flags(),
-		"cmd/elastic-agent/elastic-agent.go",
 	)
 }
 
@@ -267,47 +268,14 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	version, found := os.LookupEnv("BEAT_VERSION")
-	if !found {
-		version = release.Version()
-	}
-
-	packedBeats := []string{"filebeat", "metricbeat"}
-	requiredPackages := []string{
+	packageAgent([]string{
 		"darwin-x86_64.tar.gz",
 		"linux-x86.tar.gz",
 		"linux-x86_64.tar.gz",
 		"windows-x86.zip",
 		"windows-x86_64.zip",
-	}
-
-	for _, b := range packedBeats {
-		pwd, err := filepath.Abs(filepath.Join("..", b))
-		if err != nil {
-			panic(err)
-		}
-
-		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
-			continue
-		}
-
-		cmd := exec.Command("mage", "package")
-		cmd.Dir = pwd
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
-
-		if err := cmd.Run(); err != nil {
-			panic(err)
-		}
-	}
-
-	// package agent
-	devtools.UseElasticAgentPackaging()
-
-	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package)
+		"linux-arm64.tar.gz",
+	}, devtools.UseElasticAgentPackaging)
 }
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
@@ -410,19 +378,12 @@ func configYML() error {
 
 // ConfigFileParams returns the parameters for generating OSS config.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.XPackBeatDir("_meta/common.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.p2.yml"),
-		},
-		ReferenceParts: []string{
-			devtools.XPackBeatDir("_meta/common.reference.p1.yml"),
-			devtools.XPackBeatDir("_meta/common.reference.p2.yml"),
-		},
-		DockerParts: []string{
-			devtools.XPackBeatDir("_meta/elastic-agent.docker.yml"),
-		},
-	}
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, "_meta/config/*.tmpl")
+	p.Short.Template = "_meta/config/elastic-agent.yml.tmpl"
+	p.Reference.Template = "_meta/config/elastic-agent.reference.yml.tmpl"
+	p.Docker.Template = "_meta/config/elastic-agent.docker.yml.tmpl"
+	return p
 }
 
 // fieldDocs generates docs/fields.asciidoc containing all fields
@@ -450,20 +411,9 @@ func combineErr(errors ...error) error {
 	return e
 }
 
-// GoTestUnit is an alias for goUnitTest.
-func GoTestUnit() {
-	mg.Deps(unittest.GoUnitTest)
-}
-
 // UnitTest performs unit test on agent.
 func UnitTest() {
 	mg.Deps(Test.All)
-}
-
-// IntegTest calls go integtest, we dont have python integ test so far
-// TODO: call integtest mage package when python tests are available
-func IntegTest() {
-	os.Create(filepath.Join("build", "TEST-go-integration.out"))
 }
 
 // BuildFleetCfg embed the default fleet configuration as part of the binary.
@@ -476,7 +426,117 @@ func BuildFleetCfg() error {
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
-// Fields placeholder methods to fix the windows build.
-func Fields() error {
-	return nil
+// Enroll runs agent which enrolls before running.
+func (Demo) Enroll() error {
+	env := map[string]string{
+		"FLEET_ENROLL": "1",
+	}
+	return runAgent(env)
+}
+
+// Enroll runs agent which does not enroll before running.
+func (Demo) NoEnroll() error {
+	env := map[string]string{
+		"FLEET_ENROLL": "0",
+	}
+	return runAgent(env)
+}
+
+func runAgent(env map[string]string) error {
+	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+
+	tag := dockerTag()
+	dockerImageOut, err := sh.Output("docker", "image", "ls")
+	if err != nil {
+		return err
+	}
+
+	// docker does not exists for this commit, build it
+	if !strings.Contains(dockerImageOut, tag) {
+		// produce docker package
+		packageAgent([]string{
+			"linux-x86.tar.gz",
+			"linux-x86_64.tar.gz",
+		}, devtools.UseElasticAgentDemoPackaging)
+
+		dockerPackagePath := filepath.Join("build", "package", "elastic-agent", "elastic-agent-linux-amd64.docker", "docker-build")
+		if err := os.Chdir(dockerPackagePath); err != nil {
+			return err
+		}
+
+		// build docker image
+		if err := sh.Run("docker", "build", "-t", tag, "."); err != nil {
+			return err
+		}
+	}
+
+	// prepare env variables
+	var envs []string
+	envs = append(envs, os.Environ()...)
+	for k, v := range env {
+		envs = append(envs, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	// run docker cmd
+	dockerCmdArgs := []string{"run", "--network", "host"}
+	for _, e := range envs {
+		parts := strings.SplitN(e, "=", 2)
+		if _, isSupported := supportedEnvs[parts[0]]; !isSupported {
+			continue
+		}
+
+		dockerCmdArgs = append(dockerCmdArgs, "-e", e)
+	}
+
+	dockerCmdArgs = append(dockerCmdArgs, tag)
+	return sh.Run("docker", dockerCmdArgs...)
+}
+
+func packageAgent(requiredPackages []string, packagingFn func()) {
+	version, found := os.LookupEnv("BEAT_VERSION")
+	if !found {
+		version = release.Version()
+	}
+
+	packedBeats := []string{"filebeat", "metricbeat"}
+
+	for _, b := range packedBeats {
+		pwd, err := filepath.Abs(filepath.Join("..", b))
+		if err != nil {
+			panic(err)
+		}
+
+		if requiredPackagesPresent(pwd, b, version, requiredPackages) {
+			continue
+		}
+
+		cmd := exec.Command("mage", "package")
+		cmd.Dir = pwd
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+	}
+
+	// package agent
+	packagingFn()
+
+	mg.Deps(Update)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.SerialDeps(devtools.Package)
+}
+
+func dockerTag() string {
+	const commitLen = 7
+	tagBase := "elastic-agent"
+
+	commit, err := devtools.CommitHash()
+	if err == nil && len(commit) > commitLen {
+		return fmt.Sprintf("%s-%s", tagBase, commit[:commitLen])
+	}
+
+	return tagBase
 }

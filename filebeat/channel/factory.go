@@ -50,6 +50,10 @@ type inputOutletConfig struct {
 	Processors           processors.PluginConfig `config:"processors"`
 	KeepNull             bool                    `config:"keep_null"`
 
+	PublisherPipeline struct {
+		DisableHost bool `config:"disable_host"` // Disable addition of host.name.
+	} `config:"publisher_pipeline"`
+
 	// implicit event fields
 	Type        string `config:"type"`         // input.type
 	ServiceType string `config:"service.type"` // service.type
@@ -87,7 +91,7 @@ func NewOutletFactory(
 // Inputs and all harvesters use the same pipeline client instance.
 // This guarantees ordering between events as required by the registrar for
 // file.State updates
-func (f *OutletFactory) Create(p beat.Pipeline) Connector {
+func (f *OutletFactory) Create(p beat.PipelineConnector) Connector {
 	return &pipelineConnector{parent: f, pipeline: p}
 }
 

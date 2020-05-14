@@ -85,6 +85,10 @@ func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 	)
 
 	for _, action := range actions {
+		if err := ad.ctx.Err(); err != nil {
+			return err
+		}
+
 		if err := ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err

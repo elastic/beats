@@ -10,22 +10,14 @@ processors:
     - UNIX
 - remove:
     field: zeek.ssl.ts
-- set:
-    field: event.id
-    value: '{{zeek.session_id}}'
-    if: ctx.zeek.session_id != null
-- set:
-    field: source.ip
-    value: '{{source.address}}'
-- set:
-    field: destination.ip
-    value: '{{destination.address}}'
 - geoip:
     field: destination.ip
     target_field: destination.geo
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: source.geo
+    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip
@@ -248,7 +240,14 @@ processors:
         ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
       }
       ctx.tls.version_protocol = parts[0].toLowerCase();
-
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.ip}}"
+    if: "ctx?.destination?.ip != null"
 on_failure:
 - set:
     field: error.message

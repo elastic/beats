@@ -1,1 +1,17 @@
-- release: beta
+- name: perfmon
+  type: group
+  release: ga
+  description: >
+    perfmon
+  fields:
+  - name: instance
+    type: keyword
+    description: |
+      Instance value.
+  - name: metrics.*.*
+    type: object
+    object_type: float
+    object_type_mapping_type: "*"
+    description: >
+      Metric values returned.
+
