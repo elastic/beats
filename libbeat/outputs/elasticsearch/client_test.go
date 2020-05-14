@@ -32,6 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	e "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
@@ -321,12 +322,12 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	cases := []common.MapStr{
-		{"_id": "111", "op_type": "index", "message": "test 1", "bulkIndex": 0},
-		{"_id": "112", "op_type": "", "message": "test 2", "bulkIndex": 2},
-		{"_id": "", "op_type": "delete", "message": "test 6", "bulkIndex": -1}, // this won't get encoded due to missing _id
-		{"_id": "", "op_type": "", "message": "test 3", "bulkIndex": 4},
-		{"_id": "114", "op_type": "delete", "message": "test 4", "bulkIndex": 6},
-		{"_id": "115", "op_type": "index", "message": "test 5", "bulkIndex": 7},
+		{"_id": "111", "op_type": e.OpTypeIndex, "message": "test 1", "bulkIndex": 0},
+		{"_id": "112", "message": "test 2", "bulkIndex": 2},
+		{"_id": "", "op_type": e.OpTypeDelete, "message": "test 6", "bulkIndex": -1}, // this won't get encoded due to missing _id
+		{"_id": "", "message": "test 3", "bulkIndex": 4},
+		{"_id": "114", "op_type": e.OpTypeDelete, "message": "test 4", "bulkIndex": 6},
+		{"_id": "115", "op_type": e.OpTypeIndex, "message": "test 5", "bulkIndex": 7},
 	}
 
 	cfg := common.MustNewConfigFrom(common.MapStr{})
@@ -343,16 +344,21 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 
 	events := make([]publisher.Event, len(cases))
 	for i, fields := range cases {
+		meta := common.MapStr{
+			"_id": fields["_id"],
+		}
+		if opType, exists := fields["op_type"]; exists {
+			meta[e.FieldMetaOpType] = opType
+		}
+
 		events[i] = publisher.Event{
 			Content: beat.Event{
-				Meta: common.MapStr{
-					"_id":     fields["_id"],
-					"op_type": fields["op_type"],
-				},
+				Meta: meta,
 				Fields: common.MapStr{
 					"message": fields["message"],
 				},
-			}}
+			},
+		}
 	}
 
 	encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(version.GetDefaultVersion()), index, pipeline, events)
@@ -364,16 +370,16 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		if bulkEventIndex == -1 {
 			continue
 		}
-		caseOpType, _ := cases[i]["op_type"].(string)
+		caseOpType, _ := cases[i]["op_type"]
 		caseMessage, _ := cases[i]["message"].(string)
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
-			validOpTypes := []string{opTypeCreate, ""}
+			validOpTypes := []interface{}{e.OpTypeCreate, nil}
 			require.Contains(t, validOpTypes, caseOpType, caseMessage)
 		case eslegclient.BulkIndexAction:
-			require.Equal(t, opTypeIndex, caseOpType, caseMessage)
+			require.Equal(t, e.OpTypeIndex, caseOpType, caseMessage)
 		case eslegclient.BulkDeleteAction:
-			require.Equal(t, opTypeDelete, caseOpType, caseMessage)
+			require.Equal(t, e.OpTypeDelete, caseOpType, caseMessage)
 		default:
 			require.FailNow(t, "unknown type")
 		}
