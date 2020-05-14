@@ -125,7 +125,7 @@ type bulkStats struct {
 	TotalOperations   int `json:"total_operations"`
 	TotalTimeInMillis int `json:"total_time_in_millis"`
 	TotalSizeInBytes  int `json:"total_size_in_bytes"`
-	AvgTimeInMillis   int `json:"throttle_time_in_millis"`
+	AvgTimeInMillis   int `json:"avg_time_in_millis"`
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
