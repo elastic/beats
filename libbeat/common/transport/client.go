@@ -52,10 +52,16 @@ func NewClient(c Config, network, host string, defaultPort int) (*Client, error)
 	switch network {
 	case "tcp", "tcp4", "tcp6":
 	case "udp", "udp4", "udp6":
-		if c.TLS == nil && c.Proxy == nil {
-			break
-		}
-		fallthrough
+                // Proxy is not allow equals nil,
+                // so If any of these settings are defined we fallthrough to the default case and return an error.
+                // but The syslog output mode needs to support udp
+
+                //if c.TLS == nil && c.Proxy == nil {
+                if c.TLS == nil {
+                        break
+                }
+                fallthrough
+
 	default:
 		return nil, fmt.Errorf("unsupported network type %v", network)
 	}
