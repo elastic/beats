@@ -53,6 +53,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	// TODO: Get all nodes stats if we're in HostsModeCluster
+
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err
