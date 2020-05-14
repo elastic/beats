@@ -59,15 +59,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
-	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-	}
+	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
+	// we don't collect the same stats from every node and end up duplicating them.
+	if m.HostsMode == elasticsearch.HostsModeNode {
+		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
+		if err != nil {
+			return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		}
 
-	// Not master and we're talking to a set of ES nodes, not clusters == no event sent
-	if !isMaster && m.HostsMode == elasticsearch.HostsModeNode {
-		m.Logger().Debug("trying to fetch pending tasks from a non-master node")
-		return nil
+		// Not master, no event sent
+		if !isMaster {
+			m.Logger().Debug("trying to fetch pending tasks from a non-master node")
+			return nil
+		}
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
