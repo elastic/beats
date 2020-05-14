@@ -186,7 +186,12 @@ func checkDocker(t *testing.T, file string) {
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
-	checkConfigPermissionsWithMode(t, p, os.FileMode(0640))
+
+	// The configuration file in the Docker image is expected to be readable and writable by any user who belongs to
+	// the root group. This is done in order to allow the docker image to run on secured Kubernetes environment where
+	// the user ID used to run a container can't be known in advance.
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0660))
+
 	checkManifestPermissionsWithMode(t, p, os.FileMode(0640))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
