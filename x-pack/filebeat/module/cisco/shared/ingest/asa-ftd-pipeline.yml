@@ -293,7 +293,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313009'"
       field: "message"
-      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code} , for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}"
+      pattern: "%{event.outcome} invalid %{network.transport} code %{_temp_.cisco.icmp_code} , for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '322001'"
       field: "message"
@@ -301,7 +301,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "message"
-      pattern: "Dynamic filter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic filter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "server.domain"
@@ -309,7 +309,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "server.domain"
@@ -317,15 +317,15 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338003'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338004'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "server.domain"
@@ -333,7 +333,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "server.domain"
@@ -341,15 +341,15 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338007'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338008'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}"
+      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "server.domain"
@@ -357,7 +357,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
+      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "server.domain"
@@ -365,15 +365,15 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338103'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}"
+      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338104'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}"
+      pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "server.domain"
@@ -381,7 +381,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "server.domain"
@@ -389,7 +389,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "server.domain"
@@ -397,7 +397,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "message"
-      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.cisco.mapped_source_ip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.cisco.mapped_destination_ip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
+      pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "server.domain"
@@ -448,7 +448,7 @@ processors:
         NOTCOLON: "[^:]*"
         ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
         ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
-        MAPPEDSRC: "(?:%{DATA:_temp_.cisco.mapped_source_ip}|%{HOSTNAME})"
+        MAPPEDSRC: "(?:%{DATA:_temp_.natsrcip}|%{HOSTNAME})"
 
   #
   # Decode FTD's Security Event Syslog Messages
@@ -1210,6 +1210,19 @@ processors:
       target_field: destination.as.organization.name
       ignore_missing: true
 
+  #
+  # Set mapped_{src|dst}_ip fields only if they consist of a valid IP address.
+  #
+  - grok:
+      field: _temp_.natsrcip
+      patterns:
+        - "(?:%{IP:_temp_.cisco.mapped_source_ip}|%{GREEDYDATA:_temp_.cisco.mapped_source_host})"
+      ignore_failure: true
+  - grok:
+      field: _temp_.natdstip
+      patterns:
+        - "(?:%{IP:_temp_.cisco.mapped_destination_ip}|%{GREEDYDATA:_temp_.cisco.mapped_destination_host})"
+      ignore_failure: true
   #
   # NAT fields
   #
