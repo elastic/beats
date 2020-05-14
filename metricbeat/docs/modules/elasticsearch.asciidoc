@@ -55,7 +55,16 @@ metricbeat.modules:
 
   #index_recovery.active_only: true
   #xpack.enabled: false
+<<<<<<< HEAD
   #scope: node
+=======
+
+  # Set to cluster to treat each item in the hosts list as an endpoint for
+  # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
+  # Set to node (default) to treat each item in the hosts list as an individual
+  # node in the Elasticsearch cluster.
+  #hosts_mode: node
+>>>>>>> Adding configuration for hosts_mode
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
