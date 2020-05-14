@@ -45,8 +45,6 @@ type HttpEndpoint struct {
 	workerOnce   sync.Once               // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup          // Waits on worker goroutine.
 	server       *HttpServer             // Server instance
-	httpRequest  http.Request            // Current Request
-	httpResponse http.ResponseWriter     // Current ResponseWriter
 	eventObject  *map[string]interface{} // Current event object
 }
 
@@ -135,11 +133,11 @@ func (in *HttpEndpoint) Wait() {
 }
 
 // Validates the incoming request and creates a new event upon success
-func (in *HttpEndpoint) sendEvent() (uint, string) {
+func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) (uint, string) {
 	var err string
 	var status uint
 
-	status, err = in.validateRequest()
+	status, err = in.validateRequest(w, r)
 	if err != "" || status != 0 {
 		return status, err
 	}
@@ -158,23 +156,23 @@ func (in *HttpEndpoint) sendEvent() (uint, string) {
 }
 
 // Runs all validations for each request
-func (in *HttpEndpoint) validateRequest() (uint, string) {
+func (in *HttpEndpoint) validateRequest(w http.ResponseWriter, r *http.Request) (uint, string) {
 	var err string
 	var status uint
 
 	if in.config.BasicAuth {
-		status, err = in.validateAuth()
+		status, err = in.validateAuth(w, r)
 	}
 	if err != "" && status != 0 {
 		return status, err
 	}
 
-	status, err = in.validateHeader()
+	status, err = in.validateHeader(w, r)
 	if err != "" && status != 0 {
 		return status, err
 	}
 
-	status, err = in.validateBody()
+	status, err = in.validateBody(w, r)
 	if err != "" && status != 0 {
 		return status, err
 	}
@@ -184,24 +182,24 @@ func (in *HttpEndpoint) validateRequest() (uint, string) {
 }
 
 // Validate that only supported Accept and Content type headers are used
-func (in *HttpEndpoint) validateHeader() (uint, string) {
-	if in.httpRequest.Header.Get("Content-Type") != "application/json" {
+func (in *HttpEndpoint) validateHeader(w http.ResponseWriter, r *http.Request) (uint, string) {
+	if r.Header.Get("Content-Type") != "application/json" {
 		return http.StatusUnsupportedMediaType, in.createErrorMessage("Wrong Content-Type header, expecting application/json")
 	}
 
-	if in.httpRequest.Header.Get("Accept") != "application/json" {
+	if r.Header.Get("Accept") != "application/json" {
 		return http.StatusNotAcceptable, in.createErrorMessage("Wrong Accept header, expecting application/json")
 	}
 	return 0, ""
 }
 
 // Validate if headers are current and authentication is successful
-func (in *HttpEndpoint) validateAuth() (uint, string) {
+func (in *HttpEndpoint) validateAuth(w http.ResponseWriter, r *http.Request) (uint, string) {
 	if in.config.Username == "" || in.config.Password == "" {
 		return http.StatusUnauthorized, in.createErrorMessage("Username and password required when basicauth is enabled")
 	}
 
-	username, password, _ := in.httpRequest.BasicAuth()
+	username, password, _ := r.BasicAuth()
 	if in.config.Username != username || in.config.Password != password {
 		return http.StatusUnauthorized, in.createErrorMessage("Incorrect username or password")
 	}
@@ -210,13 +208,13 @@ func (in *HttpEndpoint) validateAuth() (uint, string) {
 }
 
 // Validates that body is not empty, not a list of objects and valid JSON
-func (in *HttpEndpoint) validateBody() (uint, string) {
+func (in *HttpEndpoint) validateBody(w http.ResponseWriter, r *http.Request) (uint, string) {
 	var isObject string
-	if in.httpRequest.Body == http.NoBody {
+	if r.Body == http.NoBody {
 		return http.StatusNotAcceptable, in.createErrorMessage("Body cannot be empty")
 	}
 
-	body, err := ioutil.ReadAll(in.httpRequest.Body)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return http.StatusInternalServerError, in.createErrorMessage("Unable to read body")
 	}
@@ -238,8 +236,8 @@ func (in *HttpEndpoint) validateBody() (uint, string) {
 }
 
 // Ensure only valid HTTP Methods used
-func (in *HttpEndpoint) validateMethod() (uint, string) {
-	if in.httpRequest.Method != http.MethodPost {
+func (in *HttpEndpoint) validateMethod(w http.ResponseWriter, r *http.Request) (uint, string) {
+	if r.Method != http.MethodPost {
 		return http.StatusMethodNotAllowed, in.createErrorMessage("Only POST requests supported")
 	}
 
@@ -263,9 +261,9 @@ func (in *HttpEndpoint) isObjectOrList(b []byte) string {
 	return ""
 }
 
-func (in *HttpEndpoint) sendResponse(h uint, b string) {
-	in.httpResponse.WriteHeader(int(h))
-	in.httpResponse.Write([]byte(b))
+func (in *HttpEndpoint) sendResponse(w http.ResponseWriter, h uint, b string) {
+	w.WriteHeader(int(h))
+	w.Write([]byte(b))
 }
 
 // Validates incoming requests and sends a new event upon success
@@ -273,15 +271,12 @@ func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
 	var err string
 	var status uint
 
-	in.httpRequest = *r
-	in.httpResponse = w
-
 	// This triggers both validation and event creation
-	status, err = in.sendEvent()
+	status, err = in.sendEvent(w, r)
 	if err != "" || status != 0 {
-		in.sendResponse(status, err)
+		in.sendResponse(w, status, err)
 		return
 	}
 
-	in.sendResponse(http.StatusOK, in.config.ResponseBody)
+	in.sendResponse(w, http.StatusOK, in.config.ResponseBody)
 }
