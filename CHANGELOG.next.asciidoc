@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
 - Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
+- Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
 
 *Auditbeat*
 
@@ -126,6 +127,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixing `ingress_controller.` fields to be of type keyword instead of text. {issue}17834[17834]
 - Fixed typo in log message. {pull}17897[17897]
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
+- Unescape file name from SQS message. {pull}18370[18370]
+- Improve cisco asa and ftd pipelines' failure handler to avoid mapping temporary fields. {issue}18391[18391] {pull}18392[18392]
 
 *Heartbeat*
 
@@ -176,6 +179,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
 - Add a switch to the driver definition on SQL module to use pretty names. {pull}17378[17378]
 - Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
+- Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
+- Fix application_pool metricset after pdh changes. {pull}18477[18477]
 
 *Packetbeat*
 
@@ -183,6 +188,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436{18436}
 
 *Functionbeat*
 
@@ -395,6 +401,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove requirement to connect as sysdba in Oracle module {issue}15846[15846] {pull}18182[18182]
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
+- Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 
 *Packetbeat*
 
