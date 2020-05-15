@@ -119,6 +119,9 @@
       "command_line": "C:\\Windows\\Sysmon.exe",
       "entity_id": "{42f11c3b-ce01-5c8f-0000-0010c73e2a00}",
       "executable": "C:\\Windows\\Sysmon.exe",
+      "hash": {
+        "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
+      },
       "name": "Sysmon.exe",
       "parent": {
         "args": [
@@ -132,6 +135,10 @@
       },
       "pid": 4860,
       "working_directory": "C:\\Windows\\system32\\"
+    },
+    "related": {
+      "hash": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e",
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -202,6 +209,9 @@
       "command_line": "C:\\Windows\\system32\\wbem\\unsecapp.exe -Embedding",
       "entity_id": "{42f11c3b-ce01-5c8f-0000-00102c412a00}",
       "executable": "C:\\Windows\\System32\\wbem\\unsecapp.exe",
+      "hash": {
+        "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
+      },
       "name": "unsecapp.exe",
       "parent": {
         "args": [
@@ -217,6 +227,10 @@
       },
       "pid": 5028,
       "working_directory": "C:\\Windows\\system32\\"
+    },
+    "related": {
+      "hash": "6df8163a6320b80b60733f9d62e2f39b4b16b678",
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -387,6 +401,9 @@
       "command_line": "C:\\Windows\\system32\\wbem\\wmiprvse.exe -Embedding",
       "entity_id": "{42f11c3b-ce03-5c8f-0000-0010e9462a00}",
       "executable": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+      "hash": {
+        "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
+      },
       "name": "WmiPrvSE.exe",
       "parent": {
         "args": [
@@ -402,6 +419,10 @@
       },
       "pid": 4508,
       "working_directory": "C:\\Windows\\system32\\"
+    },
+    "related": {
+      "hash": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21",
+      "user": "SYSTEM"
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -483,6 +504,13 @@
       "name": "svchost.exe",
       "pid": 924
     },
+    "related": {
+      "ip": [
+        "a00:20f:0:0:18a2:6e00:e0:ffff",
+        "a00:203:3000:3000:3000:3000:3000:3300"
+      ],
+      "user": "NETWORK SERVICE"
+    },
     "source": {
       "ip": "a00:20f:0:0:18a2:6e00:e0:ffff",
       "port": 62141
@@ -556,6 +584,13 @@
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 924
+    },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "10.0.2.3"
+      ],
+      "user": "NETWORK SERVICE"
     },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
@@ -632,6 +667,13 @@
       "name": "chrome.exe",
       "pid": 1600
     },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "40.77.226.250"
+      ],
+      "user": "vagrant"
+    },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
       "ip": "10.0.2.15",
@@ -707,6 +749,13 @@
       "name": "chrome.exe",
       "pid": 1600
     },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "40.77.226.250"
+      ],
+      "user": "vagrant"
+    },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
       "ip": "10.0.2.15",
@@ -781,6 +830,13 @@
       "executable": "System",
       "name": "System",
       "pid": 4
+    },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "10.0.2.255"
+      ],
+      "user": "SYSTEM"
     },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
@@ -861,6 +917,13 @@
       "name": "System",
       "pid": 4
     },
+    "related": {
+      "ip": [
+        "10.0.2.255",
+        "10.0.2.15"
+      ],
+      "user": "SYSTEM"
+    },
     "source": {
       "ip": "10.0.2.255",
       "port": 137
@@ -938,6 +1001,13 @@
       "name": "svchost.exe",
       "pid": 924
     },
+    "related": {
+      "ip": [
+        "fe80:0:0:0:e488:b85c:5262:ff86",
+        "ff02:0:0:0:0:0:1:3"
+      ],
+      "user": "NETWORK SERVICE"
+    },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
       "ip": "fe80:0:0:0:e488:b85c:5262:ff86",
@@ -1013,6 +1083,13 @@
       "name": "svchost.exe",
       "pid": 924
     },
+    "related": {
+      "ip": [
+        "a00:20f:0:0:18a2:6e00:e0:ffff",
+        "e000:fc:4300:6800:7200:6f00:6d00:6500"
+      ],
+      "user": "NETWORK SERVICE"
+    },
     "source": {
       "ip": "a00:20f:0:0:18a2:6e00:e0:ffff",
       "port": 55542
@@ -1086,6 +1163,13 @@
       "executable": "System",
       "name": "System",
       "pid": 4
+    },
+    "related": {
+      "ip": [
+        "169.254.180.25",
+        "169.254.255.255"
+      ],
+      "user": "SYSTEM"
     },
     "source": {
       "ip": "169.254.180.25",
@@ -1164,6 +1248,13 @@
       "name": "System",
       "pid": 4
     },
+    "related": {
+      "ip": [
+        "169.254.255.255",
+        "169.254.180.25"
+      ],
+      "user": "SYSTEM"
+    },
     "source": {
       "ip": "169.254.255.255",
       "port": 137
@@ -1241,6 +1332,13 @@
       "name": "svchost.exe",
       "pid": 924
     },
+    "related": {
+      "ip": [
+        "fe80:0:0:0:616f:32fa:b04f:b419",
+        "ff02:0:0:0:0:0:1:3"
+      ],
+      "user": "NETWORK SERVICE"
+    },
     "source": {
       "ip": "fe80:0:0:0:616f:32fa:b04f:b419",
       "port": 55717
@@ -1315,6 +1413,13 @@
       "name": "svchost.exe",
       "pid": 924
     },
+    "related": {
+      "ip": [
+        "a9fe:b419:0:0:f880:2301:e0:ffff",
+        "e000:fc:0:0:0:0:0:0"
+      ],
+      "user": "NETWORK SERVICE"
+    },
     "source": {
       "ip": "a9fe:b419:0:0:f880:2301:e0:ffff",
       "port": 55717
@@ -1388,6 +1493,13 @@
       "executable": "System",
       "name": "System",
       "pid": 4
+    },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "40.77.226.250"
+      ],
+      "user": "SYSTEM"
     },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
@@ -1467,6 +1579,13 @@
       "name": "System",
       "pid": 4
     },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "10.0.2.3"
+      ],
+      "user": "SYSTEM"
+    },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
       "ip": "10.0.2.15",
@@ -1545,6 +1664,13 @@
       "name": "System",
       "pid": 4
     },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "169.254.255.255"
+      ],
+      "user": "SYSTEM"
+    },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
       "ip": "10.0.2.15",
@@ -1622,6 +1748,13 @@
       "executable": "System",
       "name": "System",
       "pid": 4
+    },
+    "related": {
+      "ip": [
+        "10.0.2.15",
+        "169.254.180.25"
+      ],
+      "user": "SYSTEM"
     },
     "source": {
       "domain": "vagrant-2012-r2.local.crowbird.com",
@@ -1777,6 +1910,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data",
+      "extension": "tmp",
+      "name": "fe823684-c940-49f2-a940-14b02cbafba9.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
     },
     "host": {
@@ -1837,6 +1973,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data",
+      "extension": "tmp",
+      "name": "162d4140-cfab-4d05-9c92-bca60515a622.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
     },
     "host": {
@@ -1897,6 +2036,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
+      "extension": "tmp",
+      "name": "1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
     },
     "host": {
@@ -1957,6 +2099,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
+      "extension": "tmp",
+      "name": "37ed32e9-3c5f-4663-8457-c70743e9456d.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
     },
     "host": {
@@ -2067,6 +2212,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def",
+      "extension": "tmp",
+      "name": "ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
     },
     "host": {
@@ -2127,6 +2275,9 @@
       }
     },
     "file": {
+      "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def",
+      "extension": "tmp",
+      "name": "ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp",
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"
     },
     "host": {

@@ -52,6 +52,9 @@
         "log.offset": 0,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
         "service.type": "azure",
-        "source.ip": "81.171.241.231"
+        "source.ip": "81.171.241.231",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

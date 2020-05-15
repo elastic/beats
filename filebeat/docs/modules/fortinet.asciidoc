@@ -37,20 +37,26 @@ include::../include/config-option-intro.asciidoc[]
 ----
 - module: fortinet
   firewall:
+    enabled: true
+    var.input: udp
     var.syslog_host: 0.0.0.0
     var.syslog_port: 9004
 ----
 
 include::../include/var-paths.asciidoc[]
 
+*`var.input`*::
+
+The input to use, can be either the value `tcp`, `udp` or `file`.
+
 *`var.syslog_host`*::
 
-The interface to listen to UDP based syslog traffic. Defaults to localhost.
+The interface to listen to all syslog traffic. Defaults to localhost.
 Set to 0.0.0.0 to bind to all available interfaces.
 
 *`var.syslog_port`*::
 
-The UDP port to listen for syslog traffic. Defaults to 9004.
+The port to listen for syslog traffic. Defaults to 9004.
 
 [float]
 ==== Fortinet ECS fields
