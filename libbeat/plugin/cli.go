@@ -29,7 +29,7 @@ import (
 )
 
 type pluginList struct {
-	paths []string
+	paths  []string
 	logger *logp.Logger
 }
 
