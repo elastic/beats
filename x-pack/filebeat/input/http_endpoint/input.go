@@ -161,7 +161,12 @@ func (in *HttpEndpoint) validateRequest(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	status, err := in.validateHeader(w, r)
+	status, err := in.validateMethod(w, r)
+	if err != "" && status != 0 {
+		return status, err
+	}
+
+	status, err = in.validateHeader(w, r)
 	if err != "" && status != 0 {
 		return status, err
 	}
