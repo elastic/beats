@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/single-module') _
 
 import groovy.transform.Field
 
@@ -1163,6 +1163,10 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Speed up the CI by running only if the changeset affects a specific module.
+  // TODO: exclude should be only skip the Jenkinsfile
+  env.MODULE = getBeatsModule(pattern: '[a-z0-9]+beat\\module\\([^\\/]+)\\/.*', exclude: '(.*\\.(asciidoc|png)|Jenkinsfile)')
 }
 
 /**
