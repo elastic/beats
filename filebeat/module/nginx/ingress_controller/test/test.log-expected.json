@@ -184,9 +184,9 @@
         "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "user_agent.original": "-",
         "source.address": "192.168.64.1",
-        "source.ip": "192.168.64.1",
+        "source.ip": "192.168.64.1"
     },
     {
         "@timestamp": "2020-02-07T11:50:09.000Z",
@@ -216,7 +216,7 @@
         "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "-"
+        "user_agent.original": "-",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
         "url.original": "/products/42"
