@@ -25,12 +25,12 @@ before assigning values.
 [source,yaml]
 -------
 processors:
-- rename:
-    fields:
-     - from: "a.g"
-       to: "e.d"
-    ignore_missing: false
-    fail_on_error: true
+  - rename:
+      fields:
+        - from: "a.g"
+          to: "e.d"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 The `rename` processor has the following configuration settings:

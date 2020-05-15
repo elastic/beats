@@ -18,6 +18,7 @@
 package fileout
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 
@@ -109,9 +110,7 @@ func (out *fileOutput) Close() error {
 	return out.rotator.Close()
 }
 
-func (out *fileOutput) Publish(
-	batch publisher.Batch,
-) error {
+func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	defer batch.ACK()
 
 	st := out.observer

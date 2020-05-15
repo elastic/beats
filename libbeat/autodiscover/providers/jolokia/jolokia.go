@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 )
 
 func init() {
@@ -48,11 +49,12 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	templates template.Mapper
 	discovery DiscoveryProber
+	keystore  keystore.Keystore
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
 	}
@@ -92,6 +94,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
+		keystore:  keystore,
 	}, nil
 }
 
@@ -106,6 +109,8 @@ func (p *Provider) Start() {
 }
 
 func (p *Provider) publish(event bus.Event) {
+	// attach keystore to the event to be consumed by the static configs
+	event["keystore"] = p.keystore
 	if config := p.templates.GetConfig(event); config != nil {
 		event["config"] = config
 	} else if config := p.builders.GetConfig(event); config != nil {

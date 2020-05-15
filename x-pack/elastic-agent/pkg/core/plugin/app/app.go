@@ -38,9 +38,11 @@ type ReportFailureFunc func(context.Context, string, error)
 
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
 type Application struct {
+	bgContext       context.Context
 	id              string
 	name            string
 	pipelineID      string
+	logLevel        string
 	spec            Specifier
 	state           state.State
 	grpcClient      remoteconfig.Client
@@ -68,7 +70,8 @@ type ArgsDecorator func([]string) []string
 // NewApplication creates a new instance of an applications. It will not automatically start
 // the application.
 func NewApplication(
-	id, appName, pipelineID string,
+	ctx context.Context,
+	id, appName, pipelineID, logLevel string,
 	spec Specifier,
 	factory remoteconfig.ConnectionCreator,
 	cfg *config.Config,
@@ -82,11 +85,13 @@ func NewApplication(
 		return nil, err
 	}
 
-	b, _ := tokenbucket.NewTokenBucket(3, 3, 1*time.Second)
+	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
+		bgContext:       ctx,
 		id:              id,
 		name:            appName,
 		pipelineID:      pipelineID,
+		logLevel:        logLevel,
 		spec:            spec,
 		clientFactory:   factory,
 		processConfig:   cfg.ProcessConfig,
@@ -136,7 +141,7 @@ func (a *Application) Stop() {
 		}
 
 		// cleanup drops
-		a.monitor.Cleanup()
+		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
 }
 
@@ -150,10 +155,14 @@ func (a *Application) State() state.State {
 
 func (a *Application) watch(ctx context.Context, proc *os.Process, cfg map[string]interface{}) {
 	go func() {
-		procState, err := proc.Wait()
-		if err != nil {
-			// process is not a child - some OSs requires process to be child
-			a.externalProcess(proc)
+		var procState *os.ProcessState
+
+		select {
+		case ps := <-a.waitProc(proc):
+			procState = ps
+		case <-a.bgContext.Done():
+			a.Stop()
+			return
 		}
 
 		a.appLock.Lock()
@@ -175,8 +184,24 @@ func (a *Application) watch(ctx context.Context, proc *os.Process, cfg map[strin
 	}()
 }
 
+func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
+	resChan := make(chan *os.ProcessState)
+
+	go func() {
+		procState, err := proc.Wait()
+		if err != nil {
+			// process is not a child - some OSs requires process to be child
+			a.externalProcess(proc)
+		}
+
+		resChan <- procState
+	}()
+
+	return resChan
+}
+
 func (a *Application) reportCrash(ctx context.Context) {
-	a.monitor.Cleanup()
+	a.monitor.Cleanup(a.name, a.pipelineID)
 
 	// TODO: reporting crash
 	if a.failureReporter != nil {

@@ -1,0 +1,248 @@
+- name: metadata
+  title: Metadata fields
+  description: >
+    Meta data fields for each event that include type and timestamp.
+  type: group
+  default_field: false
+  fields:
+    - name: eventType
+      type: keyword
+      description: >
+        DetectionSummaryEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
+
+    - name: eventCreationTime
+      type: date
+      description: >
+        The time this event occurred on the endpoint in UTC UNIX_MS format.
+
+    - name: offset
+      type: integer
+      description: >
+        Offset number that tracks the location of the event in stream. This is used to identify unique detection events.
+
+    - name: customerIDString
+      type: keyword
+      description: >
+        Customer identifier
+
+    - name: version
+      type: keyword
+      description: >
+        Schema version
+
+- name: event
+  title: Event fields
+  description: >
+    Event data fields for each event and alert.
+  type: group
+  default_field: false
+  fields: 
+    - name: ProcessStartTime
+      type: date
+      description: >
+        The process start time in UTC UNIX_MS format.
+
+    - name: ProcessEndTime
+      type: date
+      description: >
+        The process termination time in UTC UNIX_MS format.
+
+    - name: ProcessId
+      type: integer
+      description: >
+        Process ID related to the detection.
+
+    - name: ParentProcessId
+      type: integer
+      description: >
+        Parent process ID related to the detection.
+
+    - name: ComputerName
+      type: keyword
+      description: >
+        Name of the computer where the detection occurred.
+
+    - name: UserName
+      type: keyword
+      description: >
+        User name associated with the detection.
+
+    - name: DetectName
+      type: keyword
+      description: >
+        Name of the detection.
+
+    - name: DetectDescription
+      type: keyword
+      description: >
+        Description of the detection.
+
+    - name: Severity
+      type: integer
+      description: >
+        Severity score of the detection.
+
+    - name: SeverityName
+      type: keyword
+      description: >
+        Severity score text.
+
+    - name: FileName
+      type: keyword
+      description: >
+        File name of the associated process for the detection.
+
+    - name: FilePath
+      type: keyword
+      description: >
+        Path of the executable associated with the detection.
+
+    - name: CommandLine
+      type: keyword
+      description: >
+        Executable path with command line arguments.
+
+    - name: SHA256String
+      type: keyword
+      description: >
+        SHA256 sum of the executable associated with the detection.
+ 
+    - name: MD5String
+      type: keyword
+      description: >
+        MD5 sum of the executable associated with the detection.
+
+    - name: MachineDomain
+      type: keyword
+      description: >
+        Domain for the machine associated with the detection.
+
+    - name: FalconHostLink
+      type: keyword
+      description: >
+        URL to view the detection in Falcon.
+
+    - name: SensorId
+      type: keyword
+      description: >
+        Unique ID associated with the Falcon sensor.
+
+    - name: DetectId
+      type: keyword
+      description: >
+        Unique ID associated with the detection.
+
+    - name: LocalIP
+      type: keyword
+      description: >
+        IP address of the host associated with the detection.
+
+    - name: MACAddress
+      type: keyword
+      description: >
+        MAC address of the host associated with the detection.
+
+    - name: Tactic
+      type: keyword
+      description: >
+        MITRE tactic category of the detection.
+
+    - name: Technique
+      type: keyword
+      description: >
+        MITRE technique category of the detection.
+
+    - name: Objective
+      type: keyword
+      description: >
+        Method of detection.
+
+    - name: PatternDispositionDescription
+      type: keyword
+      description: >
+        Action taken by Falcon.
+
+    - name: PatternDispositionValue
+      type: integer
+      description: >
+        Unique ID associated with action taken.
+
+    - name: PatternDispositionFlags
+      type: object
+      description: >
+        Flags indicating actions taken.
+
+    - name: State
+      type: keyword
+      description: >
+        Whether the incident summary is open and ongoing or closed.
+
+    - name: IncidentStartTime
+      type: date
+      description: >
+        Start time for the incident in UTC UNIX format.
+
+    - name: IncidentEndTime
+      type: date
+      description: >
+        End time for the incident in UTC UNIX format.
+
+    - name: FineScore
+      type: float
+      description: >
+        Score for incident.
+
+    - name: UserId
+      type: keyword
+      description: >
+        Email address or user ID associated with the event.
+
+    - name: UserIp
+      type: keyword
+      description: >
+        IP address associated with the user.
+
+    - name: OperationName
+      type: keyword
+      description: >
+        Event subtype.
+
+    - name: ServiceName
+      type: keyword
+      description: >
+        Service associated with this event.
+
+    - name: Success
+      type: boolean
+      description: >
+        Indicator of whether or not this event was successful.
+
+    - name: UTCTimestamp
+      type: date
+      description: >
+        Timestamp associated with this event in UTC UNIX format.
+
+    - name: AuditKeyValues
+      type: nested
+      description: >
+        Fields that were changed in this event.
+
+    - name: SessionId
+      type: keyword
+      description: >
+        Session ID of the remote response session.
+
+    - name: HostnameField
+      type: keyword
+      description: >
+        Host name of the machine for the remote session.
+
+    - name: StartTimestamp
+      type: date
+      description: >
+        Start time for the remote session in UTC UNIX format.
+
+    - name: EndTimestamp
+      type: date
+      description: >
+        End time for the remote session in UTC UNIX format.

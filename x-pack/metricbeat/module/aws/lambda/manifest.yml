@@ -6,7 +6,7 @@ input:
     metrics:
       - namespace: AWS/Lambda
         statistic: ["Average"]
-        name: ["Invocations", "Errors", "DeadLetterErrors", "Duration",
+        name: ["Invocations", "Errors", "DeadLetterErrors", "DestinationDeliveryFailures", "Duration",
                "Throttles", "IteratorAge", "ConcurrentExecutions",
                "UnreservedConcurrentExecutions"]
         tags.resource_type_filter: lambda

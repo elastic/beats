@@ -1,0 +1,9 @@
+- module: linux
+  period: 10s
+  metricsets:
+    - "pageinfo"
+    # - ksm
+    # - conntrack
+  enabled: true
+  #hostfs: /hostfs
+

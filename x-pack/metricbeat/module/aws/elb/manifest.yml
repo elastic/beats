@@ -32,12 +32,12 @@ input:
         tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Average"]
-        name: ["ActiveFlowCount", "ActiveFlowCount_TLS", "ConsumedLCUs"]
+        name: ["ActiveFlowCount", "ActiveFlowCount_TCP", "ActiveFlowCount_TLS", "ActiveFlowCount_UDP", "ConsumedLCUs", "ConsumedLCUs_TCP", "ConsumedLCUs_TLS", "ConsumedLCUs_UDP"]
         tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Sum"]
-        name: ["ClientTLSNegotiationErrorCount", "NewFlowCount", "NewFlowCount_TLS",
-               "ProcessedBytes", "ProcessedBytes_TLS", "TargetTLSNegotiationErrorCount",
+        name: ["ClientTLSNegotiationErrorCount", "NewFlowCount", "NewFlowCount_TLS", "NewFlowCount_TCP", "NewFlowCount_UDP",
+               "ProcessedBytes", "ProcessedBytes_TCP", "ProcessedBytes_TLS", "ProcessedBytes_UDP", "TargetTLSNegotiationErrorCount",
                "TCP_Client_Reset_Count", "TCP_ELB_Reset_Count", "TCP_Target_Reset_Count"]
         tags.resource_type_filter: elasticloadbalancing
       - namespace: AWS/NetworkELB

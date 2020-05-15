@@ -5,33 +5,22 @@
 package operation
 
 import (
-	"github.com/hashicorp/go-multierror"
+	multierror "github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 )
 
 const (
 	monitoringName          = "FLEET_MONITORING"
-	settingsKey             = "settings"
-	monitoringKey           = "monitoring"
 	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
-	cfg, err := getConfigFromStep(s)
-	if err != nil {
-		return errors.New(err,
-			errors.TypeConfig,
-			"operator.handleStartSidecar failed to retrieve config from step")
-	}
-
 	// if monitoring is disabled and running stop it
-	if isEnabled := isMonitoringEnabled(o.logger, cfg); !isEnabled {
+	if !o.monitor.IsMonitoringEnabled() {
 		if o.isMonitoring {
 			o.logger.Info("operator.handleStartSidecar: monitoring is running and disabled, proceeding to stop")
 			return o.handleStopSidecar(s)
@@ -43,7 +32,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 
 	o.isMonitoring = true
 
-	for _, step := range o.getMonitoringSteps(s) {
+	for _, step := range o.getMonitoringSteps(s, o.monitor.WatchLogs(), o.monitor.WatchMetrics()) {
 		p, cfg, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -68,7 +57,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.getMonitoringSteps(s) {
+	for _, step := range o.getMonitoringSteps(s, true, true) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -77,6 +66,7 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 				"operator.handleStopSidecar failed to create program")
 		}
 
+		o.logger.Debugf("stopping program %v", p)
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
 		}
@@ -97,43 +87,7 @@ func monitoringTags() map[app.Tag]string {
 	}
 }
 
-func isMonitoringEnabled(logger *logger.Logger, cfg map[string]interface{}) bool {
-	settingsVal, found := cfg[settingsKey]
-	if !found {
-		logger.Error("operator.isMonitoringEnabled: settings not found in config")
-		return false
-	}
-
-	settingsMap, ok := settingsVal.(map[string]interface{})
-	if !ok {
-		logger.Error("operator.isMonitoringEnabled: settings not a map")
-		return false
-	}
-
-	monitoringVal, found := settingsMap[monitoringKey]
-	if !found {
-		logger.Error("operator.isMonitoringEnabled: settings.monitoring not found in config")
-		return false
-	}
-
-	monitoringMap, ok := monitoringVal.(map[string]interface{})
-	if !ok {
-		logger.Error("operator.isMonitoringEnabled: settings.monitoring not a map")
-		return false
-	}
-
-	enabledVal, found := monitoringMap[monitoringEnabledSubkey]
-	if !found {
-		logger.Infof("operator.isMonitoringEnabled: monitoring.enabled key not found: %v", monitoringMap)
-		return false
-	}
-
-	enabled, ok := enabledVal.(bool)
-
-	return enabled && ok
-}
-
-func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.Step {
+func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchMetrics bool) []configrequest.Step {
 	// get output
 	config, err := getConfigFromStep(step)
 	if err != nil {
@@ -159,13 +113,13 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.S
 		return nil
 	}
 
-	return o.generateMonitoringSteps(o.config.MonitoringConfig, step.Version, output)
+	return o.generateMonitoringSteps(step.Version, output, watchLogs, watchMetrics)
 }
 
-func (o *Operator) generateMonitoringSteps(cfg *monitoring.Config, version string, output interface{}) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version string, output interface{}, watchLogs, watchMetrics bool) []configrequest.Step {
 	var steps []configrequest.Step
 
-	if cfg.MonitorLogs {
+	if watchLogs {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -183,7 +137,7 @@ func (o *Operator) generateMonitoringSteps(cfg *monitoring.Config, version strin
 		steps = append(steps, filebeatStep)
 	}
 
-	if cfg.MonitorMetrics {
+	if watchMetrics {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
 		if !any {
@@ -215,8 +169,26 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 		"filebeat": map[string]interface{}{
 			"inputs": []interface{}{
 				map[string]interface{}{
-					"type":  "log",
+					"type": "log",
+					"multiline": map[string]interface{}{
+						"pattern": "^[0-9]{4}",
+						"negate":  true,
+						"match":   "after",
+					},
 					"paths": paths,
+					"index": "logs-agent-default",
+					"processors": []map[string]interface{}{
+						map[string]interface{}{
+							"add_fields": map[string]interface{}{
+								"target": "stream",
+								"fields": map[string]interface{}{
+									"type":      "logs",
+									"dataset":   "agent",
+									"namespace": "default",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -224,6 +196,8 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			"elasticsearch": output,
 		},
 	}
+
+	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
 
 	return result, true
 }
@@ -242,6 +216,19 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					"metricsets": []string{"stats", "state"},
 					"period":     "10s",
 					"hosts":      hosts,
+					"index":      "metrics-agent-default",
+					"processors": []map[string]interface{}{
+						map[string]interface{}{
+							"add_fields": map[string]interface{}{
+								"target": "stream",
+								"fields": map[string]interface{}{
+									"type":      "metrics",
+									"dataset":   "agent",
+									"namespace": "default",
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -249,6 +236,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 			"elasticsearch": output,
 		},
 	}
+
+	o.logger.Debugf("monitoring configuration generated for metricbeat: %v", result)
 
 	return result, true
 }
@@ -260,7 +249,7 @@ func (o *Operator) getLogFilePaths() []string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		logPath := a.Monitor().LogPath()
+		logPath := a.Monitor().LogPath(a.Name(), o.pipelineID)
 		if logPath != "" {
 			paths = append(paths, logPath)
 		}
@@ -276,7 +265,7 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	defer o.appsLock.Unlock()
 
 	for _, a := range o.apps {
-		metricEndpoint := a.Monitor().MetricsPathPrefixed()
+		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Name(), o.pipelineID)
 		if metricEndpoint != "" {
 			endpoints = append(endpoints, metricEndpoint)
 		}

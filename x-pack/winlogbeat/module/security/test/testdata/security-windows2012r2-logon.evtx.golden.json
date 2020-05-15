@@ -9,7 +9,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -23,7 +23,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -86,7 +89,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -100,7 +103,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -163,7 +169,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -177,7 +183,10 @@
       "pid": 448
     },
     "related": {
-      "user": "vagrant"
+      "user": [
+        "vagrant",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -243,7 +252,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -257,7 +266,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -320,7 +332,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -397,7 +409,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -474,7 +486,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -551,7 +563,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -628,7 +640,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -708,7 +720,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -722,7 +734,10 @@
       "pid": 2812
     },
     "related": {
-      "user": "DWM-2"
+      "user": [
+        "DWM-2",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "Window Manager",
@@ -785,7 +800,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -799,7 +814,10 @@
       "pid": 2812
     },
     "related": {
-      "user": "vagrant"
+      "user": [
+        "vagrant",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "source": {
       "domain": "VAGRANT-2012-R2",
@@ -865,7 +883,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -879,7 +897,10 @@
       "pid": 2188
     },
     "related": {
-      "user": "DWM-3"
+      "user": [
+        "DWM-3",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "Window Manager",
@@ -942,7 +963,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -956,7 +977,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1019,7 +1043,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1033,7 +1057,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1096,7 +1123,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1110,7 +1137,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1173,7 +1203,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1187,7 +1217,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1250,7 +1283,7 @@
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_success"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1264,7 +1297,10 @@
       "pid": 508
     },
     "related": {
-      "user": "SYSTEM"
+      "user": [
+        "SYSTEM",
+        "VAGRANT-2012-R2$"
+      ]
     },
     "user": {
       "domain": "NT AUTHORITY",
@@ -1327,7 +1363,7 @@
       "module": "security",
       "outcome": "failure",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "authentication_failure"
+      "type": "start"
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1385,6 +1421,7 @@
           "status": "This is either due to a bad username or authentication information",
           "sub_status": "User logon with misspelled or bad user account"
         },
+        "id": "0x1008e",
         "type": "Interactive"
       },
       "opcode": "Info",

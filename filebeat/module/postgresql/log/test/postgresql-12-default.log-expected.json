@@ -1,0 +1,212 @@
+[
+    {
+        "@timestamp": "2020-04-16T09:45:11.844Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "starting PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc (Arch Linux 9.3.0-1) 9.3.0, 64-bit",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.844 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T09:45:11.844Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 143,
+        "message": "listening on IPv6 address \"::1\", port 5432",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.844 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T09:45:11.844Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 229,
+        "message": "listening on IPv4 address \"127.0.0.1\", port 5432",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.844 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T09:45:11.846Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 321,
+        "message": "listening on Unix socket \"/tmp/.s.PGSQL.5432\"",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.846 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T09:45:11.861Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 410,
+        "message": "database system was shut down at 2020-04-16 11:45:01 CEST",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.861 CEST",
+        "process.pid": 26954,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T09:45:11.864Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 511,
+        "message": "database system is ready to accept connections",
+        "postgresql.log.timestamp": "2020-04-16 11:45:11.864 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:22:22.579Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 601,
+        "message": "received smart shutdown request",
+        "postgresql.log.timestamp": "2020-04-16 12:22:22.579 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:22:22.582Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 676,
+        "message": "background worker \"logical replication launcher\" (PID 26960) exited with exit code 1",
+        "postgresql.log.timestamp": "2020-04-16 12:22:22.582 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:22:22.582Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 804,
+        "message": "shutting down",
+        "postgresql.log.timestamp": "2020-04-16 12:22:22.582 CEST",
+        "process.pid": 26955,
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2020-04-16T10:22:22.596Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 861,
+        "message": "database system is shut down",
+        "postgresql.log.timestamp": "2020-04-16 12:22:22.596 CEST",
+        "process.pid": 26953,
+        "service.type": "postgresql"
+    }
+]

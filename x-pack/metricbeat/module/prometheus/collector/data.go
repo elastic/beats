@@ -171,7 +171,7 @@ func (g *typedGenerator) rateCounterUint64(name string, labels common.MapStr, va
 	}
 
 	if g.rateCounters {
-		d["rate"] = g.counterCache.RateUint64(name+labels.String(), value)
+		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
 	}
 
 	return d
@@ -184,7 +184,7 @@ func (g *typedGenerator) rateCounterFloat64(name string, labels common.MapStr, v
 	}
 
 	if g.rateCounters {
-		d["rate"] = g.counterCache.RateFloat64(name+labels.String(), value)
+		d["rate"], _ = g.counterCache.RateFloat64(name+labels.String(), value)
 	}
 
 	return d

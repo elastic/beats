@@ -11,8 +11,8 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"os"
-	"runtime"
 	"strconv"
 	"testing"
 
@@ -43,10 +43,6 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Disabled under windows: https://github.com/elastic/beats/issues/16860")
-	}
-
 	log, _ := logger.New()
 
 	t.Run("fail to save is propagated", withTLSServer(
@@ -326,15 +322,9 @@ func withServer(
 	test func(t *testing.T, host string),
 ) func(t *testing.T) {
 	return func(t *testing.T) {
-		listener, err := net.Listen("tcp", ":0")
-		require.NoError(t, err)
-		defer listener.Close()
-
-		port := listener.Addr().(*net.TCPAddr).Port
-
-		go http.Serve(listener, m(t))
-
-		test(t, "localhost:"+strconv.Itoa(port))
+		s := httptest.NewServer(m(t))
+		defer s.Close()
+		test(t, s.Listener.Addr().String())
 	}
 }
 
@@ -343,7 +333,6 @@ func withTLSServer(
 	test func(t *testing.T, caBytes []byte, host string),
 ) func(t *testing.T) {
 	return func(t *testing.T) {
-
 		ca, err := authority.NewCA()
 		require.NoError(t, err)
 		pair, err := ca.GeneratePair()
@@ -352,7 +341,7 @@ func withTLSServer(
 		serverCert, err := tls.X509KeyPair(pair.Crt, pair.Key)
 		require.NoError(t, err)
 
-		listener, err := net.Listen("tcp", ":0")
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
 		require.NoError(t, err)
 		defer listener.Close()
 

@@ -6,3 +6,73 @@ Requirements
 
 The remote Kibana version of the Agent must be equal or higher than the Agent version, if this is not met
 Kibana will refuse the connection.
+
+
+[[Supported Actions by the Agent]]
+
+The Elastic Agent supports the following actions received by Fleet.
+
+Implemented:
+
+[[Configuration change]]
+
+The Elastic Agent receives a configuration encoded as a JSON object.
+
+[source,json]
+------------------------------------------------------------------------------
+	{
+		"type": "CONFIG_CHANGE",
+		"id": "id1",
+		"data": {
+			"config": {
+				"id": "policy-id",
+				"outputs": {
+					"default": {
+						"hosts": "https://localhost:9200"
+					}
+				},
+				"datasources": [{
+					"id": "string",
+					"enabled": true,
+					"use_output": "default",
+					"inputs": [{
+						"type": "logs",
+						"streams": [{
+							"paths": ["/var/log/hello.log"]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+------------------------------------------------------------------------------
+
+[[Planned but not implemented]]
+
+[source,json]
+------------------------------------------------------------------------------
+{
+  "type": "UPGRADE",
+  "id": "id1",
+  "target_version": "7.2.1"
+}
+------------------------------------------------------------------------------
+
+[source,json]
+------------------------------------------------------------------------------
+{
+  "type": "DOWNGRADE",
+  "id": "id1",
+  "target_version": "7.2.1"
+}
+------------------------------------------------------------------------------
+
+[source,json]
+------------------------------------------------------------------------------
+{
+  "type": "RELAY",
+  "id": "id1",
+  "destination": {"name":"endpoint"}
+  "data": {}
+}
+------------------------------------------------------------------------------

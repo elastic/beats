@@ -6,7 +6,6 @@ package filters
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/Masterminds/semver"
 
@@ -15,32 +14,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-	"github.com/elastic/go-sysinfo"
 )
 
 const (
 	datasourcesKey          = "datasources"
 	constraintsKey          = "constraints"
 	validateVersionFuncName = "validate_version"
-)
-
-// List of variables available to be used in constraint definitions.
-const (
-	// `agent.id` is a generated (in standalone) or assigned (in fleet) agent identifier.
-	agentIDKey = "agent.id"
-	// `agent.version` specifies current version of an agent.
-	agentVersionKey = "agent.version"
-	// `host.architecture` defines architecture of a host (e.g. x86_64, arm, ppc, mips).
-	hostArchKey = "host.architecture"
-	// `os.family` defines a family of underlying operating system (e.g. redhat, debian, freebsd, windows).
-	osFamilyKey = "os.family"
-	// `os.kernel` specifies current version of a kernel in a semver format.
-	osKernelKey = "os.kernel"
-	// `os.platform` specifies platform agent is running on (e.g. centos, ubuntu, windows).
-	osPlatformKey = "os.platform"
-	// `os.version` specifies version of underlying operating system (e.g. 10.12.6).
-	osVersionKey = "os.version"
 )
 
 var (
@@ -245,30 +224,20 @@ func newVarStore() (*constraintVarStore, error) {
 }
 
 func initVarStore(store *constraintVarStore) error {
-	sysInfo, err := sysinfo.Host()
-	if err != nil {
-		return err
-	}
-
 	agentInfo, err := info.NewAgentInfo()
 	if err != nil {
 		return err
 	}
 
-	info := sysInfo.Info()
+	meta, err := agentInfo.ECSMetadataFlatMap()
+	if err != nil {
+		return errors.New(err, "failed to gather host metadata")
+	}
 
-	// 	Agent
-	store.vars[agentIDKey] = agentInfo.AgentID()
-	store.vars[agentVersionKey] = release.Version()
-
-	// Host
-	store.vars[hostArchKey] = info.Architecture
-
-	// Operating system
-	store.vars[osFamilyKey] = runtime.GOOS
-	store.vars[osKernelKey] = info.KernelVersion
-	store.vars[osPlatformKey] = info.OS.Family
-	store.vars[osVersionKey] = info.OS.Version
+	// keep existing, overwrite gathered
+	for k, v := range meta {
+		store.vars[k] = v
+	}
 
 	return nil
 }

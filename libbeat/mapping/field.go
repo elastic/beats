@@ -354,6 +354,10 @@ func (f Fields) getKeys(namespace string) []string {
 		} else {
 			keys = append(keys, field.Fields.getKeys(fieldName)...)
 		}
+		if field.ObjectType == "histogram" {
+			keys = append(keys, fieldName+".values")
+			keys = append(keys, fieldName+".counts")
+		}
 	}
 
 	return keys

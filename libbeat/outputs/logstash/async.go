@@ -18,6 +18,7 @@
 package logstash
 
 import (
+	"context"
 	"errors"
 	"net"
 	"sync"
@@ -134,7 +135,7 @@ func (c *asyncClient) Close() error {
 	return c.Client.Close()
 }
 
-func (c *asyncClient) Publish(batch publisher.Batch) error {
+func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))

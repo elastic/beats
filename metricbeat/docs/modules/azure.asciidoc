@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-azure]]
 [role="xpack"]
-== azure module
+== Azure module
 
 This is the azure module.
 
@@ -97,7 +97,7 @@ Authentication: we are handling authentication on our side (creating/renewing th
 [float]
 === Example configuration
 
-The azure module supports the standard configuration options that are described
+The Azure module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

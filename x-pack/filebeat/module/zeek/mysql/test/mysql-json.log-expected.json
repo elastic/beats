@@ -4,15 +4,31 @@
         "destination.address": "192.168.0.254",
         "destination.ip": "192.168.0.254",
         "destination.port": 3306,
+        "event.action": "query",
+        "event.category": [
+            "database",
+            "network"
+        ],
         "event.dataset": "zeek.mysql",
         "event.id": "C5Hol527kLMUw36hj3",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "protocol",
+            "info"
+        ],
         "fileset.name": "mysql",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:0HUQbshhYbATQXDHv/ysOs0DlZA=",
         "network.protocol": "mysql",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.0.254",
+            "192.168.0.254"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.0.254",
         "source.ip": "192.168.0.254",

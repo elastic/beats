@@ -9,7 +9,7 @@ var:
     os.windows:
       - c:/programdata/nginx/logs/*access.log*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/ingress_controller.yml
 
 requires.processors:

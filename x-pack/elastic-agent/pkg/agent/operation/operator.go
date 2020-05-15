@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -23,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 )
@@ -41,6 +39,7 @@ type Operator struct {
 	handlers       map[string]handleFunc
 	stateResolver  *stateresolver.StateResolver
 	eventProcessor callbackHooks
+	monitor        monitoring.Monitor
 	isMonitoring   bool
 
 	apps     map[string]Application
@@ -61,9 +60,10 @@ func NewOperator(
 	fetcher download.Downloader,
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
-	eventProcessor callbackHooks) (*Operator, error) {
+	eventProcessor callbackHooks,
+	monitor monitoring.Monitor) (*Operator, error) {
 
-	operatorConfig := defaultOperatorConfig()
+	operatorConfig := operatorCfg.DefaultConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
 	}
@@ -86,6 +86,7 @@ func NewOperator(
 		stateResolver:  stateResolver,
 		apps:           make(map[string]Application),
 		eventProcessor: eventProcessor,
+		monitor:        monitor,
 	}
 
 	operator.initHandlerMap()
@@ -94,22 +95,6 @@ func NewOperator(
 	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
-}
-
-func defaultOperatorConfig() *operatorCfg.Config {
-	return &operatorCfg.Config{
-		MonitoringConfig: &monitoring.Config{
-			MonitorLogs:    false,
-			MonitorMetrics: false,
-		},
-		RetryConfig: &retry.Config{
-			Enabled:      false,
-			RetriesCount: 0,
-			Delay:        30 * time.Second,
-			MaxDelay:     5 * time.Minute,
-			Exponential:  false,
-		},
-	}
 }
 
 // State describes the current state of the system.
@@ -214,6 +199,10 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 	}
 
 	for _, op := range operations {
+		if err := o.bgContext.Err(); err != nil {
+			return err
+		}
+
 		shouldRun, err := op.Check()
 		if err != nil {
 			return err
@@ -239,6 +228,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	id := p.ID()
 
+	o.logger.Debugf("operator is looking for %s in app collection: %v", p.ID(), o.apps)
 	if a, ok := o.apps[id]; ok {
 		return a, nil
 	}
@@ -250,9 +240,20 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
 	}
 
-	monitor := monitoring.NewMonitor(isMonitorable(p), p.BinaryName(), o.pipelineID, o.config.DownloadConfig, o.config.MonitoringConfig.MonitorLogs, o.config.MonitoringConfig.MonitorMetrics)
+	// TODO: (michal) join args into more compact options version
+	a, err := app.NewApplication(
+		o.bgContext,
+		p.ID(),
+		p.BinaryName(),
+		o.pipelineID,
+		o.config.LoggingConfig.Level.String(),
+		specifier,
+		factory,
+		o.config,
+		o.logger,
+		o.eventProcessor.OnFailing,
+		o.monitor)
 
-	a, err := app.NewApplication(p.ID(), p.BinaryName(), o.pipelineID, specifier, factory, o.config, o.logger, o.eventProcessor.OnFailing, monitor)
 	if err != nil {
 		return nil, err
 	}

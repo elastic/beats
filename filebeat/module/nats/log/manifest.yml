@@ -11,5 +11,5 @@ var:
       # See more on https://nats.io/documentation/server/gnatsd-logging/
       - /var/log/nats/nats.log*
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/log.yml

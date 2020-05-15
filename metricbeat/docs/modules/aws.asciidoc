@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-aws]]
 [role="xpack"]
-== aws module
+== AWS module
 
 :libbeat-xpack-dir: ../../../x-pack/libbeat
 
@@ -273,7 +273,7 @@ include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 [float]
 === Example configuration
 
-The aws module supports the standard configuration options that are described
+The AWS module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

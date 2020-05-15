@@ -14,6 +14,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 )
 
 type agentinfo struct{}
@@ -28,9 +30,9 @@ func TestCheckin(t *testing.T) {
 	t.Run("Propagate any errors from the server", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
-Something went wrong
-}
-`
+	Something went wrong
+	}
+	`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -52,35 +54,35 @@ Something went wrong
 	t.Run("Checkin receives a PolicyChange", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
-{
-	"actions": [{
-		"type": "CONFIG_CHANGE",
-		"id": "id1",
-		"data": {
-			"config": {
-				"id": "policy-id",
-				"outputs": {
-					"default": {
-						"hosts": "https://localhost:9200"
-					}
-				},
-				"datasources": [{
-					"id": "string",
-					"enabled": true,
-					"use_output": "default",
-					"inputs": [{
-						"type": "logs",
-						"streams": [{
-							"paths": ["/var/log/hello.log"]
+	{
+		"actions": [{
+			"type": "CONFIG_CHANGE",
+			"id": "id1",
+			"data": {
+				"config": {
+					"id": "policy-id",
+					"outputs": {
+						"default": {
+							"hosts": "https://localhost:9200"
+						}
+					},
+					"datasources": [{
+						"id": "string",
+						"enabled": true,
+						"use_output": "default",
+						"inputs": [{
+							"type": "logs",
+							"streams": [{
+								"paths": ["/var/log/hello.log"]
+							}]
 						}]
 					}]
-				}]
+				}
 			}
-		}
-	}],
-	"success": true
-}
-`
+		}],
+		"success": true
+	}
+	`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -109,41 +111,41 @@ Something went wrong
 	t.Run("Checkin receives known and unknown action type", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
-{
-    "actions": [
-        {
-            "type": "CONFIG_CHANGE",
-            "id": "id1",
-            "data": {
-                "config": {
-                    "id": "policy-id",
-                    "outputs": {
-                        "default": {
-                            "hosts": "https://localhost:9200"
-                        }
-                    },
-					"datasources": [{
-						"id": "string",
-						"enabled": true,
-						"use_output": "default",
-						"inputs": [{
-							"type": "logs",
-							"streams": [{
-								"paths": ["/var/log/hello.log"]
+	{
+	    "actions": [
+	        {
+	            "type": "CONFIG_CHANGE",
+	            "id": "id1",
+	            "data": {
+	                "config": {
+	                    "id": "policy-id",
+	                    "outputs": {
+	                        "default": {
+	                            "hosts": "https://localhost:9200"
+	                        }
+	                    },
+						"datasources": [{
+							"id": "string",
+							"enabled": true,
+							"use_output": "default",
+							"inputs": [{
+								"type": "logs",
+								"streams": [{
+									"paths": ["/var/log/hello.log"]
+								}]
 							}]
 						}]
-					}]
-                }
-            }
-        },
-        {
-            "type": "WHAT_TO_DO_WITH_IT",
-            "id": "id2"
-        }
-    ],
-    "success": true
-}
-`
+	                }
+	            }
+	        },
+	        {
+	            "type": "WHAT_TO_DO_WITH_IT",
+	            "id": "id2"
+	        }
+	    ],
+	    "success": true
+	}
+	`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -177,11 +179,11 @@ Something went wrong
 	t.Run("When we receive no action", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
-{
-  "actions": [],
-	"success": true
-}
-`
+	{
+	  "actions": [],
+		"success": true
+	}
+	`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
@@ -215,21 +217,15 @@ Something went wrong
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				type Request struct {
-					Metadata map[string]interface{} `json:"local_metadata"`
+					Metadata *info.ECSMeta `json:"local_metadata"`
 				}
-				req := &Request{}
+
+				var req *Request
 
 				content, err := ioutil.ReadAll(r.Body)
 				assert.NoError(t, err)
 				assert.NoError(t, json.Unmarshal(content, &req))
-
-				assert.Equal(t, 1, len(req.Metadata))
-				v, found := req.Metadata["key"]
-				assert.True(t, found)
-
-				intV, ok := v.(string)
-				assert.True(t, ok)
-				assert.Equal(t, "value", intV)
+				assert.Equal(t, "linux", req.Metadata.OS.Name)
 
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)
@@ -237,13 +233,9 @@ Something went wrong
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			meta := map[string]interface{}{
-				"key": "value",
-			}
-
 			cmd := NewCheckinCmd(agentInfo, client)
 
-			request := CheckinRequest{Metadata: meta}
+			request := CheckinRequest{Metadata: testMetadata()}
 
 			r, err := cmd.Execute(ctx, &request)
 			require.NoError(t, err)
@@ -256,22 +248,24 @@ Something went wrong
 	t.Run("No meta are sent when not provided", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
 			raw := `
-{
-  "actions": [],
-	"success": true
-}
-`
+	{
+	  "actions": [],
+		"success": true
+	}
+	`
 			mux := http.NewServeMux()
 			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
-				req := make(map[string]interface{})
+				type Request struct {
+					Metadata *info.ECSMeta `json:"local_metadata"`
+				}
+
+				var req *Request
 
 				content, err := ioutil.ReadAll(r.Body)
 				assert.NoError(t, err)
 				assert.NoError(t, json.Unmarshal(content, &req))
-
-				_, found := req["key"]
-				assert.False(t, found)
+				assert.Nil(t, req.Metadata)
 
 				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, raw)

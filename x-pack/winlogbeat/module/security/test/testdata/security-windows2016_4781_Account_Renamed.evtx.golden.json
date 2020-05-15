@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:38:17.5566269Z",
     "event": {
       "action": "renamed-user-account",
+      "category": "iam",
       "code": 4781,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -66,10 +72,16 @@
     "@timestamp": "2019-09-06T13:38:23.5161066Z",
     "event": {
       "action": "renamed-user-account",
+      "category": "iam",
       "code": 4781,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
