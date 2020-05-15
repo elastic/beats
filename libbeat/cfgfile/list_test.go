@@ -103,6 +103,27 @@ func TestReloadSameConfigs(t *testing.T) {
 	assert.Equal(t, state, list.copyRunnerList())
 }
 
+func TestReloadDuplicateConfig(t *testing.T) {
+	factory := &runnerFactory{}
+	list := NewRunnerList("", factory, nil)
+
+	list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+	})
+
+	state := list.copyRunnerList()
+	assert.Equal(t, len(state), 3)
+
+	// This can happen in Autodiscover when a container if getting restarted but the previous one is not clean yet.
+	list.Reload([]*reload.ConfigWithMeta{
+		createConfig(1),
+		createConfig(1),
+	})
+
+	// nothing changed
+	assert.Equal(t, state, list.copyRunnerList())
+}
+
 func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
