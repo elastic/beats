@@ -25,6 +25,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer is now lowercase & http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
+- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
+will no longer send the `host` field that contains information about the host Filebeat is
+running on. This is because the `host` field specifies the host on which the event
+happened. {issue}13920[13920] {pull}18223[18223]
+- With the default configuration the cef and panw modules will no longer send the `host`
+field. You can revert this change by configuring tags for the module and omitting
+`forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
 
 *Heartbeat*
 
@@ -325,6 +332,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
+- Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 
 *Heartbeat*
