@@ -20723,6 +20723,16 @@ type: long
 
 --
 
+*`haproxy.stat.session.total`*::
++
+--
+Number of all sessions.
+
+
+type: long
+
+--
+
 
 *`haproxy.stat.session.rate.value`*::
 +
@@ -21142,6 +21152,27 @@ Health parameter of server. Between 0 and `agent.check.rise`+`agent.check.fall`-
 
 
 type: integer
+
+--
+
+*`haproxy.stat.agent.check.description`*::
++
+--
+Human readable version of check.
+
+
+type: keyword
+
+--
+
+
+*`haproxy.stat.source.address`*::
++
+--
+Address of the source.
+
+
+type: text
 
 --
 

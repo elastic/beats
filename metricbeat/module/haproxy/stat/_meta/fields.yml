@@ -335,6 +335,11 @@
           description: >
             Configured session limit.
 
+        - name: total
+          type: long
+          description: >
+            Number of all sessions.
+
         - name: rate
           type: group
           fields:
@@ -586,6 +591,21 @@
               type: integer
               description: >
                 Health parameter of server. Between 0 and `agent.check.rise`+`agent.check.fall`-1.
+
+            - name: description
+              type: keyword
+              description: >
+                Human readable version of check.
+
+
+    - name: source
+      type: group
+      fields:
+
+        - name: address
+          type: text
+          description: >
+            Address of the source.
 
 
 
