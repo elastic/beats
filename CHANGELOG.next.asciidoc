@@ -140,6 +140,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix Cisco ASA ASA 3020** and 106023 messages {pull}17964[17964]
 - Unescape file name from SQS message. {pull}18370[18370]
 - Improve cisco asa and ftd pipelines' failure handler to avoid mapping temporary fields. {issue}18391[18391] {pull}18392[18392]
+- Fix source.address not being set for nginx ingress_controller {pull}18511[18511]
 - Fix PANW module wrong mappings for bytes and packets counters. {issue}18522[18522] {pull}18525[18525]
 - Fixed ingestion of some Cisco ASA and FTD messages when a hostname was used instead of an IP for NAT fields. {issue}14034[14034] {pull}18376[18376]
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
