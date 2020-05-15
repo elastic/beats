@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2020-02-07T11:48:51.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -25,9 +26,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -40,6 +38,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:15.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -64,9 +63,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -79,6 +75,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:30.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -103,9 +100,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -118,6 +112,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:43.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -142,9 +137,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -157,6 +149,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:50.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -176,20 +169,18 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "-",
-        "source.address": "192.168.64.1",
-        "source.ip": "192.168.64.1"
+        "user_agent.original": "-"
     },
     {
         "@timestamp": "2020-02-07T11:50:09.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -209,20 +200,18 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
+        "url.original": "/products/42",
         "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "-",
-        "source.address": "192.168.64.1",
-        "source.ip": "192.168.64.1",
-        "url.original": "/products/42"
+        "user_agent.original": "-"
     },
     {
         "@timestamp": "2020-02-07T11:55:05.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -247,9 +236,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -262,6 +248,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -286,9 +273,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -304,6 +288,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -328,9 +313,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -346,6 +328,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -370,9 +353,6 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -388,6 +368,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -412,9 +393,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -430,6 +408,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -454,9 +433,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -472,6 +448,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -496,9 +473,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -514,6 +488,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -538,9 +513,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -556,6 +528,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -580,9 +553,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -598,6 +568,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -622,9 +593,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -640,6 +608,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -664,9 +633,6 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -682,6 +648,7 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -706,9 +673,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -724,6 +688,7 @@
     },
     {
         "@timestamp": "2020-02-07T12:00:28.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -748,9 +713,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -763,6 +725,7 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -787,9 +750,6 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -805,6 +765,7 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -829,9 +790,6 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
@@ -847,6 +805,7 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:42.000Z",
+        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -871,9 +830,6 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
-        "related.ip": [
-            "192.168.64.1"
-        ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
         "source.ip": "192.168.64.1",
