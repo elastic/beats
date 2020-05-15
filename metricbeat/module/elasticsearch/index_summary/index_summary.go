@@ -62,19 +62,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
-	// we don't collect the same stats from every node and end up duplicating them.
-	if m.Scope == elasticsearch.ScopeNode {
-		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
-		if err != nil {
-			return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		}
-
-		// Not master, no event sent
-		if !isMaster {
-			m.Logger().Debug("trying to fetch index summary stats from a non-master node")
-			return nil
-		}
+	shouldSkip, err := m.ShouldSkipFetch()
+	if err != nil {
+		return err
+	}
+	if shouldSkip {
+		return nil
 	}
 
 	content, err := m.HTTP.FetchContent()

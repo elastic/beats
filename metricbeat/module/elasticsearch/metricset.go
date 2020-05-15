@@ -20,6 +20,8 @@ package elasticsearch
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -114,4 +116,23 @@ func (m *MetricSet) GetServiceURI() string {
 func (m *MetricSet) SetServiceURI(servicePath string) {
 	m.servicePath = servicePath
 	m.HTTP.SetURI(m.GetServiceURI())
+}
+
+func (m *MetricSet) ShouldSkipFetch() (bool, error) {
+	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
+	// we don't collect the same stats from every node and end up duplicating them.
+	if m.Scope == ScopeNode {
+		isMaster, err := IsMaster(m.HTTP, m.GetServiceURI())
+		if err != nil {
+			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		}
+
+		// Not master, no event sent
+		if !isMaster {
+			m.Logger().Debugf("trying to fetch %v stats from a non-master node", m.Name())
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

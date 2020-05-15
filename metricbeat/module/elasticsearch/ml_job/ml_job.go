@@ -18,8 +18,6 @@
 package ml_job
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -54,19 +52,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
-	// we don't collect the same stats from every node and end up duplicating them.
-	if m.Scope == elasticsearch.ScopeNode {
-		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
-		if err != nil {
-			return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		}
-
-		// Not master, no event sent
-		if !isMaster {
-			m.Logger().Debug("trying to fetch machine learning job stats from a non-master node")
-			return nil
-		}
+	shouldSkip, err := m.ShouldSkipFetch()
+	if err != nil {
+		return err
+	}
+	if shouldSkip {
+		return nil
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
