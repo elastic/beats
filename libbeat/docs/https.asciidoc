@@ -113,13 +113,13 @@ include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
 you can associate the IP address with your hostname in `/etc/hosts`
 (on Unix) or `C:\Windows\System32\drivers\etc\hosts` (on Windows).
 
-ifndef::apm-server[]
+ifndef::no_dashboards[]
 [role="xpack"]
 [float]
 [[securing-communication-kibana]]
 === Secure communication with the Kibana endpoint
 
-If you've configured the {kib} endpoint,
+If you've configured the <<setup-kibana-endpoint,{kib} endpoint>>,
 you can also specify credentials for authenticating with {kib} under `kibana.setup`.
 If no credentials are specified, Kibana will use the configured authentication method
 in the Elasticsearch output.
@@ -144,7 +144,7 @@ endif::[]
 ifdef::serverless[]
 in environment variables.
 endif::[]
-endif::apm-server[]
+endif::no_dashboards[]
 --
 
 [role="xpack"]
