@@ -203,14 +203,27 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
-	if err != nil {
-		a.log.Errorw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "error", err)
-	}
+	var mapObject map[string][]interface{}
+	var arrayObject []interface{}
 	var messages []string
-	if len(obj[expandEventListFromField]) > 0 {
-		for _, ms := range obj[expandEventListFromField] {
+	// check if the message is an object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		if len(mapObject[expandEventListFromField]) > 0 {
+			for _, ms := range mapObject[expandEventListFromField] {
+				js, err := json.Marshal(ms)
+				if err == nil {
+					messages = append(messages, string(js))
+				} else {
+					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				}
+			}
+		}
+	} else {
+		// in some cases the message is an array
+		a.log.Debugw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "warning", err)
+		err = json.Unmarshal(bMessage, &arrayObject)
+		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))
