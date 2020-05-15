@@ -250,6 +250,9 @@ func TestMakeClientTracer(t *testing.T) {
 	}
 }
 
+// bufLogger is a buffered logger. It does not immediately print out log lines; instead it
+// buffers them. To print them out, one must explicitly call it's Flush() method. This is
+// useful when you want to see the logs only when tests fail but not when they pass.
 type bufLogger struct {
 	t     *testing.T
 	lines []string
