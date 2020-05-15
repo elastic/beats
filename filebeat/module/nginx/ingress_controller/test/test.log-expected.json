@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2020-02-07T11:48:51.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -38,7 +37,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:15.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
