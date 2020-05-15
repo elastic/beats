@@ -149,19 +149,6 @@ pipeline {
             mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
           }
         }
-        stage('Filebeat x-pack Windows'){
-          agent { label 'windows-immutable && windows-2019' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
-            }
-          }
-          steps {
-            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "update build test")
-          }
-        }
         stage('Filebeat Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
@@ -175,6 +162,19 @@ pipeline {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
         }
+        stage('Filebeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_XPACK_FILEBEAT != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+          }
+        }
         stage('Filebeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -186,6 +186,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+          }
+        }
+        stage('Filebeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "update build test")
           }
         }
         stage('Heartbeat'){
@@ -406,19 +419,6 @@ pipeline {
             }
           }
         }
-        stage('Metricbeat x-pack Windows'){
-          agent { label 'windows-immutable && windows-2019' }
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression {
-              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
-            }
-          }
-          steps {
-            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build test")
-          }
-        }
         stage('Metricbeat crosscompile'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
@@ -445,6 +445,19 @@ pipeline {
             mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
+        stage('Metricbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Metricbeat x-pack Mac OS X", "metricbeat", "build unitTest")
+          }
+        }
         stage('Metricbeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -456,6 +469,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build test")
           }
         }
         stage('Packetbeat'){
