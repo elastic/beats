@@ -187,7 +187,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
-	// TODO: call GET _nodes/_master?filter_path=nodes.*.name to figure out the ID of the master node
 	masterNodeID, err := elasticsearch.GetMasterNodeID(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
 		return err
