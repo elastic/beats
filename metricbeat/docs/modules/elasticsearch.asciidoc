@@ -18,6 +18,7 @@ The `elasticsearch` module works with {es} 6.7.0 and later.
 Like other {beatname_uc} modules, the `elasticsearch` module accepts a `hosts` configuration setting.
 This setting can contain a list of entries. The related `scope` setting determines how each entry in
 the `hosts` list is interpreted by the module.
+
 * If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an
   {es} cluster.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct
@@ -55,16 +56,7 @@ metricbeat.modules:
 
   #index_recovery.active_only: true
   #xpack.enabled: false
-<<<<<<< HEAD
   #scope: node
-=======
-
-  # Set to cluster to treat each item in the hosts list as an endpoint for
-  # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
-  # Set to node (default) to treat each item in the hosts list as an individual
-  # node in the Elasticsearch cluster.
-  #hosts_mode: node
->>>>>>> Adding configuration for hosts_mode
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

@@ -24,8 +24,4 @@
   # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
   # Set to node (default) to treat each item in the hosts list as an individual
   # node in the Elasticsearch cluster.
-<<<<<<< HEAD
   #scope: node
-=======
-  #hosts_mode: node
->>>>>>> Adding configuration for hosts_mode
