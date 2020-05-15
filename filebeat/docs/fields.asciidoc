@@ -5469,6 +5469,16 @@ type: ip
 
 --
 
+*`cisco.asa.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.asa.mapped_source_port`*::
 +
 --
@@ -5486,6 +5496,16 @@ The translated destination IP address.
 
 
 type: ip
+
+--
+
+*`cisco.asa.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
@@ -5658,6 +5678,16 @@ type: ip
 
 --
 
+*`cisco.ftd.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.ftd.mapped_source_port`*::
 +
 --
@@ -5675,6 +5705,16 @@ The translated destination IP address. Use ECS destination.nat.ip.
 
 
 type: ip
+
+--
+
+*`cisco.ftd.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
@@ -13984,6 +14024,80 @@ type: ip
 +
 --
 The user agent of the caller. This information is not authenticated and  should be treated accordingly.
+
+
+type: keyword
+
+--
+
+[float]
+=== response
+
+The operation response.
+
+
+
+*`googlecloud.audit.response.proto_name`*::
++
+--
+Type property of the response.
+
+
+type: keyword
+
+--
+
+[float]
+=== details
+
+The details of the response.
+
+
+
+*`googlecloud.audit.response.details.group`*::
++
+--
+The name of the group.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.kind`*::
++
+--
+The kind of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.name`*::
++
+--
+The name of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.uid`*::
++
+--
+The uid of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.status`*::
++
+--
+Status of the response. 
 
 
 type: keyword
