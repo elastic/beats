@@ -37,6 +37,9 @@
         "source.geo.region_name": "Moscow",
         "source.ip": "78.24.182.42",
         "source.port": "54106",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     },
     {
@@ -77,6 +80,9 @@
         "source.geo.region_name": "Moscow Oblast",
         "source.ip": "31.135.65.4",
         "source.port": "54001",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
     },
     {
@@ -117,6 +123,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52406",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     },
     {
@@ -157,6 +166,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52410",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     },
     {
@@ -197,6 +209,9 @@
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
         "source.port": "52414",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.58.0"
     }
 ]

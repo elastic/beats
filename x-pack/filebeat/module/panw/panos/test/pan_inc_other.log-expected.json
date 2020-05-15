@@ -54,7 +54,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -91,7 +94,8 @@
         "source.port": 59309,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     }
 ]
