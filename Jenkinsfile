@@ -27,6 +27,8 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    JOB_GCS_BUCKET = 'beats-ci-temp'
+    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -63,7 +65,7 @@ pipeline {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
@@ -732,7 +734,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -773,7 +775,7 @@ def withBeatsEnvWin(Closure body) {
     "RACE_DETECTOR=true",
   ]){
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -1037,7 +1039,7 @@ def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
       withBeatsEnv(false) {
-        unstash "terraform-${stashName}"
+        unstash("terraform-${stashName}")
         retry(2) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
@@ -1186,7 +1188,7 @@ def runbld() {
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
-            unstash v
+            unstash(v)
           }
         }
         sh(label: 'Process JUnit reports with runbld',

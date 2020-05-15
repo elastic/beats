@@ -30,19 +30,31 @@ function enroll(){
     if [[ -n "${FLEET_ENROLLMENT_TOKEN}" ]] && [[ ${FLEET_ENROLLMENT_TOKEN} == 1 ]]; then
       apikey = "${FLEET_ENROLLMENT_TOKEN}"
     else
-      enrollResp=$(curl -X POST  ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
-        -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} \
-        -d '{"name":"'"${FLEET_TOKEN_NAME:-demotoken}"'","config_id":"'"${FLEET_CONFIG_ID:-default}"'"}')
+        -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
 
       local exitCode=$?
       if [ $exitCode -ne 0 ]; then
         exit $exitCode
       fi
+      echo $enrollResp
+      local apikeyId=$(echo $enrollResp | jq -r '.list[0].id')
+      echo $apikeyId
 
-      apikey=$(echo $enrollResp | jq -r '.item.api_key')
+      enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/ingest_manager/fleet/enrollment-api-keys/$apikeyId \
+        -H 'Content-Type: application/json' \
+        -H 'kbn-xsrf: true' \
+        -u ${KIBANA_USERNAME:-elastic}:${KIBANA_PASSWORD:-changeme} )
+
+      exitCode=$?
+      if [ $exitCode -ne 0 ]; then
+        exit $exitCode
+      fi
     fi
+    apikey=$(echo $enrollResp | jq -r '.item.api_key')
+    echo $apikey
 
     ./{{ .BeatName }} enroll ${KIBANA_HOST:-http://localhost:5601} $apikey -f
 }

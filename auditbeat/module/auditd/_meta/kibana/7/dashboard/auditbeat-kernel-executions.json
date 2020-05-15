@@ -164,7 +164,7 @@
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "agent.name", 
                     "process.args", 
                     "auditd.summary.actor.primary", 
                     "auditd.summary.actor.secondary", 

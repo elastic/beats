@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 	"unicode"
@@ -319,7 +320,7 @@ func (a *Application) configureByFile(spec *ProcessSpec, config map[string]inter
 	defer f.Close()
 
 	// change owner
-	if err := os.Chown(filePath, a.uid, a.gid); err != nil {
+	if err := changeOwner(filePath, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -382,4 +383,13 @@ func isWindowsPath(path string) bool {
 		return false
 	}
 	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
+}
+
+func changeOwner(path string, uid, gid int) error {
+	if runtime.GOOS == "windows" {
+		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
+		return nil
+	}
+
+	return os.Chown(path, uid, gid)
 }
