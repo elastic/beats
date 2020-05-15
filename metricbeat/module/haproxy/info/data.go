@@ -33,7 +33,7 @@ import (
 
 var (
 	schema = s.Schema{
-		"threads":            c.Int("Nbthread"),
+		"threads":            c.Int("Nbthread", s.Optional),
 		"processes":          c.Int("Nbproc"),
 		"process_num":        c.Int("ProcessNum"),
 		"pid":                c.Int("Pid"),
@@ -42,11 +42,11 @@ var (
 		"run_queue":          c.Int("RunQueue"),
 		"stopping":           c.Int("Stopping"),
 		"jobs":               c.Int("Jobs"),
-		"unstoppable_jobs":   c.Int("UnstoppableJobs"),
-		"listeners":          c.Int("Listeners"),
-		"dropped_logs":       c.Int("DroppedLogs"),
-		"busy_polling":       c.Int("BusyPolling"),
-		"failed_resolutions": c.Int("FailedResolutions"),
+		"unstoppable_jobs":   c.Int("UnstoppableJobs", s.Optional),
+		"listeners":          c.Int("Listeners", s.Optional),
+		"dropped_logs":       c.Int("DroppedLogs", s.Optional),
+		"busy_polling":       c.Int("BusyPolling", s.Optional),
+		"failed_resolutions": c.Int("FailedResolutions", s.Optional),
 
 		"uptime": s.Object{
 			"sec": c.Int("UptimeSec"),
@@ -59,21 +59,21 @@ var (
 		},
 
 		"peers": s.Object{
-			"active":    c.Int("ActivePeers"),
-			"connected": c.Int("ConnectedPeers"),
+			"active":    c.Int("ActivePeers", s.Optional),
+			"connected": c.Int("ConnectedPeers", s.Optional),
 		},
 
 		"bytes": s.Object{
 			"out": s.Object{
-				"total": c.Int("TotalBytesOut"),
-				"rate":  c.Int("BytesOutRate"),
+				"total": c.Int("TotalBytesOut", s.Optional),
+				"rate":  c.Int("BytesOutRate", s.Optional),
 			},
 		},
 
 		"pool": s.Object{
-			"allocated": c.Int("PoolAlloc"),
-			"used":      c.Int("PoolUsed"),
-			"failed":    c.Int("PoolFailed"),
+			"allocated": c.Int("PoolAlloc", s.Optional),
+			"used":      c.Int("PoolUsed", s.Optional),
+			"failed":    c.Int("PoolFailed", s.Optional),
 		},
 
 		"compress": s.Object{
