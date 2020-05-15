@@ -26871,6 +26871,26 @@ kvm module
 
 
 
+*`kvm.id`*::
++
+--
+Domain id
+
+
+type: long
+
+--
+
+*`kvm.name`*::
++
+--
+Domain name
+
+
+type: keyword
+
+--
+
 [float]
 === kvm
 
@@ -26938,37 +26958,10 @@ status
 
 
 
-[float]
-=== stat
-
-Memory stat
-
-
-
-*`kvm.status.stat.state`*::
+*`kvm.status.state`*::
 +
 --
-domain state
-
-
-type: keyword
-
---
-
-*`kvm.status.id`*::
-+
---
-Domain id
-
-
-type: long
-
---
-
-*`kvm.status.name`*::
-+
---
-Domain name
+Domain state
 
 
 type: keyword
