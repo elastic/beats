@@ -28,8 +28,10 @@ import (
 
 func TestFetchEventContents(t *testing.T) {
 	conn := libvirttest.New()
+	defer conn.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(conn))
+	host := "test://" + conn.RemoteAddr().String() + ":123"
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(host))
 
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
@@ -52,7 +54,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), e)
 
-	statName, err := e.MetricSetFields.GetValue("stat.state")
+	statName, err := e.MetricSetFields.GetValue("state")
 	if err == nil {
 		assert.EqualValues(t, statName.(string), "running")
 	} else {
@@ -60,10 +62,10 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func getConfig(conn *libvirttest.MockLibvirt) map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "kvm",
 		"metricsets": []string{"status"},
-		"hosts":      []string{"test://" + conn.RemoteAddr().String() + ":123"},
+		"hosts":      []string{host},
 	}
 }
