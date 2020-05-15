@@ -156,4 +156,6 @@ More information on sending data to a secured cluster is available in the config
 
 * <<elasticsearch-output>>
 * <<configuration-ssl>>
+ifndef::no_dashboards[]
 * <<setup-kibana-endpoint>>
+endif::no_dashboards[]
