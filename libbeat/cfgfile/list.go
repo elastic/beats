@@ -73,7 +73,11 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		if _, ok := stopList[hash]; ok {
 			delete(stopList, hash)
 		} else {
-			startList[hash] = config
+			if _, ok := r.runners[hash]; !ok {
+				startList[hash] = config
+			} else {
+				r.logger.Debugf("Runner already running for this config hash: %s", hash)
+			}
 		}
 	}
 
