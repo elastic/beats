@@ -63,6 +63,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support to Sysmon file delete events (event ID 23). {issue}18094[18094]
+- Improve ECS field mappings in Sysmon module. `related.hash`, `related.ip`, and `related.user` are now populated. {issue}18364[18364]
+- Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
+- Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
+- Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 
 *Functionbeat*
 
@@ -160,9 +164,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed typo in log message. {pull}17897[17897]
 - Unescape file name from SQS message. {pull}18370[18370]
 - Improve cisco asa and ftd pipelines' failure handler to avoid mapping temporary fields. {issue}18391[18391] {pull}18392[18392]
+- Fix source.address not being set for nginx ingress_controller {pull}18511[18511]
 - Fix PANW module wrong mappings for bytes and packets counters. {issue}18522[18522] {pull}18525[18525]
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
+- Fixed ingestion of some Cisco ASA and FTD messages when a hostname was used instead of an IP for NAT fields. {issue}14034[14034] {pull}18376[18376]
 
 *Heartbeat*
 
@@ -400,6 +406,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 - Add support for v10, v11 and v12 logs on Postgres {issue}13810[13810] {pull}17732[17732]
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
+- The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 
 *Heartbeat*
 

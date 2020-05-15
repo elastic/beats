@@ -128,6 +128,9 @@ processors:
     field: fortinet.firewall.transip
     if: "ctx.fortinet?.firewall?.transip == 'N/A'"
 - remove:
+    field: fortinet.firewall.tunnelip
+    if: "ctx.fortinet?.firewall?.tunnelip == 'N/A'"
+- remove:
     field:
     - _temp
     - message
