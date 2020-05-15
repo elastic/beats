@@ -162,7 +162,7 @@ pipeline {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
         }
-        stage('Filebeat Mac OS X'){
+        stage('Filebeat x-pack Mac OS X'){
           agent { label 'macosx' }
           options { skipDefaultCheckout() }
           when {
@@ -198,7 +198,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "update build test")
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -455,7 +455,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat x-pack Mac OS X", "metricbeat", "build unitTest")
+            mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
           }
         }
         stage('Metricbeat Windows'){
@@ -481,7 +481,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build test")
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
