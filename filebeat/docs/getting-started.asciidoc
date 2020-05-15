@@ -4,7 +4,7 @@
 //TODO: Remove release-state definition before merging.
 
 [[filebeat-getting-started]]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 //TODO: We need to add a separate topic that provides a summary of the different
 //ways to parse log lines: ingest node, dissect processor, Logstash, etc. That
@@ -42,7 +42,7 @@ managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
-[[filebeat-installation]]
+[[installation]]
 === Step 1: Install {beatname_uc}
 
 //REVIEWERS: We don't currently say anything about licensing here. Should we?
@@ -128,7 +128,7 @@ module and connect to {es}. If you're sending events to {ls}, you need to
 // requirements without exposing users to a product they might not need).
 
 [float]
-[[filebeat-starting]]
+[[start]]
 === Step 5: Start {beatname_uc}
 
 Before starting {beatname_uc}, modify the user credentials in
@@ -143,7 +143,7 @@ include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 {beatname_uc} should begin streaming events to {es}.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 6: View your data in {kib}
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
@@ -160,5 +160,9 @@ include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]

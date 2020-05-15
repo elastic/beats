@@ -3,7 +3,7 @@
 //TODO: Remove release-state definition before merging.
 
 [id="{beatname_lc}-getting-started"]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
@@ -31,7 +31,7 @@ managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
-[id="{beatname_lc}-installation"]
+[[install]]
 === Step 1: Install {beatname_uc}
 
 Install {beatname_uc} on all the servers you want to monitor.
@@ -93,7 +93,7 @@ include::{libbeat-dir}/step-look-at-config.asciidoc[]
 include::{libbeat-dir}/shared/setup.asciidoc[]
 
 [float]
-[id="{beatname_lc}-starting"]
+[[start]]
 === Step 5: Start {beatname_uc}
 
 Before starting {beatname_uc}, modify the user credentials in
@@ -114,7 +114,7 @@ If you see a warning about too many open files, you need to increase the
 //command is not ideal for cloud users.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 6: View your data in {kib}
 
 To make it easier for you to start auditing the activities of users and
@@ -134,23 +134,14 @@ image::./images/auditbeat-file-integrity-dashboard.png[Auditbeat File Integrity 
 Now that you have audit data streaming into {es}, learn how to unify your logs,
 metrics, uptime, and application performance data:
 
-//REVIEWERS: I need to tailor this description to SIEM.
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
 
-* Add infrastructure metrics:
-{metricbeat-ref}/metricbeat-getting-started.html[Get started with {metricbeat}]
-* Add logs: 
-{metricbeat-ref}/filebeat-getting-started.html[Get started with {filebeat}]
-* Add uptime info:
-{heartbeat-ref}/heartbeat-getting-started.html[Get Started with {heartbeat}]
-* Add application metrics:
-{apm-get-started-ref}/index.html[APM overview]
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
 
-Then use the Observability apps in {kib} to search across all your data:
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
 
-** Analyze security events in the {kibana-ref}/xpack-siem.html[SIEM app]. 
-** Explore metrics about systems and services across your ecosystem: 
-{kibana-ref}/xpack-infra[Metrics app]
-** Drill down into related log data and tail your logs in real time:
-{kibana-ref}/xpack-logs.html[Logs app]
-** View related traces and monitor application performance:
-{kibana-ref}/xpack-apm.html[APM app]
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]

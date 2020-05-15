@@ -1,5 +1,3 @@
-//TODO: Use attributes for app names.
-
 // tag::obs-intro[]
 Learn how to unify your logs, metrics, uptime, and application performance data:
 // end::obs-intro[]
@@ -20,15 +18,42 @@ Learn how to unify your logs, metrics, uptime, and application performance data:
 * Add application metrics:
 {apm-get-started-ref}/index.html[APM overview]
 // end::add-apm[]
+// tag::add-security[]
+* Collect security events:
+{auditbeat-ref}/auditbeat-getting-started.html[Get started with {auditbeat}]
+// end::add-security[]
+// tag::add-win-logs[]
+* Add Windows event logs:
+{winlogbeat-ref}/winlogbeat-getting-started.html[Get started with {winlogbeat}]
+// end::add-win-logs[]
 
 // tag::obs-apps[]
 Then use the Observability apps in {kib} to search across all your data:
 
 ** Explore metrics about systems and services across your ecosystem: 
-{kibana-ref}/xpack-infra[Metrics app]
+{kibana-ref}/xpack-infra.html[{metrics-app}]
 ** Drill down into related log data and tail your logs in real time:
-{kibana-ref}/xpack-logs.html[Logs app]
+{kibana-ref}/xpack-logs.html[{logs-app}]
 ** Monitor availability issues across your apps and services:
-{kibana-ref}/xpack-infra[Uptime app]
+{kibana-ref}/xpack-uptime.html[{uptime-app}]
 ** Monitor application performance: {kibana-ref}/xpack-apm.html[APM app]
+** Analyze security events in the {kibana-ref}/xpack-siem.html[{siem-app}]. 
+
 // end::obs-apps[]
+
+//Example includes for copy/pasting joy
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-intro]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
+
+//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]

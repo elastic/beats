@@ -1,0 +1,19 @@
+[id="{beatname_lc}-starting"]
+=== Start {beatname_uc}
+
+++++
+<titleabbrev>Start {beatname_uc}</titleabbrev>
+++++
+
+Before starting {beatname_uc}:
+
+* Follow the steps in
+<<{beatname_lc}-getting-started,Get started with {beatname_uc}>> to install, 
+configure, and set up the {beatname_uc} environment.
+* Make sure {kib} and {es} are running.
+* Make sure the user specified in +{beatname_lc}.yml+ has the privileges
+needed to publish events. See <<privileges-to-publish-events>>.
+
+To start {beatname_uc}, run:
+
+include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]

@@ -38,4 +38,4 @@ include::./running-on-docker.asciidoc[]
 
 include::{libbeat-dir}/shared-systemd.asciidoc[]
 
-include::{libbeat-dir}/shared-shutdown.asciidoc[]
+include::{libbeat-dir}/shared/shutdown.asciidoc[]

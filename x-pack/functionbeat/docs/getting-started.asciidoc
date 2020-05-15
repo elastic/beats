@@ -1,6 +1,6 @@
 [id="{beatname_lc}-getting-started"]
 [role="xpack"]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
@@ -8,14 +8,8 @@
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
-* <<{beatname_lc}-installation>>
-* <<{beatname_lc}-configuration>>
-* <<{beatname_lc}-template>>
-* <<{beatname_lc}-deploying>>
-* <<view-kibana-dashboards>>
-
 [float]
-[id="{beatname_lc}-installation"]
+[[install]]
 === Step 1: Download {beatname_uc}
 
 The {beatname_uc} distribution contains the command line tools, configuration
@@ -82,7 +76,7 @@ https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
 endif::[]
 
 [float]
-[id="{beatname_lc}-configuration"]
+[[configuration]]
 === Step 2: Configure {beatname_uc}
 
 Before deploying {beatname_uc} to your cloud provider, you need to specify
@@ -289,11 +283,30 @@ to the configured output.
 If deployment fails, see <<faq>> for help troubleshooting.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 5: View your data in {kib}
 
 There are currently no example dashboards available for {beatname_uc}.
 
 To learn how to view and explore your data, see the
 _{kibana-ref}/index.html[{kib} User Guide]_.
+
+[float]
+=== What's next?
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-intro]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]
 

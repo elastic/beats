@@ -20,6 +20,8 @@ This section includes additional information on how to set up and run
 
 * <<directory-layout>>
 
+* <<keystore>>
+
 * <<command-line-options>>
 
 * <<running-on-docker>>
@@ -27,6 +29,10 @@ This section includes additional information on how to set up and run
 * <<running-on-kubernetes>>
 
 * <<running-with-systemd>>
+
+* <<{beatname_lc}-starting>>
+
+* <<shutdown>>
 
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
@@ -43,4 +49,6 @@ include::./running-on-kubernetes.asciidoc[]
 
 include::{libbeat-dir}/shared-systemd.asciidoc[]
 
-include::{libbeat-dir}/shared-shutdown.asciidoc[]
+include::{libbeat-dir}/shared/start.asciidoc[]
+
+include::{libbeat-dir}/shared/shutdown.asciidoc[]

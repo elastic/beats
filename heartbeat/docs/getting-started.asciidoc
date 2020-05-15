@@ -3,7 +3,7 @@
 //TODO: Remove release-state definition before merging.
 
 [[heartbeat-getting-started]]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
@@ -33,7 +33,7 @@ managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
-[[heartbeat-installation]]
+[[installation]]
 === Step 1: Install Heartbeat
 
 Unlike most Beats, which you install on edge nodes, you typically install
@@ -61,7 +61,7 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 [float]
-[[heartbeat-configuration]]
+[[condiguration]]
 === Step 3: Configure Heartbeat monitors
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
@@ -106,7 +106,7 @@ Heartbeat dashboards and installation steps are available in the
 https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [float]
-[[heartbeat-starting]]
+[[start]]
 === Step 5: Start Heartbeat
 
 Before starting {beatname_uc}, modify the user credentials in
@@ -124,7 +124,7 @@ Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 6: View your data in {kib}
 
 {beatname_uc} comes with preconfigured dashboards and UIs for visualizing the
@@ -149,9 +149,10 @@ include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
 
-//include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
-
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
 
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
 
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]

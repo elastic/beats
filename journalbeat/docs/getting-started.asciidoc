@@ -3,7 +3,7 @@
 //TODO: Remove release-state definition before merging.
 
 [id="{beatname_lc}-getting-started"]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
@@ -33,7 +33,7 @@ managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
-[id="{beatname_lc}-installation"]
+[[install]]
 === Step 1: Install {beatname_uc}
 
 Install {beatname_uc} on all the servers you want to monitor.
@@ -59,7 +59,7 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 
 [float]
-[id="{beatname_lc}-configuration"]
+[[configuration]]
 === Step 3: Configure {beatname_uc}
 
 Before running {beatname_uc}, specify the location of the systemd journal files
@@ -112,7 +112,7 @@ include::{libbeat-dir}/step-look-at-config.asciidoc[]
 include::{libbeat-dir}/shared/setup.asciidoc[]
 
 [float]
-[id="{beatname_lc}-starting"]
+[[start]]
 === Step 5: Start {beatname_uc}
 
 Before starting {beatname_uc}, modify the user credentials in
@@ -127,7 +127,7 @@ include::{libbeat-dir}/tab-widgets/start-widget-deb-rpm-linux.asciidoc[]
 {beatname_uc} is now ready to send journal events to the {es}.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 6: View your data in {kib}
 
 The {beatname_uc} dashboard is currently broken. To start exploring your data,
@@ -151,13 +151,18 @@ include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
 
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
+
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]
 
 
-The Logs app shows logs
-from `filebeat-*` indices by default. To show {beatname_uc} indices, configure
-the source to include `journalbeat-*`. You can do this in the Logs app when you
-configure the source, or you can modify the {kib} configuration. For example:
+TIP: The {logs-app} shows logs from `filebeat-*` indices by default. To show
+{beatname_uc} indices, configure the source to include `journalbeat-*`. You can
+do this in the {logs-app} when you configure the source, or you can modify the {kib}
+configuration. For
+example:
 +
 [source,yaml]
 ----

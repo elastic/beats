@@ -12,6 +12,6 @@ Each Beat is a separately installable product. To learn how to get started, see:
 * {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
 * {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
 
-If you're planning to use the Metrics app or the Logs app in {kib},
+If you're planning to use the {metrics-app} or the {logs-app} in {kib},
 also see the {metrics-guide}[Metrics Monitoring Guide]
 and the {logs-guide}[Logs Monitoring Guide].

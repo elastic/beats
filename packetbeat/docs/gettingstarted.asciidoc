@@ -3,7 +3,7 @@
 //TODO: Remove release-state definition before merging.
 
 [[packetbeat-getting-started]]
-== Get started with {beatname_uc}
+== Get started: install and configure {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
@@ -36,7 +36,7 @@ managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
-[[packetbeat-installation]]
+[[installation]]
 === Step 1: Install Packetbeat
 
 Install {beatname_uc} on all the servers you want to monitor.
@@ -184,7 +184,7 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 
 [float]
-[[packetbeat-configuration]]
+[[configuration]]
 === Step 3: Configure sniffing
 
 include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
@@ -278,7 +278,7 @@ include::{libbeat-dir}/step-look-at-config.asciidoc[]
 include::{libbeat-dir}/shared/setup.asciidoc[]
 
 [float]
-[[packetbeat-starting]]
+[[start]]
 === Step 5: Start Packetbeat
 
 Before starting {beatname_uc}, modify the user credentials in
@@ -293,7 +293,7 @@ include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 {beatname_uc} should begin streaming data to {es}.
 
 [float]
-[[view-kibana-dashboards]]
+[[view-data]]
 === Step 6: View your data in {kib}
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
@@ -313,8 +313,14 @@ include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-intro]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
 
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
+
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]

@@ -14,7 +14,7 @@
 
 ifdef::has_solutions[]
 TIP: For deeper observability into your infrastructure, you can use the
-Metrics app and the Logs app in {kib}.
+{metrics-app} and the {logs-app} in {kib}.
 For more details, see the {metrics-guide}[Metrics Monitoring Guide]
 and the {logs-guide}[Logs Monitoring Guide].
 endif::has_solutions[]
