@@ -13,7 +13,7 @@ import groovy.transform.Field
 /**
  List of supported windows versions to be tested with
 */
-@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012', 'windows-7', 'windows-7-32-bit', 'windows-2008', 'windows-2008-r2', 'windows-10']
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012-r2', 'windows-10', 'windows-2008', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit']
 
 pipeline {
   agent { label 'ubuntu && immutable' }
@@ -692,7 +692,7 @@ def mageTarget(String context, String directory, String target) {
 def mageTargetWin(String context, String directory, String target, String label) {
   return {
     log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
-    node("windows-immutable && ${label}"){
+    node("immutable && ${label}"){
       withBeatsEnvWin() {
         whenTrue(params.debug) {
           dumpFilteredEnvironment()
