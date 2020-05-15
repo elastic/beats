@@ -46,6 +46,8 @@ var:
   - name: ssl
     default: |-
       {}
+  - name: tags
+    default: [forwarded]
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.yml

@@ -4622,10 +4622,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
 
-type: keyword
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -4662,7 +4664,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -26871,6 +26873,26 @@ kvm module
 
 
 
+*`kvm.id`*::
++
+--
+Domain id
+
+
+type: long
+
+--
+
+*`kvm.name`*::
++
+--
+Domain name
+
+
+type: keyword
+
+--
+
 [float]
 === kvm
 
@@ -26938,37 +26960,10 @@ status
 
 
 
-[float]
-=== stat
-
-Memory stat
-
-
-
-*`kvm.status.stat.state`*::
+*`kvm.status.state`*::
 +
 --
-domain state
-
-
-type: keyword
-
---
-
-*`kvm.status.id`*::
-+
---
-Domain id
-
-
-type: long
-
---
-
-*`kvm.status.name`*::
-+
---
-Domain name
+Domain state
 
 
 type: keyword

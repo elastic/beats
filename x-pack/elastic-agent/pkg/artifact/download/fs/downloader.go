@@ -42,7 +42,7 @@ func NewDownloader(config *artifact.Config) *Downloader {
 func (e *Downloader) Download(_ context.Context, programName, version string) (string, error) {
 	// create a destination directory root/program
 	destinationDir := filepath.Join(e.config.TargetDirectory, programName)
-	if err := os.MkdirAll(destinationDir, os.ModeDir); err != nil {
+	if err := os.MkdirAll(destinationDir, 0755); err != nil {
 		return "", errors.New(err, "creating directory for downloaded artifact failed", errors.TypeFilesystem, errors.M(errors.MetaKeyPath, destinationDir))
 	}
 

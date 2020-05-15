@@ -55,6 +55,9 @@
         "source.geo.region_name": "Leinster",
         "source.ip": "52.213.180.42",
         "source.packets": 8,
-        "source.port": 43416
+        "source.port": 43416,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

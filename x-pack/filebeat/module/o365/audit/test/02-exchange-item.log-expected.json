@@ -55,6 +55,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -114,6 +117,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -173,6 +179,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -232,6 +241,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -291,6 +303,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -350,6 +365,9 @@
         "server.address": "DB7PR01MB4428 (15.20.2707.031)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.sqtielgo@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -409,6 +427,9 @@
         "server.address": "DB3PR0102MB3500 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "AllCompany.4529848321.eqpfynvc@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -468,6 +489,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     },
@@ -527,6 +551,9 @@
         "server.address": "AM6PR01MB4535 (15.20.2729.032)\n",
         "service.type": "o365",
         "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
         "user.email": "SIEMTest@testsiem.onmicrosoft.com",
         "user.id": "S-1-5-18"
     }

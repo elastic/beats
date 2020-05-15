@@ -48,7 +48,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -106,7 +109,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 68,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -164,7 +170,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 78,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -216,7 +225,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 1,
-        "source.port": 22
+        "source.port": 22,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -267,7 +279,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -318,7 +333,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 50646
+        "source.port": 50646,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -376,7 +394,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -434,7 +455,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 92,
-        "source.port": 33880
+        "source.port": 33880,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -492,7 +516,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 247,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -550,7 +577,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 63,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -602,7 +632,10 @@
         "source.geo.region_name": "Saint Petersburg",
         "source.ip": "192.0.2.23",
         "source.packets": 3,
-        "source.port": 59679
+        "source.port": 59679,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -660,7 +693,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 94,
-        "source.port": 33576
+        "source.port": 33576,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -718,7 +754,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 356,
-        "source.port": 33562
+        "source.port": 33562,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -776,7 +815,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33692
+        "source.port": 33692,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -834,7 +876,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 360,
-        "source.port": 33542
+        "source.port": 33542,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -892,7 +937,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 99,
-        "source.port": 33970
+        "source.port": 33970,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -940,7 +988,10 @@
         "source.bytes": 34509840,
         "source.ip": "203.0.113.93",
         "source.packets": 8690,
-        "source.port": 9243
+        "source.port": 9243,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -991,7 +1042,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 34836
+        "source.port": 34836,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1049,7 +1103,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 367,
-        "source.port": 33554
+        "source.port": 33554,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1102,7 +1159,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 608,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1160,7 +1220,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 258,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1208,7 +1271,10 @@
         "source.domain": "simianhacker-demo",
         "source.ip": "10.49.136.133",
         "source.packets": 44438,
-        "source.port": 46864
+        "source.port": 46864,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1259,7 +1325,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 33478
+        "source.port": 33478,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1317,7 +1386,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 241,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1370,7 +1442,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 732,
-        "source.port": 65320
+        "source.port": 65320,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1428,7 +1503,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 246,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1486,7 +1564,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 340,
-        "source.port": 33548
+        "source.port": 33548,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1537,7 +1618,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1590,7 +1674,10 @@
         "source.geo.region_name": "Vinh Phuc Province",
         "source.ip": "192.0.2.165",
         "source.packets": 18,
-        "source.port": 59623
+        "source.port": 59623,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1648,7 +1735,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 363,
-        "source.port": 33552
+        "source.port": 33552,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1699,7 +1789,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33924
+        "source.port": 33924,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1757,7 +1850,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 260,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1815,7 +1911,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 265,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1868,7 +1967,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 607,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1926,7 +2028,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 356,
-        "source.port": 33534
+        "source.port": 33534,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1984,7 +2089,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 735,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2035,7 +2143,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2088,7 +2199,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 594,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2146,7 +2260,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 58,
-        "source.port": 33524
+        "source.port": 33524,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2204,7 +2321,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 130,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2262,7 +2382,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 250,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2320,7 +2443,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 37,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2378,7 +2504,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 237,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2436,7 +2565,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 353,
-        "source.port": 33694
+        "source.port": 33694,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2487,7 +2619,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2540,7 +2675,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 605,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2591,7 +2729,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 33862
+        "source.port": 33862,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2644,7 +2785,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 737,
-        "source.port": 65321
+        "source.port": 65321,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2697,7 +2841,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 600,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2755,7 +2902,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.101",
         "source.packets": 949,
-        "source.port": 49680
+        "source.port": 49680,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2813,7 +2963,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.177",
         "source.packets": 227,
-        "source.port": 60112
+        "source.port": 60112,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2871,7 +3024,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 270,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2924,7 +3080,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 709,
-        "source.port": 65316
+        "source.port": 65316,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2977,7 +3136,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 728,
-        "source.port": 65263
+        "source.port": 65263,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3028,7 +3190,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 50438
+        "source.port": 50438,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3079,7 +3244,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3132,7 +3300,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 11,
-        "source.port": 22
+        "source.port": 22,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3190,7 +3361,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 353,
-        "source.port": 33558
+        "source.port": 33558,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3248,7 +3422,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 354,
-        "source.port": 33548
+        "source.port": 33548,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3301,7 +3478,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 717,
-        "source.port": 65271
+        "source.port": 65271,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3352,7 +3532,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 34178
+        "source.port": 34178,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3403,7 +3586,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33602
+        "source.port": 33602,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3461,7 +3647,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 366,
-        "source.port": 33554
+        "source.port": 33554,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3512,7 +3701,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3563,7 +3755,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 52454
+        "source.port": 52454,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3621,7 +3816,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3672,7 +3870,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3730,7 +3931,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33530
+        "source.port": 33530,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3788,7 +3992,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 366,
-        "source.port": 33556
+        "source.port": 33556,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3846,7 +4053,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 86,
-        "source.port": 33570
+        "source.port": 33570,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3904,7 +4114,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 247,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3955,7 +4168,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4013,7 +4229,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 118,
-        "source.port": 33858
+        "source.port": 33858,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4064,7 +4283,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33064
+        "source.port": 33064,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4122,7 +4344,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4173,7 +4398,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 53706
+        "source.port": 53706,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4224,7 +4452,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 52260
+        "source.port": 52260,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4275,7 +4506,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4326,7 +4560,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4377,7 +4614,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4428,7 +4668,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 34906
+        "source.port": 34906,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4479,7 +4722,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4537,7 +4783,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33534
+        "source.port": 33534,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4595,7 +4844,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 358,
-        "source.port": 33510
+        "source.port": 33510,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4646,7 +4898,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 58216
+        "source.port": 58216,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4704,7 +4959,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 243,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4755,7 +5013,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4806,7 +5067,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4857,7 +5121,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 34090
+        "source.port": 34090,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4915,7 +5182,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 246,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4973,7 +5243,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 71,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -5031,7 +5304,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 75,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5089,7 +5365,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 249,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5147,7 +5426,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 357,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5205,7 +5487,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 242,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5263,7 +5548,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 244,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5321,7 +5609,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.177",
         "source.packets": 708,
-        "source.port": 60108
+        "source.port": 60108,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5379,7 +5670,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 74,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5437,7 +5731,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 95,
-        "source.port": 33968
+        "source.port": 33968,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5495,6 +5792,9 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 351,
-        "source.port": 33590
+        "source.port": 33590,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

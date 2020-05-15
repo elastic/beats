@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
@@ -195,7 +196,7 @@ func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Meta == nil {
 		event.Meta = common.MapStr{}
 	}
-	event.Meta["raw_index"] = p.indexStr
+	event.Meta[events.FieldMetaRawIndex] = p.indexStr
 	return event, nil
 }
 
