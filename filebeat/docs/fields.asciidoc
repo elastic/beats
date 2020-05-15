@@ -9519,6 +9519,16 @@ type: ip
 
 --
 
+*`cisco.asa.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.asa.mapped_source_port`*::
 +
 --
@@ -9536,6 +9546,16 @@ The translated destination IP address.
 
 
 type: ip
+
+--
+
+*`cisco.asa.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
@@ -9708,6 +9728,16 @@ type: ip
 
 --
 
+*`cisco.ftd.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.ftd.mapped_source_port`*::
 +
 --
@@ -9725,6 +9755,16 @@ The translated destination IP address. Use ECS destination.nat.ip.
 
 
 type: ip
+
+--
+
+*`cisco.ftd.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
