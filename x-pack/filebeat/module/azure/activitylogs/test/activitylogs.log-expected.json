@@ -48,6 +48,9 @@
         "log.level": "Information",
         "log.offset": 0,
         "service.type": "azure",
-        "source.ip": "51.251.141.41"
+        "source.ip": "51.251.141.41",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

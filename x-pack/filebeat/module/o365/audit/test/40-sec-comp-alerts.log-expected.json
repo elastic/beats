@@ -57,6 +57,9 @@
         ],
         "rule.ruleset": "User",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
@@ -108,6 +111,9 @@
         "rule.name": "Elevation of Exchange admin privilege",
         "rule.reference": "http://example.net/single",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "SecurityComplianceAlerts"
     },
     {
@@ -159,6 +165,9 @@
         "rule.name": "Phony Malware Alert",
         "rule.ruleset": "MalwareFamily",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "threat.technique.id": "Malware/Evil.Malware.B",
         "user.id": "SecurityComplianceAlerts"
     }

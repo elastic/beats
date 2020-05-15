@@ -30,7 +30,10 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51600"
+        "source.port": "51600",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:07.523Z",
@@ -63,7 +66,10 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51726"
+        "source.port": "51726",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:08.477Z",
@@ -96,7 +102,10 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51734"
+        "source.port": "51734",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:09.174Z",
@@ -129,7 +138,10 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51738"
+        "source.port": "51738",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:26:14.308Z",
@@ -162,7 +174,10 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "46288"
+        "source.port": "46288",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:26:19.318Z",
@@ -195,6 +210,9 @@
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "46304"
+        "source.port": "46304",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]
