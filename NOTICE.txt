@@ -1683,7 +1683,7 @@ limitations under the License.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit/v2
 Version: v2.0.0
-Revision: 006fb639806f
+Revision: 92371bef3fb8
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-libaudit/v2/LICENSE.txt:
 --------------------------------------------------------------------
