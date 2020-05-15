@@ -343,6 +343,9 @@ field. You can revert this change by configuring tags for the module and omittin
 
 *Journalbeat*
 
+- Added an `id` config option to inputs to allow running multiple inputs on the
+  same journal. {pull}18467{18467}
+
 *Metricbeat*
 
 - Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]

@@ -18,6 +18,11 @@ journalbeat.inputs:
   # When empty starts to read from local journal.
 - paths: []
 
+  # An optional unique identifier for the input. By providing a unique `id` you
+  # can operate multiple inputs on the same journal. This allows each input's
+  # cursor to be persisted independently in the registry file.
+  #id: ""
+
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
   # The maximum number of seconds to wait before attempting to read again from journals.

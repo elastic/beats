@@ -267,7 +267,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	}
 
 	state := checkpoint.JournalState{
-		Path:               r.config.Path,
+		Path:               r.config.CheckpointID,
 		Cursor:             entry.Cursor,
 		RealtimeTimestamp:  entry.RealtimeTimestamp,
 		MonotonicTimestamp: entry.MonotonicTimestamp,
