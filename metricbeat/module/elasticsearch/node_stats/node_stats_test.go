@@ -27,22 +27,22 @@ import (
 
 func TestGetServiceURI(t *testing.T) {
 	tests := map[string]struct {
-		hostsMode   elasticsearch.HostsMode
+		scope       elasticsearch.Scope
 		expectedURI string
 	}{
-		"mode_node": {
-			hostsMode:   elasticsearch.HostsModeNode,
+		"scope_node": {
+			scope:       elasticsearch.ScopeNode,
 			expectedURI: "/_nodes/_local/stats",
 		},
-		"mode_cluster": {
-			hostsMode:   elasticsearch.HostsModeCluster,
+		"scope_cluster": {
+			scope:       elasticsearch.ScopeCluster,
 			expectedURI: "/_nodes/_all/stats",
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			newURI, err := getServiceURI("/foo/bar", test.hostsMode)
+			newURI, err := getServiceURI("/foo/bar", test.scope)
 			require.NoError(t, err)
 			require.Equal(t, test.expectedURI, newURI)
 		})

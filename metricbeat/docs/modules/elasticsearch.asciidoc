@@ -56,7 +56,7 @@ metricbeat.modules:
   # a distinct Elasticsearch cluster, e.g. a load-balancer fronting the cluster.
   # Set to node (default) to treat each item in the hosts list as an individual
   # node in the Elasticsearch cluster.
-  #hosts_mode: node
+  #scope: node
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

@@ -91,7 +91,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) updateServiceURI() error {
-	u, err := getServiceURI(m.GetURI(), m.HostsMode)
+	u, err := getServiceURI(m.GetURI(), m.Scope)
 	if err != nil {
 		return err
 	}
@@ -101,14 +101,14 @@ func (m *MetricSet) updateServiceURI() error {
 
 }
 
-func getServiceURI(currURI string, hostsMode elasticsearch.HostsMode) (string, error) {
+func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
 	u, err := url.Parse(currURI)
 	if err != nil {
 		return "", err
 	}
 
 	u.Path = nodeLocalStatsPath
-	if hostsMode == elasticsearch.HostsModeCluster {
+	if scope == elasticsearch.ScopeCluster {
 		u.Path = nodesAllStatsPath
 	}
 

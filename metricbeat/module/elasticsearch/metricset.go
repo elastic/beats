@@ -38,26 +38,26 @@ var (
 	}.Build()
 )
 
-type HostsMode int
+type Scope int
 
 const (
 	// Indicates that each item in the hosts list points to a distinct Elasticsearch node in a
 	// cluster.
-	HostsModeNode HostsMode = iota
+	ScopeNode Scope = iota
 
 	// Indicates that each item in the hosts lists points to a endpoint for a distinct Elasticsearch
 	// cluster (e.g. a load-balancing proxy) fronting the cluster.
-	HostsModeCluster
+	ScopeCluster
 )
 
-func (h *HostsMode) Unpack(str string) error {
+func (h *Scope) Unpack(str string) error {
 	switch str {
 	case "node":
-		*h = HostsModeNode
+		*h = ScopeNode
 	case "cluster":
-		*h = HostsModeCluster
+		*h = ScopeCluster
 	default:
-		return fmt.Errorf("invalid hosts_mode: %v", str)
+		return fmt.Errorf("invalid scope: %v", str)
 	}
 
 	return nil
@@ -69,8 +69,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	XPack     bool
-	HostsMode HostsMode
+	XPack bool
+	Scope Scope
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -82,11 +82,11 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack     bool      `config:"xpack.enabled"`
-		HostsMode HostsMode `config:"hosts_mode"`
+		XPack bool  `config:"xpack.enabled"`
+		Scope Scope `config:"scope"`
 	}{
-		XPack:     false,
-		HostsMode: HostsModeNode,
+		XPack: false,
+		Scope: ScopeNode,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.XPack,
-		config.HostsMode,
+		config.Scope,
 	}
 
 	ms.SetServiceURI(servicePath)

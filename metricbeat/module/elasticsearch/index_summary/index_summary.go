@@ -64,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
 	// we don't collect the same stats from every node and end up duplicating them.
-	if m.HostsMode == elasticsearch.HostsModeNode {
+	if m.Scope == elasticsearch.ScopeNode {
 		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 		if err != nil {
 			return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
