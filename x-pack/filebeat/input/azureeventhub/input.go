@@ -204,7 +204,6 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
-	var arrayObject []interface{}
 	var messages []string
 	// check if the message is an object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
@@ -222,6 +221,7 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	} else {
 		// in some cases the message is an array
 		a.log.Debugw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "warning", err)
+		var arrayObject []interface{}
 		err = json.Unmarshal(bMessage, &arrayObject)
 		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
