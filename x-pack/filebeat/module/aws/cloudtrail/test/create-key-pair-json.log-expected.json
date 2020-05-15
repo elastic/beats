@@ -32,6 +32,9 @@
         "source.geo.region_iso_code": "US-VA",
         "source.geo.region_name": "Virginia",
         "source.ip": "72.21.198.64",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

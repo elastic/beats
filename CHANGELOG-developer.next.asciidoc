@@ -33,7 +33,6 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
 - `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
 - Require logger as first parameter for `outputs.transport.transport#ProxyDialer` and `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
-
 - The `libbeat/outputs/transport` package has been moved to `libbeat/common/transport`. {pull}16734[16734]
 - The `libbeat/outputs/tls.go` file has been removed. All exported symbols in that file (`libbeat/outputs.*`) are now available as `libbeat/common/tlscommon.*`. {pull}16734[16734]
 - The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
@@ -87,3 +86,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
 - Add fields validation for histogram subfields. {pull}17759[17759]
 - Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]
+- Events intended for the Elasticsearch output can now take an `op_type` metadata field of type events.OpType or string to indicate the `op_type` to use for bulk indexing. {pull}12606[12606]
