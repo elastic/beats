@@ -87,7 +87,7 @@ type object struct {
 	Key string `json:"key"`
 }
 
-type s3BucketOjbect struct {
+type s3BucketObject struct {
 	bucket `json:"bucket"`
 	object `json:"object"`
 }
@@ -97,7 +97,7 @@ type sqsMessage struct {
 		EventSource string         `json:"eventSource"`
 		AwsRegion   string         `json:"awsRegion"`
 		EventName   string         `json:"eventName"`
-		S3          s3BucketOjbect `json:"s3"`
+		S3          s3BucketObject `json:"s3"`
 	} `json:"Records"`
 }
 
@@ -534,7 +534,7 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 			}
 		} else if err != nil {
 			// decode json failed, skip this log file
-			p.logger.Warnf(fmt.Sprintf("Decode json failed for '%s', skipping this file", s3Info.key))
+			p.logger.Warnf(fmt.Sprintf("Decode json failed for '%s', skipping this file: %s", s3Info.key, err))
 			return nil
 		}
 
