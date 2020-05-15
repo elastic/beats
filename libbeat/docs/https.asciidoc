@@ -119,7 +119,7 @@ ifndef::apm-server[]
 [[securing-communication-kibana]]
 === Secure communication with the Kibana endpoint
 
-If you've configured the <<setup-kibana-endpoint,{kib} endpoint>>,
+If you've configured the {kib} endpoint,
 you can also specify credentials for authenticating with {kib} under `kibana.setup`.
 If no credentials are specified, Kibana will use the configured authentication method
 in the Elasticsearch output.
