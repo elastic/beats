@@ -75,7 +75,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:30.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -112,7 +111,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:43.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -149,7 +147,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:49:50.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -180,7 +177,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:50:09.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -211,7 +207,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:05.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -248,7 +243,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -288,7 +282,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:55:57.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -328,7 +321,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -368,7 +360,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:24.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -408,7 +399,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -448,7 +438,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:36.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -488,7 +477,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -528,7 +516,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -568,7 +555,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:54.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -608,7 +594,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -648,7 +633,6 @@
     },
     {
         "@timestamp": "2020-02-07T11:56:56.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -688,7 +672,6 @@
     },
     {
         "@timestamp": "2020-02-07T12:00:28.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -725,7 +708,6 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -765,7 +747,6 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:38.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
@@ -805,7 +786,6 @@
     },
     {
         "@timestamp": "2020-02-07T12:02:42.000Z",
-        "agent.name": "Christoss-MacBook-Pro.local",
         "event.dataset": "nginx.ingress_controller",
         "event.module": "nginx",
         "event.timezone": "-02:00",
