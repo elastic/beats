@@ -191,8 +191,8 @@ func checkDocker(t *testing.T, file string) {
 	// the root group. This is done in order to allow the docker image to run on secured Kubernetes environment where
 	// the user ID used to run a container can't be known in advance.
 	checkConfigPermissionsWithMode(t, p, os.FileMode(0660))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0660))
 
-	checkManifestPermissionsWithMode(t, p, os.FileMode(0640))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 }
