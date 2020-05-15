@@ -18,7 +18,7 @@ by {beatname_uc}
 create visualizations that access {beatname_uc} data
 
 
-{security} provides {ref}/built-in-roles.html[built-in roles] that grant a
+{es-security-features} provides {ref}/built-in-roles.html[built-in roles] that grant a
 subset of the privileges needed by {beatname_uc} users. When possible, use the
 built-in roles to minimize the affect of future changes on your security
 strategy.
@@ -117,7 +117,7 @@ Omit any roles that aren't relevant in your environment.
 <titleabbrev>Create a _monitoring_ user</titleabbrev>
 ++++
 
-{security} provides built-in users and roles for monitoring. The privileges and
+{es-security-features} provides built-in users and roles for monitoring. The privileges and
 roles needed depend on the method used to collect monitoring data.
 
 [IMPORTANT]
@@ -130,7 +130,7 @@ grant it the roles described in the following sections.
 ====
 
 * If you're using <<monitoring-internal-collection,internal collection>> to
-collect metrics about {beatname_uc}, {security} provides
+collect metrics about {beatname_uc}, {es-security-features} provides
 the +{beat_monitoring_user}+ {ref}/built-in-users.html[built-in user] and
 +{beat_monitoring_user}+ {ref}/built-in-roles.html[built-in role] to send
 monitoring information. You can use the built-in user, if it's available in your
@@ -180,7 +180,7 @@ users who need to monitor {beatname_uc}:
 ifndef::serverless[]
 
 * If you're <<monitoring-metricbeat-collection,using {metricbeat}>> to collect
-metrics about {beatname_uc}, {security} provides the `remote_monitoring_user`
+metrics about {beatname_uc}, {es-security-features} provides the `remote_monitoring_user`
 {ref}/built-in-users.html[built-in user], and the `remote_monitoring_collector`
 and `remote_monitoring_agent` {ref}/built-in-roles.html[built-in roles] for
 collecting and sending monitoring information. You can use the built-in user, if
