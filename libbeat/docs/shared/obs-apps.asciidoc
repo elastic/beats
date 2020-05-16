@@ -1,43 +1,41 @@
 // tag::obs-intro[]
-Learn how to unify your logs, metrics, uptime, and application performance data:
+Learn how to unify your logs, metrics, uptime, and application performance data.
+
+Install and configure other {beats} shippers to ingest data:
 // end::obs-intro[]
 
 // tag::add-metrics[]
-* Add infrastructure metrics:
-{metricbeat-ref}/metricbeat-getting-started.html[Get started with {metricbeat}]
+* {metricbeat-ref}/metricbeat-getting-started.html[{metricbeat}] for
+infrastructure metrics
 // end::add-metrics[]
 // tag::add-logs[]
-* Add logs:
-{filebeat-ref}/filebeat-getting-started.html[Get started with {filebeat}]
+* {filebeat-ref}/filebeat-getting-started.html[{filebeat}] for logs
 // end::add-logs[]
 // tag::add-uptime[]
-* Add uptime info:
-{heartbeat-ref}/heartbeat-getting-started.html[Get Started with {heartbeat}]
+* {heartbeat-ref}/heartbeat-getting-started.html[{heartbeat}] for uptime info
 // end::add-uptime[]
 // tag::add-apm[]
-* Add application metrics:
-{apm-get-started-ref}/index.html[APM overview]
+* {apm-get-started-ref}/index.html[APM] for application metrics
 // end::add-apm[]
 // tag::add-security[]
-* Collect security events:
-{auditbeat-ref}/auditbeat-getting-started.html[Get started with {auditbeat}]
+* {auditbeat-ref}/auditbeat-getting-started.html[{auditbeat}] for security
+events
 // end::add-security[]
 // tag::add-win-logs[]
-* Add Windows event logs:
-{winlogbeat-ref}/winlogbeat-getting-started.html[Get started with {winlogbeat}]
+* {winlogbeat-ref}/winlogbeat-getting-started.html[{winlogbeat}] for Windows
+event logs
 // end::add-win-logs[]
 
 // tag::obs-apps[]
 Then use the Observability apps in {kib} to search across all your data:
 
-** Explore metrics about systems and services across your ecosystem: 
-{kibana-ref}/xpack-infra.html[{metrics-app}]
-** Drill down into related log data and tail your logs in real time:
-{kibana-ref}/xpack-logs.html[{logs-app}]
-** Monitor availability issues across your apps and services:
-{kibana-ref}/xpack-uptime.html[{uptime-app}]
-** Monitor application performance: {kibana-ref}/xpack-apm.html[APM app]
-** Analyze security events in the {kibana-ref}/xpack-siem.html[{siem-app}]. 
+* {kibana-ref}/xpack-infra.html[{metrics-app}] to explore metrics about systems
+and services across your ecosystem 
+* {kibana-ref}/xpack-logs.html[{logs-app}] to tail related log data in real time
+* {kibana-ref}/xpack-uptime.html[{uptime-app}] to monitor availability issues
+across your apps and services
+* {kibana-ref}/xpack-apm.html[APM app] to monitor application performance 
+* {kibana-ref}/xpack-siem.html[{siem-app}] to analyze security events
 
 // end::obs-apps[]
 

@@ -30,9 +30,9 @@ include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]
 [[installation]]
-=== Step 1: Install Winlogbeat
+=== Step 1: Install {beatname_uc}
 
-. Download the Winlogbeat zip file from the
+. Download the {beatname_uc} zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
@@ -61,7 +61,7 @@ NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
 
-Before starting Winlogbeat, you should look at the configuration options in the
+Before starting {beatname_uc}, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
 There’s also a full example configuration file called `winlogbeat.reference.yml` that
 shows all non-deprecated options. For more information about these options, see
@@ -75,35 +75,12 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 [float]
 [[configuration]]
-=== Step 3: Configure Winlogbeat
+=== Step 3: Configure {beatname_uc}
 
-To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+In `winlogbeat.yml`, configure the event logs that you want to monitor.
 
-Here is a sample of the `winlogbeat.yml` file:
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
-  - name: Security
-  - name: System
-
-output.elasticsearch:
-  hosts:
-    - localhost:9200
-
-logging.to_files: true
-logging.files:
-  path: C:\ProgramData\winlogbeat\Logs
-logging.level: info
---------------------------------------------------------------------------------
-
-To configure Winlogbeat:
-
-. In the `event_logs` section, specify the event logs that you want to monitor.
-By default, Winlogbeat is set to monitor application, security, and system logs:
+. Under `winlogbeat.event_log`, specify a list of event logs to monitor. By
+default, {beatname_uc} monitors application, security, and system logs.
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -124,9 +101,15 @@ For more information about this command, see the configuration details for
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml -e
 ----------------------------------------------------------------------
 
+//REVIEWERS: I've removed the logging section from the example shown above
+//because I don't think it's necessary and might confuse users.
+
 [float]
 [[config-winlogbeat-logstash]]
-=== Step 4: Configure Winlogbeat to use Logstash
+=== Step 4: Configure {beatname_uc} to use {ls}
+
+//REVIEWERS: Do we want to show the LS steps here or point users to ingest node
+//instead?
 
 include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
 
@@ -147,9 +130,9 @@ include::{libbeat-dir}/tab-widgets/setup.asciidoc[tag=win]
 
 [float]
 [[start]]
-=== Step 6: Start Winlogbeat
+=== Step 6: Start {beatname_uc}
 
-Start the Winlogbeat service with the following command. If you are accessing a
+Start the {beatname_uc} service with the following command. If you are accessing a
 secured Elasticsearch cluster, make sure you've configured credentials as
 described in <<{beatname_lc}-configuration>>.
 
@@ -158,7 +141,7 @@ described in <<{beatname_lc}-configuration>>.
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ----------------------------------------------------------------------
 
-Winlogbeat should now be running. If you used the configuration described here,
+{beatname_uc} should now be running. If you used the configuration described here,
 then you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services
@@ -171,9 +154,9 @@ PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
 
 [float]
-==== Stop Winlogbeat
+==== Stop {beatname_uc}
 
-Stop the Winlogbeat service with the following command:
+Stop the {beatname_uc} service with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -189,7 +172,7 @@ include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
 [role="screenshot"]
-image::./images/winlogbeat-dashboard.png[Winlogbeat statistics]
+image::./images/winlogbeat-dashboard.png[{beatname_uc} statistics]
 
 [float]
 === What's next?
