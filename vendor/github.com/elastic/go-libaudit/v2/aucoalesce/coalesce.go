@@ -26,13 +26,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/go-libaudit/auparse"
+	"github.com/elastic/go-libaudit/v2/auparse"
 	"github.com/pkg/errors"
 )
 
 // modeBlockDevice is the file mode bit representing block devices. This OS
 // package does not have a constant defined for this.
 const modeBlockDevice = 060000
+
+// ECSEvent contains ECS-specific categorization fields
+type ECSEvent struct {
+	Category []string `json:"category,omitempty" yaml:"category,omitempty"`
+	Type     []string `json:"type,omitempty" yaml:"type,omitempty"`
+	Outcome  string   `json:"outcome,omitempty" yaml:"outcome,omitempty"`
+}
 
 type Event struct {
 	Timestamp time.Time                `json:"@timestamp"       yaml:"timestamp"`
@@ -53,6 +60,10 @@ type Event struct {
 
 	Data  map[string]string   `json:"data,omitempty"  yaml:"data,omitempty"`
 	Paths []map[string]string `json:"paths,omitempty" yaml:"paths,omitempty"`
+
+	ECS struct {
+		Event ECSEvent `json:"event" yaml:"event"`
+	} `json:"ecs" yaml:"ecs"`
 
 	Warnings []error `json:"-" yaml:"-"`
 }
@@ -427,10 +438,17 @@ func addFieldsToEventData(msg *auparse.AuditMessage, event *Event) {
 func applyNormalization(event *Event) {
 	setHowDefaults(event)
 
+	var syscallNorm *Normalization
+	if syscall, ok := event.Data["syscall"]; ok {
+		syscallNorm, ok = syscallNorms[syscall]
+		if !ok {
+			syscallNorm = syscallNorms["*"] // get the default to add some basic categorization
+		}
+	}
+
 	var norm *Normalization
 	if event.Type == auparse.AUDIT_SYSCALL {
-		syscall := event.Data["syscall"]
-		norm = syscallNorms[syscall]
+		norm = syscallNorm
 	} else {
 		norms := recordTypeNorms[event.Type.String()]
 		switch len(norms) {
@@ -452,6 +470,23 @@ func applyNormalization(event *Event) {
 	if norm == nil {
 		event.Warnings = append(event.Warnings, errors.New("no normalization found for event"))
 		return
+	}
+
+	event.ECS.Event.Category = norm.ECS.Category.Values
+	event.ECS.Event.Type = norm.ECS.Type.Values
+
+	// we check to see if the non-AUDIT_SYSCALL event has an associated syscall
+	// from another part of the auditd message log, if it does and we have normalizations
+	// for that syscall, we merge the ECS categorization and type information so that
+	// the event has both enrichment for the record type itself and for the syscall it
+	// captures
+	hasAdditionalNormalization := syscallNorm != nil && syscallNorm != norm
+	if hasAdditionalNormalization {
+		event.ECS.Event.Category = append(event.ECS.Event.Category, syscallNorm.ECS.Category.Values...)
+		event.ECS.Event.Type = append(event.ECS.Event.Type, syscallNorm.ECS.Type.Values...)
+		if event.Result == "fail" {
+			event.ECS.Event.Outcome = "failure"
+		}
 	}
 
 	event.Summary.Action = norm.Action

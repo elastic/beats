@@ -31,7 +31,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-libaudit/auparse"
+	"github.com/elastic/go-libaudit/v2/auparse"
+	"github.com/elastic/go-libaudit/v2/sys"
+)
+
+var (
+	byteOrder = sys.GetEndian()
 )
 
 const (
@@ -537,7 +542,7 @@ func parseNetlinkAuditMessage(buf []byte) ([]syscall.NetlinkMessage, error) {
 
 	r := bytes.NewReader(buf)
 	m := syscall.NetlinkMessage{}
-	if err := binary.Read(r, binary.LittleEndian, &m.Header); err != nil {
+	if err := binary.Read(r, byteOrder, &m.Header); err != nil {
 		return nil, err
 	}
 	m.Data = buf[syscall.NLMSG_HDRLEN:]
@@ -596,7 +601,7 @@ type AuditStatus struct {
 func (s AuditStatus) toWireFormat() []byte {
 	buf := bytes.NewBuffer(make([]byte, sizeofAuditStatus))
 	buf.Reset()
-	if err := binary.Write(buf, binary.LittleEndian, s); err != nil {
+	if err := binary.Write(buf, byteOrder, s); err != nil {
 		// This never returns an error.
 		panic(err)
 	}
@@ -631,7 +636,7 @@ func (s *AuditStatus) FromWireFormat(buf []byte) error {
 			return nil
 		}
 
-		if err := binary.Read(r, binary.LittleEndian, f); err != nil {
+		if err := binary.Read(r, byteOrder, f); err != nil {
 			return err
 		}
 	}

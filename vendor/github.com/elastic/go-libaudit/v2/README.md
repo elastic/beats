@@ -35,7 +35,6 @@ The second is _auparse_ which parses the log files from the Linux auditd
 process or the output of the _audit_ example command. It combines related log
 messages that are a part of the same event.
 
-
 ```
 $ go install github.com/elastic/go-libaudit/cmd/auparse
 $ sudo cat /var/log/audit/audit.log | auparse
@@ -111,6 +110,12 @@ data:
   grantors: pam_env,pam_unix
   op: PAM:setcred
   terminal: /dev/pts/1
+ecs:
+  event:
+    category:
+    - authentication
+    type:
+    - info
 
 ---
 timestamp: 2016-12-07T02:22:14.303Z
@@ -148,6 +153,12 @@ data:
   grantors: pam_keyinit,pam_limits
   op: PAM:session_open
   terminal: /dev/pts/1
+ecs:
+  event:
+    category:
+    - authentication
+    type:
+    - info
 
 ---
 timestamp: 2016-12-07T02:22:14.304Z
@@ -250,4 +261,14 @@ paths:
   ogid: "0"
   ouid: "0"
   rdev: "00:00"
+ecs:
+  event:
+    category:
+    - process
+    type:
+    - start
 ```
+
+## ECS compatibility
+
+This currently provides [Elastic Common Schema (ECS) 1.5](https://www.elastic.co/guide/en/ecs/current/index.html) categorization support for some of the more prominent or meaningful auditd events and syscalls.
