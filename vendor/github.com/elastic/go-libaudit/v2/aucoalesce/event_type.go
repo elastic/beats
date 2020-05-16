@@ -18,7 +18,7 @@
 package aucoalesce
 
 import (
-	. "github.com/elastic/go-libaudit/auparse"
+	. "github.com/elastic/go-libaudit/v2/auparse"
 )
 
 // AuditEventType is a categorization of a simple or compound audit event.

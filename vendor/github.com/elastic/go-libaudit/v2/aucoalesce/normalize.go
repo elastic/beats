@@ -52,7 +52,7 @@ type Strings struct {
 func (s *Strings) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var singleValue string
 	if err := unmarshal(&singleValue); err == nil {
-		s.Values = append(s.Values, singleValue)
+		s.Values = []string{singleValue}
 		return nil
 	}
 
@@ -73,6 +73,12 @@ type Normalization struct {
 	Syscalls    Strings        `yaml:"syscalls"`
 	SourceIP    Strings        `yaml:"source_ip"`
 	HasFields   Strings        `yaml:"has_fields"`
+	ECS         ECSMapping     `yaml:"ecs"`
+}
+
+type ECSMapping struct {
+	Category Strings `yaml:"category"`
+	Type     Strings `yaml:"type"`
 }
 
 type SubjectMapping struct {
