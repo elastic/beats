@@ -18,7 +18,7 @@ Ensure that this folder is at the following location:
 To build the binary for Heartbeat run the command below. This will generate a binary
 in the same directory with the name heartbeat.
 
-```bash
+```
 make
 ```
 
@@ -27,7 +27,7 @@ make
 
 To run Heartbeat with debugging output enabled, run:
 
-```bash
+```
 ./heartbeat -c heartbeat.yml -e -d "*"
 ```
 
@@ -37,7 +37,7 @@ To run Heartbeat with debugging output enabled, run:
 Each beat has a template for the mapping in elasticsearch and a documentation for the fields
 which is automatically generated based on `fields.yml`.
 
-```bash
+```
 make update
 ```
 
