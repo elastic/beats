@@ -270,11 +270,11 @@ func benchmarkConversion(tok, msg string, b *testing.B) {
 		dissectConversion(tok, msg, b)
 	}
 }
-func BenchmarkDissectNoConversionOneValue(b *testing.B)         {
+func BenchmarkDissectNoConversionOneValue(b *testing.B) {
 	b.ReportAllocs()
 	benchmarkConversion("id=%{id} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
 }
-func BenchmarkDissectWithConversionOneValue(b *testing.B)       {
+func BenchmarkDissectWithConversionOneValue(b *testing.B) {
 	b.ReportAllocs()
 	benchmarkConversion("id=%{id|integer} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
 }
@@ -288,19 +288,23 @@ func BenchmarkDissectWithConversionMultipleValues(b *testing.B) {
 	benchmarkConversion("id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
 		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
 }
-func BenchmarkConversionNoConversionMissingType(b *testing.B)   {
+func BenchmarkDissectNoConversionMissingType(b *testing.B) {
+	b.ReportAllocs()
 	benchmarkConversion("id=%{id} status=%{status} msg=\"%{message}\"",
-	"id=1857 status=404 msg=\"File not found\"}", b)
+		"id=1857 status=404 msg=\"File not found\"}", b)
 }
-func BenchmarkConversionWithConversionMissingType(b *testing.B)   {
+func BenchmarkDissectWithConversionMissingType(b *testing.B) {
+	b.ReportAllocs()
 	benchmarkConversion("id=%{id|} status=%{status|} msg=\"%{message}\"",
 		"id=1857 status=404 msg=\"File not found\"}", b)
 }
-func BenchmarkConversionNoConversionInvalidType(b *testing.B)   {
+func BenchmarkDissectNoConversionInvalidType(b *testing.B) {
+	b.ReportAllocs()
 	benchmarkConversion("id=%{id} status=%{status} msg=\"%{message}\"",
-	"id=1945 status=500 msg=\"Internal server error\"}", b)
+		"id=1945 status=500 msg=\"Internal server error\"}", b)
 }
-func BenchmarkConversionWithConversionInvalidType(b *testing.B)   {
+func BenchmarkDissectWithConversionInvalidType(b *testing.B) {
+	b.ReportAllocs()
 	benchmarkConversion("id=%{id|xyz} status=%{status|abc} msg=\"%{message}\"",
 		"id=1945 status=500 msg=\"Internal server error\"}", b)
 }
