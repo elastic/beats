@@ -17,7 +17,7 @@
 
 package rule
 
-import "github.com/elastic/go-libaudit/auparse"
+import "github.com/elastic/go-libaudit/v2/auparse"
 
 var (
 	reverseSyscall          map[string]map[string]int
