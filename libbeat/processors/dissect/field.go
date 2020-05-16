@@ -169,7 +169,7 @@ func (f normalField) Apply(b string, m Map) {
 			if err == nil {
 				m[f.Key()] = value
 			} else {
-				fmt.Errorf("%s\n", err)
+				errors.Errorf("%s\n", err)
 			}
 		}
 	}

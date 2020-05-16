@@ -99,7 +99,7 @@ func GitDiffIndex() ([]string, error) {
 			return nil, errors.Wrap(err, "failed to dissect git diff-index output")
 		}
 
-		paths := strings.Split(m["paths"], "\t")
+		paths := strings.Split(m["paths"].(string), "\t")
 		if len(paths) > 1 {
 			modified = append(modified, paths[1])
 		} else {
