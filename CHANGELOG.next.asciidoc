@@ -259,6 +259,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add system module user dataset ECS categorization fields. {pull}18035[18035]
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
+- Add ECS categorization info for auditd module {pull}18596[18596]
 
 *Filebeat*
 

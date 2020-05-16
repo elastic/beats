@@ -1,4 +1,5 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
@@ -6,7 +7,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Vagrantfile for development ease. #61
+
 ### Changed
+
+- Added support for big endian. #48
+- Added semantic versioning support via go modules. #61
+- Add ECS categorization support for events by record type and syscall. #62
 
 ### Removed
 
@@ -23,7 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Deprecated
 
 ### Removed
-
 
 ## [0.3.0]
 
@@ -70,12 +76,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   PATH records. #20
 
 ## [0.0.7]
- 
+
 ### Added
 
 - Added WaitForPendingACKs to receive pending ACK messages from the kernel. #14
 - The AuditClient will unregister with the kernel if `SetPID` has been called. #19
- 
+
 ### Changed
 
 - auparse - Fixed an issue where the proctitle value was being truncated. #15
@@ -97,11 +103,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.5]
 
 ### Changed
+
 - auparse - Apply hex decoding to CWD field. #10
 
 ## [0.0.4]
 
 ### Added
+
 - Add a package for building audit rules that can be added to the kernel.
 - Add GetRules, DeleteRules, DeleteRule, and AddRule methods to AuditClient.
 - auparse - Add conversion of POSIX exit code values to their name.
@@ -110,12 +118,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.3]
 
 ### Added
+
 - auparse - Convert auid and session values of `4294967295` or `-1` to "unset". #5
 - auparse - Added `MarshallText` method to AuditMessageType to enable the value
   to be marshaled as a string in JSON. faabfa94ec9479bdc1ad6c0334ff178b8193fce5
 - aucoalesce - Enhanced aucoalesce to normalize events. 666ff1c30fe624e9fcd9a108b20fceb82331f5fa
 
 ### Changed
+
 - Rename RawAuditMessage fields `MessageType` and `RawData` to `Type` and
   `Data` respectively. 8622833714fccd7810669b1265df1c1f918ec0c4
 - Make Reassembler concurrency-safe. c57b59c20a684e2a6298a1a5929a79192d76d61b
@@ -129,6 +139,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.2]
 
 ### Added
+
 - Added `libaudit.Reassembler` for reassembling out of order or interleaved
   messages and providing notification for lost events based on gaps in sequence
   numbers. a60bdd3b1b642cc80a3872d999114ae675456768
@@ -143,6 +154,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   event. #1
 
 ### Changed
+
 - auparse - Changed the behavior of `ParseLogLine()` and `Parse()` to only parse
   the message header. To parse the message body, call `Data()` on the returned
   `AuditMessage`.
@@ -154,6 +166,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.1]
 
 ### Added
+
 - Added AuditClient for communicating with the Linux Audit Framework in the
   Linux kernel.
 - Added auparse package for parsing audit logs.
