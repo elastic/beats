@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix source.address not being set for nginx ingress_controller {pull}18511[18511]
 - Fix PANW module wrong mappings for bytes and packets counters. {issue}18522[18522] {pull}18525[18525]
 - Fixed ingestion of some Cisco ASA and FTD messages when a hostname was used instead of an IP for NAT fields. {issue}14034[14034] {pull}18376[18376]
+- Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 
 *Heartbeat*
 
