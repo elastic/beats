@@ -10,9 +10,9 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 
-	"github.com/docker/docker/daemon/logger"
 	"github.com/pkg/errors"
 
+	"github.com/docker/docker/daemon/logger"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
@@ -73,10 +73,10 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 
 // CreateClientWithConfig gets the pipeline linked to the given config, and creates a client
 // If no pipeline for that config exists, it creates one.
-func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, file string) (*ClientLogger, error) {
+func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutputConfig, info logger.Info, file string) (*ClientLogger, error) {
 
-	hashstring := makeConfigHash(containerConfig.Config)
-	pipeline, err := pm.getOrCreatePipeline(containerConfig.Config, file, hashstring)
+	hashstring := containerConfig.GetHash()
+	pipeline, err := pm.getOrCreatePipeline(containerConfig, file, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
@@ -87,7 +87,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, f
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, containerConfig)
+	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}
@@ -102,7 +102,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig logger.Info, f
 
 // checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
 // It will either return a new pipeline, or an existing one from the pipeline map
-func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig map[string]string, file string, hashstring string) (*Pipeline, error) {
+func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, file string, hashstring string) (*Pipeline, error) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 

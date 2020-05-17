@@ -50,14 +50,9 @@ func makeConfigHash(cfg map[string]string) string {
 }
 
 // load pipeline starts up a new pipeline with the given config
-func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Logger) (*Pipeline, error) {
+func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp.Logger) (*Pipeline, error) {
 
-	newCfg, err := parseCfgKeys(logOptsConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing config keys")
-	}
-
-	cfg, err := common.NewConfigFrom(newCfg)
+	cfg, err := common.NewConfigFrom(logOptsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +85,7 @@ func loadNewPipeline(logOptsConfig map[string]string, name string, log *logp.Log
 		return nil, errors.Wrap(err, "error unpacking pipeline config")
 	}
 
-	idx, err := idxmgmt.DefaultSupport(log, info, config.Output.Config())
+	idx, err := idxmgmt.DefaultSupport(log, info, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "error making index manager")
 	}
@@ -161,7 +156,7 @@ func getBeatInfo(cfg *common.Config) (beat.Info, error) {
 	}
 
 	if name.Name == "" {
-		name.Name = "elastic-log-driver-" + hostname
+		name.Name = "elastic-log-driver"
 	}
 	id, err := loadMeta("/tmp/meta.json")
 	if err != nil {
@@ -169,8 +164,9 @@ func getBeatInfo(cfg *common.Config) (beat.Info, error) {
 	}
 
 	info := beat.Info{
-		Beat:        "elastic-logging-plugin",
+		Beat:        name.Name,
 		Name:        name.Name,
+		IndexPrefix: name.Name,
 		Hostname:    hostname,
 		Version:     vers,
 		EphemeralID: eid,
