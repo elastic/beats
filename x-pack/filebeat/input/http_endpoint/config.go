@@ -16,7 +16,7 @@ type config struct {
 	Password       string                  `config:"password"`
 	ResponseCode   int                     `config:"response_code" validate:"positive"`
 	ResponseBody   string                  `config:"response_body"`
-	ResponseHeader string                  `config:"response_headers"`
+	ResponseHeader string                  `config:"response_header"`
 	ListenAddress  string                  `config:"listen_address"`
 	ListenPort     string                  `config:"listen_port"`
 	URL            string                  `config:"url"`

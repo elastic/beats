@@ -52,7 +52,7 @@ func createServer(in *HttpEndpoint) (*HttpServer, error) {
 	responseHandler := http.HandlerFunc(in.apiResponse)
 	mux.Handle(in.config.URL, in.validateRequest(responseHandler))
 	server := &http.Server{
-		Addr: in.config.ListenAddress + ":" + in.config.ListenPort,
+		Addr:    in.config.ListenAddress + ":" + in.config.ListenPort,
 		Handler: mux,
 	}
 
