@@ -12,6 +12,24 @@ To build and install, just run `mage Package`. The build process happens entire 
 `docker run --log-driver=elastic-logging-plugin:8.0.0 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
 
 
+## Config Options
+
+| Option               | Description                                                                                                                       |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `endpoint`           | The elasticsearch endpoint to connect to. This option is required.                                                                |
+| `user`               | The Elasticsearch User to connect as.                                                                                             |
+| `password`           | The Elasticsearch Password to connect with.                                                                                       |
+| `index`              | The Elasticsearch Index to use. Requires `ilm_enabled` to be false, and `template_name` and `template_pattern` pattern to be set. |
+| `pipeline`           |  The Elasticsearch Pipeline to use.                                                                                               |
+| `cloud_id`           | CloudID value.                                                                                                                    |
+| `cloud_auth`         |  CloudID auth.                                                                                                                    |
+| `proxy_url`          | A proxy URL to use.                                                                                                               |
+| `ilm_enabled`        | Enable or disable ILM. Values are `true` or `false`. Set to `true` by default.                                                    |
+| `ilm_rollover_alias` | Set an ILM rollover alias.                                                                                                        |
+| `ilm_pattern`        | Specify an ILM pattern.                                                                                                           |
+| `template_name`      | Set an Index template name. Required if `index` is set.                                                                           |
+| `template_pattern`   | Set an Index template pattern. Required if `index` is set.                                                                        |
+
 ## How it works
 
 Logging plugins work by starting up an HTTP server that reads over a unix socket. When a container starts up that requests the logging plugin, a request is sent to `/LogDriver.StartLogging` with the name of the log handler and a struct containing the config of the container, including labels and other metadata. The actual log reading requires the file handle to be passed to a new routine which uses protocol buffers to read from the log handler. When the container stops, a request is sent to `/LogDriver.StopLogging`.

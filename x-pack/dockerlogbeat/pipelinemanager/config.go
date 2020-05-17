@@ -63,9 +63,10 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 			return newCfg, errors.New("Cannot set output index while ILM is enabled")
 		}
 
-		newCfg.ILMRollverAlias, _ = input["ilm_rollover_alias"]
-		newCfg.ILMPatterns, _ = input["ilm_patterns"]
 	}
+
+	newCfg.ILMRollverAlias, _ = input["ilm_rollover_alias"]
+	newCfg.ILMPatterns, _ = input["ilm_pattern"]
 
 	if isIndex {
 		tname, tnameOk := input["template_name"]
