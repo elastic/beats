@@ -26,7 +26,7 @@ import (
 func TestMakeEndpoints(t *testing.T) {
 	type args struct {
 		hosts         []string
-		ports         []uint16
+		ports         []string
 		defaultScheme string
 	}
 	tests := []struct {
@@ -37,44 +37,44 @@ func TestMakeEndpoints(t *testing.T) {
 	}{
 		{
 			"hostname",
-			args{[]string{"localhost"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tcp", Hostname: "localhost", Ports: []uint16{123}}},
+			args{[]string{"localhost"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tcp", Hostname: "localhost", Ports: []string{"123"}}},
 			false,
 		},
 		{
 			"ipv4",
-			args{[]string{"1.2.3.4"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tcp", Hostname: "1.2.3.4", Ports: []uint16{123}}},
+			args{[]string{"1.2.3.4"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tcp", Hostname: "1.2.3.4", Ports: []string{"123"}}},
 			false,
 		},
 		{
 			"unbracketed ipv6",
-			args{[]string{"::1"}, []uint16{123}, "tcp"},
+			args{[]string{"::1"}, []string{"123"}, "tcp"},
 			[]endpoint{},
 			true,
 		},
 		{
 			"bracketed ipv6",
-			args{[]string{"[::1]"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tcp", Hostname: "::1", Ports: []uint16{123}}},
+			args{[]string{"[::1]"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tcp", Hostname: "::1", Ports: []string{"123"}}},
 			false,
 		},
 		{
 			"url",
-			args{[]string{"tls://example.net"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tls", Hostname: "example.net", Ports: []uint16{123}}},
+			args{[]string{"tls://example.net"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tls", Hostname: "example.net", Ports: []string{"123"}}},
 			false,
 		},
 		{
 			"url:port",
-			args{[]string{"example.net:999"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tcp", Hostname: "example.net", Ports: []uint16{999}}},
+			args{[]string{"example.net:999"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tcp", Hostname: "example.net", Ports: []string{"999"}}},
 			false,
 		},
 		{
 			"scheme://url:port",
-			args{[]string{"tls://example.net:999"}, []uint16{123}, "tcp"},
-			[]endpoint{{Scheme: "tls", Hostname: "example.net", Ports: []uint16{999}}},
+			args{[]string{"tls://example.net:999"}, []string{"123"}, "tcp"},
+			[]endpoint{{Scheme: "tls", Hostname: "example.net", Ports: []string{"999"}}},
 			false,
 		},
 		{
@@ -85,13 +85,13 @@ func TestMakeEndpoints(t *testing.T) {
 				"[2607:f8b0:4004:814::200e]",
 				"example.net:999",
 				"tls://example.net:999",
-			}, []uint16{123}, "tcp"},
+			}, []string{"123"}, "tcp"},
 			[]endpoint{
-				{Scheme: "tcp", Hostname: "localhost", Ports: []uint16{123}},
-				{Scheme: "tcp", Hostname: "192.168.0.1", Ports: []uint16{123}},
-				{Scheme: "tcp", Hostname: "2607:f8b0:4004:814::200e", Ports: []uint16{123}},
-				{Scheme: "tcp", Hostname: "example.net", Ports: []uint16{999}},
-				{Scheme: "tls", Hostname: "example.net", Ports: []uint16{999}},
+				{Scheme: "tcp", Hostname: "localhost", Ports: []string{"123"}},
+				{Scheme: "tcp", Hostname: "192.168.0.1", Ports: []string{"123"}},
+				{Scheme: "tcp", Hostname: "2607:f8b0:4004:814::200e", Ports: []string{"123"}},
+				{Scheme: "tcp", Hostname: "example.net", Ports: []string{"999"}},
+				{Scheme: "tls", Hostname: "example.net", Ports: []string{"999"}},
 			},
 			false,
 		},

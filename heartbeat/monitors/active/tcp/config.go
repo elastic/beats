@@ -29,7 +29,7 @@ import (
 type config struct {
 	// check all ports if host does not contain port
 	Hosts []string `config:"hosts" validate:"required"`
-	Ports []uint16 `config:"ports"`
+	Ports []string `config:"ports"`
 
 	Mode monitors.IPSettings `config:",inline"`
 

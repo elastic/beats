@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -31,16 +32,32 @@ import (
 type endpoint struct {
 	Scheme   string
 	Hostname string
-	Ports    []uint16
+	Ports    []string
 }
 
 // perPortURLs returns a list containing one URL per port
 func (e endpoint) perPortURLs() (urls []*url.URL) {
 	for _, port := range e.Ports {
-		urls = append(urls, &url.URL{
-			Scheme: e.Scheme,
-			Host:   net.JoinHostPort(e.Hostname, strconv.Itoa(int(port))),
-		})
+		// check if port is a range
+		if strings.Contains(port, "-") {
+			pRange := strings.Split(port, "-")
+			pStart, _  := strconv.Atoi(pRange[0])
+			pEnd, _ := strconv.Atoi(pRange[1])
+			for i := pStart; i <= pEnd; i++ {
+				urls = append(urls, &url.URL{
+					Scheme: e.Scheme,
+					Host:   net.JoinHostPort(e.Hostname, strconv.Itoa(i)),
+				})
+			}
+
+
+		} else {
+			urls = append(urls, &url.URL{
+				Scheme: e.Scheme,
+				Host:   net.JoinHostPort(e.Hostname, port),
+			})
+		}
+
 	}
 
 	return urls
@@ -48,7 +65,7 @@ func (e endpoint) perPortURLs() (urls []*url.URL) {
 
 // makeEndpoints creates a single endpoint struct for each host/port permutation.
 // Set `defaultScheme` to choose which scheme is used if not explicit in the host config.
-func makeEndpoints(hosts []string, ports []uint16, defaultScheme string) (endpoints []endpoint, err error) {
+func makeEndpoints(hosts []string, ports []string, defaultScheme string) (endpoints []endpoint, err error) {
 	for _, h := range hosts {
 		u, err := url.Parse(h)
 
@@ -72,7 +89,7 @@ func makeEndpoints(hosts []string, ports []uint16, defaultScheme string) (endpoi
 	return endpoints, nil
 }
 
-func makeURLEndpoint(u *url.URL, ports []uint16) (endpoint, error) {
+func makeURLEndpoint(u *url.URL, ports []string) (endpoint, error) {
 	switch u.Scheme {
 	case "tcp", "plain", "tls", "ssl":
 	default:
@@ -89,7 +106,7 @@ func makeURLEndpoint(u *url.URL, ports []uint16) (endpoint, error) {
 		if err != nil {
 			return endpoint{}, errors.Wrapf(err, "no port(s) defined for TCP endpoint %s", u)
 		}
-		ports = []uint16{uint16(pUint)}
+		ports = []string{string(pUint)}
 	}
 
 	if len(ports) == 0 {
