@@ -50,7 +50,7 @@ class Test(BaseTest):
             input_raw = '\n'.join([input_raw, options])
         self.beat_name = "filebeat"
         self.beat_path = os.path.abspath(
-             os.path.join(os.path.dirname(__file__), "../../"))
+            os.path.join(os.path.dirname(__file__), "../../"))
 
         input_raw = input_raw.format(host, port)
         self.render_config_template(
@@ -136,7 +136,8 @@ class Test(BaseTest):
         message = "somerandommessage"
         payload = {self.prefix: message}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        r = requests.post(self.url, headers=headers, data=json.dumps(payload), auth=HTTPBasicAuth('testuser','something'))
+        r = requests.post(self.url, headers=headers, data=json.dumps(
+            payload), auth=HTTPBasicAuth('testuser', 'something'))
 
         filebeat.check_kill_and_wait()
 
@@ -159,7 +160,7 @@ class Test(BaseTest):
         message = "somerandommessage"
         payload = {self.prefix: message}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        r = requests.post(self.url, headers=headers, data=json.dumps(payload), auth=HTTPBasicAuth('testuser','qwerty'))
+        r = requests.post(self.url, headers=headers, data=json.dumps(payload), auth=HTTPBasicAuth('testuser', 'qwerty'))
 
         filebeat.check_kill_and_wait()
 

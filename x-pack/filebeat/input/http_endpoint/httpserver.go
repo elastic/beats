@@ -7,6 +7,7 @@ package http_endpoint
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -41,15 +42,20 @@ func (h *HttpServer) Start() {
 func (h *HttpServer) Stop() {
 	h.log.Info("Stopping HTTP server")
 	h.stop()
-	h.server.Shutdown(h.ctx)
+	if err := h.server.Shutdown(h.ctx); err != nil {
+		h.log.Fatalf("Unable to stop HTTP server due to error: %v", err)
+	}
 }
 
 func createServer(in *HttpEndpoint) (*HttpServer, error) {
+	mux := http.NewServeMux()
+	responseHandler := http.HandlerFunc(in.apiResponse)
+	mux.Handle(in.config.URL, in.validateRequest(responseHandler))
 	server := &http.Server{
 		Addr: in.config.ListenAddress + ":" + in.config.ListenPort,
+		Handler: mux,
 	}
 
-	http.HandleFunc(in.config.URL, in.apiResponse)
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(in.config.TLS)
 	if err != nil {
 		return nil, err
@@ -59,7 +65,7 @@ func createServer(in *HttpEndpoint) (*HttpServer, error) {
 		server.TLSConfig = tlsConfig.BuildModuleConfig(in.config.ListenAddress)
 	}
 
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	h := &HttpServer{
 		ctx:  ctx,
 		stop: cancel,

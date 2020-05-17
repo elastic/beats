@@ -46,6 +46,7 @@ type HttpEndpoint struct {
 	workerWg     sync.WaitGroup          // Waits on worker goroutine.
 	server       *HttpServer             // Server instance
 	eventObject  *map[string]interface{} // Current event object
+	finalHandler http.HandlerFunc
 }
 
 // NewInput creates a new httpjson input
@@ -101,6 +102,7 @@ func NewInput(
 	}
 
 	in.log.Infof("Initialized %v input on %v:%v", inputName, in.config.ListenAddress, in.config.ListenPort)
+
 	return in, nil
 }
 
@@ -132,13 +134,8 @@ func (in *HttpEndpoint) Wait() {
 	in.Stop()
 }
 
-// Validates the incoming request and creates a new event upon success
-func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) (uint, string) {
-	status, err := in.validateRequest(w, r)
-	if err != "" || status != 0 {
-		return status, err
-	}
-
+// If middleware validation successed, event is sent
+func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) {
 	event := in.outlet.OnEvent(beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
@@ -146,38 +143,60 @@ func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) (uint,
 		},
 	})
 	if !event {
-		return http.StatusInternalServerError, in.createErrorMessage("Unable to send event")
+		in.sendResponse(w, http.StatusInternalServerError, in.createErrorMessage("Unable to send event"))
+		return
 	}
 
-	return 0, ""
+	return
+}
+
+func (in *HttpEndpoint) sendResponse(w http.ResponseWriter, h uint, b string) {
+	w.WriteHeader(int(h))
+	w.Write([]byte(b))
+}
+
+// Triggers if middleware validation returns successful
+func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
+	objmap := make(map[string]string)
+	json.Unmarshal([]byte(in.config.ResponseHeader), &objmap)
+	for k, v := range objmap {
+		w.Header().Set(k, v)
+	}
+	in.sendEvent(w, r)
+	in.sendResponse(w, uint(in.config.ResponseCode), in.config.ResponseBody)
 }
 
 // Runs all validations for each request
-func (in *HttpEndpoint) validateRequest(w http.ResponseWriter, r *http.Request) (uint, string) {
-	if in.config.BasicAuth {
-		status, err := in.validateAuth(w, r)
-		if err != "" && status != 0 {
-			return status, err
+func (in *HttpEndpoint) validateRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if in.config.BasicAuth {
+			status, err := in.validateAuth(w, r)
+			if err != "" && status != 0 {
+				in.sendResponse(w, status, err)
+				return
+			}
 		}
-	}
 
-	status, err := in.validateMethod(w, r)
-	if err != "" && status != 0 {
-		return status, err
-	}
+		status, err := in.validateMethod(w, r)
+		if err != "" && status != 0 {
+			in.sendResponse(w, status, err)
+			return
+		}
 
-	status, err = in.validateHeader(w, r)
-	if err != "" && status != 0 {
-		return status, err
-	}
+		status, err = in.validateHeader(w, r)
+		if err != "" && status != 0 {
+			in.sendResponse(w, status, err)
+			return
+		}
 
-	status, err = in.validateBody(w, r)
-	if err != "" && status != 0 {
-		return status, err
-	}
+		status, err = in.validateBody(w, r)
+		if err != "" && status != 0 {
+			in.sendResponse(w, status, err)
+			return
+		}
 
-	return 0, ""
-
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Validate that only supported Accept and Content type headers are used
@@ -257,21 +276,4 @@ func (in *HttpEndpoint) isObjectOrList(b []byte) string {
 	}
 
 	return ""
-}
-
-func (in *HttpEndpoint) sendResponse(w http.ResponseWriter, h uint, b string) {
-	w.WriteHeader(int(h))
-	w.Write([]byte(b))
-}
-
-// Validates incoming requests and sends a new event upon success
-func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
-	// This triggers both validation and event creation
-	status, err := in.sendEvent(w, r)
-	if err != "" || status != 0 {
-		in.sendResponse(w, status, err)
-		return
-	}
-
-	in.sendResponse(w, http.StatusOK, in.config.ResponseBody)
 }
