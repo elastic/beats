@@ -54,7 +54,6 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
- * ML jobs (where available).
  * Ingest pipelines (where available).
  * ILM policy (for Elasticsearch 6.5 and newer).
 `,
