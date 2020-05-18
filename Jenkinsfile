@@ -1165,8 +1165,7 @@ def loadConfigEnvVars(){
   env.ONLY_DOCS = isDocChangedOnly()
 
   // Speed up the CI by running only if the changeset affects a specific module.
-  // TODO: exclude should be only skip the Jenkinsfile
-  env.MODULE = getBeatsModule(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '.*\\.(asciidoc|png)')
+  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '.*\\.(asciidoc|png)')
 }
 
 /**
