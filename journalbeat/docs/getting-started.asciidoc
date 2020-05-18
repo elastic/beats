@@ -41,7 +41,7 @@ Install {beatname_uc} on all the servers you want to monitor.
 To download and install {beatname_uc}, use the commands that work with your
 system:
 
-include::{libbeat-dir}/tab-widgets/install-widget-deb-rpm-linux.asciidoc[]
+include::{libbeat-dir}/tab-widgets/install-deb-rpm-linux-widget.asciidoc[]
 
 [float]
 [[other-installation-options]]
@@ -118,7 +118,7 @@ data. To load these assets:
 . From the installation directory, run:
 +
 --
-include::{libbeat-dir}/tab-widgets/setup-widget-linux-mac-win.asciidoc[]
+include::{libbeat-dir}/tab-widgets/setup-linux-mac-win-widget.asciidoc[]
 --
 +
 `-e` is optional and sends output to standard error instead of syslog.
@@ -136,7 +136,7 @@ For more information, see <<privileges-to-publish-events>>.
 
 To start {beatname_uc}, run:
 
-include::{libbeat-dir}/tab-widgets/start-widget-deb-rpm-linux.asciidoc[]
+include::{libbeat-dir}/tab-widgets/start-deb-rpm-linux-widget.asciidoc[]
 
 {beatname_uc} is now ready to send journal events to the {es}.
 

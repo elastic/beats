@@ -19,7 +19,7 @@ environment.
 To download and extract the package, use the commands that work with your
 system.
 
-include::{libbeat-dir}/tab-widgets/install-widget-linux-mac-win.asciidoc[]
+include::{libbeat-dir}/tab-widgets/install-linux-mac-win-widget.asciidoc[]
 
 [float]
 [[set-connection]]
@@ -110,7 +110,7 @@ data. To load these assets:
 . From the installation directory, run:
 +
 --
-include::{libbeat-dir}/tab-widgets/setup-widget-linux-mac-win.asciidoc[]
+include::{libbeat-dir}/tab-widgets/setup-linux-mac-win-widget.asciidoc[]
 --
 +
 `-e` is optional and sends output to standard error instead of syslog.
