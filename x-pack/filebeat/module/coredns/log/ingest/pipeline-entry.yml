@@ -107,6 +107,34 @@ processors:
         if (q.charAt(end) == (char) '.') {
             ctx.dns.question.name = q.substring(0, end);
         }
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: network
+  - append:
+      field: event.type
+      value: protocol
+  - set:
+      field: event.outcome
+      value: success
+      if: "ctx?.dns?.response_code == 'NOERROR'"
+  - set:
+      field: event.outcome
+      value: failure
+      if: "ctx?.dns?.response_code != null && ctx.dns.response_code != 'NOERROR'"
+  - set:
+      field: network.protocol
+      value: dns
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      if: "ctx?.source?.ip != null"
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      if: "ctx?.destination?.ip != null"
 on_failure:
   - set:
       field: error.message

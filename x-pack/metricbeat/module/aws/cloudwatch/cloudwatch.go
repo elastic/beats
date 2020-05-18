@@ -105,6 +105,7 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	logger := logp.NewLogger(metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
@@ -119,13 +120,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 
+	logger.Debugf("cloudwatch config = %s", config)
 	if len(config.CloudwatchMetrics) == 0 {
 		return nil, errors.New("metrics in config is missing")
 	}
 
 	return &MetricSet{
 		MetricSet:         metricSet,
-		logger:            logp.NewLogger(metricsetName),
+		logger:            logger,
 		CloudwatchConfigs: config.CloudwatchMetrics,
 	}, nil
 }
@@ -298,9 +300,11 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
+		// If tags_filter on metricset level is given, overwrite tags in
+		// cloudwatch metrics with tags_filter.
 		tagsFilter := config.Tags
-		if config.TagsFilter != nil {
-			tagsFilter = config.TagsFilter
+		if m.MetricSet.TagsFilter != nil {
+			tagsFilter = m.MetricSet.TagsFilter
 		}
 
 		// If there is no statistic method specified, then use the default.
@@ -475,6 +479,8 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(metricDataResults)
+
+	// Create events when there is no tags_filter or tags.resource_type_filter specified.
 	if len(resourceTypeTagFilters) == 0 {
 		if !timestamp.IsZero() {
 			for _, output := range metricDataResults {
@@ -506,8 +512,10 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 		return events, nil
 	}
 
-	// Get tags
+	// Create events with tags
 	for resourceType, tagsFilter := range resourceTypeTagFilters {
+		m.logger.Debugf("resourceType = %s", resourceType)
+		m.logger.Debugf("tagsFilter = %s", tagsFilter)
 		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.
@@ -521,8 +529,11 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 		// filter resourceTagMap
 		for identifier, tags := range resourceTagMap {
 			if exists := aws.CheckTagFiltersExist(tagsFilter, tags); !exists {
+				m.logger.Debugf("In region %s, service %s tags does not match tags_filter", regionName, identifier)
 				delete(resourceTagMap, identifier)
+				continue
 			}
+			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifier)
 		}
 
 		if !timestamp.IsZero() {
@@ -551,6 +562,12 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 
 					identifierValue := labels[identifierValueIdx]
 					if _, ok := events[identifierValue]; !ok {
+						// when tagsFilter is not empty but no entry in
+						// resourceTagMap for this identifier, do not initialize
+						// an event for this identifier.
+						if len(tagsFilter) != 0 && resourceTagMap[identifierValue] == nil {
+							continue
+						}
 						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
 					}
 					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
