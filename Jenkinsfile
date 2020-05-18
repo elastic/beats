@@ -121,6 +121,11 @@ pipeline {
           steps {
             mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
+          post {
+            always {
+              deleteDir()
+            }
+          }
         }
 
         stage('Filebeat oss'){
@@ -161,6 +166,11 @@ pipeline {
           steps {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
+          post {
+            always {
+              deleteDir()
+            }
+          }
         }
         stage('Filebeat x-pack Mac OS X'){
           agent { label 'macosx' }
@@ -173,6 +183,11 @@ pipeline {
           }
           steps {
             mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+          }
+          post {
+            always {
+              deleteDir()
+            }
           }
         }
         stage('Filebeat Windows'){
@@ -228,6 +243,11 @@ pipeline {
               steps {
                 mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
               }
+              post {
+                always {
+                  deleteDir()
+                }
+              }
             }
             stage('Heartbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -275,6 +295,11 @@ pipeline {
               }
               steps {
                 mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
+              }
+              post {
+                always {
+                  deleteDir()
+                }
               }
             }
             stage('Auditbeat Windows'){
@@ -457,6 +482,11 @@ pipeline {
           steps {
             mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
           }
+          post {
+            always {
+              deleteDir()
+            }
+          }
         }
         stage('Metricbeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
@@ -591,6 +621,11 @@ pipeline {
               steps {
                 mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
+              post {
+                always {
+                  deleteDir()
+                }
+              }
             }
             stage('Functionbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -667,6 +702,11 @@ pipeline {
                   makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
                 }
               }
+              post {
+                always {
+                  deleteDir()
+                }
+              }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
@@ -681,6 +721,11 @@ pipeline {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                }
+              }
+              post {
+                always {
+                  deleteDir()
                 }
               }
             }
