@@ -160,26 +160,6 @@ func (c *publishClient) String() string {
 	return "monitoring(" + c.es.URL + ")"
 }
 
-func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
-	meta := common.MapStr{
-		"_index":   "",
-		"_routing": nil,
-		"_type":    typ,
-	}
-	bulk := [2]interface{}{
-		common.MapStr{"index": meta},
-		report.Event{
-			Timestamp: event.Content.Timestamp,
-			Fields:    event.Content.Fields,
-		},
-	}
-
-	// Currently one request per event is sent. Reason is that each event can contain different
-	// interval params and X-Pack requires to send the interval param.
-	_, err := c.es.SendMonitoringBulk(params, bulk[:])
-	return err
-}
-
 func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
