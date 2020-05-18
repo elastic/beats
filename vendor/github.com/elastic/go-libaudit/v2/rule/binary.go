@@ -23,6 +23,8 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-libaudit/v2/sys"
 )
 
 const (
@@ -30,7 +32,7 @@ const (
 	maxFields          = 64 // AUDIT_MAX_FIELDS
 )
 
-var endianness = binary.LittleEndian
+var endianness = sys.GetEndian()
 
 // WireFormat is the binary representation of a rule as used to exchange rules
 // (commands) with the kernel.

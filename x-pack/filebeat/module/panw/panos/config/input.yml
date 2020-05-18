@@ -15,7 +15,15 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+fields_under_root: true
+fields:
+  observer:
+    vendor: Palo Alto Networks
+    product: PAN-OS
+    type: firewall
 
 processors:
   - add_locale: ~

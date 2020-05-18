@@ -9,7 +9,10 @@
         "log.offset": 0,
         "message": "Stopping User Slice of root.",
         "process.name": "systemd",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2020-02-20T07:02:18.000Z",
@@ -22,7 +25,10 @@
         "message": "XMT: Solicit on eth0, interval 125240ms.",
         "process.name": "dhclient",
         "process.pid": "3000",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2020-02-20T07:02:37.000Z",
@@ -35,7 +41,10 @@
         "message": "DHCPREQUEST on eth0 to 172.31.80.1 port 67 (xid=0x4575af22)",
         "process.name": "dhclient",
         "process.pid": "2898",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2020-02-20T07:02:37.000Z",
@@ -48,7 +57,10 @@
         "message": "DHCPACK from 172.31.80.1 (xid=0x4575af22)",
         "process.name": "dhclient",
         "process.pid": "2898",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2020-02-20T07:02:37.000Z",
@@ -61,7 +73,10 @@
         "message": "bound to 172.31.81.156 -- renewal in 1599 seconds.",
         "process.name": "dhclient",
         "process.pid": "2898",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2020-02-20T07:02:37.000Z",
@@ -73,6 +88,9 @@
         "log.offset": 586,
         "message": "[get_meta] Trying to get http://169.254.169.254/latest/meta-data/network/interfaces/macs/12:e2:a9:95:8b:97/local-ipv4s",
         "process.name": "ec2net",
-        "service.type": "aws"
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]
