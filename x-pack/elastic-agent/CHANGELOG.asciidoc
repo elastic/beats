@@ -35,6 +35,7 @@
 - Ensure that the beats uses the params prefer_v2_templates on bulk request. {pull}18318[18318]
 - Stop monitoring on config change {pull}18284[18284]
 - Fix jq: command not found {pull}18408[18408]
+- Avoid Chown on windows {pull}18512[18512]
 
 ==== New features
 
@@ -57,3 +58,4 @@
 - Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
 - Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
 - Pick up version from libbeat {pull}18350[18350]
+- More clear output of inspect command {pull}18405[18405]
