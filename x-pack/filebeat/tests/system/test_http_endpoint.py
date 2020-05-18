@@ -3,7 +3,6 @@ import requests
 import sys
 import os
 import json
-import time
 from requests.auth import HTTPBasicAuth
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../filebeat/tests/system'))
@@ -60,7 +59,7 @@ class Test(BaseTest):
         self.host = host
         self.port = port
         self.prefix = 'testmessage'
-        self.url = f"http://{host}:{port}/"
+        self.url = "http://{}:{}/".format(host, port)
 
     def test_http_endpoint_request(self):
         """
@@ -68,7 +67,7 @@ class Test(BaseTest):
         """
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         message = "somerandommessage"
         payload = {self.prefix: message}
@@ -81,7 +80,7 @@ class Test(BaseTest):
         output = self.read_output()
 
         assert output[0]["input.type"] == "http_endpoint"
-        assert output[0][f"json.{self.prefix}"] == message
+        assert output[0]["json.{}".format(self.prefix)] == message
         assert r.text == '{"message": "success"}'
 
     def test_http_endpoint_wrong_content_header(self):
@@ -90,7 +89,7 @@ class Test(BaseTest):
         """
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         message = "somerandommessage"
         payload = {self.prefix: message}
@@ -108,7 +107,7 @@ class Test(BaseTest):
         """
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         message = "somerandommessage"
         payload = {self.prefix: message}
@@ -131,7 +130,7 @@ class Test(BaseTest):
 """
         self.get_config(options)
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         message = "somerandommessage"
         payload = {self.prefix: message}
@@ -155,7 +154,7 @@ class Test(BaseTest):
 """
         self.get_config(options)
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         message = "somerandommessage"
         payload = {self.prefix: message}
@@ -173,7 +172,7 @@ class Test(BaseTest):
         """
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
 
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         r = requests.post(self.url, headers=headers, data="")
@@ -190,7 +189,7 @@ class Test(BaseTest):
 
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
         payload = '{"message::":: "something"}'
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         r = requests.post(self.url, headers=headers, data=payload)
@@ -207,7 +206,7 @@ class Test(BaseTest):
 
         self.get_config()
         filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(f"Starting HTTP server on {self.host}:{self.port}"))
+        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
         message = "somerandommessage"
         payload = {self.prefix: message}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
