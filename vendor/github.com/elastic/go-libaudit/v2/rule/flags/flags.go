@@ -28,7 +28,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/go-libaudit/rule"
+	"github.com/elastic/go-libaudit/v2/rule"
 )
 
 // Parse parses an audit rule specified using flags. It can parse delete all

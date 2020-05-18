@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-	"github.com/elastic/go-libaudit/aucoalesce"
+	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
 
 const (
