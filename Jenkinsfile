@@ -123,7 +123,7 @@ pipeline {
           }
           post {
             always {
-              deleteDir()
+              delete()
             }
           }
         }
@@ -186,7 +186,7 @@ pipeline {
           }
           post {
             always {
-              deleteDir()
+              delete()
             }
           }
         }
@@ -245,7 +245,7 @@ pipeline {
               }
               post {
                 always {
-                  deleteDir()
+                  delete()
                 }
               }
             }
@@ -298,7 +298,7 @@ pipeline {
               }
               post {
                 always {
-                  deleteDir()
+                  delete()
                 }
               }
             }
@@ -484,7 +484,7 @@ pipeline {
           }
           post {
             always {
-              deleteDir()
+              delete()
             }
           }
         }
@@ -623,7 +623,7 @@ pipeline {
               }
               post {
                 always {
-                  deleteDir()
+                  delete()
                 }
               }
             }
@@ -704,7 +704,7 @@ pipeline {
               }
               post {
                 always {
-                  deleteDir()
+                  delete()
                 }
               }
             }
@@ -725,7 +725,7 @@ pipeline {
               }
               post {
                 always {
-                  deleteDir()
+                  delete()
                 }
               }
             }
@@ -757,6 +757,17 @@ pipeline {
   }
 }
 
+def delete() {
+  dir("${env.BASE_DIR}") {
+    fixPermissions("${WORKSPACE}")
+  }
+  deleteDir()
+}
+
+def fixPermissions(location) {
+  sh(script: "script/fix_permissions.sh ${location}")
+}
+
 def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
     withBeatsEnv(true) {
@@ -765,8 +776,8 @@ def makeTarget(String context, String target, boolean clean = true) {
         dumpMage()
       }
       sh(label: "Make ${target}", script: "make ${target}")
-      if (clean) {
-        sh(script: 'script/fix_permissions.sh ${HOME}')
+      whenTrue(clean) {
+        fixPermissions("${HOME}")
       }
     }
   }
