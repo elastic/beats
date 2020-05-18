@@ -140,7 +140,7 @@ func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
 	arePipelineGraphAPIsAvailable := elastic.IsFeatureAvailable(logstashVersion, PipelineGraphAPIsAvailableVersion)
 
 	if !arePipelineGraphAPIsAvailable {
-		const errorMsg = "the %v metricset with X-Pack enabled is only supported with Logstash >= %v. You are currently running Logstash %v"
+		const errorMsg = "the %v metricset for stack monitoring is only supported with Logstash >= %v. You are currently running Logstash %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), PipelineGraphAPIsAvailableVersion, logstashVersion)
 	}
 

@@ -128,7 +128,7 @@ func (m *MetricSet) init() error {
 	if m.XPackEnabled {
 		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
 		if !isSettingsAPIAvailable {
-			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
+			const errorMsg = "the %v metricset for stack monitoring is only supported with Kibana >= %v. You are currently running Kibana %v"
 			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
 		}
 
