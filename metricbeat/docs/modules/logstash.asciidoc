@@ -35,6 +35,10 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:9600"]
+
+  # Set to stack-monitoring to enable collection for the
+  # Elastic Stack Monitoring feature.
+  #mode: stack-monitoring
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
