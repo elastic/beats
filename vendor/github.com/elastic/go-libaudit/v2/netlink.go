@@ -20,7 +20,6 @@
 package libaudit
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +27,8 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-libaudit/v2/sys"
 )
 
 // Generic Netlink Client
@@ -142,11 +143,11 @@ func (c *NetlinkClient) Send(msg syscall.NetlinkMessage) (uint32, error) {
 func serialize(msg syscall.NetlinkMessage) []byte {
 	msg.Header.Len = uint32(syscall.SizeofNlMsghdr + len(msg.Data))
 	b := make([]byte, msg.Header.Len)
-	binary.LittleEndian.PutUint32(b[0:4], msg.Header.Len)
-	binary.LittleEndian.PutUint16(b[4:6], msg.Header.Type)
-	binary.LittleEndian.PutUint16(b[6:8], msg.Header.Flags)
-	binary.LittleEndian.PutUint32(b[8:12], msg.Header.Seq)
-	binary.LittleEndian.PutUint32(b[12:16], msg.Header.Pid)
+	sys.GetEndian().PutUint32(b[0:4], msg.Header.Len)
+	sys.GetEndian().PutUint16(b[4:6], msg.Header.Type)
+	sys.GetEndian().PutUint16(b[6:8], msg.Header.Flags)
+	sys.GetEndian().PutUint32(b[8:12], msg.Header.Seq)
+	sys.GetEndian().PutUint32(b[12:16], msg.Header.Pid)
 	copy(b[16:], msg.Data)
 	return b
 }
@@ -205,7 +206,7 @@ func (c *NetlinkClient) Close() error {
 // describing the problem will be returned.
 func ParseNetlinkError(netlinkData []byte) error {
 	if len(netlinkData) >= 4 {
-		errno := -binary.LittleEndian.Uint32(netlinkData[:4])
+		errno := -sys.GetEndian().Uint32(netlinkData[:4])
 		if errno == 0 {
 			return nil
 		}
