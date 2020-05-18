@@ -70,7 +70,6 @@ type Config struct {
 	Dimensions         []Dimension `config:"dimensions"`
 	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
 	Statistic          []string    `config:"statistic"`
-	TagsFilter         []aws.Tag   `config:"tags_filter"`
 	Tags               []aws.Tag   `config:"tags"` // Deprecated.
 }
 
