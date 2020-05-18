@@ -35,6 +35,7 @@
 - Stop monitoring on config change {pull}18284[18284]
 - Fix jq: command not found {pull}18408[18408]
 - Avoid Chown on windows {pull}18512[18512]
+- Remove fleet admin from setup script {pull}18611[18611]
 
 ==== New features
 
