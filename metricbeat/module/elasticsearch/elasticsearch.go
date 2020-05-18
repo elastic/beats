@@ -265,14 +265,8 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	if err != nil {
 		return nil, err
 	}
-	var licensePath string
-	if info.Version.Number.Major < 7 {
-		licensePath = "_xpack/license"
-	} else {
-		licensePath = "_license"
-	}
 
-	content, err := fetchPath(http, resetURI, licensePath, "")
+	content, err := fetchPath(http, resetURI, "_license", "")
 	if err != nil {
 		return nil, err
 	}
