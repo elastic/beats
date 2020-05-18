@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -30,13 +31,13 @@ type MetricSet struct {
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Kibana module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := DefaultConfig()
+	config := elastic.DefaultModeConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		base,
-		config.XPackEnabled,
+		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
 	}, nil
 }
