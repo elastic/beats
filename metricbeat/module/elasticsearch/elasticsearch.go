@@ -261,11 +261,6 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	}
 
 	// License not found in cache, fetch it from Elasticsearch
-	info, err := GetInfo(http, resetURI)
-	if err != nil {
-		return nil, err
-	}
-
 	content, err := fetchPath(http, resetURI, "_license", "")
 	if err != nil {
 		return nil, err
