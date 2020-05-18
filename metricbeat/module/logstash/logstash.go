@@ -83,11 +83,7 @@ type PipelineState struct {
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Logstash module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := struct {
-		XPack bool `config:"xpack.enabled"`
-	}{
-		XPack: false,
-	}
+	config := elastic.DefaultModeConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -100,7 +96,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-		config.XPack,
+		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
 	}, nil
 }
 
