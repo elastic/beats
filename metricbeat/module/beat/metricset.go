@@ -19,6 +19,7 @@ package beat
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -32,7 +33,7 @@ type MetricSet struct {
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Beat module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := DefaultConfig()
+	config := elastic.DefaultModeConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	ms := &MetricSet{
 		base,
 		http,
-		config.XPackEnabled,
+		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
 	}
 
 	return ms, nil
