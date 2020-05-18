@@ -42,7 +42,6 @@ var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 type publishClient struct {
 	es     *eslegclient.Connection
 	params map[string]string
-	format report.Format
 
 	log *logp.Logger
 }
@@ -50,12 +49,10 @@ type publishClient struct {
 func newPublishClient(
 	es *eslegclient.Connection,
 	params map[string]string,
-	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
-		format: format,
 
 		log: logp.NewLogger(logSelector),
 	}
@@ -141,14 +138,7 @@ func (c *publishClient) Publish(ctx context.Context, batch publisher.Batch) erro
 			}
 		}
 
-		switch c.format {
-		case report.FormatXPackMonitoringBulk:
-			err = c.publishXPackBulk(params, event, typ)
-		case report.FormatBulk:
-			err = c.publishBulk(ctx, event, typ)
-		}
-
-		if err != nil {
+		if err := c.publishBulk(ctx, event, typ); err != nil {
 			failed = append(failed, event)
 			reason = err
 		}

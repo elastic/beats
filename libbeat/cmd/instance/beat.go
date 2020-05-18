@@ -888,12 +888,9 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 }
 
 func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
-	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
-	if err != nil {
-		return nil, err
-	}
+	monitoringCfg := b.Config.MonitoringBeatConfig.Monitoring
 
-	monitoringClusterUUID, err := monitoring.GetClusterUUID(b.Config.MonitoringBeatConfig.Monitoring)
+	monitoringClusterUUID, err := monitoring.GetClusterUUID(monitoringCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -914,7 +911,6 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
 			ClusterUUID:     monitoringClusterUUID,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
