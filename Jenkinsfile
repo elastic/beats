@@ -765,7 +765,7 @@ def delete() {
 }
 
 def fixPermissions(location) {
-  sh(script: "script/fix_permissions.sh ${location}")
+  sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
 }
 
 def makeTarget(String context, String target, boolean clean = true) {
