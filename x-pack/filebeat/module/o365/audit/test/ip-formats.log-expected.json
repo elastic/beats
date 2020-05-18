@@ -23,10 +23,7 @@
         "related.ip": "10.11.12.13",
         "service.type": "o365",
         "source.ip": "10.11.12.13",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -52,10 +49,7 @@
         "related.ip": "10.11.12.13",
         "service.type": "o365",
         "source.ip": "10.11.12.13",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -79,10 +73,7 @@
         "o365.audit.RecordType": -1,
         "related.ip": "10.11.12.13",
         "service.type": "o365",
-        "source.ip": "10.11.12.13",
-        "tags": [
-            "forwarded"
-        ]
+        "source.ip": "10.11.12.13"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -106,10 +97,7 @@
         "o365.audit.RecordType": -1,
         "related.ip": "::ffff:10.11.12.13",
         "service.type": "o365",
-        "source.ip": "::ffff:10.11.12.13",
-        "tags": [
-            "forwarded"
-        ]
+        "source.ip": "::ffff:10.11.12.13"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -135,10 +123,7 @@
         "related.ip": "::ffff:10.11.12.13",
         "service.type": "o365",
         "source.ip": "::ffff:10.11.12.13",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -164,10 +149,7 @@
         "related.ip": "2001:db8::abcd",
         "service.type": "o365",
         "source.ip": "2001:db8::abcd",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -191,10 +173,7 @@
         "o365.audit.RecordType": -1,
         "related.ip": "2001:db8::abcd",
         "service.type": "o365",
-        "source.ip": "2001:db8::abcd",
-        "tags": [
-            "forwarded"
-        ]
+        "source.ip": "2001:db8::abcd"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -214,10 +193,7 @@
         "o365.audit.CreationTime": "2020-02-17T17:12:03",
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
-        "service.type": "o365",
-        "tags": [
-            "forwarded"
-        ]
+        "service.type": "o365"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -237,10 +213,7 @@
         "o365.audit.CreationTime": "2020-02-17T17:12:03",
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
-        "service.type": "o365",
-        "tags": [
-            "forwarded"
-        ]
+        "service.type": "o365"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -260,10 +233,7 @@
         "o365.audit.CreationTime": "2020-02-17T17:12:03",
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
-        "service.type": "o365",
-        "tags": [
-            "forwarded"
-        ]
+        "service.type": "o365"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -285,10 +255,7 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -308,10 +275,7 @@
         "o365.audit.CreationTime": "2020-02-17T17:12:03",
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
-        "service.type": "o365",
-        "tags": [
-            "forwarded"
-        ]
+        "service.type": "o365"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -333,10 +297,7 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -356,10 +317,7 @@
         "o365.audit.CreationTime": "2020-02-17T17:12:03",
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
-        "service.type": "o365",
-        "tags": [
-            "forwarded"
-        ]
+        "service.type": "o365"
     },
     {
         "@timestamp": "2020-02-17T17:12:03.000Z",
@@ -381,9 +339,6 @@
         "o365.audit.Id": "3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226",
         "o365.audit.RecordType": -1,
         "service.type": "o365",
-        "source.port": "12345",
-        "tags": [
-            "forwarded"
-        ]
+        "source.port": "12345"
     }
 ]
