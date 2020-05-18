@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
@@ -53,11 +54,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		return nil, err
 	}
 
-	config := struct {
-		XPack bool `config:"xpack.enabled"`
-	}{
-		XPack: false,
-	}
+	config := elastic.DefaultModeConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -66,7 +63,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		base,
 		servicePath,
 		http,
-		config.XPack,
+		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
 	}
 
 	ms.SetServiceURI(servicePath)
