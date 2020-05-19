@@ -157,6 +157,6 @@ func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {
-		loader.defaultLogger.Debugf("%s %v", msg, a)
+		loader.defaultLogger.Debugf(msg, a...)
 	}
 }
