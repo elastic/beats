@@ -632,14 +632,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["start", "process_start"],
+                category: ["process"],
+                type: ["start", "process_start"],
             },
-            target: "",
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -701,13 +700,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["change"],
+                category: ["file"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -744,13 +743,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["network"],
-                "event.type": ["connection", "start", "protocol"],
+                category: ["network"],
+                type: ["connection", "start", "protocol"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -825,17 +824,16 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["change"],
+                category: ["process"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -848,14 +846,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["end", "process_end"],
+                category: ["process"],
+                type: ["end", "process_end"],
             },
-            target: "",
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -887,13 +884,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["driver"],
-                "event.type": ["start"],
+                category: ["driver"],
+                type: ["start"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -907,8 +904,7 @@ var sysmon = (function () {
             fail_on_error: false,
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.Signature",
                     to: "file.code_signature.subject_name",
                 },
@@ -931,13 +927,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["change"],
+                category: ["process"],
+                type: ["change"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -964,8 +960,7 @@ var sysmon = (function () {
             fail_on_error: false,
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.Signature",
                     to: "file.code_signature.subject_name",
                 },
@@ -988,8 +983,7 @@ var sysmon = (function () {
     var event8 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1020,8 +1014,7 @@ var sysmon = (function () {
     var event9 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1058,13 +1051,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["process"],
-                "event.type": ["access"],
+                category: ["process"],
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1101,13 +1094,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["creation"],
+                category: ["file"],
+                type: ["creation"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1143,8 +1136,7 @@ var sysmon = (function () {
     var event12 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1176,8 +1168,7 @@ var sysmon = (function () {
     var event13 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1209,8 +1200,7 @@ var sysmon = (function () {
     var event14 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1243,13 +1233,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"],
-                "event.type": ["access"],
+                category: ["file"],
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1286,12 +1276,10 @@ var sysmon = (function () {
     var event16 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -1304,13 +1292,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["creation"],
+                category: ["file"], // pipes are files
+                type: ["creation"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1346,13 +1334,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["access"],
+                category: ["file"], // pipes are files
+                type: ["access"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1387,12 +1375,10 @@ var sysmon = (function () {
     var event19 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -1406,8 +1392,7 @@ var sysmon = (function () {
     var event20 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1430,12 +1415,10 @@ var sysmon = (function () {
     var event21 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
-                    from: "winlog.event_data.UtcTime",
-                    to: "@timestamp",
-                },
-            ],
+            fields: [{
+                from: "winlog.event_data.UtcTime",
+                to: "@timestamp",
+            }, ],
             mode: "rename",
             ignore_missing: true,
             fail_on_error: false,
@@ -1450,16 +1433,19 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["network"],
-                "event.type": ["connection", "protocol", "info"],
+                category: ["network"],
+                type: ["connection", "protocol", "info"],
             },
-            network: {
+            target: "event",
+        })
+        .AddFields({
+            fields: {
                 protocol: "dns",
             },
+            target: "network",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1507,13 +1493,13 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                "event.category": ["file"], // pipes are files
-                "event.type": ["deletion"],
+                category: ["file"], // pipes are files
+                type: ["deletion"],
             },
+            target: "event",
         })
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
@@ -1565,8 +1551,7 @@ var sysmon = (function () {
     var event255 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
-            fields: [
-                {
+            fields: [{
                     from: "winlog.event_data.UtcTime",
                     to: "@timestamp",
                 },
