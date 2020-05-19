@@ -334,9 +334,10 @@ metricbeat.modules:
   hosts: ["http://localhost:5066"]
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
-  #xpack.enabled: false
+  # Set to stack-monitoring to enable collection for the
+  # Elastic Stack Monitoring feature.
+  #mode: stack-monitoring
+
 
 #--------------------------------- Ceph Module ---------------------------------
 # Metricsets depending on the Ceph REST API (default port: 5000)
@@ -467,9 +468,9 @@ metricbeat.modules:
   # Set to false to fetch all entries
   #index_recovery.active_only: true
 
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
-  #xpack.enabled: false
+  # Set to stack-monitoring to enable collection for the
+  # Elastic Stack Monitoring feature.
+  #mode: stack-monitoring
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -750,9 +751,9 @@ metricbeat.modules:
   basepath: ""
   enabled: true
 
-  # Set to true to send data collected by module to X-Pack
-  # Monitoring instead of metricbeat-* indices.
-  #xpack.enabled: false
+  # Set to stack-monitoring to enable collection for the
+  # Elastic Stack Monitoring feature.
+  #mode: stack-monitoring
 
 #------------------------------ Kubernetes Module ------------------------------
 # Node metrics, from kubelet:
@@ -880,6 +881,10 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:9600"]
+
+  # Set to stack-monitoring to enable collection for the
+  # Elastic Stack Monitoring feature.
+  #mode: stack-monitoring
 
 #------------------------------ Memcached Module ------------------------------
 - module: memcached
