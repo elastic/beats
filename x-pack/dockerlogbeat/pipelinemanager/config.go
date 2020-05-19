@@ -8,6 +8,7 @@ import (
 	"crypto/sha1"
 	"reflect"
 	"sort"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -17,23 +18,23 @@ import (
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
 type ContainerOutputConfig struct {
-	Endpoint        string `struct:"output.elasticsearch.hosts"`
-	User            string `struct:"output.elasticsearch.username"`
-	Password        string `struct:"output.elasticsearch.password"`
-	Index           string `struct:"output.elasticsearch.index"`
-	Pipeline        string `struct:"output.elasticsearch.pipeline"`
-	APIKey          string `struct:"output.elasticsearch.api_key"`
+	Endpoint        string `struct:"output.elasticsearch.hosts,omitempty"`
+	User            string `struct:"output.elasticsearch.username,omitempty"`
+	Password        string `struct:"output.elasticsearch.password,omitempty"`
+	Index           string `struct:"output.elasticsearch.index,omitempty"`
+	Pipeline        string `struct:"output.elasticsearch.pipeline,omitempty"`
+	APIKey          string `struct:"output.elasticsearch.api_key,omitempty"`
 	Timeout         string `struct:"output.elasticsearch.timeout,omitempty"`
 	BackoffInit     string `struct:"output.elasticsearch.backoff.init,omitempty"`
 	BackoffMax      string `struct:"output.elasticsearch.backoff.max,omitempty"`
-	CloudID         string `struct:"cloud.id"`
-	CloudAuth       string `struct:"cloud.auth"`
-	ProxyURL        string `struct:"output.elasticsearch.proxy_url"`
-	ILMEnabled      bool   `struct:"setup.ilm.enabled"`
-	ILMRollverAlias string `struct:"setup.ilm.rollover_alias"`
-	ILMPatterns     string `struct:"setup.ilm.pattern"`
-	TemplateName    string `struct:"setup.template.name"`
-	TempatePattern  string `struct:"setup.template.pattern"`
+	CloudID         string `struct:"cloud.id,omitempty"`
+	CloudAuth       string `struct:"cloud.auth,omitempty"`
+	ProxyURL        string `struct:"output.elasticsearch.proxy_url,omitempty"`
+	ILMEnabled      bool   `struct:"setup.ilm.enabled,omitempty"`
+	ILMRollverAlias string `struct:"setup.ilm.rollover_alias,omitempty"`
+	ILMPatterns     string `struct:"setup.ilm.pattern,omitempty"`
+	TemplateName    string `struct:"setup.template.name,omitempty"`
+	TempatePattern  string `struct:"setup.template.pattern,omitempty"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -48,28 +49,26 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 
 	var isIndex bool
 
-	newCfg.User, _ = input["user"]
-	newCfg.Password, _ = input["password"]
+	newCfg.User = input["user"]
+	newCfg.Password = input["password"]
 	newCfg.Index, isIndex = input["index"]
-	newCfg.Pipeline, _ = input["pipeline"]
-	newCfg.CloudID, _ = input["cloud_id"]
-	newCfg.CloudAuth, _ = input["cloud_auth"]
-	newCfg.ProxyURL, _ = input["proxy_url"]
-	newCfg.APIKey, _ = input["api_key"]
-	newCfg.Timeout, _ = input["timeout"]
-	newCfg.BackoffInit, _ = input["backoff_init"]
-	newCfg.BackoffMax, _ = input["backoff_max"]
+	newCfg.Pipeline = input["pipeline"]
+	newCfg.CloudID = input["cloud_id"]
+	newCfg.CloudAuth = input["cloud_auth"]
+	newCfg.ProxyURL = input["proxy_url"]
+	newCfg.APIKey = input["api_key"]
+	newCfg.Timeout = input["timeout"]
+	newCfg.BackoffInit = input["backoff_init"]
+	newCfg.BackoffMax = input["backoff_max"]
 
 	rawILM, isILM := input["ilm_enabled"]
 
 	if isILM {
-		if rawILM == "true" {
-			newCfg.ILMEnabled = true
-		} else if rawILM == "false" {
-			newCfg.ILMEnabled = false
-		} else {
-			return newCfg, errors.New("ilm_enabled must be 'true' or 'false'")
+		ilmBool, err := strconv.ParseBool(rawILM)
+		if err != nil {
+			return newCfg, errors.Wrapf(err, "could not convert %s to bool", rawILM)
 		}
+		newCfg.ILMEnabled = ilmBool
 
 		if isIndex && newCfg.ILMEnabled {
 			return newCfg, errors.New("Cannot set output index while ILM is enabled")
@@ -77,8 +76,8 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 
 	}
 
-	newCfg.ILMRollverAlias, _ = input["ilm_rollover_alias"]
-	newCfg.ILMPatterns, _ = input["ilm_pattern"]
+	newCfg.ILMRollverAlias = input["ilm_rollover_alias"]
+	newCfg.ILMPatterns = input["ilm_pattern"]
 
 	if isIndex {
 		tname, tnameOk := input["template_name"]
