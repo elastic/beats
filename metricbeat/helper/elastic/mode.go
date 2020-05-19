@@ -65,3 +65,13 @@ func DefaultModeConfig() ModeConfig {
 		Mode:         ModeStackMonitoring,
 	}
 }
+
+// GetMode returns the correct mode for the config. It takes into account the deprecated
+// and new settings.
+func (c ModeConfig) GetMode() Mode {
+	if c.XPackEnabled || (c.Mode == ModeStackMonitoring) {
+		return ModeStackMonitoring
+	}
+
+	return ModeDefault
+}
