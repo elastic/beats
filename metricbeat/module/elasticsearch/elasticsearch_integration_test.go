@@ -62,7 +62,7 @@ var metricSets = []string{
 	"shard",
 }
 
-var stackMonitoringMetricSets = []string{
+var xpackMetricSets = []string{
 	"ccr",
 	"enrich",
 	"cluster_stats",
@@ -268,7 +268,7 @@ func getConfig(metricset string, host string) map[string]interface{} {
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":        elasticsearch.ModuleName,
-		"metricsets":    stackMonitoringMetricSets,
+		"metricsets":    xpackMetricSets,
 		"hosts":         []string{host},
 		"xpack.enabled": true,
 	}

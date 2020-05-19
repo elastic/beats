@@ -41,7 +41,7 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        elasticsearch.ModuleName,
 		"hosts":         []string{"foobar:9200"},
-		"xpack.enabled": "true",
+		"xpack.enabled": true,
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
