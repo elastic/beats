@@ -205,7 +205,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
-	// check if the message is an object containing a list of events
+	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
 		if len(mapObject[expandEventListFromField]) > 0 {
@@ -219,10 +219,15 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 			}
 		}
 	} else {
+		a.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
 		// in some cases the message is an array
-		a.log.Debugw(fmt.Sprintf("deserializing multiple messages using the group object `records`"), "warning", err)
 		var arrayObject []interface{}
 		err = json.Unmarshal(bMessage, &arrayObject)
+		if err != nil {
+			// return entire message
+			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			return []string{string(bMessage)}
+		}
 		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
