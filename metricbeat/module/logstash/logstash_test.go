@@ -84,11 +84,11 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 	}
 }
 
-func TestStackMonitoringMetricSets(t *testing.T) {
+func TestStackMonitoringMetricsets(t *testing.T) {
 	config := map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"hosts":         []string{"foobar:9600"},
-		"xpack.enabled": true,
+		"module": logstash.ModuleName,
+		"hosts":  []string{"foobar:9600"},
+		"mode":   "stack-monitoring",
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
