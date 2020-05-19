@@ -6,9 +6,10 @@ package pipelinemanager
 
 import (
 	"crypto/sha1"
-	"errors"
 	"reflect"
 	"sort"
+
+	"github.com/pkg/errors"
 )
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
@@ -18,6 +19,10 @@ type ContainerOutputConfig struct {
 	Password        string `config:"output.elasticsearch.password"`
 	Index           string `config:"output.elasticsearch.index"`
 	Pipeline        string `config:"output.elasticsearch.pipeline"`
+	APIKey          string `config:"output.elasticsearch.api_key"`
+	Timeout         string `config:"output.elasticsearch.timeout"`
+	BackoffInit     string `config:"output.elasticsearch.backoff.init"`
+	BackoffMax      string `config:"output.elasticsearch.backoff.max"`
 	CloudID         string `config:"cloud.id"`
 	CloudAuth       string `config:"cloud.auth"`
 	ProxyURL        string `config:"output.elasticsearch.proxy_url"`
@@ -47,6 +52,8 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg.CloudID, _ = input["cloud_id"]
 	newCfg.CloudAuth, _ = input["cloud_auth"]
 	newCfg.ProxyURL, _ = input["proxy_url"]
+	newCfg.APIKey, _ = input["api_key"]
+	newCfg.Timeout, _ = input["timeout"]
 
 	rawILM, isILM := input["ilm_enabled"]
 
