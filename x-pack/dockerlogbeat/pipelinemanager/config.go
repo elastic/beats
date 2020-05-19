@@ -9,9 +9,10 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/pkg/errors"
 )
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
