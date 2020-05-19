@@ -21,6 +21,9 @@ To build and install, just run `mage Package`. The build process happens entire 
 | `password`           | The Elasticsearch Password to connect with.                                                                                       |
 | `index`              | The Elasticsearch Index to use. Requires `ilm_enabled` to be false, and `template_name` and `template_pattern` pattern to be set. |
 | `pipeline`           |  The Elasticsearch Pipeline to use.                                                                                               |
+| `backoff_init`       |  The number of seconds to wait before trying to reconnect to Elasticsearch after a network error.                                 |
+| `backoff_max`        |  The maximum number of seconds to wait before attempting to connect to Elasticsearch after a network error.                       |
+| `timeout`            |  The http request timeout in seconds for the Elasticsearch request                                                                |
 | `cloud_id`           | CloudID value.                                                                                                                    |
 | `cloud_auth`         |  CloudID auth.                                                                                                                    |
 | `proxy_url`          | A proxy URL to use.                                                                                                               |

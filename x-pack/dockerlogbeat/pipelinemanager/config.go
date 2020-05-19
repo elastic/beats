@@ -56,6 +56,8 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg.ProxyURL, _ = input["proxy_url"]
 	newCfg.APIKey, _ = input["api_key"]
 	newCfg.Timeout, _ = input["timeout"]
+	newCfg.BackoffInit, _ = input["backoff_init"]
+	newCfg.BackoffMax, _ = input["backoff_max"]
 
 	rawILM, isILM := input["ilm_enabled"]
 
