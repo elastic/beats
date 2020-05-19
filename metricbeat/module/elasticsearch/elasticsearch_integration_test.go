@@ -185,6 +185,76 @@ func TestModeStackMonitoring(t *testing.T) {
 	}
 }
 
+func TestModeStackMonitoring(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+	host := service.Host()
+
+	version, err := getElasticsearchVersion(host)
+	require.NoError(t, err)
+
+	setupTest(t, host, version)
+
+	metricSetToTypesMap := map[string][]string{
+		"ccr":            []string{"ccr_stats", "ccr_auto_follow_stats"},
+		"cluster_stats":  []string{"cluster_stats"},
+		"enrich":         []string{"enrich_coordinator_stats"},
+		"index_recovery": []string{"index_recovery"},
+		"index_summary":  []string{"indices_stats"},
+		"ml_job":         []string{"job_stats"},
+		"node_stats":     []string{"node_stats"},
+	}
+
+	config := getStackMonitoringConfig(host)
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		t.Run(metricSet.Name(), func(t *testing.T) {
+			checkSkip(t, metricSet.Name(), version)
+			events, errs := mbtest.ReportingFetchV2Error(metricSet)
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
+
+			// Special case: the `index` metricset generates as many events
+			// as there are distinct indices in Elasticsearch
+			if metricSet.Name() == "index" {
+				numIndices, err := countIndices(host)
+				require.NoError(t, err)
+				require.Len(t, events, numIndices)
+
+				for _, event := range events {
+					require.Equal(t, "index_stats", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+				}
+
+				return
+			}
+
+			// Special case: the `shard` metricset generates as many events
+			// as there are distinct shards in Elasticsearch
+			if metricSet.Name() == "shard" {
+				numShards, err := countShards(host)
+				require.NoError(t, err)
+				require.Len(t, events, numShards)
+
+				for _, event := range events {
+					require.Equal(t, "shards", event.RootFields["type"])
+					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+				}
+
+				return
+			}
+
+			types := metricSetToTypesMap[metricSet.Name()]
+			require.Len(t, events, len(types))
+
+			for i, event := range events {
+				require.Equal(t, types[i], event.RootFields["type"])
+				require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
+			}
+		})
+	}
+}
+
 // GetConfig returns config for elasticsearch module
 func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
@@ -199,6 +269,15 @@ func getStackMonitoringConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     elasticsearch.ModuleName,
 		"metricsets": stackMonitoringMetricSets,
+		"hosts":      []string{host},
+		"mode":       "stack-monitoring",
+	}
+}
+
+func getStackMonitoringConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     elasticsearch.ModuleName,
+		"metricsets": xpackMetricSets,
 		"hosts":      []string{host},
 		"mode":       "stack-monitoring",
 	}

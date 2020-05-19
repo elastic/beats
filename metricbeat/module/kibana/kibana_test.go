@@ -58,3 +58,15 @@ func TestStackMonitoringMetricSets(t *testing.T) {
 	require.Len(t, metricSets, 1)
 	require.Equal(t, "stats", metricSets[0].Name())
 }
+
+func TestStackMonitoringMetricsets(t *testing.T) {
+	config := map[string]interface{}{
+		"module": kibana.ModuleName,
+		"hosts":  []string{"foobar:5601"},
+		"mode":   "stack-monitoring",
+	}
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	require.Len(t, metricSets, 1)
+	require.Equal(t, "stats", metricSets[0].Name())
+}

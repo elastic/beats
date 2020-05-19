@@ -81,6 +81,31 @@ func TestXPackEnabled(t *testing.T) {
 		"node_stats": "logstash_stats",
 	}
 
+	config := getXPackConfig(lsService.Host())
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
+
+		event := events[0]
+		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		require.Equal(t, clusterUUID, event.RootFields["cluster_uuid"])
+		require.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
+	}
+}
+
+func TestModeStackMonitoring(t *testing.T) {
+	lsService := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	esService := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+
+	clusterUUID := getESClusterUUID(t, esService.Host())
+
+	metricSetToTypeMap := map[string]string{
+		"node":       "logstash_state",
+		"node_stats": "logstash_stats",
+	}
+
 	config := getStackMonitoringConfig(lsService.Host())
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
@@ -100,6 +125,15 @@ func getConfig(metricSet string, host string) map[string]interface{} {
 		"module":     logstash.ModuleName,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{host},
+	}
+}
+
+func getXPackConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":        logstash.ModuleName,
+		"metricsets":    metricSets,
+		"hosts":         []string{host},
+		"xpack.enabled": "true",
 	}
 }
 

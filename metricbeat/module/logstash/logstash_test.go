@@ -83,3 +83,22 @@ func TestStackMonitoringMetricSets(t *testing.T) {
 		}
 	}
 }
+
+func TestStackMonitoringMetricSets(t *testing.T) {
+	config := map[string]interface{}{
+		"module":        logstash.ModuleName,
+		"hosts":         []string{"foobar:9600"},
+		"xpack.enabled": true,
+	}
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	require.Len(t, metricSets, 2)
+	for _, ms := range metricSets {
+		name := ms.Name()
+		switch name {
+		case "node", "node_stats":
+		default:
+			t.Errorf("unexpected metricset name = %v", name)
+		}
+	}
+}

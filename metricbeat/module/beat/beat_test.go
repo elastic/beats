@@ -48,3 +48,22 @@ func TestStackMonitoringMetricSets(t *testing.T) {
 		}
 	}
 }
+
+func TestStackMonitoringMetricsets(t *testing.T) {
+	config := map[string]interface{}{
+		"module": beat.ModuleName,
+		"hosts":  []string{"foobar:5066"},
+		"mode":   "stack-monitoring",
+	}
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	require.Len(t, metricSets, 2)
+	for _, ms := range metricSets {
+		name := ms.Name()
+		switch name {
+		case "state", "stats":
+		default:
+			t.Errorf("unexpected metricset name = %v", name)
+		}
+	}
+}

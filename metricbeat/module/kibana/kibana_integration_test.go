@@ -34,6 +34,27 @@ var xpackMetricSets = []string{
 	"stats",
 }
 
+func TestXPackEnabled(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "kibana")
+
+	metricSetToTypeMap := map[string]string{
+		"stats": "kibana_stats",
+	}
+
+	config := getXPackConfig(service.Host())
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
+
+		event := events[0]
+		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		require.Regexp(t, `^.monitoring-kibana-\d-mb`, event.Index)
+	}
+}
+
 func TestModeStackMonitoring(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "kibana")
 
@@ -55,10 +76,19 @@ func TestModeStackMonitoring(t *testing.T) {
 	}
 }
 
+func getXPackConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":        kibana.ModuleName,
+		"metricsets":    xpackMetricSets,
+		"hosts":         []string{host},
+		"xpack.enabled": "true",
+	}
+}
+
 func getStackMonitoringConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     kibana.ModuleName,
-		"metricsets": xpackMetricSets,
+		"metricsets": stackMonitoringMetricSets,
 		"hosts":      []string{host},
 		"mode":       "stack-monitoring",
 	}
