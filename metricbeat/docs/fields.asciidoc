@@ -19585,6 +19585,16 @@ type: long
 
 --
 
+*`haproxy.info.threads`*::
++
+--
+Number of threads.
+
+
+type: long
+
+--
+
 *`haproxy.info.pid`*::
 +
 --
