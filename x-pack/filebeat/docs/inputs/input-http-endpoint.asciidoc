@@ -37,7 +37,6 @@ Custom response example:
   listen_port: 8080
   response_code: 200
   response_body: '{"message": "success"}'
-  response_header: '{"Content-Type": "application/json"}'
   url: "/"
   prefix: "json"
 ----
@@ -85,11 +84,6 @@ If `basic_auth` is eanbled, this is the password used for authentication against
 ==== `response_code`
 
 The HTTP response code returned upon success. Should be in the 2XX range.
-
-[float]
-==== `response_header`
-
-The response header returned upon success.
 
 [float]
 ==== `response_body`

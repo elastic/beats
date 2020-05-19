@@ -119,8 +119,6 @@ func (in *HttpEndpoint) run() {
 	defer in.workerWg.Done()
 	defer in.log.Infof("%v worker has stopped.", inputName)
 	in.server.Start()
-
-	return
 }
 
 // Stops HTTP input and waits for it to finish
@@ -144,26 +142,19 @@ func (in *HttpEndpoint) sendEvent(w http.ResponseWriter, r *http.Request) {
 	})
 	if !event {
 		in.sendResponse(w, http.StatusInternalServerError, in.createErrorMessage("Unable to send event"))
-		return
 	}
+}
 
-	return
+// Triggers if middleware validation returns successful
+func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
+	in.sendEvent(w, r)
+	w.Header().Add("Content-Type", "application/json")
+	in.sendResponse(w, uint(in.config.ResponseCode), in.config.ResponseBody)
 }
 
 func (in *HttpEndpoint) sendResponse(w http.ResponseWriter, h uint, b string) {
 	w.WriteHeader(int(h))
 	w.Write([]byte(b))
-}
-
-// Triggers if middleware validation returns successful
-func (in *HttpEndpoint) apiResponse(w http.ResponseWriter, r *http.Request) {
-	objmap := make(map[string]string)
-	json.Unmarshal([]byte(in.config.ResponseHeader), &objmap)
-	for k, v := range objmap {
-		w.Header().Set(k, v)
-	}
-	in.sendEvent(w, r)
-	in.sendResponse(w, uint(in.config.ResponseCode), in.config.ResponseBody)
 }
 
 // Runs all validations for each request
