@@ -50,13 +50,6 @@ const ModuleName = "logstash"
 // can return pipeline graphs
 var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 
-// MetricSet can be used to build other metricsets within the Logstash module.
-type MetricSet struct {
-	mb.BaseMetricSet
-	*helper.HTTP
-	XPack bool
-}
-
 type graph struct {
 	Vertices []map[string]interface{} `json:"vertices"`
 	Edges    []map[string]interface{} `json:"edges"`
@@ -78,26 +71,6 @@ type PipelineState struct {
 	Representation *graphContainer `json:"representation"`
 	BatchSize      int             `json:"batch_size"`
 	Workers        int             `json:"workers"`
-}
-
-// NewMetricSet creates a metricset that can be used to build other metricsets
-// within the Logstash module.
-func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := elastic.DefaultModeConfig()
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
-	return &MetricSet{
-		base,
-		http,
-		config.GetMode() == elastic.ModeStackMonitoring,
-	}, nil
 }
 
 // GetPipelines returns the list of pipelines running on a Logstash node and,
