@@ -133,7 +133,7 @@ func getXPackConfig(host string) map[string]interface{} {
 		"module":        logstash.ModuleName,
 		"metricsets":    metricSets,
 		"hosts":         []string{host},
-		"xpack.enabled": "true",
+		"xpack.enabled": true,
 	}
 }
 

@@ -102,7 +102,7 @@ func getXPackConfig(host string) map[string]interface{} {
 		"module":        beat.ModuleName,
 		"metricsets":    metricSets,
 		"hosts":         []string{host},
-		"xpack.enabled": "true",
+		"xpack.enabled": true,
 	}
 }
 
