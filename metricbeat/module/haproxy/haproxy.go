@@ -186,17 +186,17 @@ type Info struct {
 	IdlePct                    string `mapstructure:"Idle_pct"`
 	Node                       string `mapstructure:"Node"`
 	Description                string `mapstructure:"Description"`
-	Stopping                   string `mapstructure:"Stopping"`
-	Jobs                       string `mapstructure:"Jobs"`
-	UnstoppableJobs            string `mapstructure:"Unstoppable Jobs"`
-	Listeners                  string `mapstructure:"Listeners"`
-	ActivePeers                string `mapstructure:"ActivePeers"`
-	ConnectedPeers             string `mapstructure:"ConnectedPeers"`
-	DroppedLogs                string `mapstructure:"DroppedLogs"`
-	BusyPolling                string `mapstructure:"BusyPolling"`
-	FailedResolutions          string `mapstructure:"FailedResolutions"`
-	TotalBytesOut              string `mapstructure:"TotalBytesOut"`
-	BytesOutRate               string `mapstructure:"BytesOutRate"`
+	Stopping                   string `mapstructure:"Stopping,omitempty"`
+	Jobs                       string `mapstructure:"Jobs,omitempty"`
+	UnstoppableJobs            string `mapstructure:"Unstoppable Jobs,omitempty"`
+	Listeners                  string `mapstructure:"Listeners,omitempty"`
+	ActivePeers                string `mapstructure:"ActivePeers,omitempty"`
+	ConnectedPeers             string `mapstructure:"ConnectedPeers,omitempty"`
+	DroppedLogs                string `mapstructure:"DroppedLogs,omitempty"`
+	BusyPolling                string `mapstructure:"BusyPolling,omitempty"`
+	FailedResolutions          string `mapstructure:"FailedResolutions,omitempty"`
+	TotalBytesOut              string `mapstructure:"TotalBytesOut,omitempty"`
+	BytesOutRate               string `mapstructure:"BytesOutRate,omitempty"`
 }
 
 // Client is an instance of the HAProxy client

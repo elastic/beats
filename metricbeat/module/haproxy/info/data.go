@@ -186,7 +186,11 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 			}
 			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
 		} else {
-			source[typeOfT.Field(i).Name] = f.Interface()
+			if f.Interface().(string) == "" {
+				source[typeOfT.Field(i).Name] = "0"
+			} else {
+				source[typeOfT.Field(i).Name] = f.Interface()
+			}
 		}
 
 	}
