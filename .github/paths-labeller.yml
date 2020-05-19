@@ -1,0 +1,3 @@
+---
+  - "Team: Ingest Management":
+    - "x-pack/elastic-agent/**/*.*"
