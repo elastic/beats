@@ -30,11 +30,11 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
 )
 
-func TestStackMonitoringMetricSets(t *testing.T) {
+func TestXPackMetricSets(t *testing.T) {
 	config := map[string]interface{}{
-		"module": beat.ModuleName,
-		"hosts":  []string{"foobar:5066"},
-		"mode":   "stack-monitoring",
+		"module":        beat.ModuleName,
+		"hosts":         []string{"foobar:5066"},
+		"xpack.enabled": "true",
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)

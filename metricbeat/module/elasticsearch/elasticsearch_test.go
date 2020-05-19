@@ -37,11 +37,11 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 )
 
-func TestStackMonitoringMetricsets(t *testing.T) {
+func TestXPackMetricsets(t *testing.T) {
 	config := map[string]interface{}{
-		"module": elasticsearch.ModuleName,
-		"hosts":  []string{"foobar:9200"},
-		"mode":   "stack-monitoring",
+		"module":        elasticsearch.ModuleName,
+		"hosts":         []string{"foobar:9200"},
+		"xpack.enabled": "true",
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
