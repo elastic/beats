@@ -63,7 +63,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		base,
 		servicePath,
 		http,
-		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
+		config.GetMode() == elastic.ModeStackMonitoring,
 	}
 
 	ms.SetServiceURI(servicePath)

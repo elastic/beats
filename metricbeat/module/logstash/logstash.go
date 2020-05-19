@@ -96,7 +96,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-		config.XPackEnabled || (config.Mode == elastic.ModeStackMonitoring),
+		config.GetMode() == elastic.ModeStackMonitoring,
 	}, nil
 }
 
