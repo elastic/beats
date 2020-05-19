@@ -47,7 +47,7 @@ NOTE: Kerberos settings are disabled if either `enabled` is set to `false` or th
 There are two options to authenticate with Kerberos KDC: `password` and `keytab`.
 
 `password` expects the principal name and its password. When choosing `keytab`, you
-have to specify a princial name and a path to a keytab. The keytab must contain
+have to specify a principal name and a path to a keytab. The keytab must contain
 the keys of the selected principal. Otherwise, authentication will fail.
 
 [float]

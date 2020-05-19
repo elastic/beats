@@ -1681,10 +1681,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --------------------------------------------------------------------
-Dependency: github.com/elastic/go-libaudit
-Version: v0.4.0
+Dependency: github.com/elastic/go-libaudit/v2
+Version: v2.0.0
+Revision: 92371bef3fb8
 License type (autodetected): Apache-2.0
-./vendor/github.com/elastic/go-libaudit/LICENSE.txt:
+./vendor/github.com/elastic/go-libaudit/v2/LICENSE.txt:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -8448,7 +8449,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.8
+Version: v2.3.0
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/yaml.v2/LICENSE:
 --------------------------------------------------------------------
@@ -8471,7 +8472,7 @@ limitations under the License.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.8
+Version: v2.3.0
 License type (autodetected): MIT
 ./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
 --------------------------------------------------------------------

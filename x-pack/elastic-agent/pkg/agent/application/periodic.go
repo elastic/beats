@@ -23,21 +23,24 @@ type periodic struct {
 }
 
 func (p *periodic) Start() error {
-	if err := p.work(); err != nil {
-		p.log.Debugf("Failed to read configuration, error: %s", err)
-	}
-
-	for {
-		select {
-		case <-p.done:
-			break
-		case <-time.After(p.period):
-		}
-
+	go func() {
 		if err := p.work(); err != nil {
 			p.log.Debugf("Failed to read configuration, error: %s", err)
 		}
-	}
+
+		for {
+			select {
+			case <-p.done:
+				break
+			case <-time.After(p.period):
+			}
+
+			if err := p.work(); err != nil {
+				p.log.Debugf("Failed to read configuration, error: %s", err)
+			}
+		}
+	}()
+	return nil
 }
 
 func (p *periodic) work() error {
