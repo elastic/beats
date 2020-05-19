@@ -16,9 +16,9 @@ The `elasticsearch` module works with {es} 6.7.0 and later.
 === Usage for Stack Monitoring
 
 The `elasticsearch` module can be used to collect metrics shown in our {stack} {monitor-features}
-UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+UI in {kib}. To enable this usage, set `mode: stack-monitoring` and remove any `metricsets`
 from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
-`metricbeat modules enable elasticsearch-xpack`.
+`metricbeat modules enable elasticsearch-stack-monitoring`.
 
 
 [float]
