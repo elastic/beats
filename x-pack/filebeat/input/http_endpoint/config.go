@@ -10,28 +10,28 @@ import (
 
 // Config contains information about httpjson configuration
 type config struct {
-	TLS            *tlscommon.ServerConfig `config:"ssl"`
-	BasicAuth      bool                    `config:"basic_auth"`
-	Username       string                  `config:"username"`
-	Password       string                  `config:"password"`
-	ResponseCode   int                     `config:"response_code" validate:"positive"`
-	ResponseBody   string                  `config:"response_body"`
-	ListenAddress  string                  `config:"listen_address"`
-	ListenPort     string                  `config:"listen_port"`
-	URL            string                  `config:"url"`
-	Prefix         string                  `config:"prefix"`
+	TLS           *tlscommon.ServerConfig `config:"ssl"`
+	BasicAuth     bool                    `config:"basic_auth"`
+	Username      string                  `config:"username"`
+	Password      string                  `config:"password"`
+	ResponseCode  int                     `config:"response_code" validate:"positive"`
+	ResponseBody  string                  `config:"response_body"`
+	ListenAddress string                  `config:"listen_address"`
+	ListenPort    string                  `config:"listen_port"`
+	URL           string                  `config:"url"`
+	Prefix        string                  `config:"prefix"`
 }
 
 func defaultConfig() config {
 	return config{
-		BasicAuth:      false,
-		Username:       "",
-		Password:       "",
-		ResponseCode:   200,
-		ResponseBody:   `{"message": "success"}`,
-		ListenAddress:  "127.0.0.1",
-		ListenPort:     "8000",
-		URL:            "/",
-		Prefix:         "json",
+		BasicAuth:     false,
+		Username:      "",
+		Password:      "",
+		ResponseCode:  200,
+		ResponseBody:  `{"message": "success"}`,
+		ListenAddress: "127.0.0.1",
+		ListenPort:    "8000",
+		URL:           "/",
+		Prefix:        "json",
 	}
 }
