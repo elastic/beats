@@ -1,0 +1,10 @@
+- name: uptime
+  type: group
+  release: beta
+  description: >
+    uptime
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

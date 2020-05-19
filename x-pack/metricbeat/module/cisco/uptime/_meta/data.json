@@ -1,0 +1,22 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"cisco",
+        "name":"uptime",
+        "rtt":44269
+    },
+    "cisco": {
+    "uptime": {
+      "duration": {
+        "sec": 10466
+      }
+    }
+  },
+
+    "type":"metricsets"
+}

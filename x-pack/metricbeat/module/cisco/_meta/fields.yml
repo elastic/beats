@@ -1,0 +1,10 @@
+- key: cisco
+  title: "cisco"
+  release: beta
+  description: >
+    cisco module
+  fields:
+    - name: cisco
+      type: group
+      description: >
+      fields:

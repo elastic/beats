@@ -359,6 +359,18 @@ metricbeat.modules:
   #username: "user"
   #password: "secret"
 
+#-------------------------------- Cisco Module --------------------------------
+- module: cisco
+  metricsets: ["system"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+#  community: private
+#  version: v2c
+#  max_oids: 10
+
+
+
 #----------------------------- Cloudfoundry Module -----------------------------
 - module: cloudfoundry
   metricsets:
