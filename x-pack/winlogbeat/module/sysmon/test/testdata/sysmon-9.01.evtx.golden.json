@@ -39,20 +39,16 @@
   {
     "@timestamp": "2019-03-18T16:57:38.011Z",
     "event": {
+      "category": [
+        "process"
+      ],
       "code": 4,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "process"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -468,22 +464,18 @@
       "port": 53
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -549,22 +541,18 @@
       "port": 53
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -631,22 +619,18 @@
       "port": 443
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -713,22 +697,18 @@
       "port": 443
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -795,22 +775,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -881,22 +857,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -965,22 +937,18 @@
       "port": 5355
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1047,22 +1015,18 @@
       "port": 5355
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1128,22 +1092,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1212,22 +1172,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1296,22 +1252,18 @@
       "port": 5355
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1377,22 +1329,18 @@
       "port": 5355
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1458,22 +1406,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1543,22 +1487,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1628,22 +1568,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1713,22 +1649,18 @@
       "port": 137
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 3,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "start",
-          "protocol"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "start",
+        "protocol"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1894,20 +1826,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.387Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data",
@@ -1957,20 +1885,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data",
@@ -2020,20 +1944,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
@@ -2083,20 +2003,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
@@ -2196,20 +2112,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def",
@@ -2259,20 +2171,16 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 2,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "change"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def",
