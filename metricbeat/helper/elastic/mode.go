@@ -62,7 +62,7 @@ type ModeConfig struct {
 func DefaultModeConfig() ModeConfig {
 	return ModeConfig{
 		XPackEnabled: false,
-		Mode:         ModeStackMonitoring,
+		Mode:         ModeDefault,
 	}
 }
 
