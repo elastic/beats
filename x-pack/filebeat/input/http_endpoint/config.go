@@ -29,7 +29,6 @@ func defaultConfig() config {
 		Password:       "",
 		ResponseCode:   200,
 		ResponseBody:   `{"message": "success"}`,
-		ResponseHeader: `{"Content-Type": "application/json"}`,
 		ListenAddress:  "127.0.0.1",
 		ListenPort:     "8000",
 		URL:            "/",
