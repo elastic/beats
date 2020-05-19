@@ -2,20 +2,16 @@
   {
     "@timestamp": "2020-05-07T08:14:44.489Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 23,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "deletion"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "deletion"
+      ]
     },
     "file": {
       "directory": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\1\\go-build583768550\\b001",
@@ -91,20 +87,16 @@
   {
     "@timestamp": "2020-05-07T07:27:18.722Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 23,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "deletion"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "deletion"
+      ]
     },
     "file": {
       "directory": "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local",
@@ -173,20 +165,16 @@
   {
     "@timestamp": "2020-05-12T06:48:27.084Z",
     "event": {
+      "category": [
+        "file"
+      ],
       "code": 23,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "file"
-        ],
-        "type": [
-          "deletion"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "deletion"
+      ]
     },
     "file": {
       "directory": "C:\\Windows\\System32\\LogFiles\\Scm",
