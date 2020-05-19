@@ -22,34 +22,36 @@ import (
 	"testing"
 	"testing/quick"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/stretchr/testify/require"
 )
 
 func TestGetServiceURI(t *testing.T) {
 	tests := map[string]struct {
 		currURI            string
-		xpackEnabled       bool
+		mode               elastic.Mode
 		graphAPIsAvailable func() error
 		expectedURI        string
 		errExpected        bool
 	}{
 		"xpack_disabled": {
 			currURI:            "/_node/stats",
-			xpackEnabled:       false,
+			mode:               elastic.ModeDefault,
 			graphAPIsAvailable: func() error { return nil },
 			expectedURI:        "/_node/stats",
 			errExpected:        false,
 		},
 		"apis_unavailable": {
 			currURI:            "/_node/stats",
-			xpackEnabled:       true,
+			mode:               elastic.ModeStackMonitoring,
 			graphAPIsAvailable: func() error { return errors.New("test") },
 			expectedURI:        "",
 			errExpected:        true,
 		},
 		"with_pipeline_vertices": {
 			currURI:            "_node/stats",
-			xpackEnabled:       true,
+			mode:               elastic.ModeStackMonitoring,
 			graphAPIsAvailable: func() error { return nil },
 			expectedURI:        "/_node/stats?vertices=true",
 			errExpected:        false,
@@ -58,7 +60,7 @@ func TestGetServiceURI(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			newURI, err := getServiceURI(nodeStatsPath, test.xpackEnabled, test.graphAPIsAvailable)
+			newURI, err := getServiceURI(nodeStatsPath, test.mode, test.graphAPIsAvailable)
 			if test.errExpected {
 				require.Equal(t, "", newURI)
 			} else {
@@ -77,7 +79,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 
 		numCalls := 2 + (r % 10) // between 2 and 11
 		for i := uint(0); i < numCalls; i++ {
-			uri, err = getServiceURI(uri, true, func() error { return nil })
+			uri, err = getServiceURI(uri, elastic.ModeStackMonitoring, func() error { return nil })
 			if err != nil {
 				return false
 			}
