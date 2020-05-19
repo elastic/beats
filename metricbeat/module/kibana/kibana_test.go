@@ -47,11 +47,11 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	}
 }
 
-func TestXPackEnabledMetricsets(t *testing.T) {
+func TestStackMonitoringMetricSets(t *testing.T) {
 	config := map[string]interface{}{
-		"module":        kibana.ModuleName,
-		"hosts":         []string{"foobar:5601"},
-		"xpack.enabled": true,
+		"module": kibana.ModuleName,
+		"hosts":  []string{"foobar:5601"},
+		"mode":   "stack-monitoring",
 	}
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)

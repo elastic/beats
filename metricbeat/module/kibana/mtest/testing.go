@@ -17,15 +17,17 @@
 
 package mtest
 
+import "github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 // GetConfig returns config for kibana module
-func GetConfig(metricset string, host string, xpackEnabled bool) map[string]interface{} {
+func GetConfig(metricset string, host string, mode elastic.Mode) map[string]interface{} {
 	config := map[string]interface{}{
 		"module":     "kibana",
 		"metricsets": []string{metricset},
 		"hosts":      []string{host},
 	}
-	if xpackEnabled {
-		config["xpack.enabled"] = true
+	if mode == elastic.ModeStackMonitoring {
+		config["mode"] = "stack-monitoring"
 	}
 
 	return config

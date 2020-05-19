@@ -81,7 +81,7 @@ func TestXPackEnabled(t *testing.T) {
 		"node_stats": "logstash_stats",
 	}
 
-	config := getXPackConfig(lsService.Host())
+	config := getStackMonitoringConfig(lsService.Host())
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
 		events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -103,12 +103,12 @@ func getConfig(metricSet string, host string) map[string]interface{} {
 	}
 }
 
-func getXPackConfig(host string) map[string]interface{} {
+func getStackMonitoringConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        logstash.ModuleName,
-		"metricsets":    metricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     logstash.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
+		"mode":       "stack-monitoring",
 	}
 }
 

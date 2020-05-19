@@ -62,7 +62,7 @@ var metricSets = []string{
 	"shard",
 }
 
-var xpackMetricSets = []string{
+var stackMonitoringMetricSets = []string{
 	"ccr",
 	"enrich",
 	"cluster_stats",
@@ -115,7 +115,7 @@ func TestData(t *testing.T) {
 	}
 }
 
-func TestXPackEnabled(t *testing.T) {
+func TestModeStackMonitoring(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 	host := service.Host()
 
@@ -134,7 +134,7 @@ func TestXPackEnabled(t *testing.T) {
 		"node_stats":     []string{"node_stats"},
 	}
 
-	config := getXPackConfig(host)
+	config := getStackMonitoringConfig(host)
 
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
@@ -195,12 +195,12 @@ func getConfig(metricset string, host string) map[string]interface{} {
 	}
 }
 
-func getXPackConfig(host string) map[string]interface{} {
+func getStackMonitoringConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        elasticsearch.ModuleName,
-		"metricsets":    xpackMetricSets,
-		"hosts":         []string{host},
-		"xpack.enabled": true,
+		"module":     elasticsearch.ModuleName,
+		"metricsets": stackMonitoringMetricSets,
+		"hosts":      []string{host},
+		"mode":       "stack-monitoring",
 	}
 }
 

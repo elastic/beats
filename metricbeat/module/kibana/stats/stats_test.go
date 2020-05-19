@@ -24,6 +24,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -63,7 +65,7 @@ func TestFetchUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL, elastic.ModeStackMonitoring)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 

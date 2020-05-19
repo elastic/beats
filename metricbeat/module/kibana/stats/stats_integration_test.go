@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -38,7 +40,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host(), elastic.ModeDefault)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -63,7 +65,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("stats", service.Host(), elastic.ModeDefault)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
