@@ -52,7 +52,7 @@ func makeConfigHash(cfg map[string]string) string {
 // load pipeline starts up a new pipeline with the given config
 func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp.Logger) (*Pipeline, error) {
 
-	cfg, err := common.NewConfigFrom(logOptsConfig)
+	cfg, err := logOptsConfig.CreateConfig()
 	if err != nil {
 		return nil, err
 	}

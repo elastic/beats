@@ -9,28 +9,30 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/pkg/errors"
 )
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
 type ContainerOutputConfig struct {
-	Endpoint        string `config:"output.elasticsearch.hosts"`
-	User            string `config:"output.elasticsearch.username"`
-	Password        string `config:"output.elasticsearch.password"`
-	Index           string `config:"output.elasticsearch.index"`
-	Pipeline        string `config:"output.elasticsearch.pipeline"`
-	APIKey          string `config:"output.elasticsearch.api_key"`
-	Timeout         string `config:"output.elasticsearch.timeout"`
-	BackoffInit     string `config:"output.elasticsearch.backoff.init"`
-	BackoffMax      string `config:"output.elasticsearch.backoff.max"`
-	CloudID         string `config:"cloud.id"`
-	CloudAuth       string `config:"cloud.auth"`
-	ProxyURL        string `config:"output.elasticsearch.proxy_url"`
-	ILMEnabled      bool   `config:"setup.ilm.enabled"`
-	ILMRollverAlias string `config:"setup.ilm.rollover_alias"`
-	ILMPatterns     string `config:"setup.ilm.pattern"`
-	TemplateName    string `config:"setup.template.name"`
-	TempatePattern  string `config:"setup.template.pattern"`
+	Endpoint        string `struct:"output.elasticsearch.hosts"`
+	User            string `struct:"output.elasticsearch.username"`
+	Password        string `struct:"output.elasticsearch.password"`
+	Index           string `struct:"output.elasticsearch.index"`
+	Pipeline        string `struct:"output.elasticsearch.pipeline"`
+	APIKey          string `struct:"output.elasticsearch.api_key"`
+	Timeout         string `struct:"output.elasticsearch.timeout,omitempty"`
+	BackoffInit     string `struct:"output.elasticsearch.backoff.init,omitempty"`
+	BackoffMax      string `struct:"output.elasticsearch.backoff.max,omitempty"`
+	CloudID         string `struct:"cloud.id"`
+	CloudAuth       string `struct:"cloud.auth"`
+	ProxyURL        string `struct:"output.elasticsearch.proxy_url"`
+	ILMEnabled      bool   `struct:"setup.ilm.enabled"`
+	ILMRollverAlias string `struct:"setup.ilm.rollover_alias"`
+	ILMPatterns     string `struct:"setup.ilm.pattern"`
+	TemplateName    string `struct:"setup.template.name"`
+	TempatePattern  string `struct:"setup.template.pattern"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -87,6 +89,23 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	}
 
 	return newCfg, nil
+}
+
+// CreateConfig converts the struct into a config object that can be absorbed by libbeat
+func (cfg ContainerOutputConfig) CreateConfig() (*common.Config, error) {
+
+	// the use of typeconv is a hacky shim so we can impliment `omitempty` where needed.
+	var tmp map[string]interface{}
+	err := typeconv.Convert(&tmp, cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "error converting config struct to interface")
+	}
+	cfgFinal, err := common.NewConfigFrom(tmp)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating config object")
+	}
+
+	return cfgFinal, nil
 }
 
 // GetHash returns a sha1 hash of the config
