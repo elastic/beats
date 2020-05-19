@@ -37,7 +37,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 )
 
-func TestXPackMetricsets(t *testing.T) {
+func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        elasticsearch.ModuleName,
 		"hosts":         []string{"foobar:9200"},

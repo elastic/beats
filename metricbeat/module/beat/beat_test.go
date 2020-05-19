@@ -30,7 +30,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
 )
 
-func TestXPackMetricSets(t *testing.T) {
+func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        beat.ModuleName,
 		"hosts":         []string{"foobar:5066"},

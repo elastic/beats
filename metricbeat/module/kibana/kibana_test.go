@@ -47,7 +47,7 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	}
 }
 
-func TestXPackMetricSets(t *testing.T) {
+func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        kibana.ModuleName,
 		"hosts":         []string{"foobar:5601"},
