@@ -75,14 +75,14 @@ func (conn *Connection) Bulk(
 		return 0, nil, nil
 	}
 
-	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
-
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
 		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
+
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
 
 	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
 	if err != nil {
@@ -105,8 +105,6 @@ func (conn *Connection) SendMonitoringBulk(
 		return nil, nil
 	}
 
-	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
-
 	enc := conn.Encoder
 	enc.Reset()
 	if err := bulkEncode(conn.log, enc, body); err != nil {
@@ -118,6 +116,8 @@ func (conn *Connection) SendMonitoringBulk(
 			return nil, err
 		}
 	}
+
+	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
 
 	requ, err := newMonitoringBulkRequest(conn.GetVersion(), conn.URL, mergedParams, enc)
 	if err != nil {
