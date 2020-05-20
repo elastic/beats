@@ -35,6 +35,8 @@ with the `publish` selector like this:
 {beatname_lc} -e -d "publish"
 ------------------------------------------------------------
 
+Other selectors are `beat` and `service`
+
 If you want all the debugging output (fair warning, it's quite a lot), you can
 use `*`, like this:
 
