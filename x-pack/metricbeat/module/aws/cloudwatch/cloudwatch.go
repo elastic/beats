@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -69,7 +70,15 @@ type Config struct {
 	Dimensions         []Dimension `config:"dimensions"`
 	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
 	Statistic          []string    `config:"statistic"`
-	Tags               []aws.Tag   `config:"tags"`
+	Tags               []aws.Tag   `config:"tags"` // Deprecated.
+}
+
+// Validate checks for deprecated config options
+func (c Config) Validate() error {
+	if c.Tags != nil {
+		cfgwarn.Deprecate("8.0.0", "tags is deprecated. Use tags_filter instead")
+	}
+	return nil
 }
 
 type metricsWithStatistics struct {
@@ -292,8 +301,9 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	for _, config := range m.CloudwatchConfigs {
 		// If tags_filter on metricset level is given, overwrite tags in
 		// cloudwatch metrics with tags_filter.
+		tagsFilter := config.Tags
 		if m.MetricSet.TagsFilter != nil {
-			config.Tags = m.MetricSet.TagsFilter
+			tagsFilter = m.MetricSet.TagsFilter
 		}
 
 		// If there is no statistic method specified, then use the default.
@@ -327,10 +337,9 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 			if config.ResourceTypeFilter != "" {
 				if _, ok := resourceTypesWithTags[config.ResourceTypeFilter]; ok {
-					resourceTypesWithTags[config.ResourceTypeFilter] = config.Tags
-
+					resourceTypesWithTags[config.ResourceTypeFilter] = tagsFilter
 				} else {
-					resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], config.Tags...)
+					resourceTypesWithTags[config.ResourceTypeFilter] = append(resourceTypesWithTags[config.ResourceTypeFilter], tagsFilter...)
 				}
 			}
 			continue
@@ -338,7 +347,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               config.Tags,
+			tags:               tagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceTypeFilter,
 			dimensions:         cloudwatchDimensions,
