@@ -890,7 +890,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest/observer
-# golang.org/x/crypto v0.0.0-20200204104054-c9f3fb736b72
+# golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5
