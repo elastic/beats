@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 	"github.com/mitchellh/hashstructure"
+
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 
 	"github.com/pkg/errors"
 
