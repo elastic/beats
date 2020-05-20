@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/pkg/errors"
 
@@ -36,7 +37,7 @@ type PipelineManager struct {
 	mu     sync.Mutex
 	Logger *logp.Logger
 	// pipelines key: config hash
-	pipelines map[string]*Pipeline
+	pipelines map[uint64]*Pipeline
 	// clients config: filepath
 	clients map[string]*ClientLogger
 }
@@ -45,7 +46,7 @@ type PipelineManager struct {
 func NewPipelineManager(logCfg *common.Config) *PipelineManager {
 	return &PipelineManager{
 		Logger:    logp.NewLogger("PipelineManager"),
-		pipelines: make(map[string]*Pipeline),
+		pipelines: make(map[uint64]*Pipeline),
 		clients:   make(map[string]*ClientLogger),
 	}
 }
@@ -76,7 +77,10 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 // If no pipeline for that config exists, it creates one.
 func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutputConfig, info logger.Info, file string) (*ClientLogger, error) {
 
-	hashstring := containerConfig.GetHash()
+	hashstring, err := hashstructure.Hash(containerConfig, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating config hash")
+	}
 	pipeline, err := pm.getOrCreatePipeline(containerConfig, file, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
@@ -103,19 +107,19 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 
 // checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
 // It will either return a new pipeline, or an existing one from the pipeline map
-func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, file string, hashstring string) (*Pipeline, error) {
+func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, file string, hash uint64) (*Pipeline, error) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
 	var pipeline *Pipeline
 	var err error
-	pipeline, test := pm.pipelines[hashstring]
+	pipeline, test := pm.pipelines[hash]
 	if !test {
 		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
 		if err != nil {
 			return nil, errors.Wrap(err, "error loading pipeline")
 		}
-		pm.pipelines[hashstring] = pipeline
+		pm.pipelines[hash] = pipeline
 	}
 
 	return pipeline, nil
@@ -130,7 +134,7 @@ func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
 }
 
 // removePipeline removes a pipeline from the manager if it's refcount is zero.
-func (pm *PipelineManager) removePipelineIfNeeded(hash string) {
+func (pm *PipelineManager) removePipelineIfNeeded(hash uint64) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
@@ -149,11 +153,11 @@ func (pm *PipelineManager) removePipelineIfNeeded(hash string) {
 }
 
 // registerClient registers a new client with the manager. Up to the caller to  actually close the libbeat client
-func (pm *PipelineManager) registerClient(cl *ClientLogger, hashstring, clientFile string) {
+func (pm *PipelineManager) registerClient(cl *ClientLogger, hash uint64, clientFile string) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 	pm.clients[clientFile] = cl
-	pm.pipelines[hashstring].refCount++
+	pm.pipelines[hash].refCount++
 }
 
 // removeClient deregisters a client

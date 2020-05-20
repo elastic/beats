@@ -5,9 +5,6 @@
 package pipelinemanager
 
 import (
-	"crypto/sha1"
-	"reflect"
-	"sort"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -30,7 +27,7 @@ type ContainerOutputConfig struct {
 	CloudID         string `struct:"cloud.id,omitempty"`
 	CloudAuth       string `struct:"cloud.auth,omitempty"`
 	ProxyURL        string `struct:"output.elasticsearch.proxy_url,omitempty"`
-	ILMEnabled      bool   `struct:"setup.ilm.enabled,omitempty"`
+	ILMEnabled      bool   `struct:"setup.ilm.enabled"`
 	ILMRollverAlias string `struct:"setup.ilm.rollover_alias,omitempty"`
 	ILMPatterns     string `struct:"setup.ilm.pattern,omitempty"`
 	TemplateName    string `struct:"setup.template.name,omitempty"`
@@ -108,35 +105,4 @@ func (cfg ContainerOutputConfig) CreateConfig() (*common.Config, error) {
 	}
 
 	return cfgFinal, nil
-}
-
-// GetHash returns a sha1 hash of the config
-func (cfg ContainerOutputConfig) GetHash() string {
-	var hashString string
-	var orderedVal []string
-
-	values := reflect.ValueOf(cfg)
-	for i := 0; i < values.NumField(); i++ {
-		valRaw := values.Field(i).Interface()
-		if parsedVal, ok := valRaw.(string); ok {
-			orderedVal = append(orderedVal, parsedVal)
-		} else if parsedVal, ok := valRaw.(bool); ok {
-			if parsedVal {
-				orderedVal = append(orderedVal, "true")
-			} else {
-				orderedVal = append(orderedVal, "false")
-			}
-		}
-
-	}
-
-	sort.Strings(orderedVal)
-
-	for _, val := range orderedVal {
-		hashString = hashString + val
-	}
-
-	sum := sha1.Sum([]byte(hashString))
-
-	return string(sum[:])
 }

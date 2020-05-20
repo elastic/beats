@@ -68,7 +68,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInputFromLine(t, logString))
 	require.NoError(t, err)
 
-	client, err := newClientFromPipeline(mockConnector, reader, "aaa", cfgObject)
+	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject)
 	require.NoError(t, err)
 
 	return client
