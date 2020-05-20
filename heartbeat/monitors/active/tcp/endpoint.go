@@ -41,7 +41,7 @@ func (e endpoint) perPortURLs() (urls []*url.URL) {
 		// check if port is a range
 		if strings.Contains(port, "-") {
 			pRange := strings.Split(port, "-")
-			pStart, _  := strconv.Atoi(pRange[0])
+			pStart, _ := strconv.Atoi(pRange[0])
 			pEnd, _ := strconv.Atoi(pRange[1])
 			for i := pStart; i <= pEnd; i++ {
 				urls = append(urls, &url.URL{
@@ -49,7 +49,6 @@ func (e endpoint) perPortURLs() (urls []*url.URL) {
 					Host:   net.JoinHostPort(e.Hostname, strconv.Itoa(i)),
 				})
 			}
-
 
 		} else {
 			urls = append(urls, &url.URL{
