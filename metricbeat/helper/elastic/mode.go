@@ -44,7 +44,7 @@ func (m *Mode) Unpack(str string) error {
 	case "stack-monitoring":
 		*m = ModeStackMonitoring
 	default:
-		return fmt.Errorf("unknown mode: %v", str)
+		return fmt.Errorf("mode %v not supported, must be one of default or stack-monitoring", str)
 	}
 
 	return nil
