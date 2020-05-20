@@ -19,5 +19,5 @@ func init() {
 // AssetCisco returns asset data.
 // This is the base64 encoded gzipped contents of module/cisco.
 func AssetCisco() string {
-	return "eJx8jkGugyAYhPecYuLeC7B4u3cQKtOGCELgN623b5TaqjX9dvwTvpkWPSeNzpUuKkCceGo0y7tRQKanKdS4UIwCLEuXXRIXB40/BaD+RYh29FTA1dHbopeoxWACP/oZmRI1bjmO6XU5ce41W9WYxAW+z2e+mePuldOuypf5OGE7gw8TkucuW7f0nO4x20P2o3nmvwprqXoGAAD//9ssa2M="
+	return "eJzEj02OhCAYRPecouLeC7CY3RyEgXJCBCGAmfH2HaV/bCW96/Tb6RdeVfUYuUhom3UQQLHFUaLbvjsBJDqqTIkfFiUAw6yTjcWGSeJLAKhv4YOZHQUwWDqT5XbqMSnPh36lLJESvynM8fqn4XzW7FV2KkyD0sz3U8u5cux+o5lXadqPVfZ1+K983HbvqX1GLn8hmcPtRfrKdxXW0NP6ORbr+Y7lJ/MHV18CAAD//xV5qmU="
 }

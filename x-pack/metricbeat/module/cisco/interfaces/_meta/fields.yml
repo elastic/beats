@@ -1,0 +1,10 @@
+- name: interfaces
+  type: group
+  release: beta
+  description: >
+    interfaces
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

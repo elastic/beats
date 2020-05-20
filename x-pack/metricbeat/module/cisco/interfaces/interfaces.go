@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package uptime
+package interfaces
 
 import (
 	"github.com/pkg/errors"
@@ -18,7 +18,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("cisco", "uptime", New, mb.DefaultMetricSet())
+	mb.Registry.MustAddMetricSet("cisco", "interfaces", New, mb.DefaultMetricSet())
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -39,7 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	log := logp.NewLogger("cisco")
+	log := logp.NewLogger("ciscointerfaces")
 
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -52,34 +52,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	value, err := m.getUptime()
+	ifaces, err := m.getIfaces()
 	if err != nil {
 		return errors.Wrap(err, "error in SNMP request")
 	}
 
-	msFields := common.MapStr{
-		"duration": common.MapStr{
-			"sec": value,
-		},
+	fields := common.MapStr{
+		"message": ifaces,
 	}
 
-	reporter.Event(mb.Event{MetricSetFields: msFields})
+	reporter.Event(mb.Event{MetricSetFields: fields})
 
 	return nil
 }
 
-func (m *MetricSet) getUptime() (uint64, error) {
-	var sec uint64
+func (m *MetricSet) getIfaces() (string, error) {
 	m.snmp.Client.Target = m.Host()
-	content, err := m.snmp.Get([]string{"1.3.6.1.2.1.1.3.0"})
+	content, err := m.snmp.BulkWalkAll("1.3.6.1.2.1.2.2.1")
 	if err != nil {
-		return 0, errors.Wrap(err, "error in SNMP request")
+		return "", errors.Wrap(err, "error in SNMP request")
 	}
 
-	sec = m.snmp.ToUint(content.Variables[0])
-	if err != nil {
-		return 0, errors.Wrap(err, "error in SNMP request")
-	}
+	m.log.Info(content)
 
-	return sec / 100, nil
+	return content, nil
 }
