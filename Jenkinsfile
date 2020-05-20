@@ -1219,6 +1219,11 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Run the ITs by running only if the changeset affects a specific module.
+  // For such, it's required to look for changes under the module folder and exclude anything else
+  // such as ascidoc and png files.
+  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
 }
 
 /**
