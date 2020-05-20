@@ -457,7 +457,7 @@ field. You can revert this change by configuring tags for the module and omittin
 *Journalbeat*
 
 *Metricbeat*
-
+- Deprecate tags config parameter in cloudwatch metricset. {pull}16733[16733]
 
 *Packetbeat*
 
