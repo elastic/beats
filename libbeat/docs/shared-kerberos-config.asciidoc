@@ -1,6 +1,10 @@
 [[configuration-kerberos]]
 == Configure Kerberos
 
+++++
+<titleabbrev>Kerberos</titleabbrev>
+++++
+
 You can specify Kerberos options with any output or input that supports Kerberos, like {es} and Kafka.
 
 The following encryption types are supported:
