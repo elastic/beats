@@ -75,5 +75,5 @@ func (m *MetricSet) getIfaces() (string, error) {
 
 	m.log.Info(content)
 
-	return content, nil
+	return "", nil
 }

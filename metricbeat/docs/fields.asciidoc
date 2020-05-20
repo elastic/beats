@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
+* <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-cloudfoundry>>
 * <<exported-fields-cockroachdb>>
@@ -5871,6 +5872,53 @@ Used kb of the pool
 
 
 type: long
+
+--
+
+[[exported-fields-cisco]]
+== cisco fields
+
+cisco module
+
+
+
+[float]
+=== cisco
+
+
+
+
+[float]
+=== interfaces
+
+interfaces
+
+
+
+*`cisco.interfaces.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
+[float]
+=== uptime
+
+uptime
+
+
+
+*`cisco.uptime.example`*::
++
+--
+Example field
+
+
+type: keyword
 
 --
 

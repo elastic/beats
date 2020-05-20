@@ -1,0 +1,48 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-cisco]]
+[role="xpack"]
+== cisco module
+
+beta[]
+
+This is the cisco module.
+
+
+
+[float]
+=== Example configuration
+
+The cisco module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: cisco
+  metricsets: ["system"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+#  community: private
+#  version: v2c
+#  max_oids: 10
+
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-cisco-interfaces,interfaces>>
+
+* <<metricbeat-metricset-cisco-uptime,uptime>>
+
+include::cisco/interfaces.asciidoc[]
+
+include::cisco/uptime.asciidoc[]
+
