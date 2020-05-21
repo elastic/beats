@@ -71,6 +71,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		}
 
 		if _, ok := stopList[hash]; ok {
+			r.logger.Debugf("Check hash: %s", ok)
 			delete(stopList, hash)
 		} else {
 			startList[hash] = config
