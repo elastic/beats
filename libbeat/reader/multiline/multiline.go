@@ -47,6 +47,7 @@ type Reader struct {
 	maxLines     int
 	linesCount   int // configured count_lines
 	separator    []byte
+	skipNewline  bool
 	last         []byte
 	numLines     int
 	truncated    int
@@ -77,13 +78,14 @@ var (
 func New(
 	r reader.Reader,
 	separator string,
+	skipNewline bool,
 	maxBytes int,
 	config *Config,
 ) (*Reader, error) {
 	if config.Type == patternMode {
-		return newMultilinePatternReader(r, separator, maxBytes, config)
+		return newMultilinePatternReader(r, separator, skipNewline, maxBytes, config)
 	} else if config.Type == countMode {
-		return newMultilineCountReader(r, separator, maxBytes, config)
+		return newMultilineCountReader(r, separator, skipNewline, maxBytes, config)
 	}
 	return nil, fmt.Errorf("unknown multiline type")
 }
@@ -91,6 +93,7 @@ func New(
 func newMultilinePatternReader(
 	r reader.Reader,
 	separator string,
+	skipNewline bool,
 	maxBytes int,
 	config *Config,
 ) (*Reader, error) {
@@ -140,6 +143,7 @@ func newMultilinePatternReader(
 		maxBytes:     maxBytes,
 		maxLines:     maxLines,
 		separator:    []byte(separator),
+		skipNewline:  skipNewline,
 		message:      reader.Message{},
 		logger:       logp.NewLogger("reader_multiline"),
 	}
@@ -149,18 +153,20 @@ func newMultilinePatternReader(
 func newMultilineCountReader(
 	r reader.Reader,
 	separator string,
+	skipNewline bool,
 	maxBytes int,
 	config *Config,
 ) (*Reader, error) {
 	mlr := &Reader{
-		reader:     r,
-		linesCount: config.LinesCount,
-		state:      (*Reader).readFirstCount,
-		maxBytes:   maxBytes,
-		maxLines:   config.LinesCount,
-		separator:  []byte(separator),
-		message:    reader.Message{},
-		logger:     logp.NewLogger("reader_counter_multiline"),
+		reader:      r,
+		linesCount:  config.LinesCount,
+		state:       (*Reader).readFirstCount,
+		maxBytes:    maxBytes,
+		maxLines:    config.LinesCount,
+		separator:   []byte(separator),
+		skipNewline: skipNewline,
+		message:     reader.Message{},
+		logger:      logp.NewLogger("reader_counter_multiline"),
 	}
 	return mlr, nil
 }
@@ -398,7 +404,7 @@ func (mlr *Reader) addLine(m reader.Message) {
 	}
 
 	sz := len(mlr.message.Content)
-	addSeparator := len(mlr.message.Content) > 0 && len(mlr.separator) > 0
+	addSeparator := len(mlr.message.Content) > 0 && len(mlr.separator) > 0 && !mlr.skipNewline
 	if addSeparator {
 		sz += len(mlr.separator)
 	}

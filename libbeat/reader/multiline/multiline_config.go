@@ -52,7 +52,8 @@ type Config struct {
 	Timeout      *time.Duration `config:"timeout" validate:"positive"`
 	FlushPattern *match.Matcher `config:"flush_pattern"`
 
-	LinesCount int `config:"count_lines" validate:"positive"`
+	LinesCount  int  `config:"count_lines" validate:"positive"`
+	SkipNewLine bool `config:"skip_newline"`
 }
 
 // Validate validates the Config option for multiline reader.
