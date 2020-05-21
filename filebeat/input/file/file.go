@@ -30,12 +30,8 @@ type File struct {
 	State    *State
 }
 
-// Checks if the two files are the same.
-func (f *File) IsSameFile(f2 *File) bool {
-	return os.SameFile(f.FileInfo, f2.FileInfo)
-}
-
 // IsSameFile checks if the given File path corresponds with the FileInfo given
+// It is used to check if the file has been renamed.
 func IsSameFile(path string, info os.FileInfo) bool {
 	fileInfo, err := os.Stat(path)
 

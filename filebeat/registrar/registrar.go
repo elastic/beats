@@ -18,7 +18,6 @@
 package registrar
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -106,22 +105,6 @@ func (r *Registrar) loadStates() error {
 
 	r.states.SetStates(states)
 	r.log.Infof("States Loaded from registrar: %+v", len(states))
-
-	return nil
-}
-
-func (r *Registrar) Start() error {
-	// Load the previous log file locations now, for use in input
-	err := r.loadStates()
-	if err != nil {
-		return fmt.Errorf("Error loading state: %v", err)
-	}
-
-	r.wg.Add(1)
-	go func() {
-		defer r.wg.Done()
-		r.Run()
-	}()
 
 	return nil
 }
