@@ -77,7 +77,7 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		return nil, err
 	}
 
-	fetcher := downloader.NewDownloader(operatorConfig.DownloadConfig)
+	fetcher := downloader.NewDownloader(log, operatorConfig.DownloadConfig)
 	installer, err := install.NewInstaller(operatorConfig.DownloadConfig)
 	if err != nil {
 		return nil, errors.New(err, "initiating installer")
