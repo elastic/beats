@@ -36,6 +36,7 @@
 - Fix jq: command not found {pull}18408[18408]
 - Avoid Chown on windows {pull}18512[18512]
 - Remove fleet admin from setup script {pull}18611[18611]
+- Clean action store after enrolling to new configuration {pull}18656[18656]
 
 ==== New features
 
