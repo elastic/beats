@@ -92,7 +92,7 @@ pipeline {
         }
 
         stage('Elastic Agent x-pack Windows'){
-          agent { label 'windows-immutable && windows-2012' }
+          agent { label 'windows-immutable && windows-2012-r2' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -159,7 +159,7 @@ pipeline {
           }
         }
         stage('Filebeat Windows'){
-          agent { label 'windows-immutable && windows-2012' }
+          agent { label 'windows-immutable && windows-2012-r2' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -200,7 +200,7 @@ pipeline {
               }
             }
             stage('Heartbeat Windows'){
-              agent { label 'windows-immutable && windows-2012' }
+              agent { label 'windows-immutable && windows-2012-r2' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -248,7 +248,7 @@ pipeline {
               }
             }
             stage('Auditbeat Windows'){
-              agent { label 'windows-immutable && windows-2012' }
+              agent { label 'windows-immutable && windows-2012-r2' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -416,7 +416,7 @@ pipeline {
           }
         }
         stage('Metricbeat Windows'){
-          agent { label 'windows-immutable && windows-2012' }
+          agent { label 'windows-immutable && windows-2012-r2' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -478,7 +478,7 @@ pipeline {
               }
             }
             stage('Winlogbeat Windows'){
-              agent { label 'windows-immutable && windows-2012' }
+              agent { label 'windows-immutable && windows-2012-r2' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
@@ -493,7 +493,7 @@ pipeline {
           }
         }
         stage('Winlogbeat Windows x-pack'){
-          agent { label 'windows-immutable && windows-2012' }
+          agent { label 'windows-immutable && windows-2012-r2' }
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
@@ -537,7 +537,7 @@ pipeline {
               }
             }
             stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2012' }
+              agent { label 'windows-immutable && windows-2012-r2' }
               options { skipDefaultCheckout() }
               when {
                 beforeAgent true
