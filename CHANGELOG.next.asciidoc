@@ -431,6 +431,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
+- Move service config under stackdriver.metrics and simplify metric types. {pull}18691[18691]
 
 *Packetbeat*
 
