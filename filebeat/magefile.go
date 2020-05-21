@@ -22,6 +22,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -200,14 +201,29 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "NOSE_"), "GENERATE")...)
+
+	envVars := append(
+		devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "NOSE_"),
+		"GENERATE",
+	)
+
+	fmt.Println(">> envVars:", envVars)
+	runner, err := devtools.NewDockerIntegrationRunner(envVars...)
 	if err != nil {
 		return err
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
+
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
+		for _, envVar := range envVars {
+			if val, found := os.LookupEnv(envVar); found {
+				args.Env[envVar] = val
+			}
+		}
+
+		fmt.Println(">>>> args.Env:", args.Env)
 		return devtools.PythonNoseTest(args)
 	})
 }

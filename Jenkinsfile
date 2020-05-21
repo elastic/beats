@@ -1224,6 +1224,7 @@ def loadConfigEnvVars(){
   // For such, it's required to look for changes under the module folder and exclude anything else
   // such as ascidoc and png files.
   env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+  env.TESTING_FILEBEAT_MODULES = env.MODULE
 }
 
 /**
