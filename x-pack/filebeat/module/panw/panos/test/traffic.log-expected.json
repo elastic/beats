@@ -58,7 +58,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "184.51.253.152",
@@ -95,7 +98,8 @@
         "source.packets": 16,
         "source.port": 55113,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -157,7 +161,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -194,7 +201,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -259,7 +267,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "17.253.3.202",
@@ -296,7 +307,8 @@
         "source.packets": 6,
         "source.port": 55114,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -358,7 +370,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -395,7 +410,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -460,7 +476,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "216.58.194.99",
@@ -497,7 +516,8 @@
         "source.packets": 5,
         "source.port": 46774,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -559,7 +579,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "209.234.224.22",
@@ -596,7 +619,8 @@
         "source.packets": 62,
         "source.port": 52408,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -658,7 +682,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -695,7 +722,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -757,7 +785,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "172.217.2.238",
@@ -794,7 +825,8 @@
         "source.packets": 7,
         "source.port": 59190,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -856,7 +888,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -893,7 +928,8 @@
         "source.packets": 1,
         "source.port": 49728,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -955,7 +991,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -992,7 +1031,8 @@
         "source.packets": 1,
         "source.port": 50500,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1054,7 +1094,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "17.249.60.78",
@@ -1091,7 +1134,8 @@
         "source.packets": 16,
         "source.port": 55112,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1153,7 +1197,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1190,7 +1237,8 @@
         "source.packets": 1,
         "source.port": 57632,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1252,7 +1300,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1289,7 +1340,8 @@
         "source.packets": 1,
         "source.port": 50271,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1351,7 +1403,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1388,7 +1443,8 @@
         "source.packets": 1,
         "source.port": 54061,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1450,7 +1506,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1487,7 +1546,8 @@
         "source.packets": 1,
         "source.port": 52701,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1549,7 +1609,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1586,7 +1649,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1648,7 +1712,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1685,7 +1752,8 @@
         "source.packets": 1,
         "source.port": 62503,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1747,7 +1815,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "98.138.49.44",
@@ -1784,7 +1855,8 @@
         "source.packets": 14,
         "source.port": 52442,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1846,7 +1918,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "72.30.3.43",
@@ -1883,7 +1958,8 @@
         "source.packets": 13,
         "source.port": 52441,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1945,7 +2021,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -1982,7 +2061,8 @@
         "source.packets": 2,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2044,7 +2124,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "172.217.9.142",
@@ -2081,7 +2164,8 @@
         "source.packets": 19,
         "source.port": 52355,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2143,7 +2227,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -2180,7 +2267,8 @@
         "source.packets": 1,
         "source.port": 50196,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2245,7 +2333,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.84.80.198",
@@ -2282,7 +2373,8 @@
         "source.packets": 13,
         "source.port": 52454,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2345,7 +2437,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "199.167.55.52",
@@ -2382,7 +2477,8 @@
         "source.packets": 8,
         "source.port": 52445,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2444,7 +2540,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -2481,7 +2580,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2540,7 +2640,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -2577,7 +2680,8 @@
         "source.packets": 1,
         "source.port": 35485,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2636,7 +2740,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "172.217.9.142",
@@ -2673,7 +2780,8 @@
         "source.packets": 6,
         "source.port": 62730,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2735,7 +2843,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "151.101.2.2",
@@ -2772,7 +2883,8 @@
         "source.packets": 8,
         "source.port": 52506,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2837,7 +2949,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "216.58.194.66",
@@ -2874,7 +2989,8 @@
         "source.packets": 5,
         "source.port": 60596,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2936,7 +3052,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -2973,7 +3092,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3035,7 +3155,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -3072,7 +3195,8 @@
         "source.packets": 2,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3134,7 +3258,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "184.51.253.193",
@@ -3171,7 +3298,8 @@
         "source.packets": 12,
         "source.port": 52514,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3233,7 +3361,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -3270,7 +3401,8 @@
         "source.packets": 1,
         "source.port": 55155,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3333,7 +3465,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "199.167.55.52",
@@ -3370,7 +3505,8 @@
         "source.packets": 1,
         "source.port": 52445,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3435,7 +3571,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "199.167.52.219",
@@ -3472,7 +3611,8 @@
         "source.packets": 11,
         "source.port": 52516,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3537,7 +3677,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.71.117.196",
@@ -3574,7 +3717,8 @@
         "source.packets": 19,
         "source.port": 52511,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3636,7 +3780,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -3673,7 +3820,8 @@
         "source.packets": 1,
         "source.port": 3018,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3735,7 +3883,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -3772,7 +3923,8 @@
         "source.packets": 1,
         "source.port": 16569,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3837,7 +3989,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.186.194.41",
@@ -3874,7 +4029,8 @@
         "source.packets": 24,
         "source.port": 52479,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3935,7 +4091,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.201.124.9",
@@ -3972,7 +4131,8 @@
         "source.packets": 63,
         "source.port": 52478,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4037,7 +4197,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "100.24.131.237",
@@ -4074,7 +4237,8 @@
         "source.packets": 17,
         "source.port": 52502,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4136,7 +4300,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "184.51.252.247",
@@ -4173,7 +4340,8 @@
         "source.packets": 8,
         "source.port": 52458,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4238,7 +4406,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.190.88.148",
@@ -4275,7 +4446,8 @@
         "source.packets": 15,
         "source.port": 52484,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4340,7 +4512,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.186.243.83",
@@ -4377,7 +4552,8 @@
         "source.packets": 15,
         "source.port": 52482,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4439,7 +4615,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "untrust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -4476,7 +4655,8 @@
         "source.packets": 1,
         "source.port": 33769,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4538,7 +4718,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -4575,7 +4758,8 @@
         "source.packets": 1,
         "source.port": 14106,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4640,7 +4824,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "untrust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "100.24.165.74",
@@ -4677,7 +4864,8 @@
         "source.packets": 17,
         "source.port": 52503,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4739,7 +4927,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "xtrust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "184.51.252.247",
@@ -4776,7 +4967,8 @@
         "source.packets": 8,
         "source.port": 52459,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4837,7 +5029,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.201.94.140",
@@ -4874,7 +5069,8 @@
         "source.packets": 15,
         "source.port": 52483,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4934,7 +5130,10 @@
         "observer.egress.interface.name": "ethernet1/1",
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -4969,7 +5168,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5031,7 +5231,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5068,7 +5271,8 @@
         "source.packets": 1,
         "source.port": 38663,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5130,7 +5334,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5167,7 +5374,8 @@
         "source.packets": 1,
         "source.port": 50443,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5229,7 +5437,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5266,7 +5477,8 @@
         "source.packets": 1,
         "source.port": 54215,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5328,7 +5540,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5365,7 +5580,8 @@
         "source.packets": 1,
         "source.port": 35827,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5427,7 +5643,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5464,7 +5683,8 @@
         "source.packets": 1,
         "source.port": 60609,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5526,7 +5746,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5563,7 +5786,8 @@
         "source.packets": 1,
         "source.port": 3248,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5625,7 +5849,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5662,7 +5889,8 @@
         "source.packets": 1,
         "source.port": 49284,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5724,7 +5952,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5761,7 +5992,8 @@
         "source.packets": 1,
         "source.port": 57732,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5823,7 +6055,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5860,7 +6095,8 @@
         "source.packets": 1,
         "source.port": 49195,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5922,7 +6158,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -5959,7 +6198,8 @@
         "source.packets": 1,
         "source.port": 17266,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6021,7 +6261,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6058,7 +6301,8 @@
         "source.packets": 1,
         "source.port": 48631,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6120,7 +6364,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6157,7 +6404,8 @@
         "source.packets": 1,
         "source.port": 58540,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6219,7 +6467,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6256,7 +6507,8 @@
         "source.packets": 1,
         "source.port": 42678,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6321,7 +6573,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "66.28.0.45",
@@ -6358,7 +6613,8 @@
         "source.packets": 1,
         "source.port": 16576,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6420,7 +6676,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6457,7 +6716,8 @@
         "source.packets": 1,
         "source.port": 39830,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6519,7 +6779,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6556,7 +6819,8 @@
         "source.packets": 1,
         "source.port": 6185,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6618,7 +6882,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6655,7 +6922,8 @@
         "source.packets": 1,
         "source.port": 8781,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6717,7 +6985,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6754,7 +7025,8 @@
         "source.packets": 1,
         "source.port": 16788,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6816,7 +7088,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -6853,7 +7128,8 @@
         "source.packets": 1,
         "source.port": 45307,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6918,7 +7194,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "23.52.174.25",
@@ -6955,7 +7234,8 @@
         "source.packets": 6,
         "source.port": 52520,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7017,7 +7297,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7054,7 +7337,8 @@
         "source.packets": 1,
         "source.port": 8503,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7116,7 +7400,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7153,7 +7440,8 @@
         "source.packets": 1,
         "source.port": 6910,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7218,7 +7506,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "54.230.5.228",
@@ -7255,7 +7546,8 @@
         "source.packets": 5,
         "source.port": 52475,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7317,7 +7609,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7354,7 +7649,8 @@
         "source.packets": 1,
         "source.port": 14342,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7416,7 +7712,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7453,7 +7752,8 @@
         "source.packets": 1,
         "source.port": 48197,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7515,7 +7815,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7552,7 +7855,8 @@
         "source.packets": 1,
         "source.port": 32296,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7614,7 +7918,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "208.83.246.20",
@@ -7651,7 +7958,8 @@
         "source.packets": 1,
         "source.port": 33870,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7712,7 +8020,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "drop-icmp",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7749,7 +8060,8 @@
         "source.packets": 2,
         "source.port": 54659,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7810,7 +8122,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "reset-client",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7847,7 +8162,8 @@
         "source.packets": 1,
         "source.port": 57446,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7908,7 +8224,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "reset-server",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -7945,7 +8264,8 @@
         "source.packets": 1,
         "source.port": 22655,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8008,7 +8328,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "reset-both",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "35.185.88.112",
@@ -8045,7 +8368,8 @@
         "source.packets": 13,
         "source.port": 52509,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8107,7 +8431,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -8144,7 +8471,8 @@
         "source.packets": 1,
         "source.port": 27192,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8206,7 +8534,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -8243,7 +8574,8 @@
         "source.packets": 1,
         "source.port": 30221,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8305,7 +8637,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -8342,7 +8677,8 @@
         "source.packets": 1,
         "source.port": 30570,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8407,7 +8743,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "50.19.85.24",
@@ -8444,7 +8783,8 @@
         "source.packets": 8,
         "source.port": 52497,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8509,7 +8849,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "50.19.85.24",
@@ -8546,7 +8889,8 @@
         "source.packets": 8,
         "source.port": 52498,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8611,7 +8955,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "50.19.85.24",
@@ -8648,7 +8995,8 @@
         "source.packets": 8,
         "source.port": 52496,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8710,7 +9058,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "104.254.150.9",
@@ -8747,7 +9098,8 @@
         "source.packets": 12,
         "source.port": 52510,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8812,7 +9164,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "50.19.85.24",
@@ -8849,7 +9204,8 @@
         "source.packets": 8,
         "source.port": 52495,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8914,7 +9270,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.0.218.108",
@@ -8951,7 +9310,8 @@
         "source.packets": 4,
         "source.port": 52486,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9016,7 +9376,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "52.6.117.19",
@@ -9053,7 +9416,8 @@
         "source.packets": 4,
         "source.port": 52489,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9118,7 +9482,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "34.238.96.22",
@@ -9155,7 +9522,8 @@
         "source.packets": 4,
         "source.port": 52490,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9220,7 +9588,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "130.211.47.17",
@@ -9257,7 +9628,8 @@
         "source.packets": 4,
         "source.port": 52493,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9319,7 +9691,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9356,7 +9731,8 @@
         "source.packets": 1,
         "source.port": 59320,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9418,7 +9794,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9455,7 +9834,8 @@
         "source.packets": 6,
         "source.port": 0,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9517,7 +9897,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9554,7 +9937,8 @@
         "source.packets": 1,
         "source.port": 13076,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9616,7 +10000,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9653,7 +10040,8 @@
         "source.packets": 1,
         "source.port": 5511,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9715,7 +10103,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9752,7 +10143,8 @@
         "source.packets": 1,
         "source.port": 9799,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9814,7 +10206,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9851,7 +10246,8 @@
         "source.packets": 1,
         "source.port": 39169,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9913,7 +10309,10 @@
         "observer.hostname": "PA-220",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "012801096514",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "8.8.8.8",
@@ -9950,7 +10349,8 @@
         "source.packets": 1,
         "source.port": 42476,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     }
 ]

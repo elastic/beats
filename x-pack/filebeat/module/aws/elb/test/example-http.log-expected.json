@@ -28,6 +28,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.38.0"
     },
     {
@@ -53,6 +56,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "curl/7.38.0"
     },
     {
@@ -77,6 +83,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "user_agent.original": "-"
     }
 ]

@@ -121,6 +121,11 @@ pipeline {
           steps {
             mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
         }
 
         stage('Filebeat oss'){
@@ -161,6 +166,29 @@ pipeline {
           steps {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Filebeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_XPACK_FILEBEAT != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
         }
         stage('Filebeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
@@ -173,6 +201,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+          }
+        }
+        stage('Filebeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -201,6 +242,11 @@ pipeline {
               }
               steps {
                 mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
+              }
+              post {
+                always {
+                  delete()
+                }
               }
             }
             stage('Heartbeat Windows'){
@@ -249,6 +295,11 @@ pipeline {
               }
               steps {
                 mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
+              }
+              post {
+                always {
+                  delete()
+                }
               }
             }
             stage('Auditbeat Windows'){
@@ -419,6 +470,24 @@ pipeline {
             mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
+        stage('Metricbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
         stage('Metricbeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -430,6 +499,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -539,6 +621,11 @@ pipeline {
               steps {
                 mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Functionbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -615,6 +702,11 @@ pipeline {
                   makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
                 }
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
@@ -629,6 +721,11 @@ pipeline {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                }
+              }
+              post {
+                always {
+                  delete()
                 }
               }
             }
@@ -660,6 +757,17 @@ pipeline {
   }
 }
 
+def delete() {
+  dir("${env.BASE_DIR}") {
+    fixPermissions("${WORKSPACE}")
+  }
+  deleteDir()
+}
+
+def fixPermissions(location) {
+  sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
+}
+
 def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
     withBeatsEnv(true) {
@@ -668,8 +776,8 @@ def makeTarget(String context, String target, boolean clean = true) {
         dumpMage()
       }
       sh(label: "Make ${target}", script: "make ${target}")
-      if (clean) {
-        sh(script: 'script/fix_permissions.sh ${HOME}')
+      whenTrue(clean) {
+        fixPermissions("${HOME}")
       }
     }
   }
@@ -1111,6 +1219,11 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+
+  // Run the ITs by running only if the changeset affects a specific module.
+  // For such, it's required to look for changes under the module folder and exclude anything else
+  // such as ascidoc and png files.
+  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
 }
 
 /**

@@ -37,6 +37,9 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
 processors:
   - add_fields:
       target: ''

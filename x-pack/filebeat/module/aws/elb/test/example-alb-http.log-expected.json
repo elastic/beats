@@ -36,6 +36,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
         "user_agent.original": "curl/7.46.0"
     },
@@ -81,6 +84,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -127,6 +133,9 @@
         "service.type": "aws",
         "source.ip": "10.0.1.252",
         "source.port": "48160",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -170,6 +179,9 @@
         "service.type": "aws",
         "source.ip": "10.0.0.140",
         "source.port": "40914",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "-"
     },
@@ -204,6 +216,9 @@
         "service.type": "aws",
         "source.ip": "10.0.0.140",
         "source.port": "44244",
+        "tags": [
+            "forwarded"
+        ],
         "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "tls.version": "1.2",
         "tls.version_protocol": "tls",
@@ -244,6 +259,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
@@ -282,6 +300,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "Root=1-58337364-23a8c76965a2ef7629b185e3",
         "user_agent.original": "curl/7.46.0"
     },
@@ -311,6 +332,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "-",
         "user_agent.original": "-"
     },
@@ -339,6 +363,9 @@
         "service.type": "aws",
         "source.ip": "192.168.131.39",
         "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
         "tracing.trace.id": "-",
         "user_agent.original": "-"
     }
