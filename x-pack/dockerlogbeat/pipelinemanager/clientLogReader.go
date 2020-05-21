@@ -47,7 +47,7 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		return nil, err
 	}
 
-	clientLogger.Debugf("Created new logger for %s", hash)
+	clientLogger.Debugf("Created new logger for %d", hash)
 
 	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hash, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
 }
