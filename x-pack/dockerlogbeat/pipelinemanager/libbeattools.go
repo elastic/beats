@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
@@ -85,10 +84,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp
 		return nil, errors.Wrap(err, "error unpacking pipeline config")
 	}
 
-	idx, err := idxmgmt.DefaultSupport(log, info, cfg)
-	if err != nil {
-		return nil, errors.Wrap(err, "error making index manager")
-	}
+	idxMgr := newIndexSupporter(info)
 
 	settings := pipeline.Settings{
 		WaitClose:     time.Duration(time.Second * 10),
@@ -106,7 +102,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, name string, log *logp
 		pipelineCfg,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(idx, info, stat, cfg.Name(), cfg.Config())
+			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
 		settings,
