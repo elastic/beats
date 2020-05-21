@@ -18,6 +18,30 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
 
+func TestConfigHosts(t *testing.T) {
+	testHostEmpty := map[string]string{
+		"api_key": "keykey",
+	}
+	_, err := NewCfgFromRaw(testHostEmpty)
+	assert.Error(t, err)
+
+	testMultiHost := map[string]string{
+		"endpoint": "endpoint1,endpoint2",
+	}
+	goodOut := []string{"endpoint1", "endpoint2"}
+	cfg, err := NewCfgFromRaw(testMultiHost)
+	assert.NoError(t, err)
+	assert.Equal(t, goodOut, cfg.Endpoint)
+
+	badIndex := map[string]string{
+		"endpoint": "elasticsearch:9200",
+		"index":    "testIdx",
+	}
+	_, err = NewCfgFromRaw(badIndex)
+	assert.Error(t, err)
+
+}
+
 func TestNewClient(t *testing.T) {
 	logString := "This is a log line"
 	cfgObject := logger.Info{
