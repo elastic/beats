@@ -848,8 +848,11 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**/build/TEST*.xml")
-            archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
+            sh(label: 'Prepare test output', script: '.ci/scripts/pre-archive-test.sh .build')
+            dir('.build') {
+              junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: '**/build/TEST*.xml')
+              archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
+            }
           }
         }
         reportCoverage()
