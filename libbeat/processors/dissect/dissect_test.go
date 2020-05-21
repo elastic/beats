@@ -308,3 +308,132 @@ func BenchmarkDissectWithConversionMultipleValuesInvalidType(b *testing.B) {
 	benchmarkConversion("id=%{id|abc} status=%{status|def} duration=%{duration|jkl} uptime=%{uptime|tux} success=%{success|xyz} msg=\"%{message}\"",
 		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
 }
+
+func BenchmarkDissectComplexStackTraceDegradation(b *testing.B) {
+	message := `18-Apr-2018 06:53:20.411 INFO [http-nio-8080-exec-1] org.apache.coyote.http11.Http11Processor.service Error parsing HTTP request header
+ Note: further occurrences of HTTP header parsing errors will be logged at DEBUG level.
+ java.lang.IllegalArgumentException: Invalid character found in method name. HTTP method names must be tokens
+    at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:426)
+    at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:687)
+    at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+    at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:790)
+    at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1459)
+    at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+    at java.lang.Thread.run(Thread.java:748) MACHINE[hello]`
+
+	b.Run("ComplexStackTrace1", func(b *testing.B) {
+		tok := "%{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace2", func(b *testing.B) {
+		tok := "%{day}-%{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace3", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace4", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{year} %{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace5", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{year} %{hour} %{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace6", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace7", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+	b.Run("ComplexStackTrace8", func(b *testing.B) {
+		tok := "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}"
+		msg := message
+		d, err := New(tok)
+		if !assert.NoError(b, err) {
+			return
+		}
+		b.ReportAllocs()
+		for n := 0; n < b.N; n++ {
+			r, err := d.Dissect(msg)
+			assert.NoError(b, err)
+			results = r
+		}
+	})
+}
