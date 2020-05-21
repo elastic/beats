@@ -86,7 +86,7 @@ func (r *stackdriverMetricsRequester) Metrics(ctx context.Context, sdc stackDriv
 			metricMeta := metricsMeta[mt]
 			r.logger.Debugf("For metricType %s, metricMeta = %s", mt, metricMeta)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, serviceName + ".googleapis.com/" + mt, interval, aligner)
+			ts := r.Metric(ctx, serviceName+".googleapis.com/"+mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)

@@ -219,7 +219,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 		for _, mt := range sdc.MetricTypes {
 			req := &monitoringpb.ListMetricDescriptorsRequest{
 				Name:   "projects/" + m.config.ProjectID,
-				Filter: fmt.Sprintf(`metric.type = "%s"`, sdc.ServiceName + ".googleapis.com/" + mt),
+				Filter: fmt.Sprintf(`metric.type = "%s"`, sdc.ServiceName+".googleapis.com/"+mt),
 			}
 
 			it := client.ListMetricDescriptors(ctx, req)
