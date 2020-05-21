@@ -11,7 +11,7 @@ The `dissect` processor tokenizes incoming strings using defined patterns.
 -------
 processors:
   - dissect:
-      tokenizer: "%{key1} %{key2}"
+      tokenizer: "%{key1} %{key2} %{key3|convert_datatype}"
       field: "message"
       target_prefix: "dissect"
 -------
@@ -19,6 +19,8 @@ processors:
 The `dissect` processor has the following configuration settings:
 
 `tokenizer`:: The field used to define the *dissection* pattern.
+              Optional convert datatype can be provided after the key using `|` as separator
+              to convert the value from string to integer, long, float, double, boolean or ip.
 
 `field`:: (Optional) The event field to tokenize. Default is `message`.
 
