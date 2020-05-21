@@ -27,7 +27,7 @@ func NewDownloader(config *artifact.Config) (download.Downloader, error) {
 }
 
 func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
-	snapshotUri, err := snapshotURI()
+	snapshotURI, err := snapshotURI()
 	if err != nil {
 		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %v", err)
 	}
@@ -35,7 +35,7 @@ func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
 	return &artifact.Config{
 		OperatingSystem: config.OperatingSystem,
 		Architecture:    config.Architecture,
-		BeatsSourceURI:  snapshotUri,
+		BeatsSourceURI:  snapshotURI,
 		TargetDirectory: config.TargetDirectory,
 		Timeout:         config.Timeout,
 		PgpFile:         config.PgpFile,
