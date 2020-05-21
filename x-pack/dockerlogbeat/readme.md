@@ -16,7 +16,7 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 | Option               | Description                                                                                                                       |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `endpoint`           | The elasticsearch endpoint to connect to. This option is required.                                                                |
+| `endpoint`           | The elasticsearch endpoint to connect to. This option is required. Multiple endpoints may be specified and delimited with a `,`   |
 | `user`               | The Elasticsearch User to connect as.                                                                                             |
 | `password`           | The Elasticsearch Password to connect with.                                                                                       |
 | `index`              | The Elasticsearch Index to use. Requires `ilm_enabled` to be false, and `template_name` and `template_pattern` pattern to be set. |

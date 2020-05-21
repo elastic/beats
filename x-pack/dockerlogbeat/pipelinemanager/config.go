@@ -5,6 +5,8 @@
 package pipelinemanager
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -13,20 +15,20 @@ import (
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
 type ContainerOutputConfig struct {
-	Endpoint       string `struct:"output.elasticsearch.hosts,omitempty"`
-	User           string `struct:"output.elasticsearch.username,omitempty"`
-	Password       string `struct:"output.elasticsearch.password,omitempty"`
-	Index          string `struct:"output.elasticsearch.index,omitempty"`
-	Pipeline       string `struct:"output.elasticsearch.pipeline,omitempty"`
-	APIKey         string `struct:"output.elasticsearch.api_key,omitempty"`
-	Timeout        string `struct:"output.elasticsearch.timeout,omitempty"`
-	BackoffInit    string `struct:"output.elasticsearch.backoff.init,omitempty"`
-	BackoffMax     string `struct:"output.elasticsearch.backoff.max,omitempty"`
-	CloudID        string `struct:"cloud.id,omitempty"`
-	CloudAuth      string `struct:"cloud.auth,omitempty"`
-	ProxyURL       string `struct:"output.elasticsearch.proxy_url,omitempty"`
-	TemplateName   string `struct:"setup.template.name,omitempty"`
-	TempatePattern string `struct:"setup.template.pattern,omitempty"`
+	Endpoint       []string `struct:"output.elasticsearch.hosts,omitempty"`
+	User           string   `struct:"output.elasticsearch.username,omitempty"`
+	Password       string   `struct:"output.elasticsearch.password,omitempty"`
+	Index          string   `struct:"output.elasticsearch.index,omitempty"`
+	Pipeline       string   `struct:"output.elasticsearch.pipeline,omitempty"`
+	APIKey         string   `struct:"output.elasticsearch.api_key,omitempty"`
+	Timeout        string   `struct:"output.elasticsearch.timeout,omitempty"`
+	BackoffInit    string   `struct:"output.elasticsearch.backoff.init,omitempty"`
+	BackoffMax     string   `struct:"output.elasticsearch.backoff.max,omitempty"`
+	CloudID        string   `struct:"cloud.id,omitempty"`
+	CloudAuth      string   `struct:"cloud.auth,omitempty"`
+	ProxyURL       string   `struct:"output.elasticsearch.proxy_url,omitempty"`
+	TemplateName   string   `struct:"setup.template.name,omitempty"`
+	TempatePattern string   `struct:"setup.template.pattern,omitempty"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -37,7 +39,10 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	if !ok {
 		return newCfg, errors.New("An endpoint flag is required")
 	}
-	newCfg.Endpoint = endpoint
+
+	endpointList := strings.Split(endpoint, ",")
+
+	newCfg.Endpoint = endpointList
 
 	var isIndex bool
 
