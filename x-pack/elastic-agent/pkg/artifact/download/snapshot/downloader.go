@@ -27,12 +27,10 @@ func NewDownloader(config *artifact.Config) (download.Downloader, error) {
 }
 
 func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
-	snapshotUri, err := snapshotUri()
+	snapshotUri, err := snapshotURI()
 	if err != nil {
 		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %v", err)
 	}
-
-	fmt.Println(">>>>>> SNAPSHOT URI", snapshotUri)
 
 	return &artifact.Config{
 		OperatingSystem: config.OperatingSystem,
@@ -46,9 +44,9 @@ func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
 	}, nil
 }
 
-func snapshotUri() (string, error) {
-	artifactsUri := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", release.Version())
-	resp, err := gohttp.Get(artifactsUri)
+func snapshotURI() (string, error) {
+	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", release.Version())
+	resp, err := gohttp.Get(artifactsURI)
 	if err != nil {
 		return "", err
 	}
