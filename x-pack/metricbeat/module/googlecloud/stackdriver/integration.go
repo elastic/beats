@@ -35,10 +35,10 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 		}
 
 		if metricSetName == "stackdriver" {
-			config["stackdriver.service"] = "compute"
 			stackDriverConfig := stackDriverConfig{
+				ServiceName: "compute",
 				Aligner:     "ALIGN_NONE",
-				MetricTypes: []string{"compute.googleapis.com/instance/uptime"},
+				MetricTypes: []string{"instance/uptime"},
 			}
 			config["stackdriver.metrics"] = stackDriverConfig
 		}

@@ -37,15 +37,16 @@ given aggregation aligner applied for each metric type.
   exclude_labels: false
   period: 300s
   stackdriver:
-    service: compute
     metrics:
       - aligner: ALIGN_MEAN
+        service: compute
         metric_types:
-          - "compute.googleapis.com/instance/cpu/usage_time"
-          - "compute.googleapis.com/instance/cpu/utilization"
+          - "instance/cpu/usage_time"
+          - "instance/cpu/utilization"
       - aligner: ALIGN_SUM
+        service: compute
         metric_types:
-          - "compute.googleapis.com/instance/uptime"
+          - "instance/uptime"
 
 ----
 
@@ -70,13 +71,14 @@ ignored.
   exclude_labels: false
   period: 60s
   stackdriver:
-    service: compute
     metrics:
       - aligner: ALIGN_MEAN
+        service: compute
         metric_types:
-          - "compute.googleapis.com/instance/cpu/usage_time"
-          - "compute.googleapis.com/instance/cpu/utilization"
+          - "instance/cpu/usage_time"
+          - "instance/cpu/utilization"
       - aligner: ALIGN_SUM
+        service: compute
         metric_types:
-          - "compute.googleapis.com/instance/uptime"
+          - "instance/uptime"
 ----
