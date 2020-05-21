@@ -324,116 +324,58 @@ func BenchmarkDissectComplexStackTraceDegradation(b *testing.B) {
     at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
     at java.lang.Thread.run(Thread.java:748) MACHINE[hello]`
 
-	b.Run("ComplexStackTrace1", func(b *testing.B) {
-		tok := "%{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace2", func(b *testing.B) {
-		tok := "%{day}-%{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace3", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace4", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{year} %{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace5", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{year} %{hour} %{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace6", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace7", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
-	b.Run("ComplexStackTrace8", func(b *testing.B) {
-		tok := "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}"
-		msg := message
-		d, err := New(tok)
-		if !assert.NoError(b, err) {
-			return
-		}
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			r, err := d.Dissect(msg)
-			assert.NoError(b, err)
-			results = r
-		}
-	})
+	tests := []struct {
+		Name     string
+		Tok      string
+	}{
+		{
+			Name:"ComplexStackTrace-1",
+			Tok: "%{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-2",
+			Tok: "%{day} %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-3",
+			Tok: "%{day}-%{month} %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-4",
+			Tok: "%{day}-%{month}-%{year} %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-5",
+			Tok: "%{day}-%{month}-%{year} %{hour} %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-6",
+			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-7",
+			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
+		},
+		{
+			Name:"ComplexStackTrace-8",
+			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}",
+		},
+	}
+
+	for _, test := range tests {
+		b.Run(test.Name, func(b *testing.B) {
+			tok := test.Tok
+			msg := message
+			d, err := New(tok)
+			if !assert.NoError(b, err) {
+				return
+			}
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				r, err := d.Dissect(msg)
+				assert.NoError(b, err)
+				results = r
+			}
+		})
+	}
 }
