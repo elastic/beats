@@ -325,40 +325,40 @@ func BenchmarkDissectComplexStackTraceDegradation(b *testing.B) {
     at java.lang.Thread.run(Thread.java:748) MACHINE[hello]`
 
 	tests := []struct {
-		Name     string
-		Tok      string
+		Name string
+		Tok  string
 	}{
 		{
-			Name:"ComplexStackTrace-1",
-			Tok: "%{origin} %{message}",
+			Name: "ComplexStackTrace-1",
+			Tok:  "%{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-2",
-			Tok: "%{day} %{origin} %{message}",
+			Name: "ComplexStackTrace-2",
+			Tok:  "%{day} %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-3",
-			Tok: "%{day}-%{month} %{origin} %{message}",
+			Name: "ComplexStackTrace-3",
+			Tok:  "%{day}-%{month} %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-4",
-			Tok: "%{day}-%{month}-%{year} %{origin} %{message}",
+			Name: "ComplexStackTrace-4",
+			Tok:  "%{day}-%{month}-%{year} %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-5",
-			Tok: "%{day}-%{month}-%{year} %{hour} %{origin} %{message}",
+			Name: "ComplexStackTrace-5",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-6",
-			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}",
+			Name: "ComplexStackTrace-6",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-7",
-			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
+			Name: "ComplexStackTrace-7",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{message}",
 		},
 		{
-			Name:"ComplexStackTrace-8",
-			Tok: "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}",
+			Name: "ComplexStackTrace-8",
+			Tok:  "%{day}-%{month}-%{year} %{hour} %{severity} [%{thread_id}] %{origin} %{first_line} %{message}",
 		},
 	}
 
