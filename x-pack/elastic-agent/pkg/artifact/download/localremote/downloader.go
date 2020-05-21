@@ -22,7 +22,6 @@ func NewDownloader(log *logger.Logger, config *artifact.Config) download.Downloa
 	downloaders = append(downloaders, fs.NewDownloader(config))
 
 	// try snapshot repo before official
-	log.Errorf("IS SNAPSHOT", release.Snapshot())
 	if release.Snapshot() {
 		snapDownloader, err := snapshot.NewDownloader(config)
 		if err != nil {
