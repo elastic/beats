@@ -21,11 +21,11 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_fields:
-    target: project
-    fields:
-      name: myproject
-      id: '574734885120952459'
+  - add_fields:
+      target: project
+      fields:
+        name: myproject
+        id: '574734885120952459'
 ------------------------------------------------------------------------------
 
 Adds these fields to any event:

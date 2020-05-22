@@ -13,10 +13,10 @@ always exported, even if they are not defined in the `include_fields` list.
 [source,yaml]
 -------
 processors:
- - include_fields:
-     when:
+  - include_fields:
+      when:
         condition
-     fields: ["field1", "field2", ...]
+      fields: ["field1", "field2", ...]
 -------
 
 See <<conditions>> for a list of supported conditions.

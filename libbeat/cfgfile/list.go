@@ -35,12 +35,12 @@ type RunnerList struct {
 	runners  map[uint64]Runner
 	mutex    sync.RWMutex
 	factory  RunnerFactory
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	logger   *logp.Logger
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
@@ -70,7 +70,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			continue
 		}
 
-		if _, ok := stopList[hash]; ok {
+		if _, ok := r.runners[hash]; ok {
 			delete(stopList, hash)
 		} else {
 			startList[hash] = config

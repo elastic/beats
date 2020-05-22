@@ -14,6 +14,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 )
@@ -38,10 +39,8 @@ func TestEnroll(t *testing.T) {
 
 				require.Equal(t, PermanentEnroll, req.Type)
 				require.Equal(t, "im-a-beat", req.SharedID)
-				require.Equal(t, Metadata{
-					Local:        map[string]interface{}{"os": "linux"},
-					UserProvided: make(map[string]interface{}),
-				}, req.Metadata)
+				require.Equal(t, make(map[string]interface{}), req.Metadata.UserProvided)
+				require.Equal(t, "linux", req.Metadata.Local.OS.Name)
 
 				response := &EnrollResponse{
 					Action:  "created",
@@ -77,9 +76,7 @@ func TestEnroll(t *testing.T) {
 				EnrollAPIKey: "my-enrollment-api-key",
 				SharedID:     "im-a-beat",
 				Metadata: Metadata{
-					Local: map[string]interface{}{
-						"os": "linux",
-					},
+					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),
 				},
 			}
@@ -116,9 +113,7 @@ func TestEnroll(t *testing.T) {
 				EnrollAPIKey: "my-enrollment-api-key",
 				SharedID:     "im-a-beat",
 				Metadata: Metadata{
-					Local: map[string]interface{}{
-						"os": "linux",
-					},
+					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),
 				},
 			}
@@ -131,4 +126,12 @@ func TestEnroll(t *testing.T) {
 			require.True(t, strings.Index(err.Error(), "Something is really bad here") > 0)
 		},
 	))
+}
+
+func testMetadata() *info.ECSMeta {
+	return &info.ECSMeta{
+		OS: &info.SystemECSMeta{
+			Name: "linux",
+		},
+	}
 }

@@ -50,6 +50,7 @@ func newErrNotFound(s string, a ...interface{}) *ErrNotFound {
 // into this module.
 type MessageOutputter func(msg string, a ...interface{})
 
+// Importer is a type to import dashboards
 type Importer struct {
 	cfg     *Config
 	version common.Version
@@ -90,12 +91,14 @@ func (imp Importer) Import() error {
 	return nil
 }
 
+// ImportDashboard imports a dashboard
 func (imp Importer) ImportDashboard(file string) error {
 	imp.loader.statusMsg("Import dashboard %s", file)
 
 	return imp.loader.ImportDashboard(file)
 }
 
+// ImportFile imports a file
 func (imp Importer) ImportFile(fileType string, file string) error {
 	imp.loader.statusMsg("Import %s from %s", fileType, file)
 
@@ -107,6 +110,7 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
 
+// ImportDir imports a directory
 func (imp Importer) ImportDir(dirType string, dir string) error {
 	imp.loader.statusMsg("Import directory %s", dir)
 
@@ -191,6 +195,7 @@ func (imp Importer) unzip(archive, target string) error {
 	return nil
 }
 
+// ImportArchive imports a zip archive
 func (imp Importer) ImportArchive() error {
 	var archive string
 
@@ -292,7 +297,7 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	return targetPath, nil
 }
 
-// import Kibana dashboards and index-pattern or only one of these
+// ImportKibanaDir imports dashboards and index-pattern or only one of these
 func (imp Importer) ImportKibanaDir(dir string) error {
 	var err error
 

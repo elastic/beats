@@ -72,7 +72,7 @@ func streamFactory(ctx context.Context, cfg *config.Config, client sender, r rep
 }
 
 func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *config.Config, r reporter, m monitoring.Monitor) (*operation.Operator, error) {
-	operatorConfig := &operatorCfg.Config{}
+	operatorConfig := operatorCfg.DefaultConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
 	}

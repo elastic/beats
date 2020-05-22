@@ -17,7 +17,7 @@ const (
 	logFileFormatWin = "%s\\logs\\%s\\%s"
 
 	// args: pipeline name, application name
-	mbEndpointFileFormat = "unix://%s/run/%s/%s/%s.sock"
+	mbEndpointFileFormat = "unix:///tmp/elastic-agent/%s/%s/%s.sock"
 	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`
 )
@@ -27,7 +27,7 @@ func getMonitoringEndpoint(program, operatingSystem, pipelineID string) string {
 		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, program)
 	}
 
-	return fmt.Sprintf(mbEndpointFileFormat, paths.Data(), pipelineID, program, program)
+	return fmt.Sprintf(mbEndpointFileFormat, pipelineID, program, program)
 }
 
 func getLoggingFile(program, operatingSystem, installPath, pipelineID string) string {

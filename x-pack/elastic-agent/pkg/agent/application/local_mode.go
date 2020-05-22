@@ -55,7 +55,7 @@ func newLocal(
 ) (*Local, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New()
+		log, err = logger.NewFromConfig(rawConfig)
 		if err != nil {
 			return nil, err
 		}

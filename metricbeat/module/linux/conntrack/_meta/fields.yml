@@ -1,0 +1,43 @@
+- name: conntrack
+  type: group
+  release: beta
+  description: >
+    conntrack
+  fields:
+    - name: summary
+      type: group
+      description: >
+        summary of nf_conntrack statistics, summed across CPU cores
+      fields:
+        - name: drop
+          type: long
+          description: >
+            packets dropped due to conntrack failiure
+        - name: early_drop
+          type: long
+          description: >
+            conntrack entries dropped to make room for new ones
+        - name: entries
+          type: long
+          description: >
+            entries in the conntrack table
+        - name: found
+          type: long
+          description: >
+            successfully searched entries
+        - name: ignore
+          type: long
+          description: >
+            packets seen already connected to a conntrack entry
+        - name: insert_failed
+          type: long
+          description: >
+            Number of entries where list insert insert failed 
+        - name: invalid
+          type: long
+          description: > 
+            packets seen that cannot be tracked
+        - name: search_restart
+          type: long
+          description: >
+            table lookups which had to be restarted due to table resizes

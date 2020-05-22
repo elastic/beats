@@ -1,0 +1,15 @@
+{"ClientIP":"[10.11.12.13]:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"10.11.12.13:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"10.11.12.13","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"::ffff:10.11.12.13","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[::ffff:10.11.12.13]:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[2001:db8::abcd]:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"2001:db8::abcd","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[2001:db8::abcd]","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[10.11.12.13]","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"localhost","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[localhost]:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"localhost:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"[cool.client.local]:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"cool.client.local","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}
+{"ClientIP":"cool.client.local:12345","RecordType":-1,"CreationTime":"2020-02-17T17:12:03","Id":"3be78a31-dbd3-4c2c-eaf9-08d7b3cc8226"}

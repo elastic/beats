@@ -3,10 +3,16 @@
     "@timestamp": "2019-09-06T13:28:40.0015275Z",
     "event": {
       "action": "disabled-user-account",
+      "category": "iam",
       "code": 4725,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "deletion",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
@@ -63,10 +69,16 @@
     "@timestamp": "2019-09-06T13:28:55.2644212Z",
     "event": {
       "action": "disabled-user-account",
+      "category": "iam",
       "code": 4725,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "deletion",
+        "user"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"

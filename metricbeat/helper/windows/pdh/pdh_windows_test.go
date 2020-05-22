@@ -51,7 +51,8 @@ func TestPdhAddCounterInvalidCounter(t *testing.T) {
 func TestPdhGetFormattedCounterValueInvalidCounter(t *testing.T) {
 	counterType, counterValue, err := PdhGetFormattedCounterValueDouble(InvalidCounterHandle)
 	assert.EqualValues(t, counterType, 0)
-	assert.EqualValues(t, counterValue, (*PdhCounterValueDouble)(nil))
+	assert.NotNil(t, counterValue)
+	assert.Equal(t, counterValue.Value, float64(0))
 	assert.EqualValues(t, err, PDH_INVALID_HANDLE)
 }
 

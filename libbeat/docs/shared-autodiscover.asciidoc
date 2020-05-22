@@ -18,7 +18,6 @@ to set conditions that, when met, launch specific configurations.
 On start, {beatname_uc} will scan existing containers and launch the proper configs for them. Then it will watch for new
 start/stop events. This ensures you don't need to worry about state, but only define your desired configs.
 
-ifdef::autodiscoverDocker[]
 [float]
 ===== Docker
 
@@ -125,10 +124,7 @@ running configuration for a container, 60s by default.
 =======================================
 endif::[]
 
-endif::autodiscoverDocker[]
 
-
-ifdef::autodiscoverKubernetes[]
 [float]
 ===== Kubernetes
 
@@ -246,9 +242,7 @@ running configuration for a container, 60s by default.
           include_labels: ["nodelabel2"]
 -------------------------------------------------------------------------------------
 
-
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
-endif::autodiscoverKubernetes[]
 
 [float]
 ===== Manually Defining Ports with Kubernetes

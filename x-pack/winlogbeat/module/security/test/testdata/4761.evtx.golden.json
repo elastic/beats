@@ -3,10 +3,16 @@
     "@timestamp": "2019-12-19T08:29:38.4487328Z",
     "event": {
       "action": "added-member-to-distribution-group",
+      "category": "iam",
       "code": 4761,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "change",
+        "group"
+      ]
     },
     "group": {
       "domain": "TEST",
@@ -19,7 +25,10 @@
       "level": "information"
     },
     "related": {
-      "user": "at_adm"
+      "user": [
+        "at_adm",
+        "Administrator"
+      ]
     },
     "user": {
       "domain": "TEST",

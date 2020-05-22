@@ -32,6 +32,8 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"go.elastic.co/ecszap"
+
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/paths"
 )
@@ -189,20 +191,28 @@ func makeOptions(cfg Config) []zap.Option {
 
 func makeStderrOutput(cfg Config) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return zapcore.NewCore(buildEncoder(cfg), stderr, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.zapLevel()), nil
 }
 
 func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return zapcore.NewCore(buildEncoder(cfg), discard, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.zapLevel()), nil
 }
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
-	return newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
+	if err != nil {
+		return nil, err
+	}
+	return wrappedCore(cfg, core), nil
 }
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
-	return newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
+	if err != nil {
+		return nil, err
+	}
+	return wrappedCore(cfg, core), nil
 }
 
 func makeFileOutput(cfg Config) (zapcore.Core, error) {
@@ -224,7 +234,17 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		return nil, errors.Wrap(err, "failed to create file rotator")
 	}
 
-	return zapcore.NewCore(buildEncoder(cfg), rotator, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.zapLevel()), nil
+}
+
+func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
+	return wrappedCore(cfg, zapcore.NewCore(enc, ws, enab))
+}
+func wrappedCore(cfg Config, core zapcore.Core) zapcore.Core {
+	if cfg.ECSEnabled {
+		return ecszap.WrapCore(core)
+	}
+	return core
 }
 
 func globalLogger() *zap.Logger {
