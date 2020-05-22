@@ -24,7 +24,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -40,7 +42,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
-	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
@@ -185,6 +187,55 @@ func TestXPackEnabled(t *testing.T) {
 	}
 }
 
+func TestGetAllIndices(t *testing.T) {
+	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+	host := service.Host()
+
+	// Create two indices, one hidden, one not
+	idx1, err := createIndex(host, false)
+	require.NoError(t, err)
+
+	idx2, err := createIndex(host, true)
+	require.NoError(t, err)
+
+	config := getXPackConfig(host)
+
+	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
+	for _, metricSet := range metricSets {
+		// We only care about the index metricset for this test
+		if metricSet.Name() != "index" {
+			continue
+		}
+
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
+
+		// Check that we have events for both indices we created
+		var idx1Exists, idx2Exists bool
+		for _, event := range events {
+			v, err := event.RootFields.GetValue("index_stats")
+			require.NoError(t, err)
+
+			idx, ok := v.(index.Index)
+			if !ok {
+				t.FailNow()
+			}
+
+			switch idx.Index {
+			case idx1:
+				idx1Exists = true
+			case idx2:
+				idx2Exists = true
+			}
+		}
+
+		require.True(t, idx1Exists)
+		require.True(t, idx2Exists)
+	}
+}
+
 // GetConfig returns config for elasticsearch module
 func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
@@ -205,7 +256,7 @@ func getXPackConfig(host string) map[string]interface{} {
 }
 
 func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
-	err := createIndex(esHost)
+	_, err := createIndex(esHost, false)
 	require.NoError(t, err)
 
 	err = enableTrialLicense(esHost, esVersion)
@@ -221,30 +272,31 @@ func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
 	require.NoError(t, err)
 }
 
-// createIndex creates and elasticsearch index in case it does not exit yet
-func createIndex(host string) error {
-	client := &http.Client{}
+// createIndex creates an random elasticsearch index
+func createIndex(host string, isHidden bool) (string, error) {
+	indexName := randString(5)
 
-	if checkExists("http://" + host + "/testindex") {
-		return nil
-	}
+	reqBody := fmt.Sprintf(`{ "settings": { "index.hidden": %v } }`, isHidden)
 
-	req, err := http.NewRequest("PUT", "http://"+host+"/testindex", nil)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "could not build create index request")
 	}
+	req.Header.Add("Content-Type", "application/json")
 
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "could not send create index request")
 	}
 	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
+		return "", fmt.Errorf("HTTP error %d: %s, %s", resp.StatusCode, resp.Status, string(respBody))
 	}
 
-	return nil
+	return indexName, nil
 }
 
 // enableTrialLicense creates and elasticsearch index in case it does not exit yet
@@ -658,4 +710,17 @@ func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAtte
 	}
 
 	return false, nil
+}
+
+func randString(len int) string {
+	rand.Seed(time.Now().UnixNano())
+
+	b := make([]byte, len)
+	aIdx := int('a')
+	for i := range b {
+		charIdx := aIdx + rand.Intn(26)
+		b[i] = byte(charIdx)
+	}
+
+	return string(b)
 }
