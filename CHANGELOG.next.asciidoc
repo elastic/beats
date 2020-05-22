@@ -112,6 +112,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
+- [Autodiscover] Check if runner is already running before starting again. {pull}18564[18564]
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 
 *Auditbeat*
@@ -300,6 +301,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
+- Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 
 *Auditbeat*
 
