@@ -192,10 +192,10 @@ func TestGetAllIndices(t *testing.T) {
 	host := service.Host()
 
 	// Create two indices, one hidden, one not
-	idx1, err := createIndex(host, false)
+	indexVisible, err := createIndex(host, false)
 	require.NoError(t, err)
 
-	idx2, err := createIndex(host, true)
+	indexHidden, err := createIndex(host, true)
 	require.NoError(t, err)
 
 	config := getXPackConfig(host)
@@ -213,7 +213,7 @@ func TestGetAllIndices(t *testing.T) {
 		require.NotEmpty(t, events)
 
 		// Check that we have events for both indices we created
-		var idx1Exists, idx2Exists bool
+		var idxVisibleExists, idxHiddenExists bool
 		for _, event := range events {
 			v, err := event.RootFields.GetValue("index_stats")
 			require.NoError(t, err)
@@ -224,15 +224,15 @@ func TestGetAllIndices(t *testing.T) {
 			}
 
 			switch idx.Index {
-			case idx1:
-				idx1Exists = true
-			case idx2:
-				idx2Exists = true
+			case indexVisible:
+				idxVisibleExists = true
+			case indexHidden:
+				idxHiddenExists = true
 			}
 		}
 
-		require.True(t, idx1Exists)
-		require.True(t, idx2Exists)
+		require.True(t, idxVisibleExists)
+		require.True(t, idxHiddenExists)
 	}
 }
 
