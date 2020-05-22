@@ -591,16 +591,16 @@ func ingestAndEnrichDoc(host string) error {
 }
 
 func countIndices(elasticsearchHostPort string) (int, error) {
-	return countCatItems(elasticsearchHostPort, "indices")
+	return countCatItems(elasticsearchHostPort, "indices", "&expand_wildcards=all")
 
 }
 
 func countShards(elasticsearchHostPort string) (int, error) {
-	return countCatItems(elasticsearchHostPort, "shards")
+	return countCatItems(elasticsearchHostPort, "shards", "")
 }
 
-func countCatItems(elasticsearchHostPort, catObject string) (int, error) {
-	resp, err := http.Get("http://" + elasticsearchHostPort + "/_cat/" + catObject + "?format=json")
+func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, error) {
+	resp, err := http.Get("http://" + elasticsearchHostPort + "/_cat/" + catObject + "?format=json" + extraParams)
 	if err != nil {
 		return 0, err
 	}
