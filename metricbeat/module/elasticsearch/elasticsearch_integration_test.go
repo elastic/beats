@@ -226,8 +226,10 @@ func TestGetAllIndices(t *testing.T) {
 			switch idx.Index {
 			case indexVisible:
 				idxVisibleExists = true
+				require.False(t, idx.Hidden)
 			case indexHidden:
 				idxHiddenExists = true
+				require.True(t, idx.Hidden)
 			}
 		}
 
