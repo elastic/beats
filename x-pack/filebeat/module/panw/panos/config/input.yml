@@ -73,9 +73,9 @@ processors:
         event.outcome: 30
         network.bytes: 31
         client.bytes: 32
-        destination.bytes: 32
+        source.bytes: 32
         server.bytes: 33
-        source.bytes: 33
+        destination.bytes: 33
         network.packets: 34
         event.start: 35
         event.duration: 36
