@@ -9,13 +9,9 @@ To learn more about required roles and privileges, see
 <<feature-roles>>.
 
 ifeval::["{beatname_uc}"!="Winlogbeat"]
-NOTE: {beatname_uc} supports other <<configuring-output,outputs>>,
+NOTE: You can send data to other <<configuring-output,outputs>>,
 ifndef::no-output-logstash[]
 such as {ls},
 endif::no-output-logstash[]
-but typically you'll send events directly to {es}.
-endif::[]
-
-ifndef::win_only[]
-include::{libbeat-dir}/step-test-config.asciidoc[]
+but that requires additional configuration and setup.
 endif::[]

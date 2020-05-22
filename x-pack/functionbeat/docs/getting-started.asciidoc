@@ -1,3 +1,5 @@
+:release-state: released
+
 [id="{beatname_lc}-getting-started"]
 [role="xpack"]
 == Get started: install and configure {beatname_uc}
@@ -95,7 +97,7 @@ See <<configuration-{beatname_lc}-gcp-options>> for more examples.
 
 --
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
 [[setup-assets]]

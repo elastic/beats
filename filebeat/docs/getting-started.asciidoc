@@ -58,11 +58,11 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 [[other-installation-options]]
 ==== Other installation options
 
-* <<setup-repositories>>
+* <<setup-repositories,APT or YUM>>
 * https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
-* <<running-on-docker>>
-* <<running-on-kubernetes>> 
-* <<running-on-cloudfoundry>> 
+* <<running-on-docker,Docker>>
+* <<running-on-kubernetes,Kubernetes>> 
+* <<running-on-cloudfoundry,Cloudfoundry>> 
 
 [float]
 [[set-connection]]
@@ -109,7 +109,7 @@ default locations, set the `paths` variable. For example:
 ----
 --
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
 [[setup-assets]]

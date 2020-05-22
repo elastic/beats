@@ -50,9 +50,9 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 [[other-installation-options]]
 ==== Other installation options
 
-* <<setup-repositories>>
+* <<setup-repositories,APT or YUM>>
 * https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
-* <<running-on-docker>>
+* <<running-on-docker,Docker>>
 
 [float]
 [[set-connection]]
@@ -93,7 +93,7 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
 (`all`).
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
 [[setup-assets]]

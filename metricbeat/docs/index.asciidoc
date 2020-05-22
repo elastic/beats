@@ -39,8 +39,6 @@ include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::{libbeat-dir}/repositories.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
 
 include::./upgrading.asciidoc[]

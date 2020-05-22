@@ -12,7 +12,7 @@ that shows all non-deprecated options.
 endif::[]
 
 TIP: See the
-{beats-ref}/config-file-format.html[Config File Format] section of the
-_Beats Platform Reference_ for more about the structure of the config file.
+{beats-ref}/config-file-format.html[Config File Format] for more about the
+structure of the config file.
 
 The following topics describe how to configure {beatname_uc}:
