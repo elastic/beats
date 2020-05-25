@@ -692,7 +692,8 @@ def mageTarget(String context, String directory, String target) {
 def mageTargetWin(String context, String directory, String target, String label) {
   return {
     log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
-    node("immutable && ${label}"){
+    def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
+    node("${immutable} && ${label}"){
       withBeatsEnvWin() {
         whenTrue(params.debug) {
           dumpFilteredEnvironment()
