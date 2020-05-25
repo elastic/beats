@@ -128,5 +128,5 @@ settings.monitoring:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: trace
+#logging.level: info
 

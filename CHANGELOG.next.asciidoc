@@ -341,6 +341,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
+- Added http_endpoint input{pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
 - Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
