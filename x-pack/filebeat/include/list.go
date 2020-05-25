@@ -11,6 +11,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/googlepubsub"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
