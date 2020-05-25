@@ -20,7 +20,6 @@ package fingerprint
 import (
 	"fmt"
 	"io"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -40,7 +39,6 @@ type fingerprint struct {
 	config Config
 	fields []string
 	hash   hashMethod
-	mu     sync.Mutex
 }
 
 // New constructs a new fingerprint processor.
