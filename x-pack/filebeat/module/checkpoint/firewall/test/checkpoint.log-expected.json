@@ -9,7 +9,7 @@
         "event.id": "{0x5e80a059,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -35,7 +35,7 @@
         "event.id": "{0x5e80a059,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -61,7 +61,7 @@
         "event.id": "{0x5e80a059,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -96,7 +96,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -117,7 +117,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -150,6 +149,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.10",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -160,7 +160,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -181,7 +181,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.10",
             "194.29.39.10"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -189,7 +188,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26680",
+        "source.nat.port": 26680,
         "source.port": "61794",
         "tags": [
             "checkpoint-firewall"
@@ -214,7 +213,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -235,7 +234,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -265,6 +263,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -275,7 +274,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -296,7 +295,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -304,7 +302,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10012",
+        "source.nat.port": 10012,
         "source.port": "41566",
         "tags": [
             "checkpoint-firewall"
@@ -329,7 +327,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -350,7 +348,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -380,6 +377,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -390,7 +388,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -411,7 +409,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -419,7 +416,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10013",
+        "source.nat.port": 10013,
         "source.port": "48698",
         "tags": [
             "checkpoint-firewall"
@@ -444,7 +441,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -465,7 +462,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -495,6 +491,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -505,7 +502,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -526,7 +523,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -534,7 +530,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10014",
+        "source.nat.port": 10014,
         "source.port": "61150",
         "tags": [
             "checkpoint-firewall"
@@ -559,7 +555,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -580,7 +576,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -610,6 +605,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.81.142.43",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -620,7 +616,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -641,7 +637,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.81.142.43",
             "104.81.142.43"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -649,7 +644,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26681",
+        "source.nat.port": 26681,
         "source.port": "55110",
         "tags": [
             "checkpoint-firewall"
@@ -674,7 +669,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -695,7 +690,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -725,6 +719,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -735,7 +730,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -756,7 +751,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -764,7 +758,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26682",
+        "source.nat.port": 26682,
         "source.port": "48718",
         "tags": [
             "checkpoint-firewall"
@@ -789,7 +783,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "14",
+        "event.sequence": 14,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -810,7 +804,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -840,6 +833,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -850,7 +844,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -871,7 +865,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -879,7 +872,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26683",
+        "source.nat.port": 26683,
         "source.port": "62206",
         "tags": [
             "checkpoint-firewall"
@@ -904,7 +897,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -925,7 +918,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -955,6 +947,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -965,7 +958,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -986,7 +979,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -994,7 +986,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26684",
+        "source.nat.port": 26684,
         "source.port": "41596",
         "tags": [
             "checkpoint-firewall"
@@ -1019,7 +1011,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1040,7 +1032,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1070,6 +1061,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1080,7 +1072,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "19",
+        "event.sequence": 19,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1101,7 +1093,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1109,7 +1100,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10015",
+        "source.nat.port": 10015,
         "source.port": "61180",
         "tags": [
             "checkpoint-firewall"
@@ -1134,7 +1125,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "20",
+        "event.sequence": 20,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1155,7 +1146,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1185,6 +1175,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1195,7 +1186,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "21",
+        "event.sequence": 21,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1216,7 +1207,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1224,7 +1214,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10016",
+        "source.nat.port": 10016,
         "source.port": "48732",
         "tags": [
             "checkpoint-firewall"
@@ -1249,7 +1239,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1270,7 +1260,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1300,6 +1289,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1310,7 +1300,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1331,7 +1321,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1339,7 +1328,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43354",
+        "source.nat.port": 43354,
         "source.port": "62222",
         "tags": [
             "checkpoint-firewall"
@@ -1364,7 +1353,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1385,7 +1374,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1415,6 +1403,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1425,7 +1414,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1446,7 +1435,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1454,7 +1442,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10017",
+        "source.nat.port": 10017,
         "source.port": "61188",
         "tags": [
             "checkpoint-firewall"
@@ -1479,7 +1467,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1500,7 +1488,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1530,6 +1517,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -1540,7 +1528,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1561,7 +1549,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1569,7 +1556,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26685",
+        "source.nat.port": 26685,
         "source.port": "41624",
         "tags": [
             "checkpoint-firewall"
@@ -1594,7 +1581,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1615,7 +1602,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1645,6 +1631,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1655,7 +1642,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1676,7 +1663,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1684,7 +1670,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10018",
+        "source.nat.port": 10018,
         "source.port": "48758",
         "tags": [
             "checkpoint-firewall"
@@ -1709,7 +1695,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1730,7 +1716,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1760,6 +1745,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -1770,7 +1756,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1791,7 +1777,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1799,7 +1784,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10019",
+        "source.nat.port": 10019,
         "source.port": "62246",
         "tags": [
             "checkpoint-firewall"
@@ -1824,7 +1809,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1845,7 +1830,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1875,6 +1859,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -1885,7 +1870,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1906,7 +1891,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1914,7 +1898,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10020",
+        "source.nat.port": 10020,
         "source.port": "41638",
         "tags": [
             "checkpoint-firewall"
@@ -1939,7 +1923,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1960,7 +1944,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -1990,6 +1973,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2000,7 +1984,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2021,7 +2005,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2029,7 +2012,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43355",
+        "source.nat.port": 43355,
         "source.port": "61224",
         "tags": [
             "checkpoint-firewall"
@@ -2054,7 +2037,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2075,7 +2058,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2109,7 +2091,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "22",
+        "event.sequence": 22,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2122,6 +2104,9 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.117"
+        ],
+        "related.user": [
+            "admin"
         ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
@@ -2149,6 +2134,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2159,7 +2145,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2180,7 +2166,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2188,7 +2173,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43356",
+        "source.nat.port": 43356,
         "source.port": "48776",
         "tags": [
             "checkpoint-firewall"
@@ -2205,7 +2190,7 @@
         "event.id": "{0x5e80a09c,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2240,6 +2225,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.47",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -2250,7 +2236,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2271,7 +2257,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.47",
             "194.29.39.47"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2279,7 +2264,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26686",
+        "source.nat.port": 26686,
         "source.port": "51436",
         "tags": [
             "checkpoint-firewall"
@@ -2304,7 +2289,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2325,7 +2310,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2357,7 +2341,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2378,7 +2362,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.153",
             "192.168.1.153"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2410,7 +2393,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2431,7 +2414,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2461,6 +2443,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2471,7 +2454,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2492,7 +2475,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2500,7 +2482,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26687",
+        "source.nat.port": 26687,
         "source.port": "62396",
         "tags": [
             "checkpoint-firewall"
@@ -2525,7 +2507,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2546,7 +2528,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2576,6 +2557,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2586,7 +2568,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2607,7 +2589,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2615,7 +2596,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26688",
+        "source.nat.port": 26688,
         "source.port": "48914",
         "tags": [
             "checkpoint-firewall"
@@ -2640,7 +2621,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2661,7 +2642,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2691,6 +2671,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -2701,7 +2682,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2722,7 +2703,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2730,7 +2710,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10021",
+        "source.nat.port": 10021,
         "source.port": "41844",
         "tags": [
             "checkpoint-firewall"
@@ -2755,7 +2735,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2776,7 +2756,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2806,6 +2785,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2816,7 +2796,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2837,7 +2817,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2845,7 +2824,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26689",
+        "source.nat.port": 26689,
         "source.port": "62468",
         "tags": [
             "checkpoint-firewall"
@@ -2870,7 +2849,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2891,7 +2870,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2921,6 +2899,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -2931,7 +2910,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2952,7 +2931,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -2960,7 +2938,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26690",
+        "source.nat.port": 26690,
         "source.port": "61434",
         "tags": [
             "checkpoint-firewall"
@@ -2985,7 +2963,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3006,7 +2984,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3036,6 +3013,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -3046,7 +3024,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3067,7 +3045,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3075,7 +3052,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26691",
+        "source.nat.port": 26691,
         "source.port": "41856",
         "tags": [
             "checkpoint-firewall"
@@ -3102,7 +3079,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -3115,6 +3092,9 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.117"
+        ],
+        "related.user": [
+            "admin"
         ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
@@ -3144,7 +3124,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3165,7 +3145,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3195,6 +3174,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -3205,7 +3185,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3226,7 +3206,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3234,7 +3213,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26692",
+        "source.nat.port": 26692,
         "source.port": "48990",
         "tags": [
             "checkpoint-firewall"
@@ -3259,7 +3238,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3280,7 +3259,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3310,6 +3288,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -3320,7 +3299,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3341,7 +3320,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3349,7 +3327,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26693",
+        "source.nat.port": 26693,
         "source.port": "62478",
         "tags": [
             "checkpoint-firewall"
@@ -3374,7 +3352,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3395,7 +3373,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3425,6 +3402,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -3435,7 +3413,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3456,7 +3434,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3464,7 +3441,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10022",
+        "source.nat.port": 10022,
         "source.port": "41864",
         "tags": [
             "checkpoint-firewall"
@@ -3489,7 +3466,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3510,7 +3487,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3540,6 +3516,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -3550,7 +3527,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3571,7 +3548,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3579,7 +3555,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43357",
+        "source.nat.port": 43357,
         "source.port": "61446",
         "tags": [
             "checkpoint-firewall"
@@ -3604,7 +3580,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3625,7 +3601,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3655,6 +3630,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -3665,7 +3641,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3686,7 +3662,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3694,7 +3669,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43358",
+        "source.nat.port": 43358,
         "source.port": "48998",
         "tags": [
             "checkpoint-firewall"
@@ -3717,6 +3692,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -3727,7 +3703,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3748,7 +3724,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3756,7 +3731,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43359",
+        "source.nat.port": 43359,
         "source.port": "41870",
         "tags": [
             "checkpoint-firewall"
@@ -3781,7 +3756,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3802,7 +3777,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3834,7 +3808,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3855,7 +3829,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3885,6 +3858,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -3895,7 +3869,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3916,7 +3890,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -3924,7 +3897,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26694",
+        "source.nat.port": 26694,
         "source.port": "62488",
         "tags": [
             "checkpoint-firewall"
@@ -3949,7 +3922,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3970,7 +3943,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4000,6 +3972,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -4010,7 +3983,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4031,7 +4004,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4039,7 +4011,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10023",
+        "source.nat.port": 10023,
         "source.port": "61454",
         "tags": [
             "checkpoint-firewall"
@@ -4055,7 +4027,7 @@
         "event.id": "{0x5e80a0af,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4081,7 +4053,7 @@
         "event.id": "{0x5e80a0af,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4107,7 +4079,7 @@
         "event.id": "{0x5e80a0af,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4143,6 +4115,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.10",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -4153,7 +4126,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4174,7 +4147,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.10",
             "194.29.39.10"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4182,7 +4154,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43360",
+        "source.nat.port": 43360,
         "source.port": "62122",
         "tags": [
             "checkpoint-firewall"
@@ -4207,7 +4179,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4228,7 +4200,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4260,7 +4231,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4281,7 +4252,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4311,6 +4281,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.81.142.43",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -4321,7 +4292,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4342,7 +4313,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.81.142.43",
             "104.81.142.43"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4350,7 +4320,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26695",
+        "source.nat.port": 26695,
         "source.port": "55424",
         "tags": [
             "checkpoint-firewall"
@@ -4375,7 +4345,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4396,7 +4366,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4426,6 +4395,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -4436,7 +4406,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4457,7 +4427,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4465,7 +4434,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26696",
+        "source.nat.port": 26696,
         "source.port": "49026",
         "tags": [
             "checkpoint-firewall"
@@ -4490,7 +4459,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4511,7 +4480,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4541,6 +4509,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -4551,7 +4520,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4572,7 +4541,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4580,7 +4548,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26697",
+        "source.nat.port": 26697,
         "source.port": "62514",
         "tags": [
             "checkpoint-firewall"
@@ -4605,7 +4573,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4626,7 +4594,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4656,6 +4623,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -4666,7 +4634,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4687,7 +4655,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4695,7 +4662,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10024",
+        "source.nat.port": 10024,
         "source.port": "41902",
         "tags": [
             "checkpoint-firewall"
@@ -4720,7 +4687,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4741,7 +4708,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4771,6 +4737,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -4781,7 +4748,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4802,7 +4769,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4810,7 +4776,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43361",
+        "source.nat.port": 43361,
         "source.port": "61490",
         "tags": [
             "checkpoint-firewall"
@@ -4835,7 +4801,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4856,7 +4822,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4886,6 +4851,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -4896,7 +4862,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4917,7 +4883,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -4925,7 +4890,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26698",
+        "source.nat.port": 26698,
         "source.port": "49042",
         "tags": [
             "checkpoint-firewall"
@@ -4950,7 +4915,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4971,7 +4936,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5001,6 +4965,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -5011,7 +4976,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5032,7 +4997,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5040,7 +5004,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26699",
+        "source.nat.port": 26699,
         "source.port": "41914",
         "tags": [
             "checkpoint-firewall"
@@ -5065,7 +5029,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5086,7 +5050,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5116,6 +5079,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -5126,7 +5090,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5147,7 +5111,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5155,7 +5118,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10025",
+        "source.nat.port": 10025,
         "source.port": "62534",
         "tags": [
             "checkpoint-firewall"
@@ -5180,7 +5143,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5201,7 +5164,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5231,6 +5193,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -5241,7 +5204,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5262,7 +5225,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5270,7 +5232,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10026",
+        "source.nat.port": 10026,
         "source.port": "61500",
         "tags": [
             "checkpoint-firewall"
@@ -5295,7 +5257,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5316,7 +5278,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5346,6 +5307,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
+        "destination.nat.port": 0,
         "destination.port": "443",
         "event.action": "Accept",
         "event.category": [
@@ -5356,7 +5318,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5377,7 +5339,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5385,7 +5346,7 @@
         "server.port": "443",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10027",
+        "source.nat.port": 10027,
         "source.port": "41938",
         "tags": [
             "checkpoint-firewall"
@@ -5410,7 +5371,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5431,7 +5392,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5461,6 +5421,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
+        "destination.nat.port": 0,
         "destination.port": "80",
         "event.action": "Accept",
         "event.category": [
@@ -5471,7 +5432,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5492,7 +5453,6 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
@@ -5500,7 +5460,7 @@
         "server.port": "80",
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43362",
+        "source.nat.port": 43362,
         "source.port": "49102",
         "tags": [
             "checkpoint-firewall"
