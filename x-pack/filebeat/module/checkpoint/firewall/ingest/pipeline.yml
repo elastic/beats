@@ -59,267 +59,101 @@ processors:
     field: observer.product
     value: '{{checkpoint.product}}'
     if: ctx.checkpoint?.product != null
-- convert:
-    field: checkpoint.server_outbound_bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.received_bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.server_outbound_packets
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.service
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.xlatedport
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.client_outbound_bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.client_outbound_packets
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.s_port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.sequencenum
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.file_size
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.packets
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.sent_byte
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: checkpoint.xlatesport
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- set:
-    field: client.ip
-    value: '{{checkpoint.src}}'
+- rename:
+    field: checkpoint.src
+    target_field: source.ip
     if: ctx.checkpoint?.src != null
-- set:
-    field: source.ip
-    value: '{{checkpoint.src}}'
-    if: ctx.checkpoint?.src != null
-- set:
-    field: client.ip
-    value: '{{checkpoint.client_ip}}'
-    if: ctx.client?.ip == null && ctx.checkpoint?.client_ip != null
-- set:
-    field: source.ip
-    value: '{{checkpoint.client_ip}}'
+- rename:
+    field: checkpoint.client_ip
+    target_field: source.ip
     if: ctx.source?.ip == null && ctx.checkpoint?.client_ip != null
-- set:
-    field: client.nat.ip
-    value: '{{checkpoint.xlatesrc}}'
-    if: ctx.checkpoint?.xlatesrc != '0.0.0.0' && ctx.checkpoint?.xlatesrc != null
-- set:
-    field: source.nat.ip
-    value: '{{checkpoint.xlatesrc}}'
-    if: ctx.checkpoint?.xlatesrc != '0.0.0.0' && ctx.checkpoint?.xlatesrc != null
-- set:
-    field: server.ip
-    value: '{{checkpoint.dst}}'
+- rename:
+    field: checkpoint.xlatesrc
+    target_field: source.nat.ip
+    if: "ctx.checkpoint?.xlatesrc != '0.0.0.0' && ctx.checkpoint?.xlatesrc != null"
+- rename:
+    field: checkpoint.dst
+    target_field: destination.ip
     if: ctx.checkpoint?.dst != null
-- set:
-    field: destination.ip
-    value: '{{checkpoint.dst}}'
-    if: ctx.checkpoint?.dst != null
-- set:
-    field: server.nat.ip
-    value: '{{checkpoint.xlatedst}}'
-    if: ctx.checkpoint?.xlatedst != '0.0.0.0' && ctx.checkpoint?.xlatedst != null
-- set:
-    field: destination.nat.ip
-    value: '{{checkpoint.xlatedst}}'
-    if: ctx.checkpoint?.xlatedst != '0.0.0.0' && ctx.checkpoint?.xlatedst != null
-- set:
-    field: client.user.id
-    value: '{{checkpoint.uid}}'
+- rename:
+    field: checkpoint.xlatedst
+    target_field: destination.nat.ip
+    if: "ctx.checkpoint?.xlatedst != '0.0.0.0' && ctx.checkpoint?.xlatedst != null"
+- rename:
+    field: checkpoint.uid
+    target_field: source.user.id
     if: ctx.checkpoint?.uid != null
-- set:
-    field: source.user.id
-    value: '{{checkpoint.uid}}'
-    if: ctx.checkpoint?.uid != null
-- set:
-    field: client.user.name
-    value: '{{checkpoint.administrator}}'
+- rename:
+    field: checkpoint.administrator
+    target_field: source.user.name
     if: ctx.checkpoint?.administrator != null
-- set:
-    field: source.user.name
-    value: '{{checkpoint.administrator}}'
-    if: ctx.checkpoint?.administrator != null
-- set:
-    field: client.user.name
-    value: '{{checkpoint.source_user_name}}'
-    if: ctx.client?.user?.name == null && ctx.checkpoint?.source_user_name != null
-- set:
-    field: source.user.name
-    value: '{{checkpoint.source_user_name}}'
+- rename:
+    field: checkpoint.source_user_name
+    target_field: source.user.name
     if: ctx.source?.user?.name == null && ctx.checkpoint?.source_user_name != null
-- set:
-    field: source.packets
-    value: '{{checkpoint.client_outbound_packets}}'
+- rename:
+    field: checkpoint.client_outbound_packets
+    target_field: source.packets
     if: ctx.checkpoint?.client_outbound_packets != null
-- set:
-    field: client.packets
-    value: '{{checkpoint.client_outbound_packets}}'
-    if: ctx.checkpoint?.client_outbound_packets != null
-- set:
-    field: destination.packets
-    value: '{{checkpoint.server_outbound_packets}}'
+- rename:
+    field: checkpoint.server_outbound_packets
+    target_field: destination.packets
     if: ctx.checkpoint?.server_outbound_packets != null
-- set:
-    field: server.packets
-    value: '{{checkpoint.server_outbound_packets}}'
-    if: ctx.checkpoint?.server_outbound_packets != null
-- set:
-    field: client.bytes
-    value: '{{checkpoint.client_outbound_bytes}}'
+- rename:
+    field: checkpoint.client_outbound_bytes
+    target_field: source.bytes
     if: ctx.checkpoint?.client_outbound_bytes != null
-- set:
-    field: source.bytes
-    value: '{{checkpoint.client_outbound_bytes}}'
-    if: ctx.checkpoint?.client_outbound_bytes != null
-- set:
-    field: client.bytes
-    value: '{{checkpoint.sent_bytes}}'
-    if: ctx.client?.bytes == null && ctx.checkpoint?.sent_bytes != null
-- set:
-    field: source.bytes
-    value: '{{checkpoint.sent_bytes}}'
-    if: ctx.source?.bytes == null && ctx.checkpoint?.sent_bytes != null
-- set:
-    field: destination.bytes
-    value: '{{checkpoint.server_outbound_bytes}}'
+- rename:
+    field: checkpoint.sent_byte
+    target_field: source.bytes
+    if: ctx.source?.bytes == null && ctx.checkpoint?.sent_byte != null
+- rename:
+    field: checkpoint.server_outbound_bytes
+    target_field: destination.bytes
     if: ctx.checkpoint?.server_outbound_bytes != null
-- set:
-    field: server.bytes
-    value: '{{checkpoint.server_outbound_bytes}}'
-    if: ctx.checkpoint?.server_outbound_bytes != null
-- set:
-    field: destination.bytes
-    value: '{{checkpoint.server_outbound_bytes}}'
+- rename:
+    field: checkpoint.server_outbound_bytes
+    target_field: destination.bytes
     if: ctx.checkpoint?.received_bytes != null && ctx.destination?.bytes == null
-- set:
-    field: server.bytes
-    value: '{{checkpoint.server_outbound_bytes}}'
-    if: ctx.checkpoint?.received_bytes != null && ctx.server?.bytes == null
-- set:
-    field: destination.port
-    value: '{{checkpoint.service}}'
+- rename:
+    field: checkpoint.service
+    target_field: destination.port
     if: ctx.checkpoint?.service != null
-- set:
-    field: server.port
-    value: '{{checkpoint.service}}'
-    if: ctx.checkpoint?.service != null
-- set:
-    field: destination.nat.port
-    value: '{{checkpoint.xlatedport}}'
-    if: ctx.checkpoint?.xlatedport != null
-- set:
-    field: server.nat.port
-    value: '{{checkpoint.xlatedport}}'
-    if: ctx.checkpoint?.xlatedport != null
-- set:
-    field: client.port
-    value: '{{checkpoint.s_port}}'
+- rename:
+    field: checkpoint.xlatedport
+    target_field: destination.nat.port
+    if: "ctx.checkpoint?.xlatedport != null && ctx.checkpoint?.xlatedport != '0'"
+- rename:
+    field: checkpoint.s_port
+    target_field: source.port
     if: ctx.checkpoint?.s_port != null
-- set:
-    field: source.port
-    value: '{{checkpoint.s_port}}'
-    if: ctx.checkpoint?.s_port != null
-- set:
-    field: client.nat.port
-    value: '{{checkpoint.xlatesport}}'
-    if: ctx.checkpoint?.xlatesport != null
-- set:
-    field: source.nat.port
-    value: '{{checkpoint.xlatesport}}'
-    if: ctx.checkpoint?.xlatesport != null
-- set:
-    field: client.mac
-    value: '{{checkpoint.mac_source_address}}'
+- rename:
+    field: checkpoint.xlatesport
+    target_field: source.nat.port
+    if: "ctx.checkpoint?.xlatesport != null && ctx.checkpoint?.xlatesport != '0'"
+- rename:
+    field: checkpoint.mac_source_address
+    target_field: source.mac
     if: ctx.checkpoint?.mac_source_address != null
-- set:
-    field: source.mac
-    value: '{{checkpoint.mac_source_address}}'
-    if: ctx.checkpoint?.mac_source_address != null
-- set:
-    field: client.user.email
-    value: '{{checkpoint.from}}'
+- rename:
+    field: checkpoint.from
+    target_field: source.user.email
     if: ctx.checkpoint?.from != null
-- set:
-    field: source.user.email
-    value: '{{checkpoint.from}}'
-    if: ctx.checkpoint?.from != null
-- set:
-    field: client.domain
-    value: '{{checkpoint.src_machine_name}}'
+- rename:
+    field: checkpoint.src_machine_name
+    target_field: source.domain
     if: ctx.checkpoint?.src_machine_name != null
-- set:
-    field: source.domain
-    value: '{{checkpoint.src_machine_name}}'
-    if: ctx.checkpoint?.src_machine_name != null
-- set:
-    field: server.domain
-    value: '{{checkpoint.destination_dns_hostname}}'
+- rename:
+    field: checkpoint.destination_dns_hostname
+    target_field: destination.domain
     if: ctx.checkpoint?.destination_dns_hostname != null
-- set:
-    field: destination.domain
-    value: '{{checkpoint.destination_dns_hostname}}'
-    if: ctx.checkpoint?.destination_dns_hostname != null
-- set:
-    field: server.domain
-    value: '{{checkpoint.dst_machine_name}}'
+- rename:
+    field: checkpoint.dst_machine_name
+    target_field: destination.domain
     if: ctx.server?.domain == null && ctx.checkpoint?.dst_machine_name != null
-- set:
-    field: destination.domain
-    value: '{{checkpoint.dst_machine_name}}'
-    if: ctx.server?.domain == null && ctx.checkpoint?.dst_machine_name != null
-- set:
-    field: client.user.group.name
-    value: '{{checkpoint.src_user_group}}'
-    if: ctx.checkpoint?.src_user_group != null
-- set:
-    field: source.user.group.name
-    value: '{{checkpoint.src_user_group}}'
+- rename:
+    field: checkpoint.src_user_group
+    target_field: source.user.group.name
     if: ctx.checkpoint?.src_user_group != null
 - append:
     field: event.category
@@ -551,7 +385,7 @@ processors:
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: checkpoint.client_inbound_interface
+    field: checkpoint.client_outbound_interface
     target_field: observer.egress.interface.name
     ignore_missing: true
 - rename:
@@ -560,7 +394,7 @@ processors:
     ignore_missing: true
     if: ctx.network?.direction == 'inbound'
 - rename:
-    field: checkpoint.client_inbound_interface
+    field: checkpoint.ifname
     target_field: observer.egress.interface.name
     ignore_missing: true
     if: ctx.network?.direction == 'outbound'
@@ -739,14 +573,180 @@ processors:
     field: related.user
     value: '{{destination.user.name}}'
     if: ctx.destination?.user?.name != null
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    if: ctx.source?.ip != null
+- set:
+    field: server.ip
+    value: '{{destination.ip}}'
+    if: ctx.destination?.ip != null
+- set:
+    field: client.nat.ip
+    value: '{{source.nat.ip}}'
+    if: ctx.source?.nat?.ip != null
+- set:
+    field: server.nat.ip
+    value: '{{destination.nat.ip}}'
+    if: ctx.destination?.nat?.ip != null
+- set:
+    field: client.port
+    value: '{{source.port}}'
+    if: ctx.source?.port != null
+- set:
+    field: server.port
+    value: '{{destination.port}}'
+    if: ctx.destination?.port != null
+- set:
+    field: client.nat.port
+    value: '{{source.nat.port}}'
+    if: ctx.source?.nat?.port != null
+- set:
+    field: server.nat.port
+    value: '{{destination.nat.port}}'
+    if: ctx.destination?.nat?.port != null
+- set:
+    field: client.packets
+    value: '{{source.packets}}'
+    if: ctx.source?.packets != null
+- set:
+    field: server.packets
+    value: '{{destination.packets}}'
+    if: ctx.destination?.packets != null
+- set:
+    field: client.bytes
+    value: '{{source.bytes}}'
+    if: ctx.source?.bytes != null
+- set:
+    field: server.bytes
+    value: '{{destination.bytes}}'
+    if: ctx.destination?.bytes != null
+- set:
+    field: client.user.id
+    value: '{{source.user.id}}'
+    if: ctx.source?.user?.id != null
+- set:
+    field: client.user.name
+    value: '{{source.user.name}}'
+    if: ctx.source?.user?.name != null
+- set:
+    field: client.mac
+    value: '{{source.mac}}'
+    if: ctx.source?.mac != null
+- set:
+    field: client.user.email
+    value: '{{source.user.email}}'
+    if: ctx.source?.user?.email != null
+- set:
+    field: client.domain
+    value: '{{source.domain}}'
+    if: ctx.source?.domain != null
+- set:
+    field: server.domain
+    value: '{{destination.domain}}'
+    if: ctx.destination?.domain != null
+- set:
+    field: client.user.group.name
+    value: '{{source.user.group.name}}'
+    if: ctx.source?.user?.group?.name != null
+- convert:
+    field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: client.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: source.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true 
+- convert:
+    field: client.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true 
+- convert:
+    field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: client.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: source.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: client.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: server.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: server.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true 
+- convert:
+    field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: server.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: server.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: event.sequence
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: file.size
+    type: long
+    ignore_failure: true
+    ignore_missing: true 
 - script:
     lang: painless
-    source: ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
     if: ctx?.source?.bytes != null && ctx?.destination?.bytes != null && ctx?.network?.bytes == null
     ignore_failure: true
 - script:
     lang: painless
-    source: ctx.network.packets = ctx.source.packets + ctx.destination.packets
+    source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
     if: ctx?.source?.packets != null && ctx?.destination?.packets != null && ctx?.network?.packets == null
     ignore_failure: true
 - geoip:
@@ -793,31 +793,12 @@ processors:
     ignore_missing: true
 - remove:
     field:
-    - checkpoint.client_outbound_packets
-    - checkpoint.client_outbound_bytes
-    - checkpoint.server_outbound_packets
-    - checkpoint.server_outbound_bytes
-    - checkpoint.received_bytes
     - checkpoint.product
-    - checkpoint.uid
-    - checkpoint.from
-    - checkpoint.mac_source_address
-    - checkpoint.source_user_name
-    - checkpoint.administrator
-    - checkpoint.src_machine_name
-    - checkpoint.src_user_group
-    - checkpoint.destination_dns_hostname
-    - checkpoint.dst_machine_name
-    - checkpoint.dst
-    - checkpoint.src
-    - checkpoint.service
-    - checkpoint.s_port
-    - checkpoint.ifname
     - checkpoint.xlatesrc
     - checkpoint.xlatedst
-    - checkpoint.xlatedport
     - checkpoint.xlatesport
-    - checkpoint.client_ip
+    - checkpoint.xlatedport
+    - checkpoint.uid
     - syslog5424_ts
     ignore_missing: true
 on_failure:
