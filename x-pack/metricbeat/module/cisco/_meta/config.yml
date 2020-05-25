@@ -1,5 +1,5 @@
 - module: cisco
-  metricsets: ["system"]
+  metricsets: ["uptime"]
   enabled: false
   period: 10s
   hosts: ["localhost"]
