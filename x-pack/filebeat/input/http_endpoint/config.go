@@ -5,6 +5,8 @@
 package http_endpoint
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
@@ -34,4 +36,12 @@ func defaultConfig() config {
 		URL:           "/",
 		Prefix:        "json",
 	}
+}
+
+func (c *config) Validate() error {
+  if !json.Valid([]byte(c.ResponseBody)) {
+    return errors.New("response_body must be valid JSON")
+  }
+
+  return nil 
 }
