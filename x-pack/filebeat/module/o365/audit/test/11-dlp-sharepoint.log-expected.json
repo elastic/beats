@@ -76,6 +76,9 @@
         "rule.id": "c5981414-9f1f-4275-a2df-2fbfb1d03795",
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -167,6 +170,9 @@
         "rule.id": "7503b92a-67c2-494b-8a46-57ef0d738886",
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -254,6 +260,9 @@
         "rule.id": "c5981414-9f1f-4275-a2df-2fbfb1d03795",
         "rule.name": "Low volume of content detected U.S. Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -345,6 +354,9 @@
         "rule.id": "7503b92a-67c2-494b-8a46-57ef0d738886",
         "rule.name": "High volume of content detected U.S. Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -436,6 +448,9 @@
         "rule.id": "bc4d376f-b038-4695-9362-609d32f963cf",
         "rule.name": "High volume of content detected France Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/INTERNAL%20CREDIT%20CARD%20NUMBERS.docx",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -527,6 +542,9 @@
         "rule.id": "121c85c3-b2b2-4d5b-af11-b1d1bc0b36fd",
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",
@@ -618,6 +636,9 @@
         "rule.id": "121c85c3-b2b2-4d5b-af11-b1d1bc0b36fd",
         "rule.name": "Low volume of content detected France Financial",
         "service.type": "o365",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",

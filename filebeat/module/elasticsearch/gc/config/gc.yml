@@ -9,3 +9,8 @@ multiline:
   pattern: '^(\[?[0-9]{4}-[0-9]{2}-[0-9]{2}|{)'
   negate: true
   match: after
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

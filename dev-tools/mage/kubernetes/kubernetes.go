@@ -102,14 +102,14 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	// Apply the manifest from the dir. This is the requirements for the tests that will
 	// run inside the cluster.
-	if err := mage.KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
+	if err := KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
 		return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
 	}
 	defer func() {
 		if mg.Verbose() {
 			fmt.Println(">> Deleting module manifest from cluster...")
 		}
-		if err := mage.KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
+		if err := KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
 			log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
 		}
 	}()
@@ -125,7 +125,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	workDir := filepath.Join(destDir, repo.SubDir)
-	remote, err := mage.NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
+	remote, err := NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
 	if err != nil {
 		return err
 	}

@@ -6,8 +6,6 @@
 <titleabbrev>decode_cef</titleabbrev>
 ++++
 
-beta[]
-
 The `decode_cef` processor decodes Common Event Format (CEF) messages. This
 processor is available in Filebeat.
 
@@ -18,11 +16,11 @@ renaming it to `event.original`. It is best to rename `message` to
 [source,yaml]
 ----
 processors:
-- rename:
-    fields:
-      - {from: "message", to: "event.original"}
-- decode_cef:
-    field: event.original
+  - rename:
+      fields:
+        - {from: "message", to: "event.original"}
+  - decode_cef:
+      field: event.original
 ----
 
 The `decode_cef` processor has the following configuration settings.

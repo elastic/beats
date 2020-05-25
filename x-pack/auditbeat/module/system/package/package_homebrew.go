@@ -52,6 +52,7 @@ func listBrewPackages() ([]*Package, error) {
 				Name:        packageDir.Name(),
 				Version:     version.Name(),
 				InstallTime: version.ModTime(),
+				Type:        "brew",
 			}
 
 			// Read formula

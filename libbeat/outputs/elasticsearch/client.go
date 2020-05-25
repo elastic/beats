@@ -18,21 +18,24 @@
 package elasticsearch
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 // Client is an elasticsearch client.
@@ -171,9 +174,9 @@ func (client *Client) Clone() *Client {
 	return c
 }
 
-func (client *Client) Publish(batch publisher.Batch) error {
+func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
-	rest, err := client.publishEvents(events)
+	rest, err := client.publishEvents(ctx, events)
 	if len(rest) == 0 {
 		batch.ACK()
 	} else {
@@ -185,9 +188,9 @@ func (client *Client) Publish(batch publisher.Batch) error {
 // PublishEvents sends all events to elasticsearch. On error a slice with all
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
-func (client *Client) publishEvents(
-	data []publisher.Event,
-) ([]publisher.Event, error) {
+func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
+	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
+	defer span.End()
 	begin := time.Now()
 	st := client.observer
 
@@ -202,8 +205,10 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 	origCount := len(data)
+	span.Context.SetLabel("events_original", origCount)
 	data, bulkItems := bulkEncodePublishRequest(client.log, client.conn.GetVersion(), client.index, client.pipeline, data)
 	newCount := len(data)
+	span.Context.SetLabel("events_encoded", newCount)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
 	}
@@ -211,14 +216,18 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	status, result, sendErr := client.conn.Bulk("", "", nil, bulkItems)
+	status, result, sendErr := client.conn.Bulk(ctx, "", "", nil, bulkItems)
 	if sendErr != nil {
-		client.log.Errorf("Failed to perform any bulk index operations: %s", sendErr)
+		err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", sendErr))
+		err.Send()
+		client.log.Error(err)
 		return data, sendErr
 	}
+	pubCount := len(data)
+	span.Context.SetLabel("events_published", pubCount)
 
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
-		len(data),
+		pubCount,
 		time.Now().Sub(begin))
 
 	// check response for transient errors
@@ -232,6 +241,7 @@ func (client *Client) publishEvents(
 	}
 
 	failed := len(failedEvents)
+	span.Context.SetLabel("events_failed", failed)
 	if st := client.observer; st != nil {
 		dropped := stats.nonIndexable
 		duplicates := stats.duplicates
@@ -272,7 +282,12 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		bulkItems = append(bulkItems, meta, event)
+		if opType := events.GetOpType(*event); opType == events.OpTypeDelete {
+			// We don't include the event source in a bulk DELETE
+			bulkItems = append(bulkItems, meta)
+		} else {
+			bulkItems = append(bulkItems, meta, event)
+		}
 		okEvents = append(okEvents, data[i])
 	}
 	return okEvents, bulkItems
@@ -302,16 +317,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	var id string
-	if m := event.Meta; m != nil {
-		if tmp := m["_id"]; tmp != nil {
-			if s, ok := tmp.(string); ok {
-				id = s
-			} else {
-				log.Errorf("Event ID '%v' is no string value", id)
-			}
-		}
-	}
+	id, _ := events.GetMetaStringValue(*event, events.FieldMetaID)
+	opType := events.GetOpType(*event)
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
@@ -320,7 +327,17 @@ func createEventBulkMeta(
 		ID:       id,
 	}
 
+	if opType == events.OpTypeDelete {
+		if id != "" {
+			return eslegclient.BulkDeleteAction{Delete: meta}, nil
+		} else {
+			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
+		}
+	}
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
+		if opType == events.OpTypeIndex {
+			return eslegclient.BulkIndexAction{Index: meta}, nil
+		}
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
@@ -328,12 +345,15 @@ func createEventBulkMeta(
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
 	if event.Meta != nil {
-		if pipeline, exists := event.Meta["pipeline"]; exists {
-			if p, ok := pipeline.(string); ok {
-				return p, nil
-			}
+		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
+		if err == common.ErrKeyNotFound {
+			return "", nil
+		}
+		if err != nil {
 			return "", errors.New("pipeline metadata is no string")
 		}
+
+		return pipeline, nil
 	}
 
 	if pipelineSel != nil {

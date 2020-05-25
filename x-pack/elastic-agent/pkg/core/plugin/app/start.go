@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 	"unicode"
@@ -81,6 +82,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 		a.limiter.Add()
 	}
 
+	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args)
 
 	// specify beat name to avoid data lock conflicts
@@ -112,6 +114,27 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	a.watch(ctx, a.state.ProcessInfo.Process, cfg)
 
 	return nil
+}
+
+func injectLogLevel(logLevel string, args []string) []string {
+	var level string
+	// Translate to level beat understands
+	switch logLevel {
+	case "trace":
+		level = "debug"
+	case "info":
+		level = "info"
+	case "debug":
+		level = "debug"
+	case "error":
+		level = "error"
+	}
+
+	if args == nil || level == "" {
+		return args
+	}
+
+	return append(args, "-E", "logging.level="+level)
 }
 
 func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
@@ -211,7 +234,7 @@ func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *aut
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	dataPath := filepath.Join(paths.Data(), pipelineID, id)
+	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }
 
@@ -297,7 +320,7 @@ func (a *Application) configureByFile(spec *ProcessSpec, config map[string]inter
 	defer f.Close()
 
 	// change owner
-	if err := os.Chown(filePath, a.uid, a.gid); err != nil {
+	if err := changeOwner(filePath, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -360,4 +383,13 @@ func isWindowsPath(path string) bool {
 		return false
 	}
 	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
+}
+
+func changeOwner(path string, uid, gid int) error {
+	if runtime.GOOS == "windows" {
+		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
+		return nil
+	}
+
+	return os.Chown(path, uid, gid)
 }

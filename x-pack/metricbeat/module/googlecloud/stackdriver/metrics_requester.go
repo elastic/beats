@@ -105,6 +105,9 @@ var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
 // if they have a region specified.
 func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	f = fmt.Sprintf(`metric.type="%s"`, m)
+	if r.config.Zone == "" && r.config.Region == "" {
+		return
+	}
 
 	service := serviceRegexp.ReplaceAllString(m, "${service}")
 

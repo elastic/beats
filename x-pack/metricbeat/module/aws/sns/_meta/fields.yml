@@ -27,7 +27,7 @@
           description: The number of messages that were rejected by subscription filter policies.
         - name: NumberOfNotificationsFilteredOut-InvalidAttributes.sum
           type: long
-          description: The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid – for example, because the attribute JSON is incorrectly formatted.
+          description: The number of messages that were rejected by subscription filter policies because the messages' attributes are invalid - for example, because the attribute JSON is incorrectly formatted.
         - name: NumberOfNotificationsFilteredOut-NoMessageAttributes.sum
           type: long
           description: The number of messages that were rejected by subscription filter policies because the messages have no attributes.

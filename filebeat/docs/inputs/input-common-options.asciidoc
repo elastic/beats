@@ -101,3 +101,9 @@ version and the event timestamp; for access to dynamic fields, use
 
 Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
 expand to `"filebeat-myindex-2019.11.01"`.
+
+[float]
+===== `publisher_pipeline.disable_host`
+
+By default, all events contain `host.name`. This option can be set to `true` to
+disable the addition of this field to all events. The default value is `false`.

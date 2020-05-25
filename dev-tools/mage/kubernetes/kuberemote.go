@@ -50,6 +50,8 @@ import (
 	"k8s.io/client-go/tools/portforward"
 	watchtools "k8s.io/client-go/tools/watch"
 	"k8s.io/client-go/transport/spdy"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const sshBitSize = 4096
@@ -72,8 +74,8 @@ type KubeRemote struct {
 	publicKey  []byte
 }
 
-// New creates a new kubernetes remote runner.
-func New(kubeconfig string, namespace string, name string, workDir string, destDir string, syncDir string) (*KubeRemote, error) {
+// NewKubeRemote creates a new kubernetes remote runner.
+func NewKubeRemote(kubeconfig string, namespace string, name string, workDir string, destDir string, syncDir string) (*KubeRemote, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, err
@@ -204,8 +206,13 @@ func (r *KubeRemote) syncServiceAccount() error {
 
 // createPod creates the pod.
 func (r *KubeRemote) createPod(env map[string]string, cmd ...string) (*apiv1.Pod, error) {
+	version, err := mage.GoVersion()
+	if err != nil {
+		return nil, err
+	}
+	image := fmt.Sprintf("golang:%s", version)
 	r.deletePod() // ensure it doesn't already exist
-	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, "golang:1.13.9", env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
+	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, image, env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
 }
 
 // deletePod deletes the pod.
@@ -426,6 +433,8 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 		},
 		Spec: apiv1.PodSpec{
 			ServiceAccountName: svcAccName,
+			HostNetwork:        true,
+			DNSPolicy:          apiv1.DNSClusterFirstWithHostNet,
 			RestartPolicy:      apiv1.RestartPolicyNever,
 			InitContainers: []apiv1.Container{
 				{
@@ -458,7 +467,7 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 				},
 			},
 			Containers: []apiv1.Container{
-				apiv1.Container{
+				{
 					Name:       "exec",
 					Image:      image,
 					Command:    cmd,

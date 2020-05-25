@@ -15,10 +15,14 @@ pipeline {
     BASE_DIR = 'src/github.com/elastic/beats'
     GOX_FLAGS = "-arch amd64"
     DOCKER_COMPOSE_VERSION = "1.21.0"
+    TERRAFORM_VERSION = "0.12.24"
     PIPELINE_LOG_LEVEL = "INFO"
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
+    AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    JOB_GCS_BUCKET = 'beats-ci-temp'
+    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -27,7 +31,8 @@ pipeline {
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
-    disableConcurrentBuilds()
+    quietPeriod(10)
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
@@ -36,6 +41,11 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'windowsTest', defaultValue: true, description: 'Allow Windows stages.')
     booleanParam(name: 'macosTest', defaultValue: true, description: 'Allow macOS stages.')
+
+    booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
+    string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
+
     booleanParam(name: 'debug', defaultValue: false, description: 'Allow debug logging for Jenkins steps')
     booleanParam(name: 'dry_run', defaultValue: false, description: 'Skip build steps, it is for testing pipeline flow')
   }
@@ -46,9 +56,10 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
@@ -64,6 +75,10 @@ pipeline {
       }
     }
     stage('Build and Test'){
+      when {
+        beforeAgent true
+        expression { return env.ONLY_DOCS == "false" }
+      }
       failFast false
       parallel {
         stage('Elastic Agent x-pack'){
@@ -106,6 +121,11 @@ pipeline {
           steps {
             mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
         }
 
         stage('Filebeat oss'){
@@ -146,6 +166,29 @@ pipeline {
           steps {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Filebeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_XPACK_FILEBEAT != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
         }
         stage('Filebeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
@@ -158,6 +201,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+          }
+        }
+        stage('Filebeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -186,6 +242,11 @@ pipeline {
               }
               steps {
                 mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
+              }
+              post {
+                always {
+                  delete()
+                }
               }
             }
             stage('Heartbeat Windows'){
@@ -234,6 +295,11 @@ pipeline {
               }
               steps {
                 mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
+              }
+              post {
+                always {
+                  delete()
+                }
               }
             }
             stage('Auditbeat Windows'){
@@ -352,8 +418,30 @@ pipeline {
               return env.BUILD_METRICBEAT_XPACK != "false"
             }
           }
-          steps {
-            mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+          stages {
+            stage('Prepare cloud integration tests environments'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                startCloudTestEnv('x-pack-metricbeat', [
+                   [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+                ])
+              }
+            }
+            stage('Metricbeat x-pack'){
+              agent { label 'ubuntu && immutable' }
+              options { skipDefaultCheckout() }
+              steps {
+                withCloudTestEnv() {
+                  mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                }
+              }
+            }
+          }
+          post {
+            cleanup {
+              terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+            }
           }
         }
         stage('Metricbeat crosscompile'){
@@ -382,6 +470,24 @@ pipeline {
             mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
+        stage('Metricbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
         stage('Metricbeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -393,6 +499,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -502,6 +621,11 @@ pipeline {
               steps {
                 mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Functionbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -578,6 +702,11 @@ pipeline {
                   makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
                 }
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
@@ -592,6 +721,11 @@ pipeline {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                }
+              }
+              post {
+                always {
+                  delete()
                 }
               }
             }
@@ -623,6 +757,17 @@ pipeline {
   }
 }
 
+def delete() {
+  dir("${env.BASE_DIR}") {
+    fixPermissions("${WORKSPACE}")
+  }
+  deleteDir()
+}
+
+def fixPermissions(location) {
+  sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
+}
+
 def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
     withBeatsEnv(true) {
@@ -631,8 +776,8 @@ def makeTarget(String context, String target, boolean clean = true) {
         dumpMage()
       }
       sh(label: "Make ${target}", script: "make ${target}")
-      if (clean) {
-        sh(script: 'script/fix_permissions.sh ${HOME}')
+      whenTrue(clean) {
+        fixPermissions("${HOME}")
       }
     }
   }
@@ -683,11 +828,11 @@ def withBeatsEnv(boolean archive, Closure body) {
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
     "PYTHON_ENV=${WORKSPACE}/python-env",
-    "TEST_TAGS=oracle",
+    "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -728,7 +873,7 @@ def withBeatsEnvWin(Closure body) {
     "RACE_DETECTOR=true",
   ]){
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -750,6 +895,7 @@ def installTools() {
   if(isUnix()) {
     retry(i) { sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh") }
     retry(i) { sh(label: "Install docker-compose ${DOCKER_COMPOSE_VERSION}", script: ".ci/scripts/install-docker-compose.sh") }
+    retry(i) { sh(label: "Install Terraform ${TERRAFORM_VERSION}", script: ".ci/scripts/install-terraform.sh") }
     retry(i) { sh(label: "Install Mage", script: "make mage") }
   } else {
     retry(i) { bat(label: "Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
@@ -821,6 +967,7 @@ def dumpFilteredEnvironment(){
   echo "SYSTEM_TESTS: ${env.SYSTEM_TESTS}"
   echo "STRESS_TESTS: ${env.STRESS_TESTS}"
   echo "STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}"
+  echo "TEST_TAGS: ${env.TEST_TAGS}"
   echo "GOX_OS: ${env.GOX_OS}"
   echo "GOX_OSARCH: ${env.GOX_OSARCH}"
   echo "GOX_FLAGS: ${env.GOX_FLAGS}"
@@ -887,7 +1034,7 @@ def isChangedOSSCode(patterns) {
     "^libbeat/.*",
     "^testing/.*",
     "^dev-tools/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
   return isChanged(allPatterns)
@@ -901,10 +1048,102 @@ def isChangedXPackCode(patterns) {
     "^dev-tools/.*",
     "^testing/.*",
     "^x-pack/libbeat/.*",
-    "^\\.ci/.*",
+    "^\\.ci/scripts/.*",
   ]
   allPatterns.addAll(patterns)
   return isChanged(allPatterns)
+}
+
+// withCloudTestEnv executes a closure with credentials for cloud test
+// environments.
+def withCloudTestEnv(Closure body) {
+  def maskedVars = []
+  def testTags = "${env.TEST_TAGS}"
+
+  // AWS
+  if (params.allCloudTests || params.awsCloudTests) {
+    testTags = "${testTags},aws"
+    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
+    if (!aws.containsKey('access_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
+    }
+    if (!aws.containsKey('secret_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
+    }
+    maskedVars.addAll([
+      [var: "AWS_REGION", password: params.awsRegion],
+      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
+      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
+    ])
+  }
+
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
+    withEnvMask(vars: maskedVars) {
+      body()
+    }
+  }
+}
+
+def terraformInit(String directory) {
+  dir(directory) {
+    sh(label: "Terraform Init on ${directory}", script: "terraform init")
+  }
+}
+
+def terraformApply(String directory) {
+  terraformInit(directory)
+  dir(directory) {
+    sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+  }
+}
+
+// Start testing environment on cloud using terraform. Terraform files are
+// stashed so they can be used by other stages. They are also archived in
+// case manual cleanup is needed.
+//
+// Example:
+//   startCloudTestEnv('x-pack-metricbeat', [
+//     [cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws'],
+//   ])
+//   ...
+//   terraformCleanup('x-pack-metricbeat', 'x-pack/metricbeat')
+def startCloudTestEnv(String name, environments = []) {
+  withCloudTestEnv() {
+    withBeatsEnv(false) {
+      def runAll = params.runAllCloudTests
+      try {
+        for (environment in environments) {
+          if (environment.cond || runAll) {
+            retry(2) {
+              terraformApply(environment.dir)
+            }
+          }
+        }
+      } finally {
+        // Archive terraform states in case manual cleanup is needed.
+        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+      }
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+    }
+  }
+}
+
+
+// Looks for all terraform states in directory and runs terraform destroy for them,
+// it uses terraform states previously stashed by startCloudTestEnv.
+def terraformCleanup(String stashName, String directory) {
+  stage("Remove cloud scenarios in ${directory}"){
+    withCloudTestEnv() {
+      withBeatsEnv(false) {
+        unstash("terraform-${stashName}")
+        retry(2) {
+          sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
+        }
+      }
+    }
+  }
 }
 
 def loadConfigEnvVars(){
@@ -977,6 +1216,28 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
+
+  // Skip all the stages for changes only related to the documentation
+  env.ONLY_DOCS = isDocChangedOnly()
+
+  // Run the ITs by running only if the changeset affects a specific module.
+  // For such, it's required to look for changes under the module folder and exclude anything else
+  // such as ascidoc and png files.
+  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+}
+
+/**
+  This method verifies if the changeset for the current pull request affect only changes related
+  to documentation, such as asciidoc and png files.
+*/
+def isDocChangedOnly(){
+  if (params.runAllStages || !env.CHANGE_ID?.trim()) {
+    log(level: 'INFO', text: 'Speed build for docs only is disabled for branches/tags or when forcing with the runAllStages parameter.')
+    return 'false'
+  } else {
+    log(level: "INFO", text: 'Check if the speed build for docs is enabled.')
+    return isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
+  }
 }
 
 /**
@@ -1030,7 +1291,7 @@ def runbld() {
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
-            unstash v
+            unstash(v)
           }
         }
         sh(label: 'Process JUnit reports with runbld',

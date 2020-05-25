@@ -76,14 +76,14 @@ type builtinModifier func(beat.Info) common.MapStr
 // MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
 func MakeDefaultBeatSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithHost, WithBeatMeta("agent"))
+	return MakeDefaultSupport(normalize, WithECS, WithHost, WithAgentMeta())
 }
 
 // MakeDefaultObserverSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultObserverSupport automatically adds the `ecs.version` and `observer.X` fields
 // to each event.
 func MakeDefaultObserverSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithBeatMeta("observer"))
+	return MakeDefaultSupport(normalize, WithECS, WithObserverMeta())
 }
 
 // MakeDefaultSupport creates a new SupportFactory for use with the publisher pipeline.
@@ -139,21 +139,39 @@ var WithHost modifier = builtinModifier(func(info beat.Info) common.MapStr {
 	}
 })
 
-// WithBeatMeta adds beat meta information as builtin fields to a processing pipeline.
-// The `key` parameter defines the field to be used.
-func WithBeatMeta(key string) modifier {
+// WithAgentMeta adds agent meta information as builtin fields to a processing
+// pipeline.
+func WithAgentMeta() modifier {
 	return builtinModifier(func(info beat.Info) common.MapStr {
 		metadata := common.MapStr{
-			"type":         info.Beat,
 			"ephemeral_id": info.EphemeralID.String(),
-			"hostname":     info.Hostname,
 			"id":           info.ID.String(),
+			"name":         info.Hostname,
+			"type":         info.Beat,
+			"version":      info.Version,
+		}
+		if info.Name != "" {
+			metadata["name"] = info.Name
+		}
+		return common.MapStr{"agent": metadata}
+	})
+}
+
+// WithObserverMeta adds beat meta information as builtin fields to a processing
+// pipeline.
+func WithObserverMeta() modifier {
+	return builtinModifier(func(info beat.Info) common.MapStr {
+		metadata := common.MapStr{
+			"type":         info.Beat,                 // Per ECS this is not a valid type value.
+			"ephemeral_id": info.EphemeralID.String(), // Not in ECS.
+			"hostname":     info.Hostname,
+			"id":           info.ID.String(), // Not in ECS.
 			"version":      info.Version,
 		}
 		if info.Name != info.Hostname {
 			metadata.Put("name", info.Name)
 		}
-		return common.MapStr{key: metadata}
+		return common.MapStr{"observer": metadata}
 	})
 }
 
@@ -248,6 +266,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
 	builtin := b.builtinMeta
+	if cfg.DisableHost {
+		tmp := builtin.Clone()
+		tmp.Delete("host")
+		builtin = tmp
+	}
+
 	var clientFields common.MapStr
 	for _, mod := range b.modifiers {
 		m := mod.ClientFields(b.info, cfg)

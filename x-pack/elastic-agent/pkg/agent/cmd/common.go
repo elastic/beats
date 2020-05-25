@@ -61,6 +61,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(newRunCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newIntrospectCommandWithArgs(flags, args, streams))
 
 	return cmd
 }

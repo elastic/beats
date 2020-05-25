@@ -56,7 +56,7 @@ Other supported formats are listed below.
 * `hostNameInCertificate` - Specifies the Common Name (CN) in the server certificate. Default value is the server host.
 * `ServerSPN` - The kerberos SPN (Service Principal Name) for the server. Default is MSSQLSvc/host:port.
 * `Workstation ID` - The workstation name (default is the host name)
-* `ApplicationIntent` - Can be given the value `ReadOnly` to initiate a read-only connection to an Availability Group listener.
+* `ApplicationIntent` - Can be given the value `ReadOnly` to initiate a read-only connection to an Availability Group listener. The `database` must be specified when connecting with `Application Intent` set to `ReadOnly`. 
 
 ### The connection string can be specified in one of three formats:
 
@@ -106,6 +106,26 @@ Other supported formats are listed below.
   * `odbc:server=localhost;user id=sa;password={foo{bar}` // Literal `{`, password is "foo{bar"
   * `odbc:server=localhost;user id=sa;password={foo}}bar}` // Escaped `} with `}}`, password is "foo}bar"
 
+### Azure Active Directory authentication - preview
+
+The configuration of functionality might change in the future.
+
+Azure Active Directory (AAD) access tokens are relatively short lived and need to be 
+valid when a new connection is made. Authentication is supported using a callback func that
+provides a fresh and valid token using a connector:
+``` golang
+conn, err := mssql.NewAccessTokenConnector(
+  "Server=test.database.windows.net;Database=testdb",
+  tokenProvider)
+if err != nil {
+	// handle errors in DSN
+}
+db := sql.OpenDB(conn)
+```
+Where `tokenProvider` is a function that returns a fresh access token or an error. None of these statements
+actually trigger the retrieval of a token, this happens when the first statment is issued and a connection
+is created.
+
 ## Executing Stored Procedures
 
 To run a stored procedure, set the query text to the procedure name:
@@ -117,6 +137,66 @@ _, err := db.ExecContext(ctx, "sp_RunMe",
 )
 ```
 
+## Reading Output Parameters from a Stored Procedure with Resultset
+
+To read output parameters from a stored procedure with resultset, make sure you read all the rows before reading the output parameters:
+```go
+sqltextcreate := `
+CREATE PROCEDURE spwithoutputandrows
+	@bitparam BIT OUTPUT
+AS BEGIN
+	SET @bitparam = 1
+	SELECT 'Row 1'
+END
+`
+var bitout int64
+rows, err := db.QueryContext(ctx, "spwithoutputandrows", sql.Named("bitparam", sql.Out{Dest: &bitout}))
+var strrow string
+for rows.Next() {
+	err = rows.Scan(&strrow)
+}
+fmt.Printf("bitparam is %d", bitout)
+```
+
+## Caveat for local temporary tables
+
+Due to protocol limitations, temporary tables will only be allocated on the connection
+as a result of executing a query with zero parameters. The following query
+will, due to the use of a parameter, execute in its own session,
+and `#mytemp` will be de-allocated right away:
+
+```go
+conn, err := pool.Conn(ctx)
+defer conn.Close()
+_, err := conn.ExecContext(ctx, "select @p1 as x into #mytemp", 1)
+// at this point #mytemp is already dropped again as the session of the ExecContext is over
+```
+
+To work around this, always explicitly create the local temporary
+table in a query without any parameters. As a special case, the driver
+will then be able to execute the query directly on the
+connection-scoped session. The following example works:
+
+```go
+conn, err := pool.Conn(ctx)
+
+// Set us up so that temp table is always cleaned up, since conn.Close()
+// merely returns conn to pool, rather than actually closing the connection.
+defer func() {
+	_, _ = conn.ExecContext(ctx, "drop table #mytemp")  // always clean up
+	conn.Close() // merely returns conn to pool
+}()
+
+
+// Since we not pass any parameters below, the query will execute on the scope of
+// the connection and succeed in creating the table.
+_, err := conn.ExecContext(ctx, "create table #mytemp ( x int )")
+
+// #mytemp is now available even if you pass parameters
+_, err := conn.ExecContext(ctx, "insert into #mytemp (x) values (@p1)", 1)
+
+```
+
 ## Return Status
 
 To get the procedure return status, pass into the parameters a
@@ -126,6 +206,19 @@ var rs mssql.ReturnStatus
 _, err := db.ExecContext(ctx, "theproc", &rs)
 log.Printf("status=%d", rs)
 ```
+
+or
+
+```
+var rs mssql.ReturnStatus
+_, err := db.QueryContext(ctx, "theproc", &rs)
+for rows.Next() {
+	err = rows.Scan(&val)
+}
+log.Printf("status=%d", rs)
+```
+
+Limitation: ReturnStatus cannot be retrieved using `QueryRow`.
 
 ## Parameters
 
@@ -147,9 +240,10 @@ are supported:
  * time.Time -> datetimeoffset or datetime (TDS version dependent)
  * mssql.DateTime1 -> datetime
  * mssql.DateTimeOffset -> datetimeoffset
- * "cloud.google.com/go/civil".Date -> date
- * "cloud.google.com/go/civil".DateTime -> datetime2
- * "cloud.google.com/go/civil".Time -> time
+ * "github.com/golang-sql/civil".Date -> date
+ * "github.com/golang-sql/civil".DateTime -> datetime2
+ * "github.com/golang-sql/civil".Time -> time
+ * mssql.TVP -> Table Value Parameter (TDS version dependent)
 
 ## Important Notes
 

@@ -97,7 +97,7 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	config   DynamicConfig
 	path     string
 	done     chan struct{}
@@ -105,7 +105,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.PipelineConnector, cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 

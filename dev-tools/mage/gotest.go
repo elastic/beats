@@ -156,7 +156,9 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		foundModule = true
 
 		// Set MODULE because only want that modules tests to run inside the testing environment.
-		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), map[string]string{"MODULE": fi.Name()})
+		env := map[string]string{"MODULE": fi.Name()}
+		passThroughEnvs(env, IntegrationTestEnvVars()...)
+		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), env)
 		if err != nil {
 			return errors.Wrapf(err, "test setup failed for module %s", fi.Name())
 		}
@@ -454,5 +456,10 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}
+
+	start := time.Now()
+	defer func() {
+		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
+	}()
 	return sh.RunV("go", args...)
 }

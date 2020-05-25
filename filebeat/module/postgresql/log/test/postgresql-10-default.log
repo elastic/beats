@@ -1,0 +1,20 @@
+2020-04-15 12:02:55.244 CEST [23922] LOG:  database system was shut down at 2020-04-15 12:02:52 CEST
+2020-04-15 12:02:55.247 CEST [23920] LOG:  database system is ready to accept connections
+2020-04-15 12:04:45.416 CEST [24981] FATAL:  password authentication failed for user "root"
+2020-04-15 12:04:45.416 CEST [24981] DETAIL:  Role "root" does not exist.
+	Connection matched pg_hba.conf line 80: "local   all             all                                     md5"
+2020-04-15 12:04:45.416 CEST [24981] LOG:  could not send data to client: Broken pipe
+2020-04-15 12:06:36.719 CEST [25143] ERROR:  syntax error at or near "l" at character 1
+2020-04-15 12:56:29.569 CEST [25143] STATEMENT:  SELECT al.id, al.tenant_id, al.created_by_id, al.create_ip, al.audit_date, al.audit_table, al.entity_id, al.entity_name, al.reason_for_change, al.audit_log_event_type_id,
+	        aet.lookup_code, al.old_value, al.new_value, al.event_crf_id, al.event_crf_version_id, al.study_id, al.study_site_id, ss.rc_oid, al.subject_id, s.unique_identifier,
+	        al.study_event_id, sed.name AS studyEventName, al.user_id, al.value_index, al.crf_version_id, al.global_logs, cv.version_name, crf.id AS crfId, crf.name AS crfName
+	         FROM public.rc_audit_log_events AS al
+	        LEFT JOIN rc_crf_versions AS cv ON cv.id=al.crf_version_id
+	            LEFT JOIN rc_crfs AS crf ON crf.id=cv.crf_id
+	            LEFT JOIN ad_lookup_codes AS aet ON aet.id=al.audit_log_event_type_id
+	            LEFT JOIN rc_study_sites AS ss ON ss.id=al.study_site_id
+	            LEFT JOIN rc_subjects AS s ON s.id=al.subject_id
+	            LEFT JOIN rc_study_events AS se ON se.id=al.study_event_id
+	            LEFT JOIN rc_study_event_definitions AS sed ON sed.id=se.study_event_definition_id
+	            WHERE al.tenant_id=$1 AND al.study_id=$2  AND aet.lookup_code IN ($3, $4, $5, $6) AND al.audit_date >= $7 ORDER BY al.id DESC  limit $8
+	;
