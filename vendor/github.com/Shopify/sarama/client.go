@@ -17,8 +17,14 @@ type Client interface {
 	// altered after it has been created.
 	Config() *Config
 
-	// Controller returns the cluster controller broker. Requires Kafka 0.10 or higher.
+	// Controller returns the cluster controller broker. It will return a
+	// locally cached value if it's available. You can call RefreshController
+	// to update the cached value. Requires Kafka 0.10 or higher.
 	Controller() (*Broker, error)
+
+	// RefreshController retrieves the cluster controller from fresh metadata
+	// and stores it in the local cache. Requires Kafka 0.10 or higher.
+	RefreshController() (*Broker, error)
 
 	// Brokers returns the current set of active brokers as retrieved from cluster metadata.
 	Brokers() []*Broker
@@ -193,7 +199,6 @@ func (client *client) Brokers() []*Broker {
 func (client *client) InitProducerID() (*InitProducerIDResponse, error) {
 	var err error
 	for broker := client.any(); broker != nil; broker = client.any() {
-
 		req := &InitProducerIDRequest{}
 
 		response, err := broker.InitProducerID(req)
@@ -242,6 +247,9 @@ func (client *client) Close() error {
 }
 
 func (client *client) Closed() bool {
+	client.lock.RLock()
+	defer client.lock.RUnlock()
+
 	return client.brokers == nil
 }
 
@@ -484,6 +492,35 @@ func (client *client) Controller() (*Broker, error) {
 	return controller, nil
 }
 
+// deregisterController removes the cached controllerID
+func (client *client) deregisterController() {
+	client.lock.Lock()
+	defer client.lock.Unlock()
+	delete(client.brokers, client.controllerID)
+}
+
+// RefreshController retrieves the cluster controller from fresh metadata
+// and stores it in the local cache. Requires Kafka 0.10 or higher.
+func (client *client) RefreshController() (*Broker, error) {
+	if client.Closed() {
+		return nil, ErrClosedClient
+	}
+
+	client.deregisterController()
+
+	if err := client.refreshMetadata(); err != nil {
+		return nil, err
+	}
+
+	controller := client.cachedController()
+	if controller == nil {
+		return nil, ErrControllerNotAvailable
+	}
+
+	_ = controller.Open(client.conf)
+	return controller, nil
+}
+
 func (client *client) Coordinator(consumerGroup string) (*Broker, error) {
 	if client.Closed() {
 		return nil, ErrClosedClient
@@ -525,10 +562,39 @@ func (client *client) RefreshCoordinator(consumerGroup string) error {
 
 // private broker management helpers
 
+func (client *client) updateBroker(brokers []*Broker) {
+	var currentBroker = make(map[int32]*Broker, len(brokers))
+
+	for _, broker := range brokers {
+		currentBroker[broker.ID()] = broker
+		if client.brokers[broker.ID()] == nil { // add new broker
+			client.brokers[broker.ID()] = broker
+			Logger.Printf("client/brokers registered new broker #%d at %s", broker.ID(), broker.Addr())
+		} else if broker.Addr() != client.brokers[broker.ID()].Addr() { // replace broker with new address
+			safeAsyncClose(client.brokers[broker.ID()])
+			client.brokers[broker.ID()] = broker
+			Logger.Printf("client/brokers replaced registered broker #%d with %s", broker.ID(), broker.Addr())
+		}
+	}
+
+	for id, broker := range client.brokers {
+		if _, exist := currentBroker[id]; !exist { // remove old broker
+			safeAsyncClose(broker)
+			delete(client.brokers, id)
+			Logger.Printf("client/broker remove invalid broker #%d with %s", broker.ID(), broker.Addr())
+		}
+	}
+}
+
 // registerBroker makes sure a broker received by a Metadata or Coordinator request is registered
 // in the brokers map. It returns the broker that is registered, which may be the provided broker,
 // or a previously registered Broker instance. You must hold the write lock before calling this function.
 func (client *client) registerBroker(broker *Broker) {
+	if client.brokers == nil {
+		Logger.Printf("cannot register broker #%d at %s, client already closed", broker.ID(), broker.Addr())
+		return
+	}
+
 	if client.brokers[broker.ID()] == nil {
 		client.brokers[broker.ID()] = broker
 		Logger.Printf("client/brokers registered new broker #%d at %s", broker.ID(), broker.Addr())
@@ -756,7 +822,7 @@ func (client *client) tryRefreshMetadata(topics []string, attemptsRemaining int,
 				Logger.Println("client/metadata skipping last retries as we would go past the metadata timeout")
 				return err
 			}
-			Logger.Printf("client/metadata retrying after %dms... (%d attempts remaining)\n", client.conf.Metadata.Retry.Backoff/time.Millisecond, attemptsRemaining)
+			Logger.Printf("client/metadata retrying after %dms... (%d attempts remaining)\n", backoff/time.Millisecond, attemptsRemaining)
 			if backoff > 0 {
 				time.Sleep(backoff)
 			}
@@ -822,7 +888,7 @@ func (client *client) tryRefreshMetadata(topics []string, attemptsRemaining int,
 	}
 
 	if broker != nil {
-		Logger.Println("client/metadata not fetching metadata from broker %s as we would go past the metadata timeout\n", broker.addr)
+		Logger.Printf("client/metadata not fetching metadata from broker %s as we would go past the metadata timeout\n", broker.addr)
 		return retry(ErrOutOfBrokers)
 	}
 
@@ -833,16 +899,19 @@ func (client *client) tryRefreshMetadata(topics []string, attemptsRemaining int,
 
 // if no fatal error, returns a list of topics that need retrying due to ErrLeaderNotAvailable
 func (client *client) updateMetadata(data *MetadataResponse, allKnownMetaData bool) (retry bool, err error) {
+	if client.Closed() {
+		return
+	}
+
 	client.lock.Lock()
 	defer client.lock.Unlock()
 
 	// For all the brokers we received:
 	// - if it is a new ID, save it
 	// - if it is an existing ID, but the address we have is stale, discard the old one and save it
+	// - if some brokers is not exist in it, remove old broker
 	// - otherwise ignore it, replacing our existing one would just bounce the connection
-	for _, broker := range data.Brokers {
-		client.registerBroker(broker)
-	}
+	client.updateBroker(data.Brokers)
 
 	client.controllerID = data.ControllerID
 
