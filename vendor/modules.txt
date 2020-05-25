@@ -93,7 +93,7 @@ github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
 # github.com/Microsoft/hcsshim v0.8.7
 github.com/Microsoft/hcsshim/osversion
-# github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 => github.com/elastic/sarama v0.0.0-20191122160421-355d120d0970
+# github.com/Shopify/sarama v0.0.0-00010101000000-000000000000 => github.com/elastic/sarama v1.24.1-elastic.0.20200519143807-cbc80333a91e
 github.com/Shopify/sarama
 # github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 github.com/StackExchange/wmi
@@ -404,7 +404,7 @@ github.com/dop251/goja_nodejs/require
 github.com/dop251/goja_nodejs/util
 # github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 github.com/dustin/go-humanize
-# github.com/eapache/go-resiliency v1.1.0
+# github.com/eapache/go-resiliency v1.2.0
 github.com/eapache/go-resiliency/breaker
 # github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21
 github.com/eapache/go-xerial-snappy
@@ -593,7 +593,7 @@ github.com/h2non/filetype/types
 github.com/hashicorp/errwrap
 # github.com/hashicorp/go-multierror v1.0.0
 github.com/hashicorp/go-multierror
-# github.com/hashicorp/go-uuid v1.0.1
+# github.com/hashicorp/go-uuid v1.0.2
 github.com/hashicorp/go-uuid
 # github.com/hashicorp/go-version v1.0.0
 github.com/hashicorp/go-version
@@ -629,7 +629,7 @@ github.com/json-iterator/go
 github.com/jstemmer/go-junit-report
 github.com/jstemmer/go-junit-report/formatter
 github.com/jstemmer/go-junit-report/parser
-# github.com/klauspost/compress v1.9.3-0.20191122130757-c099ac9f21dd
+# github.com/klauspost/compress v1.9.8
 github.com/klauspost/compress/flate
 github.com/klauspost/compress/fse
 github.com/klauspost/compress/huff0
@@ -694,7 +694,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.0.0-rc9
 github.com/opencontainers/runc/libcontainer/system
 github.com/opencontainers/runc/libcontainer/user
-# github.com/pierrec/lz4 v2.2.6+incompatible
+# github.com/pierrec/lz4 v2.4.1+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
 # github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
@@ -719,7 +719,7 @@ github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
 # github.com/prometheus/prometheus v2.5.0+incompatible
 github.com/prometheus/prometheus/prompb
-# github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a
+# github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563
 github.com/rcrowley/go-metrics
 # github.com/reviewdog/errorformat v0.0.0-20200109134752-8983be9bc7dd
 github.com/reviewdog/errorformat
@@ -1113,7 +1113,7 @@ gopkg.in/jcmturner/aescts.v1
 gopkg.in/jcmturner/dnsutils.v1
 # gopkg.in/jcmturner/goidentity.v3 v3.0.0
 gopkg.in/jcmturner/goidentity.v3
-# gopkg.in/jcmturner/gokrb5.v7 v7.3.0
+# gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 gopkg.in/jcmturner/gokrb5.v7/asn1tools
 gopkg.in/jcmturner/gokrb5.v7/client
 gopkg.in/jcmturner/gokrb5.v7/config
