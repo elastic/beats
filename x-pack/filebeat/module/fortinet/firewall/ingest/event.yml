@@ -197,11 +197,61 @@ processors:
     field: fortinet.firewall.url
     target_field: url.path
     ignore_missing: true
+- convert:
+    field: fortinet.firewall.sess_duration
+    type: long
+    ignore_failure: true
+    ignore_missing: true
 - rename:
     field: fortinet.firewall.sess_duration
     target_field: event.duration
     ignore_missing: true
     if: "ctx.event?.duration == null"
+- convert:
+    field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: source.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: source.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: destination.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: file.size
+    type: long
+    ignore_failure: true
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: source.geo
