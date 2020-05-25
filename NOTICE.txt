@@ -1385,7 +1385,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/eapache/go-resiliency
-Version: v1.1.0
+Version: v1.2.0
 License type (autodetected): MIT
 ./vendor/github.com/eapache/go-resiliency/LICENSE:
 --------------------------------------------------------------------
@@ -3159,7 +3159,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/hashicorp/go-uuid
-Version: v1.0.1
+Version: v1.0.2
 License type (autodetected): MPL-2.0
 ./vendor/github.com/hashicorp/go-uuid/LICENSE:
 --------------------------------------------------------------------
@@ -4595,8 +4595,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/klauspost/compress
-Version: v1.9.3
-Revision: c099ac9f21dd
+Version: v1.9.8
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/klauspost/compress/LICENSE:
 --------------------------------------------------------------------
@@ -5570,7 +5569,7 @@ See also http://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
 Dependency: github.com/pierrec/lz4
-Version: v2.2.6
+Version: v2.4.1
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/pierrec/lz4/LICENSE:
 --------------------------------------------------------------------
@@ -5861,7 +5860,7 @@ See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for license detai
 
 --------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
-Revision: 3113b8401b8a
+Revision: cac0b30c2563
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
@@ -6158,7 +6157,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
 Overwrite: github.com/elastic/sarama
-Overwrite-Revision: 355d120d0970
+Overwrite-Version: v1.24.1
+Overwrite-Revision: cbc80333a91e
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -7117,7 +7117,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/jcmturner/gokrb5.v7
-Version: v7.3.0
+Version: v7.5.0
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/jcmturner/gokrb5.v7/LICENSE:
 --------------------------------------------------------------------
@@ -7232,7 +7232,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.7
+Version: v2.2.8
 License type (autodetected): Apache-2.0
 ./vendor/gopkg.in/yaml.v2/LICENSE:
 --------------------------------------------------------------------
@@ -7255,7 +7255,7 @@ limitations under the License.
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/yaml.v2
-Version: v2.2.7
+Version: v2.2.8
 License type (autodetected): MIT
 ./vendor/gopkg.in/yaml.v2/LICENSE.libyaml:
 --------------------------------------------------------------------
