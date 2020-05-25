@@ -59,6 +59,76 @@ processors:
     field: observer.product
     value: '{{checkpoint.product}}'
     if: ctx.checkpoint?.product != null
+- convert:
+    field: checkpoint.server_outbound_bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.received_bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.server_outbound_packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.service
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.xlatedport
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.client_outbound_bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.client_outbound_packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.s_port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.sequencenum
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.file_size
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.sent_byte
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.xlatesport
+    type: long
+    ignore_failure: true
+    ignore_missing: true
 - set:
     field: client.ip
     value: '{{checkpoint.src}}'
@@ -656,6 +726,11 @@ processors:
     target_field: message
     ignore_missing: true
     if: ctx.message == null
+- gsub:
+    field: checkpoint.sys_message
+    pattern: ^:"
+    replacement: ""
+    if: ctx.checkpoint?.sys_message != null
 - append:
     field: related.user
     value: '{{source.user.name}}'

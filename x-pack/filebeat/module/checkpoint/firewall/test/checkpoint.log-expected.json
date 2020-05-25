@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2020-03-29T13:19:20Z",
-        "checkpoint.sys_message": ":\"The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
+        "checkpoint.sys_message": "The eth0 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
         ],
@@ -9,7 +9,7 @@
         "event.id": "{0x5e80a059,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -27,7 +27,7 @@
     },
     {
         "@timestamp": "2020-03-29T13:19:20Z",
-        "checkpoint.sys_message": ":\"The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
+        "checkpoint.sys_message": "The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
         ],
@@ -35,7 +35,7 @@
         "event.id": "{0x5e80a059,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -53,7 +53,7 @@
     },
     {
         "@timestamp": "2020-03-29T13:19:21Z",
-        "checkpoint.sys_message": ":\"installed Standard",
+        "checkpoint.sys_message": "installed Standard",
         "event.category": [
             "network"
         ],
@@ -61,7 +61,7 @@
         "event.id": "{0x5e80a059,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -96,7 +96,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -161,7 +161,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -215,7 +215,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -277,7 +277,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -331,7 +331,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -393,7 +393,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -447,7 +447,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -509,7 +509,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -563,7 +563,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -625,7 +625,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -679,7 +679,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -741,7 +741,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -795,7 +795,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "14",
+        "event.sequence": 14,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -857,7 +857,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -911,7 +911,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -973,7 +973,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1027,7 +1027,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1089,7 +1089,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "19",
+        "event.sequence": 19,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1143,7 +1143,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "20",
+        "event.sequence": 20,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1205,7 +1205,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "21",
+        "event.sequence": 21,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1259,7 +1259,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1321,7 +1321,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1375,7 +1375,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1437,7 +1437,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1491,7 +1491,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1553,7 +1553,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1607,7 +1607,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1669,7 +1669,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1723,7 +1723,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1785,7 +1785,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1839,7 +1839,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1901,7 +1901,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1955,7 +1955,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2017,7 +2017,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2071,7 +2071,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2125,7 +2125,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "22",
+        "event.sequence": 22,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2180,7 +2180,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2226,7 +2226,7 @@
         "event.id": "{0x5e80a09c,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2273,7 +2273,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2327,7 +2327,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2379,7 +2379,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2431,7 +2431,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2493,7 +2493,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2547,7 +2547,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2609,7 +2609,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2663,7 +2663,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2725,7 +2725,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2779,7 +2779,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2841,7 +2841,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2895,7 +2895,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2957,7 +2957,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3011,7 +3011,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3073,7 +3073,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3129,7 +3129,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -3174,7 +3174,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3236,7 +3236,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3290,7 +3290,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3352,7 +3352,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3406,7 +3406,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3468,7 +3468,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3522,7 +3522,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3584,7 +3584,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3638,7 +3638,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3700,7 +3700,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3764,7 +3764,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3818,7 +3818,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3870,7 +3870,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3932,7 +3932,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3986,7 +3986,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4048,7 +4048,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4093,7 +4093,7 @@
         "event.id": "{0x5e80a0af,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4111,7 +4111,7 @@
     },
     {
         "@timestamp": "2020-03-29T13:20:46Z",
-        "checkpoint.sys_message": ":\"The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
+        "checkpoint.sys_message": "The eth1 interface is not protected by the anti-spoofing feature. Your network may be at risk",
         "event.category": [
             "network"
         ],
@@ -4119,7 +4119,7 @@
         "event.id": "{0x5e80a0af,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4137,7 +4137,7 @@
     },
     {
         "@timestamp": "2020-03-29T13:20:46Z",
-        "checkpoint.sys_message": ":\"installed Standard",
+        "checkpoint.sys_message": "installed Standard",
         "event.category": [
             "network"
         ],
@@ -4145,7 +4145,7 @@
         "event.id": "{0x5e80a0af,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4193,7 +4193,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4247,7 +4247,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4299,7 +4299,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4361,7 +4361,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4415,7 +4415,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4477,7 +4477,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4531,7 +4531,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4593,7 +4593,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4647,7 +4647,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4709,7 +4709,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4763,7 +4763,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4825,7 +4825,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4879,7 +4879,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4941,7 +4941,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4995,7 +4995,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5057,7 +5057,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5111,7 +5111,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5173,7 +5173,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5227,7 +5227,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5289,7 +5289,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5343,7 +5343,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5405,7 +5405,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5459,7 +5459,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5521,7 +5521,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
