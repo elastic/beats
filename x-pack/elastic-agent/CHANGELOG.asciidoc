@@ -59,3 +59,4 @@
 - Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
 - Pick up version from libbeat {pull}18350[18350]
 - More clear output of inspect command {pull}18405[18405]
+- Logging level defaults to info {pull}18657[18657]
