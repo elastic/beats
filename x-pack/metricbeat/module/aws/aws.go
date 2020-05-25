@@ -90,6 +90,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		TagsFilter:    config.TagsFilter,
 	}
 
+	base.Logger().Debug("Metricset level config for period: ", metricSet.Period)
+	base.Logger().Debug("Metricset level config for tags filter: ", metricSet.TagsFilter)
+
 	// Get IAM account name
 	awsConfig.Region = "us-east-1"
 	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
@@ -129,11 +132,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		}
 
 		metricSet.RegionsList = completeRegionsList
+		base.Logger().Debug("Metricset level config for regions: ", metricSet.RegionsList)
 		return &metricSet, nil
 	}
 
 	// Construct MetricSet with specific regions list from config
 	metricSet.RegionsList = config.Regions
+	base.Logger().Debug("Metricset level config for regions: ", metricSet.RegionsList)
 	return &metricSet, nil
 }
 
