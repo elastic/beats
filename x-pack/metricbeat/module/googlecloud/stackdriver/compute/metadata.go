@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
@@ -27,6 +29,7 @@ func NewMetadataService(projectID, zone string, region string, opt ...option.Cli
 		region:        region,
 		opt:           opt,
 		instanceCache: common.NewCache(30*time.Second, 13),
+		logger:        logp.NewLogger("metadata"),
 	}, nil
 }
 
@@ -55,12 +58,13 @@ type metadataCollector struct {
 	computeMetadata *computeMetadata
 
 	instanceCache *common.Cache
+	logger        *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
 func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (googlecloud.MetadataCollectorData, error) {
 	if s.computeMetadata == nil {
-		_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.zone, s.region)
+		_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceZone(resp))
 		if err != nil {
 			return googlecloud.MetadataCollectorData{}, err
 		}
@@ -104,8 +108,8 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 }
 
 // instanceMetadata returns the labels of an instance
-func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string, region string) (*computeMetadata, error) {
-	i, err := s.instance(ctx, instanceID, zone, region)
+func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
+	i, err := s.instance(ctx, instanceID, zone)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error trying to get data from instance '%s' in zone '%s'", instanceID, zone)
 	}
@@ -139,7 +143,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 }
 
 // instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID, zone string, region string) (*compute.Instance, error) {
+func (s *metadataCollector) instance(ctx context.Context, instanceID, zone string) (*compute.Instance, error) {
 	service, err := compute.NewService(ctx, s.opt...)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error getting client from Compute service")
@@ -152,29 +156,11 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID, zone strin
 		}
 	}
 
-	if region != "" {
-		regionData, err := service.Regions.Get(s.projectID, region).Do()
-		if err != nil {
-			return nil, errors.Wrapf(err, "error getting region information for '%s'", region)
-		}
-
-		zones := regionData.Zones
-		for _, zone := range zones {
-			zString := strings.Split(zone, "/")
-			zName := zString[len(zString)-1]
-			instanceData, err := service.Instances.Get(s.projectID, zName, instanceID).Do()
-			if err != nil {
-				continue
-			}
-			s.instanceCache.Put(instanceID, instanceData)
-			return instanceData, nil
-		}
-	}
-
 	if zone != "" {
 		instanceData, err := service.Instances.Get(s.projectID, zone, instanceID).Do()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error getting instance information for instance with ID '%s'", instanceID)
+			s.logger.Warnf("failed to get instance information for instance '%s' in zone '%s', skipping metadata for instance", instanceID, zone)
+			return nil, nil
 		}
 		s.instanceCache.Put(instanceID, instanceData)
 		return instanceData, nil
@@ -185,6 +171,14 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID, zone strin
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
 	if ts.Resource != nil && ts.Resource.Labels != nil {
 		return ts.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSInstanceID]
+	}
+
+	return ""
+}
+
+func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
+	if ts.Resource != nil && ts.Resource.Labels != nil {
+		return ts.Resource.Labels[googlecloud.TimeSeriesResponsePathForECSAvailabilityZone]
 	}
 
 	return ""
