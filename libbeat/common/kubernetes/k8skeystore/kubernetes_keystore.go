@@ -23,10 +23,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/keystore"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type KubernetesKeystores map[string]keystore.Keystore
