@@ -33,6 +33,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+* iptables {pull}18756[18756]
 
 *Heartbeat*
 
