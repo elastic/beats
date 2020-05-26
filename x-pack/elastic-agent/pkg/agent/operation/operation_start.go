@@ -10,15 +10,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 )
 
 // operationStart start installed process
 // skips if process is already running
 type operationStart struct {
-	program        app.Descriptor
 	logger         *logger.Logger
+	program        Descriptor
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
 	eventProcessor callbackHooks
@@ -28,6 +27,7 @@ type operationStart struct {
 
 func newOperationStart(
 	logger *logger.Logger,
+	program Descriptor,
 	operatorConfig *config.Config,
 	cfg map[string]interface{},
 	eventProcessor callbackHooks) *operationStart {
@@ -35,6 +35,7 @@ func newOperationStart(
 
 	return &operationStart{
 		logger:         logger,
+		program:        program,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
 		eventProcessor: eventProcessor,
@@ -72,5 +73,5 @@ func (o *operationStart) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	return application.Start(ctx, o.cfg)
+	return application.Start(ctx, o.program, o.cfg)
 }
