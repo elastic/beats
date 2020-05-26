@@ -25,7 +25,7 @@ onto time series data for ListTimeSeries API. If it's not given, default aligner
 is set to be `ALIGN_NONE`. Google Cloud also supports `ALIGN_DELTA`, `ALIGN_RATE`,
 `ALIGN_MIN`, `ALIGN_MAX`, `ALIGN_MEAN`, `ALIGN_COUNT`, `ALIGN_SUM` and etc.
 Please see
-https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies#aligner[Aggregation Aligner]
+https://cloud.google.com/monitoring/api/ref_v3/rpc/google.monitoring.v3#aligner[Aggregation Aligner]
 for the full list of aligners.
 
 
