@@ -15,20 +15,18 @@ import (
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
 type ContainerOutputConfig struct {
-	Endpoint       []string `struct:"output.elasticsearch.hosts,omitempty"`
-	User           string   `struct:"output.elasticsearch.username,omitempty"`
-	Password       string   `struct:"output.elasticsearch.password,omitempty"`
-	Index          string   `struct:"output.elasticsearch.index,omitempty"`
-	Pipeline       string   `struct:"output.elasticsearch.pipeline,omitempty"`
-	APIKey         string   `struct:"output.elasticsearch.api_key,omitempty"`
-	Timeout        string   `struct:"output.elasticsearch.timeout,omitempty"`
-	BackoffInit    string   `struct:"output.elasticsearch.backoff.init,omitempty"`
-	BackoffMax     string   `struct:"output.elasticsearch.backoff.max,omitempty"`
-	CloudID        string   `struct:"cloud.id,omitempty"`
-	CloudAuth      string   `struct:"cloud.auth,omitempty"`
-	ProxyURL       string   `struct:"output.elasticsearch.proxy_url,omitempty"`
-	TemplateName   string   `struct:"setup.template.name,omitempty"`
-	TempatePattern string   `struct:"setup.template.pattern,omitempty"`
+	Endpoint    []string `struct:"output.elasticsearch.hosts,omitempty"`
+	User        string   `struct:"output.elasticsearch.username,omitempty"`
+	Password    string   `struct:"output.elasticsearch.password,omitempty"`
+	Index       string   `struct:"output.elasticsearch.index,omitempty"`
+	Pipeline    string   `struct:"output.elasticsearch.pipeline,omitempty"`
+	APIKey      string   `struct:"output.elasticsearch.api_key,omitempty"`
+	Timeout     string   `struct:"output.elasticsearch.timeout,omitempty"`
+	BackoffInit string   `struct:"output.elasticsearch.backoff.init,omitempty"`
+	BackoffMax  string   `struct:"output.elasticsearch.backoff.max,omitempty"`
+	CloudID     string   `struct:"cloud.id,omitempty"`
+	CloudAuth   string   `struct:"cloud.auth,omitempty"`
+	ProxyURL    string   `struct:"output.elasticsearch.proxy_url,omitempty"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -44,11 +42,9 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 
 	newCfg.Endpoint = endpointList
 
-	var isIndex bool
-
 	newCfg.User = input["user"]
 	newCfg.Password = input["password"]
-	newCfg.Index, isIndex = input["index"]
+	newCfg.Index, _ = input["index"]
 	newCfg.Pipeline = input["pipeline"]
 	newCfg.CloudID = input["cloud_id"]
 	newCfg.CloudAuth = input["cloud_auth"]
@@ -57,17 +53,6 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg.Timeout = input["timeout"]
 	newCfg.BackoffInit = input["backoff_init"]
 	newCfg.BackoffMax = input["backoff_max"]
-
-	if isIndex {
-		tname, tnameOk := input["template_name"]
-		tpattern, tpatternOk := input["template_pattern"]
-
-		if !tnameOk || !tpatternOk {
-			return newCfg, errors.New("template_pattern and template_name must be set if index is set")
-		}
-		newCfg.TempatePattern = tpattern
-		newCfg.TemplateName = tname
-	}
 
 	return newCfg, nil
 }

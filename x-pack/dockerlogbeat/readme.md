@@ -30,8 +30,6 @@ To build and install, just run `mage Package`. The build process happens entire 
 | `ilm_enabled`        | Enable or disable ILM. Values are `true` or `false`. Set to `true` by default.                                                    |
 | `ilm_rollover_alias` | Set an ILM rollover alias.                                                                                                        |
 | `ilm_pattern`        | Specify an ILM pattern.                                                                                                           |
-| `template_name`      | Set an Index template name. Required if `index` is set.                                                                           |
-| `template_pattern`   | Set an Index template pattern. Required if `index` is set.                                                                        |
 
 ## How it works
 

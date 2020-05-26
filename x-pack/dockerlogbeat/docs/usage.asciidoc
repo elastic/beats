@@ -76,8 +76,6 @@ docker run --log-driver=elastic/{log-driver-alias}:{version} \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            --log-opt index="eld-%{[agent.version]}-%{+yyyy.MM.dd}" \
-           --log-opt template_name="filebeat" \ 
-           --log-opt template_pattern="filebeat-*"
            -it debian:jessie /bin/bash
 ----
 
@@ -91,8 +89,6 @@ docker run --log-driver=elastic/{log-driver-alias}:{version} \
     "endpoint" : "myhost:9200",
     "user" : "myusername",
     "index" : "eld-%{[agent.version]}-%{+yyyy.MM.dd}",
-    "template_name" : "filebeat",
-    "template_pattern" "filebeat-*",
     "password" : "mypassword",
   }
 }
