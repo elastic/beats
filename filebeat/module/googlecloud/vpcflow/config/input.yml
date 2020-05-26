@@ -1,0 +1,31 @@
+{{ if eq .input "google-pubsub" }}
+
+type: google-pubsub
+project_id: {{ .project_id }}
+topic: {{ .topic }}
+subscription.name: {{ .subscription_name }}
+{{ if .credentials_file }}
+credentials_file: {{ .credentials_file }}
+{{ end }}
+{{ if .credentials_json }}
+credentials_json: {{ .credentials_json }}
+{{ end }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+processors:
+  - script:
+      lang: javascript
+      id: googlecloud_vpcflow_script
+      file: ${path.home}/module/googlecloud/vpcflow/config/pipeline.js
+      params:
+        keep_original_message: {{ .keep_original_message }}

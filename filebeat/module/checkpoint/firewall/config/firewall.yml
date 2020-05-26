@@ -1,0 +1,36 @@
+{{ if eq .input "syslog" }}
+
+type: syslog
+protocol.udp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+  {{ if ne .pipeline "" }}
+  pipeline: "{{.pipeline}}"
+  {{ end }}
+{{ else if eq .input "tls" }}
+type: syslog
+protocol.tcp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+  ssl:
+    enabled: true
+    certificate_authorities: ["{{.cafile}}"]
+    certificate: "{{.certfile}}"
+    key: "{{.keyfile}}"
+    client_authentication: "full"
+  {{ if ne .pipeline "" }}
+  pipeline: "{{.pipeline}}"
+  {{ end }}
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags}}
+
+processors:
+  - add_locale: ~

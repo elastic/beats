@@ -1,0 +1,5 @@
+dashboards:
+- id: ceefb9e0-1f51-11e9-93ed-f7e068f4aebb
+  file: Filebeat-Iptables-Overview.json
+- id: d39f0980-1ff3-11e9-ae2a-939083c6a64e
+  file: Filebeat-Iptables-Ubiquiti-Firewall-Overview.json

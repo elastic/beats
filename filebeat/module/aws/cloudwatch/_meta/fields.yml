@@ -1,0 +1,11 @@
+- name: cloudwatch
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Fields for AWS CloudWatch logs.
+  fields:
+    - name: message
+      type: text
+      description: >
+        CloudWatch log message.

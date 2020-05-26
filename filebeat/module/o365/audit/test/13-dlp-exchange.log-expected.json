@@ -1,0 +1,780 @@
+[
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "destination.user.email": [
+            "asr@example.org",
+            "asr@example.net"
+        ],
+        "event.action": "DlpRuleMatch",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "failure",
+        "event.provider": "Exchange",
+        "event.severity": 4,
+        "event.type": "access",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Here's the phony data",
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.ExchangeMetaData.BCC": [],
+        "o365.audit.ExchangeMetaData.CC": [
+            "asr@example.net"
+        ],
+        "o365.audit.ExchangeMetaData.FileSize": 13405,
+        "o365.audit.ExchangeMetaData.From": "asr@testsiem2.onmicrosoft.com",
+        "o365.audit.ExchangeMetaData.MessageID": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.ExchangeMetaData.RecipientCount": 2,
+        "o365.audit.ExchangeMetaData.Sent": "2020-02-24T20:11:14",
+        "o365.audit.ExchangeMetaData.Subject": "Here's the phony data",
+        "o365.audit.ExchangeMetaData.To": [
+            "asr@example.org"
+        ],
+        "o365.audit.ExchangeMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.Id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleMatch",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-e159-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "High volume of content detected test",
+                        "Severity": "High"
+                    },
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-1234-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "Mid volume of content detected test",
+                        "Severity": "Medium"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "rule.id": [
+            "51e3d97a-e159-4645-9092-608bd24e083a",
+            "51e3d97a-1234-4645-9092-608bd24e083a"
+        ],
+        "rule.name": [
+            "High volume of content detected test",
+            "Mid volume of content detected test"
+        ],
+        "service.type": "o365",
+        "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "user.id": "DlpAgent"
+    },
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "destination.user.email": [
+            "asr@example.org",
+            "asr@example.net"
+        ],
+        "event.action": "DlpRuleUndo",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "success",
+        "event.provider": "Exchange",
+        "event.severity": 4,
+        "event.type": "access",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 2230,
+        "message": "Here's the phony data",
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.ExchangeMetaData.BCC": [],
+        "o365.audit.ExchangeMetaData.CC": [
+            "asr@example.net"
+        ],
+        "o365.audit.ExchangeMetaData.FileSize": 13405,
+        "o365.audit.ExchangeMetaData.From": "asr@testsiem2.onmicrosoft.com",
+        "o365.audit.ExchangeMetaData.MessageID": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.ExchangeMetaData.RecipientCount": 2,
+        "o365.audit.ExchangeMetaData.Sent": "2020-02-24T20:11:14",
+        "o365.audit.ExchangeMetaData.Subject": "Here's the phony data",
+        "o365.audit.ExchangeMetaData.To": [
+            "asr@example.org"
+        ],
+        "o365.audit.ExchangeMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.Id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleUndo",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-e159-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "High volume of content detected test",
+                        "Severity": "High"
+                    },
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-1234-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "Mid volume of content detected test",
+                        "Severity": "Medium"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "rule.id": [
+            "51e3d97a-e159-4645-9092-608bd24e083a",
+            "51e3d97a-1234-4645-9092-608bd24e083a"
+        ],
+        "rule.name": [
+            "High volume of content detected test",
+            "Mid volume of content detected test"
+        ],
+        "service.type": "o365",
+        "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "user.id": "DlpAgent"
+    },
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "destination.user.email": [
+            "asr@example.org",
+            "asr@example.net"
+        ],
+        "event.action": "DlpRuleMatch",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "success",
+        "event.provider": "Exchange",
+        "event.severity": 4,
+        "event.type": "access",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 4459,
+        "message": "Here's the phony data",
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.ExceptionInfo.Reason": "{ \"Justification\": \"I really need to share those files\" }",
+        "o365.audit.ExchangeMetaData.BCC": [],
+        "o365.audit.ExchangeMetaData.CC": [
+            "asr@example.net"
+        ],
+        "o365.audit.ExchangeMetaData.FileSize": 13405,
+        "o365.audit.ExchangeMetaData.From": "asr@testsiem2.onmicrosoft.com",
+        "o365.audit.ExchangeMetaData.MessageID": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.ExchangeMetaData.RecipientCount": 2,
+        "o365.audit.ExchangeMetaData.Sent": "2020-02-24T20:11:14",
+        "o365.audit.ExchangeMetaData.Subject": "Here's the phony data",
+        "o365.audit.ExchangeMetaData.To": [
+            "asr@example.org"
+        ],
+        "o365.audit.ExchangeMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.Id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleMatch",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-e159-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "High volume of content detected test",
+                        "Severity": "High"
+                    },
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-1234-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "Mid volume of content detected test",
+                        "Severity": "Medium"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "rule.id": [
+            "51e3d97a-e159-4645-9092-608bd24e083a",
+            "51e3d97a-1234-4645-9092-608bd24e083a"
+        ],
+        "rule.name": [
+            "High volume of content detected test",
+            "Mid volume of content detected test"
+        ],
+        "service.type": "o365",
+        "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "user.id": "DlpAgent"
+    },
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "destination.user.email": [
+            "asr@example.org",
+            "asr@example.net"
+        ],
+        "event.action": "DlpRuleMatch",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "success",
+        "event.provider": "Exchange",
+        "event.severity": 4,
+        "event.type": "access",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 6769,
+        "message": "Here's the phony data",
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.ExceptionInfo.FalsePositive": true,
+        "o365.audit.ExchangeMetaData.BCC": [],
+        "o365.audit.ExchangeMetaData.CC": [
+            "asr@example.net"
+        ],
+        "o365.audit.ExchangeMetaData.FileSize": 13405,
+        "o365.audit.ExchangeMetaData.From": "asr@testsiem2.onmicrosoft.com",
+        "o365.audit.ExchangeMetaData.MessageID": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.ExchangeMetaData.RecipientCount": 2,
+        "o365.audit.ExchangeMetaData.Sent": "2020-02-24T20:11:14",
+        "o365.audit.ExchangeMetaData.Subject": "Here's the phony data",
+        "o365.audit.ExchangeMetaData.To": [
+            "asr@example.org"
+        ],
+        "o365.audit.ExchangeMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.Id": "d5a0e7d9-e06f-498c-8413-eb83b7dbd516",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleMatch",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-e159-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "High volume of content detected test",
+                        "Severity": "High"
+                    },
+                    {
+                        "ActionParameters": [
+                            "GenerateIncidentReport:asr@testsiem2.onmicrosoft.com"
+                        ],
+                        "Actions": [
+                            "BlockAccess",
+                            "NotifyUser",
+                            "GenerateIncidentReport"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "51e3d97a-1234-4645-9092-608bd24e083a",
+                        "RuleMode": "Enable",
+                        "RuleName": "Mid volume of content detected test",
+                        "Severity": "Medium"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "rule.id": [
+            "51e3d97a-e159-4645-9092-608bd24e083a",
+            "51e3d97a-1234-4645-9092-608bd24e083a"
+        ],
+        "rule.name": [
+            "High volume of content detected test",
+            "Mid volume of content detected test"
+        ],
+        "service.type": "o365",
+        "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "user.id": "DlpAgent"
+    },
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "destination.user.email": [
+            "asr@example.org",
+            "asr@example.net"
+        ],
+        "event.action": "DlpRuleMatch",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "a42123a9-1c07-4dde-9be6-ac71cb9fd16b",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "success",
+        "event.provider": "Exchange",
+        "event.severity": 2,
+        "event.type": "access",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 9041,
+        "message": "Here's the phony data",
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.ExchangeMetaData.BCC": [],
+        "o365.audit.ExchangeMetaData.CC": [
+            "asr@example.net"
+        ],
+        "o365.audit.ExchangeMetaData.FileSize": 13310,
+        "o365.audit.ExchangeMetaData.From": "asr@testsiem2.onmicrosoft.com",
+        "o365.audit.ExchangeMetaData.MessageID": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.ExchangeMetaData.RecipientCount": 2,
+        "o365.audit.ExchangeMetaData.Sent": "2020-02-24T20:11:14",
+        "o365.audit.ExchangeMetaData.Subject": "Here's the phony data",
+        "o365.audit.ExchangeMetaData.To": [
+            "asr@example.org"
+        ],
+        "o365.audit.ExchangeMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.Id": "a42123a9-1c07-4dde-9be6-ac71cb9fd16b",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleMatch",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "Actions": [
+                            "NotifyUser"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
+                        "RuleMode": "Enable",
+                        "RuleName": "Low volume of content detected test",
+                        "Severity": "Low"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "rule.id": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
+        "rule.name": "Low volume of content detected test",
+        "service.type": "o365",
+        "source.user.email": "asr@testsiem2.onmicrosoft.com",
+        "user.id": "DlpAgent"
+    },
+    {
+        "@timestamp": "2020-02-24T20:11:15.000Z",
+        "event.action": "DlpRuleMatch",
+        "event.category": "file",
+        "event.code": "ComplianceDLPExchange",
+        "event.dataset": "o365.audit",
+        "event.id": "a42123a9-1c07-4dde-9be6-ac71cb9fd16b",
+        "event.kind": "alert",
+        "event.module": "o365",
+        "event.outcome": "success",
+        "event.provider": "Exchange",
+        "event.severity": 2,
+        "event.type": "access",
+        "file.inode": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "file.mtime": "2020-02-24T12:13:14.000Z",
+        "file.name": "Company-Internal-Financial.docx",
+        "file.owner": "alice@testsiem2.onmicrosoft.com",
+        "fileset.name": "audit",
+        "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "input.type": "log",
+        "log.offset": 10504,
+        "o365.audit.CreationTime": "2020-02-24T20:11:15",
+        "o365.audit.Id": "a42123a9-1c07-4dde-9be6-ac71cb9fd16b",
+        "o365.audit.IncidentId": "c1dc582b-fa61-6020-1800-08d7b966ec64",
+        "o365.audit.ObjectId": "<AM0PR05MB4803CDA6206C2F2FEB36DB5AB8EC0@AM0PR05MB4803.eurprd05.prod.outlook.com>",
+        "o365.audit.Operation": "DlpRuleMatch",
+        "o365.audit.OrganizationId": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "o365.audit.PolicyDetails": [
+            {
+                "PolicyId": "88956b36-45b3-4828-bf53-78603c0e5f58",
+                "PolicyName": "test",
+                "Rules": [
+                    {
+                        "Actions": [
+                            "NotifyUser"
+                        ],
+                        "ConditionsMatched": {
+                            "OtherConditions": [
+                                {
+                                    "Name": "AccessScope",
+                                    "Value": "IncludeExternalUsers"
+                                }
+                            ],
+                            "SensitiveInformation": [
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "419f449f-6d9d-4be1-a154-b531f7a91b41",
+                                    "UniqueCount": 1
+                                },
+                                {
+                                    "Confidence": 75,
+                                    "Count": 1,
+                                    "Location": "Message Body",
+                                    "SensitiveType": "b8fe86d1-c056-453b-bfaa-9fe698699ecc",
+                                    "UniqueCount": 1
+                                }
+                            ]
+                        },
+                        "RuleId": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
+                        "RuleMode": "Enable",
+                        "RuleName": "Low volume of content detected test",
+                        "Severity": "Low"
+                    }
+                ]
+            }
+        ],
+        "o365.audit.RecordType": 13,
+        "o365.audit.SensitiveInfoDetectionIsIncluded": false,
+        "o365.audit.SharePointMetaData.FileName": "Company-Internal-Financial.docx",
+        "o365.audit.SharePointMetaData.FileOwner": "alice@testsiem2.onmicrosoft.com",
+        "o365.audit.SharePointMetaData.FilePathUrl": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
+        "o365.audit.SharePointMetaData.From": "alice@testsiem2.onmicrosoft.com",
+        "o365.audit.SharePointMetaData.LastModifiedTime": "2020-02-24T12:13:14Z",
+        "o365.audit.SharePointMetaData.UniqueID": "8e103f2f-b293-4062-38b8-08d7b965b2fa",
+        "o365.audit.SharePointMetaData.itemCreationTime": "2020-02-20T11:23:45",
+        "o365.audit.UserId": "DlpAgent",
+        "o365.audit.UserKey": "1153801116545789462",
+        "o365.audit.UserType": 4,
+        "o365.audit.Version": 1,
+        "o365.audit.Workload": "Exchange",
+        "organization.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
+        "related.user": [
+            "alice",
+            "alice@testsiem2.onmicrosoft.com"
+        ],
+        "rule.id": "8398c03a-a00d-42bb-8f80-ead0ad04e1df",
+        "rule.name": "Low volume of content detected test",
+        "service.type": "o365",
+        "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
+        "user.domain": "testsiem2.onmicrosoft.com",
+        "user.id": "alice@testsiem2.onmicrosoft.com",
+        "user.name": "alice"
+    }
+]

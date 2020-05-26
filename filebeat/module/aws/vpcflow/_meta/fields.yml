@@ -1,0 +1,54 @@
+- name: vpcflow
+  type: group
+  release: beta
+  description: >
+    Fields for AWS VPC flow logs.
+  fields:
+    - name: version
+      type: keyword
+      description: >
+        The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
+    - name: account_id
+      type: keyword
+      description: >
+        The AWS account ID for the flow log.
+    - name: interface_id
+      type: keyword
+      description: >
+        The ID of the network interface for which the traffic is recorded.
+    - name: action
+      type: keyword
+      description: >
+        The action that is associated with the traffic, ACCEPT or REJECT.
+    - name: log_status
+      type: keyword
+      description: >
+        The logging status of the flow log, OK, NODATA or SKIPDATA.
+    - name: instance_id
+      type: keyword
+      description: >
+        The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
+    - name: pkt_srcaddr
+      type: ip
+      description: >
+        The packet-level (original) source IP address of the traffic.
+    - name: pkt_dstaddr
+      type: ip
+      description: >
+        The packet-level (original) destination IP address for the traffic.
+    - name: vpc_id
+      type: keyword
+      description: >
+        The ID of the VPC that contains the network interface for which the traffic is recorded.
+    - name: subnet_id
+      type: keyword
+      description: >
+        The ID of the subnet that contains the network interface for which the traffic is recorded.
+    - name: tcp_flags
+      type: keyword
+      description: >
+        The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+    - name: type
+      type: keyword
+      description: >
+        The type of traffic: IPv4, IPv6, or EFA.

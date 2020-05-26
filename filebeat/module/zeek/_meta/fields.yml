@@ -1,0 +1,14 @@
+- key: zeek
+  title: Zeek
+  description: >
+    Module for handling logs produced by Zeek/Bro
+  fields:
+    - name: zeek
+      type: group
+      description: >
+        Fields from Zeek/Bro logs after normalization
+      fields:
+        - name: session_id
+          type: keyword
+          description: >
+            A unique identifier of the session

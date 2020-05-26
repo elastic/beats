@@ -1,0 +1,3 @@
+dashboards:
+- id: a555b160-4987-11e9-b8ce-ed898b5ef295
+  file: Filebeat-Cisco-ASA.json

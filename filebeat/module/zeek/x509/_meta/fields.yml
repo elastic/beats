@@ -1,0 +1,199 @@
+- name: x509
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek x509 log.
+  fields:
+    - name: id
+      type: keyword
+      description: >
+        File id of this certificate.
+
+    - name: certificate
+      type: group
+      description: >
+        Basic information about the certificate.
+      fields:
+        - name: version
+          type: integer
+          description: >
+            Version number.
+
+        - name: serial
+          type: keyword
+          description: >
+            Serial number.
+
+        - name: subject
+          type: group
+          description: >
+            Subject.
+          fields:
+            - name: country
+              type: keyword
+              description: >
+                Country provided in the certificate subject.
+
+            - name: common_name
+              type: keyword
+              description: >
+                Common name provided in the certificate subject.
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality provided in the certificate subject.
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization provided in the certificate subject.
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit provided in the certificate subject.
+
+            - name: state
+              type: keyword
+              description: >
+                State or province provided in the certificate subject.
+
+        - name: issuer
+          type: group
+          description: >
+            Issuer.
+          fields:
+            - name: country
+              type: keyword
+              description: >
+                Country provided in the certificate issuer field.
+
+            - name: common_name
+              type: keyword
+              description: >
+                Common name provided in the certificate issuer field.
+
+            - name: locality
+              type: keyword
+              description: >
+                Locality provided in the certificate issuer field.
+
+            - name: organization
+              type: keyword
+              description: >
+                Organization provided in the certificate issuer field.
+
+            - name: organizational_unit
+              type: keyword
+              description: >
+                Organizational unit provided in the certificate issuer field.
+
+            - name: state
+              type: keyword
+              description: >
+                State or province provided in the certificate issuer field.
+
+        - name: common_name
+          type: keyword
+          description: >
+            Last (most specific) common name.
+
+        - name: valid
+          type: group
+          description: >
+            Certificate validity timestamps
+          fields:
+            - name: from
+              type: date
+              description: >
+                Timestamp before when certificate is not valid.
+
+            - name: until
+              type: date
+              description: >
+                Timestamp after when certificate is not valid.
+
+        - name: key
+          type: group
+          fields:
+            - name: algorithm
+              type: keyword
+              description: >
+                Name of the key algorithm.
+
+            - name: type
+              type: keyword
+              description: >
+                Key type, if key parseable by openssl (either rsa, dsa or ec).
+
+            - name: length
+              type: integer
+              description: >
+                Key length in bits.
+
+        - name: signature_algorithm
+          type: keyword
+          description: >
+            Name of the signature algorithm.
+
+        - name: exponent
+          type: keyword
+          description: >
+            Exponent, if RSA-certificate.
+
+        - name: curve
+          type: keyword
+          description: >
+            Curve, if EC-certificate.
+
+    - name: san
+      type: group
+      description: >
+        Subject alternative name extension of the certificate.
+      fields:
+        - name: dns
+          type: keyword
+          description: >
+            List of DNS entries in SAN.
+
+        - name: uri
+          type: keyword
+          description: >
+            List of URI entries in SAN.
+
+        - name: email
+          type: keyword
+          description: >
+            List of email entries in SAN.
+
+        - name: ip
+          type: ip
+          description: >
+            List of IP entries in SAN.
+
+        - name: other_fields
+          type: boolean
+          description: >
+            True if the certificate contained other, not recognized or parsed name fields.
+
+    - name: basic_constraints
+      type: group
+      description: >
+        Basic constraints extension of the certificate.
+      fields:
+        - name: certificate_authority
+          type: boolean
+          description: >
+            CA flag set or not.
+
+        - name: path_length
+          type: integer
+          description: >
+            Maximum path length.
+
+    - name: log_cert
+      type: boolean
+      description: |
+        Present if policy/protocols/ssl/log-hostcerts-only.bro is loaded
+        Logging of certificate is suppressed if set to F.

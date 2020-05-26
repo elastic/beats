@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/files.log
+    os.linux:
+      - /var/log/bro/current/files.log
+    os.darwin:
+      - /usr/local/var/logs/current/files.log
+  - name: tags
+    default: [zeek.files]
+  - name: community_id
+    default: true
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/files.yml
+
+requires.processors:

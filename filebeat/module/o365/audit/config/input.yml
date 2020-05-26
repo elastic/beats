@@ -1,0 +1,62 @@
+{{ if eq .input "o365audit" }}
+
+type: o365audit
+{{ if .application_id }}application_id: {{ .application_id }}{{ end }}
+tenant_id:
+{{ range .tenants }}
+ - {{ .id }}
+{{ end }}
+{{ if .certificate }}certificate: {{ .certificate }}{{ end }}
+{{ if .key }}key: {{ .key }}{{ end }}
+{{ if .key_passphrase }}key_passphrase: {{ .key_passphrase }}{{ end }}
+{{ if .client_secret }}client_secret: {{ .client_secret }}{{ end }}
+{{ if eq "string" (printf "%T" .content_type) }}
+content_type: {{ .content_type }}
+{{ else }}
+content_type:
+{{ range .content_type }}
+ - {{ . }}
+{{ end }}
+{{ end }}
+{{ if .api }}
+api:
+{{ range $k, $v := .api }}
+ - {{ $k }}: {{ $v -}}
+{{ end }}
+{{ end }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range .paths }}
+ - {{ . }}
+{{ end }}
+exclude_files: [".gz$"]
+json.add_error_key: true
+
+{{ end }}
+
+processors:
+{{ if eq .input "file" }}
+  - rename:
+     fields:
+      - from: json
+        to: o365audit
+  - timestamp:
+      field: o365audit.CreationTime
+      layouts:
+        - 2006-01-02T15:04:05
+{{ end }}
+  - script:
+      lang: javascript
+      id: o365audit_script
+      file: ${path.home}/module/o365/audit/config/pipeline.js
+      params:
+        debug: false
+        tenants:
+          {{ range .tenants }}
+          - id: "{{ .id }}"
+            name: "{{ .name }}"
+          {{ end }}
+

@@ -1,0 +1,51 @@
+- key: azure
+  title: "Azure"
+  release: beta
+  description: >
+    Azure Module
+  fields:
+    - name: azure
+      type: group
+      description: >
+      fields:
+        - name: subscription_id
+          type: keyword
+          description: >
+            Azure subscription ID
+        - name: correlation_id
+          type: keyword
+          description: >
+            Correlation ID
+        - name: tenant_id
+          type: keyword
+          description: >
+            tenant ID
+        - name: resource
+          type: group
+          description: >
+            Resource
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                Resource ID
+            - name: group
+              type: keyword
+              description: >
+                Resource group
+            - name: provider
+              type: keyword
+              description: >
+                Resource type/namespace
+            - name: namespace
+              type: keyword
+              description: >
+                Resource type/namespace
+            - name: name
+              type: keyword
+              description: >
+                Name
+            - name: authorization_rule
+              type: keyword
+              description: >
+                Authorization rule

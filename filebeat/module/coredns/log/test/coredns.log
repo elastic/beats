@@ -1,0 +1,2 @@
+2019-03-06T08:55:28.903Z [INFO] 172.17.0.4:36413 - 21583 "A IN httpbin.org.cluster.local. udp 43 false 512" NXDOMAIN qr,rd,ra 136 0.000102078s
+2019-03-18T22:13:36.289-07:00 [INFO] [::1]:57413 - 14639 "A IN www.yahoo.com. udp 42 false 4096" NOERROR qr,rd,ra 188 0.020948545s
