@@ -87,7 +87,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, nil)
+		mapper, err := NewConfigMapper(mappings, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -141,7 +141,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings, keystore)
+		mapper, err := NewConfigMapper(mappings, keystore, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -165,7 +165,7 @@ func TestNilConditionConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = NewConfigMapper(mappings, nil)
+	_, err = NewConfigMapper(mappings, nil, nil)
 	assert.NoError(t, err)
 	assert.Nil(t, mappings[0].ConditionConfig)
 }

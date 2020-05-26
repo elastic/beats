@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package keystore
+package k8skeystore
 
 import (
 	"strings"
@@ -25,10 +25,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type KubernetesKeystores map[string]Keystore
+type KubernetesKeystores map[string]keystore.Keystore
 
 // KubernetesKeystoresRegistry holds KubernetesKeystores for known namespaces. Once a Keystore for one k8s namespace
 // is initialized it will be reused every time it is needed.
@@ -46,13 +47,13 @@ type KubernetesSecretsKeystore struct {
 }
 
 // Factoryk8s Create the right keystore with the configured options
-func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (Keystore, error) {
+func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (keystore.Keystore, error) {
 	keystore, err := NewKubernetesSecretsKeystore(keystoreNamespace, ks8client, logger)
 	return keystore, err
 }
 
 // NewKubernetesKeystoresRegistry initializes a KubernetesKeystoresRegistry
-func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) *KubernetesKeystoresRegistry {
+func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) keystore.KeystoreProvider {
 	return &KubernetesKeystoresRegistry{
 		kubernetesKeystores: KubernetesKeystores{},
 		logger:              logger,
@@ -60,8 +61,8 @@ func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) *
 	}
 }
 
-// GetK8sKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
-func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore {
+// GetKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
+func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Keystore {
 	namespace := ""
 	if val, ok := event["kubernetes"]; ok {
 		kubernetesMeta := val.(common.MapStr)
@@ -74,8 +75,7 @@ func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore 
 	}
 	if namespace != "" {
 		// either retrieve already stored keystore or create a new one for the namespace
-		storedKeystore := kr.lookupForKeystore(namespace)
-		if storedKeystore != nil {
+		if storedKeystore, ok := kr.kubernetesKeystores[namespace]; ok {
 			return storedKeystore
 		}
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
@@ -86,15 +86,8 @@ func (kr *KubernetesKeystoresRegistry) GetK8sKeystore(event bus.Event) Keystore 
 	return nil
 }
 
-func (kr *KubernetesKeystoresRegistry) lookupForKeystore(keystoreNamespace string) Keystore {
-	if keystore, ok := kr.kubernetesKeystores[keystoreNamespace]; ok {
-		return keystore
-	}
-	return nil
-}
-
 // NewKubernetesSecretsKeystore returns an new k8s Keystore
-func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (Keystore, error) {
+func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interface, logger *logp.Logger) (keystore.Keystore, error) {
 	keystore := KubernetesSecretsKeystore{
 		namespace: keystoreNamespace,
 		client:    ks8client,
@@ -104,7 +97,7 @@ func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interf
 }
 
 // Retrieve return a SecureString instance that will contains both the key and the secret.
-func (k *KubernetesSecretsKeystore) Retrieve(key string) (*SecureString, error) {
+func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString, error) {
 	// key = "kubernetes.somenamespace.somesecret.value"
 	tokens := strings.Split(key, ".")
 	if len(tokens) != 4 {
@@ -113,32 +106,32 @@ func (k *KubernetesSecretsKeystore) Retrieve(key string) (*SecureString, error) 
 			key,
 			"kubernetes.somenamespace.somesecret.value",
 		)
-		return nil, ErrKeyDoesntExists
+		return nil, keystore.ErrKeyDoesntExists
 	}
 	ns := tokens[1]
 	secretName := tokens[2]
 	secretVar := tokens[3]
 	if ns != k.namespace {
 		k.logger.Debugf("cannot access Kubernetes secrets from a different namespace than: %v", ns)
-		return nil, ErrKeyDoesntExists
+		return nil, keystore.ErrKeyDoesntExists
 	}
 	secretIntefrace := k.client.CoreV1().Secrets(ns)
 	secrets, err := secretIntefrace.List(metav1.ListOptions{})
 	if err != nil {
 		k.logger.Errorf("Could not retrieve secrets from k8s API: %v", err)
-		return nil, ErrKeyDoesntExists
+		return nil, keystore.ErrKeyDoesntExists
 	}
 	if len(secrets.Items) == 0 {
 		k.logger.Debugf("no secrets found for namespace: %v", ns)
-		return nil, ErrKeyDoesntExists
+		return nil, keystore.ErrKeyDoesntExists
 	}
 	secret, err := secretIntefrace.Get(secretName, metav1.GetOptions{})
 	if err != nil {
 		k.logger.Errorf("Could not retrieve secret from k8s API: %v", err)
-		return nil, ErrKeyDoesntExists
+		return nil, keystore.ErrKeyDoesntExists
 	}
 	secretString := secret.Data[secretVar]
-	return NewSecureString(secretString), nil
+	return keystore.NewSecureString(secretString), nil
 }
 
 // GetConfig returns common.Config representation of the key / secret pair to be merged with other

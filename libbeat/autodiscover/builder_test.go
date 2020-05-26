@@ -30,7 +30,7 @@ import (
 
 type fakeBuilder struct{}
 
-func (f *fakeBuilder) CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config {
+func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	return []*common.Config{common.NewConfig()}
 }
 
@@ -63,7 +63,7 @@ func TestBuilderRegistry(t *testing.T) {
 
 	// Try to create a config with fake builder and assert length
 	// of configs returned is one
-	res := builder.CreateConfig(nil, nil)
+	res := builder.CreateConfig(nil)
 	assert.Equal(t, len(res), 1)
 
 	builders := Builders{}

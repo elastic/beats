@@ -62,7 +62,7 @@ func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create config based on input hints in the bus event
-func (hb *heartbeatHints) CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config {
+func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var hints common.MapStr
 	hIface, ok := event["hints"]
 	if ok {
@@ -93,7 +93,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options []ucfg.Option) [
 		}
 		hb.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, nil)
+		return template.ApplyConfigTemplate(event, configs)
 	}
 
 	tempCfg := common.MapStr{}
@@ -123,7 +123,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options []ucfg.Option) [
 	}
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs, nil)
+	return template.ApplyConfigTemplate(event, configs)
 }
 
 func (hb *heartbeatHints) getType(hints common.MapStr) common.MapStr {

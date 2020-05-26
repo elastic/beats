@@ -302,7 +302,7 @@ func TestGenerateHints(t *testing.T) {
 			Key:      defaultConfig().Key,
 			Registry: mockRegister,
 		}
-		cfgs := m.CreateConfig(test.event, nil)
+		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
 
 		if len(cfgs) != 0 {
@@ -375,7 +375,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 			Key:      defaultConfig().Key,
 			Registry: mockRegister,
 		}
-		cfgs := m.CreateConfig(test.event, nil)
+		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
 		if len(cfgs) != 0 {
 			config := common.MapStr{}

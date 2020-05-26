@@ -32,14 +32,14 @@ import (
 // Builder provides an interface by which configs can be built from provider metadata
 type Builder interface {
 	// CreateConfig creates a config from hints passed from providers
-	CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config
+	CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config
 }
 
-// Builders is a struct of Builder list objects and a `kubernetesKeystoresRegistry` object, which
-// holds Kubernetes keystores for known namespaces
+// Builders is a struct of Builder list objects and a `keystoreProvider`, which
+// has access to a keystores registry
 type Builders struct {
-	Builders                    []Builder
-	kubernetesKeystoresRegistry *keystore.KubernetesKeystoresRegistry
+	Builders         []Builder
+	keystoreProvider keystore.KeystoreProvider
 }
 
 // BuilderConstructor is a func used to generate a Builder object
@@ -98,8 +98,8 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	configs := []*common.Config{}
 	var opts []ucfg.Option
 
-	if b.kubernetesKeystoresRegistry != nil {
-		k8sKeystore := b.kubernetesKeystoresRegistry.GetK8sKeystore(event)
+	if b.keystoreProvider != nil {
+		k8sKeystore := b.keystoreProvider.GetKeystore(event)
 		if k8sKeystore != nil {
 			opts = []ucfg.Option{
 				ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)),
@@ -107,7 +107,7 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 		}
 	}
 	for _, builder := range b.Builders {
-		if config := builder.CreateConfig(event, opts); config != nil {
+		if config := builder.CreateConfig(event, opts...); config != nil {
 			configs = append(configs, config...)
 		}
 	}
@@ -115,14 +115,13 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
-// SetKubernetesKeystoresRegistry set the k8sKeystoresRegistry of the Builders object
-func (b *Builders) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
-	b.kubernetesKeystoresRegistry = k8sKeystoresRegistry
-}
-
 // NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
-// for simplified mode (single 'hints' builder)
-func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
+// for simplified mode (single 'hints' builder), `keystoreProvider` has access to keystore registry
+func NewBuilders(
+	bConfigs []*common.Config,
+	hintsCfg *common.Config,
+	keystoreProvider keystore.KeystoreProvider,
+) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
@@ -141,6 +140,6 @@ func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, 
 		}
 		builders.Builders = append(builders.Builders, builder)
 	}
-
+	builders.keystoreProvider = keystoreProvider
 	return builders, nil
 }

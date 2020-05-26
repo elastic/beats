@@ -78,6 +78,6 @@ func newMockBuilder(_ *common.Config) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil
 }
 
-func (m *mockBuilder) CreateConfig(event bus.Event, options []ucfg.Option) []*common.Config {
+func (m *mockBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	return nil
 }

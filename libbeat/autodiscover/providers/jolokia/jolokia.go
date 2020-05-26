@@ -69,7 +69,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		Interfaces:   config.Interfaces,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -77,7 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}

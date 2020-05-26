@@ -29,12 +29,12 @@ import (
 
 // Mapper maps config templates with conditions in ConditionMaps, if a match happens on a discover event
 // the given template will be used as config.
-// Mapper also includes the global Keystore object at `keystore` and `kubernetesKeystoresRegistry`, which
-// holds Kubernetes keystores for known namespaces
+// Mapper also includes the global Keystore object at `keystore` and `keystoreProvider`, which
+// has access to a keystores registry
 type Mapper struct {
-	ConditionMaps               []*ConditionMap
-	keystore                    keystore.Keystore
-	kubernetesKeystoresRegistry *keystore.KubernetesKeystoresRegistry
+	ConditionMaps    []*ConditionMap
+	keystore         keystore.Keystore
+	keystoreProvider keystore.KeystoreProvider
 }
 
 // ConditionMap maps a condition to the configs to use when it's triggered
@@ -50,7 +50,11 @@ type MapperSettings []*struct {
 }
 
 // NewConfigMapper builds a template Mapper from given settings
-func NewConfigMapper(configs MapperSettings, keystore keystore.Keystore) (mapper Mapper, err error) {
+func NewConfigMapper(
+	configs MapperSettings,
+	keystore keystore.Keystore,
+	keystoreProvider keystore.KeystoreProvider,
+) (mapper Mapper, err error) {
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
 		if c.ConditionConfig != nil {
@@ -63,6 +67,7 @@ func NewConfigMapper(configs MapperSettings, keystore keystore.Keystore) (mapper
 	}
 
 	mapper.keystore = keystore
+	mapper.keystoreProvider = keystoreProvider
 	return mapper, nil
 }
 
@@ -78,11 +83,6 @@ func (e Event) GetValue(key string) (interface{}, error) {
 	return val, nil
 }
 
-// SetKubernetesKeystoresRegistry set the k8sKeystoresRegistry of the Mapper object
-func (c *Mapper) SetKubernetesKeystoresRegistry(k8sKeystoresRegistry *keystore.KubernetesKeystoresRegistry) {
-	c.kubernetesKeystoresRegistry = k8sKeystoresRegistry
-}
-
 // GetConfig returns a matching Config if any, nil otherwise
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
@@ -90,8 +90,8 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	if c.keystore != nil {
 		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(c.keystore)))
 	}
-	if c.kubernetesKeystoresRegistry != nil {
-		k8sKeystore := c.kubernetesKeystoresRegistry.GetK8sKeystore(event)
+	if c.keystoreProvider != nil {
+		k8sKeystore := c.keystoreProvider.GetKeystore(event)
 		if k8sKeystore != nil {
 			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)))
 		}
@@ -103,7 +103,7 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 			continue
 		}
 
-		configs := ApplyConfigTemplate(event, mapping.Configs, opts)
+		configs := ApplyConfigTemplate(event, mapping.Configs, opts...)
 		if configs != nil {
 			result = append(result, configs...)
 		}
@@ -112,7 +112,7 @@ func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 }
 
 // ApplyConfigTemplate takes a set of templated configs and applys information in an event map
-func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options []ucfg.Option) []*common.Config {
+func ApplyConfigTemplate(event bus.Event, configs []*common.Config, options ...ucfg.Option) []*common.Config {
 	var result []*common.Config
 	// unpack input
 	vars, err := ucfg.NewFrom(map[string]interface{}{

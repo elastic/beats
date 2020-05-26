@@ -628,7 +628,7 @@ func TestGenerateHints(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		cfgs := l.CreateConfig(test.event, nil)
+		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len, test.msg)
 		if test.len != 0 {
 			config := common.MapStr{}
@@ -860,7 +860,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		cfgs := l.CreateConfig(test.event, nil)
+		cfgs := l.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len, test.msg)
 		if test.len != 0 {
 			config := common.MapStr{}
