@@ -6,19 +6,20 @@ protocol.udp:
   {{ if ne .pipeline "" }}
   pipeline: "{{.pipeline}}"
   {{ end }}
+
 {{ else if eq .input "tls" }}
-type: syslog
-protocol.tcp:
-  host: "{{.syslog_host}}:{{.syslog_port}}"
-  ssl:
-    enabled: true
-    certificate_authorities: ["{{.cafile}}"]
-    certificate: "{{.certfile}}"
-    key: "{{.keyfile}}"
-    client_authentication: "full"
-  {{ if ne .pipeline "" }}
-  pipeline: "{{.pipeline}}"
-  {{ end }}
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl:
+  enabled: true
+  certificate_authorities: ["{{.cafile}}"]
+  certificate: "{{.certfile}}"
+  key: "{{.keyfile}}"
+  client_authentication: "required"
+{{ if ne .pipeline "" }}
+pipeline: "{{.pipeline}}"
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log

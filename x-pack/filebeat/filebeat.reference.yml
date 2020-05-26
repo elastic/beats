@@ -37,6 +37,24 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#------------------------------- Activemq Module -------------------------------
+- module: activemq
+  # Audit logs
+  audit:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Application logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   # Audit logs
@@ -300,6 +318,246 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+#--------------------------------- AWS Module ---------------------------------
+- module: aws
+  cloudtrail:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  cloudwatch:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  ec2:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  elb:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  s3access:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+  vpcflow:
+    enabled: false
+
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  # All logs
+  activitylogs:
+    enabled: true
+    var:
+      # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
+      eventhub: "insights-operational-logs"
+      # consumer group name that has access to the event hub, we advise creating a dedicated consumer group for the azure module
+      consumer_group: "$Default"
+      # the connection string required to communicate with Event Hubs, steps to generate one here https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string
+      connection_string: ""
+      # the name of the storage account the state/offsets will be stored and updated
+      storage_account: ""
+      # the storage account key, this key will be used to authorize access to data in your storage account
+      storage_account_key: ""
+
+  auditlogs:
+    enabled: false
+ #   var:
+ #     eventhub: "insights-logs-auditlogs"
+ #     consumer_group: "$Default"
+ #     connection_string: ""
+ #     storage_account: ""
+ #     storage_account_key: ""
+  signinlogs:
+    enabled: false
+ #   var:
+ #     eventhub: "insights-logs-signinlogs"
+ #     consumer_group: "$Default"
+ #     connection_string: ""
+ #     storage_account: ""
+ #     storage_account_key: ""
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
@@ -342,6 +600,14 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+#--------------------------------- CEF Module ---------------------------------
+- module: cef
+  log:
+    enabled: true
+    var:
+      syslog_host: localhost
+      syslog_port: 9003
+
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
@@ -356,6 +622,84 @@ filebeat.modules:
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+#------------------------------ Checkpoint Module ------------------------------
+- module: checkpoint
+  firewall:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+#-------------------------------- Cisco Module --------------------------------
+- module: cisco
+  asa:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+
+  ftd:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9003.
+    #var.syslog_port: 9003
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
+    #var.log_level: 7
+
+  ios:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9002.
+    #var.syslog_port: 9002
+
+    # Set custom paths for the log files when using file input. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -422,6 +766,26 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------- Coredns Module -------------------------------
+- module: coredns
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#----------------------------- Crowdstrike Module -----------------------------
+- module: crowdstrike
+  
+  falcon:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
   
@@ -462,6 +826,16 @@ filebeat.modules:
 
   deprecation:
     enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -547,6 +921,62 @@ filebeat.modules:
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+#----------------------------- Google Cloud Module -----------------------------
+- module: googlecloud
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: googlecloud-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  firewall:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: googlecloud-vpc-firewall
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-firewall-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: googlecloud-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -555,6 +985,16 @@ filebeat.modules:
 
     # Set which input to use between syslog (default) or file.
     #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#-------------------------------- Ibmmq Module --------------------------------
+- module: ibmmq
+  # All logs
+  errorlog:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -646,6 +1086,18 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------- Iptables Module -------------------------------
+- module: iptables
+  log:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
   # All logs
@@ -707,6 +1159,25 @@ filebeat.modules:
     #    verification_mode: none
     #  }
 
+#--------------------------------- MISP Module ---------------------------------
+- module: misp
+  threat:
+    enabled: true
+    # API key to access MISP
+    #var.api_key
+
+    # Array object in MISP response
+    #var.json_objects_array
+
+    # URL of the MISP REST API
+    #var.url
+   
+    # You can also pass SSL options. For example:
+    #var.ssl: |-
+    #  {
+    #    verification_mode: none
+    #  }
+
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs
@@ -720,6 +1191,16 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  # Fileset for native deployment
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #-------------------------------- Mssql Module --------------------------------
 - module: mssql
@@ -766,6 +1247,14 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------------- NetFlow Module -------------------------------
+- module: netflow
+  log:
+    enabled: true
+    var:
+      netflow_host: localhost
+      netflow_port: 2055
 
 #------------------------------- NetFlow Module -------------------------------
 - module: netflow
@@ -856,6 +1345,69 @@ filebeat.modules:
     #   max_requests_per_minute: 2000
     #   poll_interval: 3m
 
+#------------------------------ Office 365 Module ------------------------------
+- module: o365
+  audit:
+    enabled: true
+
+    # Set the application_id (also known as client ID):
+    var.application_id: "<MyApplicationID>"
+
+    # Configure the tenants to monitor:
+    # Use the tenant ID (also known as directory ID) and the domain name.
+    # var.tenants:
+    #  - id: "tenant_id_1"
+    #    name: "mydomain.onmicrosoft.com"
+    #  - id: "tenant_id_2"
+    #    name: "mycompany.com"
+    var.tenants:
+     - id: "<MyTenantID>"
+       name: "mytenant.onmicrosoft.com"
+
+    # List of content-types to fetch. By default all known content-types
+    # are retrieved:
+    # var.content_type:
+    #  - "Audit.AzureActiveDirectory"
+    #  - "Audit.Exchange"
+    #  - "Audit.SharePoint"
+    #  - "Audit.General"
+    #  - "DLP.All"
+
+    # Use the following settings to enable certificate-based authentication:
+    # var.certificate: "/path/to/certificate.pem"
+    # var.key: "/path/to/private_key.pem"
+    # var.key_passphrase: "myPrivateKeyPassword"
+
+    # Client-secret based authentication:
+    # Comment the following line if using certificate authentication.
+    var.client_secret: "<YourClientSecretHere>"
+
+    # Advanced settings, use with care:
+    # var.api:
+    #   # Settings for custom endpoints:
+    #   authentication_endpoint: "https://login.microsoftonline.us/"
+    #   resource: "https://manage.office365.us"
+    #
+    #   max_retention: 7d
+    #   max_requests_per_minute: 2000
+    #   poll_interval: 3m
+
+#--------------------------------- Okta Module ---------------------------------
+- module: okta
+  system:
+    enabled: true
+    # API key to access Okta
+    #var.api_key
+
+    # URL of the Okta REST API
+    #var.url
+
+    # Disable SSL verification 
+    #var.ssl: |-
+    #  {
+    #    "verification_mode": "none"
+    #  }
+
 #--------------------------------- Okta Module ---------------------------------
 - module: okta
   system:
@@ -898,6 +1450,18 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  panos:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
@@ -911,6 +1475,16 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#------------------------------- RabbitMQ Module -------------------------------
+- module: rabbitmq
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
@@ -960,6 +1534,16 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------- Suricata Module -------------------------------
+- module: suricata
+  # All logs
+  eve:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik
   # Access logs
@@ -973,6 +1557,89 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#--------------------------------- Zeek Module ---------------------------------
+- module: zeek
+  capture_loss:
+    enabled: true
+  connection:
+    enabled: true
+  dce_rpc:
+    enabled: true
+  dhcp:
+    enabled: true
+  dnp3:
+    enabled: true
+  dns:
+    enabled: true
+  dpd:
+    enabled: true
+  files:
+    enabled: true
+  ftp:
+    enabled: true
+  http:
+    enabled: true
+  intel:
+    enabled: true    
+  irc:
+    enabled: true
+  kerberos:
+    enabled: true
+  modbus:
+    enabled: true
+  mysql:
+    enabled: true
+  notice:
+    enabled: true
+  ntlm:
+    enabled: true
+  ocsp:
+    enabled: true
+  pe:
+    enabled: true
+  radius:
+    enabled: true
+  rdp:
+    enabled: true
+  rfb:
+    enabled: true
+  signatures:
+    enabled: true
+  sip:
+    enabled: true
+  smb_cmd:
+    enabled: true
+  smb_files:
+    enabled: true
+  smb_mapping:
+    enabled: true
+  smtp:
+    enabled: true
+  snmp:
+    enabled: true
+  socks:
+    enabled: true
+  ssh:
+    enabled: true
+  ssl:
+    enabled: true
+  stats:
+    enabled: true
+  syslog:
+    enabled: true
+  traceroute:
+    enabled: true
+  tunnel:
+    enabled: true
+  weird:
+    enabled: true
+  x509:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #--------------------------------- Zeek Module ---------------------------------
 - module: zeek
