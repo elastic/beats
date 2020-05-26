@@ -99,9 +99,9 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		return multierror.Errors{err}
 	}
 	switch subData := d.(type) {
-	case map[string]interface{}:
+	case map[string]interface{}, common.MapStr:
 		subEvent := common.MapStr{}
-		_, errors := convMap.Schema.ApplyTo(subEvent, subData)
+		_, errors := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
 		for _, err := range errors {
 			if err, ok := err.(schema.KeyError); ok {
 				err.SetKey(convMap.Key + "." + err.Key())
