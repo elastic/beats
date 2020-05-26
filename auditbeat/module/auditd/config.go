@@ -31,8 +31,8 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/go-libaudit/rule"
-	"github.com/elastic/go-libaudit/rule/flags"
+	"github.com/elastic/go-libaudit/v2/rule"
+	"github.com/elastic/go-libaudit/v2/rule/flags"
 )
 
 const (

@@ -59,6 +59,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -131,6 +134,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -203,6 +209,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -275,6 +284,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -348,6 +360,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -420,6 +435,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -492,6 +510,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot 2020-01-27 at 11.30.48.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -565,6 +586,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -637,6 +661,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -709,6 +736,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -781,6 +811,9 @@
         "source.geo.region_iso_code": "ES-B",
         "source.geo.region_name": "Barcelona",
         "source.ip": "213.97.47.133",
+        "tags": [
+            "forwarded"
+        ],
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",

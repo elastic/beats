@@ -33,7 +33,13 @@
 - Fix default configuration after enroll {pull}18232[18232]
 - Fix make sure the collected logs or metrics include streams information. {pull}18261[18261]
 - Stop monitoring on config change {pull}18284[18284]
+- Enable more granular control of monitoring {pull}18346[18346]
 - Fix jq: command not found {pull}18408[18408]
+- Avoid Chown on windows {pull}18512[18512]
+- Remove fleet admin from setup script {pull}18611[18611]
+- Correctly report platform and family. {issue}18665[18665]
+- Clean action store after enrolling to new configuration {pull}18656[18656]
+ [Ingest Manager] Avoid watching monitor logs {pull}18723[18723]
 
 ==== New features
 

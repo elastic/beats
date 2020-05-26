@@ -151,14 +151,7 @@ func newMonitoringBulkRequest(
 	params map[string]string,
 	body BodyEncoder,
 ) (*bulkRequest, error) {
-	var path string
-	var err error
-	if esVersion.Major < 7 {
-		path, err = makePath("_xpack", "monitoring", "_bulk")
-	} else {
-		path, err = makePath("_monitoring", "bulk", "")
-	}
-
+	path, err := makePath("_monitoring", "bulk", "")
 	if err != nil {
 		return nil, err
 	}

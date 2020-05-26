@@ -25,28 +25,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -108,28 +107,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -192,28 +190,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -280,28 +277,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -363,28 +359,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -453,28 +448,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -532,28 +526,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -620,28 +613,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -695,28 +687,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -786,28 +777,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -909,28 +899,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -988,28 +977,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1071,28 +1059,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1159,28 +1146,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1234,28 +1220,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1323,28 +1308,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1406,28 +1390,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1489,28 +1472,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1599,28 +1581,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1689,28 +1670,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1824,28 +1804,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1947,28 +1926,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2075,28 +2053,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2168,28 +2145,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2298,28 +2274,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2431,28 +2406,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2510,28 +2484,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2634,28 +2607,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2717,28 +2689,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2841,28 +2812,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2920,28 +2890,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2999,28 +2968,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3117,28 +3085,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3224,28 +3191,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3303,28 +3269,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3417,28 +3382,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3546,28 +3510,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3676,28 +3639,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3755,28 +3717,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3884,28 +3845,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4007,28 +3967,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4086,28 +4045,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4161,28 +4119,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4253,28 +4210,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4372,28 +4328,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4495,28 +4450,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4582,28 +4536,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4712,28 +4665,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4800,28 +4752,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4908,28 +4859,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4991,28 +4941,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5070,28 +5019,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5136,28 +5084,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5202,28 +5149,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5326,28 +5272,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5414,28 +5359,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5493,28 +5437,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5617,28 +5560,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5705,28 +5647,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5829,28 +5770,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5908,28 +5848,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6002,28 +5941,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6096,28 +6034,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6176,28 +6113,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6300,28 +6236,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6430,28 +6365,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6560,28 +6494,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6684,28 +6617,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6772,28 +6704,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6866,28 +6797,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6945,28 +6875,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7069,28 +6998,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7203,28 +7131,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7326,28 +7253,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7409,28 +7335,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7538,28 +7463,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7621,28 +7545,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7750,28 +7673,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7874,28 +7796,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7976,28 +7897,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8106,28 +8026,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8210,28 +8129,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8285,28 +8203,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8409,28 +8326,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8503,28 +8419,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8578,28 +8493,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8702,28 +8616,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8827,28 +8740,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8931,28 +8843,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9055,28 +8966,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9168,28 +9078,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9281,28 +9190,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9415,28 +9323,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9540,28 +9447,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9658,28 +9564,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9782,28 +9687,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9906,28 +9810,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9989,28 +9892,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10111,28 +10013,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10194,28 +10095,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10288,28 +10188,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10372,28 +10271,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10456,28 +10354,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10539,28 +10436,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10623,28 +10519,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -10702,28 +10597,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10790,28 +10684,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10873,28 +10766,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10960,28 +10852,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11043,28 +10934,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11126,28 +11016,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11209,28 +11098,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11339,28 +11227,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11433,28 +11320,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11518,28 +11404,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11643,28 +11528,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11718,28 +11602,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11801,28 +11684,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11930,28 +11812,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12009,28 +11890,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12092,28 +11972,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12219,28 +12098,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12352,28 +12230,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12435,28 +12312,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12564,28 +12440,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12694,28 +12569,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12819,28 +12693,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12939,28 +12812,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13069,28 +12941,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13403,28 +13274,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13547,28 +13417,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13626,28 +13495,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13713,28 +13581,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13779,28 +13646,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13862,28 +13728,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13992,28 +13857,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14122,28 +13986,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14205,28 +14068,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14329,28 +14191,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14453,28 +14314,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14576,28 +14436,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14688,28 +14547,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14771,28 +14629,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14854,28 +14711,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -14978,28 +14834,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -15073,28 +14928,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -15203,28 +15057,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -15282,28 +15135,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -15365,28 +15217,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -15444,28 +15295,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
@@ -15510,28 +15360,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
@@ -15575,28 +15424,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e9f7-5d2f-0000-001031039c00}",
@@ -15640,28 +15488,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-001016f70000}",
@@ -15727,28 +15574,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
@@ -15806,28 +15652,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
@@ -15919,28 +15764,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
-    },
-    "fields": {
-      "event": {
-        "category": [
-          "network"
-        ],
-        "type": [
-          "connection",
-          "protocol",
-          "info"
-        ]
-      }
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",

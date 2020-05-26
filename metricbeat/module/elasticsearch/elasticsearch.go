@@ -66,7 +66,7 @@ var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 var EnrichStatsAPIAvailableVersion = common.MustNewVersion("7.5.0")
 
 // BulkStatsAvailableVersion is the version since when bulk indexing stats are available
-var BulkStatsAvailableVersion = common.MustNewVersion("7.8.0")
+var BulkStatsAvailableVersion = common.MustNewVersion("8.0.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -261,18 +261,7 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	}
 
 	// License not found in cache, fetch it from Elasticsearch
-	info, err := GetInfo(http, resetURI)
-	if err != nil {
-		return nil, err
-	}
-	var licensePath string
-	if info.Version.Number.Major < 7 {
-		licensePath = "_xpack/license"
-	} else {
-		licensePath = "_license"
-	}
-
-	content, err := fetchPath(http, resetURI, licensePath, "")
+	content, err := fetchPath(http, resetURI, "_license", "")
 	if err != nil {
 		return nil, err
 	}

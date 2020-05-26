@@ -54,7 +54,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -91,7 +94,8 @@
         "source.port": 59324,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -146,7 +150,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -183,7 +190,8 @@
         "source.port": 54448,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -238,7 +246,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -275,7 +286,8 @@
         "source.port": 53121,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -333,7 +345,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -370,7 +385,8 @@
         "source.port": 59323,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -428,7 +444,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -465,7 +484,8 @@
         "source.port": 59322,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -520,7 +540,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -557,7 +580,8 @@
         "source.port": 55766,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -612,7 +636,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -649,7 +676,8 @@
         "source.port": 55072,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -707,7 +735,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -744,7 +775,8 @@
         "source.port": 59207,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -802,7 +834,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -839,7 +874,8 @@
         "source.port": 59209,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -897,7 +933,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -934,7 +973,8 @@
         "source.port": 59208,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -992,7 +1032,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1029,7 +1072,8 @@
         "source.port": 59318,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1087,7 +1131,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1124,7 +1171,8 @@
         "source.port": 59317,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1182,7 +1230,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1219,7 +1270,8 @@
         "source.port": 59316,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1277,7 +1329,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1314,7 +1369,8 @@
         "source.port": 59315,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1372,7 +1428,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1409,7 +1468,8 @@
         "source.port": 59206,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1467,7 +1527,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1504,7 +1567,8 @@
         "source.port": 59205,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1562,7 +1626,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1599,7 +1666,8 @@
         "source.port": 56858,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1657,7 +1725,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1694,7 +1765,8 @@
         "source.port": 59314,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1752,7 +1824,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1789,7 +1864,8 @@
         "source.port": 59313,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1844,7 +1920,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1881,7 +1960,8 @@
         "source.port": 52139,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -1936,7 +2016,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -1973,7 +2056,8 @@
         "source.port": 60592,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2031,7 +2115,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2068,7 +2155,8 @@
         "source.port": 59309,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2123,7 +2211,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2160,7 +2251,8 @@
         "source.port": 57322,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2218,7 +2310,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2255,7 +2350,8 @@
         "source.port": 59204,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2313,7 +2409,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2350,7 +2449,8 @@
         "source.port": 59203,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2408,7 +2508,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2445,7 +2548,8 @@
         "source.port": 59305,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2500,7 +2604,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2537,7 +2644,8 @@
         "source.port": 64005,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2592,7 +2700,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2629,7 +2740,8 @@
         "source.port": 58768,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2687,7 +2799,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2724,7 +2839,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2782,7 +2898,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2819,7 +2938,8 @@
         "source.port": 59304,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2874,7 +2994,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -2911,7 +3034,8 @@
         "source.port": 54533,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -2969,7 +3093,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3006,7 +3133,8 @@
         "source.port": 59201,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3064,7 +3192,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3101,7 +3232,8 @@
         "source.port": 59303,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3156,7 +3288,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3193,7 +3328,8 @@
         "source.port": 50876,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3248,7 +3384,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3285,7 +3424,8 @@
         "source.port": 57657,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3343,7 +3483,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3380,7 +3523,8 @@
         "source.port": 59302,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3438,7 +3582,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3475,7 +3622,8 @@
         "source.port": 59301,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3530,7 +3678,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3567,7 +3718,8 @@
         "source.port": 64844,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3622,7 +3774,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3659,7 +3814,8 @@
         "source.port": 52257,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3712,7 +3868,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3744,7 +3903,8 @@
         "source.packets": 1,
         "source.port": 38796,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3799,7 +3959,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3836,7 +3999,8 @@
         "source.port": 59200,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3892,7 +4056,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -3924,7 +4091,8 @@
         "source.packets": 10,
         "source.port": 48412,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -3982,7 +4150,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4019,7 +4190,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4077,7 +4249,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4114,7 +4289,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4167,7 +4343,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4199,7 +4378,8 @@
         "source.packets": 1,
         "source.port": 52189,
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4257,7 +4437,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4294,7 +4477,8 @@
         "source.port": 59300,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4349,7 +4533,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4386,7 +4573,8 @@
         "source.port": 54414,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4444,7 +4632,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4481,7 +4672,8 @@
         "source.port": 59299,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4536,7 +4728,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4573,7 +4768,8 @@
         "source.port": 60399,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4628,7 +4824,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4665,7 +4864,8 @@
         "source.port": 59626,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4720,7 +4920,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4757,7 +4960,8 @@
         "source.port": 51542,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4812,7 +5016,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4849,7 +5056,8 @@
         "source.port": 54182,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4904,7 +5112,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -4941,7 +5152,8 @@
         "source.port": 59199,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -4999,7 +5211,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5036,7 +5251,8 @@
         "source.port": 59198,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5094,7 +5310,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5131,7 +5350,8 @@
         "source.port": 56856,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5186,7 +5406,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5223,7 +5446,8 @@
         "source.port": 52489,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5281,7 +5505,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5318,7 +5545,8 @@
         "source.port": 59298,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5373,7 +5601,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5410,7 +5641,8 @@
         "source.port": 60185,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5465,7 +5697,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5502,7 +5737,8 @@
         "source.port": 51817,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5560,7 +5796,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5597,7 +5836,8 @@
         "source.port": 47752,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5655,7 +5895,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5692,7 +5935,8 @@
         "source.port": 59297,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5747,7 +5991,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5784,7 +6031,8 @@
         "source.port": 52537,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5839,7 +6087,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5876,7 +6127,8 @@
         "source.port": 53155,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -5931,7 +6183,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -5968,7 +6223,8 @@
         "source.port": 59197,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6023,7 +6279,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6060,7 +6319,8 @@
         "source.port": 56995,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6115,7 +6375,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6152,7 +6415,8 @@
         "source.port": 59069,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6207,7 +6471,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6244,7 +6511,8 @@
         "source.port": 55697,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6302,7 +6570,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6339,7 +6610,8 @@
         "source.port": 59295,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6394,7 +6666,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6431,7 +6706,8 @@
         "source.port": 59196,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6489,7 +6765,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6526,7 +6805,8 @@
         "source.port": 59291,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6581,7 +6861,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6618,7 +6901,8 @@
         "source.port": 52858,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6673,7 +6957,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6710,7 +6997,8 @@
         "source.port": 61383,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6768,7 +7056,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6805,7 +7096,8 @@
         "source.port": 59290,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6860,7 +7152,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6897,7 +7192,8 @@
         "source.port": 59195,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -6952,7 +7248,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -6989,7 +7288,8 @@
         "source.port": 49812,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7044,7 +7344,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7081,7 +7384,8 @@
         "source.port": 50185,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7139,7 +7443,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7176,7 +7483,8 @@
         "source.port": 59286,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7225,7 +7533,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7262,7 +7573,8 @@
         "source.port": 52531,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7320,7 +7632,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7357,7 +7672,8 @@
         "source.port": 59194,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7415,7 +7731,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7452,7 +7771,8 @@
         "source.port": 59192,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7501,7 +7821,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7538,7 +7861,8 @@
         "source.port": 56463,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7587,7 +7911,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7624,7 +7951,8 @@
         "source.port": 55849,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7682,7 +8010,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7719,7 +8050,8 @@
         "source.port": 59282,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7774,7 +8106,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7811,7 +8146,8 @@
         "source.port": 57846,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7866,7 +8202,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7903,7 +8242,8 @@
         "source.port": 51008,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -7961,7 +8301,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -7998,7 +8341,8 @@
         "source.port": 59281,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8053,7 +8397,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8090,7 +8437,8 @@
         "source.port": 55252,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8139,7 +8487,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8176,7 +8527,8 @@
         "source.port": 56995,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8231,7 +8583,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8268,7 +8623,8 @@
         "source.port": 60989,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8326,7 +8682,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8363,7 +8722,8 @@
         "source.port": 59280,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8418,7 +8778,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8455,7 +8818,8 @@
         "source.port": 53766,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8510,7 +8874,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8547,7 +8914,8 @@
         "source.port": 56032,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8602,7 +8970,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8639,7 +9010,8 @@
         "source.port": 59193,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8697,7 +9069,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8734,7 +9109,8 @@
         "source.port": 59279,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8792,7 +9168,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8829,7 +9208,8 @@
         "source.port": 59278,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8887,7 +9267,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -8924,7 +9307,8 @@
         "source.port": 59277,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -8973,7 +9357,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -9010,7 +9397,8 @@
         "source.port": 60026,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9068,7 +9456,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -9105,7 +9496,8 @@
         "source.port": 59276,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9163,7 +9555,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -9200,7 +9595,8 @@
         "source.port": 59275,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     },
     {
@@ -9258,7 +9654,10 @@
         "observer.egress.zone": "untrust",
         "observer.ingress.interface.name": "ethernet1/2",
         "observer.ingress.zone": "trust",
+        "observer.product": "PAN-OS",
         "observer.serial_number": "01606001116",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
         "panw.panos.action": "allow",
         "panw.panos.destination.interface": "ethernet1/1",
         "panw.panos.destination.nat.ip": "0.0.0.0",
@@ -9295,7 +9694,8 @@
         "source.port": 59274,
         "source.user.name": "crusher",
         "tags": [
-            "pan-os"
+            "pan-os",
+            "forwarded"
         ]
     }
 ]
