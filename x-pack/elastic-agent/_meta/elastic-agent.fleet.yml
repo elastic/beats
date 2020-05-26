@@ -61,7 +61,3 @@ management:
 #   # With 30s delay and 3 retries: 30, 60, 120s
 #   # Default is false
 #   exponential: false
-
-# Sets log level. The default log level is info.
-# Available log levels are: error, warning, info, debug
-#logging.level: info

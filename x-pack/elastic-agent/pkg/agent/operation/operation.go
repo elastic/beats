@@ -7,6 +7,7 @@ package operation
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
@@ -30,7 +31,7 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
-	Start(ctx context.Context, cfg map[string]interface{}) error
+	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
 	State() state.State
@@ -45,4 +46,5 @@ type Descriptor interface {
 	ID() string
 	Directory() string
 	IsGrpcConfigurable() bool
+	Tags() map[app.Tag]string
 }

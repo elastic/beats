@@ -101,6 +101,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - [Autodiscover] Check if runner is already running before starting again. {pull}18564[18564]
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
+- Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 
 *Auditbeat*
 
