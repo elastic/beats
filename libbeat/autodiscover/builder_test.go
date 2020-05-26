@@ -67,7 +67,7 @@ func TestBuilderRegistry(t *testing.T) {
 	assert.Equal(t, len(res), 1)
 
 	builders := Builders{}
-	builders.Builders = append(builders.Builders, builder)
+	builders.builders = append(builders.builders, builder)
 
 	// Try using builders object for the same as above and expect
 	// the same result

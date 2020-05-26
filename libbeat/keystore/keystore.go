@@ -75,7 +75,7 @@ type ListingKeystore interface {
 }
 
 // Provider for keystore
-type KeystoreProvider interface {
+type Provider interface {
 	GetKeystore(event bus.Event) Keystore
 }
 

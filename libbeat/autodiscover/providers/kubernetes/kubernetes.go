@@ -30,8 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	k8sks "github.com/elastic/beats/v7/libbeat/k8skeystore"
-	ks "github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -59,7 +59,7 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore ks.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
@@ -77,7 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore
 		return nil, errWrap(err)
 	}
 
-	k8sKeystoreProvider := k8sks.NewKubernetesKeystoresRegistry(logger, client)
+	k8sKeystoreProvider := k8skeystore.NewKubernetesKeystoresRegistry(logger, client)
 
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider)
 	if err != nil {

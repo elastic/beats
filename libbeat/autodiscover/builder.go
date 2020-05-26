@@ -35,11 +35,11 @@ type Builder interface {
 	CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config
 }
 
-// Builders is a struct of Builder list objects and a `keystoreProvider`, which
+// builders is a struct of Builder list objects and a `keystoreProvider`, which
 // has access to a keystores registry
 type Builders struct {
-	Builders         []Builder
-	keystoreProvider keystore.KeystoreProvider
+	builders         []Builder
+	keystoreProvider keystore.Provider
 }
 
 // BuilderConstructor is a func used to generate a Builder object
@@ -106,7 +106,7 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 			}
 		}
 	}
-	for _, builder := range b.Builders {
+	for _, builder := range b.builders {
 		if config := builder.CreateConfig(event, opts...); config != nil {
 			configs = append(configs, config...)
 		}
@@ -120,7 +120,7 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 func NewBuilders(
 	bConfigs []*common.Config,
 	hintsCfg *common.Config,
-	keystoreProvider keystore.KeystoreProvider,
+	keystoreProvider keystore.Provider,
 ) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
@@ -138,7 +138,7 @@ func NewBuilders(
 		if err != nil {
 			return Builders{}, err
 		}
-		builders.Builders = append(builders.Builders, builder)
+		builders.builders = append(builders.builders, builder)
 	}
 	builders.keystoreProvider = keystoreProvider
 	return builders, nil

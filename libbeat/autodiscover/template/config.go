@@ -34,7 +34,7 @@ import (
 type Mapper struct {
 	ConditionMaps    []*ConditionMap
 	keystore         keystore.Keystore
-	keystoreProvider keystore.KeystoreProvider
+	keystoreProvider keystore.Provider
 }
 
 // ConditionMap maps a condition to the configs to use when it's triggered
@@ -53,7 +53,7 @@ type MapperSettings []*struct {
 func NewConfigMapper(
 	configs MapperSettings,
 	keystore keystore.Keystore,
-	keystoreProvider keystore.KeystoreProvider,
+	keystoreProvider keystore.Provider,
 ) (mapper Mapper, err error) {
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
@@ -87,14 +87,16 @@ func (e Event) GetValue(key string) (interface{}, error) {
 func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
 	opts := []ucfg.Option{}
-	if c.keystore != nil {
-		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(c.keystore)))
-	}
+	// add k8s keystore in options list with higher priority
 	if c.keystoreProvider != nil {
 		k8sKeystore := c.keystoreProvider.GetKeystore(event)
 		if k8sKeystore != nil {
 			opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(k8sKeystore)))
 		}
+	}
+	// add local keystore in options list with lower priority
+	if c.keystore != nil {
+		opts = append(opts, ucfg.Resolve(keystore.ResolverWrap(c.keystore)))
 	}
 	for _, mapping := range c.ConditionMaps {
 		// An empty condition matches everything

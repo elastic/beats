@@ -210,7 +210,7 @@ type mockKeystore struct {
 	secret string
 }
 
-func newMockKeystoreProvider(secret string) keystore.KeystoreProvider {
+func newMockKeystoreProvider(secret string) keystore.Provider {
 	return &mockKeystore{secret}
 }
 
