@@ -34,6 +34,7 @@
 - Fix an issue where the checkin_frequency, jitter, and backoff options where not configurable. {pull}17843[17843]
 - Ensure that the beats uses the params prefer_v2_templates on bulk request. {pull}18318[18318]
 - Stop monitoring on config change {pull}18284[18284]
+- Enable more granular control of monitoring {pull}18346[18346]
 - Fix jq: command not found {pull}18408[18408]
 - Avoid Chown on windows {pull}18512[18512]
 - Clean action store after enrolling to new configuration {pull}18656[18656]
