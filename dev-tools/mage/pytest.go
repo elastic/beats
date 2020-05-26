@@ -210,11 +210,11 @@ func PythonVirtualenv() (string, error) {
 		args = append(args, "-Ur", req)
 	}
 
-    // First ensure that wheel is installed so that
-    // bdists build cleanly
-	wheel_args := []string{"install"}
-    wheel_args = append(wheel_args, "-Ur", "wheel")
-	if err := sh.RunWith(env, pip, wheel_args...); err != nil {
+	// First ensure that wheel is installed so that
+	// bdists build cleanly
+	wheelArgs := []string{"install"}
+	wheelArgs = append(wheelArgs, "-Ur", "wheel")
+	if err := sh.RunWith(env, pip, wheelArgs...); err != nil {
 		return "", err
 	}
 
