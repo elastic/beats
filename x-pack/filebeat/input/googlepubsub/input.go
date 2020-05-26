@@ -5,9 +5,13 @@
 package googlepubsub
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -48,6 +52,8 @@ type pubsubInput struct {
 	workerWg     sync.WaitGroup     // Waits on pubsub worker goroutine.
 
 	ackedCount *atomic.Uint32 // Total number of successfully ACKed pubsub messages.
+
+	zippers *sync.Pool // Pool of gzip readers for decompression
 }
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
@@ -88,6 +94,7 @@ func NewInput(
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
 		ackedCount:   atomic.NewUint32(0),
+		zippers:      &sync.Pool{New: func() interface{} { return new(gzip.Reader) }},
 	}
 
 	// Build outlet for events.
@@ -160,6 +167,15 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		if msg.Attributes["filebeat.compression"] == "gzip" {
+			err = in.decompress(msg)
+			if err != nil {
+				msg.Nack()
+				in.log.Warnf("failed to decompress gzip: %s", err)
+				return
+			}
+		}
+
 		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
 			msg.Nack()
 			in.log.Debug("OnEvent returned false. Stopping input worker.")
@@ -177,6 +193,23 @@ func (in *pubsubInput) Stop() {
 // Wait is an alias for Stop.
 func (in *pubsubInput) Wait() {
 	in.Stop()
+}
+
+func (in *pubsubInput) decompress(m *pubsub.Message) error {
+	rc := in.zippers.Get().(*gzip.Reader)
+	if err := rc.Reset(bytes.NewReader(m.Data)); err != nil {
+		return fmt.Errorf("rc.Reset: %v", err)
+	}
+	var data bytes.Buffer
+	if _, err := io.Copy(&data, rc); err != nil {
+		return fmt.Errorf("io.Copy: %v", err)
+	}
+	if err := rc.Close(); err != nil {
+		return fmt.Errorf("gzip.Close: %v", err)
+	}
+	in.zippers.Put(rc)
+	m.Data = data.Bytes()
+	return nil
 }
 
 // makeTopicID returns a short sha256 hash of the project ID plus topic name.
