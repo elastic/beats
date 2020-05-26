@@ -38,7 +38,7 @@ type stateClient interface {
 }
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -83,7 +83,10 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	}
 
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
-	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args)
+
+	// use separate file
+	isSidecar := IsSidecar(t)
+	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args, isSidecar)
 
 	// specify beat name to avoid data lock conflicts
 	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
@@ -111,7 +114,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	a.state.Status = state.Running
 
 	// setup watcher
-	a.watch(ctx, a.state.ProcessInfo.Process, cfg)
+	a.watch(ctx, t, a.state.ProcessInfo.Process, cfg)
 
 	return nil
 }
