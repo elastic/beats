@@ -37,6 +37,7 @@ type ptrCache struct {
 	sync.RWMutex
 	data    map[string]ptrRecord
 	maxSize int
+	minSuccessTTL time.Duration
 }
 
 func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
@@ -49,7 +50,7 @@ func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
 
 	c.data[key] = ptrRecord{
 		host:    ptr.Host,
-		expires: now.Add(time.Duration(ptr.TTL) * time.Second),
+		expires: now.Add(maxDuration(time.Duration(ptr.TTL), c.minSuccessTTL) * time.Second),
 	}
 }
 
@@ -135,11 +136,12 @@ func (ce *cachedError) Cause() error  { return ce.err }
 // reverse DNS queries. It caches the results of queries regardless of their
 // outcome (success or failure).
 type PTRLookupCache struct {
-	success    *ptrCache
-	failure    *failureCache
-	failureTTL time.Duration
-	resolver   PTRResolver
-	stats      cacheStats
+	success       *ptrCache
+	minSuccessTTL time.Duration
+	failure       *failureCache
+	failureTTL    time.Duration
+	resolver      PTRResolver
+	stats         cacheStats
 }
 
 type cacheStats struct {
@@ -157,6 +159,7 @@ func NewPTRLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver PTRR
 		success: &ptrCache{
 			data:    make(map[string]ptrRecord, conf.SuccessCache.InitialCapacity),
 			maxSize: conf.SuccessCache.MaxCapacity,
+			minSuccessTTL: conf.SuccessCache.MinTTL,
 		},
 		failure: &failureCache{
 			data:       make(map[string]failureRecord, conf.FailureCache.InitialCapacity),
@@ -203,6 +206,13 @@ func (c PTRLookupCache) LookupPTR(ip string) (*PTR, error) {
 }
 
 func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
+func maxDuration(a time.Duration, b time.Duration) time.Duration {
 	if a >= b {
 		return a
 	}

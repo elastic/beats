@@ -84,8 +84,11 @@ type CacheConfig struct {
 // CacheSettings define the caching behavior for an individual cache.
 type CacheSettings struct {
 	// TTL value for items in cache. Not used for success because we use TTL
-	// from the DNS record.
+	// from the DNS record or the minimum configured TTL.
 	TTL time.Duration `config:"ttl"`
+
+	// Minimum TTL value for successful DNS responses.
+	MinTTL time.Duration `config:"ttl.min" validate:"min=1"`
 
 	// Initial capacity. How much space is allocated at initialization.
 	InitialCapacity int `config:"capacity.initial" validate:"min=0"`
@@ -122,6 +125,9 @@ func (c *Config) Validate() error {
 
 // Validate validates the data contained in the CacheConfig.
 func (c *CacheConfig) Validate() error {
+	if c.SuccessCache.MinTTL <= 0 {
+		return errors.Errorf("success_cache.ttl.min must be > 0")
+	}
 	if c.FailureCache.TTL <= 0 {
 		return errors.Errorf("failure_cache.ttl must be > 0")
 	}
@@ -146,6 +152,7 @@ func (c *CacheConfig) Validate() error {
 var defaultConfig = Config{
 	CacheConfig: CacheConfig{
 		SuccessCache: CacheSettings{
+			MinTTL:          time.Minute,
 			InitialCapacity: 1000,
 			MaxCapacity:     10000,
 		},
