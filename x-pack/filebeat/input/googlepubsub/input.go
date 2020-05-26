@@ -177,7 +177,7 @@ func (in *pubsubInput) run() error {
 		}
 
 		var rawRecords [][]byte
-		if msg.Attributes["filebeat.ndjson"] == "true" {
+		if msg.Attributes["filebeat.multiline"] == "true" {
 			rawRecords = bytes.Split(msg.Data, []byte("\n"))
 		} else {
 			rawRecords = [][]byte{msg.Data}
