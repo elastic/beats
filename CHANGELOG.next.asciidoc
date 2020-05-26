@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
+- Make error message about locked data path actionable. {pull}18667[18667]
 
 *Auditbeat*
 
@@ -98,6 +99,8 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 - Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
 - Change `decode_json_fields` processor, to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
+- [Autodiscover] Check if runner is already running before starting again. {pull}18564[18564]
+- Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 
 *Auditbeat*
@@ -339,6 +342,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
+- Added http_endpoint input{pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
 - Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]

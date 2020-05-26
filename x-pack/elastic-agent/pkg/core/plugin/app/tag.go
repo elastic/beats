@@ -10,3 +10,15 @@ type Tag string
 
 // TagSidecar tags a sidecar process
 const TagSidecar = "sidecar"
+
+// Taggable is an object containing tags.
+type Taggable interface {
+	Tags() map[Tag]string
+}
+
+// IsSidecar returns true if tags contains sidecar flag.
+func IsSidecar(descriptor Taggable) bool {
+	tags := descriptor.Tags()
+	_, isSidecar := tags[TagSidecar]
+	return isSidecar
+}
