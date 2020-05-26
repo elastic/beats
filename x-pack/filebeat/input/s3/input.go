@@ -533,9 +533,10 @@ func (p *s3Input) decodeJSONWithKey(decoder *json.Decoder, objectHash string, s3
 				}
 			}
 		} else if err != nil {
-			// decode json failed, skip this log file
-			p.logger.Warnf(fmt.Sprintf("Decode json failed for '%s', skipping this file: %s", s3Info.key, err))
-			return nil
+			// decode json failed, skip this file for now and put the SQS message back into the queue.
+			err = errors.Wrapf(err, fmt.Sprintf("Decode json failed for '%s', skipping this file", s3Info.key))
+			p.logger.Error(err)
+			return err
 		}
 
 		textValues, ok := jsonFields[p.config.ExpandEventListFromField]
