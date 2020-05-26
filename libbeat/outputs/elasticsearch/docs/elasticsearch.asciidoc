@@ -682,5 +682,3 @@ See <<configuration-ssl>> for more information.
 Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
-
-include::{libbeat-dir}/shared-kerberos-config.asciidoc[]

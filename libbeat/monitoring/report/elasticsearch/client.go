@@ -28,6 +28,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -200,14 +201,14 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		meta["_type"] = "doc"
 	}
 
-	action := common.MapStr{}
-	var opType string
+	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
-		opType = "index"
-	} else {
-		opType = "create"
+		opType = events.OpTypeIndex
 	}
-	action[opType] = meta
+
+	action := common.MapStr{
+		opType.String(): meta,
+	}
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
