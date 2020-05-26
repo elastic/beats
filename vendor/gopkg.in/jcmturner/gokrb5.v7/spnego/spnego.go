@@ -44,7 +44,7 @@ func (s *SPNEGO) OID() asn1.ObjectIdentifier {
 
 // AcquireCred is the GSS-API method to acquire a client credential via Kerberos for SPNEGO.
 func (s *SPNEGO) AcquireCred() error {
-	return s.client.Login()
+	return s.client.AffirmLogin()
 }
 
 // InitSecContext is the GSS-API method for the client to a generate a context token to the service via Kerberos.
@@ -132,6 +132,10 @@ func (s *SPNEGOToken) Marshal() ([]byte, error) {
 func (s *SPNEGOToken) Unmarshal(b []byte) error {
 	var r []byte
 	var err error
+	// We need some data in the array
+	if len(b) < 1 {
+		return fmt.Errorf("provided byte array is empty")
+	}
 	if b[0] != byte(161) {
 		// Not a NegTokenResp/Targ could be a NegTokenInit
 		var oid asn1.ObjectIdentifier
