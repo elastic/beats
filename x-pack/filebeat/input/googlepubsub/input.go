@@ -176,10 +176,24 @@ func (in *pubsubInput) run() error {
 			}
 		}
 
-		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
-			msg.Nack()
-			in.log.Debug("OnEvent returned false. Stopping input worker.")
-			cancel()
+		var rawRecords [][]byte
+		if msg.Attributes["filebeat.ndjson"] == "true" {
+			rawRecords = bytes.Split(msg.Data, []byte("\n"))
+		} else {
+			rawRecords = [][]byte{msg.Data}
+		}
+
+		for _, rawRecord := range rawRecords {
+			if len(rawRecord) == 0 {
+				continue
+			}
+
+			if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
+				msg.Nack()
+				in.log.Debug("OnEvent returned false. Stopping input worker.")
+				cancel()
+				return
+			}
 		}
 	})
 }
