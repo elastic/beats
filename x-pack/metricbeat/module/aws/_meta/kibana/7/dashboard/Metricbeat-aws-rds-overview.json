@@ -232,7 +232,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -314,7 +314,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -395,7 +395,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -490,7 +490,7 @@
             "drilldown_url": "",
             "filter": "",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -630,7 +630,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -712,7 +712,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
@@ -794,7 +794,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "1m",
             "isModelInvalid": false,
             "series": [
