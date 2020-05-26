@@ -33,13 +33,6 @@ func TestConfigHosts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, goodOut, cfg.Endpoint)
 
-	badIndex := map[string]string{
-		"endpoint": "elasticsearch:9200",
-		"index":    "testIdx",
-	}
-	_, err = NewCfgFromRaw(badIndex)
-	assert.Error(t, err)
-
 }
 
 func TestNewClient(t *testing.T) {
