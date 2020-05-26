@@ -212,7 +212,8 @@ func PythonVirtualenv() (string, error) {
 
     // First ensure that wheel is installed so that
     // bdists build cleanly
-    wheel_args := append(args, "-Ur", "wheel")
+	wheel_args := []string{"install"}
+    wheel_args = append(wheel_args, "-Ur", "wheel")
 	if err := sh.RunWith(env, pip, wheel_args...); err != nil {
 		return "", err
 	}
