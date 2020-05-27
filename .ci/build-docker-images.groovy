@@ -6,11 +6,12 @@ pipeline {
   agent { label 'linux && immutable' }
   environment {
     REPO = 'beats'
-    BASE_DIR = "src/github.com/elastic/beats"
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKER_REGISTRY = 'docker.elastic.co'
     DOCKER_REGISTRY_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     GOPATH = "${env.WORKSPACE}"
     HOME = "${env.WORKSPACE}"
+    JOB_GCS_BUCKET = credentials('gcs-bucket')
     NOTIFY_TO = credentials('notify-to')
     PATH = "${env.GOPATH}/bin:${env.PATH}"
     PIPELINE_LOG_LEVEL='INFO'
@@ -35,7 +36,7 @@ pipeline {
     stage('Checkout') {
       steps {
         dir("${BASE_DIR}"){
-          git("https://github.com/elastic/beats.git")
+          git("https://github.com/elastic/${REPO}.git")
         }
         script {
           dir("${BASE_DIR}"){
@@ -52,9 +53,9 @@ pipeline {
         sh(label: 'Install virtualenv', script: 'pip install --user virtualenv')
       }
     }
-    stage('Metricbeat Test Docker images'){
+    stage('Release Beats Test Docker images'){
       options {
-        warnError('Metricbeat Test Docker images failed')
+        warnError('Release Beats Docker images failed')
       }
       when {
         expression { return params.RELEASE_TEST_IMAGES }
@@ -66,9 +67,9 @@ pipeline {
         }
       }
     }
-    stage('Metricbeat x-pack Test Docker images'){
+    stage('Release X-Pack Beats Test Docker images'){
       options {
-        warnError('Metricbeat x-pack Docker images failed')
+        warnError('Release X-Pack Beats Docker images failed')
       }
       when {
         expression { return params.RELEASE_TEST_IMAGES }
@@ -77,20 +78,6 @@ pipeline {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
         retry(3){
           sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/metricbeat'")
-        }
-      }
-    }
-    stage('Filebeat x-pack Test Docker images'){
-      options {
-        warnError('Filebeat x-pack Test Docker images failed')
-      }
-      when {
-        expression { return params.RELEASE_TEST_IMAGES }
-      }
-      steps {
-        dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        retry(3){
-          sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/filebeat'")
         }
       }
     }
