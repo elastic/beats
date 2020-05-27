@@ -63,3 +63,4 @@
 - Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
 - More clear output of inspect command {pull}18405[18405]
 - Pick up version from libbeat {pull}18350[18350]
+- Use shorter hash for application differentiator {pull}18770[18770]
