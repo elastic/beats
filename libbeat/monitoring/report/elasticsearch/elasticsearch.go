@@ -141,16 +141,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		return nil, err
 	}
 
-	params := map[string]string{}
-
-	if config.Format == report.FormatXPackMonitoringBulk {
-		for k, v := range defaultXPackParams {
-			params[k] = v
-		}
-	}
-	for k, v := range config.Params {
-		params[k] = v
-	}
+	params := makeClientParams(config)
 
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
@@ -391,4 +382,19 @@ func getClusterUUID() string {
 
 	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
 	return snapshot.Strings["cluster_uuid"]
+}
+
+func makeClientParams(config config) map[string]string {
+	params := map[string]string{}
+
+	if config.Format == report.FormatXPackMonitoringBulk {
+		for k, v := range defaultXPackParams {
+			params[k] = v
+		}
+	}
+	for k, v := range config.Params {
+		params[k] = v
+	}
+
+	return params
 }
