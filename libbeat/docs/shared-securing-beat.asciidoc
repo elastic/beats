@@ -35,36 +35,40 @@ system calls that a process can issue.
 * <<linux-seccomp>>
 endif::[]
 
-// APM uses this for extra information on HTTPS
+// APM HTTPS information
 ifdef::beat-specific-security[]
 include::{beat-specific-security}[]
 endif::[]
 
 --
 
-// APM uses this to include Agent security
+// APM privileges
+ifdef::apm-server[]
+include::{docdir}/feature-roles.asciidoc[]
+endif::[]
+
+// Beat privileges
+ifndef::apm-server[]
+include::./security/users.asciidoc[]
+endif::[]
+
+// API Keys
+include::./security/api-keys.asciidoc[]
+
+// APM Agent security
 ifdef::apm-server[]
 include::{docdir}/secure-communication-agents.asciidoc[]
 endif::[]
 
-include::./security/users.asciidoc[]
-
-include::./security/api-keys.asciidoc[]
-
-[role="xpack"]
-[[securing-communication-elasticsearch]]
-== Secure communication with Elasticsearch
-
+// Elasticsearch security
 include::./https.asciidoc[]
 
+// Logstash security
 ifndef::no-output-logstash[]
-[role="xpack"]
-[[configuring-ssl-logstash]]
-== Secure communication with Logstash
-
 include::./shared-ssl-logstash-config.asciidoc[]
 endif::[]
 
+// Linux Seccomp
 ifndef::serverless[]
 include::./security/linux-seccomp.asciidoc[]
 endif::[]

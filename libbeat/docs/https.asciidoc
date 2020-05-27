@@ -10,6 +10,10 @@
 //// This content is structured to be included as a whole file.
 //////////////////////////////////////////////////////////////////////////
 
+[role="xpack"]
+[[securing-communication-elasticsearch]]
+== Secure communication with Elasticsearch
+
 When sending data to a secured cluster through the `elasticsearch`
 output, {beatname_uc} can use any of the following authentication methods:
 

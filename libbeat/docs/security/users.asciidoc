@@ -25,7 +25,7 @@ strategy.
 
 Instead of using usernames and passwords, roles and privileges can be assigned to
 API keys to grant access to Elasticsearch resources. See <<beats-api-keys>> for
-more information
+more information.
 
 [[privileges-to-setup-beats]]
 === Grant privileges and roles needed for setup

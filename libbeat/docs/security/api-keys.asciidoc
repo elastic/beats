@@ -110,7 +110,6 @@ monitoring.elasticsearch:
 --------------------
 <1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
 
-
 [[learn-more-api-keys]]
 [float]
 === Learn more about API keys
