@@ -80,6 +80,7 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 	kubeConfig := filepath.Join(kubeCfgDir, "kubecfg")
+	fmt.Println("Kubeconfig is: %v", kubeConfig)
 	if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
 		return err
 	}
