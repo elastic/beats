@@ -5,6 +5,7 @@ filebeat:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
+    dataset: generic
     index: logs-generic-default
     processors:
       - add_fields:
