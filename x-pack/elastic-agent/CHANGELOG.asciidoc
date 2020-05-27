@@ -40,6 +40,7 @@
 - Clean action store after enrolling to new configuration {pull}18656[18656]
 - Avoid watching monitor logs {pull}18723[18723]
 - Correctly report platform and family. {issue}18665[18665]
+- Guard against empty stream.datasource and namespace {pull}18769[18769]
 
 ==== New features
 
