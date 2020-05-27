@@ -8,4 +8,4 @@ services:
       args:
         SDK_VERSION: ${SDK_VERSION:-293.0.0-0}
     ports:
-      - 127.0.0.1:8432:8432
+      - 8432
