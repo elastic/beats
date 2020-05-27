@@ -12,8 +12,8 @@ The +{modulename}+ module collects and parses logs from the audit daemon
 (`auditd`).
 
 NOTE: Although {beatname_uc} is able to parse logs by using the `auditd` module,
-{auditbeat-ref}/auditbeat-module-auditd.html[Auditbeat] offers more advanced
-features for ingesting audit logs.
+{auditbeat-ref}/auditbeat-module-auditd.html[{auditbeat}] offers more advanced
+features for monitoring audit logs.
 
 include::../include/what-happens.asciidoc[]
 
