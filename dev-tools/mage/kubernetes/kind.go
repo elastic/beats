@@ -51,11 +51,13 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	_, exists := env["KUBECONFIG"]
 	if exists {
 		// do nothing
+		fmt.Println("KUBECONFIG Kubeconfig is: ", env["KUBECONFIG"])
 		return nil
 	}
 	_, exists = env["KUBE_CONFIG"]
 	if exists {
 		// do nothing
+		fmt.Println("KUBE_CONFIG Kubeconfig is: ", env["KUBE_CONFIG"])
 		return nil
 	}
 	_, err := exec.LookPath("kind")
@@ -80,7 +82,7 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 	kubeConfig := filepath.Join(kubeCfgDir, "kubecfg")
-	fmt.Println("Kubeconfig is: %v", kubeConfig)
+	fmt.Println("Kubeconfig is: ", kubeConfig)
 	if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
 		return err
 	}
