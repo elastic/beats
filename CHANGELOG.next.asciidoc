@@ -24,7 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
-- Improve ECS categorization field mappings for nginx module. http.request.referrer is now lowercase & http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
+- Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 will no longer send the `host` field that contains information about the host Filebeat is
@@ -33,6 +33,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 
 *Heartbeat*
 
