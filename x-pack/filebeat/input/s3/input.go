@@ -436,6 +436,18 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
+	// Check if content is gzipped
+	if isS3ObjGzipped(info, *resp) {
+		gzipReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			err = errors.Wrapf(err, "gzip.NewReader failed for '%s' from S3 bucket '%s'", info.key, info.name)
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
+	}
+
 	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
 	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
 		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
@@ -453,18 +465,6 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			return err
 		}
 		return nil
-	}
-
-	// Check content-type = "application/x-gzip" or filename ends with ".gz"
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrapf(err, "gzip.NewReader failed for '%s' from S3 bucket '%s'", info.key, info.name)
-			p.logger.Error(err)
-			return err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
 	}
 
 	// handle s3 objects that are not json content-type
@@ -667,4 +667,10 @@ func (c *s3Context) Inc() {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 	c.refs++
+}
+
+func isS3ObjGzipped(info s3Info, resp s3.GetObjectResponse) bool {
+	return (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") ||
+		(resp.ContentEncoding != nil && *resp.ContentEncoding == "gzip") ||
+		strings.HasSuffix(info.key, ".gz")
 }
