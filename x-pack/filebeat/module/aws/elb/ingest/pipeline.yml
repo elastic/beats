@@ -127,10 +127,6 @@ processors:
       field: event.outcome
       value: failure
 
-  - lowercase:
-      field: http.request.method
-      ignore_missing: true
-
   - set:
       if: "ctx?.aws?.elb?.trace_id != null"
       field: tracing.trace.id
