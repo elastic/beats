@@ -52,13 +52,13 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	if exists {
 		// do nothing
 		if mg.Verbose() {
-			fmt.Println("KUBECONFIG is: ", env["KUBECONFIG"])
+			fmt.Println("KUBECONFIG: ", env["KUBECONFIG"])
 		}
 		if _, err := os.Stat(env["KUBECONFIG"]); err == nil {
 			return nil
 		} else if os.IsNotExist(err) {
 			if mg.Verbose() {
-				fmt.Println("KUBECONFIG file not found", env["KUBECONFIG"], err)
+				fmt.Println("KUBECONFIG file not found: ", env["KUBECONFIG"], err)
 			}
 		}
 	}
@@ -66,13 +66,13 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	if exists {
 		// do nothing
 		if mg.Verbose() {
-			fmt.Println("KUBE_CONFIG is: ", env["KUBE_CONFIG"])
+			fmt.Println("KUBE_CONFIG: ", env["KUBE_CONFIG"])
 		}
 		if _, err := os.Stat(env["KUBE_CONFIG"]); err == nil {
 			return nil
 		} else if os.IsNotExist(err) {
 			if mg.Verbose() {
-				fmt.Println("KUBE_CONFIG file not found", env["KUBE_CONFIG"], err)
+				fmt.Println("KUBE_CONFIG file not found ", env["KUBE_CONFIG"], err)
 			}
 		}
 	}
@@ -98,7 +98,9 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 	kubeConfig := filepath.Join(kubeCfgDir, "kubecfg")
-	fmt.Println("Kubeconfig is: ", kubeConfig)
+	if mg.Verbose() {
+		fmt.Println("Kubeconfig: ", kubeConfig)
+	}
 	if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
 		return err
 	}
