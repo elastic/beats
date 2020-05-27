@@ -885,7 +885,7 @@ def withBeatsEnvWin(Closure body) {
         }
       } finally {
         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-          bat(label: 'Prepare test output', script: 'make prepare-archive-test')
+          bat(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
           dir('build') {
             junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: "**\\build\\TEST*.xml")
             archiveArtifacts(allowEmptyArchive: true, artifacts: '**\\build\\TEST*.out')
