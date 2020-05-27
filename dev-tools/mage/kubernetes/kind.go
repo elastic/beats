@@ -72,7 +72,7 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 			return nil
 		} else if os.IsNotExist(err) {
 			if mg.Verbose() {
-				fmt.Println("KUBE_CONFIG file not found ", env["KUBE_CONFIG"], err)
+				fmt.Println("KUBE_CONFIG file not found: ", env["KUBE_CONFIG"], err)
 			}
 		}
 	}
