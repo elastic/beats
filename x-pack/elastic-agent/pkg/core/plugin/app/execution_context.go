@@ -9,6 +9,10 @@ import (
 	"fmt"
 )
 
+const (
+	hashLen = 16
+)
+
 // ExecutionContext describes runnable binary
 type ExecutionContext struct {
 	BinaryName string
@@ -22,6 +26,9 @@ func NewExecutionContext(binaryName, version string, tags map[Tag]string) Execut
 	id := fmt.Sprintf("%s--%s", binaryName, version)
 	if len(tags) > 0 {
 		hash := fmt.Sprintf("%x", sha256.New().Sum([]byte(fmt.Sprint(tags))))
+		if len(hash) > hashLen {
+			hash = hash[:hashLen]
+		}
 		id += fmt.Sprintf("--%x", hash)
 	}
 
