@@ -768,11 +768,11 @@ def fixPermissions(location) {
   sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
 }
 
-def makeTarget(Map params = [:]) {
-  def context = params.context
-  def target = params.target
-  def clean = params.get('clean', true)
-  def withModule = params.get('withModule', false)
+def makeTarget(Map args = [:]) {
+  def context = args.context
+  def target = args.target
+  def clean = args.get('clean', true)
+  def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule) {
       whenTrue(params.debug) {
@@ -787,11 +787,11 @@ def makeTarget(Map params = [:]) {
   }
 }
 
-def mageTarget(Map params = [:]) {
-  def context = params.context
-  def directory = params.directory
-  def target = params.target
-  def withModule = params.get('withModule', false)
+def mageTarget(Map args = [:]) {
+  def context = args.context
+  def directory = args.directory
+  def target = args.target
+  def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule) {
       whenTrue(params.debug) {
@@ -807,11 +807,11 @@ def mageTarget(Map params = [:]) {
   }
 }
 
-def mageTargetWin(Map params = [:]) {
-  def context = params.context
-  def directory = params.directory
-  def target = params.target
-  def withModule = params.get('module', false)
+def mageTargetWin(Map args = [:]) {
+  def context = args.context
+  def directory = args.directory
+  def target = args.target
+  def withModule = args.get('module', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnvWin(withModule: withModule) {
       whenTrue(params.debug) {
@@ -827,13 +827,13 @@ def mageTargetWin(Map params = [:]) {
   }
 }
 
-def withBeatsEnv(Map params = [:], Closure body) {
-  def archive = params.get('archive', true)
+def withBeatsEnv(Map args = [:], Closure body) {
+  def archive = args.get('archive', true)
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
 
   def module = ''
-  if (params.withModule) {
+  if (args.withModule) {
     module = getCommonModuleInTheChangeSet()
   }
 
@@ -877,9 +877,9 @@ def withBeatsEnv(Map params = [:], Closure body) {
   }
 }
 
-def withBeatsEnvWin(Map params = [:], Closure body) {
+def withBeatsEnvWin(Map args = [:], Closure body) {
   def module = ''
-  if (params.withModule) {
+  if (args.withModule) {
     module = getCommonModuleInTheChangeSet()
   }
 
