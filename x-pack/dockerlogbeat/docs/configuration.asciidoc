@@ -97,7 +97,6 @@ timer is reset.
 |
 |Instead of using usernames and passwords,
 you can use API keys to secure communication with {es}.
-For more information, see <<beats-api-keys>>.
 
 |`pipeline`
 |
