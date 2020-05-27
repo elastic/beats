@@ -7,9 +7,16 @@ set up {beatname_uc}. For example:
 ["source","yaml",subs="attributes"]
 ----------------------------------------------------------------------
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "{beatname_lc}_setup:{pwd}"
+cloud.auth: "{beatname_lc}_setup:{pwd}" <1>
 ----------------------------------------------------------------------
-
+<1> This examples shows a hard-coded password, but you should store sensitive
+values
+ifndef::serverless[]
+in the <<keystore,secrets keystore>>.
+endif::[]
+ifdef::serverless[]
+in environment variables.
+endif::[]
 // end::cloud[]
 
 // tag::self-managed[]
