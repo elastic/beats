@@ -9,7 +9,7 @@ if __name__ == "__main__":
     if not os.path.exists('build'):
         os.makedirs('build')
 
-    ## Top level folders to be excluded
+    # Top level folders to be excluded
     EXCLUDE = set(['.ci', '.git', '.github', 'vendor', 'dev-tools'])
     for root, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in EXCLUDE]
