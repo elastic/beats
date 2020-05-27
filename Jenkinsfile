@@ -832,6 +832,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
 
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+
+  // NOTE: This is required to run after the unstash
   def module = ''
   if (args.withModule) {
     module = getCommonModuleInTheChangeSet()
@@ -848,10 +852,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "PYTHON_ENV=${WORKSPACE}/python-env",
     "TEST_TAGS=${env.TEST_TAGS},oracle",
     "DOCKER_PULL=0",
-    "MODULE=${module}",
+    "MODULE=${module}"
   ]) {
-    deleteDir()
-    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -878,14 +880,18 @@ def withBeatsEnv(Map args = [:], Closure body) {
 }
 
 def withBeatsEnvWin(Map args = [:], Closure body) {
+  final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
+  final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
+  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
+
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+
+  // NOTE: This is required to run after the unstash
   def module = ''
   if (args.withModule) {
     module = getCommonModuleInTheChangeSet()
   }
-
-  final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
-  final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
-  def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -895,10 +901,8 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
     "MAGEFILE_CACHE=${env.WORKSPACE}\\.magefile",
     "TEST_COVERAGE=true",
     "RACE_DETECTOR=true",
-    "MODULE=${module}",
+    "MODULE=${module}"
   ]){
-    deleteDir()
-    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -1254,7 +1258,11 @@ def loadConfigEnvVars(){
   such as ascidoc and png files.
 */
 def getCommonModuleInTheChangeSet(String pattern='[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*') {
-  return getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+  def module = ''
+  dir("${env.BASE_DIR}") {
+    module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+  }
+  return module
 }
 
 /**
