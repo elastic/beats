@@ -375,7 +375,9 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
-				namespace = nsKey.value.String()
+				if newNamespace := nsKey.value.String(); newNamespace != "" {
+					namespace = newNamespace
+				}
 			}
 		}
 
@@ -413,7 +415,9 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 				if found {
 					dsKey, ok := dsNode.(*Key)
 					if ok {
-						dataset = dsKey.value.String()
+						if newDataset := dsKey.value.String(); newDataset != "" {
+							dataset = newDataset
+						}
 					}
 
 				}
@@ -464,7 +468,9 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
-				namespace = nsKey.value.String()
+				if newNamespace := nsKey.value.String(); newNamespace != "" {
+					namespace = newNamespace
+				}
 			}
 		}
 
@@ -502,7 +508,9 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 				if found {
 					dsKey, ok := dsNode.(*Key)
 					if ok {
-						dataset = dsKey.value.String()
+						if newDataset := dsKey.value.String(); newDataset != "" {
+							dataset = newDataset
+						}
 					}
 				}
 

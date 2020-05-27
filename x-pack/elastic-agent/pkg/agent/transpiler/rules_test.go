@@ -49,6 +49,13 @@ datasources:
       streams:
         - paths: /var/log/mysql/access.log
           dataset: dsds
+  - name: All specified with empty strings
+    namespace: ""
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: ""
 `,
 			expectedYAML: `
 datasources:
@@ -80,6 +87,14 @@ datasources:
         - paths: /var/log/mysql/access.log
           dataset: dsds
           index: mytype-dsds-nsns
+  - name: All specified with empty strings
+    namespace: ""
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: ""
+          index: mytype-generic-default
 `,
 			rule: &RuleList{
 				Rules: []Rule{
