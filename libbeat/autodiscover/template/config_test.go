@@ -87,7 +87,7 @@ func TestConfigsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings)
+		mapper, err := NewConfigMapper(mappings, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,8 +124,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
   - correct: config
     password: "${PASSWORD}"`,
 			event: bus.Event{
-				"foo":      3,
-				"keystore": keystore,
+				"foo": 3,
 			},
 			expected: []*common.Config{config},
 		},
@@ -142,7 +141,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mapper, err := NewConfigMapper(mappings)
+		mapper, err := NewConfigMapper(mappings, keystore, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -150,6 +149,78 @@ func TestConfigsMappingKeystore(t *testing.T) {
 		res := mapper.GetConfig(test.event)
 		assert.Equal(t, test.expected, res)
 	}
+}
+
+func TestConfigsMappingKeystoreProvider(t *testing.T) {
+	secret := "mapping_provider_secret"
+	//expected config
+	config, _ := common.NewConfigFrom(map[string]interface{}{
+		"correct":  "config",
+		"password": secret,
+	})
+
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, secret)
+
+	tests := []struct {
+		mapping  string
+		event    bus.Event
+		expected []*common.Config
+	}{
+		// Match config
+		{
+			mapping: `
+- condition.equals:
+    foo: 3
+  config:
+  - correct: config
+    password: "${PASSWORD}"`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
+	}
+
+	keystoreProvider := newMockKeystoreProvider(secret)
+	for _, test := range tests {
+		var mappings MapperSettings
+		config, err := common.NewConfigWithYAML([]byte(test.mapping), "")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if err := config.Unpack(&mappings); err != nil {
+			t.Fatal(err)
+		}
+
+		mapper, err := NewConfigMapper(mappings, keystore, keystoreProvider)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res := mapper.GetConfig(test.event)
+		assert.Equal(t, test.expected, res)
+	}
+}
+
+type mockKeystore struct {
+	secret string
+}
+
+func newMockKeystoreProvider(secret string) keystore.Provider {
+	return &mockKeystore{secret}
+}
+
+// GetKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
+func (kr *mockKeystore) GetKeystore(event bus.Event) keystore.Keystore {
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, kr.secret)
+	return keystore
 }
 
 func TestNilConditionConfig(t *testing.T) {
@@ -166,7 +237,7 @@ func TestNilConditionConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = NewConfigMapper(mappings)
+	_, err = NewConfigMapper(mappings, nil, nil)
 	assert.NoError(t, err)
 	assert.Nil(t, mappings[0].ConditionConfig)
 }
