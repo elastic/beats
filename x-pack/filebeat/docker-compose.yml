@@ -17,7 +17,9 @@ services:
     command: make
 
   googlepubsub:
-    build: input/googlepubsub/_meta
+    extends:
+      file: input/googlepubsub/_meta/docker-compose.yml
+      service: googlepubsub
     ports:
       - 8432
 
