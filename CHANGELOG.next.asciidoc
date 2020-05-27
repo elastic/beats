@@ -34,7 +34,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 
 *Auditbeat*
 
