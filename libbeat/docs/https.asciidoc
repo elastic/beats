@@ -26,7 +26,7 @@ For example:
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["localhost:9200"]
+  hosts: ["https://myEShost:9200"]
   username: "{beat_default_index_prefix}_writer" <1>
   password: "{pwd}" <2>
 ----------------------------------------------------------------------
@@ -49,7 +49,7 @@ For example:
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["https://localhost:9200"]
+  hosts: ["https://myEShost:9200"]
   api_key: "KnR6yE41RrSowb0kQ0HWoA" <1>
 ----------------------------------------------------------------------
 <1> This API key must have the privileges required to publish events to {es}.
@@ -65,7 +65,7 @@ For example:
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["localhost:9200"]
+  hosts: ["https://myEShost:9200"]
   ssl.certificate: "/etc/pki/client/cert.pem" <1>
   ssl.key: "/etc/pki/client/cert.key" <2>
 ----------------------------------------------------------------------
@@ -92,7 +92,7 @@ Here is an example configuration:
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["localhost:9200"]
+  hosts: ["https://myEShost:9200"]
   ssl.certificate_authorities: <1>
     - /etc/pki/my_root_ca.pem
     - /etc/pki/my_other_ca.pem
