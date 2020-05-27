@@ -62,11 +62,6 @@ func (p *Descriptor) Directory() string {
 	return p.directory
 }
 
-// IsGrpcConfigurable yields true in case application is grpc configurable.
-func (p *Descriptor) IsGrpcConfigurable() bool {
-	return p.spec.Configurable == ConfigurableGrpc
-}
-
 func defaultSpec(dir string, binaryName string) ProcessSpec {
 	if !isKnownBeat(binaryName) {
 		return ProcessSpec{
