@@ -153,7 +153,7 @@ func (a *Application) State() state.State {
 	return a.state
 }
 
-func (a *Application) watch(ctx context.Context, proc *os.Process, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
 
@@ -179,7 +179,7 @@ func (a *Application) watch(ctx context.Context, proc *os.Process, cfg map[strin
 			// it was a crash, report it async not to block
 			// process management with networking issues
 			go a.reportCrash(ctx)
-			a.Start(ctx, cfg)
+			a.Start(ctx, p, cfg)
 		}
 	}()
 }
