@@ -29,7 +29,8 @@ a partial region name like `us-east` or `us-east*`, which will monitor all regio
 `us-east`: `us-east1` and `us-east4`. If both region and zone are configured,
 only region will be used.
 Please see https://cloud.google.com/compute/docs/regions-zones#available[GCP regions]
-for regions that are available in GCP.
+for regions that are available in GCP. If both `region` and `zone` are not
+specified, metrics will be collected from all regions/zones.
 
 * *project_id*: A single string with your GCP Project ID
 
@@ -235,6 +236,23 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 5m
+
+- module: googlecloud
+  metricsets:
+    - stackdriver
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  stackdriver:
+    service: compute
+    metrics:
+      - aligner: ALIGN_NONE
+        metric_types:
+          - "compute.googleapis.com/instance/cpu/reserved_cores"
+          - "compute.googleapis.com/instance/cpu/usage_time"
+          - "compute.googleapis.com/instance/cpu/utilization"
+          - "compute.googleapis.com/instance/uptime"
 ----
 
 [float]

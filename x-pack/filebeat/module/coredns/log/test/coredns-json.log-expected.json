@@ -24,10 +24,18 @@
         "dns.question.name": "httpbin.org.cluster.local",
         "dns.question.type": "A",
         "dns.response_code": "NXDOMAIN",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "coredns.log",
         "event.duration": 102078,
+        "event.kind": "event",
         "event.module": "coredns",
         "event.original": "{\"message\":\"2019-02-12T00:27:28.903Z [INFO] 172.17.0.4:36413 - 21583 \\\"A IN httpbin.org.cluster.local. udp 43 false 512\\\" NXDOMAIN qr,rd,ra 136 0.000102078s\", \"stream\": \"stdout\", \"time\": \"2019-02-12T00:27:28.903433597Z\", \"kubernetes\": { \"container\": { \"name\": \"coredns\" }, \"node\": { \"name\": \"minikube\" }, \"pod\": { \"uid\": \"d57d545e-2a9d-11e9-995f-08002730e0dc\", \"name\": \"coredns-86c58d9df4-jwhsg\" }, \"namespace\": \"kube-system\", \"replicaset\": { \"name\": \"coredns-86c58d9df4\" }, \"labels\": { \"pod-template-hash\": \"86c58d9df4\", \"k8s-app\": \"kube-dns\" } } }",
+        "event.outcome": "failure",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "kubernetes.container.name": "coredns",
@@ -41,7 +49,11 @@
         "log.level": "INFO",
         "log.offset": 0,
         "message": "2019-02-12T00:27:28.903Z [INFO] 172.17.0.4:36413 - 21583 \"A IN httpbin.org.cluster.local. udp 43 false 512\" NXDOMAIN qr,rd,ra 136 0.000102078s",
+        "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "172.17.0.4"
+        ],
         "service.type": "coredns",
         "source.address": "172.17.0.4",
         "source.ip": "172.17.0.4",
@@ -75,10 +87,18 @@
         "dns.question.name": "httpbin.org",
         "dns.question.type": "A",
         "dns.response_code": "NOERROR",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "coredns.log",
         "event.duration": 82083,
+        "event.kind": "event",
         "event.module": "coredns",
         "event.original": "{\"message\":\"2019-03-19T02:57:23.213Z [INFO] 172.17.0.9:37723 - 6966 \\\"A IN httpbin.org. udp 29 false 512\\\" NOERROR qr,rd,ra 83 0.000082083s\\n\",\"stream\":\"stdout\",\"time\":\"2019-03-19T02:57:23.214583742Z\", \"kubernetes\": { \"container\": { \"name\": \"coredns\" }, \"node\": { \"name\": \"minikube\" }, \"pod\": { \"uid\": \"d57d545e-2a9d-11e9-995f-08002730e0dc\", \"name\": \"coredns-86c58d9df4-jwhsg\" }, \"namespace\": \"kube-system\", \"replicaset\": { \"name\": \"coredns-86c58d9df4\" }, \"labels\": { \"pod-template-hash\": \"86c58d9df4\", \"k8s-app\": \"kube-dns\" } } }",
+        "event.outcome": "success",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "kubernetes.container.name": "coredns",
@@ -92,7 +112,11 @@
         "log.level": "INFO",
         "log.offset": 550,
         "message": "2019-03-19T02:57:23.213Z [INFO] 172.17.0.9:37723 - 6966 \"A IN httpbin.org. udp 29 false 512\" NOERROR qr,rd,ra 83 0.000082083s\n",
+        "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "172.17.0.9"
+        ],
         "service.type": "coredns",
         "source.address": "172.17.0.9",
         "source.ip": "172.17.0.9",
@@ -126,10 +150,18 @@
         "dns.question.name": "czbaoyu.com",
         "dns.question.type": "AAAA",
         "dns.response_code": "NOERROR",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "coredns.log",
         "event.duration": 62860,
+        "event.kind": "event",
         "event.module": "coredns",
         "event.original": "{\"message\":\"2019-03-11T07:16:34.013Z [INFO] [::1]:37915 - 62762 \\\"AAAA IN czbaoyu.com. udp 29 false 512\\\" NOERROR qr,rd,ra 100 0.00006286s\\n\",\"stream\":\"stdout\",\"time\":\"2019-03-11T07:16:34.013970788Z\", \"kubernetes\": { \"container\": { \"name\": \"coredns\" }, \"node\": { \"name\": \"minikube\" }, \"pod\": { \"uid\": \"d57d545e-2a9d-11e9-995f-08002730e0dc\", \"name\": \"coredns-86c58d9df4-jwhsg\" }, \"namespace\": \"kube-system\", \"replicaset\": { \"name\": \"coredns-86c58d9df4\" }, \"labels\": { \"pod-template-hash\": \"86c58d9df4\", \"k8s-app\": \"kube-dns\" } } }",
+        "event.outcome": "success",
+        "event.type": [
+            "protocol"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "kubernetes.container.name": "coredns",
@@ -143,7 +175,11 @@
         "log.level": "INFO",
         "log.offset": 1081,
         "message": "2019-03-11T07:16:34.013Z [INFO] [::1]:37915 - 62762 \"AAAA IN czbaoyu.com. udp 29 false 512\" NOERROR qr,rd,ra 100 0.00006286s\n",
+        "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "::1"
+        ],
         "service.type": "coredns",
         "source.address": "::1",
         "source.ip": "::1",

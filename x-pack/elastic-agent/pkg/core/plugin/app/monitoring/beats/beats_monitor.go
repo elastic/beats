@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"unicode"
 
@@ -79,22 +80,30 @@ func (b *Monitor) generateLoggingPath(process, pipelineID string) string {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(process, pipelineID string, args []string) []string {
+func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSidecar bool) []string {
 	appendix := make([]string, 0, 7)
 
 	monitoringEndpoint := b.generateMonitoringEndpoint(process, pipelineID)
 	if monitoringEndpoint != "" {
+		endpoint := monitoringEndpoint
+		if isSidecar {
+			endpoint += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "http.enabled=true",
-			"-E", "http.host="+monitoringEndpoint,
+			"-E", "http.host="+endpoint,
 		)
 	}
 
 	loggingPath := b.generateLoggingPath(process, pipelineID)
 	if loggingPath != "" {
+		logFile := process
+		if isSidecar {
+			logFile += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "logging.files.path="+loggingPath,
-			"-E", "logging.files.name="+process,
+			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
 			"-E", "logging.files.permission=0644",
 			"-E", "logging.files.interval=1h",
@@ -139,7 +148,7 @@ func (b *Monitor) Prepare(process, pipelineID string, uid, gid int) error {
 			}
 		}
 
-		if err := os.Chown(drop, uid, gid); err != nil {
+		if err := changeOwner(drop, uid, gid); err != nil {
 			return err
 		}
 	}
@@ -228,4 +237,13 @@ func isWindowsPath(path string) bool {
 		return false
 	}
 	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
+}
+
+func changeOwner(path string, uid, gid int) error {
+	if runtime.GOOS == "windows" {
+		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
+		return nil
+	}
+
+	return os.Chown(path, uid, gid)
 }

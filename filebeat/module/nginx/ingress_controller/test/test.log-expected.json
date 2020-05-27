@@ -32,8 +32,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -73,8 +77,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -114,8 +122,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -155,8 +167,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
@@ -191,8 +207,12 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42"
     },
     {
@@ -223,8 +243,12 @@
         ],
         "nginx.ingress_controller.upstream.alternative_name": "",
         "nginx.ingress_controller.upstream.name": "",
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42"
     },
     {
@@ -260,8 +284,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Wget",
@@ -301,8 +329,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -346,8 +378,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -390,8 +426,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -435,8 +475,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
@@ -479,8 +523,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -524,8 +572,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -568,8 +620,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -612,8 +668,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -657,8 +717,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -701,8 +765,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.002,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -746,8 +814,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Safari",
@@ -790,8 +862,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/products/42?address=delhi+technological+university",
         "user_agent.device.name": "Other",
         "user_agent.name": "Python Requests",
@@ -831,8 +907,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.001,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -875,8 +955,12 @@
         "nginx.ingress_controller.upstream.response.length": 59,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/favicon.ico",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -919,8 +1003,12 @@
         "nginx.ingress_controller.upstream.response.length": 61,
         "nginx.ingress_controller.upstream.response.status_code": 200,
         "nginx.ingress_controller.upstream.response.time": 0.0,
+        "related.ip": [
+            "192.168.64.1"
+        ],
         "service.type": "nginx",
-        "source.address": "",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
         "url.original": "/v2/some",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
