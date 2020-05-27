@@ -62,99 +62,128 @@ processors:
 - rename:
     field: checkpoint.src
     target_field: source.ip
-    if: ctx.checkpoint?.src != null
+    ignore_missing: true
 - rename:
     field: checkpoint.client_ip
     target_field: source.ip
-    if: ctx.source?.ip == null && ctx.checkpoint?.client_ip != null
+    ignore_missing: true
+    if: ctx.source?.ip == null
 - rename:
     field: checkpoint.xlatesrc
     target_field: source.nat.ip
-    if: "ctx.checkpoint?.xlatesrc != '0.0.0.0' && ctx.checkpoint?.xlatesrc != null"
+    if: "ctx.checkpoint?.xlatesrc != '0.0.0.0'"
+    ignore_missing: true
 - rename:
     field: checkpoint.dst
     target_field: destination.ip
-    if: ctx.checkpoint?.dst != null
+    ignore_missing: true
 - rename:
     field: checkpoint.xlatedst
     target_field: destination.nat.ip
-    if: "ctx.checkpoint?.xlatedst != '0.0.0.0' && ctx.checkpoint?.xlatedst != null"
+    if: "ctx.checkpoint?.xlatedst != '0.0.0.0'"
+    ignore_missing: true
 - rename:
     field: checkpoint.uid
     target_field: source.user.id
-    if: ctx.checkpoint?.uid != null
+    ignore_missing: true
 - rename:
     field: checkpoint.administrator
     target_field: source.user.name
-    if: ctx.checkpoint?.administrator != null
+    ignore_missing: true
 - rename:
     field: checkpoint.source_user_name
     target_field: source.user.name
-    if: ctx.source?.user?.name == null && ctx.checkpoint?.source_user_name != null
-- rename:
+    if: ctx.source?.user?.name == null
+    ignore_missing: true
+- convert:
     field: checkpoint.client_outbound_packets
     target_field: source.packets
-    if: ctx.checkpoint?.client_outbound_packets != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
     field: checkpoint.server_outbound_packets
     target_field: destination.packets
-    if: ctx.checkpoint?.server_outbound_packets != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
     field: checkpoint.client_outbound_bytes
     target_field: source.bytes
-    if: ctx.checkpoint?.client_outbound_bytes != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
     field: checkpoint.sent_byte
     target_field: source.bytes
-    if: ctx.source?.bytes == null && ctx.checkpoint?.sent_byte != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: ctx.source?.bytes == null
+- convert:
     field: checkpoint.server_outbound_bytes
     target_field: destination.bytes
-    if: ctx.checkpoint?.server_outbound_bytes != null
-- rename:
-    field: checkpoint.server_outbound_bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: checkpoint.received_bytes
     target_field: destination.bytes
-    if: ctx.checkpoint?.received_bytes != null && ctx.destination?.bytes == null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: ctx.destination?.bytes == null
+- convert:
     field: checkpoint.service
     target_field: destination.port
-    if: ctx.checkpoint?.service != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
     field: checkpoint.xlatedport
     target_field: destination.nat.port
-    if: "ctx.checkpoint?.xlatedport != null && ctx.checkpoint?.xlatedport != '0'"
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.checkpoint?.xlatedport != '0'"
+- convert:
     field: checkpoint.s_port
     target_field: source.port
-    if: ctx.checkpoint?.s_port != null
-- rename:
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+- convert:
     field: checkpoint.xlatesport
     target_field: source.nat.port
-    if: "ctx.checkpoint?.xlatesport != null && ctx.checkpoint?.xlatesport != '0'"
+    type: long
+    ignore_failure: true
+    ignore_missing: true 
+    if: "ctx.checkpoint?.xlatesport != '0'"
 - rename:
     field: checkpoint.mac_source_address
     target_field: source.mac
-    if: ctx.checkpoint?.mac_source_address != null
+    ignore_missing: true
 - rename:
     field: checkpoint.from
     target_field: source.user.email
-    if: ctx.checkpoint?.from != null
+    ignore_missing: true
 - rename:
     field: checkpoint.src_machine_name
     target_field: source.domain
-    if: ctx.checkpoint?.src_machine_name != null
+    ignore_missing: true
 - rename:
     field: checkpoint.destination_dns_hostname
     target_field: destination.domain
-    if: ctx.checkpoint?.destination_dns_hostname != null
+    ignore_missing: true
 - rename:
     field: checkpoint.dst_machine_name
     target_field: destination.domain
-    if: ctx.server?.domain == null && ctx.checkpoint?.dst_machine_name != null
+    if: ctx.server?.domain == null
+    ignore_missing: true
 - rename:
     field: checkpoint.src_user_group
     target_field: source.user.group.name
-    if: ctx.checkpoint?.src_user_group != null
+    ignore_missing: true
 - append:
     field: event.category
     value: authentication
@@ -267,9 +296,11 @@ processors:
     field: checkpoint.loguid
     target_field: event.id
     ignore_missing: true
-- rename:
+- convert:
     field: checkpoint.sequencenum
     target_field: event.sequence
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: checkpoint.severity
@@ -312,9 +343,11 @@ processors:
     field: checkpoint.file_name
     target_field: file.name
     ignore_missing: true
-- rename:
+- convert:
     field: checkpoint.file_size
     target_field: file.size
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: checkpoint.file_md5
@@ -650,37 +683,17 @@ processors:
     value: '{{source.user.group.name}}'
     if: ctx.source?.user?.group?.name != null
 - convert:
-    field: source.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
     field: client.port
     type: long
     ignore_failure: true
     ignore_missing: true
-- convert:
-    field: source.nat.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true 
 - convert:
     field: client.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true 
 - convert:
-    field: source.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
     field: client.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: source.packets
     type: long
     ignore_failure: true
     ignore_missing: true
@@ -690,17 +703,7 @@ processors:
     ignore_failure: true
     ignore_missing: true
 - convert:
-    field: destination.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
     field: server.port
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: destination.nat.port
     type: long
     ignore_failure: true
     ignore_missing: true
@@ -710,32 +713,12 @@ processors:
     ignore_failure: true
     ignore_missing: true 
 - convert:
-    field: destination.bytes
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
     field: server.bytes
     type: long
     ignore_failure: true
     ignore_missing: true
 - convert:
-    field: destination.packets
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
     field: server.packets
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: event.sequence
-    type: long
-    ignore_failure: true
-    ignore_missing: true
-- convert:
-    field: file.size
     type: long
     ignore_failure: true
     ignore_missing: true 
@@ -793,11 +776,21 @@ processors:
     ignore_missing: true
 - remove:
     field:
+    - checkpoint.client_outbound_packets
+    - checkpoint.server_outbound_packets
+    - checkpoint.client_outbound_bytes
+    - checkpoint.sent_byte
+    - checkpoint.server_outbound_bytes
+    - checkpoint.received_bytes
+    - checkpoint.service
+    - checkpoint.xlatedport
+    - checkpoint.s_port
+    - checkpoint.xlatesport
+    - checkpoint.sequencenum
+    - checkpoint.file_size
     - checkpoint.product
     - checkpoint.xlatesrc
     - checkpoint.xlatedst
-    - checkpoint.xlatesport
-    - checkpoint.xlatedport
     - checkpoint.uid
     - syslog5424_ts
     ignore_missing: true
