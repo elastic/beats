@@ -112,7 +112,7 @@ func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString
 	secretName := tokens[2]
 	secretVar := tokens[3]
 	if ns != k.namespace {
-		k.logger.Debugf("cannot access Kubernetes secrets from a different namespace than: %v", ns)
+		k.logger.Debugf("cannot access Kubernetes secrets from a different namespace (%v) than: %v", ns, k.namespace)
 		return nil, keystore.ErrKeyDoesntExists
 	}
 	secretIntefrace := k.client.CoreV1().Secrets(ns)
@@ -128,6 +128,10 @@ func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString
 	secret, err := secretIntefrace.Get(secretName, metav1.GetOptions{})
 	if err != nil {
 		k.logger.Errorf("Could not retrieve secret from k8s API: %v", err)
+		return nil, keystore.ErrKeyDoesntExists
+	}
+	if _, ok := secret.Data[secretVar]; !ok {
+		k.logger.Errorf("Could not retrieve value %v for secret %v", secretVar, secretName)
 		return nil, keystore.ErrKeyDoesntExists
 	}
 	secretString := secret.Data[secretVar]
