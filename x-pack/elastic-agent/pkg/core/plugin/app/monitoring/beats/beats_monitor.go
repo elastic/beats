@@ -80,22 +80,30 @@ func (b *Monitor) generateLoggingPath(process, pipelineID string) string {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(process, pipelineID string, args []string) []string {
+func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSidecar bool) []string {
 	appendix := make([]string, 0, 7)
 
 	monitoringEndpoint := b.generateMonitoringEndpoint(process, pipelineID)
 	if monitoringEndpoint != "" {
+		endpoint := monitoringEndpoint
+		if isSidecar {
+			endpoint += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "http.enabled=true",
-			"-E", "http.host="+monitoringEndpoint,
+			"-E", "http.host="+endpoint,
 		)
 	}
 
 	loggingPath := b.generateLoggingPath(process, pipelineID)
 	if loggingPath != "" {
+		logFile := process
+		if isSidecar {
+			logFile += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "logging.files.path="+loggingPath,
-			"-E", "logging.files.name="+process,
+			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
 			"-E", "logging.files.permission=0644",
 			"-E", "logging.files.interval=1h",
