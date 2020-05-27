@@ -348,7 +348,7 @@ func CopyAllToList(to, onMerge string, except ...string) *CopyAllToListRule {
 	}
 }
 
-// FixStreamsRule fixes streams to contain default values
+// FixStreamRule fixes streams to contain default values
 // in case no value or invalid value are provided
 type FixStreamRule struct {
 }
