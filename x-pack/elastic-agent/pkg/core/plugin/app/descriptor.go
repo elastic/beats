@@ -70,9 +70,8 @@ func defaultSpec(dir string, binaryName string) ProcessSpec {
 	}
 
 	return ProcessSpec{
-		BinaryPath:   path.Join(dir, binaryName),
-		Args:         []string{},
-		Configurable: ConfigurableFile, // known unrolled beat will be started with a generated configuration file
+		BinaryPath: path.Join(dir, binaryName),
+		Args:       []string{},
 	}
 
 }
@@ -134,10 +133,6 @@ func populateSpec(dir, binaryName string, spec ProcessSpec) ProcessSpec {
 
 	if len(programSpec.Args) > 0 {
 		spec.Args = programSpec.Args
-	}
-
-	if programSpec.Configurable != "" {
-		spec.Configurable = programSpec.Configurable
 	}
 
 	return spec
