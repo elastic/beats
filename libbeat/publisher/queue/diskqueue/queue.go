@@ -18,6 +18,10 @@
 package diskqueue
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -84,16 +88,11 @@ type diskQueueState struct {
 	// first byte after its end.
 	lastPosition bufferPosition
 
-	// The maximum number of pages that can be used for the queue buffer.
-	// This is derived by dividing Settings.MaxBufferSize by pageSize and
-	// rounding down.
-	maxPageCount uint64
-
 	// The number of pages currently occupied by the queue buffer. This can't
 	// be derived from firstPosition and lastPosition because segment length
 	// varies with the size of their last event.
-	// This can be greater than maxPageCount if the maximum buffer size is
-	// reduced on an already-full queue.
+	// This can be greater than diskQueue.maxPageCount if the maximum buffer
+	// size is reduced on an already-full queue.
 	allocatedPageCount uint64
 }
 
@@ -104,7 +103,13 @@ type diskQueue struct {
 
 	// The persistent queue state. After a filesystem sync this should be
 	// identical to the queue's metadata file.
-	state diskQueueState
+	state     diskQueueState
+	stateFile *stateFile
+
+	// The maximum number of pages that can be used for the queue buffer.
+	// This is derived by dividing Settings.MaxBufferSize by pageSize and
+	// rounding down.
+	maxPageCount uint64
 
 	// The position of the next event to read from the queue. If this equals
 	// state.lastPosition, then there are no events left to read.
@@ -117,6 +122,8 @@ type diskQueue struct {
 	// in-memory state that should not persist through a restart.
 	readPosition bufferPosition
 }
+
+type stateFile os.File
 
 func init() {
 	queue.RegisterQueueType(
@@ -147,16 +154,35 @@ func queueFactory(
 }
 
 // NewQueue returns a disk-based queue configured with the given logger
-// and settings.
+// and settings, creating it if it doesn't exist.
 func NewQueue(settings Settings) (queue.Queue, error) {
-	if settings.Path == "" {
-		settings.Path = paths.Resolve(paths.Data, "queue.dat")
+	// Create the given directory path if it doesn't exist.
+	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
 	}
+
+	// Load the file handle for the queue state.
+	stateFile, err := stateFileForPath(settings.stateFilePath())
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			// If the function is returning because of an error, close the
+			// file handle.
+			stateFile.Close()
+		}
+	}()
+
+	// Decode the state from the file.
+	stateFile.Seek(0)
+
 	return &diskQueue{settings: settings}, nil
 }
 
 //
-// diskQueue mplementation of the queue.Queue interface
+// diskQueue implementation of the queue.Queue interface
 //
 
 func (dq *diskQueue) Close() error {
@@ -177,4 +203,40 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 
 func (dq *diskQueue) Consumer() queue.Consumer {
 	panic("TODO: not implemented")
+}
+
+func (settings diskQueueSettings) directoryPath() string {
+	if settings.Path == "" {
+		return paths.Resolve(paths.Data, "diskqueue")
+	}
+	return settings.Path
+}
+
+func (settings diskQueueSettings) stateFilePath() string {
+	return filepath.Join(settings.directoryPath(), "queue-state.dat")
+}
+
+func (settings diskQueueSettings) segmentFilePath(segmentID uint64) string {
+	return filepath.Join(settings.directoryPath(), "segment.%v", segmentID)
+}
+
+func queueStateFromPath(path string) (diskQueueState, error) {
+	return diskQueueState{}, nil
+}
+
+func stateFileForPath(path string) (*stateFile, error) {
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't stat disk queue metadata file: %w", err)
+	}
+	if 
+	return file, nil
+}
+
+func (stateFile *stateFile) saveState(state diskQueueState) error {
+	return nil
 }
