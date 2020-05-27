@@ -16,7 +16,7 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 | Option               | Description                                                                                                                       |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `endpoint`           | The elasticsearch endpoint to connect to. This option is required. Multiple endpoints may be specified and delimited with a `,`   |
+| `hosts`              | The elasticsearch endpoint to connect to. This option is required. Multiple endpoints may be specified and delimited with a `,`   |
 | `user`               | The Elasticsearch User to connect as.                                                                                             |
 | `password`           | The Elasticsearch Password to connect with.                                                                                       |
 | `index`              | The Elasticsearch Index to use. Requires `ilm_enabled` to be false, and `template_name` and `template_pattern` pattern to be set. |
@@ -27,9 +27,6 @@ To build and install, just run `mage Package`. The build process happens entire 
 | `cloud_id`           | CloudID value.                                                                                                                    |
 | `cloud_auth`         |  CloudID auth.                                                                                                                    |
 | `proxy_url`          | A proxy URL to use.                                                                                                               |
-| `ilm_enabled`        | Enable or disable ILM. Values are `true` or `false`. Set to `true` by default.                                                    |
-| `ilm_rollover_alias` | Set an ILM rollover alias.                                                                                                        |
-| `ilm_pattern`        | Specify an ILM pattern.                                                                                                           |
 
 ## How it works
 

@@ -26,7 +26,7 @@ func TestConfigHosts(t *testing.T) {
 	assert.Error(t, err)
 
 	testMultiHost := map[string]string{
-		"endpoint": "endpoint1,endpoint2",
+		"hosts": "endpoint1,endpoint2",
 	}
 	goodOut := []string{"endpoint1", "endpoint2"}
 	cfg, err := NewCfgFromRaw(testMultiHost)

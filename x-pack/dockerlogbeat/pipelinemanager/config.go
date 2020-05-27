@@ -33,7 +33,7 @@ type ContainerOutputConfig struct {
 func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 
 	newCfg := ContainerOutputConfig{}
-	endpoint, ok := input["endpoint"]
+	endpoint, ok := input["hosts"]
 	if !ok {
 		return newCfg, errors.New("An endpoint flag is required")
 	}
