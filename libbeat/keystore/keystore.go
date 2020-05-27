@@ -21,7 +21,8 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/parse"
 )
 
@@ -71,6 +72,11 @@ type WritableKeystore interface {
 type ListingKeystore interface {
 	// List returns the list of keys in the keystore, return an empty list if none is found.
 	List() ([]string, error)
+}
+
+// Provider for keystore
+type Provider interface {
+	GetKeystore(event bus.Event) Keystore
 }
 
 // ResolverWrap wrap a config resolver around an existing keystore.
