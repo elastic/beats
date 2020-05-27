@@ -204,7 +204,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
 - Fix application_pool metricset after pdh changes. {pull}18477[18477]
 - Fix tags_filter for cloudwatch metricset in aws. {pull}18524[18524]
-- Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}[]
+- Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}18797[18797]
 
 *Packetbeat*
 
