@@ -105,10 +105,23 @@ TIP: For testing purposes only, you can set `verification_mode: none` to disable
 
 Here are some common errors and ways to fix them:
 
+* <<failed-to-parse-private-key,tls: failed to parse private key>>
 * <<cannot-validate-certificate,x509: cannot validate certificate>>
 * <<getsockopt-no-route-to-host,getsockopt: no route to host>>
 * <<getsockopt-connection-refused,getsockopt: connection refused>>
 * <<target-machine-refused-connection,No connection could be made because the target machine actively refused it>>
+
+[[failed-to-parse-private-key]]
+===== tls: failed to parse private key
+
+This might occur for a few reasons:
+
+* The encrypted file is not recognized as an encrypted PEM block. {beatname_uc}
+tries to use the encrypted content as the final key, which fails.
+* The file is correctly encrypted in a PEM block, but the decrypted content is
+not a key in a format that {beatname_uc} recognizes. The key must be encoded as
+PEM format.
+* The passphrase is missing or has an error.
 
 [[cannot-validate-certificate]]
 ===== x509: cannot validate certificate for <IP address> because it doesn't contain any IP SANs
