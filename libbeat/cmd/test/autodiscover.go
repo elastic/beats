@@ -15,25 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package test
 
 import (
 	"github.com/spf13/cobra"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/cmd/test"
 )
 
-func genTestCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
-	exportCmd := &cobra.Command{
-		Use:   "test",
-		Short: "Test config",
+func GenTestAutodiscoverCmd() *cobra.Command {
+	configTestCmd := cobra.Command{
+		Use:   "autodiscover",
+		Short: "Test autodiscover configuration",
+		Run: func(cmd *cobra.Command, args []string) {
+			// TODO: test autodiscover
+			//b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			//if err != nil {
+			//	fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+			//	os.Exit(1)
+			//}
+
+			//if err = b.TestConfig(settings, beatCreator); err != nil {
+			//	os.Exit(1)
+			//}
+		},
 	}
 
-	exportCmd.AddCommand(test.GenTestConfigCmd(settings, beatCreator))
-	exportCmd.AddCommand(test.GenTestOutputCmd(settings))
-	exportCmd.AddCommand(test.GenTestAutodiscoverCmd()) // TODO: pass any necessary args
-
-	return exportCmd
+	return &configTestCmd
 }
