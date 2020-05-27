@@ -39,6 +39,7 @@
 - Avoid Chown on windows {pull}18512[18512]
 - Clean action store after enrolling to new configuration {pull}18656[18656]
 - Avoid watching monitor logs {pull}18723[18723]
+- Correctly report platform and family. {issue}18665[18665]
 
 ==== New features
 
