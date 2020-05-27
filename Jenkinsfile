@@ -138,7 +138,9 @@ pipeline {
             }
           }
           steps {
-            makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
+            withModuleEnv() {
+              makeTarget("Filebeat oss Linux", "-C filebeat testsuite")
+            }
           }
         }
         stage('Filebeat x-pack'){
@@ -151,7 +153,9 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
+            withModuleEnv() {
+              mageTarget("Filebeat x-pack Linux", "x-pack/filebeat", "update build test")
+            }
           }
         }
         stage('Filebeat Mac OS X'){
@@ -276,7 +280,9 @@ pipeline {
           stages {
             stage('Auditbeat Linux'){
               steps {
-                makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
+                withModuleEnv() {
+                  makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
+                }
               }
             }
             stage('Auditbeat crosscompile'){
@@ -327,7 +333,9 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+            withModuleEnv() {
+              mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+            }
           }
         }
         stage('Libbeat'){
@@ -393,7 +401,9 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+            withModuleEnv() {
+              mageTarget("Metricbeat OSS linux/amd64 (goIntegTest)", "metricbeat", "goIntegTest")
+            }
           }
         }
         stage('Metricbeat Python integration tests'){
@@ -406,7 +416,9 @@ pipeline {
             }
           }
           steps {
-            mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
+            withModuleEnv() {
+              mageTarget("Metricbeat OSS linux/amd64 (pythonIntegTest)", "metricbeat", "pythonIntegTest")
+            }
           }
         }
         stage('Metricbeat x-pack'){
@@ -432,8 +444,10 @@ pipeline {
               agent { label 'ubuntu && immutable' }
               options { skipDefaultCheckout() }
               steps {
-                withCloudTestEnv() {
-                  mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                withModuleEnv() {
+                  withCloudTestEnv() {
+                    mageTarget("Metricbeat x-pack Linux", "x-pack/metricbeat", "build test")
+                  }
                 }
               }
             }
@@ -588,7 +602,9 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            withModuleEnv() {
+              mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+            }
           }
         }
         stage('Functionbeat'){
@@ -1219,11 +1235,20 @@ def loadConfigEnvVars(){
 
   // Skip all the stages for changes only related to the documentation
   env.ONLY_DOCS = isDocChangedOnly()
+}
 
-  // Run the ITs by running only if the changeset affects a specific module.
-  // For such, it's required to look for changes under the module folder and exclude anything else
-  // such as ascidoc and png files.
-  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+/**
+  This method configures the MODULE env variable in the scope of the body, if required, in order to
+  run the ITs only if the changeset affects a specific module.
+
+  For such, it's required to look for changes under the module folder and exclude anything else
+  such as ascidoc and png files.
+*/
+def withModuleEnv(String pattern='[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', Closure body) {
+  def module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+  withEnv(["MODULE=${module}"]) {
+    body()
+  }
 }
 
 /**
