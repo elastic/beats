@@ -66,7 +66,7 @@ func TestServer_InitialCheckIn(t *testing.T) {
 
 	// client should get initial check-in
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
@@ -77,7 +77,7 @@ func TestServer_InitialCheckIn(t *testing.T) {
 
 	// application state should be updated
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -106,13 +106,13 @@ func TestServer_MultiClients(t *testing.T) {
 
 	// clients should get initial check-ins
 	require.NoError(t, waitFor(func() error {
-		if cImpl1.Config != initConfig1 {
+		if cImpl1.Config() != initConfig1 {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	require.NoError(t, waitFor(func() error {
-		if cImpl2.Config != initConfig2 {
+		if cImpl2.Config() != initConfig2 {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
@@ -124,13 +124,13 @@ func TestServer_MultiClients(t *testing.T) {
 
 	// application states should be updated
 	assert.NoError(t, waitFor(func() error {
-		if app1.status != proto.StateObserved_HEALTHY {
+		if app1.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
 	}))
 	assert.NoError(t, waitFor(func() error {
-		if app2.status != proto.StateObserved_DEGRADED {
+		if app2.Status() != proto.StateObserved_DEGRADED {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -154,10 +154,10 @@ func TestServer_PreventMultipleStreams(t *testing.T) {
 	defer c2.Stop()
 
 	assert.NoError(t, waitFor(func() error {
-		if cImpl2.Error == nil {
+		if cImpl2.Error() == nil {
 			return fmt.Errorf("client never got error trying to connect twice")
 		}
-		s, ok := status.FromError(cImpl2.Error)
+		s, ok := status.FromError(cImpl2.Error())
 		if !ok {
 			return fmt.Errorf("client didn't get a status error")
 		}
@@ -182,10 +182,10 @@ func TestServer_PreventCheckinStream(t *testing.T) {
 	defer c.Stop()
 
 	assert.NoError(t, waitFor(func() error {
-		if cImpl.Error == nil {
+		if cImpl.Error() == nil {
 			return fmt.Errorf("client never got error trying to connect twice")
 		}
-		s, ok := status.FromError(cImpl.Error)
+		s, ok := status.FromError(cImpl.Error())
 		if !ok {
 			return fmt.Errorf("client didn't get a status error")
 		}
@@ -210,10 +210,10 @@ func TestServer_PreventActionsStream(t *testing.T) {
 	defer c.Stop()
 
 	assert.NoError(t, waitFor(func() error {
-		if cImpl.Error == nil {
+		if cImpl.Error() == nil {
 			return fmt.Errorf("client never got error trying to connect twice")
 		}
-		s, ok := status.FromError(cImpl.Error)
+		s, ok := status.FromError(cImpl.Error())
 		if !ok {
 			return fmt.Errorf("client didn't get a status error")
 		}
@@ -238,10 +238,10 @@ func TestServer_DestroyPreventConnectAtTLS(t *testing.T) {
 	defer c.Stop()
 
 	assert.NoError(t, waitFor(func() error {
-		if cImpl.Error == nil {
+		if cImpl.Error() == nil {
 			return fmt.Errorf("client never got error trying to connect twice")
 		}
-		s, ok := status.FromError(cImpl.Error)
+		s, ok := status.FromError(cImpl.Error())
 		if !ok {
 			return fmt.Errorf("client didn't get a status error")
 		}
@@ -269,14 +269,14 @@ func TestServer_UpdateConfig(t *testing.T) {
 
 	// clients should get initial check-ins then set as healthy
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_HEALTHY, "Running")
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -292,7 +292,7 @@ func TestServer_UpdateConfig(t *testing.T) {
 	require.NoError(t, as.UpdateConfig(newConfig))
 	assert.Equal(t, preIdx+1, as.expectedConfigIdx)
 	assert.NoError(t, waitFor(func() error {
-		if cImpl.Config != newConfig {
+		if cImpl.Config() != newConfig {
 			return fmt.Errorf("client never got updated config")
 		}
 		return nil
@@ -313,14 +313,14 @@ func TestServer_UpdateConfigDisconnected(t *testing.T) {
 
 	// clients should get initial check-ins then set as healthy
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_HEALTHY, "Running")
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -334,7 +334,7 @@ func TestServer_UpdateConfigDisconnected(t *testing.T) {
 	// reconnect, client should get latest config
 	require.NoError(t, c.Start(context.Background()))
 	assert.NoError(t, waitFor(func() error {
-		if cImpl.Config != newConfig {
+		if cImpl.Config() != newConfig {
 			return fmt.Errorf("client never got updated config")
 		}
 		return nil
@@ -355,14 +355,14 @@ func TestServer_UpdateConfigStopping(t *testing.T) {
 
 	// clients should get initial check-ins then set as healthy
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_HEALTHY, "Running")
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -371,7 +371,7 @@ func TestServer_UpdateConfigStopping(t *testing.T) {
 	// perform stop try to update config (which will error)
 	done := make(chan bool)
 	go func() {
-		as.Stop(500 * time.Millisecond)
+		_ = as.Stop(500 * time.Millisecond)
 		close(done)
 	}()
 	err = as.UpdateConfig("new_config")
@@ -393,14 +393,14 @@ func TestServer_Stop(t *testing.T) {
 
 	// clients should get initial check-ins then set as healthy
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_HEALTHY, "Running")
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -421,21 +421,21 @@ func TestServer_Stop(t *testing.T) {
 	//   4. client sends stopping
 	//   5. client disconnects
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Stop == 0 {
+		if cImpl.Stop() == 0 {
 			return fmt.Errorf("client never got expected stop")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_CONFIGURING, "Configuring")
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Stop < 1 {
+		if cImpl.Stop() < 1 {
 			return fmt.Errorf("client never got expected stop again")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_STOPPING, "Stopping")
 	require.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_STOPPING {
+		if app.Status() != proto.StateObserved_STOPPING {
 			return fmt.Errorf("server never updated to stopping")
 		}
 		return nil
@@ -461,14 +461,14 @@ func TestServer_StopTimeout(t *testing.T) {
 
 	// clients should get initial check-ins then set as healthy
 	require.NoError(t, waitFor(func() error {
-		if cImpl.Config != initConfig {
+		if cImpl.Config() != initConfig {
 			return fmt.Errorf("client never got intial config")
 		}
 		return nil
 	}))
 	c.Status(proto.StateObserved_HEALTHY, "Running")
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_HEALTHY {
+		if app.Status() != proto.StateObserved_HEALTHY {
 			return fmt.Errorf("server never updated currect application state")
 		}
 		return nil
@@ -501,19 +501,19 @@ func TestServer_WatchdogFailApp(t *testing.T) {
 	_, err := srv.Register(app, initConfig)
 	require.NoError(t, err)
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_DEGRADED {
+		if app.Status() != proto.StateObserved_DEGRADED {
 			return fmt.Errorf("app status nevers set to degraded")
 		}
 		return nil
 	}))
-	assert.Equal(t, "Missed last check-in", app.message)
+	assert.Equal(t, "Missed last check-in", app.Message())
 	assert.NoError(t, waitFor(func() error {
-		if app.status != proto.StateObserved_FAILED {
+		if app.Status() != proto.StateObserved_FAILED {
 			return fmt.Errorf("app status nevers set to degraded")
 		}
 		return nil
 	}))
-	assert.Equal(t, "Missed two check-ins", app.message)
+	assert.Equal(t, "Missed two check-ins", app.Message())
 }
 
 func TestServer_PerformAction(t *testing.T) {
@@ -555,6 +555,8 @@ func TestServer_PerformAction(t *testing.T) {
 	// try slow action again with the client disconnected (should timeout the same)
 	c.Stop()
 	require.NoError(t, waitFor(func() error {
+		as.actionsLock.RLock()
+		defer as.actionsLock.RUnlock()
 		if as.actionsDone != nil {
 			return fmt.Errorf("client never disconnected the actions stream")
 		}
@@ -643,41 +645,74 @@ func newClientFromApplicationState(t *testing.T, as *ApplicationState, impl clie
 }
 
 type StubApp struct {
+	lock    sync.RWMutex
 	status  proto.StateObserved_Status
 	message string
+}
+
+func (a *StubApp) Status() proto.StateObserved_Status {
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+	return a.status
+}
+
+func (a *StubApp) Message() string {
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+	return a.message
 }
 
 type StubHandler struct{}
 
 func (h *StubHandler) OnStatusChange(as *ApplicationState, status proto.StateObserved_Status, message string) {
 	stub := as.app.(*StubApp)
+	stub.lock.Lock()
+	defer stub.lock.Unlock()
 	stub.status = status
 	stub.message = message
 }
 
 type StubClientImpl struct {
-	Lock   sync.Mutex
-	Config string
-	Stop   int
-	Error  error
+	Lock   sync.RWMutex
+	config string
+	stop   int
+	error  error
+}
+
+func (c *StubClientImpl) Config() string {
+	c.Lock.RLock()
+	defer c.Lock.RUnlock()
+	return c.config
+}
+
+func (c *StubClientImpl) Stop() int {
+	c.Lock.RLock()
+	defer c.Lock.RUnlock()
+	return c.stop
+}
+
+func (c *StubClientImpl) Error() error {
+	c.Lock.RLock()
+	defer c.Lock.RUnlock()
+	return c.error
 }
 
 func (c *StubClientImpl) OnConfig(config string) {
 	c.Lock.Lock()
 	defer c.Lock.Unlock()
-	c.Config = config
+	c.config = config
 }
 
 func (c *StubClientImpl) OnStop() {
 	c.Lock.Lock()
 	defer c.Lock.Unlock()
-	c.Stop++
+	c.stop++
 }
 
 func (c *StubClientImpl) OnError(err error) {
 	c.Lock.Lock()
 	defer c.Lock.Unlock()
-	c.Error = err
+	c.error = err
 }
 
 type EchoAction struct{}

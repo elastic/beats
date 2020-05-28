@@ -518,7 +518,7 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 
 	// send it to the client if its connected, otherwise it will be sent once it connects.
 	as.sendExpectedState(&proto.StateExpected{
-		State:          as.expected,
+		State:          proto.StateExpected_STOPPING,
 		ConfigStateIdx: cfgIdx,
 		Config:         "",
 	}, false)
@@ -577,9 +577,9 @@ func (as *ApplicationState) UpdateConfig(config string) error {
 
 	// send it to the client if its connected, otherwise it will be sent once it connects.
 	as.sendExpectedState(&proto.StateExpected{
-		State:          as.expected,
+		State:          expected,
 		ConfigStateIdx: idx,
-		Config:         as.expectedConfig,
+		Config:         config,
 	}, false)
 	return nil
 }
