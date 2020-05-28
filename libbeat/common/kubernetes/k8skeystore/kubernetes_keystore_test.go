@@ -19,6 +19,7 @@ package k8skeystore
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,7 +58,10 @@ func TestGetKeystoreAndRetrieve(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret", err)
+	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
 	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
