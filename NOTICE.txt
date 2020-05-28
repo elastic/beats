@@ -3065,7 +3065,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/google/gofuzz
-Version: v1.0.0
+Version: v1.1.0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/google/gofuzz/LICENSE:
 --------------------------------------------------------------------
@@ -5397,7 +5397,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/json-iterator/go
-Version: v1.1.7
+Version: v1.1.8
 License type (autodetected): MIT
 ./vendor/github.com/json-iterator/go/LICENSE:
 --------------------------------------------------------------------
@@ -7120,7 +7120,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/spf13/pflag
-Version: v1.0.3
+Version: v1.0.5
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/spf13/pflag/LICENSE:
 --------------------------------------------------------------------
@@ -8272,7 +8272,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
-Version: v0.9.0
+Version: v0.9.1
 License type (autodetected): BSD-3-Clause
 ./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
@@ -8903,7 +8903,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: k8s.io/api
-Revision: b90922c02518
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/api/LICENSE:
 --------------------------------------------------------------------
@@ -8912,7 +8912,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/apimachinery
-Revision: bfcf53abc9f8
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/apimachinery/LICENSE:
 --------------------------------------------------------------------
@@ -8921,7 +8921,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/client-go
-Revision: 78d2af792bab
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/client-go/LICENSE:
 --------------------------------------------------------------------
@@ -8930,8 +8930,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/klog
-Version: v0.3.4
-Revision: 6a023d6d0e09
+Version: v1.0.0
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/klog/LICENSE:
 --------------------------------------------------------------------
@@ -8940,7 +8939,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/utils
-Revision: 3dccf664f023
+Revision: a9aa75ae1b89
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/utils/LICENSE:
 --------------------------------------------------------------------
@@ -8948,9 +8947,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: sigs.k8s.io/structured-merge-diff/v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/sigs.k8s.io/structured-merge-diff/v3/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: sigs.k8s.io/yaml
-Version: v1.1.1
-Revision: 4cd0c284b15f
+Version: v1.2.0
 License type (autodetected): MIT
 ./vendor/sigs.k8s.io/yaml/LICENSE:
 --------------------------------------------------------------------

@@ -142,7 +142,7 @@ func (s *severity) Set(value string) error {
 	if v, ok := severityByName(value); ok {
 		threshold = v
 	} else {
-		v, err := strconv.Atoi(value)
+		v, err := strconv.ParseInt(value, 10, 32)
 		if err != nil {
 			return err
 		}
@@ -226,7 +226,7 @@ func (l *Level) Get() interface{} {
 
 // Set is part of the flag.Value interface.
 func (l *Level) Set(value string) error {
-	v, err := strconv.Atoi(value)
+	v, err := strconv.ParseInt(value, 10, 32)
 	if err != nil {
 		return err
 	}
@@ -294,7 +294,7 @@ func (m *moduleSpec) Set(value string) error {
 			return errVmoduleSyntax
 		}
 		pattern := patLev[0]
-		v, err := strconv.Atoi(patLev[1])
+		v, err := strconv.ParseInt(patLev[1], 10, 32)
 		if err != nil {
 			return errors.New("syntax error: expect comma-separated list of filename=N")
 		}
@@ -396,31 +396,23 @@ type flushSyncWriter interface {
 	io.Writer
 }
 
+// init sets up the defaults and runs flushDaemon.
 func init() {
-	// Default stderrThreshold is ERROR.
-	logging.stderrThreshold = errorLog
-
+	logging.stderrThreshold = errorLog // Default stderrThreshold is ERROR.
 	logging.setVState(0, nil, false)
+	logging.logDir = ""
+	logging.logFile = ""
+	logging.logFileMaxSizeMB = 1800
+	logging.toStderr = true
+	logging.alsoToStderr = false
+	logging.skipHeaders = false
+	logging.addDirHeader = false
+	logging.skipLogHeaders = false
 	go logging.flushDaemon()
 }
 
-var initDefaultsOnce sync.Once
-
 // InitFlags is for explicitly initializing the flags.
 func InitFlags(flagset *flag.FlagSet) {
-
-	// Initialize defaults.
-	initDefaultsOnce.Do(func() {
-		logging.logDir = ""
-		logging.logFile = ""
-		logging.logFileMaxSizeMB = 1800
-		logging.toStderr = true
-		logging.alsoToStderr = false
-		logging.skipHeaders = false
-		logging.addDirHeader = false
-		logging.skipLogHeaders = false
-	})
-
 	if flagset == nil {
 		flagset = flag.CommandLine
 	}
@@ -746,6 +738,8 @@ func (rb *redirectBuffer) Write(bytes []byte) (n int, err error) {
 
 // SetOutput sets the output destination for all severities
 func SetOutput(w io.Writer) {
+	logging.mu.Lock()
+	defer logging.mu.Unlock()
 	for s := fatalLog; s >= infoLog; s-- {
 		rb := &redirectBuffer{
 			w: w,
@@ -756,6 +750,8 @@ func SetOutput(w io.Writer) {
 
 // SetOutputBySeverity sets the output destination for specific severity
 func SetOutputBySeverity(name string, w io.Writer) {
+	logging.mu.Lock()
+	defer logging.mu.Unlock()
 	sev, ok := severityByName(name)
 	if !ok {
 		panic(fmt.Sprintf("SetOutputBySeverity(%q): unrecognized severity name", name))
@@ -781,24 +777,38 @@ func (l *loggingT) output(s severity, buf *buffer, file string, line int, alsoTo
 		if alsoToStderr || l.alsoToStderr || s >= l.stderrThreshold.get() {
 			os.Stderr.Write(data)
 		}
-		if l.file[s] == nil {
-			if err := l.createFiles(s); err != nil {
-				os.Stderr.Write(data) // Make sure the message appears somewhere.
-				l.exit(err)
+
+		if logging.logFile != "" {
+			// Since we are using a single log file, all of the items in l.file array
+			// will point to the same file, so just use one of them to write data.
+			if l.file[infoLog] == nil {
+				if err := l.createFiles(infoLog); err != nil {
+					os.Stderr.Write(data) // Make sure the message appears somewhere.
+					l.exit(err)
+				}
 			}
-		}
-		switch s {
-		case fatalLog:
-			l.file[fatalLog].Write(data)
-			fallthrough
-		case errorLog:
-			l.file[errorLog].Write(data)
-			fallthrough
-		case warningLog:
-			l.file[warningLog].Write(data)
-			fallthrough
-		case infoLog:
 			l.file[infoLog].Write(data)
+		} else {
+			if l.file[s] == nil {
+				if err := l.createFiles(s); err != nil {
+					os.Stderr.Write(data) // Make sure the message appears somewhere.
+					l.exit(err)
+				}
+			}
+
+			switch s {
+			case fatalLog:
+				l.file[fatalLog].Write(data)
+				fallthrough
+			case errorLog:
+				l.file[errorLog].Write(data)
+				fallthrough
+			case warningLog:
+				l.file[warningLog].Write(data)
+				fallthrough
+			case infoLog:
+				l.file[infoLog].Write(data)
+			}
 		}
 	}
 	if s == fatalLog {
