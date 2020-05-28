@@ -206,6 +206,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
 - Fix application_pool metricset after pdh changes. {pull}18477[18477]
 - Fix tags_filter for cloudwatch metricset in aws. {pull}18524[18524]
+- Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 
 *Packetbeat*
 
@@ -440,6 +441,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
+- Add memory metrics into compute googlecloud. {pull}18802[18802]
 
 *Packetbeat*
 
