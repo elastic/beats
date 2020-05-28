@@ -18,4 +18,5 @@ input:
         - "compute.googleapis.com/instance/network/received_bytes_count"
         - "compute.googleapis.com/instance/network/received_packets_count"
         - "compute.googleapis.com/instance/network/sent_bytes_count"
+        - "compute.googleapis.com/instance/network/sent_packets_count"
         - "compute.googleapis.com/instance/uptime"
