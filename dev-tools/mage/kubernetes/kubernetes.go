@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
@@ -113,6 +114,24 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 			log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
 		}
 	}()
+
+	checkNodeReadyAttempts := 10
+	connectionAttempts := 1
+	for {
+		err := KubectlWait(env, stdOut, stdErr, "condition=ready", "pod", "app=kube-state-metrics")
+		if err != nil {
+			if mg.Verbose() {
+				fmt.Println("Kube-state-metrics is not ready yet...retrying")
+			}
+		} else {
+			break
+		}
+		if connectionAttempts > checkNodeReadyAttempts {
+			return errors.Wrapf(err, "Timeout waiting for kube-state-metrics")
+		}
+		time.Sleep(3 * time.Second)
+		connectionAttempts += 1
+	}
 
 	// Pass all environment variables inside the pod, except for KUBECONFIG as the test
 	// should use the environment set by kubernetes on the pod.
