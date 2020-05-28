@@ -151,6 +151,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
+- Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
 
 *Heartbeat*
 
