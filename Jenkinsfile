@@ -24,6 +24,7 @@ pipeline {
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -328,7 +329,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
+            mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true)
           }
         }
         stage('Libbeat'){
@@ -434,7 +435,7 @@ pipeline {
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
-                  mageTarget(context: "Metricbeat x-pack Linux", directory: "x-pack/metricbeat", target: "build test", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
+                  mageTarget(context: "Metricbeat x-pack Linux", directory: "x-pack/metricbeat", target: "build test", withModule: true)
                 }
               }
             }
@@ -589,7 +590,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
+            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true)
           }
         }
         stage('Functionbeat'){
@@ -774,9 +775,8 @@ def makeTarget(Map args = [:]) {
   def target = args.target
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
-  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: modulePattern) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: env.OSS_MODULE_PATTERN) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -794,9 +794,8 @@ def mageTarget(Map args = [:]) {
   def directory = args.directory
   def target = args.target
   def withModule = args.get('withModule', false)
-  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: modulePattern) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: env.XPACK_MODULE_PATTERN) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -815,9 +814,8 @@ def mageTargetWin(Map args = [:]) {
   def directory = args.directory
   def target = args.target
   def withModule = args.get('withModule', false)
-  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin(withModule: withModule, modulePattern: modulePattern) {
+    withBeatsEnvWin(withModule: withModule, modulePattern: env.XPACK_MODULE_PATTERN) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -833,6 +831,11 @@ def mageTargetWin(Map args = [:]) {
 
 def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
+  def withModule = args.get('withModule', false)
+  def modulePattern
+  if (withModule) {
+    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnv: modulePattern parameter is required.')
+  }
   def os = goos()
   def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
 
@@ -840,14 +843,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
 
   // NOTE: This is required to run after the unstash
-  def module = ''
-  if (args.withModule) {
-    if (args.modulePattern?.trim()) {
-      module = getCommonModuleInTheChangeSet(args.modulePattern)
-    } else {
-      module = getCommonModuleInTheChangeSet()
-    }
-  }
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -888,6 +884,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
 }
 
 def withBeatsEnvWin(Map args = [:], Closure body) {
+  def withModule = args.get('withModule', false)
+  def modulePattern
+  if (withModule) {
+    modulePattern = args.containsKey('modulePattern') ? args.modulePattern : error('withBeatsEnvWin: modulePattern parameter is required.')
+  }
   final String chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
   final String chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
   def goRoot = "${env.USERPROFILE}\\.gvm\\versions\\go${GO_VERSION}.windows.amd64"
@@ -896,14 +897,7 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
 
   // NOTE: This is required to run after the unstash
-  def module = ''
-  if (args.withModule) {
-    if (args.modulePattern?.trim()) {
-      module = getCommonModuleInTheChangeSet(args.modulePattern)
-    } else {
-      module = getCommonModuleInTheChangeSet()
-    }
-  }
+  def module = withModule ? getCommonModuleInTheChangeSet(modulePattern) : ''
 
   withEnv([
     "HOME=${env.WORKSPACE}",
@@ -1269,7 +1263,7 @@ def loadConfigEnvVars(){
   For such, it's required to look for changes under the module folder and exclude anything else
   such as ascidoc and png files.
 */
-def getCommonModuleInTheChangeSet(String pattern='^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*') {
+def getCommonModuleInTheChangeSet(String pattern) {
   def module = ''
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
