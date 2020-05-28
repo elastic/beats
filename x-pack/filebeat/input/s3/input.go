@@ -677,6 +677,7 @@ func (c *s3Context) Inc() {
 }
 
 func isStreamGzipped(r *bufio.Reader) (bool, error) {
+	// Why 512? See https://godoc.org/net/http#DetectContentType
 	buf, err := r.Peek(512)
 	if err != nil && err != io.EOF {
 		return false, err
