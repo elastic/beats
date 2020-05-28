@@ -357,6 +357,10 @@ May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED
 			b.Bytes(),
 			true,
 		},
+		"empty": {
+			[]byte{},
+			false,
+		},
 	}
 
 	for name, test := range tests {
