@@ -97,7 +97,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
 			return defaultNode
 		}
-		log.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
+		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
 		return pod.Spec.NodeName
 	}
 
