@@ -8,14 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var fake *monitoring.TimeSeries = &monitoring.TimeSeries{
