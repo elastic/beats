@@ -48,7 +48,7 @@ func init() {
 		selectors:    map[string]struct{}{},
 		rootLogger:   zap.NewNop(),
 		globalLogger: zap.NewNop(),
-		logger:       newLogger(zap.NewNop(), ""),
+		logger:       newLogger(zap.NewNop(), "", false), //ecsEnabled=false reflects default config
 	})
 }
 
@@ -110,7 +110,7 @@ func Configure(cfg Config) error {
 		selectors:    selectors,
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
-		logger:       newLogger(root, ""),
+		logger:       newLogger(root, "", cfg.ECSEnabled),
 		observedLogs: observedLogs,
 	})
 	return nil

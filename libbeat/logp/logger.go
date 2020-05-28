@@ -29,16 +29,17 @@ type LogOption = zap.Option
 
 // Logger logs messages to the configured output.
 type Logger struct {
-	logger *zap.Logger
-	sugar  *zap.SugaredLogger
+	logger     *zap.Logger
+	sugar      *zap.SugaredLogger
+	ecsEnabled bool
 }
 
-func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
+func newLogger(rootLogger *zap.Logger, selector string, ecsEnabled bool, options ...LogOption) *Logger {
 	log := rootLogger.
 		WithOptions(zap.AddCallerSkip(1)).
 		WithOptions(options...).
 		Named(selector)
-	return &Logger{log, log.Sugar()}
+	return &Logger{log, log.Sugar(), ecsEnabled}
 }
 
 // NewLogger returns a new Logger labeled with the name of the selector. This
@@ -47,21 +48,22 @@ func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *L
 // Instead create new Logger instance that your object reuses. Or if you need to
 // log from a static context then you may use logp.L().Infow(), for example.
 func NewLogger(selector string, options ...LogOption) *Logger {
-	return newLogger(loadLogger().rootLogger, selector, options...)
+	coreLogger := loadLogger()
+	return newLogger(coreLogger.rootLogger, selector, coreLogger.logger.ecsEnabled, options...)
 }
 
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
 	sugar := l.sugar.With(args...)
-	return &Logger{sugar.Desugar(), sugar}
+	return &Logger{sugar.Desugar(), sugar, l.ecsEnabled}
 }
 
 // Named adds a new path segment to the logger's name. Segments are joined by
 // periods.
 func (l *Logger) Named(name string) *Logger {
 	logger := l.logger.Named(name)
-	return &Logger{logger, logger.Sugar()}
+	return &Logger{logger, logger.Sugar(), l.ecsEnabled}
 }
 
 // Sprint
@@ -211,6 +213,13 @@ func (l *Logger) Recover(msg string) {
 		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
 		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
 	}
+}
+
+// ECSEnabled returns whether or not logging should be ECS conformant.
+// Switching to ECS can mean a breaking change for the log format.
+// This information is helpful until all logs are switched to ECS by default.
+func (l *Logger) ECSEnabled() bool {
+	return l.ecsEnabled
 }
 
 // L returns an unnamed global logger.
