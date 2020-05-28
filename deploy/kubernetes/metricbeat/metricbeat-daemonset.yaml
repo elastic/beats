@@ -16,7 +16,7 @@ spec:
         k8s-app: metricbeat
     spec:
       serviceAccountName: metricbeat
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 31
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
