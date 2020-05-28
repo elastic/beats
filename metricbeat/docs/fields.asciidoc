@@ -18232,6 +18232,9 @@ GCP module
 *`googlecloud.labels`*::
 +
 --
+Google cloud monitoring metrics labels
+
+
 type: object
 
 --
