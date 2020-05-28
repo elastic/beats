@@ -65,3 +65,4 @@
 - Enable debug log level for Metricbeat and Filebeat when run under the Elastic Agent. {pull}17935[17935]
 - More clear output of inspect command {pull}18405[18405]
 - Pick up version from libbeat {pull}18350[18350]
+- Use shorter hash for application differentiator {pull}18770[18770]
