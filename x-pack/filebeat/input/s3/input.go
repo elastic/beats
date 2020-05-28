@@ -391,7 +391,7 @@ func (p *s3Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC 
 		p.logger.Debugf("Processing file from s3 bucket \"%s\" with name \"%s\"", info.name, info.key)
 		err := p.createEventsFromS3Info(svc, info, s3Ctx)
 		if err != nil {
-			err = errors.Wrapf(err, "createEventsFromS3Info failed for %v", info.key)
+			err = errors.Wrapf(err, "createEventsFromS3Info failed processing file from s3 bucket \"%s\" with name \"%s\"", info.name, info.key)
 			p.logger.Error(err)
 			s3Ctx.setError(err)
 		}
