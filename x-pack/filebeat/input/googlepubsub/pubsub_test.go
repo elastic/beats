@@ -40,17 +40,19 @@ var once sync.Once
 func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	t.Helper()
 
-	host := os.Getenv("PUBSUB_EMULATOR_HOST")
-	if host == "" {
-		t.Skip("PUBSUB_EMULATOR_HOST is not set in environment. You can start " +
-			"the emulator with \"docker-compose up\" from the _meta directory. " +
-			"The default address is PUBSUB_EMULATOR_HOST=localhost:8432")
-	}
-
+	var host string
 	if isInDockerIntegTestEnv() {
 		// We're running inside out integration test environment so
 		// make sure that that googlepubsub container is running.
-		compose.EnsureUp(t, "googlepubsub")
+		host = compose.EnsureUp(t, "googlepubsub").Host()
+		os.Setenv("PUBSUB_EMULATOR_HOST", host)
+	} else {
+		host = os.Getenv("PUBSUB_EMULATOR_HOST")
+		if host == "" {
+			t.Skip("PUBSUB_EMULATOR_HOST is not set in environment. You can start " +
+				"the emulator with \"docker-compose up\" from the _meta directory. " +
+				"The default address is PUBSUB_EMULATOR_HOST=localhost:8432")
+		}
 	}
 
 	once.Do(func() {

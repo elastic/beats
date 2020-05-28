@@ -24,7 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
-- Improve ECS categorization field mappings for nginx module. http.request.referrer is now lowercase & http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
+- Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 will no longer send the `host` field that contains information about the host Filebeat is
@@ -33,6 +33,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 
 *Heartbeat*
 
@@ -58,6 +59,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
+- Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
 
 *Functionbeat*
 
@@ -150,6 +152,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix a rate limit related issue in httpjson input for Okta module. {issue}18530[18530] {pull}18534[18534]
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
+- Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
 
 *Heartbeat*
 
@@ -204,6 +207,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix application_pool metricset after pdh changes. {pull}18477[18477]
 - Fix tags_filter for cloudwatch metricset in aws. {pull}18524[18524]
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
+- Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 
 *Packetbeat*
 
@@ -244,6 +248,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
+- Add k8s keystore backend. {pull}18096[18096]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
 - Add support for basic ECS logging. {pull}17974[17974]
@@ -437,6 +442,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
+- Add memory metrics into compute googlecloud. {pull}18802[18802]
 
 *Packetbeat*
 
