@@ -328,7 +328,7 @@ func TestGenerateHints(t *testing.T) {
 	}
 }
 
-func TestGenerateHintsDoesNotAccessKeystore(t *testing.T) {
+func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 	path := getTemporaryKeystoreFile()
 	defer os.Remove(path)
 	// store the secret

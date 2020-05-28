@@ -26,6 +26,11 @@ import (
 	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 )
 
+const (
+	isMonitoringMetricsFlag = 1 << 0
+	isMonitoringLogsFlag    = 1 << 1
+)
+
 // Operator runs Start/Stop/Update operations
 // it is responsible for detecting reconnect to existing processes
 // based on backed up configuration
@@ -40,7 +45,7 @@ type Operator struct {
 	stateResolver  *stateresolver.StateResolver
 	eventProcessor callbackHooks
 	monitor        monitoring.Monitor
-	isMonitoring   bool
+	isMonitoring   int
 
 	apps     map[string]Application
 	appsLock sync.Mutex
@@ -152,7 +157,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
 		newOperationVerify(o.eventProcessor),
 		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
-		newOperationStart(o.logger, o.config, cfg, o.eventProcessor),
+		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
 		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
 	}
 	return o.runFlow(p, flow)
@@ -180,7 +185,7 @@ func (o *Operator) pushConfig(p Descriptor, cfg map[string]interface{}) error {
 		flow = []operation{
 			// updates a configuration file and restarts a process
 			newOperationStop(o.logger, o.config, o.eventProcessor),
-			newOperationStart(o.logger, o.config, cfg, o.eventProcessor),
+			newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
 		}
 	}
 
@@ -263,15 +268,6 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 }
 
 func isMonitorable(descriptor Descriptor) bool {
-	type taggable interface {
-		Tags() map[app.Tag]string
-	}
-
-	if taggable, ok := descriptor.(taggable); ok {
-		tags := taggable.Tags()
-		_, isSidecar := tags[app.TagSidecar]
-		return !isSidecar // everything is monitorable except sidecar
-	}
-
-	return false
+	isSidecar := app.IsSidecar(descriptor)
+	return !isSidecar // everything is monitorable except sidecar
 }

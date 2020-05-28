@@ -16,12 +16,14 @@ const (
 	monitoringName          = "FLEET_MONITORING"
 	outputKey               = "output"
 	monitoringEnabledSubkey = "enabled"
+	logsProcessName         = "filebeat"
+	metricsProcessName      = "metricbeat"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 	// if monitoring is disabled and running stop it
 	if !o.monitor.IsMonitoringEnabled() {
-		if o.isMonitoring {
+		if o.isMonitoring != 0 {
 			o.logger.Info("operator.handleStartSidecar: monitoring is running and disabled, proceeding to stop")
 			return o.handleStopSidecar(s)
 		}
@@ -30,9 +32,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 		return nil
 	}
 
-	o.isMonitoring = true
-
-	for _, step := range o.getMonitoringSteps(s, o.monitor.WatchLogs(), o.monitor.WatchMetrics()) {
+	for _, step := range o.getMonitoringSteps(s) {
 		p, cfg, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -45,10 +45,14 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 		if step.ID == configrequest.StepRemove {
 			if err := o.stop(p); err != nil {
 				result = multierror.Append(err, err)
+			} else {
+				o.markStopMonitoring(step.Process)
 			}
 		} else {
 			if err := o.start(p, cfg); err != nil {
 				result = multierror.Append(err, err)
+			} else {
+				o.markStartMonitoring(step.Process)
 			}
 		}
 	}
@@ -57,7 +61,7 @@ func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
 }
 
 func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
-	for _, step := range o.getMonitoringSteps(s, true, true) {
+	for _, step := range o.getMonitoringSteps(s) {
 		p, _, err := getProgramFromStepWithTags(step, o.config.DownloadConfig, monitoringTags())
 		if err != nil {
 			return errors.New(err,
@@ -69,13 +73,9 @@ func (o *Operator) handleStopSidecar(s configrequest.Step) (result error) {
 		o.logger.Debugf("stopping program %v", p)
 		if err := o.stop(p); err != nil {
 			result = multierror.Append(err, err)
+		} else {
+			o.markStopMonitoring(step.Process)
 		}
-	}
-
-	// if result != nil then something might be still running, setting isMonitoring to false
-	// will prevent tearing it down in a future
-	if result == nil {
-		o.isMonitoring = false
 	}
 
 	return result
@@ -87,7 +87,7 @@ func monitoringTags() map[app.Tag]string {
 	}
 }
 
-func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchMetrics bool) []configrequest.Step {
+func (o *Operator) getMonitoringSteps(step configrequest.Step) []configrequest.Step {
 	// get output
 	config, err := getConfigFromStep(step)
 	if err != nil {
@@ -113,22 +113,25 @@ func (o *Operator) getMonitoringSteps(step configrequest.Step, watchLogs, watchM
 		return nil
 	}
 
-	return o.generateMonitoringSteps(step.Version, output, watchLogs, watchMetrics)
+	return o.generateMonitoringSteps(step.Version, output)
 }
 
-func (o *Operator) generateMonitoringSteps(version string, output interface{}, watchLogs, watchMetrics bool) []configrequest.Step {
+func (o *Operator) generateMonitoringSteps(version string, output interface{}) []configrequest.Step {
 	var steps []configrequest.Step
+	watchLogs := o.monitor.WatchLogs()
+	watchMetrics := o.monitor.WatchMetrics()
 
-	if watchLogs {
+	// generate only on change
+	if watchLogs != o.isMonitoringLogs() {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
-		if !any {
+		if !watchLogs || !any {
 			stepID = configrequest.StepRemove
 		}
 		filebeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: "filebeat",
+			Process: logsProcessName,
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
 			},
@@ -136,18 +139,17 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}, w
 
 		steps = append(steps, filebeatStep)
 	}
-
-	if watchMetrics {
+	if watchMetrics != o.isMonitoringMetrics() {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
-		if !any {
+		if !watchMetrics || !any {
 			stepID = configrequest.StepRemove
 		}
 
 		metricbeatStep := configrequest.Step{
 			ID:      stepID,
 			Version: version,
-			Process: "metricbeat",
+			Process: metricsProcessName,
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
 			},
@@ -272,4 +274,30 @@ func (o *Operator) getMetricbeatEndpoints() []string {
 	}
 
 	return endpoints
+}
+
+func (o *Operator) markStopMonitoring(process string) {
+	switch process {
+	case logsProcessName:
+		o.isMonitoring ^= isMonitoringLogsFlag
+	case metricsProcessName:
+		o.isMonitoring ^= isMonitoringMetricsFlag
+	}
+}
+
+func (o *Operator) markStartMonitoring(process string) {
+	switch process {
+	case logsProcessName:
+		o.isMonitoring |= isMonitoringLogsFlag
+	case metricsProcessName:
+		o.isMonitoring |= isMonitoringMetricsFlag
+	}
+}
+
+func (o *Operator) isMonitoringLogs() bool {
+	return (o.isMonitoring & isMonitoringLogsFlag) != 0
+}
+
+func (o *Operator) isMonitoringMetrics() bool {
+	return (o.isMonitoring & isMonitoringMetricsFlag) != 0
 }
