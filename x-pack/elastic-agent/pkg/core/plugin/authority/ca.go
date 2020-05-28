@@ -30,8 +30,8 @@ type CertificateAuthority struct {
 
 // Pair is a x509 Key/Cert pair
 type Pair struct {
-	Crt []byte
-	Key []byte
+	Crt         []byte
+	Key         []byte
 	Certificate *tls.Certificate
 }
 
@@ -142,8 +142,8 @@ func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
 	}
 
 	return &Pair{
-		Crt: certOut.Bytes(),
-		Key: keyOut.Bytes(),
+		Crt:         certOut.Bytes(),
+		Key:         keyOut.Bytes(),
 		Certificate: &tlsCert,
 	}, nil
 }

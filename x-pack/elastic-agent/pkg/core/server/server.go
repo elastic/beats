@@ -9,19 +9,21 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	"net"
 	"sync"
 	"time"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/gofrs/uuid"
 	protobuf "github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -60,25 +62,25 @@ type ApplicationState struct {
 	app interface{}
 
 	token string
-	cert *authority.Pair
+	cert  *authority.Pair
 
-	pendingExpected chan *proto.StateExpected
-	expected proto.StateExpected_State
+	pendingExpected   chan *proto.StateExpected
+	expected          proto.StateExpected_State
 	expectedConfigIdx uint64
-	expectedConfig string
-	status proto.StateObserved_Status
-	statusMessage string
-	statusConfigIdx uint64
-	statusTime time.Time
-	checkinConn bool
-	checkinDone chan bool
-	checkinLock sync.RWMutex
+	expectedConfig    string
+	status            proto.StateObserved_Status
+	statusMessage     string
+	statusConfigIdx   uint64
+	statusTime        time.Time
+	checkinConn       bool
+	checkinDone       chan bool
+	checkinLock       sync.RWMutex
 
 	pendingActions chan *pendingAction
-	sentActions map[string]*sentAction
-	actionsConn bool
-	actionsDone chan bool
-	actionsLock sync.RWMutex
+	sentActions    map[string]*sentAction
+	actionsConn    bool
+	actionsDone    chan bool
+	actionsLock    sync.RWMutex
 }
 
 // Handler is the used by the server to inform of status changes.
@@ -89,21 +91,22 @@ type Handler interface {
 
 // Server is the GRPC server that the launched applications connect back to.
 type Server struct {
-	lock sync.RWMutex
-	logger *logger.Logger
-	ca *authority.CertificateAuthority
+	lock       sync.RWMutex
+	logger     *logger.Logger
+	ca         *authority.CertificateAuthority
 	listenAddr string
-	handler Handler
+	handler    Handler
 
-	server *grpc.Server
+	listener     net.Listener
+	server       *grpc.Server
 	watchdogDone chan bool
-	watchdogWG sync.WaitGroup
+	watchdogWG   sync.WaitGroup
 
 	apps map[string]*ApplicationState
 
 	// overridden in tests
 	watchdogCheckInterval time.Duration
-	checkInMinTimeout time.Duration
+	checkInMinTimeout     time.Duration
 }
 
 // New creates a new GRPC server for clients to connect to.
@@ -113,13 +116,13 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 		return nil, err
 	}
 	return &Server{
-		logger: logger,
-		ca: ca,
-		listenAddr: listenAddr,
-		handler: handler,
-		apps: make(map[string]*ApplicationState),
+		logger:                logger,
+		ca:                    ca,
+		listenAddr:            listenAddr,
+		handler:               handler,
+		apps:                  make(map[string]*ApplicationState),
 		watchdogCheckInterval: WatchdogCheckLoop,
-		checkInMinTimeout: client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
+		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
 	}, nil
 }
 
@@ -129,6 +132,7 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
+	s.listener = lis
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM(s.ca.Crt()); !ok {
 		return errors.New("failed to append root CA", errors.TypeSecurity)
@@ -162,10 +166,12 @@ func (s *Server) Stop() {
 		close(s.watchdogDone)
 		s.server.Stop()
 		s.server = nil
+		s.listener = nil
 		s.watchdogWG.Wait()
 	}
 }
 
+// Get returns the application state from the server for the passed application.
 func (s *Server) Get(app interface{}) (*ApplicationState, bool) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -192,20 +198,21 @@ func (s *Server) Register(app interface{}, config string) (*ApplicationState, er
 		return nil, err
 	}
 	appState := &ApplicationState{
-		srv:   s,
-		app:   app,
-		token: id.String(),
-		cert:  pair,
-		pendingExpected: make(chan *proto.StateExpected),
-		expected: proto.StateExpected_RUNNING,
+		srv:               s,
+		app:               app,
+		token:             id.String(),
+		cert:              pair,
+		pendingExpected:   make(chan *proto.StateExpected),
+		expected:          proto.StateExpected_RUNNING,
 		expectedConfigIdx: 1,
-		expectedConfig: config,
-		checkinConn: true,
-		status: proto.StateObserved_STARTING,
-		statusConfigIdx: client.InitialConfigIdx,
-		statusTime: time.Now().UTC(),
-		pendingActions: make(chan *pendingAction, 100),
-		actionsConn: true,
+		expectedConfig:    config,
+		checkinConn:       true,
+		status:            proto.StateObserved_STARTING,
+		statusConfigIdx:   client.InitialConfigIdx,
+		statusTime:        time.Now().UTC(),
+		pendingActions:    make(chan *pendingAction, 100),
+		sentActions:       make(map[string]*sentAction),
+		actionsConn:       true,
 	}
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -261,8 +268,8 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 		s.logger.Debug("check-in stream cannot connect, application is being destroyed; closing connection")
 		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
 	}
-	done := make(chan bool)
-	appState.checkinDone = done
+	checkinDone := make(chan bool)
+	appState.checkinDone = checkinDone
 	appState.checkinLock.Unlock()
 
 	defer func() {
@@ -273,6 +280,7 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 
 	// send the config and expected state changes to the applications when
 	// pushed on the channel
+	recvDone := make(chan bool)
 	sendDone := make(chan bool)
 	go func() {
 		defer func() {
@@ -281,7 +289,9 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 		for {
 			var expected *proto.StateExpected
 			select {
-			case <-done:
+			case <-checkinDone:
+				return
+			case <-recvDone:
 				return
 			case expected = <-appState.pendingExpected:
 			}
@@ -308,7 +318,7 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 				if reportableErr(err) {
 					s.logger.Debugf("check-in stream failed to receive data: %s", err)
 				}
-				close(done)
+				close(recvDone)
 				return
 			}
 			appState.updateStatus(checkin, false)
@@ -372,8 +382,8 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 		s.logger.Debug("actions stream cannot connect, application is being destroyed; closing connection")
 		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
 	}
-	done := make(chan bool)
-	appState.actionsDone = done
+	actionsDone := make(chan bool)
+	appState.actionsDone = actionsDone
 	appState.actionsLock.Unlock()
 
 	defer func() {
@@ -383,13 +393,16 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 	}()
 
 	// send the pending actions that need to be performed
+	recvDone := make(chan bool)
 	sendDone := make(chan bool)
 	go func() {
 		defer func() { close(sendDone) }()
 		for {
 			var pending *pendingAction
 			select {
-			case <-done:
+			case <-actionsDone:
+				return
+			case <-recvDone:
 				return
 			case pending = <-appState.pendingActions:
 			}
@@ -416,7 +429,7 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 				return
 			}
 			appState.sentActions[pending.id] = &sentAction{
-				callback: pending.callback,
+				callback:  pending.callback,
 				expiresOn: pending.expiresOn,
 			}
 			appState.actionsLock.Unlock()
@@ -431,7 +444,7 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 				if reportableErr(err) {
 					s.logger.Debugf("actions stream failed to receive data: %s", err)
 				}
-				close(done)
+				close(recvDone)
 				return
 			}
 			appState.actionsLock.Lock()
@@ -472,7 +485,7 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 // Note: If the writer implements io.Closer the writer is also closed.
 func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
 	connInfo := &proto.ConnInfo{
-		Addr:     as.srv.listenAddr,
+		Addr:     as.srv.getListenAddr(),
 		Token:    as.token,
 		CaCert:   as.srv.ca.Crt(),
 		PeerCert: as.cert.Crt,
@@ -518,10 +531,10 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 		}
 
 		as.checkinLock.RLock()
-		status := as.status
+		s := as.status
 		doneChan := as.checkinDone
 		as.checkinLock.RUnlock()
-		if status == proto.StateObserved_STOPPING && doneChan == nil {
+		if s == proto.StateObserved_STOPPING && doneChan == nil {
 			// sent stopping and now is disconnected (so its stopped)
 			as.Destroy()
 			return nil
@@ -581,10 +594,14 @@ func (as *ApplicationState) PerformAction(name string, params map[string]interfa
 	if err != nil {
 		return nil, err
 	}
+	if !as.actionsConn {
+		// actions stream destroyed, action cancelled
+		return nil, ErrActionCancelled
+	}
 
 	resChan := make(chan actionResult)
 	as.pendingActions <- &pendingAction{
-		id: id.String(),
+		id:     id.String(),
 		name:   name,
 		params: paramBytes,
 		callback: func(m map[string]interface{}, err error) {
@@ -615,9 +632,9 @@ func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForRe
 	var expected *proto.StateExpected
 	if as.expected == proto.StateExpected_STOPPING && checkin.Status != proto.StateObserved_STOPPING {
 		expected = &proto.StateExpected{
-			State: as.expected,
-			ConfigStateIdx: as.statusConfigIdx,  // stopping always inform that the config it has is correct
-			Config: "",
+			State:          as.expected,
+			ConfigStateIdx: as.statusConfigIdx, // stopping always inform that the config it has is correct
+			Config:         "",
 		}
 	} else if checkin.ConfigStateIdx != as.expectedConfigIdx {
 		expected = &proto.StateExpected{
@@ -647,7 +664,6 @@ func (as *ApplicationState) sendExpectedState(expected *proto.StateExpected, wai
 	select {
 	case as.pendingExpected <- expected:
 	default:
-		return
 	}
 }
 
@@ -748,22 +764,29 @@ func (s *Server) watchdog() {
 			serverApp.checkinLock.RUnlock()
 			if now.Sub(statusTime) > s.checkInMinTimeout {
 				serverApp.checkinLock.Lock()
+				prevStatus := serverApp.status
+				s := prevStatus
+				prevMessage := serverApp.statusMessage
+				message := prevMessage
 				if serverApp.status == proto.StateObserved_DEGRADED {
-					serverApp.status = proto.StateObserved_FAILED
+					s = proto.StateObserved_FAILED
+					message = "Missed two check-ins"
+					serverApp.status = s
+					serverApp.statusMessage = message
 					serverApp.statusTime = now
 				} else if serverApp.status != proto.StateObserved_FAILED {
-					serverApp.status = proto.StateObserved_DEGRADED
+					s = proto.StateObserved_DEGRADED
+					message = "Missed last check-in"
+					serverApp.status = s
+					serverApp.statusMessage = message
 					serverApp.statusTime = now
 				}
 				serverApp.checkinLock.Unlock()
+				if prevStatus != s || prevMessage != message {
+					serverApp.srv.handler.OnStatusChange(serverApp, s, message)
+				}
 			}
-			serverApp.actionsLock.RLock()
-			actionsDone := serverApp.actionsDone
-			serverApp.actionsLock.RUnlock()
-			if actionsDone == nil {
-				// actions stream is disconnected; flush any expired actions
-				serverApp.flushExpiredActions()
-			}
+			serverApp.flushExpiredActions()
 		}
 		s.lock.RUnlock()
 	}
@@ -789,22 +812,31 @@ func (s *Server) getCertificate(clientHello *tls.ClientHelloInfo) (*tls.Certific
 	return nil, errors.New("no supported TLS certificate", errors.TypeSecurity)
 }
 
+// getListenAddr returns the listening address of the server.
+func (s *Server) getListenAddr() string {
+	if s.listenAddr != ":0" {
+		return s.listenAddr
+	}
+	port := s.listener.Addr().(*net.TCPAddr).Port
+	return fmt.Sprintf(":%d", port)
+}
+
 type pendingAction struct {
-	id string
-	name string
-	params []byte
-	callback func(map[string]interface{}, error)
+	id        string
+	name      string
+	params    []byte
+	callback  func(map[string]interface{}, error)
 	expiresOn time.Time
 }
 
 type sentAction struct {
-	callback func(map[string]interface{}, error)
+	callback  func(map[string]interface{}, error)
 	expiresOn time.Time
 }
 
 type actionResult struct {
 	result map[string]interface{}
-	err error
+	err    error
 }
 
 func reportableErr(err error) bool {
