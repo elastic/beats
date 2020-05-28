@@ -23,6 +23,7 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -327,7 +328,7 @@ pipeline {
             }
           }
           steps {
-            mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true)
+            mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
           }
         }
         stage('Libbeat'){
@@ -433,7 +434,7 @@ pipeline {
               options { skipDefaultCheckout() }
               steps {
                 withCloudTestEnv() {
-                  mageTarget(context: "Metricbeat x-pack Linux", directory: "x-pack/metricbeat", target: "build test", withModule: true)
+                  mageTarget(context: "Metricbeat x-pack Linux", directory: "x-pack/metricbeat", target: "build test", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
                 }
               }
             }
@@ -588,7 +589,7 @@ pipeline {
             }
           }
           steps {
-            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true)
+            mageTargetWin(context: "Winlogbeat Windows Unit test", directory: "x-pack/winlogbeat", target: "build unitTest", withModule: true, modulePattern: env.XPACK_MODULE_PATTERN)
           }
         }
         stage('Functionbeat'){
@@ -773,8 +774,9 @@ def makeTarget(Map args = [:]) {
   def target = args.target
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
+  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: modulePattern) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -792,8 +794,9 @@ def mageTarget(Map args = [:]) {
   def directory = args.directory
   def target = args.target
   def withModule = args.get('withModule', false)
+  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: modulePattern) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -811,9 +814,10 @@ def mageTargetWin(Map args = [:]) {
   def context = args.context
   def directory = args.directory
   def target = args.target
-  def withModule = args.get('module', false)
+  def withModule = args.get('withModule', false)
+  def modulePattern = args.get('modulePattern', '')
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin(withModule: withModule) {
+    withBeatsEnvWin(withModule: withModule, modulePattern: modulePattern) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -838,7 +842,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
   // NOTE: This is required to run after the unstash
   def module = ''
   if (args.withModule) {
-    module = getCommonModuleInTheChangeSet()
+    if (args.modulePattern?.trim()) {
+      module = getCommonModuleInTheChangeSet(args.modulePattern)
+    } else {
+      module = getCommonModuleInTheChangeSet()
+    }
   }
 
   withEnv([
@@ -890,7 +898,11 @@ def withBeatsEnvWin(Map args = [:], Closure body) {
   // NOTE: This is required to run after the unstash
   def module = ''
   if (args.withModule) {
-    module = getCommonModuleInTheChangeSet()
+    if (args.modulePattern?.trim()) {
+      module = getCommonModuleInTheChangeSet(args.modulePattern)
+    } else {
+      module = getCommonModuleInTheChangeSet()
+    }
   }
 
   withEnv([
@@ -1257,7 +1269,7 @@ def loadConfigEnvVars(){
   For such, it's required to look for changes under the module folder and exclude anything else
   such as ascidoc and png files.
 */
-def getCommonModuleInTheChangeSet(String pattern='[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*') {
+def getCommonModuleInTheChangeSet(String pattern='^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*') {
   def module = ''
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern , exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
