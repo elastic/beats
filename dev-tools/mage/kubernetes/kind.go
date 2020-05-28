@@ -48,34 +48,15 @@ func (m *KindIntegrationTestStep) Use(dir string) (bool, error) {
 //
 // If `KUBECONFIG` is already deinfed in the env then it will do nothing.
 func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
-	_, exists := env["KUBECONFIG"]
-	if exists {
-		// do nothing
-		if mg.Verbose() {
-			fmt.Println("KUBECONFIG: ", env["KUBECONFIG"])
-		}
-		if _, err := os.Stat(env["KUBECONFIG"]); err == nil {
+
+	envVars := []string{"KUBECONFIG", "KUBE_CONFIG"}
+	for _, envVar := range envVars {
+		exists := envKubeConfigExists(env, envVar)
+		if exists {
 			return nil
-		} else if os.IsNotExist(err) {
-			if mg.Verbose() {
-				fmt.Println("KUBECONFIG file not found: ", env["KUBECONFIG"], err)
-			}
 		}
 	}
-	_, exists = env["KUBE_CONFIG"]
-	if exists {
-		// do nothing
-		if mg.Verbose() {
-			fmt.Println("KUBE_CONFIG: ", env["KUBE_CONFIG"])
-		}
-		if _, err := os.Stat(env["KUBE_CONFIG"]); err == nil {
-			return nil
-		} else if os.IsNotExist(err) {
-			if mg.Verbose() {
-				fmt.Println("KUBE_CONFIG file not found: ", env["KUBE_CONFIG"], err)
-			}
-		}
-	}
+
 	_, err := exec.LookPath("kind")
 	if err != nil {
 		if mg.Verbose() {
@@ -161,4 +142,21 @@ func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
 		delete(env, "KIND_CLUSTER")
 	}
 	return nil
+}
+
+func envKubeConfigExists(env map[string]string, envVar string) bool {
+	_, exists := env[envVar]
+	if exists {
+		if mg.Verbose() {
+			fmt.Printf("%s: %s\n", envVar, env[envVar])
+		}
+		if _, err := os.Stat(env[envVar]); err == nil {
+			return true
+		} else if os.IsNotExist(err) {
+			if mg.Verbose() {
+				fmt.Printf("%s file not found: %s: %v\n", envVar, env[envVar], err)
+			}
+		}
+	}
+	return false
 }
