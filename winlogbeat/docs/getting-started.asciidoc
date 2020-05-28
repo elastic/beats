@@ -1,10 +1,10 @@
-[[winlogbeat-getting-started]]
-== Get started: install and configure {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
 //TODO: Needs more work. Just getting the build working.
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>{beatname_uc} quick start</titleabbrev>
 ++++
 
 This guide describes how to get started quickly with Windows log collection.
@@ -117,8 +117,8 @@ include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logsta
 [[setup-assets]]
 === Step 5: Set up assets
 
-{beatname_uc} comes with predefined assets for visualizing and parsing your
-data. To load these assets:
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
 <<privileges-to-setup-beats,privileges and roles>> needed to set up
@@ -126,7 +126,19 @@ data. To load these assets:
 
 . From the installation directory, run:
 +
+--
 include::{libbeat-dir}/tab-widgets/setup.asciidoc[tag=win]
+--
+
+This step loads the recommended index template for writing to {es}
+and deploys the sample dashboards for visualizing the data in {kib}.
+
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>> and <<load-kibana-dashboards>>.
+=====
 
 [float]
 [[start]]
@@ -136,6 +148,7 @@ Start the {beatname_uc} service with the following command. If you are accessing
 secured Elasticsearch cluster, make sure you've configured credentials as
 described in <<{beatname_lc}-configuration>>.
 
+// tag::start-step[]
 [source,shell]
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
@@ -152,6 +165,7 @@ this command:
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
+// end::start-step[]
 
 [float]
 ==== Stop {beatname_uc}

@@ -16,7 +16,7 @@ it's not overwritten unless you configure {beatname_uc} to do so.
 
 ifndef::no-output-logstash[]
 NOTE: A connection to {es} is required to load the index template. If
-the output is not {es} (or {ec}), you must
+the output is not {es} (or {ess}), you must
 <<load-template-manually,load the template manually>>. 
 endif::[]
 
@@ -86,7 +86,7 @@ You can omit the `-E` flags if {es} output is already enabled.
 
 
 If you are connecting to a secured {es} cluster, make sure you've
-configured credentials as described in the <<{beatname_lc}-getting-started>>.
+configured credentials as described in the <<{beatname_lc}-installation-configuration>>.
 
 If the host running {beatname_uc} does not have direct connectivity to
 {es}, see <<load-template-manually-alternate>>.

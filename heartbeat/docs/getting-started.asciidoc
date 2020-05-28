@@ -2,11 +2,11 @@
 
 //TODO: Remove release-state definition before merging.
 
-[[heartbeat-getting-started]]
-== Get started: install and configure {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>{beatname_uc} quick start</titleabbrev>
 ++++
 
 This guide describes how to get started quickly collecting uptime data about
@@ -99,8 +99,8 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[setup-assets]]
 === Step 4: Set up assets
 
-{beatname_uc} comes with predefined assets for visualizing and parsing your
-data. To load these assets:
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
 <<privileges-to-setup-beats,privileges needed to set up {beatname_uc}>>.
@@ -117,6 +117,13 @@ The `setup` command loads the recommended index template for writing to {es}.
 It does not install {beatname_uc} dashboards.  Heartbeat dashboards and 
 installation steps are available in the
 https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
+
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>>.
+=====
 
 [float]
 [[start]]
@@ -140,7 +147,7 @@ events to your defined output.
 [[view-data]]
 === Step 6: View your data in {kib}
 
-{beatname_uc} comes with preconfigured dashboards and UIs for visualizing the
+{beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing the
 status of your services. The dashboards are available in the
 https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 

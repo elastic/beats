@@ -1,10 +1,6 @@
 [[beats-reference]]
 == Beats overview
 
-++++
-<titleabbrev>Overview</titleabbrev>
-++++
-
 {beats} are open source data shippers that you install as agents on your
 servers to send operational data to
 https://www.elastic.co/products/elasticsearch[{es}]. Elastic provides {beats}

@@ -32,7 +32,7 @@ a Kibana endpoint, see <<setup-kibana-endpoint>>.
 
 Make sure Kibana is running before you perform this step. If you are accessing a
 secured Kibana instance, make sure you've configured credentials as described in
-the <<{beatname_lc}-getting-started>>.
+the <<{beatname_lc}-installation-configuration>>.
 
 To set up the Kibana dashboards for {beatname_uc}, use the appropriate command
 for your system. The command shown here loads the dashboards from the {beatname_uc}

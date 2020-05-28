@@ -17,7 +17,7 @@ configuration. For detailed documentation and the full list of available
 modules, see <<filebeat-modules>>.
 
 Can't find a module for your log file type? Follow the numbered steps under
-<<filebeat-getting-started>> to set up and configure {beatname_uc} manually.
+<<{beatname_lc}-installation-configuration>> to set up and configure {beatname_uc} manually.
 
 ==== Prerequisites
 

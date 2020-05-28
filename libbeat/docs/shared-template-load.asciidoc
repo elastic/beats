@@ -12,7 +12,7 @@
 
 ifndef::no-output-logstash[]
 NOTE: A connection to {es} is required to load the index template. If
-the output is not {es} (or {ec}), you must
+the output is not {es} (or {ess}), you must
 <<load-template-manually,load the template manually>>. 
 endif::[]
 

@@ -93,7 +93,7 @@ endif::[]
 
 ifeval::["{beatname_lc}"!="metricbeat"]
 . Install {metricbeat} on the same server as {beatname_uc}. To learn how, see
-{metricbeat-ref}/metricbeat-getting-started.html[Get started with {metricbeat}].
+{metricbeat-ref}/metricbeat-installation-configuration.html[Get started with {metricbeat}].
 If you already have {metricbeat} installed on the server, skip this step.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]

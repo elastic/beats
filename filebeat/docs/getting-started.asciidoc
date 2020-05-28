@@ -3,15 +3,15 @@
 
 //TODO: Remove release-state definition before merging.
 
-[[filebeat-getting-started]]
-== Get started: install and configure {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
 //TODO: We need to add a separate topic that provides a summary of the different
 //ways to parse log lines: ingest node, dissect processor, Logstash, etc. That
 //is beyond the scope of a quick start, IMO.
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>{beatname_uc} quick start</titleabbrev>
 ++++
 
 This guide describes how to get started quickly with log collection.
@@ -62,7 +62,7 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 * https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
 * <<running-on-docker,Docker>>
 * <<running-on-kubernetes,Kubernetes>> 
-* <<running-on-cloudfoundry,Cloudfoundry>> 
+* <<running-on-cloudfoundry,Cloud Foundry>> 
 
 [float]
 [[set-connection]]
@@ -73,6 +73,9 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 [float]
 [[enable-modules]]
 === Step 3: Enable and configure data collection modules
+
+// REVIEWERS: I'm intentionally focusing on the module config steps because I
+// feel it represents the fastest getting started experience. 
 
 {beatname_uc} uses modules to collect and parse log data.
 
@@ -115,8 +118,8 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[setup-assets]]
 === Step 4: Set up assets
 
-{beatname_uc} comes with predefined assets for visualizing and parsing your
-data. To load these assets:
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
 <<privileges-to-setup-beats,privileges needed to set up {beatname_uc}>>.
@@ -134,13 +137,17 @@ and deploys the sample dashboards for visualizing the data in {kib}.
 
 This step does not load the ingest pipelines used to parse log lines. By
 default, ingest pipelines are set up automatically the first time you run the
-module and connect to {es}. If you're sending events to {ls}, you need to
-<<load-ingest-pipelines>>.
+module and connect to {es}.
 
-// REVIEWERS: I wonder if we should even mention Logstash in this guide. I think
-// it might be better to have a full topic in the  how-to section that describes
-// how to route events through Logstash (then we could cover all the
-// requirements without exposing users to a product they might not need).
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
+=====
 
 [float]
 [[start]]
@@ -153,7 +160,11 @@ For more information, see <<privileges-to-publish-events>>.
 
 To start {beatname_uc}, run:
 
+// tag::start-step[]
+:requires-sudo:
 include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
+:requires-sudo!:
+// end::start-step[]
 
 {beatname_uc} should begin streaming events to {es}.
 

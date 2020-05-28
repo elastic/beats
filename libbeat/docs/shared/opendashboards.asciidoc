@@ -1,5 +1,5 @@
 // tag::open-dashboards-intro[]
-{beatname_uc} comes with preconfigured dashboards and UIs for visualizing log
+{beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing log
 data. You loaded the dashboards earlier when you ran the `setup` command.
 // end::open-dashboards-intro[]
 

@@ -2,11 +2,11 @@
 
 //TODO: Remove release-state definition before merging.
 
-[[packetbeat-getting-started]]
-== Get started: install and configure {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>{beatname_uc} quick start</titleabbrev>
 ++++
 
 The best way to understand the value of a network packet analytics system like
@@ -30,7 +30,7 @@ and managing it.
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 --
 
-* On non-Linux platforms, {beatname_uc} requires the libpcap packet capture
+* On most platforms, {beatname_uc} requires the libpcap packet capture
 library. Depending on your OS, you might need to install it: 
 +
 --
@@ -155,8 +155,8 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[setup-assets]]
 === Step 4: Set up assets
 
-{beatname_uc} comes with predefined assets for visualizing and parsing your
-data. To load these assets:
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
 <<privileges-to-setup-beats,privileges needed to set up {beatname_uc}>>.
@@ -172,6 +172,13 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 This step loads the recommended index template for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>> and <<load-kibana-dashboards>>.
+=====
+
 [float]
 [[start]]
 === Step 5: Start {beatname_uc}
@@ -183,7 +190,9 @@ For more information, see <<privileges-to-publish-events>>.
 
 To start {beatname_uc}, run:
 
+// tag::start-step[]
 include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
+// end::start-step[]
 
 {beatname_uc} should begin streaming data to {es}.
 

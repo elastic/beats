@@ -11,7 +11,7 @@ See <<configuring-howto-{beatname_lc}>>.
 [role="exclude",id="{beatname_lc}-installation"]
 === Install {beatname_uc}
 
-See <<{beatname_lc}-getting-started>>.
+See <<{beatname_lc}-installation-configuration>>.
 
 //TODO: ^^ Waiting to hear back from Anne B to see which URL (install or gs)
 //provides better SEO. 
@@ -19,6 +19,11 @@ See <<{beatname_lc}-getting-started>>.
 [role="exclude",id="view-kibana-dashboards"]
 === View the sample {kib} dashboards
 
-See <<{beatname_lc}-getting-started>>.
+See <<{beatname_lc}-installation-configuration>>.
+
+[role="exclude",id="{beatname_lc}-getting-started"]
+=== Get started with {beatname_uc}
+
+See <<{beatname_lc}-installation-configuration>>.
 
 //TODO: Remove any internal cross references that point to these IDs.

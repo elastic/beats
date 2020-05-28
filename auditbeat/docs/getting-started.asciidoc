@@ -2,11 +2,11 @@
 
 //TODO: Remove release-state definition before merging.
 
-[id="{beatname_lc}-getting-started"]
-== Get started: install and configure {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>Get started</titleabbrev>
+<titleabbrev>{beatname_uc} quick start</titleabbrev>
 ++++
 
 This guide describes how to get started quickly with audit data collection.
@@ -91,8 +91,8 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[setup-assets]]
 === Step 4: Set up assets
 
-{beatname_uc} comes with predefined assets for visualizing and parsing your
-data. To load these assets:
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
 . Make sure the user specified in +{beatname_lc}.yml+ has the
 <<privileges-to-setup-beats,privileges needed to set up {beatname_uc}>>.
@@ -108,6 +108,13 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 This step loads the recommended index template for writing to {es}
 and deploys the sample dashboards for visualizing the data in {kib}.
 
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>> and <<load-kibana-dashboards>>.
+=====
+
 [float]
 [[start]]
 === Step 5: Start {beatname_uc}
@@ -119,9 +126,12 @@ For more information, see <<privileges-to-publish-events>>.
 
 To start {beatname_uc}, run:
 
+// tag::start-step[]
 include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
+// end::start-step[]
 
 {beatname_uc} should begin streaming events to {es}.
+
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
 
@@ -134,8 +144,8 @@ If you see a warning about too many open files, you need to increase the
 === Step 6: View your data in {kib}
 
 To make it easier for you to start auditing the activities of users and
-processes on your system, {beatname_uc} comes with preconfigured dashboards and
-UIs for visualizing your data.
+processes on your system, {beatname_uc} comes with pre-built {kib} dashboards
+and UIs for visualizing your data.
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 

@@ -13,6 +13,7 @@ the foreground.
 
 // end::initd-note[]
 
+Also see <<running-with-systemd>>.
 // end::deb[]
 
 // tag::rpm[]
@@ -22,6 +23,8 @@ sudo service {beatname_pkg} start
 ----------------------------------------------------------------------
 
 include::start.asciidoc[tag=initd-note]
+
+Also see <<running-with-systemd>>.
 
 // end::rpm[]
 

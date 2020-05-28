@@ -40,7 +40,7 @@ ifdef::serverless[]
 in environment variables.
 endif::[]
 
-. If you plan to use our preconfigured {kib} dashboards, configure the {kib}
+. If you plan to use our pre-built {kib} dashboards, configure the {kib}
 endpoint. Skip this step if {kib} is running on the same host as {es}.
 +
 [source,yaml]

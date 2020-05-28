@@ -12,7 +12,7 @@
 ++++
 
 Before reading this section, see the
-<<{beatname_lc}-getting-started,getting started documentation>> for basic
+<<{beatname_lc}-installation-configuration>> for basic
 installation instructions to get you started.
 
 This section includes additional information on how to install, set up, and run
