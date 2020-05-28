@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-var fake *monitoring.TimeSeries = &monitoring.TimeSeries{
+var fake = &monitoring.TimeSeries{
 	Resource: &monitoredres.MonitoredResource{
 		Type: "gce_instance",
 		Labels: map[string]string{
