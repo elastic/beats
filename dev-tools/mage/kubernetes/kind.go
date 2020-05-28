@@ -48,16 +48,15 @@ func (m *KindIntegrationTestStep) Use(dir string) (bool, error) {
 //
 // If `KUBECONFIG` is already deinfed in the env then it will do nothing.
 func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
-	_, exists := env["KUBECONFIG"]
-	if exists {
-		// do nothing
-		return nil
+
+	envVars := []string{"KUBECONFIG", "KUBE_CONFIG"}
+	for _, envVar := range envVars {
+		exists := envKubeConfigExists(env, envVar)
+		if exists {
+			return nil
+		}
 	}
-	_, exists = env["KUBE_CONFIG"]
-	if exists {
-		// do nothing
-		return nil
-	}
+
 	_, err := exec.LookPath("kind")
 	if err != nil {
 		if mg.Verbose() {
@@ -80,6 +79,9 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 	kubeConfig := filepath.Join(kubeCfgDir, "kubecfg")
+	if mg.Verbose() {
+		fmt.Println("Kubeconfig: ", kubeConfig)
+	}
 	if err := os.MkdirAll(kubeCfgDir, os.ModePerm); err != nil {
 		return err
 	}
@@ -140,4 +142,21 @@ func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
 		delete(env, "KIND_CLUSTER")
 	}
 	return nil
+}
+
+func envKubeConfigExists(env map[string]string, envVar string) bool {
+	_, exists := env[envVar]
+	if exists {
+		if mg.Verbose() {
+			fmt.Printf("%s: %s\n", envVar, env[envVar])
+		}
+		if _, err := os.Stat(env[envVar]); err == nil {
+			return true
+		} else if os.IsNotExist(err) {
+			if mg.Verbose() {
+				fmt.Printf("%s file not found: %s: %v\n", envVar, env[envVar], err)
+			}
+		}
+	}
+	return false
 }
