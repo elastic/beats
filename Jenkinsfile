@@ -990,8 +990,8 @@ def k8sTest(versions){
           withBeatsEnv(false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
             sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
-            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
