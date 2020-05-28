@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
@@ -436,9 +437,13 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
-	// Check if content is gzipped
-	if isS3ObjGzipped(info, *resp) {
-		gzipReader, err := gzip.NewReader(resp.Body)
+	isS3ObjGzipped, err := isStreamGzipped(reader)
+	if err != nil {
+		return errors.Wrap(err, "could not determine if S3 object is gzipped")
+	}
+
+	if isS3ObjGzipped {
+		gzipReader, err := gzip.NewReader(reader)
 		if err != nil {
 			err = errors.Wrapf(err, "gzip.NewReader failed for '%s' from S3 bucket '%s'", info.key, info.name)
 			p.logger.Error(err)
@@ -669,8 +674,16 @@ func (c *s3Context) Inc() {
 	c.refs++
 }
 
-func isS3ObjGzipped(info s3Info, resp s3.GetObjectResponse) bool {
-	return (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") ||
-		(resp.ContentEncoding != nil && *resp.ContentEncoding == "gzip") ||
-		strings.HasSuffix(info.key, ".gz")
+func isStreamGzipped(r *bufio.Reader) (bool, error) {
+	buf, err := r.Peek(512)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+
+	switch http.DetectContentType(buf) {
+	case "application/x-gzip", "application/zip":
+		return true, nil
+	default:
+		return false, nil
+	}
 }
