@@ -455,7 +455,7 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 		gzipReader.Close()
 	}
 
-	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	// Check if expand_event_list_from_field is given with document content-type = "application/json"
 	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
 		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
 		p.logger.Error(err)
