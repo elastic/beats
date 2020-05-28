@@ -18232,6 +18232,9 @@ GCP module
 *`googlecloud.labels`*::
 +
 --
+Google cloud monitoring metrics labels
+
+
 type: object
 
 --
@@ -18378,6 +18381,43 @@ type: long
 +
 --
 Count of packets sent over the network
+
+type: long
+
+--
+
+
+*`googlecloud.compute.instance.memory.balloon.ram_size.value`*::
++
+--
+The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`googlecloud.compute.instance.memory.balloon.ram_used.value`*::
++
+--
+Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`googlecloud.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
++
+--
+The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`googlecloud.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
++
+--
+The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
 
 type: long
 
