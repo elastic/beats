@@ -676,6 +676,10 @@ func (c *s3Context) Inc() {
 	c.refs++
 }
 
+// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
+// stream without consuming it. This makes it convenient for code executed after this function call
+// to consume the stream if it wants.
 func isStreamGzipped(r *bufio.Reader) (bool, error) {
 	// Why 512? See https://godoc.org/net/http#DetectContentType
 	buf, err := r.Peek(512)
