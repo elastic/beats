@@ -14,19 +14,19 @@ To build and install, just run `mage Package`. The build process happens entire 
 
 ## Config Options
 
-| Option               | Description                                                                                                                       |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `hosts`              | The elasticsearch endpoint to connect to. This option is required. Multiple endpoints may be specified and delimited with a `,`   |
-| `user`               | The Elasticsearch User to connect as.                                                                                             |
-| `password`           | The Elasticsearch Password to connect with.                                                                                       |
-| `index`              | The Elasticsearch Index to use. Requires `ilm_enabled` to be false, and `template_name` and `template_pattern` pattern to be set. |
-| `pipeline`           |  The Elasticsearch Pipeline to use.                                                                                               |
-| `backoff_init`       |  The number of seconds to wait before trying to reconnect to Elasticsearch after a network error.                                 |
-| `backoff_max`        |  The maximum number of seconds to wait before attempting to connect to Elasticsearch after a network error.                       |
-| `timeout`            |  The http request timeout in seconds for the Elasticsearch request                                                                |
-| `cloud_id`           | CloudID value.                                                                                                                    |
-| `cloud_auth`         |  CloudID auth.                                                                                                                    |
-| `proxy_url`          | A proxy URL to use.                                                                                                               |
+The Plugin supports a number of Elasticsearch config options:
+
+```
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt endpoint="myhost:9200" \
+           --log-opt user="myusername" \
+           --log-opt password="mypassword" \
+           -it debian:jessie /bin/bash
+```
+
+You can find complete documentation on the [Elastic site](https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-configuration.html).
+
+
 
 ## How it works
 
