@@ -61,8 +61,8 @@ const logSelector = "monitoring"
 
 var errNoMonitoring = errors.New("xpack monitoring not available")
 
-// default monitoring api parameters
-var defaultParams = map[string]string{
+// default x-pack monitoring api parameters
+var defaultXPackParams = map[string]string{
 	"system_id":          "beats",
 	"system_api_version": "7",
 }
@@ -141,13 +141,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		return nil, err
 	}
 
-	params := map[string]string{}
-	for k, v := range defaultParams {
-		params[k] = v
-	}
-	for k, v := range config.Params {
-		params[k] = v
-	}
+	params := makeClientParams(config)
 
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
@@ -388,4 +382,19 @@ func getClusterUUID() string {
 
 	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
 	return snapshot.Strings["cluster_uuid"]
+}
+
+func makeClientParams(config config) map[string]string {
+	params := map[string]string{}
+
+	if config.Format == report.FormatXPackMonitoringBulk {
+		for k, v := range defaultXPackParams {
+			params[k] = v
+		}
+	}
+	for k, v := range config.Params {
+		params[k] = v
+	}
+
+	return params
 }
