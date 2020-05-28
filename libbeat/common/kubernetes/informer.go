@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,11 +51,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nodeSelector(&options, opts)
-				return p.List(options)
+				return p.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nodeSelector(&options, opts)
-				return p.Watch(options)
+				return p.Watch(context.Background(), options)
 			},
 		}
 
@@ -63,10 +64,10 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		e := client.CoreV1().Events(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return e.List(options)
+				return e.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return e.Watch(options)
+				return e.Watch(context.Background(), options)
 			},
 		}
 
@@ -76,11 +77,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nameSelector(&options, opts.Node)
-				return n.List(options)
+				return n.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nameSelector(&options, opts.Node)
-				return n.Watch(options)
+				return n.Watch(context.Background(), options)
 			},
 		}
 
@@ -90,11 +91,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nameSelector(&options, opts.Namespace)
-				return ns.List(options)
+				return ns.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nameSelector(&options, opts.Namespace)
-				return ns.Watch(options)
+				return ns.Watch(context.Background(), options)
 			},
 		}
 
@@ -103,10 +104,10 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		d := client.AppsV1().Deployments(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return d.List(options)
+				return d.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return d.Watch(options)
+				return d.Watch(context.Background(), options)
 			},
 		}
 
@@ -115,10 +116,10 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		rs := client.AppsV1().ReplicaSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return rs.List(options)
+				return rs.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return rs.Watch(options)
+				return rs.Watch(context.Background(), options)
 			},
 		}
 
@@ -127,10 +128,10 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		ss := client.AppsV1().StatefulSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return ss.List(options)
+				return ss.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return ss.Watch(options)
+				return ss.Watch(context.Background(), options)
 			},
 		}
 
@@ -139,10 +140,10 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		svc := client.CoreV1().Services(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return svc.List(options)
+				return svc.List(context.Background(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return svc.Watch(options)
+				return svc.Watch(context.Background(), options)
 			},
 		}
 
