@@ -439,7 +439,9 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	isS3ObjGzipped, err := isStreamGzipped(reader)
 	if err != nil {
-		return errors.Wrap(err, "could not determine if S3 object is gzipped")
+		err = errors.Wrap(err, "could not determine if S3 object is gzipped")
+		p.logger.Error(err)
+		return err
 	}
 
 	if isS3ObjGzipped {
