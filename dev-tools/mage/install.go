@@ -26,21 +26,7 @@ var (
 	GoLicenserImportPath = "github.com/elastic/go-licenser"
 )
 
-// InstallVendored uses go get to install a command from its vendored source
-func InstallVendored(importPath string) error {
-	install := gotool.Install
-	return install(
-		install.Vendored(),
-		install.Package(importPath),
-	)
-}
-
 // InstallGoLicenser target installs go-licenser
 func InstallGoLicenser() error {
-	if UseVendor {
-		return InstallVendored(GoLicenserImportPath)
-	}
-	return gotool.Get(
-		gotool.Get.Package(GoLicenserImportPath),
-	)
+	return gotool.Install(gotool.Install.Package(GoLicenserImportPath))
 }
