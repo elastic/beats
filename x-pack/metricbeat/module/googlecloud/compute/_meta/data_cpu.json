@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "1174463293187628268",
-            "name": "gke-observability-8--observability-8--bc1afd95-ngmh"
+            "id": "7692260917184259934",
+            "name": "instance-test-ks"
         },
         "machine": {
-            "type": "n1-standard-4"
+            "type": "e2-standard-2"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "us-central1-a",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -23,32 +23,48 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 181
+                    "value": 171
                 },
                 "dropped_packets_count": {
-                    "value": 3
+                    "value": 4
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 4
+                        "value": 2
                     },
                     "usage_time": {
-                        "value": 63.478293027728796
+                        "value": 0.1803964574089818
                     },
                     "utilization": {
-                        "value": 0.26449288761553663
+                        "value": 0.001503303811741515
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 7896264704
+                        },
+                        "ram_used": {
+                            "value": 416518144
+                        },
+                        "swap_in_bytes_count": {
+                            "value": 0
+                        },
+                        "swap_out_bytes_count": {
+                            "value": 0
+                        }
                     }
                 },
                 "uptime": {
-                    "value": 60
+                    "value": 60.000000000000455
                 }
             }
         },
         "labels": {
             "user": {
-                "goog-gke-node": ""
+                "created-by": "ks"
             }
         }
     },
