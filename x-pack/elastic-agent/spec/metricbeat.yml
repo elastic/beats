@@ -7,6 +7,7 @@ post_install:
       path: "modules.d/system.yml"
       target: "modules.d/system.yml.disabled"
 rules:
+- fix_stream: {}
 - inject_index:
     type: metrics
 
