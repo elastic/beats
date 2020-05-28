@@ -19,7 +19,6 @@ package k8skeystore
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -60,7 +59,7 @@ func TestGetKeystoreAndRetrieve(t *testing.T) {
 	}
 	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
-		t.Fatalf("failed to create k8s secret", err)
+		t.Fatalf("failed to create k8s secret: %v", err)
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
@@ -68,7 +67,7 @@ func TestGetKeystoreAndRetrieve(t *testing.T) {
 	key := "kubernetes.test_namespace.testing_secret.secret_value"
 	secretVal, err := k1.Retrieve(key)
 	if err != nil {
-		t.Fatalf("could not retrive k8s secret", err)
+		t.Fatalf("could not retrive k8s secret: %v", err)
 	}
 	assert.Equal(t, pass, secretVal)
 }
