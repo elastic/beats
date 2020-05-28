@@ -1,0 +1,822 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package server
+
+import (
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/json"
+	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"io"
+	"net"
+	"sync"
+	"time"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/gofrs/uuid"
+	protobuf "github.com/golang/protobuf/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
+)
+
+const (
+	// InitialCheckinTimeout is the maximum amount of wait time from initial check-in stream to
+	// getting the first check-in observed state.
+	InitialCheckinTimeout = 5 * time.Second
+	// CheckinMinimumTimeoutGracePeriod is additional time added to the client.CheckinMinimumTimeout
+	// to ensure the application is checking in correctly.
+	CheckinMinimumTimeoutGracePeriod = 2 * time.Second
+	// WatchdogCheckLoop is the amount of time that the watchdog will wait between checking for
+	// applications that have not checked in the correct amount of time.
+	WatchdogCheckLoop = 5 * time.Second
+)
+
+var (
+	// ErrApplicationAlreadyRegistered returned when trying to register an application more than once.
+	ErrApplicationAlreadyRegistered = errors.New("application already registered", errors.TypeApplication)
+	// ErrApplicationStopping returned when trying to update an application config but it is stopping.
+	ErrApplicationStopping = errors.New("application stopping", errors.TypeApplication)
+	// ErrApplicationStopTimedOut returned when calling Stop and the application timed out stopping.
+	ErrApplicationStopTimedOut = errors.New("application stopping timed out", errors.TypeApplication)
+	// ErrActionTimedOut returned on PerformAction when the action timed out.
+	ErrActionTimedOut = errors.New("application action timed out", errors.TypeApplication)
+	// ErrActionCancelled returned on PerformAction when an action is cancelled, normally due to the application
+	// being stopped or removed from the server.
+	ErrActionCancelled = errors.New("application action cancelled", errors.TypeApplication)
+)
+
+// ApplicationState represents the applications state according to the server.
+type ApplicationState struct {
+	srv *Server
+	app interface{}
+
+	token string
+	cert *authority.Pair
+
+	pendingExpected chan *proto.StateExpected
+	expected proto.StateExpected_State
+	expectedConfigIdx uint64
+	expectedConfig string
+	status proto.StateObserved_Status
+	statusMessage string
+	statusConfigIdx uint64
+	statusTime time.Time
+	checkinConn bool
+	checkinDone chan bool
+	checkinLock sync.RWMutex
+
+	pendingActions chan *pendingAction
+	sentActions map[string]*sentAction
+	actionsConn bool
+	actionsDone chan bool
+	actionsLock sync.RWMutex
+}
+
+// Handler is the used by the server to inform of status changes.
+type Handler interface {
+	// OnStatusChange called when a registered application observed status is changed.
+	OnStatusChange(*ApplicationState, proto.StateObserved_Status, string)
+}
+
+// Server is the GRPC server that the launched applications connect back to.
+type Server struct {
+	lock sync.RWMutex
+	logger *logger.Logger
+	ca *authority.CertificateAuthority
+	listenAddr string
+	handler Handler
+
+	server *grpc.Server
+	watchdogDone chan bool
+	watchdogWG sync.WaitGroup
+
+	apps map[string]*ApplicationState
+
+	// overridden in tests
+	watchdogCheckInterval time.Duration
+	checkInMinTimeout time.Duration
+}
+
+// New creates a new GRPC server for clients to connect to.
+func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, error) {
+	ca, err := authority.NewCA()
+	if err != nil {
+		return nil, err
+	}
+	return &Server{
+		logger: logger,
+		ca: ca,
+		listenAddr: listenAddr,
+		handler: handler,
+		apps: make(map[string]*ApplicationState),
+		watchdogCheckInterval: WatchdogCheckLoop,
+		checkInMinTimeout: client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
+	}, nil
+}
+
+// Start starts the GRPC endpoint and accepts new connections.
+func (s *Server) Start() error {
+	lis, err := net.Listen("tcp", s.listenAddr)
+	if err != nil {
+		return err
+	}
+	certPool := x509.NewCertPool()
+	if ok := certPool.AppendCertsFromPEM(s.ca.Crt()); !ok {
+		return errors.New("failed to append root CA", errors.TypeSecurity)
+	}
+	creds := credentials.NewTLS(&tls.Config{
+		ClientAuth:     tls.RequireAndVerifyClientCert,
+		ClientCAs:      certPool,
+		GetCertificate: s.getCertificate,
+	})
+	s.server = grpc.NewServer(grpc.Creds(creds))
+	proto.RegisterElasticAgentServer(s.server, s)
+
+	// start serving GRPC connections
+	go func() {
+		err := s.server.Serve(lis)
+		if err != nil {
+			s.logger.Errorf("error listening for GRPC: %s", err)
+		}
+	}()
+
+	// start the watchdog
+	s.watchdogDone = make(chan bool)
+	go s.watchdog()
+
+	return nil
+}
+
+// Stop stops the GRPC endpoint.
+func (s *Server) Stop() {
+	if s.server != nil {
+		close(s.watchdogDone)
+		s.server.Stop()
+		s.server = nil
+		s.watchdogWG.Wait()
+	}
+}
+
+func (s *Server) Get(app interface{}) (*ApplicationState, bool) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	for _, appState := range s.apps {
+		if appState.app == app {
+			return appState, true
+		}
+	}
+	return nil, false
+}
+
+// Register registers a new application to connect to the server.
+func (s *Server) Register(app interface{}, config string) (*ApplicationState, error) {
+	if _, ok := s.Get(app); ok {
+		return nil, ErrApplicationAlreadyRegistered
+	}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	pair, err := s.ca.GeneratePair()
+	if err != nil {
+		return nil, err
+	}
+	appState := &ApplicationState{
+		srv:   s,
+		app:   app,
+		token: id.String(),
+		cert:  pair,
+		pendingExpected: make(chan *proto.StateExpected),
+		expected: proto.StateExpected_RUNNING,
+		expectedConfigIdx: 1,
+		expectedConfig: config,
+		checkinConn: true,
+		status: proto.StateObserved_STARTING,
+		statusConfigIdx: client.InitialConfigIdx,
+		statusTime: time.Now().UTC(),
+		pendingActions: make(chan *pendingAction, 100),
+		actionsConn: true,
+	}
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.apps[appState.token] = appState
+	return appState, nil
+}
+
+// Checkin implements the GRPC bi-direction stream connection for check-ins.
+func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
+	firstCheckinChan := make(chan *proto.StateObserved)
+	go func() {
+		// go func will not be leaked, because when the main function
+		// returns it will close the connection. that will cause this
+		// function to return.
+		observed, err := server.Recv()
+		if err != nil {
+			close(firstCheckinChan)
+			return
+		}
+		firstCheckinChan <- observed
+	}()
+
+	var ok bool
+	var firstCheckin *proto.StateObserved
+	select {
+	case firstCheckin, ok = <-firstCheckinChan:
+		break
+	case <-time.After(InitialCheckinTimeout):
+		// close connection
+		s.logger.Debug("check-in stream never sent initial observed message; closing connection")
+		return nil
+	}
+	if !ok {
+		// close connection
+		return nil
+	}
+	appState, ok := s.getByToken(firstCheckin.Token)
+	if !ok {
+		// no application with token; close connection
+		s.logger.Debug("check-in stream sent an invalid token; closing connection")
+		return status.Error(codes.PermissionDenied, "invalid token")
+	}
+	appState.checkinLock.Lock()
+	if appState.checkinDone != nil {
+		// application is already connected (cannot have multiple); close connection
+		appState.checkinLock.Unlock()
+		s.logger.Debug("check-in stream already exists for application; closing connection")
+		return status.Error(codes.AlreadyExists, "application already connected")
+	}
+	if !appState.checkinConn {
+		// application is being destroyed cannot reconnect; close connection
+		appState.checkinLock.Unlock()
+		s.logger.Debug("check-in stream cannot connect, application is being destroyed; closing connection")
+		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
+	}
+	done := make(chan bool)
+	appState.checkinDone = done
+	appState.checkinLock.Unlock()
+
+	defer func() {
+		appState.checkinLock.Lock()
+		appState.checkinDone = nil
+		appState.checkinLock.Unlock()
+	}()
+
+	// send the config and expected state changes to the applications when
+	// pushed on the channel
+	sendDone := make(chan bool)
+	go func() {
+		defer func() {
+			close(sendDone)
+		}()
+		for {
+			var expected *proto.StateExpected
+			select {
+			case <-done:
+				return
+			case expected = <-appState.pendingExpected:
+			}
+
+			err := server.Send(expected)
+			if err != nil {
+				if reportableErr(err) {
+					s.logger.Debugf("check-in stream failed to send expected state: %s", err)
+				}
+				return
+			}
+		}
+	}()
+
+	// update status after the pendingExpected channel has a reader
+	appState.updateStatus(firstCheckin, true)
+
+	// read incoming state observations from the application and act based on
+	// the servers expected state of the application
+	go func() {
+		for {
+			checkin, err := server.Recv()
+			if err != nil {
+				if reportableErr(err) {
+					s.logger.Debugf("check-in stream failed to receive data: %s", err)
+				}
+				close(done)
+				return
+			}
+			appState.updateStatus(checkin, false)
+		}
+	}()
+
+	<-sendDone
+	return nil
+}
+
+// Actions implements the GRPC bi-direction stream connection for actions.
+func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
+	firstRespChan := make(chan *proto.ActionResponse)
+	go func() {
+		// go func will not be leaked, because when the main function
+		// returns it will close the connection. that will cause this
+		// function to return.
+		observed, err := server.Recv()
+		if err != nil {
+			close(firstRespChan)
+			return
+		}
+		firstRespChan <- observed
+	}()
+
+	var ok bool
+	var firstResp *proto.ActionResponse
+	select {
+	case firstResp, ok = <-firstRespChan:
+		break
+	case <-time.After(InitialCheckinTimeout):
+		// close connection
+		s.logger.Debug("actions stream never sent initial response message; closing connection")
+		return nil
+	}
+	if !ok {
+		// close connection
+		return nil
+	}
+	if firstResp.Id != client.ActionResponseInitID {
+		// close connection
+		s.logger.Debug("actions stream first response message must be an init message; closing connection")
+		return status.Error(codes.InvalidArgument, "initial response must be an init message")
+	}
+	appState, ok := s.getByToken(firstResp.Token)
+	if !ok {
+		// no application with token; close connection
+		s.logger.Debug("actions stream sent an invalid token; closing connection")
+		return status.Error(codes.PermissionDenied, "invalid token")
+	}
+	appState.actionsLock.Lock()
+	if appState.actionsDone != nil {
+		// application is already connected (cannot have multiple); close connection
+		appState.actionsLock.Unlock()
+		s.logger.Debug("actions stream already exists for application; closing connection")
+		return status.Error(codes.AlreadyExists, "application already connected")
+	}
+	if !appState.actionsConn {
+		// application is being destroyed cannot reconnect; close connection
+		appState.actionsLock.Unlock()
+		s.logger.Debug("actions stream cannot connect, application is being destroyed; closing connection")
+		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
+	}
+	done := make(chan bool)
+	appState.actionsDone = done
+	appState.actionsLock.Unlock()
+
+	defer func() {
+		appState.actionsLock.Lock()
+		appState.actionsDone = nil
+		appState.actionsLock.Unlock()
+	}()
+
+	// send the pending actions that need to be performed
+	sendDone := make(chan bool)
+	go func() {
+		defer func() { close(sendDone) }()
+		for {
+			var pending *pendingAction
+			select {
+			case <-done:
+				return
+			case pending = <-appState.pendingActions:
+			}
+
+			if pending.expiresOn.Sub(time.Now().UTC()) <= 0 {
+				// to late action already expired
+				pending.callback(nil, ErrActionTimedOut)
+				continue
+			}
+
+			appState.actionsLock.Lock()
+			err := server.Send(&proto.ActionRequest{
+				Id:     pending.id,
+				Name:   pending.name,
+				Params: pending.params,
+			})
+			if err != nil {
+				// failed to send action; add back to channel to retry on re-connect from the client
+				appState.actionsLock.Unlock()
+				appState.pendingActions <- pending
+				if reportableErr(err) {
+					s.logger.Debugf("failed to send pending action %s (will retry, after re-connect): %s", pending.id, err)
+				}
+				return
+			}
+			appState.sentActions[pending.id] = &sentAction{
+				callback: pending.callback,
+				expiresOn: pending.expiresOn,
+			}
+			appState.actionsLock.Unlock()
+		}
+	}()
+
+	// receive the finished actions
+	go func() {
+		for {
+			response, err := server.Recv()
+			if err != nil {
+				if reportableErr(err) {
+					s.logger.Debugf("actions stream failed to receive data: %s", err)
+				}
+				close(done)
+				return
+			}
+			appState.actionsLock.Lock()
+			action, ok := appState.sentActions[response.Id]
+			if !ok {
+				// nothing to do, unknown action request
+				s.logger.Debugf("actions stream received an unknown action: %s", response.Id)
+				appState.actionsLock.Unlock()
+				continue
+			}
+			delete(appState.sentActions, response.Id)
+			appState.actionsLock.Unlock()
+
+			var result map[string]interface{}
+			err = json.Unmarshal(response.Result, &result)
+			if err != nil {
+				action.callback(nil, err)
+			} else if response.Status == proto.ActionResponse_FAILED {
+				errStr, ok := result["error"]
+				if ok {
+					err = fmt.Errorf("%s", errStr)
+				} else {
+					err = fmt.Errorf("unknown error")
+				}
+				action.callback(nil, err)
+			} else {
+				action.callback(result, nil)
+			}
+		}
+	}()
+
+	<-sendDone
+	return nil
+}
+
+// WriteConnInfo writes the connection information for the application into the writer.
+//
+// Note: If the writer implements io.Closer the writer is also closed.
+func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
+	connInfo := &proto.ConnInfo{
+		Addr:     as.srv.listenAddr,
+		Token:    as.token,
+		CaCert:   as.srv.ca.Crt(),
+		PeerCert: as.cert.Crt,
+		PeerKey:  as.cert.Key,
+	}
+	infoBytes, err := protobuf.Marshal(connInfo)
+	if err != nil {
+		return errors.New(err, "failed to marshal connection information", errors.TypeApplication)
+	}
+	_, err = w.Write(infoBytes)
+	if err != nil {
+		return errors.New(err, "failed to write connection information", errors.TypeApplication)
+	}
+	closer, ok := w.(io.Closer)
+	if ok {
+		_ = closer.Close()
+	}
+	return nil
+}
+
+// Stop instructs the application to stop gracefully within the timeout.
+//
+// Once the application is stopped or the timeout is reached the application is destroyed. Even in the case
+// the application times out during stop and ErrApplication
+func (as *ApplicationState) Stop(timeout time.Duration) error {
+	as.checkinLock.Lock()
+	cfgIdx := as.statusConfigIdx
+	as.expected = proto.StateExpected_STOPPING
+	as.checkinLock.Unlock()
+
+	// send it to the client if its connected, otherwise it will be sent once it connects.
+	as.sendExpectedState(&proto.StateExpected{
+		State:          as.expected,
+		ConfigStateIdx: cfgIdx,
+		Config:         "",
+	}, false)
+
+	started := time.Now().UTC()
+	for {
+		if time.Now().UTC().Sub(started) > timeout {
+			as.Destroy()
+			return ErrApplicationStopTimedOut
+		}
+
+		as.checkinLock.RLock()
+		status := as.status
+		doneChan := as.checkinDone
+		as.checkinLock.RUnlock()
+		if status == proto.StateObserved_STOPPING && doneChan == nil {
+			// sent stopping and now is disconnected (so its stopped)
+			as.Destroy()
+			return nil
+		}
+
+		<-time.After(500 * time.Millisecond)
+	}
+}
+
+// Destroy completely removes the application from the server without sending any stop command to the application.
+//
+// The ApplicationState at this point cannot be used.
+func (as *ApplicationState) Destroy() {
+	as.destroyActionsStream()
+	as.destroyCheckinStream()
+	as.srv.lock.Lock()
+	delete(as.srv.apps, as.token)
+	as.srv.lock.Unlock()
+}
+
+// UpdateConfig pushes an updated configuration to the connected application.
+func (as *ApplicationState) UpdateConfig(config string) error {
+	as.checkinLock.RLock()
+	expected := as.expected
+	currentCfg := as.expectedConfig
+	as.checkinLock.RUnlock()
+	if expected == proto.StateExpected_STOPPING {
+		return ErrApplicationStopping
+	}
+	if config == currentCfg {
+		// already at that expected config
+		return nil
+	}
+
+	as.checkinLock.Lock()
+	idx := as.expectedConfigIdx + 1
+	as.expectedConfigIdx = idx
+	as.expectedConfig = config
+	as.checkinLock.Unlock()
+
+	// send it to the client if its connected, otherwise it will be sent once it connects.
+	as.sendExpectedState(&proto.StateExpected{
+		State:          as.expected,
+		ConfigStateIdx: idx,
+		Config:         as.expectedConfig,
+	}, false)
+	return nil
+}
+
+// PerformAction synchronously performs an action on the application.
+func (as *ApplicationState) PerformAction(name string, params map[string]interface{}, timeout time.Duration) (map[string]interface{}, error) {
+	paramBytes, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
+	resChan := make(chan actionResult)
+	as.pendingActions <- &pendingAction{
+		id: id.String(),
+		name:   name,
+		params: paramBytes,
+		callback: func(m map[string]interface{}, err error) {
+			resChan <- actionResult{
+				result: m,
+				err:    err,
+			}
+		},
+		expiresOn: time.Now().UTC().Add(timeout),
+	}
+	res := <-resChan
+	return res.result, res.err
+}
+
+// updateStatus updates the current observed status from the application, sends the expected state back to the
+// application if the server expects it to be different then its observed state, and alerts the handler on the
+// server when the application status has changed.
+func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForReader bool) {
+	as.checkinLock.Lock()
+	prevStatus := as.status
+	prevMessage := as.statusMessage
+	as.status = checkin.Status
+	as.statusMessage = checkin.Message
+	as.statusConfigIdx = checkin.ConfigStateIdx
+	as.statusTime = time.Now().UTC()
+	as.checkinLock.Unlock()
+
+	var expected *proto.StateExpected
+	if as.expected == proto.StateExpected_STOPPING && checkin.Status != proto.StateObserved_STOPPING {
+		expected = &proto.StateExpected{
+			State: as.expected,
+			ConfigStateIdx: as.statusConfigIdx,  // stopping always inform that the config it has is correct
+			Config: "",
+		}
+	} else if checkin.ConfigStateIdx != as.expectedConfigIdx {
+		expected = &proto.StateExpected{
+			State:          as.expected,
+			ConfigStateIdx: as.expectedConfigIdx,
+			Config:         as.expectedConfig,
+		}
+	}
+	if expected != nil {
+		as.sendExpectedState(expected, waitForReader)
+	}
+
+	// alert the service handler that status has changed for the application
+	if prevStatus != checkin.Status || prevMessage != checkin.Message {
+		as.srv.handler.OnStatusChange(as, checkin.Status, checkin.Message)
+	}
+}
+
+// sendExpectedState sends the expected status over the pendingExpected channel if the other side is
+// waiting for a message.
+func (as *ApplicationState) sendExpectedState(expected *proto.StateExpected, waitForReader bool) {
+	if waitForReader {
+		as.pendingExpected <- expected
+		return
+	}
+
+	select {
+	case as.pendingExpected <- expected:
+	default:
+		return
+	}
+}
+
+// destroyActionsStream disconnects the actions stream (prevent reconnect), cancel all pending actions
+func (as *ApplicationState) destroyActionsStream() {
+	as.actionsLock.Lock()
+	as.actionsConn = false
+	if as.actionsDone != nil {
+		close(as.actionsDone)
+		as.actionsDone = nil
+	}
+	as.actionsLock.Unlock()
+	as.cancelActions()
+}
+
+// flushExpiredActions flushes any expired actions from the pending channel or current processing.
+func (as *ApplicationState) flushExpiredActions() {
+	now := time.Now().UTC()
+	pendingActions := make([]*pendingAction, 0, len(as.pendingActions))
+	for {
+		done := false
+		select {
+		case pending := <-as.pendingActions:
+			pendingActions = append(pendingActions, pending)
+		default:
+			done = true
+		}
+		if done {
+			break
+		}
+	}
+	for _, pending := range pendingActions {
+		if pending.expiresOn.Sub(now) <= 0 {
+			pending.callback(nil, ErrActionTimedOut)
+		} else {
+			as.pendingActions <- pending
+		}
+	}
+	as.actionsLock.Lock()
+	for id, pendingResp := range as.sentActions {
+		if pendingResp.expiresOn.Sub(now) <= 0 {
+			delete(as.sentActions, id)
+			pendingResp.callback(nil, ErrActionTimedOut)
+		}
+	}
+	as.actionsLock.Unlock()
+}
+
+// cancelActions cancels all pending or currently processing actions.
+func (as *ApplicationState) cancelActions() {
+	for {
+		done := false
+		select {
+		case pending := <-as.pendingActions:
+			pending.callback(nil, ErrActionCancelled)
+		default:
+			done = true
+		}
+		if done {
+			break
+		}
+	}
+	as.actionsLock.Lock()
+	for id, pendingResp := range as.sentActions {
+		delete(as.sentActions, id)
+		pendingResp.callback(nil, ErrActionCancelled)
+	}
+	as.actionsLock.Unlock()
+}
+
+// destroyCheckinStream disconnects the check stream (prevent reconnect).
+func (as *ApplicationState) destroyCheckinStream() {
+	as.checkinLock.Lock()
+	as.checkinConn = false
+	if as.checkinDone != nil {
+		close(as.checkinDone)
+		as.checkinDone = nil
+	}
+	as.checkinLock.Unlock()
+}
+
+// watchdog ensures that the current applications are checking in during the correct intervals of time.
+func (s *Server) watchdog() {
+	s.watchdogWG.Add(1)
+	defer s.watchdogWG.Done()
+	for {
+		select {
+		case <-s.watchdogDone:
+			return
+		case <-time.After(s.watchdogCheckInterval):
+		}
+
+		s.lock.RLock()
+		now := time.Now().UTC()
+		for _, serverApp := range s.apps {
+			serverApp.checkinLock.RLock()
+			statusTime := serverApp.statusTime
+			serverApp.checkinLock.RUnlock()
+			if now.Sub(statusTime) > s.checkInMinTimeout {
+				serverApp.checkinLock.Lock()
+				if serverApp.status == proto.StateObserved_DEGRADED {
+					serverApp.status = proto.StateObserved_FAILED
+					serverApp.statusTime = now
+				} else if serverApp.status != proto.StateObserved_FAILED {
+					serverApp.status = proto.StateObserved_DEGRADED
+					serverApp.statusTime = now
+				}
+				serverApp.checkinLock.Unlock()
+			}
+			serverApp.actionsLock.RLock()
+			actionsDone := serverApp.actionsDone
+			serverApp.actionsLock.RUnlock()
+			if actionsDone == nil {
+				// actions stream is disconnected; flush any expired actions
+				serverApp.flushExpiredActions()
+			}
+		}
+		s.lock.RUnlock()
+	}
+}
+
+// getByToken returns an application state by its token.
+func (s *Server) getByToken(token string) (*ApplicationState, bool) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	a, ok := s.apps[token]
+	return a, ok
+}
+
+// getCertificate returns the TLS certificate based on the clientHello or errors if not found.
+func (s *Server) getCertificate(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	for _, serverApp := range s.apps {
+		if err := clientHello.SupportsCertificate(serverApp.cert.Certificate); err == nil {
+			return serverApp.cert.Certificate, nil
+		}
+	}
+	return nil, errors.New("no supported TLS certificate", errors.TypeSecurity)
+}
+
+type pendingAction struct {
+	id string
+	name string
+	params []byte
+	callback func(map[string]interface{}, error)
+	expiresOn time.Time
+}
+
+type sentAction struct {
+	callback func(map[string]interface{}, error)
+	expiresOn time.Time
+}
+
+type actionResult struct {
+	result map[string]interface{}
+	err error
+}
+
+func reportableErr(err error) bool {
+	if err == io.EOF {
+		return false
+	}
+	s, ok := status.FromError(err)
+	if !ok {
+		return true
+	}
+	if s.Code() == codes.Canceled {
+		return false
+	}
+	return true
+}

@@ -32,6 +32,7 @@ type CertificateAuthority struct {
 type Pair struct {
 	Crt []byte
 	Key []byte
+	Certificate *tls.Certificate
 }
 
 // NewCA creates a new certificate authority capable of generating child certificates
@@ -134,9 +135,16 @@ func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
 		return nil, errors.New(err, "generating private key", errors.TypeSecurity)
 	}
 
+	// TLS Certificate
+	tlsCert, err := tls.X509KeyPair(certOut.Bytes(), keyOut.Bytes())
+	if err != nil {
+		return nil, errors.New(err, "creating TLS certificate", errors.TypeSecurity)
+	}
+
 	return &Pair{
 		Crt: certOut.Bytes(),
 		Key: keyOut.Bytes(),
+		Certificate: &tlsCert,
 	}, nil
 }
 
