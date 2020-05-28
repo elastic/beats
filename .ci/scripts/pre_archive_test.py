@@ -15,4 +15,4 @@ if __name__ == "__main__":
         dirs[:] = [d for d in dirs if d not in EXCLUDE]
         if root.endswith(('build')) and not root.startswith(('./build')):
             dest = os.path.join('build', root.replace('./', ''))
-            distutils.dir_util.copy_tree(root, dest)
+            distutils.dir_util.copy_tree(root, dest, preserve_symlinks=1)

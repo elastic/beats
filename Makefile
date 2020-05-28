@@ -165,14 +165,6 @@ python-env:
 test-apm:
 	sh ./script/test_apm.sh
 
-### CI specific ####
-
-## prepare-archive-test : Move the test output to the top level .build folder
-.PHONY: prepare-archive-test
-prepare-archive-test: python-env
-	@${PYTHON_ENV_EXE} .ci/scripts/pre_archive_test.py .
-
-
 ### Packaging targets ####
 
 ## snapshot : Builds a snapshot release.

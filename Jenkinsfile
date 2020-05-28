@@ -848,7 +848,8 @@ def withBeatsEnv(boolean archive, Closure body) {
       } finally {
         if (archive) {
           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-            sh(label: 'Prepare test output', script: 'make prepare-archive-test')
+            fixPermissions("${WORKSPACE}")
+            sh(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
             dir('build') {
               junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: '**/build/TEST*.xml')
               archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
