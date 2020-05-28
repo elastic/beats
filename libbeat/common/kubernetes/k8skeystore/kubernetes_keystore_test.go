@@ -18,9 +18,14 @@
 package k8skeystore
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -35,32 +40,31 @@ func TestGetKeystore(t *testing.T) {
 	assert.NotEqual(t, k2, k3)
 }
 
-// TODO: upgrade client dependency and use fake client to test retrieve
-//func TestGetKeystoreAndRetrieve(t *testing.T) {
-//	client := k8sfake.NewSimpleClientset()
-//	ns := "test_namespace"
-//	pass := "testing_passpass"
-//	secret := &v1.Secret{
-//		TypeMeta: metav1.TypeMeta{
-//			Kind:       "Secret",
-//			APIVersion: "apps/v1beta1",
-//		},
-//		ObjectMeta: metav1.ObjectMeta{
-//			Name:      "testing_secret",
-//			Namespace: ns,
-//		},
-//		Data: map[string][]byte{
-//			"secret_value": []byte(pass),
-//		},
-//	}
-//	client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
-//
-//	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
-//	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
-//	key := "kubernetes.test_namespace.testing_secret.secret_value"
-//	secretVal, err := k1.Retrieve(key)
-//	if err != nil {
-//		t.Fatalf("could not retrive k8s secret", err)
-//	}
-//	assert.Equal(t, pass, secretVal)
-//}
+func TestGetKeystoreAndRetrieve(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+
+	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace.testing_secret.secret_value"
+	secretVal, err := k1.Retrieve(key)
+	if err != nil {
+		t.Fatalf("could not retrive k8s secret", err)
+	}
+	assert.Equal(t, pass, secretVal)
+}
