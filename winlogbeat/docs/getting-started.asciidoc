@@ -4,7 +4,7 @@
 //TODO: Needs more work. Just getting the build working.
 
 ++++
-<titleabbrev>{beatname_uc} quick start</titleabbrev>
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
 This guide describes how to get started quickly with Windows log collection.

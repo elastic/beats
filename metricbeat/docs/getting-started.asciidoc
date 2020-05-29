@@ -2,7 +2,7 @@
 == {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>{beatname_uc} quick start</titleabbrev>
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
 {beatname_uc} helps you monitor your servers and the services they host by

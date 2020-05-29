@@ -2,7 +2,7 @@
 == {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>{beatname_uc} quick start</titleabbrev>
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
 The best way to understand the value of a network packet analytics system like

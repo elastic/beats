@@ -2,7 +2,7 @@
 == {beatname_uc} quick start: installation and configuration
 
 ++++
-<titleabbrev>{beatname_uc} quick start</titleabbrev>
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
 This guide describes how to get started quickly with audit data collection.
