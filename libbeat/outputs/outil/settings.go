@@ -21,34 +21,47 @@ type Settings struct {
 	Case SelectorCase
 }
 
+// SelectorCase is used to configure a Selector output string casing.
+// Use SelectorLowerCase or SelectorUpperCase to enforce the Selector to
+// always generate lower case or upper case strings.
 type SelectorCase uint8
 
 const (
+	// SelectorKeepCase instructs the Selector to not modify the string output.
 	SelectorKeepCase SelectorCase = iota
+
+	// SelectorLowerCase instructs the Selector to always transform the string output to lower case only.
 	SelectorLowerCase
+
+	// SelectorUpperCase instructs the Selector to always transform the string output to upper case only.
 	SelectorUpperCase
 )
 
+// WithKey returns a new Settings struct with updated `Key` setting.
 func (s Settings) WithKey(key string) Settings {
 	s.Key = key
 	return s
 }
 
+// WithMultiKey returns a new Settings struct with updated `MultiKey` setting.
 func (s Settings) WithMultiKey(key string) Settings {
 	s.MultiKey = key
 	return s
 }
 
+// WithEnableSingleOnly returns a new Settings struct with updated `EnableSingleOnly` setting.
 func (s Settings) WithEnableSingleOnly(b bool) Settings {
 	s.EnableSingleOnly = b
 	return s
 }
 
+// WithFailEmpty returns a new Settings struct with updated `FailEmpty` setting.
 func (s Settings) WithFailEmpty(b bool) Settings {
 	s.FailEmpty = b
 	return s
 }
 
+// WithSelectorCase returns a new Settings struct with updated `Case` setting.
 func (s Settings) WithSelectorCase(c SelectorCase) Settings {
 	s.Case = c
 	return s
