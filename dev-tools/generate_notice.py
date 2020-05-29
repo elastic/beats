@@ -434,7 +434,6 @@ ACCEPTED_LICENSES = [
     "MPL-2.0",
     "UPL-1.0",
     "ISC",
-    "UNKNOWN",
 ]
 SKIP_NOTICE = []
 

@@ -58,7 +58,7 @@ func TestGetKeystoreAndRetrieve(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s secret: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestGetKeystoreAndRetrieveWithNonAllowedNamespace(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s secret: %v", err)
 	}
@@ -124,7 +124,7 @@ func TestGetKeystoreAndRetrieveWithWrongKeyFormat(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s secret: %v", err)
 	}
@@ -166,7 +166,7 @@ func TestGetKeystoreAndRetrieveWithWrongSecretName(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s secret: %v", err)
 	}
@@ -196,7 +196,7 @@ func TestGetKeystoreAndRetrieveWithWrongSecretValue(t *testing.T) {
 			"secret_value": []byte(pass),
 		},
 	}
-	_, err := client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s secret: %v", err)
 	}
