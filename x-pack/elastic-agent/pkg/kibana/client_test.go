@@ -43,6 +43,7 @@ func TestPortDefaults(t *testing.T) {
 		ExpectedPort   int
 		ExpectedScheme string
 	}{
+		{"no scheme uri", "test.url", kibanaPort, "http"},
 		{"default kibana port", "http://test.url", kibanaPort, "http"},
 		{"specified kibana port", "http://test.url:123", 123, "http"},
 		{"default kibana https port", "https://test.url", kibanaHTTPSPort, "https"},
