@@ -8,6 +8,7 @@ package pkg
 
 import (
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,6 +20,10 @@ import (
 )
 
 func TestData(t *testing.T) {
+	if runtime.GOOS == "darwin" {
+		t.Skip("FIXME")
+	}
+
 	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
