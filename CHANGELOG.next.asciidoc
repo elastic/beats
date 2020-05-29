@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+- Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 
 *Auditbeat*
 
