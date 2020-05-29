@@ -69,9 +69,10 @@ func TestHomebrew(t *testing.T) {
 }
 
 func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
+	t.Helper()
 	value, err := event.GetValue(fieldName)
-	if assert.NoError(t, err) {
-		assert.Equal(t, fieldValue, value)
+	if assert.NoError(t, err, "checking field %s", fieldName) {
+		assert.Equal(t, fieldValue, value, "checking field %v", fieldName)
 	}
 }
 
