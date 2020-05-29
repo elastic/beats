@@ -45,7 +45,7 @@ func TestPortDefaults(t *testing.T) {
 	}{
 		{"default kibana port", "http://test.url", kibanaPort, "http"},
 		{"specified kibana port", "http://test.url:123", 123, "http"},
-		{"default kibana https port", "https://test.url", kibanaHttpsPort, "https"},
+		{"default kibana https port", "https://test.url", kibanaHTTPSPort, "https"},
 		{"specified kibana https port", "https://test.url:123", 123, "https"},
 	}
 	for _, tc := range testCases {

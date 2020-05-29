@@ -23,7 +23,7 @@ import (
 
 const (
 	kibanaPort      = 5601
-	kibanaHttpsPort = 443
+	kibanaHTTPSPort = 443
 )
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
@@ -149,7 +149,7 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 
 	usedDefaultPort := kibanaPort
 	if cfg.Protocol == "https" {
-		usedDefaultPort = kibanaHttpsPort
+		usedDefaultPort = kibanaHTTPSPort
 	}
 
 	kibanaURL, err := common.MakeURL(string(cfg.Protocol), p, cfg.Host, usedDefaultPort)
