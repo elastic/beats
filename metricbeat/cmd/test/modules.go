@@ -91,6 +91,7 @@ func newPublisher() *publisher {
 	return &publisher{pipeline.NewNilPipeline()}
 }
 
+// SetACKHandler is a dummy implementation of the ack handler for the test publisher.
 func (*publisher) SetACKHandler(beat.PipelineACKHandler) error {
 	return nil
 }
