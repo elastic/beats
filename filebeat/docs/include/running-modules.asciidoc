@@ -11,7 +11,7 @@ If you're running our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}] on
 {ecloud}, or you've enabled security in {es} and {kib}, you need to specify
 additional connection information before setting up and running the module. See
-<<filebeat-modules-quickstart>> for the complete setup.
+<<{beatname_lc}-installation-configuration>> for the complete setup.
 
 To set up and run the module:
 

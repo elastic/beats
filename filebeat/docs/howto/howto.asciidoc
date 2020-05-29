@@ -5,10 +5,12 @@
 --
 Learn how to perform common {beatname_uc} configuration tasks.
 
-* <<configuration-filebeat-modules>>
+* <<override-{beatname_lc}-config-settings>
+* <<configuration-{beatname_lc}-modules>>
 * <<{beatname_lc}-template>>
 * <<change-index-name>>
 * <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
 * <<{beatname_lc}-geoip>>
 * <<{beatname_lc}-deduplication>>
 * <<configuring-ingest-node>>
@@ -18,6 +20,8 @@ Learn how to perform common {beatname_uc} configuration tasks.
 
 --
 
+include::override-config-settings.asciidoc[]
+
 include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
 
 include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
@@ -25,6 +29,8 @@ include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
 include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
 include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
+
+include::load-ingest-pipelines.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 

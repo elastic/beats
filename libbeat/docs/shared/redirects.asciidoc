@@ -13,9 +13,6 @@ See <<configuring-howto-{beatname_lc}>>.
 
 See <<{beatname_lc}-installation-configuration>>.
 
-//TODO: ^^ Waiting to hear back from Anne B to see which URL (install or gs)
-//provides better SEO. 
-
 [role="exclude",id="view-kibana-dashboards"]
 === View the sample {kib} dashboards
 
@@ -26,4 +23,12 @@ See <<{beatname_lc}-installation-configuration>>.
 
 See <<{beatname_lc}-installation-configuration>>.
 
-//TODO: Remove any internal cross references that point to these IDs.
+ifeval::["{beatname_lc}"=="filebeat"]
+
+[role="exclude",id="{beatname_lc}-modules-quickstart"]
+=== Quick start: modules for common log formats
+
+See <<{beatname_lc}-installation-configuration>>.
+
+//TODO: Remove any internal cross references that point to these IDs, set up
+//redirects, then delete this file.

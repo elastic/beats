@@ -26,8 +26,8 @@ behavior of the modules, and you can specify
 <<advanced-settings,advanced settings>> to override input settings.
 
 Before running {beatname_uc} with modules enabled, make sure you also set up the
-environment to use Kibana dashboards. See <<{beatname_lc}-modules-quickstart>> for
-more information.
+environment to use Kibana dashboards. See
+<<{beatname_lc}-installation-configuration>> for more information.
 
 [float]
 [[enable-modules-d-configs]]

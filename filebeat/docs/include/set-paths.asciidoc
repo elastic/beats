@@ -1,3 +1,4 @@
+//REVIEWERS: This content has moved to override-config-settings.asciidoc.
 Each module and fileset has variables that you can set to change the default
 behavior of the module, including the paths where the module looks for log
 files. You can set the path in the configuration or from the command line. For

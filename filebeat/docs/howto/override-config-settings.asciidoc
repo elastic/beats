@@ -1,0 +1,86 @@
+[id="override-{beatname_lc}-config-settings"]
+== Override configuration settings at the command line
+
+NOTE: If you're running {beatname_uc} as a service, you can't specify
+command-line flags. To specify flags, start {beatname_uc} in the foreground.
+
+You can override any configuration setting from the command line by using flags:
+
+`-E, --E "SETTING_NAME=VALUE"`::
+Overrides a specific configuration setting. 
+`-M, --M "VAR_NAME=VALUE"`::
+Overrides the default configuration for a module. 
+
+You can specify multiple overrides. Overrides are applied to the currently
+running {beatname_uc} process. The {beatname_uc} configuration file is not
+changed.
+
+The following sections show examples.
+
+[float]
+=== Override configuration settings
+
+Use the `-E` flag to override any setting in the configuration.
+
+//TODO: Add more detail here. Add example that shows how to override the input
+// settings
+
+[float]
+=== Override module settings
+
+Use the `M` flag to override module configuration settings.
+
+For example, the following configuration sets the path to access logs:
+
+[source,yaml]
+----
+- module: nginx
+  access:
+    var.paths: ["/var/log/nginx/access.log*"] <1> 
+----
+<1> Sets the path for `nginx` access log files.
+
+To override this setting from the command line, use the `-M` flag. The variable
+name must include the module and fileset name. For example:
+
+//TODO: Convert this section to use platform tabs.
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e -M "nginx.access.var.paths=[/var/log/nginx/access.log*]"
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe -e -M "nginx.access.var.paths=[c:/programdata/nginx/logs/*access.log*]"
+----
+
+You can specify multiple overrides. Each override must start with `-M`. 
+
+For information about specific variables that you can set for each fileset,
+see the <<{beatname_lc}-modules,documentation for the modules>>.
