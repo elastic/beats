@@ -30,7 +30,7 @@ func ConfiguredModules(modulesData []*common.Config, configModulesData *common.C
 	var modules []*Wrapper
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, mb.Registry, nil)
+		module, err := NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
