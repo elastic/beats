@@ -117,12 +117,12 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
-	//Load default indexer configs
+	//Load and append default indexer configs
 	if config.DefaultIndexers.Enabled {
 		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
 	}
 
-	//Load default matcher configs
+	//Load and append default matcher configs
 	if config.DefaultMatchers.Enabled {
 		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
 	}
