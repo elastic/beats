@@ -853,6 +853,11 @@ def withBeatsEnv(boolean archive, Closure body) {
             dir('build') {
               junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: '**/build/TEST*.xml')
               archiveArtifacts(allowEmptyArchive: true, artifacts: '**/build/TEST*.out')
+              catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
+                sh(label: 'Find', script: '''
+                pwd
+                find . -path ./python-env -prune -o -type f''')
+              }
             }
           }
         }
