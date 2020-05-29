@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -115,22 +116,9 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 		}
 	}()
 
-	checkNodeReadyAttempts := 10
-	connectionAttempts := 1
-	for {
-		err := KubectlWait(env, stdOut, stdErr, "condition=ready", "pod", "app=kube-state-metrics")
-		if err != nil {
-			if mg.Verbose() {
-				fmt.Println("Kube-state-metrics is not ready yet...retrying")
-			}
-		} else {
-			break
-		}
-		if connectionAttempts > checkNodeReadyAttempts {
-			return errors.Wrapf(err, "Timeout waiting for kube-state-metrics")
-		}
-		time.Sleep(3 * time.Second)
-		connectionAttempts += 1
+	err = waitKubeStateMetricsReadiness(env, stdOut, stdErr)
+	if err != nil {
+		return err
 	}
 
 	// Pass all environment variables inside the pod, except for KUBECONFIG as the test
@@ -159,6 +147,29 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 // InsideTest performs the tests inside of environment.
 func (d *KubernetesIntegrationTester) InsideTest(test func() error) error {
 	return test()
+}
+
+// waitKubeStateMetricsReadiness waits until kube-state-metrics Pod is ready to receive requests
+func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writer) error {
+	checkKubeStateMetricsReadyAttempts := 10
+	readyAttempts := 1
+	for {
+		err := KubectlWait(env, stdOut, stdErr, "condition=ready", "pod", "app=kube-state-metrics")
+		if err != nil {
+			if mg.Verbose() {
+				fmt.Println("Kube-state-metrics is not ready yet...retrying")
+			}
+		} else {
+			break
+		}
+		if readyAttempts > checkKubeStateMetricsReadyAttempts {
+			return errors.Wrapf(err, "Timeout waiting for kube-state-metrics")
+		}
+		time.Sleep(6 * time.Second)
+		readyAttempts += 1
+	}
+	// kube-state-metrics ready, return with no error
+	return nil
 }
 
 // kubernetesPodName returns the pod name to use with kubernetes.
