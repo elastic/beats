@@ -21,7 +21,7 @@ import (
 
 func TestData(t *testing.T) {
 	if runtime.GOOS == "darwin" {
-		t.Skip("FIXME")
+		t.Skip("FIXME: https://github.com/elastic/beats/issues/18855")
 	}
 
 	defer abtest.SetupDataDir(t)()
