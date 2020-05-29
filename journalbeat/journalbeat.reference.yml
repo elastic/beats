@@ -18,6 +18,11 @@ journalbeat.inputs:
   # When empty starts to read from local journal.
 - paths: []
 
+  # An optional unique identifier for the input. By providing a unique `id` you
+  # can operate multiple inputs on the same journal. This allows each input's
+  # cursor to be persisted independently in the registry file.
+  #id: ""
+
   # The number of seconds to wait before trying to read again from journals.
   #backoff: 1s
   # The maximum number of seconds to wait before attempting to read again from journals.
@@ -671,6 +676,17 @@ output.elasticsearch:
   # until all events are published. The default is 3.
   #max_retries: 3
 
+  # The number of seconds to wait before trying to republish to Kafka
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to republish. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful publish, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to republish to
+  # Kafka after a network error. The default is 60s.
+  #backoff.max: 60s
+
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
@@ -1230,6 +1246,11 @@ logging.files:
 
 # Set to true to log messages in JSON format.
 #logging.json: false
+
+# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
+# information. Recommended to use in combination with `logging.json=true`
+# Defaults to false.
+#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Journalbeat can export internal metrics to a central Elasticsearch monitoring

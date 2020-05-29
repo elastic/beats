@@ -18,7 +18,7 @@ func NewMonitor() *Monitor {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(_ string, _ string, args []string) []string {
+func (b *Monitor) EnrichArgs(_ string, _ string, args []string, _ bool) []string {
 	return args
 }
 

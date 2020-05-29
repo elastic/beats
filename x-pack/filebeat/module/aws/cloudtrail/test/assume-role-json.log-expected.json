@@ -34,6 +34,9 @@
         "source.geo.region_iso_code": "CN-CQ",
         "source.geo.region_name": "Chongqing",
         "source.ip": "123.145.67.89",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "AROAIN5ATK5U7KEXAMPLE:JohnRole1",
         "user_agent.device.name": "Spider",
         "user_agent.name": "aws-cli",

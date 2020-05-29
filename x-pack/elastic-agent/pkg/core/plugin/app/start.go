@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 	"unicode"
@@ -37,7 +38,7 @@ type stateClient interface {
 }
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -82,7 +83,10 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	}
 
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
-	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args)
+
+	// use separate file
+	isSidecar := IsSidecar(t)
+	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args, isSidecar)
 
 	// specify beat name to avoid data lock conflicts
 	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
@@ -110,7 +114,7 @@ func (a *Application) Start(ctx context.Context, cfg map[string]interface{}) (er
 	a.state.Status = state.Running
 
 	// setup watcher
-	a.watch(ctx, a.state.ProcessInfo.Process, cfg)
+	a.watch(ctx, t, a.state.ProcessInfo.Process, cfg)
 
 	return nil
 }
@@ -319,7 +323,7 @@ func (a *Application) configureByFile(spec *ProcessSpec, config map[string]inter
 	defer f.Close()
 
 	// change owner
-	if err := os.Chown(filePath, a.uid, a.gid); err != nil {
+	if err := changeOwner(filePath, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -382,4 +386,13 @@ func isWindowsPath(path string) bool {
 		return false
 	}
 	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
+}
+
+func changeOwner(path string, uid, gid int) error {
+	if runtime.GOOS == "windows" {
+		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
+		return nil
+	}
+
+	return os.Chown(path, uid, gid)
 }

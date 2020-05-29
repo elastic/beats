@@ -208,3 +208,7 @@ processors:
         - zeek.dns.auth
         - zeek.dns.addl
         - zeek.dns.ts
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

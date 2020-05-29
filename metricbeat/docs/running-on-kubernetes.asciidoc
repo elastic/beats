@@ -118,7 +118,7 @@ NOTE: `kubelet-service-ca.crt` can be any CA bundle that contains the issuer of 
 According to each specific installation of Openshift this can be found either in `secrets` or in `configmaps`.
 In some installations it can be available as part of the service account secret, in
 `/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt`.
-In case of using Openshift installer[https://github.com/openshift/installer/blob/master/docs/user/gcp/install.md]
+In case of using https://github.com/openshift/installer/blob/master/docs/user/gcp/install.md[Openshift installer]
 for GCP then the following `configmap` can be mounted in Metricbeat Pod and use `ca-bundle.crt`
 in `ssl.certificate_authorities`:
 +

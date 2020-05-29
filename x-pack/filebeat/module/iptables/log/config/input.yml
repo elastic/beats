@@ -51,3 +51,7 @@ processors:
         icmp_type: iptables.icmp.type
         icmp_code: iptables.icmp.code
 {{ end}}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

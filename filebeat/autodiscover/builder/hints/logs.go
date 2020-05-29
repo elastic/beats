@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -70,7 +72,7 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create config based on input hints in the bus event
-func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
+func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var hints common.MapStr
 	hIface, ok := event["hints"]
 	if ok {
@@ -109,7 +111,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, false)
+		return template.ApplyConfigTemplate(event, configs)
 	}
 
 	tempCfg := common.MapStr{}
@@ -163,7 +165,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 	logp.Debug("hints.builder", "generated config %+v", config)
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, []*common.Config{config}, false)
+	return template.ApplyConfigTemplate(event, []*common.Config{config})
 }
 
 func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {

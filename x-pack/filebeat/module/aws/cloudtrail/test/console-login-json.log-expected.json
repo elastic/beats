@@ -27,6 +27,9 @@
         "service.type": "aws",
         "source.address": "192.0.2.110",
         "source.ip": "192.0.2.110",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "AIDACKCEVSQ6C2EXAMPLE",
         "user.name": "JohnDoe",
         "user_agent.device.name": "Other",
@@ -66,6 +69,9 @@
         "service.type": "aws",
         "source.address": "192.0.2.100",
         "source.ip": "192.0.2.100",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "AIDACKCEVSQ6C2EXAMPLE",
         "user.name": "JaneDoe",
         "user_agent.device.name": "Other",
@@ -111,6 +117,9 @@
         "service.type": "aws",
         "source.address": "192.0.2.100",
         "source.ip": "192.0.2.100",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "AROAIDPPEZS35WEXAMPLE:AssumedRoleSessionName",
         "user.name": "RoleToBeAssumed",
         "user_agent.device.name": "Other",

@@ -17,9 +17,14 @@ import (
 
 // ECSMeta is a collection of agent related metadata in ECS compliant object form.
 type ECSMeta struct {
-	Agent *AgentECSMeta  `json:"elastic.agent"`
-	Host  *HostECSMeta   `json:"host"`
-	OS    *SystemECSMeta `json:"os"`
+	Elastic *ElasticECSMeta `json:"elastic"`
+	Host    *HostECSMeta    `json:"host"`
+	OS      *SystemECSMeta  `json:"os"`
+}
+
+// ElasticECSMeta is a collection of elastic vendor metadata in ECS compliant object form.
+type ElasticECSMeta struct {
+	Agent *AgentECSMeta `json:"agent"`
 }
 
 // AgentECSMeta is a collection of agent metadata in ECS compliant object form.
@@ -119,9 +124,11 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 	info := sysInfo.Info()
 
 	return &ECSMeta{
-		Agent: &AgentECSMeta{
-			ID:      i.agentID,
-			Version: release.Version(),
+		Elastic: &ElasticECSMeta{
+			Agent: &AgentECSMeta{
+				ID:      i.agentID,
+				Version: release.Version(),
+			},
 		},
 		Host: &HostECSMeta{
 			Arch:     info.Architecture,
@@ -134,9 +141,9 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 
 		// Operating system
 		OS: &SystemECSMeta{
-			Family:   runtime.GOOS,
+			Family:   info.OS.Family,
 			Kernel:   info.KernelVersion,
-			Platform: info.OS.Family,
+			Platform: info.OS.Platform,
 			Version:  info.OS.Version,
 			Name:     info.OS.Name,
 			FullName: getFullOSName(info),
