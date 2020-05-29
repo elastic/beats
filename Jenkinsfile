@@ -856,7 +856,7 @@ def withBeatsEnv(boolean archive, Closure body) {
 }
 
 /**
-  This method archive and report the tests output.
+  This method archives and report the tests output.
     It searches for certain folders to bypass some issues when working with big repositories. In addition,
 
     OUTPUT:
@@ -866,28 +866,39 @@ def withBeatsEnv(boolean archive, Closure body) {
 */
 def archiveTestOutput(Map args = [:]) {
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-    def labelName = 'Prepare test output'
-    def command = 'python .ci/scripts/pre_archive_test.py'
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
-      sh(label: labelName, script: command)
-    } else {
-      bat(label: labelName, script: command)
     }
+    shOrBat(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-        // TODO: support windows. (required to support the windows platform in the tar step)
-        if (isUnix()) {
-          def folder = sh(label: 'Find system-tests', returnStdout: true, script: 'find . -name system-tests -type d')
-          if (folder.trim()) {
-            def name = folder.replaceAll('./', '').replaceAll('/', '-').replaceAll('build/', '')
-            tar(file: "${name}.tgz", archive: true, dir: folder)
-          }
+        def folder = shOrBat(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py')
+        if (folder.trim()) {
+          def name = folder.replaceAll('/', '-').replaceAll('\\', '-').replaceAll('build', '')
+          tar(file: "${name}.tgz", archive: true, dir: folder)
         }
       }
     }
+  }
+}
+
+/**
+  This method encapsulates the OS shell.
+*/
+def shOrBat(Map args = [:]) {
+  if (isUnix()) {
+    return sh(args)
+  } else {
+    def command = args.script
+    if (args.containsKey('returnStdout') && args.returnStdout) {
+      command = """@echo off
+      ${args.script}
+      """
+      args.script = command
+    }
+    return bat(args)
   }
 }
 
