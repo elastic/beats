@@ -1,7 +1,3 @@
-:release-state: released
-
-//TODO: Remove release-state definition before merging.
-
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 

@@ -16,21 +16,12 @@ include::{libbeat-dir}/tab-widgets/open-kibana-widget.asciidoc[]
 sure the predefined +{beatname_lc}-*+ index pattern is selected.
 +
 --
-[role="screenshot"]
-image::./images/kibana-created-indexes.png[Discover tab with index selected]
-
 TIP: If you don’t see data in {kib}, try changing the date range to a larger
 range. By default, {kib} shows the last 15 minutes.
-
 --
 
 . In the side navigation, click *Dashboard*, then select the dashboard that you
 want to open.
-+
---
-[role="screenshot"]
-image::./images/kibana-navigation-vis.png[Navigation widget in Kibana]
---
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.

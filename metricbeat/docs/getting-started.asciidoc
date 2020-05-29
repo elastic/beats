@@ -1,8 +1,3 @@
-:modulename: apache mysql
-:release-state: released
-
-//TODO: Remove release-state definition before merging.
-
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 
@@ -21,16 +16,14 @@ You'll learn how to:
 * send the metrics to {es}
 * visualize the metrics data in {kib}
 
+[role="screenshot"]
+image::./images/{beatname_lc}-system-dashboard.png[{beatname_uc} System dashboard]
+
 [float]
 === Before you begin
 
 You need {es} for storing and searching your data, and {kib} for visualizing and
 managing it.
-
-// TODO: We might want to provide the instructions for spinning up a deployment
-// here. See
-// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
-// Or link to the topic that's available for cloud.
 
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
@@ -157,9 +150,6 @@ include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
-
-[role="screenshot"]
-image::./images/{beatname_lc}_system_dashboard.png[{beatname_uc} Dashboard]
 
 [float]
 === What's next?

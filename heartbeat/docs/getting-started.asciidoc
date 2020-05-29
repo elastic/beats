@@ -1,7 +1,3 @@
-:release-state: released
-
-//TODO: Remove release-state definition before merging.
-
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 
@@ -17,18 +13,17 @@ your hosts. You'll learn how to:
 * send uptime data to {es}
 * visualize the uptime data in {kib}
 
-//TODO: Move dashboards up to show value.
+// REVIEWERS: This screenshot comes from demo.elastic.co. Let me know if you
+// have a build or screenshot that you'd prefer to use here. 
+
+[role="screenshot"]
+image::./images/heartbeat-statistics.png[{beatname_uc} HTTP monitoring dashboard]
 
 [float]
 === Before you begin
 
 You need {es} for storing and searching your data, and {kib} for visualizing and
 managing it.
-
-// TODO: We might want to provide the instructions for spinning up a deployment
-// here. See
-// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
-// Or link to the topic that's available for cloud.
 
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
@@ -154,11 +149,6 @@ https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 If you loaded the dashboards earlier, open them now.
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
-
-Example dashboard:
-
-[role="screenshot"]
-image::./images/heartbeat-statistics.png[Heartbeat statistics]
 
 [float]
 === What's next?

@@ -1,5 +1,3 @@
-:release-state: released
-
 [id="{beatname_lc}-installation-configuration"]
 [role="xpack"]
 == {beatname_uc} quick start: installation and configuration

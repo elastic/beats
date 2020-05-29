@@ -1,7 +1,3 @@
-:release-state: released
-
-//TODO: Remove release-state definition before merging.
-
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 
@@ -19,6 +15,9 @@ You'll learn how to:
 * specify the network devices and protocols to sniff
 * parse the packet data into fields and send it to {es}
 * visualize the packet data in {kib}
+
+[role="screenshot"]
+image::./images/packetbeat-overview-dashboard.png[{beatname_uc} Overview dashboard]
 
 [float]
 === Before you begin
@@ -206,9 +205,6 @@ include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
 TIP: To populate the client locations map in the overview dashboard, follow the
 steps described in <<{beatname_lc}-geoip>>.
-
-[role="screenshot"]
-image::./images/packetbeat-statistics.png[{beatname_uc} statistics]
 
 [float]
 === What's next?

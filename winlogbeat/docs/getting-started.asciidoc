@@ -15,16 +15,14 @@ You'll learn how to:
 * parse log data into fields and send it to {es}
 * visualize the log data in {kib}
 
+[role="screenshot"]
+image::./images/winlogbeat-dashboard.png[{beatname_uc} dashboard]
+
 [float]
 === Before you begin
 
 You need {es} for storing and searching your data, and {kib} for visualizing and
 managing it.
-
-// TODO: We might want to provide the instructions for spinning up a deployment
-// here. See
-// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
-// Or link to the topic that's available for cloud.
 
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
@@ -184,9 +182,6 @@ PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
-
-[role="screenshot"]
-image::./images/winlogbeat-dashboard.png[{beatname_uc} statistics]
 
 [float]
 === What's next?

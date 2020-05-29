@@ -1,7 +1,6 @@
 :modulename: system nginx mysql
-:release-state: released
 
-//TODO: Remove release-state definition before merging.
+//TODO: Remove release-state override before merging.
 
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
@@ -21,23 +20,15 @@ You'll learn how to:
 * specify the location of your log files
 * parse log data into fields and send it to {es}
 * visualize the log data in {kib}
-+
-[role="screenshot"]
-image::./images/kibana-system.png[]
 
-//REVIEWERS: I think that moving up these dashboards makes the value FB adds
-//more obvious. Should I do this with all the GS guides?
+[role="screenshot"]
+image::./images/kibana-system.png[{beatname_uc} System dashboard]
 
 [float]
 === Before you begin
 
 You need {es} for storing and searching your data, and {kib} for visualizing and
 managing it.
-
-// TODO: We might want to provide the instructions for spinning up a deployment
-// here. See
-// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
-// Or link to the topic that's available for cloud.
 
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
@@ -75,7 +66,7 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 === Step 3: Enable and configure data collection modules
 
 // REVIEWERS: I'm intentionally focusing on the module config steps because I
-// feel it represents the fastest getting started experience. 
+// feel it represents the fastest getting started experience. Any objections?
 
 {beatname_uc} uses modules to collect and parse log data.
 
