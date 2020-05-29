@@ -158,22 +158,10 @@ _{kibana-ref}/index.html[{kib} User Guide]_.
 [float]
 === What's next?
 
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-intro]
+Now that you have your logs streaming into {es}, learn how to unify your logs,
+metrics, uptime, and application performance data.
 
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-metrics]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-logs]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-uptime]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-apm]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-security]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=add-win-logs]
-
-include::{libbeat-dir}/shared/obs-apps.asciidoc[tag=obs-apps]
-
+include::{libbeat-dir}/shared/obs-apps.asciidoc[]
 
 [TIP]
 ====
