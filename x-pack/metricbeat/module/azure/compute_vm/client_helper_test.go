@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
 func MockResource() resources.GenericResource {
@@ -81,8 +81,11 @@ func TestMapMetric(t *testing.T) {
 	metricConfig := azure.MetricConfig{Name: []string{"*"}}
 	var resourceConfig = azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}}
 	client := azure.NewMockClient()
+	res := resource
+	res.Properties = map[string]interface{}{"hardwareProfile": map[string]interface{}{"vmSize": "A1Basic"}}
 	t.Run("return error when the metric namespaces api call returns an error", func(t *testing.T) {
 		m := &azure.MockService{}
+		m.On("GetResourceDefinitionById", mock.Anything).Return(res, nil)
 		m.On("GetMetricNamespaces", mock.Anything).Return(insights.MetricNamespaceCollection{}, errors.New("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
@@ -93,6 +96,7 @@ func TestMapMetric(t *testing.T) {
 	})
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
+		m.On("GetResourceDefinitionById", mock.Anything).Return(res, nil)
 		m.On("GetMetricNamespaces", mock.Anything).Return(namespace, nil)
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
@@ -104,20 +108,22 @@ func TestMapMetric(t *testing.T) {
 	})
 	t.Run("return mapped metrics correctly", func(t *testing.T) {
 		m := &azure.MockService{}
+		m.On("GetResourceDefinitionById", mock.Anything).Return(res, nil)
 		m.On("GetMetricNamespaces", mock.Anything).Return(namespace, nil)
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.Nil(t, err)
-		assert.Equal(t, metrics[0].Resource.ID, "123")
+		assert.Equal(t, metrics[0].Resource.Id, "123")
 		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
-		assert.Equal(t, metrics[1].Resource.ID, "123")
+		assert.Equal(t, metrics[1].Resource.Id, "123")
 		assert.Equal(t, metrics[1].Resource.Name, "resourceName")
 		assert.Equal(t, metrics[1].Resource.Type, "resourceType")
 		assert.Equal(t, metrics[1].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[1].Resource.Size, "A1Basic")
 		assert.Equal(t, metrics[1].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Dimensions, []azure.Dimension(nil))
 		assert.Equal(t, metrics[1].Dimensions, []azure.Dimension(nil))

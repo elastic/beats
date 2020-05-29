@@ -24,10 +24,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/kibana/mtest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/kibana/mtest"
 )
 
 func TestFetchUsage(t *testing.T) {
@@ -44,17 +44,17 @@ func TestFetchUsage(t *testing.T) {
 			// Make GET /api/stats return 503 for first call, 200 for subsequent calls
 			switch numStatsRequests {
 			case 0: // first call
-				assert.Equal(t, "false", excludeUsage)
+				require.Equal(t, "false", excludeUsage)
 				w.WriteHeader(503)
 
 			case 1: // second call
 				// Make sure exclude_usage is still false since first call failed
-				assert.Equal(t, "false", excludeUsage)
+				require.Equal(t, "false", excludeUsage)
 				w.WriteHeader(200)
 
 			case 2: // third call
 				// Make sure exclude_usage is now true since second call succeeded
-				assert.Equal(t, "true", excludeUsage)
+				require.Equal(t, "true", excludeUsage)
 				w.WriteHeader(200)
 			}
 

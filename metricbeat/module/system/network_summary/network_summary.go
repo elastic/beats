@@ -20,8 +20,8 @@ package network_summary
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )

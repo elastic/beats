@@ -7,7 +7,7 @@
 package sysmon
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetSysmon returns asset data.
 // This is the base64 encoded gzipped contents of module/sysmon.
 func AssetSysmon() string {
-	return "eJxUzrFuwzAQA9BdX0Fkjz9AQ6fOXVKgs+qjEaG2zr07N9DfF1WTISsJEu+ML/YM775pS0DUWJlxuowAm8qx8pQAoc9W96jaMl4SALxf6UQxIq4Ef9gCS+UqDt8516XOCB3l092UAOPK4sz4ZJSE+y6ncXxGKxsfqkmaTx4lDh8tEH1n/oPf1OSePfk+ahO9Of5XmFUIYxzWKFjUhun17YLvg9an9BsAAP//OQhWnA=="
+	return "eJysjrFOKzEQRXt/xVX6+ANcvOo1NDRBokSOfVcZ4djBM5uwf49iEqGVIiraGd1zzhbvXAJ00WOrDjCxwoDNbhxwbHku3DggU1OXk0mrAf8cALwcqETshB0InlkNk7BkhZ6YZJIEa+O5wnkHdBZGZcCeFh1uu+AGeIsaj7xX+VzVq0WbdXwBW04M1/BL6/l2W/W9Ss3tovheIbVMdNrcKzOm1kfT/+cdPmb2xT+0TlLoY08HOTOvxPvWCmN9JH6qWVI0KmQaksxCu0qlEJeouBN/kYq+8ZNptrgv/ENzxQ/Wu68AAAD//xH3plw="
 }

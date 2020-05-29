@@ -26,7 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/input/file"
 )
 
 func TestRegistrarRead(t *testing.T) {

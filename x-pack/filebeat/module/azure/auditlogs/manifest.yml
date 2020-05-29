@@ -7,6 +7,12 @@ var:
     default: "insights-logs-auditlogs"
   - name: consumer_group
     default: "$Default"
+  - name: connection_string
+  - name: storage_account
+  - name: storage_account_key
+  - name: resource_manager_endpoint
+  - name: tags
+    default: [forwarded]
 
 ingest_pipeline:
   - ingest/pipeline.json

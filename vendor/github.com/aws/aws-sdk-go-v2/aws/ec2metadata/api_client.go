@@ -40,7 +40,7 @@ func New(config aws.Config) *Client {
 			aws.Metadata{
 				ServiceName: "EC2 Instance Metadata",
 				ServiceID:   "EC2InstanceMetadata",
-				EndpointsID: "ec2metadata",
+				EndpointsID:  "ec2metadata",
 				APIVersion:  "latest",
 			},
 		),

@@ -27,7 +27,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const defaultNode = "localhost"

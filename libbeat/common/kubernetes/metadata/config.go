@@ -17,7 +17,7 @@
 
 package metadata
 
-import "github.com/elastic/beats/libbeat/common"
+import "github.com/elastic/beats/v7/libbeat/common"
 
 // Config declares supported configuration for metadata generation
 type Config struct {
@@ -38,12 +38,11 @@ type AddResourceMetadataConfig struct {
 	Namespace *common.Config `config:"namespace"`
 }
 
-func defaultConfig() Config {
-	return Config{
-		IncludeCreatorMetadata: true,
-		LabelsDedot:            true,
-		AnnotationsDedot:       true,
-	}
+// InitDefaults initializes the defaults for the config.
+func (c *Config) InitDefaults() {
+	c.IncludeCreatorMetadata = true
+	c.LabelsDedot = true
+	c.AnnotationsDedot = true
 }
 
 // Unmarshal unpacks a Config into the metagen Config

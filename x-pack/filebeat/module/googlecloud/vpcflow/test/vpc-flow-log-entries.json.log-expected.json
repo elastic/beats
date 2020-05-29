@@ -10,12 +10,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.12",
         "destination.port": 33478,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:45:37.301953198Z",
+        "event.id": "ut8lbrffooxyw",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:45:37.186193305Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -46,7 +48,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -57,12 +62,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33970,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821302149Z",
+        "event.id": "ut8lbrffooxzb",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.466657665Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -102,7 +109,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 68,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -116,12 +126,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33576,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821143836Z",
+        "event.id": "ut8lbrffooxze",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:20.510622432Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -158,7 +170,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 78,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -173,12 +188,14 @@
         "destination.geo.region_name": "Saint Petersburg",
         "destination.ip": "192.0.2.23",
         "destination.port": 59679,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:46.031032701Z",
+        "event.id": "ut8lbrffooxyz",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:45.860349247Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -208,7 +225,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 1,
-        "source.port": 22
+        "source.port": 22,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -221,12 +241,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "192.0.2.117",
         "destination.port": 50646,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:37.048196137Z",
+        "event.id": "ut8lbrffooxz6",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:36.895188084Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -257,7 +279,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -268,12 +293,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:37.048196137Z",
+        "event.id": "ut8lbrffooxzf",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:36.895188084Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -306,7 +333,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 50646
+        "source.port": 50646,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -317,12 +347,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33692,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565287007Z",
+        "event.id": "ut8lbrffooxz1",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500498059Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -362,7 +394,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -376,12 +411,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821308944Z",
+        "event.id": "ut8lbrffooxyp",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.469099728Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -418,7 +455,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 92,
-        "source.port": 33880
+        "source.port": 33880,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -429,12 +469,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33554,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565311154Z",
+        "event.id": "ut8lbrffooxzd",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500506974Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -474,7 +516,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 247,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -485,12 +530,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33880,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821308944Z",
+        "event.id": "ut8lbrffooxz8",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.469099728Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -530,7 +577,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 63,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -541,12 +591,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 22,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:46.031032701Z",
+        "event.id": "ut8lbrffooxyt",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:45.860349247Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -580,7 +632,10 @@
         "source.geo.region_name": "Saint Petersburg",
         "source.ip": "192.0.2.23",
         "source.packets": 3,
-        "source.port": 59679
+        "source.port": 59679,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -591,12 +646,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821056075Z",
+        "event.id": "ut8lbrffooxz5",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:20.510622432Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -636,7 +693,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 94,
-        "source.port": 33576
+        "source.port": 33576,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -647,12 +707,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.393910944Z",
+        "event.id": "ut8lbrffooxza",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:01.074897435Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -692,7 +754,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 356,
-        "source.port": 33562
+        "source.port": 33562,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -706,12 +771,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565287007Z",
+        "event.id": "ut8lbrffooxyq",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500498059Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -748,7 +815,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33692
+        "source.port": 33692,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -762,12 +832,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565272745Z",
+        "event.id": "ut8lbrffooxz2",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.150720950Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -804,7 +876,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 360,
-        "source.port": 33542
+        "source.port": 33542,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -818,12 +893,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821302149Z",
+        "event.id": "ut8lbrffooxyo",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.466657665Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -860,7 +937,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 99,
-        "source.port": 33970
+        "source.port": 33970,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -871,12 +951,14 @@
         "destination.domain": "simianhacker-demo",
         "destination.ip": "10.49.136.133",
         "destination.port": 46864,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:29.432367659Z",
+        "event.id": "ut8lbrffooxzc",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:17.343890802Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -906,7 +988,10 @@
         "source.bytes": 34509840,
         "source.ip": "203.0.113.93",
         "source.packets": 8690,
-        "source.port": 9243
+        "source.port": 9243,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -917,12 +1002,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:48:39.076420731Z",
+        "event.id": "ut8lbrffooxz7",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:48:38.961050187Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -955,7 +1042,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 34836
+        "source.port": 34836,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -969,12 +1059,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565311154Z",
+        "event.id": "ut8lbrffooxyu",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500506974Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1011,7 +1103,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 367,
-        "source.port": 33554
+        "source.port": 33554,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1026,12 +1121,14 @@
         "destination.geo.region_name": "Colorado",
         "destination.ip": "203.0.113.58",
         "destination.port": 65320,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220714119Z",
+        "event.id": "ut8lbrffooxyv",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.560917237Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -1062,7 +1159,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 608,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1076,12 +1176,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33562,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.393910944Z",
+        "event.id": "ut8lbrffooxz0",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:01.074897435Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1118,7 +1220,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 258,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1128,12 +1233,14 @@
         "destination.address": "203.0.113.93",
         "destination.ip": "203.0.113.93",
         "destination.port": 9243,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:58.716492806Z",
+        "event.id": "ut8lbrffooxys",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:17.306085222Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -1164,7 +1271,10 @@
         "source.domain": "simianhacker-demo",
         "source.ip": "10.49.136.133",
         "source.packets": 44438,
-        "source.port": 46864
+        "source.port": 46864,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1175,12 +1285,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:45:37.301953198Z",
+        "event.id": "ut8lbrffooxyx",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:45:37.186193305Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1213,7 +1325,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 33478
+        "source.port": 33478,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1227,12 +1342,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33548,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.393651211Z",
+        "event.id": "ut8lbrffooxz4",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147252064Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1269,7 +1386,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 241,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1280,12 +1400,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220714119Z",
+        "event.id": "ut8lbrffooxz3",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.560917237Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1320,7 +1442,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 732,
-        "source.port": 65320
+        "source.port": 65320,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1331,12 +1456,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33542,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565272745Z",
+        "event.id": "ut8lbrffooxz9",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.150720950Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1376,7 +1503,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 246,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1387,12 +1517,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:48.537763242Z",
+        "event.id": "ut8lbrffooxyr",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147252064Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1432,7 +1564,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 340,
-        "source.port": 33548
+        "source.port": 33548,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:10.845Z",
@@ -1445,12 +1580,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.12",
         "destination.port": 34836,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:48:39.076420731Z",
+        "event.id": "ut8lbrffooxyy",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:48:38.961050187Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -1481,7 +1618,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1492,12 +1632,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 22,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:52.361155668Z",
+        "event.id": "1ulp77rfdvho4g",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:46.541094678Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1532,7 +1674,10 @@
         "source.geo.region_name": "Vinh Phuc Province",
         "source.ip": "192.0.2.165",
         "source.packets": 18,
-        "source.port": 59623
+        "source.port": 59623,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1546,12 +1691,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.213244028Z",
+        "event.id": "1ulp77rfdvho5r",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075811571Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1588,7 +1735,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 363,
-        "source.port": 33552
+        "source.port": 33552,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1599,12 +1749,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:20.745658276Z",
+        "event.id": "1ulp77rfdvho5k",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:20.634435179Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1637,7 +1789,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33924
+        "source.port": 33924,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1651,12 +1806,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33534,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.597088427Z",
+        "event.id": "1ulp77rfdvho55",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075942176Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1693,7 +1850,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 260,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1707,12 +1867,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33694,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565117754Z",
+        "event.id": "1ulp77rfdvho60",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.566551903Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1749,7 +1911,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 265,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1764,12 +1929,14 @@
         "destination.geo.region_name": "Colorado",
         "destination.ip": "203.0.113.58",
         "destination.port": 65263,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220748025Z",
+        "event.id": "1ulp77rfdvho49",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:01.270990648Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -1800,7 +1967,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 607,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1811,12 +1981,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.597088427Z",
+        "event.id": "1ulp77rfdvho4t",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075942176Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1856,7 +2028,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 356,
-        "source.port": 33534
+        "source.port": 33534,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1870,12 +2045,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.101",
         "destination.port": 49680,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.705469925Z",
+        "event.id": "1ulp77rfdvho68",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.711043814Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -1912,7 +2089,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 735,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1925,12 +2105,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "192.0.2.117",
         "destination.port": 33862,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:11.779780615Z",
+        "event.id": "1ulp77rfdvho5n",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:11.655143526Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -1961,7 +2143,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -1976,12 +2161,14 @@
         "destination.geo.region_name": "Colorado",
         "destination.ip": "203.0.113.58",
         "destination.port": 65321,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.312105537Z",
+        "event.id": "1ulp77rfdvho5l",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.843986502Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -2012,7 +2199,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 594,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2023,12 +2213,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.461087350Z",
+        "event.id": "1ulp77rfdvho65",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:24.790136141Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2068,7 +2260,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 58,
-        "source.port": 33524
+        "source.port": 33524,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2082,12 +2277,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "192.0.2.177",
         "destination.port": 60112,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:18.224268993Z",
+        "event.id": "1ulp77rfdvho4b",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:14.031541248Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-central1",
@@ -2124,7 +2321,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 130,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2135,12 +2335,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33552,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.213244028Z",
+        "event.id": "1ulp77rfdvho4m",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075811571Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2180,7 +2382,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 250,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2194,12 +2399,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33524,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.461087350Z",
+        "event.id": "1ulp77rfdvho5t",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:24.790136141Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2236,7 +2443,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 37,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2247,12 +2457,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33548,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565451051Z",
+        "event.id": "1ulp77rfdvho50",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147072949Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2292,7 +2504,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 237,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2303,12 +2518,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565117754Z",
+        "event.id": "1ulp77rfdvho63",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.566551903Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2348,7 +2565,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 353,
-        "source.port": 33694
+        "source.port": 33694,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2361,12 +2581,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.107",
         "destination.port": 33924,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:20.745658276Z",
+        "event.id": "1ulp77rfdvho4r",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:20.634545217Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -2397,7 +2619,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2412,12 +2637,14 @@
         "destination.geo.region_name": "Colorado",
         "destination.ip": "203.0.113.58",
         "destination.port": 65271,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.318940798Z",
+        "event.id": "1ulp77rfdvho4i",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.155378070Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -2448,7 +2675,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 605,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2459,12 +2689,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:11.779780615Z",
+        "event.id": "1ulp77rfdvho5v",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:11.655143526Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2497,7 +2729,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 33862
+        "source.port": 33862,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2508,12 +2743,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.312105537Z",
+        "event.id": "1ulp77rfdvho5i",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.843986502Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2548,7 +2785,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 737,
-        "source.port": 65321
+        "source.port": 65321,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2563,12 +2803,14 @@
         "destination.geo.region_name": "Colorado",
         "destination.ip": "203.0.113.58",
         "destination.port": 65316,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220838853Z",
+        "event.id": "1ulp77rfdvho5c",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.565831992Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -2599,7 +2841,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 600,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2610,12 +2855,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.705469925Z",
+        "event.id": "1ulp77rfdvho5p",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.711043814Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2655,7 +2902,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.101",
         "source.packets": 949,
-        "source.port": 49680
+        "source.port": 49680,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2666,12 +2916,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:18.224268993Z",
+        "event.id": "1ulp77rfdvho4y",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:14.031541248Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2711,7 +2963,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.177",
         "source.packets": 227,
-        "source.port": 60112
+        "source.port": 60112,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2725,12 +2980,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33558,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.394676451Z",
+        "event.id": "1ulp77rfdvho4o",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:58.492572765Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2767,7 +3024,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 270,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2778,12 +3038,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220838853Z",
+        "event.id": "1ulp77rfdvho5g",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.565831992Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2818,7 +3080,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 709,
-        "source.port": 65316
+        "source.port": 65316,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2829,12 +3094,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:56.220748025Z",
+        "event.id": "1ulp77rfdvho59",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:01.270990648Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2869,7 +3136,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 728,
-        "source.port": 65263
+        "source.port": 65263,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2880,12 +3150,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:20.569744903Z",
+        "event.id": "1ulp77rfdvho57",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:20.454046087Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -2918,7 +3190,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.117",
         "source.packets": 7,
-        "source.port": 50438
+        "source.port": 50438,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2931,12 +3206,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "192.0.2.117",
         "destination.port": 50438,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:20.569744903Z",
+        "event.id": "1ulp77rfdvho5e",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:20.454046087Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -2967,7 +3244,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -2982,12 +3262,14 @@
         "destination.geo.region_name": "Vinh Phuc Province",
         "destination.ip": "192.0.2.165",
         "destination.port": 59623,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:40:52.361155668Z",
+        "event.id": "1ulp77rfdvho4d",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:46.541094678Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -3018,7 +3300,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 11,
-        "source.port": 22
+        "source.port": 22,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3029,12 +3314,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:48.538257098Z",
+        "event.id": "1ulp77rfdvho5y",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:58.492572765Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3074,7 +3361,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 353,
-        "source.port": 33558
+        "source.port": 33558,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3088,12 +3378,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565451051Z",
+        "event.id": "1ulp77rfdvho6a",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147072949Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3130,7 +3422,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 354,
-        "source.port": 33548
+        "source.port": 33548,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:11.981Z",
@@ -3141,12 +3436,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:55.318940798Z",
+        "event.id": "1ulp77rfdvho4v",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.155378070Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3181,7 +3478,10 @@
         "source.geo.region_name": "Colorado",
         "source.ip": "203.0.113.58",
         "source.packets": 717,
-        "source.port": 65271
+        "source.port": 65271,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3192,12 +3492,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:51.355687385Z",
+        "event.id": "bnj3cofh3cdk1",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:51.237256499Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3230,7 +3532,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 34178
+        "source.port": 34178,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3241,12 +3546,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:45:51.090104692Z",
+        "event.id": "bnj3cofh3cdjx",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:45:50.954948790Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3279,7 +3586,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33602
+        "source.port": 33602,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3290,12 +3600,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565131125Z",
+        "event.id": "bnj3cofh3cdju",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:02.143837873Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3335,7 +3647,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 366,
-        "source.port": 33554
+        "source.port": 33554,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3348,12 +3663,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.107",
         "destination.port": 33602,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:45:51.090104692Z",
+        "event.id": "bnj3cofh3cdjz",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:45:50.954948790Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -3384,7 +3701,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3395,12 +3715,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:42:40.888804332Z",
+        "event.id": "bnj3cofh3cdkk",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:42:40.779893091Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3433,7 +3755,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 52454
+        "source.port": 52454,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3444,12 +3769,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33534,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.597279654Z",
+        "event.id": "bnj3cofh3cdk0",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075756033Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3489,7 +3816,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3502,12 +3832,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.27",
         "destination.port": 52260,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:42:11.183868408Z",
+        "event.id": "bnj3cofh3cdk8",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:42:11.063146265Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -3538,7 +3870,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3552,12 +3887,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565300944Z",
+        "event.id": "bnj3cofh3cdkp",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.140119099Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3594,7 +3931,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33530
+        "source.port": 33530,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3608,12 +3948,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565335113Z",
+        "event.id": "bnj3cofh3cdkc",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500498059Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3650,7 +3992,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 366,
-        "source.port": 33556
+        "source.port": 33556,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3661,12 +4006,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821047175Z",
+        "event.id": "bnj3cofh3cdkm",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.469473010Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3706,7 +4053,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 86,
-        "source.port": 33570
+        "source.port": 33570,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3720,12 +4070,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33554,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565131125Z",
+        "event.id": "bnj3cofh3cdjy",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:02.143837873Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3762,7 +4114,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 247,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3775,12 +4130,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.27",
         "destination.port": 53706,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:43:50.822333871Z",
+        "event.id": "bnj3cofh3cdjv",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:43:50.703302550Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -3811,7 +4168,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3822,12 +4182,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.789039435Z",
+        "event.id": "bnj3cofh3cdkh",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.458515996Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3867,7 +4229,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 118,
-        "source.port": 33858
+        "source.port": 33858,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3878,12 +4243,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:44:40.243022993Z",
+        "event.id": "bnj3cofh3cdkg",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:44:40.125336665Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3916,7 +4283,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 33064
+        "source.port": 33064,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3927,12 +4297,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33556,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565335113Z",
+        "event.id": "bnj3cofh3cdk7",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500498059Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -3972,7 +4344,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 251,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -3983,12 +4358,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:43:50.822333871Z",
+        "event.id": "bnj3cofh3cdk9",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:43:50.703302550Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4021,7 +4398,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 53706
+        "source.port": 53706,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4032,12 +4412,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:42:11.183868408Z",
+        "event.id": "bnj3cofh3cdkj",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:42:11.063146265Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4070,7 +4452,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 52260
+        "source.port": 52260,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4083,12 +4468,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.27",
         "destination.port": 34090,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:37.827345444Z",
+        "event.id": "bnj3cofh3cdki",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:37.712749588Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4119,7 +4506,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4132,12 +4522,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.12",
         "destination.port": 34178,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:51.355687385Z",
+        "event.id": "bnj3cofh3cdkd",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:51.237256499Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4168,7 +4560,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4181,12 +4576,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.107",
         "destination.port": 33064,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:44:40.243022993Z",
+        "event.id": "bnj3cofh3cdjw",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:44:40.125336665Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4217,7 +4614,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4228,12 +4628,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:48:50.757255245Z",
+        "event.id": "bnj3cofh3cdk3",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:48:50.642206049Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4266,7 +4668,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.107",
         "source.packets": 7,
-        "source.port": 34906
+        "source.port": 34906,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4279,12 +4684,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.12",
         "destination.port": 58216,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:36.982303071Z",
+        "event.id": "bnj3cofh3cdkb",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:49:36.865198297Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4315,7 +4722,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4329,12 +4739,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.597279654Z",
+        "event.id": "bnj3cofh3cdk4",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075756033Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4371,7 +4783,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 361,
-        "source.port": 33534
+        "source.port": 33534,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4385,12 +4800,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.248",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565335113Z",
+        "event.id": "bnj3cofh3cdkf",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500418290Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4427,7 +4844,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 358,
-        "source.port": 33510
+        "source.port": 33510,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4438,12 +4858,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:36.982303071Z",
+        "event.id": "bnj3cofh3cdkl",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:49:36.865198297Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4476,7 +4898,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.12",
         "source.packets": 7,
-        "source.port": 58216
+        "source.port": 58216,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4487,12 +4912,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33510,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565335113Z",
+        "event.id": "bnj3cofh3cdk2",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:39:59.500418290Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4532,7 +4959,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 243,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4545,12 +4975,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "198.51.100.107",
         "destination.port": 34906,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:48:50.757255245Z",
+        "event.id": "bnj3cofh3cdko",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:48:50.642206049Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4581,7 +5013,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4594,12 +5029,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.27",
         "destination.port": 52454,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:42:40.888804332Z",
+        "event.id": "bnj3cofh3cdke",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:42:40.779893091Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.source.instance.project_id": "my-sample-project",
         "googlecloud.source.instance.region": "us-east1",
@@ -4630,7 +5067,10 @@
         "source.domain": "kibana",
         "source.ip": "10.87.40.76",
         "source.packets": 7,
-        "source.port": 5601
+        "source.port": 5601,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4641,12 +5081,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 5601,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:46:37.827345444Z",
+        "event.id": "bnj3cofh3cdka",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:46:37.712749588Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4679,7 +5121,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.27",
         "source.packets": 7,
-        "source.port": 34090
+        "source.port": 34090,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4690,12 +5135,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33530,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565300944Z",
+        "event.id": "bnj3cofh3cdkn",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.140119099Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4735,7 +5182,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 246,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4749,12 +5199,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33570,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:51.821129119Z",
+        "event.id": "bnj3cofh3cdk5",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.469473010Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4791,7 +5243,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 71,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:13.921Z",
@@ -4805,12 +5260,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33858,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:37.933164456Z",
+        "event.id": "bnj3cofh3cdk6",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.458515996Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4847,7 +5304,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 75,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -4861,12 +5321,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33590,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565116665Z",
+        "event.id": "y4wffpfk2ero3",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147151100Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -4903,7 +5365,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 249,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -4917,12 +5382,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "192.0.2.177",
         "destination.port": 60108,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:54.108975753Z",
+        "event.id": "y4wffpfk2eroh",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.762958327Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-central1",
@@ -4959,7 +5426,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 357,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -4973,12 +5443,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33536,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565156020Z",
+        "event.id": "y4wffpfk2erom",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.150481417Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5015,7 +5487,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 242,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5026,12 +5501,14 @@
         "destination.domain": "kibana",
         "destination.ip": "10.87.40.76",
         "destination.port": 33560,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565287007Z",
+        "event.id": "y4wffpfk2ero9",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:06.075859688Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5071,7 +5548,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "198.51.100.248",
         "source.packets": 244,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5082,12 +5562,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:54.108975753Z",
+        "event.id": "y4wffpfk2erog",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:00.762958327Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5127,7 +5609,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "192.0.2.177",
         "source.packets": 708,
-        "source.port": 60108
+        "source.port": 60108,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5141,12 +5626,14 @@
         "destination.geo.country_name": "usa",
         "destination.ip": "203.0.113.134",
         "destination.port": 33874,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:37.933099658Z",
+        "event.id": "y4wffpfk2ero7",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:20.513551480Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5183,7 +5670,10 @@
         "source.domain": "elasticsearch",
         "source.ip": "10.139.99.242",
         "source.packets": 74,
-        "source.port": 9200
+        "source.port": 9200,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5194,12 +5684,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:37.965119632Z",
+        "event.id": "y4wffpfk2eroe",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:08.480430427Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5239,7 +5731,10 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 95,
-        "source.port": 33968
+        "source.port": 33968,
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-06-14T03:50:16.453Z",
@@ -5250,12 +5745,14 @@
         "destination.domain": "elasticsearch",
         "destination.ip": "10.139.99.242",
         "destination.port": 9200,
-        "event.category": "network_traffic",
+        "event.category": "network",
         "event.dataset": "googlecloud.vpcflow",
         "event.end": "2019-06-14T03:49:59.565116665Z",
+        "event.id": "y4wffpfk2eroa",
+        "event.kind": "event",
         "event.module": "googlecloud",
         "event.start": "2019-06-14T03:40:05.147151100Z",
-        "event.type": "flow",
+        "event.type": "connection",
         "fileset.name": "vpcflow",
         "googlecloud.destination.instance.project_id": "my-sample-project",
         "googlecloud.destination.instance.region": "us-east1",
@@ -5295,6 +5792,9 @@
         "source.geo.country_name": "usa",
         "source.ip": "203.0.113.134",
         "source.packets": 351,
-        "source.port": 33590
+        "source.port": 33590,
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

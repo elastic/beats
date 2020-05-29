@@ -37,6 +37,9 @@
         "input.type": "log",
         "log.level": "Informational",
         "log.offset": 0,
-        "service.type": "azure"
+        "service.type": "azure",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

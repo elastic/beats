@@ -20,7 +20,7 @@ package reader
 import (
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
+	"github.com/elastic/beats/v7/journalbeat/config"
 )
 
 // Config stores the options of a reder.
@@ -41,6 +41,8 @@ type Config struct {
 	Matches []string
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool
+	// CheckpointID is the identifier to use when persisting state.
+	CheckpointID string
 }
 
 const (

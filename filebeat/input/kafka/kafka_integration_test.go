@@ -32,12 +32,12 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
-	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 )
 
 const (

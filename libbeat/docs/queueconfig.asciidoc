@@ -1,6 +1,9 @@
 [[configuring-internal-queue]]
 == Configure the internal queue
 
+++++
+<titleabbrev>Internal queue</titleabbrev>
+++++
 {beatname_uc} uses an internal queue to store events before publishing them. The
 queue is responsible for buffering and combining events into batches that can
 be consumed by the outputs. The outputs will use bulk operations to send a

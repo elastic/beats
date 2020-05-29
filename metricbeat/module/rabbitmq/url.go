@@ -18,7 +18,7 @@
 package rabbitmq
 
 import (
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 // Subpaths to management plugin endpoints

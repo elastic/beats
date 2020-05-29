@@ -1,5 +1,5 @@
 - key: sql
-  title: "sql"
+  title: "SQL"
   release: beta
   description: >
     SQL module fetches metrics from a SQL database

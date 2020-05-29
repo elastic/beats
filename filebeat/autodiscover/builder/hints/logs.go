@@ -21,14 +21,15 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/beats/filebeat/fileset"
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -60,7 +61,7 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry([]*common.Config{}, "", false)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs)
+		return template.ApplyConfigTemplate(event, configs, false)
 	}
 
 	tempCfg := common.MapStr{}
@@ -162,7 +163,7 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 	logp.Debug("hints.builder", "generated config %+v", config)
 
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, []*common.Config{config})
+	return template.ApplyConfigTemplate(event, []*common.Config{config}, false)
 }
 
 func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {

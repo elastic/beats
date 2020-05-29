@@ -20,17 +20,17 @@ package module
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 )
 
 // Connector configures and establishes a beat.Client for publishing events
 // to the publisher pipeline.
 type Connector struct {
-	pipeline      beat.Pipeline
+	pipeline      beat.PipelineConnector
 	processors    *processors.Processors
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
@@ -54,7 +54,7 @@ type metricSetRegister interface {
 }
 
 func NewConnector(
-	beatInfo beat.Info, pipeline beat.Pipeline,
+	beatInfo beat.Info, pipeline beat.PipelineConnector,
 	c *common.Config, dynFields *common.MapStrPointer,
 ) (*Connector, error) {
 	config := connectorConfig{}

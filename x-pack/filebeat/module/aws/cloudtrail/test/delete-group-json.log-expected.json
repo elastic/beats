@@ -27,6 +27,10 @@
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "0123456789012",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
@@ -60,6 +64,10 @@
         "log.offset": 747,
         "service.type": "aws",
         "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_PRINCIPLE",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",

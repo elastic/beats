@@ -1,0 +1,302 @@
+[[log-driver-configuration]]
+[role="xpack"]
+== {log-driver} configuration options
+
+++++
+<titleabbrev>Configuration options</titleabbrev>
+++++
+
+experimental[]
+
+Use the following options to configure the {log-driver-long}. You can
+pass these options with the `--log-opt` flag when you start a container, or
+you can set them in the `daemon.json` file for all containers. 
+
+* <<cloud-options>>
+* <<es-output-options>>
+* <<ls-output-options>>
+* <<kafka-output-options>>
+* <<redis-output-options>>
+
+[float]
+=== Usage examples
+
+To set configuration options when you start a container:
+
+include::install.asciidoc[tag=log-driver-run]
+
+To set configuration options for all containers in the `daemon.json` file:
+
+include::install.asciidoc[tag=log-driver-daemon]
+
+For more examples, see <<log-driver-usage-examples>>.
+
+[float]
+[[cloud-options]]
+=== {ecloud} options
+ 
+[options="header"]
+|=====
+|Option  | Description
+
+|`cloud.id`
+|The Cloud ID found in the Elastic Cloud web console. This ID is
+used to resolve the {stack} URLs when connecting to {ess} on {ecloud}.
+
+|`cloud.auth`
+|The username and password combination for connecting to {ess} on {ecloud}. The
+format is `"username:password"`.
+|=====
+
+[float]
+[[es-output-options]]
+=== {es} output options
+
+// TODO: Add the following settings. Syntax is a little different so we might
+// need to add deameon examples that show how to specify these settings:
+// `output.elasticsearch.indices
+// `output.elasticsearch.pipelines`
+
+[options="header"]
+|=====
+|Option  |Default |Description
+
+|`output.elasticsearch.hosts`
+|`"localhost:9200"`
+|The list of {es} nodes to connect to. Specify each node as a `URL` or
+`IP:PORT`. For example: `http://192.0.2.0`, `https://myhost:9230` or
+`192.0.2.0:9300`. If no port is specified, the default is `9200`.
+
+|`output.elasticsearch.protocol`
+|`http` 
+|The protocol (`http` or `https`) that {es} is reachable on. If you specify a
+URL for `hosts`, the value of `protocol` is overridden by whatever scheme you
+specify in the URL.
+
+|`output.elasticsearch.username`
+|
+|The basic authentication username for connecting to {es}. 
+
+|`output.elasticsearch.password`
+|
+|The basic authentication password for connecting to {es}.
+
+|`output.elasticsearch.index`
+|
+|A {beats-ref}/config-file-format-type.html#_format_string_sprintf[format string]
+value that specifies the index to write events to when you're using daily
+indices. For example: +"dockerlogs-%{+yyyy.MM.dd}"+. 
+
+3+|*Advanced:*
+
+|`output.elasticsearch.backoff.init`
+|`1s`
+|The number of seconds to wait before trying to reconnect to {es} after
+a network error. After waiting `backoff.init` seconds, the {log-driver}
+tries to reconnect. If the attempt fails, the backoff timer is increased
+exponentially up to `backoff.max`. After a successful connection, the backoff
+timer is reset.
+
+|`output.elasticsearch.backoff.max`
+|`60s`
+|The maximum number of seconds to wait before attempting to connect to
+{es} after a network error.
+
+|`output.elasticsearch.bulk_max_size`
+|`50`
+|The maximum number of events to bulk in a single {es} bulk API index request.
+Specify 0 to allow the queue to determine the batch size.
+
+|`output.elasticsearch.compression_level`
+|`0`
+|The gzip compression level. Valid compression levels range from 1 (best speed)
+to 9 (best compression). Specify 0 to disable compression.  Higher compression
+levels reduce network usage, but increase CPU usage.
+
+|`output.elasticsearch.escape_html`
+|`false`
+|Whether to escape HTML in strings.
+
+|`output.elasticsearch.headers`
+|
+|Custom HTTP headers to add to each request created by the {es} output. Specify
+multiple header values for the same header name by separating them with a comma.
+
+|`output.elasticsearch.loadbalance`
+|`false`
+|Whether to load balance when sending events to multiple hosts. The load
+balancer also supports multiple workers per host (see
+`output.elasticsearch.worker`.)
+
+|`output.elasticsearch.max_retries`
+|`3`
+|The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped. Specify
+0 to retry indefinitely.
+
+|`output.elasticsearch.parameters`
+|
+| A dictionary of HTTP parameters to pass within the URL with index operations.
+
+|`output.elasticsearch.path`
+|
+|An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+cases where {es} listens behind an HTTP reverse proxy that exports the API under
+a custom prefix.
+
+|`output.elasticsearch.pipeline`
+|
+|A {beats-ref}/config-file-format-type.html#_format_string_sprintf[format string]
+value that specifies the {ref}/ingest.html[ingest node pipeline] to write events
+to.
+
+|`output.elasticsearch.proxy_url`
+|
+|The URL of the proxy to use when connecting to the {es} servers. Specify a
+`URL` or `IP:PORT`.
+
+|`output.elasticsearch.timeout`
+|`90`
+|The HTTP request timeout in seconds for the {es} request.
+
+|`output.elasticsearch.worker`
+|`1`
+|The number of workers per configured host publishing events to {es}. Use with
+load balancing mode (`output.elasticsearch.loadbalance`) set to `true`. Example:
+If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each
+host).
+
+|=====
+
+
+[float]
+[[ls-output-options]]
+=== {ls} output options
+
+[options="header"]
+|=====
+|Option  | Default | Description
+
+|`output.logstash.hosts`
+|`"localhost:5044"` 
+|The list of known {ls} servers to connect to. If load balancing is
+disabled, but multiple hosts are configured, one host is selected randomly
+(there is no precedence). If one host becomes unreachable, another one is
+selected randomly. If no port is specified, the default is `5044`.
+
+|`output.logstash.index`
+|
+|The index root name to write events to. For example +"dockerlogs"+ generates
++"dockerlogs-{version}"+ indices. 
+
+3+|*Advanced:*
+
+|`output.logstash.backoff.init`
+|`1s`
+|The number of seconds to wait before trying to reconnect to {ls} after
+a network error. After waiting `backoff.init` seconds, the {log-driver}
+tries to reconnect. If the attempt fails, the backoff timer is increased
+exponentially up to `backoff.max`. After a successful connection, the backoff
+timer is reset.
+
+|`output.logstash.backoff.max`
+|`60s`
+|The maximum number of seconds to wait before attempting to connect to
+{ls} after a network error.
+
+|`output.logstash.bulk_max_size`
+|`2048`
+|The maximum number of events to bulk in a single {ls} request. Specify 0 to
+allow the queue to determine the batch size. 
+
+|`output.logstash.compression_level`
+|`0`
+|The gzip compression level. Valid compression levels range from 1 (best speed)
+to 9 (best compression). Specify 0 to disable compression.  Higher compression
+levels reduce network usage, but increase CPU usage.
+
+|`output.logstash.escape_html`
+|`false`
+|Whether to escape HTML in strings.
+
+|`output.logstash.loadbalance`
+|`false`
+|Whether to load balance when sending events to multiple {ls} hosts. If set to
+`false`, the driver sends all events to only one host (determined at random) and
+switches to another host if the selected one becomes unresponsive.
+
+|`output.logstash.pipelining`
+|`2`
+|The number of batches to send asynchronously to {ls} while waiting for an ACK
+from {ls}. Specify 0 to disable pipelining.
+
+|`output.logstash.proxy_url`
+|
+|The URL of the SOCKS5 proxy to use when connecting to the {ls} servers. The
+value must be a URL with a scheme of `socks5://`. You can embed a
+username and password in the URL (for example,
+`socks5://user:password@socks5-proxy:2233`).
+
+|`output.logstash.proxy_use_local_resolver`
+|`false`
+|Whether to resolve {ls} hostnames locally when using a proxy. If `false`,
+name resolution occurs on the proxy server.
+
+|`output.logstash.slow_start`
+|`false`
+|When enabled, only a subset of events in a batch are transferred per
+transaction. If there are no errors, the number of events per transaction
+is increased up to the bulk max size (see `output.logstash.bulk_max_size`).
+On error, the number of events per transaction is reduced again.
+
+|`output.logstash.timeout`
+|`30`
+|The number of seconds to wait for responses from the {ls} server before
+timing out. 
+
+|`output.logstash.ttl`
+|`0`
+|Time to live for a connection to {ls} after which the connection will be
+re-established. Useful when {ls} hosts represent load balancers. Because
+connections to {ls} hosts are sticky, operating behind load balancers can lead
+to uneven load distribution across instances. Specify a TTL on the connection
+to distribute connections across instances. Specify 0 to disable this feature.
+This option is not supported if `output.logstash.pipelining` is set.
+
+|`output.logstash.worker`
+|`1`
+|The number of workers per configured host publishing events to {ls}. Use with
+load balancing mode (`output.logstash.loadbalance`) set to `true`. Example:
+If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each
+host).
+
+|=====
+
+[float]
+[[kafka-output-options]]
+=== Kafka output options
+
+// TODO: Add kafka output options here.
+
+// NOTE: The following annotation renders as: "Coming in a future update. This
+// documentation is a work in progress."
+
+coming[a future update. This documentation is a work in progress]
+
+Need the docs now? See the
+{filebeat-ref}/kafka-output.html[Kafka output docs] for {filebeat}.
+The {log-driver} supports most of the same options, just make sure you use
+the fully qualified setting names.
+
+[float]
+[[redis-output-options]]
+=== Redis output options
+
+// TODO: Add Redis output options here. 
+
+coming[a future update. This documentation is a work in progress]
+
+Need the docs now? See the
+{filebeat-ref}/redis-output.html[Redis output docs] for {filebeat}.
+The {log-driver} supports most of the same options, just make sure you use
+the fully qualified setting names.

@@ -30,6 +30,10 @@
         ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
@@ -67,6 +71,10 @@
         ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

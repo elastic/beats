@@ -1,9 +1,17 @@
 - key: kvm
-  title: "kvm"
+  title: "KVM"
   release: beta
   description: >
     kvm module
   fields:
+    - name: kvm.id
+      type: long
+      description: >
+        Domain id
+    - name: kvm.name
+      type: keyword
+      description: >
+        Domain name
     - name: kvm
       type: group
       description: >

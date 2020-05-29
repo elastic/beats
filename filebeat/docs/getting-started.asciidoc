@@ -1,5 +1,9 @@
 [[filebeat-getting-started]]
-== Getting Started With Filebeat
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
 
 include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
 
@@ -104,6 +108,11 @@ See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 *kubernetes:*
 
 See <<running-on-kubernetes, Running on Kubernetes>> for deploying with Kubernetes.
+
+[[cloudfoundry]]
+*cloudfoundry:*
+
+See <<running-on-cloudfoundry, Running on Cloud Foundry>> for deploying with Cloud Foundry.
 
 [[win]]
 *win:*

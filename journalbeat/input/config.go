@@ -20,14 +20,16 @@ package input
 import (
 	"time"
 
-	"github.com/elastic/beats/journalbeat/config"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/v7/journalbeat/config"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // Config stores the options of an input.
 type Config struct {
+	// Unique ID of the input for state persistence purposes.
+	ID string `config:"id"`
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 	// Backoff is the current interval to wait before

@@ -1,0 +1,51 @@
+- name: natgateway
+  type: group
+  description: >
+    `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: BytesInFromDestination.sum
+          type: long
+          description: The number of bytes received by the NAT gateway from the destination.
+        - name: BytesInFromSource.sum
+          type: long
+          description: The number of bytes received by the NAT gateway from clients in your VPC.
+        - name: BytesOutToDestination.sum
+          type: long
+          description: The number of bytes sent out through the NAT gateway to the destination.
+        - name: BytesOutToSource.sum
+          type: long
+          description: The number of bytes sent through the NAT gateway to the clients in your VPC.
+        - name: ConnectionAttemptCount.sum
+          type: long
+          description: The number of connection attempts made through the NAT gateway.
+        - name: ConnectionEstablishedCount.sum
+          type: long
+          description: The number of connections established through the NAT gateway.
+        - name: ErrorPortAllocation.sum
+          type: long
+          description: The number of times the NAT gateway could not allocate a source port.
+        - name: IdleTimeoutCount.sum
+          type: long
+          description: The number of connections that transitioned from the active state to the idle state.
+        - name: PacketsDropCount.sum
+          type: long
+          description: The number of packets dropped by the NAT gateway.
+        - name: PacketsInFromDestination.sum
+          type: long
+          description: The number of packets received by the NAT gateway from the destination.
+        - name: PacketsInFromSource.sum
+          type: long
+          description: The number of packets received by the NAT gateway from clients in your VPC.
+        - name: PacketsOutToDestination.sum
+          type: long
+          description: The number of packets sent out through the NAT gateway to the destination.
+        - name: PacketsOutToSource.sum
+          type: long
+          description: The number of packets sent through the NAT gateway to the clients in your VPC.
+        - name: ActiveConnectionCount.max
+          type: long
+          description: The total number of concurrent active TCP connections through the NAT gateway.

@@ -11,9 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/auditbeat/core"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/auditbeat/core"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
@@ -36,7 +38,16 @@ func TestData(t *testing.T) {
 	}
 
 	for _, e := range events {
-		if name, _ := e.RootFields.GetValue("user.name"); name == "elastic" {
+		if name, _ := e.RootFields.GetValue("user.name"); name == "__elastic" {
+			relatedNames, err := e.RootFields.GetValue("related.user")
+			require.NoError(t, err)
+			require.Equal(t, []string{"__elastic"}, relatedNames)
+			groupName, err := e.RootFields.GetValue("user.group.name")
+			require.NoError(t, err)
+			require.Equal(t, "__elastic", groupName)
+			groupID, err := e.RootFields.GetValue("user.group.id")
+			require.NoError(t, err)
+			require.Equal(t, "1001", groupID)
 			fullEvent := mbtest.StandardizeEvent(f, e, core.AddDatasetToEvent)
 			mbtest.WriteEventToDataJSON(t, fullEvent, "")
 			return
@@ -48,13 +59,13 @@ func TestData(t *testing.T) {
 
 func testUser() *User {
 	return &User{
-		Name: "elastic",
+		Name: "__elastic",
 		UID:  "9999",
 		GID:  "1001",
 		Groups: []*user.Group{
 			&user.Group{
 				Gid:  "1001",
-				Name: "elastic",
+				Name: "__elastic",
 			},
 			&user.Group{
 				Gid:  "1002",

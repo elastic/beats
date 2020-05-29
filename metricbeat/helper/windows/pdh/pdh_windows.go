@@ -41,6 +41,7 @@ import (
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 //sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 //sys _PdhGetCounterInfo(counter PdhCounterHandle, text uint16, size *uint32, lpBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetCounterInfoW
+//sys _PdhEnumObjectItems(dataSource uint16, machineName uint16, objectName *uint16, counterList *uint16, counterListSize *uint32, instanceList *uint16, instanceListSize *uint32, detailLevel uint32, flags uint32) (errcode error) [failretval!=0] = pdh.PdhEnumObjectItemsW
 
 type PdhQueryHandle uintptr
 
@@ -49,6 +50,9 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+// PerformanceDetailWizard is the counter detail level
+const PerformanceDetailWizard = 400
 
 // PdhCounterInfo struct contains the performance counter details
 type PdhCounterInfo struct {
@@ -157,7 +161,7 @@ func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCo
 	var counterType uint32
 	var value PdhCounterValueDouble
 	if err := _PdhGetFormattedCounterValueDouble(counter, PdhFmtDouble|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
@@ -168,7 +172,7 @@ func PdhGetFormattedCounterValueLarge(counter PdhCounterHandle) (uint32, *PdhCou
 	var counterType uint32
 	var value PdhCounterValueLarge
 	if err := _PdhGetFormattedCounterValueLarge(counter, PdhFmtLarge|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
@@ -179,7 +183,7 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 	var counterType uint32
 	var value PdhCounterValueLong
 	if err := _PdhGetFormattedCounterValueLong(counter, PdhFmtLong|PdhFmtNoCap100, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
+		return 0, &value, PdhErrno(err.(syscall.Errno))
 	}
 
 	return counterType, &value, nil
@@ -245,6 +249,48 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	}
 
 	return nil
+}
+
+// PdhEnumObjectItems returns the counters and instance info for given object
+func PdhEnumObjectItems(objectName string) ([]uint16, []uint16, error) {
+	var (
+		cBuff     = make([]uint16, 1)
+		cBuffSize = uint32(0)
+		iBuff     = make([]uint16, 1)
+		iBuffSize = uint32(0)
+	)
+	obj := windows.StringToUTF16Ptr(objectName)
+	if err := _PdhEnumObjectItems(
+		0,
+		0,
+		obj,
+		&cBuff[0],
+		&cBuffSize,
+		&iBuff[0],
+		&iBuffSize,
+		PerformanceDetailWizard,
+		0); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, nil, PdhErrno(err.(syscall.Errno))
+		}
+		cBuff = make([]uint16, cBuffSize)
+		iBuff = make([]uint16, iBuffSize)
+
+		if err = _PdhEnumObjectItems(
+			0,
+			0,
+			obj,
+			&cBuff[0],
+			&cBuffSize,
+			&iBuff[0],
+			&iBuffSize,
+			PerformanceDetailWizard,
+			0); err != nil {
+			return nil, nil, err
+		}
+		return cBuff, iBuff, nil
+	}
+	return nil, nil, nil
 }
 
 // Error returns a more explicit error message.

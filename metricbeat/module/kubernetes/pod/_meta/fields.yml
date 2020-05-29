@@ -56,7 +56,7 @@
               type: scaled_float
               format: percent
               description: >
-                CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if unlimited)
+                CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
     - name: memory
       type: group
       fields:

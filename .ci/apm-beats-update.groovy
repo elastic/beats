@@ -6,11 +6,14 @@ pipeline {
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    BEATS_MOD = 'github.com/elastic/beats-local'
+    BEATS_DIR = "src/${BEATS_MOD}"
     NOTIFY_TO = credentials('notify-to')
     GITHUB_CHECK_ITS_NAME = 'APM Server Beats update'
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
     HOME = "${env.WORKSPACE}"
     GOPATH = "${env.WORKSPACE}"
+    SHELL = "/bin/bash"
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -33,16 +36,15 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
-        gitCheckout(basedir: "beats", githubNotifyFirstTimeContributor: false)
+        gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
         script {
-          dir("beats"){
+          dir("${BEATS_DIR}"){
             env.GO_VERSION = readFile(".go-version").trim()
             def regexps =[
               "^devtools/mage.*",
               "^libbeat/scripts/Makefile",
             ]
             env.BEATS_UPDATED = isGitRegionMatch(patterns: regexps)
-
             // Skip all the stages except docs for PR's with asciidoc changes only
             env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
           }
@@ -72,23 +74,7 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Check Apm Server Beats Update') {
-          deleteDir()
-          dir("${BASE_DIR}"){
-            git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
-              url:  "git@github.com:elastic/${REPO}.git")
-            sh(label: 'Update Beats script', script: """
-              export BEATS_VERSION=${env.GIT_BASE_COMMIT}
-              git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
-              script/jenkins/update-beats.sh
-            """)
-          }
-        }
-      }
-      post {
-        always {
-          catchError(buildResult: 'SUCCESS', message: 'Failed to grab test results tar files', stageResult: 'SUCCESS') {
-            tar(file: "update-beats-system-tests-linux-files.tgz", archive: true, dir: "system-tests", pathPrefix: "${BASE_DIR}/build")
-          }
+          beatsUpdate()
         }
       }
     }
@@ -98,4 +84,37 @@ pipeline {
   //     notifyBuildResult()
   //   }
   // }
+}
+
+def beatsUpdate() {
+  def os = "linux"
+  def goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${os}.amd64"
+
+  withEnv([
+    "HOME=${env.WORKSPACE}",
+    "GOPATH=${env.WORKSPACE}",
+    "GOROOT=${goRoot}",
+    "PATH=${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}",
+    "MAGEFILE_CACHE=${env.WORKSPACE}/.magefile",
+  ]) {
+    dir("${BEATS_DIR}") {
+      sh(label: "Create branch localVersion", script: "git checkout -b localVersion")
+      sh(label: "Install Go ${GO_VERSION}", script: ".ci/scripts/install-go.sh")
+    }
+    dir("${BASE_DIR}"){
+      git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
+        url:  "git@github.com:elastic/${env.REPO}.git")
+      sh(label: 'Update Beats script', script: """
+        git config --global user.email "none@example.com"
+        git config --global user.name "None"
+        git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
+
+        go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        make update
+        git commit -a -m beats-update
+
+        make check
+      """)
+    }
+  }
 }

@@ -1,0 +1,6 @@
+- name: mgr_cluster_disk
+  type: group
+  description: >
+    see: cluster_disk
+  release: beta
+  fields:

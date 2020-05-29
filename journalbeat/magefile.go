@@ -20,7 +20,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -29,12 +28,16 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -114,13 +117,6 @@ func Fields() error {
 	return devtools.GenerateFieldsYAML()
 }
 
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
 // -----------------------------------------------------------------------------
 // Customizations specific to Journalbeat.
 // - Install required headers on builders for different architectures.
@@ -197,7 +193,15 @@ func installDependencies(arch string, pkgs ...string) error {
 		return err
 	}
 
-	params := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	params := append([]string{"install", "-y",
+		"--no-install-recommends",
+
+		// Journalbeat is built with old versions of Debian that don't update
+		// their repositories, so they have expired keys.
+		// Allow unauthenticated packages.
+		// This was not enough: "-o", "Acquire::Check-Valid-Until=false",
+		"--allow-unauthenticated",
+	}, pkgs...)
 	return sh.Run("apt-get", params...)
 }
 
@@ -227,5 +231,7 @@ func selectImage(platform string) (string, error) {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	return devtools.Config(devtools.AllConfigTypes, p, ".")
 }

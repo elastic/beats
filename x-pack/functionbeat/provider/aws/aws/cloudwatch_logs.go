@@ -19,13 +19,13 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 	"github.com/awslabs/goformation/v4/cloudformation/policies"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/feature"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
 )
 
 var (
@@ -101,8 +101,8 @@ func NewCloudwatchLogs(provider provider.Provider, cfg *common.Config) (provider
 }
 
 // CloudwatchLogsDetails returns the details of the feature.
-func CloudwatchLogsDetails() *feature.Details {
-	return feature.NewDetails("Cloudwatch Logs trigger", "receive events from cloudwatch logs.", feature.Stable)
+func CloudwatchLogsDetails() feature.Details {
+	return feature.MakeDetails("Cloudwatch Logs trigger", "receive events from cloudwatch logs.", feature.Stable)
 }
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.

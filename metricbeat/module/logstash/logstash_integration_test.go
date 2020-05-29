@@ -20,15 +20,18 @@
 package logstash_test
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/logstash"
-	_ "github.com/elastic/beats/metricbeat/module/logstash/node"
-	_ "github.com/elastic/beats/metricbeat/module/logstash/node_stats"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
+	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
 )
 
 var metricSets = []string{
@@ -45,10 +48,8 @@ func TestFetch(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
-			assert.Empty(t, errs)
-			if !assert.NotEmpty(t, events) {
-				t.FailNow()
-			}
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
 
 			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 				events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
@@ -64,34 +65,33 @@ func TestData(t *testing.T) {
 			config := getConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-			if err != nil {
-				t.Fatal("write", err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
 
 func TestXPackEnabled(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	lsService := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	esService := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+
+	clusterUUID := getESClusterUUID(t, esService.Host())
 
 	metricSetToTypeMap := map[string]string{
 		"node":       "logstash_state",
 		"node_stats": "logstash_stats",
 	}
 
-	config := getXPackConfig(service.Host())
-
+	config := getXPackConfig(lsService.Host())
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
 		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		assert.Empty(t, errs)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
+		require.Empty(t, errs)
+		require.NotEmpty(t, events)
 
 		event := events[0]
-		assert.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-		assert.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
+		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+		require.Equal(t, clusterUUID, event.RootFields["cluster_uuid"])
+		require.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
 	}
 }
 
@@ -110,4 +110,20 @@ func getXPackConfig(host string) map[string]interface{} {
 		"hosts":         []string{host},
 		"xpack.enabled": true,
 	}
+}
+
+func getESClusterUUID(t *testing.T, host string) string {
+	resp, err := http.Get("http://" + host + "/")
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	var body struct {
+		ClusterUUID string `json:"cluster_uuid"`
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	json.Unmarshal(data, &body)
+
+	return body.ClusterUUID
 }

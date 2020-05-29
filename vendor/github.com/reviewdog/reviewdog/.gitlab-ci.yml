@@ -1,0 +1,37 @@
+# Open merge request automatically and run reviewdog against created MR.
+stages:
+  - openMr
+  - reviewdog
+
+# https://github.com/tmaier/gitlab-auto-merge-request
+Open Merge Request:
+  except:
+    - master
+  stage: openMr
+  image: tmaier/gitlab-auto-merge-request:1
+  before_script: []
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - merge-request.sh
+
+Reviewdog:
+  except:
+    - master
+  stage: reviewdog
+  image: golang:latest
+  cache:
+    key:
+      files:
+        - go.sum
+    paths:
+      - .cache
+  before_script:
+    - export GO111MODULE=on
+    - export GOPATH=${CI_PROJECT_DIR}/.cache
+    - export PATH=$PATH:$GOPATH/bin
+    - go install ./cmd/reviewdog
+    - ( cd linters && go get golang.org/x/lint/golint )
+  script:
+    - golint ./... | reviewdog -f=golint -name=golint-discussion -reporter=gitlab-mr-discussion
+    - golint ./... | reviewdog -f=golint -name=golint-commit -reporter=gitlab-mr-commit

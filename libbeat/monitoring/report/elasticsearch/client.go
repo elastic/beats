@@ -18,31 +18,37 @@
 package elasticsearch
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
+	"go.elastic.co/apm"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	esout "github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
 var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
 
 type publishClient struct {
-	es     *esout.Client
+	es     *eslegclient.Connection
 	params map[string]string
 	format report.Format
+
+	log *logp.Logger
 }
 
 func newPublishClient(
-	es *esout.Client,
+	es *eslegclient.Connection,
 	params map[string]string,
 	format report.Format,
 ) (*publishClient, error) {
@@ -50,12 +56,14 @@ func newPublishClient(
 		es:     es,
 		params: params,
 		format: format,
+
+		log: logp.NewLogger(logSelector),
 	}
 	return p, nil
 }
 
 func (c *publishClient) Connect() error {
-	debugf("Monitoring client: connect.")
+	c.log.Debug("Monitoring client: connect.")
 
 	err := c.es.Connect()
 	if err != nil {
@@ -86,11 +94,11 @@ func (c *publishClient) Connect() error {
 	}
 
 	if !resp.Features.Monitoring.Enabled {
-		debugf("XPack monitoring is disabled.")
+		c.log.Debug("XPack monitoring is disabled.")
 		return errNoMonitoring
 	}
 
-	debugf("XPack monitoring is enabled")
+	c.log.Debug("XPack monitoring is enabled")
 
 	return nil
 }
@@ -99,7 +107,7 @@ func (c *publishClient) Close() error {
 	return c.es.Close()
 }
 
-func (c *publishClient) Publish(batch publisher.Batch) error {
+func (c *publishClient) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	var failed []publisher.Event
 	var reason error
@@ -108,13 +116,13 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
-			logp.Err("Type not available in monitoring reported. Please report this error: %s", err)
+			c.log.Errorf("Type not available in monitoring reported. Please report this error: %+v", err)
 			continue
 		}
 
 		typ, ok := t.(string)
 		if !ok {
-			logp.Err("monitoring type is not a string")
+			c.log.Error("monitoring type is not a string")
 		}
 
 		var params = map[string]string{}
@@ -137,7 +145,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		case report.FormatXPackMonitoringBulk:
 			err = c.publishXPackBulk(params, event, typ)
 		case report.FormatBulk:
-			err = c.publishBulk(event, typ)
+			err = c.publishBulk(ctx, event, typ)
 		}
 
 		if err != nil {
@@ -159,7 +167,7 @@ func (c *publishClient) Test(d testing.Driver) {
 }
 
 func (c *publishClient) String() string {
-	return "publish(" + c.es.String() + ")"
+	return "monitoring(" + c.es.URL + ")"
 }
 
 func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
@@ -182,7 +190,7 @@ func (c *publishClient) publishXPackBulk(params map[string]string, event publish
 	return err
 }
 
-func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
+func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
@@ -193,14 +201,14 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 		meta["_type"] = "doc"
 	}
 
-	action := common.MapStr{}
-	var opType string
+	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
-		opType = "index"
-	} else {
-		opType = "create"
+		opType = events.OpTypeIndex
 	}
-	action[opType] = meta
+
+	action := common.MapStr{
+		opType.String(): meta,
+	}
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
@@ -229,13 +237,13 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	// FIXME: index name (first param below)
-	result, err := c.es.BulkWith(getMonitoringIndexName(), "", nil, nil, bulk[:])
+	_, result, err := c.es.Bulk(ctx, getMonitoringIndexName(), "", nil, bulk[:])
 	if err != nil {
+		apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", err)).Send()
 		return err
 	}
 
-	logBulkFailures(result, []report.Event{document})
+	logBulkFailures(c.log, result, []report.Event{document})
 	return err
 }
 
@@ -245,25 +253,38 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(result esout.BulkResult, events []report.Event) {
-	reader := esout.NewJSONReader(result)
-	err := esout.BulkReadToItems(reader)
-	if err != nil {
-		logp.Err("failed to parse monitoring bulk items: %v", err)
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+	var response struct {
+		Items []map[string]map[string]interface{} `json:"items"`
+	}
+
+	if err := json.Unmarshal(result, &response); err != nil {
+		log.Errorf("failed to parse monitoring bulk items: %v", err)
 		return
 	}
 
 	for i := range events {
-		status, msg, err := esout.BulkReadItemStatus(reader)
-		if err != nil {
-			logp.Err("failed to parse monitoring bulk item status: %v", err)
-			return
-		}
-		switch {
-		case status < 300, status == http.StatusConflict:
-			continue
-		default:
-			logp.Warn("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		for _, innerItem := range response.Items[i] {
+			var status int
+			if s, exists := innerItem["status"]; exists {
+				if v, ok := s.(int); ok {
+					status = v
+				}
+			}
+
+			var errorMsg string
+			if e, exists := innerItem["error"]; exists {
+				if v, ok := e.(string); ok {
+					errorMsg = v
+				}
+			}
+
+			switch {
+			case status < 300, status == http.StatusConflict:
+				continue
+			default:
+				log.Warnf("monitoring bulk item insert failed (i=%v, status=%v): %s", i, status, errorMsg)
+			}
 		}
 	}
 }

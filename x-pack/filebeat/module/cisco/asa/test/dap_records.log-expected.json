@@ -1,0 +1,35 @@
+[
+    {
+        "cisco.asa.connection_type": "AnyConnect",
+        "cisco.asa.dap_records": [
+            "dap_1",
+            "dap_2"
+        ],
+        "cisco.asa.message_id": "734001",
+        "event.action": "firewall-rule",
+        "event.code": 734001,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-734001: DAP: User firsname.lastname@domain.net, Addr 1.2.3.4, Connection AnyConnect: The following DAP records were selected for this connection: dap_1, dap_2",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 0,
+        "service.type": "cisco",
+        "source.address": "1.2.3.4",
+        "source.geo.city_name": "Moscow",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "RU",
+        "source.geo.location.lat": 55.7527,
+        "source.geo.location.lon": 37.6172,
+        "source.geo.region_iso_code": "RU-MOW",
+        "source.geo.region_name": "Moscow",
+        "source.ip": "1.2.3.4",
+        "tags": [
+            "cisco-asa"
+        ],
+        "user.email": "firsname.lastname@domain.net"
+    }
+]

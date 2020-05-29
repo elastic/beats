@@ -20,7 +20,7 @@ package beat
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type Pipeline interface {
@@ -109,6 +109,9 @@ type ProcessingConfig struct {
 
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool
+
+	// Disables the addition of host.name if it was enabled for the publisher.
+	DisableHost bool
 
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.

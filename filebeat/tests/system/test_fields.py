@@ -60,10 +60,9 @@ class Test(BaseTest):
         assert doc["timestamp"] == 2
         assert "fields" not in doc
 
-    def test_beat_fields(self):
+    def test_agent_name_custom(self):
         """
-        Checks that it's possible to set a custom shipper name. Also
-        tests that beat.hostname  has values.
+        Checks that it's possible to set a custom agent name.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
@@ -80,5 +79,24 @@ class Test(BaseTest):
         output = self.read_output()
         doc = output[0]
         assert doc["host.name"] == "testShipperName"
-        assert doc["agent.hostname"] == socket.gethostname()
+        assert doc["agent.name"] == "testShipperName"
         assert "fields" not in doc
+
+    def test_agent_name_default(self):
+        """
+        Checks that agent.name defaults to the hostname.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+        )
+
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("test message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+        doc = output[0]
+        assert doc["agent.name"] == socket.gethostname()

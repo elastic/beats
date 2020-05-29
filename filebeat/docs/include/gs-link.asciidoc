@@ -1,0 +1,2 @@
+TIP: Read the <<filebeat-modules-quickstart,quick start>> to learn how to set up and
+run modules.

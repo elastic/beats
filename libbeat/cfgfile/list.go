@@ -24,10 +24,10 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -35,12 +35,12 @@ type RunnerList struct {
 	runners  map[uint64]Runner
 	mutex    sync.RWMutex
 	factory  RunnerFactory
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	logger   *logp.Logger
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,

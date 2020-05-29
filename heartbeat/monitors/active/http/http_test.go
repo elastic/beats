@@ -22,6 +22,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -33,27 +34,28 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
-	schedule "github.com/elastic/beats/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func testRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
-	return testTLSRequest(t, testURL, useUrls, nil)
+func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
+	return sendTLSRequest(t, testURL, useUrls, nil)
 }
 
-// testTLSRequest tests the given request. certPath is optional, if given
+// sendTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
+func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"timeout": "1s",
 	}
@@ -91,7 +93,7 @@ func testTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
-	event := testRequest(t, server.URL, useUrls)
+	event := sendSimpleTLSRequest(t, server.URL, useUrls)
 
 	return server, event
 }
@@ -219,13 +221,6 @@ var downStatuses = []int{
 	http.StatusNetworkAuthenticationRequired,
 }
 
-func serverHostname(t *testing.T, server *httptest.Server) string {
-	surl, err := url.Parse(server.URL)
-	require.NoError(t, err)
-
-	return surl.Hostname()
-}
-
 func TestUpStatuses(t *testing.T) {
 	for _, status := range upStatuses {
 		status := status
@@ -346,7 +341,7 @@ func runHTTPSServerCheck(
 	// we give it a few attempts to see if the server can come up before we run the real assertions.
 	var event *beat.Event
 	for i := 0; i < 10; i++ {
-		event = testTLSRequest(t, server.URL, false, mergedExtraConfig)
+		event = sendTLSRequest(t, server.URL, false, mergedExtraConfig)
 		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
 			break
 		}
@@ -370,6 +365,30 @@ func TestHTTPSServer(t *testing.T) {
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 
 	runHTTPSServerCheck(t, server, nil)
+}
+
+func TestExpiredHTTPSServer(t *testing.T) {
+	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
+	require.NoError(t, err)
+	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	defer closeSrv()
+	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
+
+	extraConfig := map[string]interface{}{"ssl.certificate_authorities": "../fixtures/expired.cert"}
+	event := sendTLSRequest(t, u.String(), true, extraConfig)
+
+	testslike.Test(
+		t,
+		lookslike.Strict(lookslike.Compose(
+			hbtest.BaseChecks("127.0.0.1", "down", "http"),
+			hbtest.RespondingTCPChecks(),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.ExpiredCertChecks(cert),
+			hbtest.URLChecks(t, &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}),
+			// No HTTP fields expected because we fail at the TCP level
+		)),
+		event.Fields,
+	)
 }
 
 func TestHTTPSx509Auth(t *testing.T) {
@@ -417,7 +436,7 @@ func TestConnRefusedJob(t *testing.T) {
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url, false)
+	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -439,7 +458,7 @@ func TestUnreachableJob(t *testing.T) {
 	port := uint16(1234)
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
-	event := testRequest(t, url, false)
+	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
 		t,
@@ -512,7 +531,7 @@ func TestNewRoundTripper(t *testing.T) {
 
 	for name, config := range configs {
 		t.Run(name, func(t *testing.T) {
-			transp, err := newRoundTripper(&config, &transport.TLSConfig{})
+			transp, err := newRoundTripper(&config, &tlscommon.TLSConfig{})
 			require.NoError(t, err)
 
 			if config.ProxyURL == "" {
@@ -525,7 +544,7 @@ func TestNewRoundTripper(t *testing.T) {
 			require.NotNil(t, transp.Dial)
 			require.NotNil(t, transport.TLSDialer)
 
-			require.Equal(t, (&transport.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			require.Equal(t, (&tlscommon.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
 			require.True(t, transp.DisableKeepAlives)
 		})
 	}

@@ -1,0 +1,143 @@
+[[monitor-options]]
+=== Common monitor options
+
+You can specify the following options when defining a {beatname_uc} monitor in any location.
+These options are the same for all monitors. Each monitor type has additional configuration
+options that are specific to that monitor type.
+
+[float]
+[[monitor-type]]
+==== `type`
+
+The type of monitor to run. See <<monitor-types>>.
+
+[float]
+[[monitor-id]]
+==== `id`
+
+A unique identifier for this configuration. This should not change with edits to the monitor configuration
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. Note that this uniqueness is only within a given beat instance. If you want to monitor the same endpoint from multiple locations it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
+
+When querying against indexed monitor data this is the field you will be aggregating with. Appears in the
+<<exported-fields,exported fields>> as `monitor.id`.
+
+If you do not set this explicitly the monitor's config will be hashed and a generated value used. This value will
+change with any options change to this monitor making aggregations over time between changes impossible. For this reason
+it is recommended that you set this manually.
+
+[float]
+[[monitor-name]]
+==== `name`
+
+Optional human readable name for this monitor. This value appears in the <<exported-fields,exported fields>>
+as `monitor.name`.
+
+[float]
+[[monitor-enabled]]
+==== `enabled`
+
+A Boolean value that specifies whether the module is enabled. If the `enabled`
+option is missing from the configuration block, the module is enabled by
+default.
+
+[float]
+[[monitor-schedule]]
+==== `schedule`
+
+A cron-like expression that specifies the task schedule. For example:
+
+* `*/5 * * * * * *` runs the task every 5 seconds (for example, at 10:00:00,
+10:00:05, and so on).
+* `@every 5s` runs the task every 5 seconds from the time when {beatname_uc} was
+started.
+
+The `schedule` option uses a cron-like syntax based on https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementation],
+but adds the `@every` keyword.
+
+For stats on the execution of scheduled tasks you can enable the HTTP stats server with `http.enabled: true` in heartbeat.yml, then run `curl http://localhost:5066/stats | jq .heartbeat.scheduler` to view the scheduler's stats. Stats are provided for both jobs and tasks. Each time a monitor is scheduled is considered to be a single job, while portions of the work a job does, like DNS lookups and executing network requests are defined as tasks. The stats provided are:
+
+* **jobs.active:** The number of actively running jobs/monitors.
+* **jobs.missed_deadline:** The number of jobs that executed after their scheduled time. This can be caused either by overlong long timeouts from the previous job or high load preventing heartbeat from keeping up with work.
+* **tasks.active:** The number of tasks currently running.
+* **tasks.waiting:** If the global `schedule.limit` option is set, this number will reflect the number of tasks that are ready to execute, but have not been started in order to prevent exceeding `schedule.limit`.
+
+Also see the <<monitors-scheduler,task scheduler>> settings.
+
+[float]
+[[monitor-ipv4]]
+==== `ipv4`
+
+A Boolean value that specifies whether to ping using the ipv4 protocol if
+hostnames are configured. The default is `true`.
+
+[float]
+[[monitor-ipv6]]
+==== `ipv6`
+
+A Boolean value that specifies whether to ping using the ipv6 protocol
+if hostnames are configured. The default is `true`.
+
+[float]
+[[monitor-mode]]
+==== `mode`
+
+If `mode` is `any`, the monitor pings only one IP address for a hostname. If
+`mode` is `all`, the monitor pings all resolvable IPs for a hostname. The
+`mode: all` setting is useful if you are using a DNS-load balancer and want to
+ping every IP address for the specified hostname. The default is `any`.
+
+[float]
+[[monitor-timeout]]
+==== `timeout`
+
+The total running time for each ping test. This is the total time allowed for
+testing the connection and exchanging data. The default is 16 seconds (16s).
+
+If the timeout is exceeded, {beatname_uc} publishes a `service-down` event. If the
+value specified for `timeout` is greater than `schedule`, intermediate checks
+will not be executed by the scheduler.
+
+[float]
+[[monitor-fields]]
+==== `fields`
+
+Optional fields that you can specify to add additional information to the
+output. For example, you might add fields that you can use for filtering log
+data. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the fields that you specify here will be
+grouped under a `fields` sub-dictionary in the output document. To store the
+custom fields as top-level fields, set the `fields_under_root` option to true.
+If a duplicate field is declared in the general configuration, then its value
+will be overwritten by the value declared here.
+
+[float]
+[[monitor-fields-under-root]]
+==== `fields_under_root`
+
+If this option is set to true, the custom <<monitor-fields,fields>>
+are stored as top-level fields in the output document instead of being grouped
+under a `fields` sub-dictionary. If the custom field names conflict with other
+field names added by {beatname_uc}, then the custom fields overwrite the other
+fields.
+
+[float]
+[[monitor-tags]]
+==== `tags`
+
+A list of tags that will be sent with the monitor event. This setting is optional.
+
+[float]
+[[monitor-processors]]
+==== `processors`
+
+A list of processors to apply to the data generated by the monitor.
+
+See <<filtering-and-enhancing-data>> for information about specifying
+processors in your config.
+
+[float]
+[[monitor-keep-null]]
+==== `keep_null`
+
+If this option is set to true, fields with `null` values will be published in
+the output document. By default, `keep_null` is set to `false`.

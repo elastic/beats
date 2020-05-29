@@ -20,17 +20,20 @@
 package service
 
 import (
-	"github.com/coreos/go-systemd/dbus"
+	"path/filepath"
+
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Config stores the config object
 type Config struct {
-	StateFilter []string `config:"service.state_filter"`
+	StateFilter   []string `config:"service.state_filter"`
+	PatternFilter []string `config:"service.pattern_filter"`
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -47,8 +50,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	conn *dbus.Conn
-	cfg  Config
+	conn     *dbus.Conn
+	cfg      Config
+	unitList unitFetcher
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -66,10 +70,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error connecting to dbus")
 	}
 
+	unitFunction, err := instrospectForUnitMethods()
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding ListUnits Method")
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		conn:          conn,
 		cfg:           config,
+		unitList:      unitFunction,
 	}, nil
 }
 
@@ -77,7 +87,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	units, err := m.conn.ListUnitsByPatterns(m.cfg.StateFilter, []string{"*.service"})
+
+	units, err := m.unitList(m.conn, m.cfg.StateFilter, m.cfg.PatternFilter)
 	if err != nil {
 		return errors.Wrap(err, "error getting list of running units")
 	}
@@ -85,6 +96,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, unit := range units {
 		//Skip what are basically errors dude to systemd's declarative dependency system
 		if unit.LoadState == "not-found" {
+			continue
+		}
+
+		match, err := filepath.Match("*.service", unit.Name)
+		if err != nil {
+			m.Logger().Errorf("Error matching unit service %s: %s", unit.Name, err)
+			continue
+		}
+		// If we don't have a *.service, skip
+		if !match {
 			continue
 		}
 

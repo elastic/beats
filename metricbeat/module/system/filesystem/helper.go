@@ -29,8 +29,8 @@ import (
 
 	"runtime"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 	sigar "github.com/elastic/gosigar"
 )
 

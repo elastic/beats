@@ -88,11 +88,11 @@
       type: long
       description: >
         The number of handlers that were re-used during config transition.
-    - name: handler
-      type: long
+    - name: handler.name
+      type: keyword
       description: >
         The name of the daemon  handler
     - name: variety
-      type: long
+      type: keyword
       description: >
         The name of the variety

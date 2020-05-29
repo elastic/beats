@@ -64,7 +64,7 @@ func (client LogProfilesClient) CreateOrUpdate(ctx context.Context, logProfileNa
 					{Target: "parameters.LogProfileProperties.RetentionPolicy", Name: validation.Null, Rule: true,
 						Chain: []validation.Constraint{{Target: "parameters.LogProfileProperties.RetentionPolicy.Enabled", Name: validation.Null, Rule: true, Chain: nil},
 							{Target: "parameters.LogProfileProperties.RetentionPolicy.Days", Name: validation.Null, Rule: true,
-								Chain: []validation.Constraint{{Target: "parameters.LogProfileProperties.RetentionPolicy.Days", Name: validation.InclusiveMinimum, Rule: 0, Chain: nil}}},
+								Chain: []validation.Constraint{{Target: "parameters.LogProfileProperties.RetentionPolicy.Days", Name: validation.InclusiveMinimum, Rule: int64(0), Chain: nil}}},
 						}},
 				}}}}}); err != nil {
 		return result, validation.NewError("insights.LogProfilesClient", "CreateOrUpdate", err.Error())

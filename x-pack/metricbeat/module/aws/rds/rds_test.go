@@ -12,11 +12,12 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 // MockRDSClient struct is used for unit tests.
@@ -73,6 +74,21 @@ func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstance
 	}
 }
 
+func (m *MockRDSClient) ListTagsForResourceRequest(input *rds.ListTagsForResourceInput) rds.ListTagsForResourceRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return rds.ListTagsForResourceRequest{
+		Request: &awssdk.Request{
+			Data: &rds.ListTagsForResourceOutput{
+				TagList: []rds.Tag{
+					{Key: awssdk.String("dept.name"), Value: awssdk.String("eng.software")},
+					{Key: awssdk.String("created-by"), Value: awssdk.String("foo")},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
 func TestConstructLabel(t *testing.T) {
 	cases := []struct {
 		dimensions    []cloudwatch.Dimension
@@ -112,7 +128,10 @@ func TestConstructLabel(t *testing.T) {
 
 func TestGetDBInstancesPerRegion(t *testing.T) {
 	mockSvc := &MockRDSClient{}
-	dbInstanceIDs, dbDetailsMap, err := getDBInstancesPerRegion(mockSvc)
+	metricSet := MetricSet{
+		&aws.MetricSet{},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
 	if err != nil {
 		t.FailNow()
 	}
@@ -126,8 +145,92 @@ func TestGetDBInstancesPerRegion(t *testing.T) {
 		dbAvailabilityZone: availabilityZone,
 		dbIdentifier:       dbInstanceIdentifier,
 		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
 	}
 	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithTagsFilter(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "created-by", Value: "foo"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 1, len(dbDetailsMap))
+
+	dbInstanceMap := DBDetails{
+		dbArn:              dbInstanceArn,
+		dbClass:            dbInstanceClass,
+		dbAvailabilityZone: availabilityZone,
+		dbIdentifier:       dbInstanceIdentifier,
+		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
+	}
+	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithDotInTag(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "dept.name", Value: "eng.software"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 1, len(dbDetailsMap))
+
+	dbInstanceMap := DBDetails{
+		dbArn:              dbInstanceArn,
+		dbClass:            dbInstanceClass,
+		dbAvailabilityZone: availabilityZone,
+		dbIdentifier:       dbInstanceIdentifier,
+		dbStatus:           dbInstanceStatus,
+		tags: []aws.Tag{
+			{Key: "dept_name", Value: "eng_software"},
+			{Key: "created-by", Value: "foo"},
+		},
+	}
+	assert.Equal(t, dbInstanceMap, dbDetailsMap[dbInstanceIDs[0]])
+}
+
+func TestGetDBInstancesPerRegionWithNoMatchingTagsFilter(t *testing.T) {
+	mockSvc := &MockRDSClient{}
+	metricSet := MetricSet{
+		&aws.MetricSet{
+			TagsFilter: []aws.Tag{
+				{Key: "dept.name", Value: "accounting"},
+			},
+		},
+	}
+	dbInstanceIDs, dbDetailsMap, err := metricSet.getDBInstancesPerRegion(mockSvc)
+	if err != nil {
+		t.FailNow()
+	}
+
+	assert.Equal(t, 1, len(dbInstanceIDs))
+	assert.Equal(t, 0, len(dbDetailsMap))
 }
 
 func TestConstructMetricQueries(t *testing.T) {

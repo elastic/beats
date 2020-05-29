@@ -26,11 +26,16 @@ package ecs
 // A concrete example is IP addresses, which can be under host, observer,
 // source, destination, client, server, and network.forwarded_ip. If you append
 // all IPs to `related.ip`, you can then search for a given IP trivially, no
-// matter where it appeared, by querying `related.ip:a.b.c.d`.
+// matter where it appeared, by querying `related.ip:192.0.2.15`.
 type Related struct {
 	// All of the IPs seen on your event.
 	IP string `ecs:"ip"`
 
 	// All the user names seen on your event.
 	User string `ecs:"user"`
+
+	// All the hashes seen on your event. Populating this field, then using it
+	// to search for hashes can help in situations where you're unsure what the
+	// hash algorithm is (and therefore which key name to search).
+	Hash string `ecs:"hash"`
 }

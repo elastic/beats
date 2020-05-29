@@ -19,6 +19,7 @@ package sys
 
 import (
 	"fmt"
+	"strconv"
 )
 
 // SID represents the Windows Security Identifier for an account.
@@ -51,6 +52,7 @@ const (
 	SidTypeUnknown
 	SidTypeComputer
 	SidTypeLabel
+	SidTypeLogonSession
 )
 
 // sidTypeToString is a mapping of SID types to their string representations.
@@ -65,9 +67,15 @@ var sidTypeToString = map[SIDType]string{
 	SidTypeUnknown:        "Unknown",
 	SidTypeComputer:       "Computer",
 	SidTypeLabel:          "Label",
+	SidTypeLogonSession:   "Logon Session",
 }
 
 // String returns string representation of SIDType.
 func (st SIDType) String() string {
-	return sidTypeToString[st]
+	if typ, found := sidTypeToString[st]; found {
+		return typ
+	} else if st > 0 {
+		return strconv.FormatUint(uint64(st), 10)
+	}
+	return ""
 }

@@ -43,6 +43,7 @@ https://docs.aws.amazon.com/lambda/latest/dg/monitoring-functions-metrics.html[l
 |Invocations | Average
 |Errors | Average
 |DeadLetterErrors | Average
+|DestinationDeliveryFailures | Average
 |Duration | Average
 |Throttles | Average
 |IteratorAge | Average

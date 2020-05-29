@@ -43,7 +43,9 @@ The username to use for authentication
 [float]
 ===== `co.elastic.metrics/password`
 
-The password to use for authentication. It is recommended to retrieve this sensitive information from an ENV variable or a keystore and avoid placing passwords in plain text
+The password to use for authentication. It is recommended to retrieve this sensitive information from an ENV variable
+and avoid placing passwords in plain text. Unlike static autodiscover configuration, hints based autodiscover has
+no access to the keystore of Metricbeat since it could be a potential security issue.
 
 [float]
 ===== `co.elastic.metrics/ssl.*`
@@ -125,6 +127,25 @@ annotations:
   co.elastic.metrics/hosts: '${data.host}:80'
   co.elastic.metrics.sidecar/hosts: '${data.host}:8080'
 -------------------------------------------------------------------------------------
+
+[float]
+===== Configuring Namespace Defaults
+
+Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
+The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
+enable Namespace defaults configure the `add_resource_metadata` for Namespace objects as follows:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+metricbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      add_resource_metadata:
+        namespace:
+          enabled: true
+-------------------------------------------------------------------------------------
+
 
 [float]
 === Docker

@@ -18,3 +18,7 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

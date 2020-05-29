@@ -1,0 +1,12 @@
+{{block "beat.yml.tmpl" .}}{{end}}
+{{template "general.yml.tmpl" .}}
+{{if not .ExcludeDashboards}}{{template "setup.dashboards.yml.tmpl" .}}{{end}}
+{{template "setup.kibana.yml.tmpl" .}}
+{{template "elastic-cloud.yml.tmpl" .}}
+{{template "outputs.yml.tmpl" .}}
+{{template "output-elasticsearch.yml.tmpl" .}}
+{{template "output-logstash.yml.tmpl" .}}
+{{template "processors.yml.tmpl" .}}
+{{template "logging.yml.tmpl" .}}
+{{template "monitoring.yml.tmpl" .}}
+{{template "migration.yml.tmpl" .}}

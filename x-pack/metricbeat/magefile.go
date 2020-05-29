@@ -9,30 +9,33 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/compose"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(Fields)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -69,7 +72,12 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseElasticBeatXPackPackaging()
+	if v, found := os.LookupEnv("AGENT_PACKAGING"); found && v != "" {
+		devtools.UseElasticBeatXPackReducedPackaging()
+	} else {
+		devtools.UseElasticBeatXPackPackaging()
+	}
+
 	metricbeat.CustomizePackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
@@ -98,7 +106,7 @@ func moduleFieldsGo() error {
 	return devtools.GenerateModuleFieldsGo("module")
 }
 
-// fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
+// fieldsYML generates a fields.yml based on metricbeat + x-pack/metricbeat/modules.
 func fieldsYML() error {
 	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module")
 }
@@ -124,44 +132,37 @@ func Update() {
 		devtools.GenerateModuleIncludeListGo)
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+// Use NOSE_TESTMATCH=pattern to only run tests matching the specified pattern.
+// Use any other NOSE_* environment variable to influence the behavior of
+// nosetests.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("NOSE_")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})

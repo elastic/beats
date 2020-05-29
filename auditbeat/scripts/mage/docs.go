@@ -25,7 +25,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // ModuleDocs collects documentation from modules (both OSS and X-Pack).

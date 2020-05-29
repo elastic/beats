@@ -14,7 +14,7 @@ To bring this container up simply run the tests for Kafka module:
 After the tests have been completed, the Kafka container should be still running. Verify with:
 
 ```console
-707b50334835    docker.elastic.co/integrations-ci/beats-kafka:2.1.1-2  "/run.sh"        2 minutes ago    Up 2 minutes (healthy)  2181/tcp, 0.0.0.0:32785->8774/tcp, 0.0.0.0:32784->8775/tcp, 0.0.0.0:32783->8779/tcp, 0.0.0.0:32782->9092/tcp  kafka_a035cf4c6889705a_kafka_1
+707b50334835    docker.elastic.co/integrations-ci/beats-kafka:2.2.2-2  "/run.sh"        2 minutes ago    Up 2 minutes (healthy)  2181/tcp, 0.0.0.0:32785->8774/tcp, 0.0.0.0:32784->8775/tcp, 0.0.0.0:32783->8779/tcp, 0.0.0.0:32782->9092/tcp  kafka_a035cf4c6889705a_kafka_1
 ```
 
 In order to identify to which port the Broker is listening on one should check in the logs of the container and find 
