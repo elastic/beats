@@ -1856,7 +1856,7 @@ subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
 Dependency: github.com/evanphx/json-patch
 Version: v4.2.0
-License type (autodetected): UNKNOWN
+License type (autodetected): BSD-3-Clause
 ./vendor/github.com/evanphx/json-patch/LICENSE:
 --------------------------------------------------------------------
 Copyright (c) 2014, Evan Phoenix
