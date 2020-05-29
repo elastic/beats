@@ -69,6 +69,8 @@ type Beat struct {
 	ConfigManager management.ConfigManager // config manager
 
 	Keystore keystore.Keystore
+
+	Instrumentation *Instrumentation // Instrumentation holds an APM agent for capturing and reporting traces
 }
 
 // BeatConfig struct contains the basic configuration of every beat
