@@ -874,7 +874,7 @@ def archiveTestOutput(Map args = [:]) {
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-        def folder = shOrBat(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py')
+        def folder = shOrBat(label: 'Find system-tests', returnStdout: true, script: 'python ../.ci/scripts/search_system_tests.py')
         if (folder.trim()) {
           def name = folder.replaceAll('/', '-').replaceAll('\\', '-').replaceAll('build', '')
           tar(file: "${name}.tgz", archive: true, dir: folder)
