@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 )
@@ -49,6 +50,8 @@ func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Com
 				os.Exit(1)
 			}
 
+			// A publisher is needed for modules that add their own pipelines
+			b.Beat.Publisher = newPublisher()
 			mb, err := create(&b.Beat, b.Beat.BeatConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing metricbeat: %s\n", err)
@@ -77,4 +80,18 @@ func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Com
 			}
 		},
 	}
+}
+
+type publisher struct {
+	beat.PipelineConnector
+}
+
+// newPublisher returns a functional publisher that does nothing.
+func newPublisher() *publisher {
+	return &publisher{pipeline.NewNilPipeline()}
+}
+
+// SetACKHandler is a dummy implementation of the ack handler for the test publisher.
+func (*publisher) SetACKHandler(beat.PipelineACKHandler) error {
+	return nil
 }
