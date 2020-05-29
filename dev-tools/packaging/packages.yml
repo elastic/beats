@@ -144,7 +144,7 @@ shared:
     files:
       <<: *agent_binary_files
       install-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service.ps1.tmpl'
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service-elastic-agent.ps1.tmpl'
         mode: 0755
       uninstall-service-{{.BeatName}}.ps1:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
