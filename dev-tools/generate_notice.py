@@ -412,14 +412,8 @@ def detect_license_summary(content):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
         return "MIT"
-    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
-        if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
-            if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
-                return "BSD-4-Clause"
-            return "BSD-3-Clause"
-        else:
-            return "BSD-2-Clause"
-    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS_COMMA_MISSING):
+    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS) or \
+            all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS_COMMA_MISSING):
         if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
             if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
                 return "BSD-4-Clause"
