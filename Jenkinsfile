@@ -776,7 +776,7 @@ def makeTarget(Map args = [:]) {
   def clean = args.get('clean', true)
   def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: env.OSS_MODULE_PATTERN) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(target)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -795,7 +795,7 @@ def mageTarget(Map args = [:]) {
   def target = args.target
   def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, modulePattern: env.XPACK_MODULE_PATTERN) {
+    withBeatsEnv(archive: true, withModule: withModule, modulePattern: getModulePattern(directory)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMage()
@@ -815,7 +815,7 @@ def mageTargetWin(Map args = [:]) {
   def target = args.target
   def withModule = args.get('withModule', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin(withModule: withModule, modulePattern: env.XPACK_MODULE_PATTERN) {
+    withBeatsEnvWin(withModule: withModule, modulePattern: getModulePattern(directory)) {
       whenTrue(params.debug) {
         dumpFilteredEnvironment()
         dumpMageWin()
@@ -827,6 +827,11 @@ def mageTargetWin(Map args = [:]) {
       }
     }
   }
+}
+
+def getModulePattern(String toCompare) {
+  // Use contains to support the makeTarget(target: '-C <folder>') while mageTarget(directory: '<folder>')
+  return (toCompare.contains('x-pack') ? env.XPACK_MODULE_PATTERN : env.OSS_MODULE_PATTERN)
 }
 
 def withBeatsEnv(Map args = [:], Closure body) {
