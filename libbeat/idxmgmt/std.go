@@ -198,6 +198,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		MultiKey:         "indices",
 		EnableSingleOnly: true,
 		FailEmpty:        mode != ilm.ModeEnabled,
+		Case:             outil.SelectorLowerCase,
 	}
 
 	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)

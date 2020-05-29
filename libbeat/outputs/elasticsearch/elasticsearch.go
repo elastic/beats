@@ -138,6 +138,7 @@ func buildSelectors(
 		MultiKey:         "pipelines",
 		EnableSingleOnly: true,
 		FailEmpty:        false,
+		Case:             outil.SelectorLowerCase,
 	})
 	if err != nil {
 		return index, pipeline, err

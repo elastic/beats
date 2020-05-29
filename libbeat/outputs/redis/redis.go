@@ -97,6 +97,7 @@ func makeRedis(
 		MultiKey:         "keys",
 		EnableSingleOnly: true,
 		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
 	})
 	if err != nil {
 		return outputs.Fail(err)

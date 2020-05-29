@@ -71,6 +71,7 @@ func makeKafka(
 		MultiKey:         "topics",
 		EnableSingleOnly: true,
 		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
 	})
 	if err != nil {
 		return outputs.Fail(err)
