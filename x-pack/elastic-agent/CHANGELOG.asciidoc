@@ -66,3 +66,4 @@
 - More clear output of inspect command {pull}18405[18405]
 - Pick up version from libbeat {pull}18350[18350]
 - Use shorter hash for application differentiator {pull}18770[18770]
+- When not port are specified and the https is used fallback to 443 {pull}18844[18844]
