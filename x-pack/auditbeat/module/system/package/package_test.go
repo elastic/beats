@@ -13,6 +13,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -27,6 +28,10 @@ import (
 var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")
 
 func TestData(t *testing.T) {
+	if runtime.GOOS == "darwin" {
+		t.Skip("FIXME: https://github.com/elastic/beats/issues/18855")
+	}
+
 	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
