@@ -1,8 +1,6 @@
 [id="override-{beatname_lc}-config-settings"]
 == Override configuration settings at the command line
 
-//TODO: Test the new examples.
-
 //TODO: Convert this topic to use platform tabs.
 
 // REVEWERS: This is a mix of new and old content. Please review.

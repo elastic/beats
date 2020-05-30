@@ -22,11 +22,6 @@ image::./images/auditbeat-auditd-dashboard.png[{beatname_uc} Auditd dashboard]
 You need {es} for storing and searching your data, and {kib} for visualizing and
 managing it.
 
-// TODO: We might want to provide the instructions for spinning up a deployment
-// here. See
-// https://github.com/elastic/docs/pull/1815/files#diff-934228d98950ff95c8c53444966daeaeR10
-// Or link to the topic that's available for cloud.
-
 include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
 
 [float]

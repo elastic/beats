@@ -1,5 +1,3 @@
-//TODO: Clean up repetition where possible.
-
 // tag::deb[]
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------

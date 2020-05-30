@@ -5,10 +5,6 @@
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 
-//TODO: We need to add a separate topic that provides a summary of the different
-//ways to parse log lines: ingest node, dissect processor, Logstash, etc. That
-//is beyond the scope of a quick start, IMO.
-
 ++++
 <titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
