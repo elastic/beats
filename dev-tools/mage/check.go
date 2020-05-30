@@ -276,7 +276,7 @@ type dashboardObject struct {
 		VisState *struct {
 			Params *struct {
 				IndexPattern *string `json:"index_pattern"`
-				Controls []struct {
+				Controls     []struct {
 					IndexPattern *string
 				} `json:"controls"`
 			} `json:"params"`
