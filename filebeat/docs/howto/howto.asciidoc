@@ -6,7 +6,6 @@
 Learn how to perform common {beatname_uc} configuration tasks.
 
 * <<override-{beatname_lc}-config-settings>
-* <<configuration-{beatname_lc}-modules>>
 * <<{beatname_lc}-template>>
 * <<change-index-name>>
 * <<load-kibana-dashboards>>
@@ -21,8 +20,6 @@ Learn how to perform common {beatname_uc} configuration tasks.
 --
 
 include::override-config-settings.asciidoc[]
-
-include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
 
 include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
 

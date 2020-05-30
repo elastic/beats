@@ -1,3 +1,6 @@
+// REVIEWERS: I am deleting this topic because it is not longer required. We
+// are pointing users to the quick start instead.
+
 :has_module_steps:
 
 [float]

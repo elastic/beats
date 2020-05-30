@@ -10,6 +10,7 @@
 include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 
 * <<configuration-filebeat-options>>
+* <<configuration-{beatname_lc}-modules>>
 * <<configuration-general-options>>
 * <<configuration-path>>
 * <<filebeat-configuration-reloading>>
@@ -31,6 +32,8 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 --
 
 include::./filebeat-options.asciidoc[]
+
+include::{docdir}/../docs/filebeat-modules-options.asciidoc[]
 
 include::./filebeat-general-options.asciidoc[]
 
