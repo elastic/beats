@@ -1,8 +1,6 @@
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
 
-//TODO: Needs more work. Just getting the build working.
-
 ++++
 <titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
@@ -100,20 +98,11 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 ----------------------------------------------------------------------
 
 //REVIEWERS: I've removed the logging section from the example shown above
-//because I don't think it's necessary and might confuse users.
-
-[float]
-[[config-winlogbeat-logstash]]
-=== Step 4: Configure {beatname_uc} to use {ls}
-
-//REVIEWERS: Do we want to show the LS steps here or point users to ingest node
-//instead?
-
-include::{libbeat-outputs-dir}/logstash/docs/logstash.asciidoc[tag=shared-logstash-config]
+//because I don't think it's necessary and might confuse users. WDYT?
 
 [float]
 [[setup-assets]]
-=== Step 5: Set up assets
+=== Step 4: Set up assets
 
 {beatname_uc} comes with predefined assets for parsing, indexing, and
 visualizing your data. To load these assets:
@@ -140,7 +129,7 @@ environment. If you're using a different output, such as {ls}, see
 
 [float]
 [[start]]
-=== Step 6: Start {beatname_uc}
+=== Step 5: Start {beatname_uc}
 
 Start the {beatname_uc} service with the following command. If you are accessing a
 secured Elasticsearch cluster, make sure you've configured credentials as
@@ -177,7 +166,7 @@ PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 
 [float]
 [[view-data]]
-=== Step 7: View your data in {kib}
+=== Step 6: View your data in {kib}
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
