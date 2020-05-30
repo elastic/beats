@@ -985,7 +985,7 @@
               "query": "event.code:4732 OR event.code:4728 OR event.code:4756"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "winlogbeat-*", "winlogbeat-*", "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
