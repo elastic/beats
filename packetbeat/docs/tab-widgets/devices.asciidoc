@@ -29,7 +29,7 @@ packetbeat devices
 // tag::linux[]
 [source,shell]
 ----------------------------------------------------------------------
-packetbeat devices
+./packetbeat devices
 ----------------------------------------------------------------------
 // end::linux[]
 

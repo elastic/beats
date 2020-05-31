@@ -15,29 +15,22 @@ Learn how to perform common {beatname_uc} configuration tasks.
 
 
 --
-[role="xpack"]
 include::{libbeat-dir}/howto/load-index-templates.asciidoc[]
 
-[role="xpack"]
 include::{libbeat-dir}/howto/change-index-name.asciidoc[]
 
-[role="xpack"]
 include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
 
-[role="xpack"]
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 
 :standalone:
-[role="xpack"]
 include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:
 
-[role="xpack"]
 include::{libbeat-dir}/shared-config-ingest.asciidoc[]
 
 :standalone:
 :allplatforms:
-[role="xpack"]
 include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
 :allplatforms!:

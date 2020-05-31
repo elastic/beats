@@ -11,7 +11,7 @@
 <titleabbrev>Set up and run</titleabbrev>
 ++++
 
-Before reading this section, see the
+Before reading this section, see
 <<{beatname_lc}-installation-configuration>> for basic
 installation instructions to get you started.
 

@@ -12,7 +12,7 @@
 <titleabbrev>Set up and deploy</titleabbrev>
 ++++
 
-Before reading this section, see the
+Before reading this section, see
 <<{beatname_lc}-installation-configuration>> for basic
 installation instructions to get you started.
 

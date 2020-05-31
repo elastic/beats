@@ -5,7 +5,7 @@
 <titleabbrev>Quick start: installation and configuration</titleabbrev>
 ++++
 
-This guide describes how to get started quickly with Windows log collection.
+This guide describes how to get started quickly with Windows log monitoring.
 You'll learn how to:
 
 * install {beatname_uc} on each system you want to monitor
@@ -37,7 +37,7 @@ icon and select Run As Administrator).
 . From the PowerShell prompt, run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
-------------------------------------------------
+----
 PS C:\Users\Administrator> cd 'C:\Program Files\Winlogbeat'
 PS C:\Program Files\Winlogbeat> .\install-service-winlogbeat.ps1
 
@@ -51,17 +51,11 @@ Do you want to run C:\Program Files\Winlogbeat\install-service-winlogbeat.ps1?
 Status   Name               DisplayName
 ------   ----               -----------
 Stopped  winlogbeat         winlogbeat
-------------------------------------------------
+----
 
 NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
-
-Before starting {beatname_uc}, you should look at the configuration options in the
-configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
-There’s also a full example configuration file called `winlogbeat.reference.yml` that
-shows all non-deprecated options. For more information about these options, see
-<<configuring-howto-winlogbeat>>.
 
 [float]
 [[set-connection]]
@@ -79,26 +73,45 @@ In `winlogbeat.yml`, configure the event logs that you want to monitor.
 default, {beatname_uc} monitors application, security, and system logs.
 +
 [source,yaml]
-----------------------------------------------------------------------
+----
 winlogbeat.event_logs:
   - name: Application
   - name: Security
   - name: System
-----------------------------------------------------------------------
+----
 +
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
 For more information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
+. (Optional) Set logging options to write Winlogbeat logs to a file:
++
+[source,yaml]
+----
+logging.to_files: true
+logging.files:
+  path: C:\ProgramData\winlogbeat\Logs
+logging.level: info
+----
+
 . After you save your configuration file, test it with the following command.
 +
 [source,shell]
-----------------------------------------------------------------------
+----
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml -e
-----------------------------------------------------------------------
+----
 
 //REVIEWERS: I've removed the logging section from the example shown above
 //because I don't think it's necessary and might confuse users. WDYT?
+
+For more information about configuring {beatname_uc}, also see:
+
+* <<configuring-howto-{beatname_lc},Configure {beatname_uc}>>
+* {beats-ref}/config-file-format.html[Config file format]
+ifeval::["{beatname_lc}"!="apm-server"]
+* <<{beatname_lc}-reference-yml,+{beatname_lc}.reference.yml+>>: This reference configuration
+file shows all non-deprecated options. You'll find it in the same location as
++{beatname_lc}.yml+.
 
 [float]
 [[setup-assets]]
@@ -107,9 +120,8 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe test config -c .\winlogbeat.yml
 {beatname_uc} comes with predefined assets for parsing, indexing, and
 visualizing your data. To load these assets:
 
-. Make sure the user specified in +{beatname_lc}.yml+ has the
-<<privileges-to-setup-beats,privileges and roles>> needed to set up
-{beatname_uc}.
+. Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
 
 . From the installation directory, run:
 +
@@ -131,9 +143,11 @@ environment. If you're using a different output, such as {ls}, see
 [[start]]
 === Step 5: Start {beatname_uc}
 
-Start the {beatname_uc} service with the following command. If you are accessing a
-secured Elasticsearch cluster, make sure you've configured credentials as
-described in <<{beatname_lc}-configuration>>.
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who is
+<<privileges-to-publish-events,authorized to publish events>>.
+
+To start the {beatname_uc} service, run:
 
 // tag::start-step[]
 [source,shell]
@@ -141,8 +155,9 @@ described in <<{beatname_lc}-configuration>>.
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ----------------------------------------------------------------------
 
-{beatname_uc} should now be running. If you used the configuration described here,
-then you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
+{beatname_uc} should now be running. If you used the logging configuration
+described here, you can view the log file at
+`C:\ProgramData\winlogbeat\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services
 management console in Windows. To launch the management console, run

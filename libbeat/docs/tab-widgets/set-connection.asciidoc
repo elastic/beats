@@ -1,7 +1,7 @@
 // tag::cloud[]
 
 Specify the <<configure-cloud-id,`cloud.id`>> of your {ess}, and set
-<<configure-cloud-id,`cloud.auth`>> to a user who has the credentials needed to
+<<configure-cloud-id,`cloud.auth`>> to a user who is authorized to
 set up {beatname_uc}. For example:
 
 ["source","yaml",subs="attributes"]
@@ -21,8 +21,8 @@ endif::[]
 
 // tag::self-managed[]
 . Set the host and port where {beatname_uc} can find the {es} installation, and
-set the username and password of a user who has the credentials needed to set
-up {beatname_uc}. For example:
+set the username and password of a user who is authorized to set up
+{beatname_uc}. For example:
 +
 ["source","yaml",subs="attributes"]
 ----

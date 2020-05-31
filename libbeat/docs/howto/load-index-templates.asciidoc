@@ -20,8 +20,7 @@ the output is not {es} (or {ess}), you must
 <<load-template-manually,load the template manually>>. 
 endif::[]
 
-This page shows how to change the default template loading behavior in the
-when you want to:
+This page shows how to change the default template loading behavior to:
 
 * <<load-custom-template>>
 * <<overwrite-template>>
@@ -58,7 +57,7 @@ setup.template.overwrite: true
 
 [float]
 [[disable-template-loading]]
-=== Disable automatic template loading
+=== Disable automatic index template loading
 
 You may want to disable automatic template loading if you're using an output
 other than {es} and need to load the template manually. To disable automatic
@@ -69,8 +68,8 @@ template loading, set:
 setup.template.enabled: false
 -----
 
-If you disable automatic template loading, you must
-<<load-template-manually,load the template manually>>.
+If you disable automatic template loading, you must load the index template
+manually.
 
 [float]
 [[load-template-manually]]

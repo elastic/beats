@@ -1,3 +1,5 @@
+:modulename: system nginx mysql
+
 [id="configuration-{beatname_lc}-modules"]
 == Configure modules
 
@@ -11,7 +13,7 @@ NOTE: Using {beatname_uc} modules is optional. You may decide to
 <<configuration-{beatname_lc}-options,configure inputs manually>> if you're using
 a log type that isn't supported, or you want to use a different setup.
 
-{beatname_uc} <<{beatname_lc}-modules,modules>> provide a quick way for you to
+{beatname_uc} <<{beatname_lc}-modules,modules>> provide a quick way to
 get started processing common log formats. They contain default configurations,
 {es} ingest node pipeline definitions, and {kib} dashboards to help you
 implement and deploy a log monitoring solution.
@@ -23,13 +25,16 @@ Before running {beatname_uc} with modules enabled, make sure you also set up the
 environment to use {kib} dashboards. See
 <<{beatname_lc}-installation-configuration>> for more information.
 
+include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
+
 [float]
 [[configure-modules-d-configs]]
 ===  Configure modules in the `modules.d` directory
 
 The `modules.d` directory contains default configurations for all the modules
-available in {beatname_uc}. To enable or disable specific module configurations under `modules.d`, run the
-<<modules-command,`modules enable` or `modules disable`>> commands. For example:
+available in {beatname_uc}. To enable or disable specific module configurations
+under `modules.d`, run the
+<<modules-command,`modules enable` or `modules disable`>> command. For example:
 
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 
@@ -38,10 +43,10 @@ your OS and that the behavior of the module is appropriate for your environment.
 To change the default behavior, configure variable settings. For a list of
 available settings, see the documentation under <<{beatname_lc}-modules>>.
 
-For advanced use cases, you can also override input settings. See
-<<advanced-settings>>.
+For advanced use cases, you can also
+<<advanced-settings,override input settings>>.
 
-TIP: You can also enable modules at runtime by using the
+TIP: You can enable modules at runtime by using the
 <<{beatname_lc}-modules,--modules flag>>. This is useful if you're getting started
 and want to try things out. Any modules specified at the command line are loaded
 along with any modules that are enabled in the configuration file or `modules.d`
@@ -54,7 +59,7 @@ line is used.
 
 [float]
 [[configure-modules-config-file]]
-=== Configure modules in the configuration file
+=== Configure modules in the +{beatname_lc}.yml+ file
 
 When possible, you should use the config files in the `modules.d` directory.
 
@@ -65,12 +70,12 @@ directory. You can continue to configure modules in the +{beatname_lc}.yml+
 file, but you won't be able to use the `modules` command to enable and disable
 configurations because the command requires the `modules.d` layout.
 
-To enable specific modules in the +{beatname_lc}.yml+ config file, you can add
+To enable specific modules in the +{beatname_lc}.yml+ config file, add
 entries to the +{beatname_lc}.modules+ list. Each entry in the list begins with
 a dash (-) and is followed by settings for that module.
 
 The following example shows a configuration that runs the `nginx`,`mysql`, and
-`system` modules.
+`system` modules:
 
 ["source","yaml",subs="attributes"]
 ----
@@ -79,11 +84,6 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 - module: mysql
 - module: system
 ----
-
-The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the behavior of the module is
-appropriate for your environment. To change the default configurations, you need
-to set variables in module configuration.
 
 // REVIEWERS: Deleting the section about configuring variable settings because
 // it doesn't really add much value to users who are looking at the module
@@ -127,3 +127,5 @@ You can also enable `close_eof` for all inputs created by any of the modules:
 ----------------------------------------------------------------------
 -M "*.*.input.close_eof=true"
 ----------------------------------------------------------------------
+
+:modulename!:

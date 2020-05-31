@@ -32,10 +32,4 @@ and loads them to the respective {stack} components.
 To learn how to configure and run {beatname_uc} modules:
 
 * Get started by reading <<{beatname_lc}-installation-configuration>>.
-//* Learn about the different ways to enable modules in
-//<<configuration-filebeat-modules>>.
 * Dive into the documentation for each <<filebeat-modules,module>>.
-
-// REVIEWERS: I'm commenting out the second item ^^ because I think we confuse
-// users by describing all the ways to configure modules. At the very least, we
-// shouldn't be pointing users to this confusing subject. WDYT?
