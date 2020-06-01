@@ -133,7 +133,7 @@ require (
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.5.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
@@ -160,17 +160,14 @@ require (
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
 	google.golang.org/grpc v1.27.1
-	gopkg.in/inf.v0 v0.9.0
+	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
-	k8s.io/api v0.0.0-20190722141453-b90922c02518
-	k8s.io/apimachinery v0.0.0-20190719140911-bfcf53abc9f8
-	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
-	k8s.io/klog v0.3.4-0.20190719014911-6a023d6d0e09 // indirect
-	k8s.io/utils v0.0.0-20190712204705-3dccf664f023 // indirect
-	sigs.k8s.io/yaml v1.1.1-0.20190704183835-4cd0c284b15f // indirect
+	k8s.io/api v0.18.3
+	k8s.io/apimachinery v0.18.3
+	k8s.io/client-go v0.18.3
 )
 
 replace (

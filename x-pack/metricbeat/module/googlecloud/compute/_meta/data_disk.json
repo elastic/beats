@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "8390997210852978465",
-            "name": "gke-observability-7--observability-7--3dd3e39b-0jm5"
+            "id": "7692260917184259934",
+            "name": "instance-test-ks"
         },
         "machine": {
-            "type": "n1-standard-4"
+            "type": "e2-standard-2"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "us-central1-a",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -30,22 +30,22 @@
                         "value": 0
                     },
                     "write_bytes_count": {
-                        "value": 0
+                        "value": 158506
                     },
                     "write_ops_count": {
-                        "value": 0
+                        "value": 25
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "gke-observability-7-1--pvc-65581044-7d5d-11ea-8cd9-42010af0011c",
+                "device_name": "instance-test-ks",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
             },
             "user": {
-                "goog-gke-node": ""
+                "created-by": "ks"
             }
         }
     },

@@ -19,8 +19,9 @@ package hints
 
 import (
 	"fmt"
-
 	"strings"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
@@ -69,7 +70,7 @@ func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
 }
 
 // Create configs based on hints passed from providers
-func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
+func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var config []*common.Config
 	host, _ := event["host"].(string)
 	if host == "" {
@@ -94,7 +95,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		logp.Debug("hints.builder", "generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, false)
+		return template.ApplyConfigTemplate(event, configs, options...)
 
 	}
 
@@ -155,7 +156,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	return template.ApplyConfigTemplate(event, config, false)
+	return template.ApplyConfigTemplate(event, config, options...)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
