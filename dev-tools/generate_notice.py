@@ -352,6 +352,18 @@ are permitted provided that the following conditions are met:"""),
    and/or other materials provided with the distribution.
 """)]
 
+# This is a temporary workaround to solve UNKNOWN licence issue
+# for `evanphx/json-patch`: https://github.com/evanphx/json-patch/pull/105
+BSD_LICENSE_CONTENTS_COMMA_MISSING = [
+    re.sub(r"\s+", " ", """Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:"""),
+    re.sub(r"\s+", " ", """Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer."""),
+    re.sub(r"\s+", " ", """Redistributions in binary form must reproduce the above copyright notice
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+""")]
+
 BSD_LICENSE_3_CLAUSE = [
     re.sub(r"\s+", " ", """Neither the name of"""),
     re.sub(r"\s+", " ", """nor the
@@ -400,7 +412,8 @@ def detect_license_summary(content):
         return "Apache-2.0"
     if any(sentence in content[0:1000] for sentence in MIT_LICENSES):
         return "MIT"
-    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS):
+    if all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS) or \
+            all(sentence in content[0:1000] for sentence in BSD_LICENSE_CONTENTS_COMMA_MISSING):
         if all(sentence in content[0:1000] for sentence in BSD_LICENSE_3_CLAUSE):
             if all(sentence in content[0:1000] for sentence in BSD_LICENSE_4_CLAUSE):
                 return "BSD-4-Clause"

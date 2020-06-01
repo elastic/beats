@@ -9,7 +9,7 @@
         "event.id": "{0x5e80a059,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -35,7 +35,7 @@
         "event.id": "{0x5e80a059,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -61,7 +61,7 @@
         "event.id": "{0x5e80a059,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -84,9 +84,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "46915",
+        "client.port": 46915,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -96,7 +96,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -109,6 +109,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -117,15 +118,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "46915",
+        "source.port": 46915,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -139,7 +139,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61794",
+        "client.nat.port": 26680,
+        "client.port": 61794,
         "destination.as.number": 25046,
         "destination.as.organization.name": "Check Point Software Technologies LTD",
         "destination.geo.city_name": "Tel Aviv",
@@ -150,7 +151,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.10",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -160,7 +161,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -173,6 +174,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -181,16 +183,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.10",
             "194.29.39.10"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.10",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26680",
-        "source.port": "61794",
+        "source.nat.port": 26680,
+        "source.port": 61794,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -202,9 +203,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "36749",
+        "client.port": 36749,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -214,7 +215,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -227,6 +228,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -235,15 +237,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "36749",
+        "source.port": 36749,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -257,7 +258,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41566",
+        "client.nat.port": 10012,
+        "client.port": 41566,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -265,7 +267,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -275,7 +277,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -288,6 +290,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -296,16 +299,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10012",
-        "source.port": "41566",
+        "source.nat.port": 10012,
+        "source.port": 41566,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -317,9 +319,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "55799",
+        "client.port": 55799,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -329,7 +331,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -342,6 +344,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -350,15 +353,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "55799",
+        "source.port": 55799,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -372,7 +374,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48698",
+        "client.nat.port": 10013,
+        "client.port": 48698,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -380,7 +383,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -390,7 +393,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -403,6 +406,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -411,16 +415,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10013",
-        "source.port": "48698",
+        "source.nat.port": 10013,
+        "source.port": 48698,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -432,9 +435,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48658",
+        "client.port": 48658,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -444,7 +447,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -457,6 +460,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -465,15 +469,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "48658",
+        "source.port": 48658,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -487,7 +490,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61150",
+        "client.nat.port": 10014,
+        "client.port": 61150,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -495,7 +499,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -505,7 +509,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -518,6 +522,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -526,16 +531,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10014",
-        "source.port": "61150",
+        "source.nat.port": 10014,
+        "source.port": 61150,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -547,9 +551,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "59800",
+        "client.port": 59800,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -559,7 +563,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -572,6 +576,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -580,15 +585,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "59800",
+        "source.port": 59800,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -602,7 +606,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "55110",
+        "client.nat.port": 26681,
+        "client.port": 55110,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -610,7 +615,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.81.142.43",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -620,7 +625,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -633,6 +638,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -641,16 +647,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.81.142.43",
             "104.81.142.43"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26681",
-        "source.port": "55110",
+        "source.nat.port": 26681,
+        "source.port": 55110,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -662,9 +667,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "49780",
+        "client.port": 49780,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -674,7 +679,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -687,6 +692,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -695,15 +701,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "49780",
+        "source.port": 49780,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -717,7 +722,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48718",
+        "client.nat.port": 26682,
+        "client.port": 48718,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -725,7 +731,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -735,7 +741,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -748,6 +754,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -756,16 +763,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26682",
-        "source.port": "48718",
+        "source.nat.port": 26682,
+        "source.port": 48718,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -777,9 +783,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "33536",
+        "client.port": 33536,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -789,7 +795,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "14",
+        "event.sequence": 14,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -802,6 +808,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -810,15 +817,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "33536",
+        "source.port": 33536,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -832,7 +838,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62206",
+        "client.nat.port": 26683,
+        "client.port": 62206,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -840,7 +847,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -850,7 +857,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -863,6 +870,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -871,16 +879,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26683",
-        "source.port": "62206",
+        "source.nat.port": 26683,
+        "source.port": 62206,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -892,9 +899,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61767",
+        "client.port": 61767,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -904,7 +911,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -917,6 +924,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -925,15 +933,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "61767",
+        "source.port": 61767,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -947,7 +954,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41596",
+        "client.nat.port": 26684,
+        "client.port": 41596,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -955,7 +963,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -965,7 +973,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -978,6 +986,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -986,16 +995,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26684",
-        "source.port": "41596",
+        "source.nat.port": 26684,
+        "source.port": 41596,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1007,9 +1015,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48728",
+        "client.port": 48728,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1019,7 +1027,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1032,6 +1040,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1040,15 +1049,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "48728",
+        "source.port": 48728,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1062,7 +1070,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61180",
+        "client.nat.port": 10015,
+        "client.port": 61180,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1070,7 +1079,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1080,7 +1089,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "19",
+        "event.sequence": 19,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1093,6 +1102,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1101,16 +1111,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10015",
-        "source.port": "61180",
+        "source.nat.port": 10015,
+        "source.port": 61180,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1122,9 +1131,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "64364",
+        "client.port": 64364,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1134,7 +1143,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "20",
+        "event.sequence": 20,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1147,6 +1156,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1155,15 +1165,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "64364",
+        "source.port": 64364,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1177,7 +1186,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48732",
+        "client.nat.port": 10016,
+        "client.port": 48732,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1185,7 +1195,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1195,7 +1205,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "21",
+        "event.sequence": 21,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1208,6 +1218,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1216,16 +1227,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10016",
-        "source.port": "48732",
+        "source.nat.port": 10016,
+        "source.port": 48732,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1237,9 +1247,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "54002",
+        "client.port": 54002,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1249,7 +1259,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1262,6 +1272,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1270,15 +1281,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "54002",
+        "source.port": 54002,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1292,7 +1302,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62222",
+        "client.nat.port": 43354,
+        "client.port": 62222,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1300,7 +1311,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1310,7 +1321,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1323,6 +1334,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1331,16 +1343,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43354",
-        "source.port": "62222",
+        "source.nat.port": 43354,
+        "source.port": 62222,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1352,9 +1363,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "40677",
+        "client.port": 40677,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1364,7 +1375,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1377,6 +1388,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1385,15 +1397,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "40677",
+        "source.port": 40677,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1407,7 +1418,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61188",
+        "client.nat.port": 10017,
+        "client.port": 61188,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1415,7 +1427,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1425,7 +1437,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1438,6 +1450,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1446,16 +1459,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10017",
-        "source.port": "61188",
+        "source.nat.port": 10017,
+        "source.port": 61188,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1467,9 +1479,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "53589",
+        "client.port": 53589,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1479,7 +1491,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1492,6 +1504,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1500,15 +1513,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "53589",
+        "source.port": 53589,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1522,7 +1534,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41624",
+        "client.nat.port": 26685,
+        "client.port": 41624,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -1530,7 +1543,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1540,7 +1553,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1553,6 +1566,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1561,16 +1575,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26685",
-        "source.port": "41624",
+        "source.nat.port": 26685,
+        "source.port": 41624,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1582,9 +1595,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "36166",
+        "client.port": 36166,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1594,7 +1607,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1607,6 +1620,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1615,15 +1629,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "36166",
+        "source.port": 36166,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1637,7 +1650,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48758",
+        "client.nat.port": 10018,
+        "client.port": 48758,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1645,7 +1659,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1655,7 +1669,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1668,6 +1682,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1676,16 +1691,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10018",
-        "source.port": "48758",
+        "source.nat.port": 10018,
+        "source.port": 48758,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1697,9 +1711,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "43736",
+        "client.port": 43736,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1709,7 +1723,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1722,6 +1736,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1730,15 +1745,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "43736",
+        "source.port": 43736,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1752,7 +1766,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62246",
+        "client.nat.port": 10019,
+        "client.port": 62246,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1760,7 +1775,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1770,7 +1785,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1783,6 +1798,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1791,16 +1807,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10019",
-        "source.port": "62246",
+        "source.nat.port": 10019,
+        "source.port": 62246,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1812,9 +1827,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "46065",
+        "client.port": 46065,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1824,7 +1839,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1837,6 +1852,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1845,15 +1861,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "46065",
+        "source.port": 46065,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1867,7 +1882,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41638",
+        "client.nat.port": 10020,
+        "client.port": 41638,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -1875,7 +1891,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1885,7 +1901,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1898,6 +1914,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1906,16 +1923,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10020",
-        "source.port": "41638",
+        "source.nat.port": 10020,
+        "source.port": 41638,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1927,9 +1943,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "43388",
+        "client.port": 43388,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -1939,7 +1955,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "15",
+        "event.sequence": 15,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -1952,6 +1968,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -1960,15 +1977,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "43388",
+        "source.port": 43388,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -1982,7 +1998,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61224",
+        "client.nat.port": 43355,
+        "client.port": 61224,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -1990,7 +2007,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2000,7 +2017,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "16",
+        "event.sequence": 16,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2013,6 +2030,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2021,16 +2039,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43355",
-        "source.port": "61224",
+        "source.nat.port": 43355,
+        "source.port": 61224,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2042,9 +2059,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61851",
+        "client.port": 61851,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2054,7 +2071,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "17",
+        "event.sequence": 17,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2067,6 +2084,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2075,15 +2093,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "61851",
+        "source.port": 61851,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2109,7 +2126,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "22",
+        "event.sequence": 22,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2122,6 +2139,9 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.117"
+        ],
+        "related.user": [
+            "admin"
         ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
@@ -2141,7 +2161,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48776",
+        "client.nat.port": 43356,
+        "client.port": 48776,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -2149,7 +2170,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2159,7 +2180,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "18",
+        "event.sequence": 18,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2172,6 +2193,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2180,16 +2202,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43356",
-        "source.port": "48776",
+        "source.nat.port": 43356,
+        "source.port": 48776,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2205,7 +2226,7 @@
         "event.id": "{0x5e80a09c,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -2229,7 +2250,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "51436",
+        "client.nat.port": 26686,
+        "client.port": 51436,
         "destination.as.number": 25046,
         "destination.as.organization.name": "Check Point Software Technologies LTD",
         "destination.geo.city_name": "Tel Aviv",
@@ -2240,7 +2262,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.47",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2250,7 +2272,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2263,6 +2285,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2271,16 +2294,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.47",
             "194.29.39.47"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.47",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26686",
-        "source.port": "51436",
+        "source.nat.port": 26686,
+        "source.port": 51436,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2292,9 +2314,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "36896",
+        "client.port": 36896,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2304,7 +2326,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2317,6 +2339,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2325,15 +2348,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "36896",
+        "source.port": 36896,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2345,9 +2367,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "38864",
+        "client.port": 38864,
         "destination.ip": "192.168.1.153",
-        "destination.port": "514",
+        "destination.port": 514,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2357,7 +2379,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2370,6 +2392,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2378,15 +2401,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.153",
             "192.168.1.153"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.153",
-        "server.port": "514",
+        "server.port": 514,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "38864",
+        "source.port": 38864,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2398,9 +2420,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "59284",
+        "client.port": 59284,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2410,7 +2432,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2423,6 +2445,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2431,15 +2454,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "59284",
+        "source.port": 59284,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2453,7 +2475,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62396",
+        "client.nat.port": 26687,
+        "client.port": 62396,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -2461,7 +2484,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2471,7 +2494,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2484,6 +2507,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2492,16 +2516,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26687",
-        "source.port": "62396",
+        "source.nat.port": 26687,
+        "source.port": 62396,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2513,9 +2536,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "43379",
+        "client.port": 43379,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2525,7 +2548,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2538,6 +2561,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2546,15 +2570,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "43379",
+        "source.port": 43379,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2568,7 +2591,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48914",
+        "client.nat.port": 26688,
+        "client.port": 48914,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -2576,7 +2600,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2586,7 +2610,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2599,6 +2623,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2607,16 +2632,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26688",
-        "source.port": "48914",
+        "source.nat.port": 26688,
+        "source.port": 48914,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2628,9 +2652,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41365",
+        "client.port": 41365,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2640,7 +2664,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2653,6 +2677,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2661,15 +2686,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "41365",
+        "source.port": 41365,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2683,7 +2707,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41844",
+        "client.nat.port": 10021,
+        "client.port": 41844,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -2691,7 +2716,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2701,7 +2726,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2714,6 +2739,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2722,16 +2748,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10021",
-        "source.port": "41844",
+        "source.nat.port": 10021,
+        "source.port": 41844,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2743,9 +2768,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "47951",
+        "client.port": 47951,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2755,7 +2780,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2768,6 +2793,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2776,15 +2802,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "47951",
+        "source.port": 47951,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2798,7 +2823,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62468",
+        "client.nat.port": 26689,
+        "client.port": 62468,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -2806,7 +2832,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2816,7 +2842,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2829,6 +2855,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2837,16 +2864,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26689",
-        "source.port": "62468",
+        "source.nat.port": 26689,
+        "source.port": 62468,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2858,9 +2884,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "36526",
+        "client.port": 36526,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2870,7 +2896,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2883,6 +2909,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2891,15 +2918,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "36526",
+        "source.port": 36526,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2913,7 +2939,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61434",
+        "client.nat.port": 26690,
+        "client.port": 61434,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -2921,7 +2948,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2931,7 +2958,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2944,6 +2971,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -2952,16 +2980,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26690",
-        "source.port": "61434",
+        "source.nat.port": 26690,
+        "source.port": 61434,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -2973,9 +3000,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "34981",
+        "client.port": 34981,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -2985,7 +3012,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -2998,6 +3025,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3006,15 +3034,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "34981",
+        "source.port": 34981,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3028,7 +3055,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41856",
+        "client.nat.port": 26691,
+        "client.port": 41856,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -3036,7 +3064,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3046,7 +3074,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3059,6 +3087,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3067,16 +3096,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26691",
-        "source.port": "41856",
+        "source.nat.port": 26691,
+        "source.port": 41856,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3102,7 +3130,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -3115,6 +3143,9 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.117"
+        ],
+        "related.user": [
+            "admin"
         ],
         "rule.name": "gw-da58d3",
         "service.type": "checkpoint",
@@ -3132,9 +3163,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61445",
+        "client.port": 61445,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3144,7 +3175,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3157,6 +3188,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3165,15 +3197,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "61445",
+        "source.port": 61445,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3187,7 +3218,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48990",
+        "client.nat.port": 26692,
+        "client.port": 48990,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -3195,7 +3227,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3205,7 +3237,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3218,6 +3250,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3226,16 +3259,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26692",
-        "source.port": "48990",
+        "source.nat.port": 26692,
+        "source.port": 48990,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3247,9 +3279,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "64618",
+        "client.port": 64618,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3259,7 +3291,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3272,6 +3304,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3280,15 +3313,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "64618",
+        "source.port": 64618,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3302,7 +3334,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62478",
+        "client.nat.port": 26693,
+        "client.port": 62478,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -3310,7 +3343,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3320,7 +3353,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3333,6 +3366,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3341,16 +3375,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26693",
-        "source.port": "62478",
+        "source.nat.port": 26693,
+        "source.port": 62478,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3362,9 +3395,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61203",
+        "client.port": 61203,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3374,7 +3407,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3387,6 +3420,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3395,15 +3429,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "61203",
+        "source.port": 61203,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3417,7 +3450,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41864",
+        "client.nat.port": 10022,
+        "client.port": 41864,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -3425,7 +3459,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3435,7 +3469,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3448,6 +3482,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3456,16 +3491,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10022",
-        "source.port": "41864",
+        "source.nat.port": 10022,
+        "source.port": 41864,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3477,9 +3511,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "35209",
+        "client.port": 35209,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3489,7 +3523,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3502,6 +3536,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3510,15 +3545,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "35209",
+        "source.port": 35209,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3532,7 +3566,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61446",
+        "client.nat.port": 43357,
+        "client.port": 61446,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -3540,7 +3575,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3550,7 +3585,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3563,6 +3598,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3571,16 +3607,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43357",
-        "source.port": "61446",
+        "source.nat.port": 43357,
+        "source.port": 61446,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3592,9 +3627,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "35787",
+        "client.port": 35787,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3604,7 +3639,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3617,6 +3652,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3625,15 +3661,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "35787",
+        "source.port": 35787,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3647,7 +3682,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "48998",
+        "client.nat.port": 43358,
+        "client.port": 48998,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -3655,7 +3691,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3665,7 +3701,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3678,6 +3714,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3686,16 +3723,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43358",
-        "source.port": "48998",
+        "source.nat.port": 43358,
+        "source.port": 48998,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3709,7 +3745,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41870",
+        "client.nat.port": 43359,
+        "client.port": 41870,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -3717,7 +3754,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3727,7 +3764,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3740,6 +3777,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3748,16 +3786,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43359",
-        "source.port": "41870",
+        "source.nat.port": 43359,
+        "source.port": 41870,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3769,9 +3806,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "46851",
+        "client.port": 46851,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3781,7 +3818,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3794,6 +3831,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3802,15 +3840,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "46851",
+        "source.port": 46851,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3822,9 +3859,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "37927",
+        "client.port": 37927,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3834,7 +3871,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3847,6 +3884,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3855,15 +3893,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "37927",
+        "source.port": 37927,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3877,7 +3914,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62488",
+        "client.nat.port": 26694,
+        "client.port": 62488,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -3885,7 +3923,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3895,7 +3933,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3908,6 +3946,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3916,16 +3955,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26694",
-        "source.port": "62488",
+        "source.nat.port": 26694,
+        "source.port": 62488,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3937,9 +3975,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "45589",
+        "client.port": 45589,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -3949,7 +3987,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -3962,6 +4000,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -3970,15 +4009,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "45589",
+        "source.port": 45589,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -3992,7 +4030,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61454",
+        "client.nat.port": 10023,
+        "client.port": 61454,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -4000,7 +4039,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4010,7 +4049,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4023,6 +4062,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4031,16 +4071,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10023",
-        "source.port": "61454",
+        "source.nat.port": 10023,
+        "source.port": 61454,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4055,7 +4094,7 @@
         "event.id": "{0x5e80a0af,0x0,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4081,7 +4120,7 @@
         "event.id": "{0x5e80a0af,0x1,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4107,7 +4146,7 @@
         "event.id": "{0x5e80a0af,0x2,0x6401a8c0,0x3c7878a}",
         "event.kind": "event",
         "event.module": "checkpoint",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "fileset.name": "firewall",
         "input.type": "log",
@@ -4132,7 +4171,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62122",
+        "client.nat.port": 43360,
+        "client.port": 62122,
         "destination.as.number": 25046,
         "destination.as.organization.name": "Check Point Software Technologies LTD",
         "destination.geo.city_name": "Tel Aviv",
@@ -4143,7 +4183,7 @@
         "destination.geo.region_iso_code": "IL-TA",
         "destination.geo.region_name": "Tel Aviv",
         "destination.ip": "194.29.39.10",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4153,7 +4193,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4166,6 +4206,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4174,16 +4215,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "194.29.39.10",
             "194.29.39.10"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "194.29.39.10",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43360",
-        "source.port": "62122",
+        "source.nat.port": 43360,
+        "source.port": 62122,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4195,9 +4235,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "40928",
+        "client.port": 40928,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4207,7 +4247,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4220,6 +4260,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4228,15 +4269,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "40928",
+        "source.port": 40928,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4248,9 +4288,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "51957",
+        "client.port": 51957,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4260,7 +4300,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4273,6 +4313,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4281,15 +4322,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "51957",
+        "source.port": 51957,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4303,7 +4343,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "55424",
+        "client.nat.port": 26695,
+        "client.port": 55424,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -4311,7 +4352,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.81.142.43",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4321,7 +4362,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4334,6 +4375,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4342,16 +4384,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.81.142.43",
             "104.81.142.43"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26695",
-        "source.port": "55424",
+        "source.nat.port": 26695,
+        "source.port": 55424,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4363,9 +4404,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "37029",
+        "client.port": 37029,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4375,7 +4416,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4388,6 +4429,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4396,15 +4438,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "37029",
+        "source.port": 37029,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4418,7 +4459,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "49026",
+        "client.nat.port": 26696,
+        "client.port": 49026,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -4426,7 +4468,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4436,7 +4478,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4449,6 +4491,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4457,16 +4500,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26696",
-        "source.port": "49026",
+        "source.nat.port": 26696,
+        "source.port": 49026,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4478,9 +4520,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61725",
+        "client.port": 61725,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4490,7 +4532,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "7",
+        "event.sequence": 7,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4503,6 +4545,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4511,15 +4554,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "61725",
+        "source.port": 61725,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4533,7 +4575,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62514",
+        "client.nat.port": 26697,
+        "client.port": 62514,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -4541,7 +4584,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4551,7 +4594,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4564,6 +4607,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4572,16 +4616,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26697",
-        "source.port": "62514",
+        "source.nat.port": 26697,
+        "source.port": 62514,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4593,9 +4636,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "59562",
+        "client.port": 59562,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4605,7 +4648,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4618,6 +4661,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4626,15 +4670,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "59562",
+        "source.port": 59562,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4648,7 +4691,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41902",
+        "client.nat.port": 10024,
+        "client.port": 41902,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -4656,7 +4700,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4666,7 +4710,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4679,6 +4723,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4687,16 +4732,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10024",
-        "source.port": "41902",
+        "source.nat.port": 10024,
+        "source.port": 41902,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4708,9 +4752,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "60754",
+        "client.port": 60754,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4720,7 +4764,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4733,6 +4777,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4741,15 +4786,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "60754",
+        "source.port": 60754,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4763,7 +4807,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61490",
+        "client.nat.port": 43361,
+        "client.port": 61490,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -4771,7 +4816,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4781,7 +4826,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4794,6 +4839,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4802,16 +4848,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43361",
-        "source.port": "61490",
+        "source.nat.port": 43361,
+        "source.port": 61490,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4823,9 +4868,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "36577",
+        "client.port": 36577,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4835,7 +4880,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "3",
+        "event.sequence": 3,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4848,6 +4893,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4856,15 +4902,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "36577",
+        "source.port": 36577,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4878,7 +4923,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "49042",
+        "client.nat.port": 26698,
+        "client.port": 49042,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -4886,7 +4932,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4896,7 +4942,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "4",
+        "event.sequence": 4,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4909,6 +4955,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4917,16 +4964,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26698",
-        "source.port": "49042",
+        "source.nat.port": 26698,
+        "source.port": 49042,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4938,9 +4984,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "39956",
+        "client.port": 39956,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -4950,7 +4996,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "5",
+        "event.sequence": 5,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -4963,6 +5009,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -4971,15 +5018,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "39956",
+        "source.port": 39956,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -4993,7 +5039,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41914",
+        "client.nat.port": 26699,
+        "client.port": 41914,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -5001,7 +5048,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5011,7 +5058,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "6",
+        "event.sequence": 6,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5024,6 +5071,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5032,16 +5080,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "26699",
-        "source.port": "41914",
+        "source.nat.port": 26699,
+        "source.port": 41914,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5053,9 +5100,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "46729",
+        "client.port": 46729,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5065,7 +5112,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "8",
+        "event.sequence": 8,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5078,6 +5125,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5086,15 +5134,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "46729",
+        "source.port": 46729,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5108,7 +5155,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "62534",
+        "client.nat.port": 10025,
+        "client.port": 62534,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -5116,7 +5164,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.41",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5126,7 +5174,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "9",
+        "event.sequence": 9,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5139,6 +5187,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5147,16 +5196,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.41",
             "192.124.249.41"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10025",
-        "source.port": "62534",
+        "source.nat.port": 10025,
+        "source.port": 62534,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5168,9 +5216,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "37133",
+        "client.port": 37133,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5180,7 +5228,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "10",
+        "event.sequence": 10,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5193,6 +5241,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5201,15 +5250,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "37133",
+        "source.port": 37133,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5223,7 +5271,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "61500",
+        "client.nat.port": 10026,
+        "client.port": 61500,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -5231,7 +5280,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.36",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5241,7 +5290,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "11",
+        "event.sequence": 11,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5254,6 +5303,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5262,16 +5312,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.36",
             "192.124.249.36"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10026",
-        "source.port": "61500",
+        "source.nat.port": 10026,
+        "source.port": 61500,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5283,9 +5332,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "44417",
+        "client.port": 44417,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5295,7 +5344,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "12",
+        "event.sequence": 12,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5308,6 +5357,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5316,15 +5366,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "44417",
+        "source.port": 44417,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5338,7 +5387,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "41938",
+        "client.nat.port": 10027,
+        "client.port": 41938,
         "destination.as.number": 16625,
         "destination.as.organization.name": "Akamai Technologies, Inc.",
         "destination.geo.continent_name": "North America",
@@ -5346,7 +5396,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.99.234.45",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5356,7 +5406,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "13",
+        "event.sequence": 13,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5369,6 +5419,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5377,16 +5428,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "104.99.234.45",
             "104.99.234.45"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
-        "server.port": "443",
+        "server.port": 443,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "10027",
-        "source.port": "41938",
+        "source.nat.port": 10027,
+        "source.port": 41938,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5398,9 +5448,9 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "37245",
+        "client.port": 37245,
         "destination.ip": "192.168.1.1",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5410,7 +5460,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "1",
+        "event.sequence": 1,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5423,6 +5473,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5431,15 +5482,14 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.168.1.1",
             "192.168.1.1"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
-        "server.port": "53",
+        "server.port": 53,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.port": "37245",
+        "source.port": 37245,
         "tags": [
             "checkpoint-firewall"
         ]
@@ -5453,7 +5503,8 @@
         "checkpoint.parent_rule": "0",
         "checkpoint.rule_action": "Accept",
         "client.ip": "192.168.1.100",
-        "client.port": "49102",
+        "client.nat.port": 43362,
+        "client.port": 49102,
         "destination.as.number": 30148,
         "destination.as.organization.name": "Sucuri",
         "destination.geo.continent_name": "North America",
@@ -5461,7 +5512,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "192.124.249.31",
-        "destination.port": "80",
+        "destination.port": 80,
         "event.action": "Accept",
         "event.category": [
             "network"
@@ -5471,7 +5522,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.outcome": "success",
-        "event.sequence": "2",
+        "event.sequence": 2,
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -5484,6 +5535,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
         "observer.name": "192.168.1.100",
@@ -5492,16 +5544,15 @@
         "observer.vendor": "Checkpoint",
         "related.ip": [
             "192.168.1.100",
-            "192.124.249.31",
             "192.124.249.31"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
-        "server.port": "80",
+        "server.port": 80,
         "service.type": "checkpoint",
         "source.ip": "192.168.1.100",
-        "source.nat.port": "43362",
-        "source.port": "49102",
+        "source.nat.port": 43362,
+        "source.port": 49102,
         "tags": [
             "checkpoint-firewall"
         ]

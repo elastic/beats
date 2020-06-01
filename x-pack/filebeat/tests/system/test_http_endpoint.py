@@ -101,24 +101,6 @@ class Test(BaseTest):
         assert r.status_code == 415
         assert r.text == '{"message": "Wrong Content-Type header, expecting application/json"}'
 
-    def test_http_endpoint_wrong_accept_header(self):
-        """
-        Test http_endpoint input with wrong accept header.
-        """
-        self.get_config()
-        filebeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Starting HTTP server on {}:{}".format(self.host, self.port)))
-
-        message = "somerandommessage"
-        payload = {self.prefix: message}
-        headers = {"Content-Type": "application/json", "Accept": "application/xml"}
-        r = requests.post(self.url, headers=headers, data=json.dumps(payload))
-
-        filebeat.check_kill_and_wait()
-
-        assert r.status_code == 406
-        assert r.text == '{"message": "Wrong Accept header, expecting application/json"}'
-
     def test_http_endpoint_missing_auth_value(self):
         """
         Test http_endpoint input with missing basic auth values.
