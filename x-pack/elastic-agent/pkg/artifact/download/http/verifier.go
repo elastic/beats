@@ -6,7 +6,9 @@ package http
 
 import (
 	"bytes"
+	"crypto/sha512"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -54,6 +56,40 @@ func NewVerifier(config *artifact.Config) (*Verifier, error) {
 // Verify checks downloaded package on preconfigured
 // location agains a key stored on elastic.co website.
 func (v *Verifier) Verify(programName, version string) (bool, error) {
+	// TODO: think about verifying asc for prepacked beats
+	return v.verifyHash(programName, version)
+}
+
+func (v *Verifier) verifyHash(programName, version string) (bool, error) {
+	fullPath, err := artifact.GetArtifactPath(programName, version, v.config.OS(), v.config.Arch(), v.config.TargetDirectory)
+	if err != nil {
+		return false, errors.New(err, "retrieving package path")
+	}
+
+	hashFilePath := fullPath + ".sha512"
+	expectedHashBytes, err := ioutil.ReadFile(hashFilePath)
+	if err != nil {
+		return false, err
+	}
+
+	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
+	if err != nil {
+		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
+	}
+	defer fileReader.Close()
+
+	// compute file hash
+	hash := sha512.New()
+	if _, err := io.Copy(hash, fileReader); err != nil {
+		return false, err
+	}
+	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
+	expectedHash := string(bytes.TrimSpace(expectedHashBytes))
+
+	return expectedHash == computedHash, nil
+}
+
+func (v *Verifier) verifyAsc(programName, version string) (bool, error) {
 	filename, err := artifact.GetArtifactName(programName, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
@@ -92,6 +128,7 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 	}
 
 	return true, nil
+
 }
 
 func (v *Verifier) composeURI(programName, filename string) (string, error) {

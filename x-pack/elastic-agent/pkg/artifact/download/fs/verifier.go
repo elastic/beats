@@ -6,7 +6,9 @@ package fs
 
 import (
 	"bytes"
+	"crypto/sha512"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -52,6 +54,34 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 
 	fullPath := filepath.Join(v.config.TargetDirectory, filename)
 
+	return v.verifyHash(fullPath)
+}
+
+func (v *Verifier) verifyHash(fullPath string) (bool, error) {
+	hashFilePath := fullPath + ".sha512"
+	expectedHashBytes, err := ioutil.ReadFile(hashFilePath)
+	if err != nil {
+		return false, err
+	}
+
+	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
+	if err != nil {
+		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
+	}
+	defer fileReader.Close()
+
+	// compute file hash
+	hash := sha512.New()
+	if _, err := io.Copy(hash, fileReader); err != nil {
+		return false, err
+	}
+	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
+	expectedHash := string(bytes.TrimSpace(expectedHashBytes))
+
+	return expectedHash == computedHash, nil
+}
+
+func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
 	ascBytes, err := v.getPublicAsc(filename)
 	if err != nil {
 		return false, err
