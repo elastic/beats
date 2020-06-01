@@ -137,37 +137,6 @@ func TestServer_MultiClients(t *testing.T) {
 	}))
 }
 
-func TestServer_PreventMultipleStreams(t *testing.T) {
-	initConfig := "initial_config"
-	app := &StubApp{}
-	srv := createAndStartServer(t, &StubHandler{})
-	defer srv.Stop()
-	as, err := srv.Register(app, initConfig)
-	require.NoError(t, err)
-	cImpl1 := &StubClientImpl{}
-	c1 := newClientFromApplicationState(t, as, cImpl1)
-	require.NoError(t, c1.Start(context.Background()))
-	defer c1.Stop()
-	cImpl2 := &StubClientImpl{}
-	c2 := newClientFromApplicationState(t, as, cImpl2)
-	require.NoError(t, c2.Start(context.Background()))
-	defer c2.Stop()
-
-	assert.NoError(t, waitFor(func() error {
-		if cImpl2.Error() == nil {
-			return fmt.Errorf("client never got error trying to connect twice")
-		}
-		s, ok := status.FromError(cImpl2.Error())
-		if !ok {
-			return fmt.Errorf("client didn't get a status error")
-		}
-		if s.Code() != codes.AlreadyExists {
-			return fmt.Errorf("client didn't get already exists error")
-		}
-		return nil
-	}))
-}
-
 func TestServer_PreventCheckinStream(t *testing.T) {
 	initConfig := "initial_config"
 	app := &StubApp{}
