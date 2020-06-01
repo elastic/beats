@@ -43,6 +43,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+* Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 
 *Heartbeat*
