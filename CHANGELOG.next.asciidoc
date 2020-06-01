@@ -32,17 +32,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   running on. This is because the `host` field specifies the host on which the event
   happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the following modules will no longer send the `host`
-  field. You can revert this change by configuring tags for the module and omitting
+  field that contains information about the host on which Filebeat is running.
+  You can revert this change by configuring tags for the module and omitting
   `forwarded` from the list. {issue}13920[13920]
 * CEF {pull}18223[18223]
 * PANW {pull}18223[18223]
 * Cisco {pull}18753[18753]
-will no longer send the `host` field that contains information about the host Filebeat is
-running on. This is because the `host` field specifies the host on which the event
-happened. {issue}13920[13920] {pull}18223[18223]
-- With the default configuration the cef and panw modules will no longer send the `host`
-field. You can revert this change by configuring tags for the module and omitting
-`forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+* iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 
