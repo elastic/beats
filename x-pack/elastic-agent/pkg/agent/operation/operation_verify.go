@@ -82,7 +82,7 @@ func (o *operationVerify) Run(ctx context.Context, application Application) (err
 
 	if !isVerified {
 		return errors.New(err,
-			fmt.Sprintf("operation '%s' marked '%s.%s' invalid", o.Name(), o.program.BinaryName(), o.program.Version()),
+			fmt.Sprintf("operation '%s' marked '%s.%s' corrupted", o.Name(), o.program.BinaryName(), o.program.Version()),
 			errors.TypeSecurity)
 	}
 
