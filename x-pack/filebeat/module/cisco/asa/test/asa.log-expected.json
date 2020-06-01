@@ -26,7 +26,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -56,7 +57,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -106,7 +108,8 @@
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -156,7 +159,8 @@
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -206,7 +210,8 @@
         "source.ip": "100.66.185.90",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -256,7 +261,8 @@
         "source.ip": "100.66.185.90",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -306,7 +312,8 @@
         "source.ip": "100.66.160.197",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -356,7 +363,8 @@
         "source.ip": "100.66.205.14",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -406,7 +414,8 @@
         "source.ip": "100.66.124.33",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -456,7 +465,8 @@
         "source.ip": "100.66.35.9",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -506,7 +516,8 @@
         "source.ip": "100.66.211.242",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -556,7 +567,8 @@
         "source.ip": "100.66.218.21",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -606,7 +618,8 @@
         "source.ip": "100.66.198.27",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -656,7 +669,8 @@
         "source.ip": "100.66.198.27",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -706,7 +720,8 @@
         "source.ip": "100.66.202.211",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -756,7 +771,8 @@
         "source.ip": "100.66.124.15",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -806,7 +822,8 @@
         "source.ip": "100.66.124.15",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -856,7 +873,8 @@
         "source.ip": "100.66.209.247",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -906,7 +924,8 @@
         "source.ip": "100.66.35.162",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -936,7 +955,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -966,7 +986,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1016,7 +1037,8 @@
         "source.ip": "100.66.80.32",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1046,7 +1068,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1096,7 +1119,8 @@
         "source.ip": "100.66.252.6",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1126,7 +1150,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1156,7 +1181,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1186,7 +1212,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1216,7 +1243,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1246,7 +1274,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1276,7 +1305,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1326,7 +1356,8 @@
         "source.ip": "100.66.238.126",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1376,7 +1407,8 @@
         "source.ip": "100.66.93.51",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1406,7 +1438,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1436,7 +1469,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1466,7 +1500,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1496,7 +1531,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1526,7 +1562,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1576,7 +1613,8 @@
         "source.ip": "100.66.240.126",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1626,7 +1664,8 @@
         "source.ip": "100.66.44.45",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1656,7 +1695,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1686,7 +1726,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1716,7 +1757,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1746,7 +1788,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1796,7 +1839,8 @@
         "source.ip": "100.66.157.232",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1846,7 +1890,8 @@
         "source.ip": "100.66.178.133",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1876,7 +1921,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1906,7 +1952,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1956,7 +2003,8 @@
         "source.ip": "100.66.133.112",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1986,7 +2034,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2036,7 +2085,8 @@
         "source.ip": "100.66.157.232",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2086,7 +2136,8 @@
         "source.ip": "100.66.204.197",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2116,7 +2167,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2146,7 +2198,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2176,7 +2229,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2206,7 +2260,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2236,7 +2291,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2266,7 +2322,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2296,7 +2353,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2346,7 +2404,8 @@
         "source.ip": "100.66.100.4",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2376,7 +2435,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2406,7 +2466,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2436,7 +2497,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2466,7 +2528,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2496,7 +2559,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2546,7 +2610,8 @@
         "source.ip": "100.66.198.40",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2576,7 +2641,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2606,7 +2672,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2656,7 +2723,8 @@
         "source.ip": "100.66.1.107",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2686,7 +2754,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2716,7 +2785,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2746,7 +2816,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2776,7 +2847,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2806,7 +2878,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2836,7 +2909,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2866,7 +2940,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2896,7 +2971,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2926,7 +3002,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2956,7 +3033,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2986,7 +3064,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3036,7 +3115,8 @@
         "source.ip": "100.66.115.46",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3086,7 +3166,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3116,7 +3197,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3146,7 +3228,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3193,7 +3276,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3240,7 +3324,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3287,7 +3372,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3334,7 +3420,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3381,7 +3468,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3428,7 +3516,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3475,7 +3564,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3522,7 +3612,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3569,7 +3660,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3616,7 +3708,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3663,7 +3756,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3710,7 +3804,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3757,7 +3852,8 @@
         "source.ip": "100.66.19.254",
         "source.port": 80,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3787,7 +3883,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3817,7 +3914,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3847,7 +3945,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -3877,7 +3976,8 @@
         "process.pid": 999,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     }
 ]

@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/cisco-ios.log
   - name: tags
-    default: [cisco-ios]
+    default: [cisco-ios, forwarded]
   - name: syslog_host
     default: localhost
   - name: syslog_port

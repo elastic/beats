@@ -41,7 +41,8 @@
         "source.address": "10.1.123.45",
         "source.ip": "10.1.123.45",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -74,7 +75,8 @@
         "process.pid": 1234,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -108,7 +110,8 @@
         "process.pid": 1234,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -161,7 +164,8 @@
         "source.ip": "127.0.0.1",
         "source.port": 512,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]
