@@ -1854,6 +1854,38 @@ separate copyright notices and license terms. Your use of these
 subcomponents is subject to the terms and conditions of the 
 subcomponent's license, as noted in the LICENSE file.
 --------------------------------------------------------------------
+Dependency: github.com/evanphx/json-patch
+Version: v4.2.0
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/evanphx/json-patch/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2014, Evan Phoenix
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+* Neither the name of the Evan Phoenix nor the names of its contributors 
+  may be used to endorse or promote products derived from this software 
+  without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/fatih/color
 Version: v1.5.0
 License type (autodetected): MIT
@@ -3065,7 +3097,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/google/gofuzz
-Version: v1.0.0
+Version: v1.1.0
 License type (autodetected): Apache-2.0
 ./vendor/github.com/google/gofuzz/LICENSE:
 --------------------------------------------------------------------
@@ -5397,7 +5429,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/json-iterator/go
-Version: v1.1.7
+Version: v1.1.8
 License type (autodetected): MIT
 ./vendor/github.com/json-iterator/go/LICENSE:
 --------------------------------------------------------------------
@@ -7120,7 +7152,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/spf13/pflag
-Version: v1.0.3
+Version: v1.0.5
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/spf13/pflag/LICENSE:
 --------------------------------------------------------------------
@@ -8272,7 +8304,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
-Version: v0.9.0
+Version: v0.9.1
 License type (autodetected): BSD-3-Clause
 ./vendor/gopkg.in/inf.v0/LICENSE:
 --------------------------------------------------------------------
@@ -8903,7 +8935,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: k8s.io/api
-Revision: b90922c02518
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/api/LICENSE:
 --------------------------------------------------------------------
@@ -8912,7 +8944,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/apimachinery
-Revision: bfcf53abc9f8
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/apimachinery/LICENSE:
 --------------------------------------------------------------------
@@ -8921,7 +8953,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/client-go
-Revision: 78d2af792bab
+Version: v0.18.3
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/client-go/LICENSE:
 --------------------------------------------------------------------
@@ -8930,8 +8962,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: k8s.io/klog
-Version: v0.3.4
-Revision: 6a023d6d0e09
+Version: v1.0.0
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/klog/LICENSE:
 --------------------------------------------------------------------
@@ -8939,8 +8970,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: k8s.io/kube-openapi
+Revision: 61e04a5be9a6
+License type (autodetected): Apache-2.0
+./vendor/k8s.io/kube-openapi/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: k8s.io/utils
-Revision: 3dccf664f023
+Revision: a9aa75ae1b89
 License type (autodetected): Apache-2.0
 ./vendor/k8s.io/utils/LICENSE:
 --------------------------------------------------------------------
@@ -8948,9 +8988,17 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: sigs.k8s.io/structured-merge-diff/v3
+Version: v3.0.0
+License type (autodetected): Apache-2.0
+./vendor/sigs.k8s.io/structured-merge-diff/v3/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: sigs.k8s.io/yaml
-Version: v1.1.1
-Revision: 4cd0c284b15f
+Version: v1.2.0
 License type (autodetected): MIT
 ./vendor/sigs.k8s.io/yaml/LICENSE:
 --------------------------------------------------------------------
