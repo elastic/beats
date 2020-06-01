@@ -78,6 +78,10 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 		expectedHash = strings.TrimSpace(strings.TrimSuffix(line, filename))
 	}
 
+	if expectedHash == "" {
+		return false, fmt.Errorf("hash for '%s' not found", filename)
+	}
+
 	// compute file hash
 	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
 	if err != nil {
@@ -90,10 +94,6 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 		return false, err
 	}
 	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
-
-	fmt.Println(">>>>>>> fs")
-	fmt.Printf("e: '%s'\nc: '%s'\n", expectedHash, computedHash)
-	fmt.Println("<<<<<<<")
 
 	return expectedHash == computedHash, nil
 }
