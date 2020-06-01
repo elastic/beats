@@ -1,5 +1,4 @@
 ---
----
 - job:
     name: Beats/build-it-docker-images
     display-name: ITs Docker images
