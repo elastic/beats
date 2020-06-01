@@ -5,6 +5,7 @@
 package fs
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/sha512"
 	"fmt"
@@ -12,6 +13,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 
 	"golang.org/x/crypto/openpgp"
 
@@ -37,10 +40,6 @@ func NewVerifier(config *artifact.Config) (*Verifier, error) {
 		config: config,
 	}
 
-	if err := v.loadPGP(config.PgpFile); err != nil {
-		return nil, errors.New(err, "loading PGP")
-	}
-
 	return v, nil
 }
 
@@ -54,34 +53,63 @@ func (v *Verifier) Verify(programName, version string) (bool, error) {
 
 	fullPath := filepath.Join(v.config.TargetDirectory, filename)
 
-	return v.verifyHash(fullPath)
+	return v.verifyHash(filename, fullPath)
 }
 
-func (v *Verifier) verifyHash(fullPath string) (bool, error) {
+func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	hashFilePath := fullPath + ".sha512"
-	expectedHashBytes, err := ioutil.ReadFile(hashFilePath)
+	hashFileHandler, err := os.Open(hashFilePath)
 	if err != nil {
 		return false, err
 	}
+	defer hashFileHandler.Close()
 
+	// get hash
+	// content of a file is in following format
+	// hash  filename
+	var expectedHash string
+	scanner := bufio.NewScanner(hashFileHandler)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !strings.HasSuffix(line, filename) {
+			continue
+		}
+
+		expectedHash = strings.TrimSpace(strings.TrimSuffix(line, filename))
+	}
+
+	// compute file hash
 	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
 	if err != nil {
 		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
 	}
 	defer fileReader.Close()
 
-	// compute file hash
 	hash := sha512.New()
 	if _, err := io.Copy(hash, fileReader); err != nil {
 		return false, err
 	}
 	computedHash := fmt.Sprintf("%x", hash.Sum(nil))
-	expectedHash := string(bytes.TrimSpace(expectedHashBytes))
+
+	fmt.Println(">>>>>>> fs")
+	fmt.Printf("e: '%s'\nc: '%s'\n", expectedHash, computedHash)
+	fmt.Println("<<<<<<<")
 
 	return expectedHash == computedHash, nil
 }
 
 func (v *Verifier) verifyAsc(filename, fullPath string) (bool, error) {
+	var err error
+	var pgpBytesLoader sync.Once
+
+	pgpBytesLoader.Do(func() {
+		err = v.loadPGP(v.config.PgpFile)
+	})
+
+	if err != nil {
+		return false, errors.New(err, "loading PGP")
+	}
+
 	ascBytes, err := v.getPublicAsc(filename)
 	if err != nil {
 		return false, err
