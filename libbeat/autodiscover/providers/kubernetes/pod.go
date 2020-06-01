@@ -134,7 +134,7 @@ func (p *pod) OnAdd(obj interface{}) {
 func (p *pod) OnUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 
-	p.logger.Errorf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
+	p.logger.Debugf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
 	if pod.Status.Phase == kubernetes.PodPending {
 		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
 		return
