@@ -23,10 +23,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 
 *Filebeat*
+
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
+  will no longer send the `host` field that contains information about the host Filebeat is
+  running on. This is because the `host` field specifies the host on which the event
+  happened. {issue}13920[13920] {pull}18223[18223]
+- With the default configuration the following modules will no longer send the `host`
+  field. You can revert this change by configuring tags for the module and omitting
+  `forwarded` from the list. {issue}13920[13920]
+* CEF {pull}18223[18223]
+* PANW {pull}18223[18223]
+* Cisco {pull}18753[18753]
 will no longer send the `host` field that contains information about the host Filebeat is
 running on. This is because the `host` field specifies the host on which the event
 happened. {issue}13920[13920] {pull}18223[18223]
