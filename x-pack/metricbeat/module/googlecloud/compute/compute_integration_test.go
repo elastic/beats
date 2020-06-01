@@ -33,6 +33,7 @@ func TestData(t *testing.T) {
 		{"googlecloud.compute.instance.network", "./_meta/data_network.json"},
 		{"googlecloud.compute.instance.cpu", "./_meta/data_cpu.json"},
 		{"googlecloud.compute.firewall", "./_meta/data_firewall.json"},
+		{"googlecloud.compute.instance.memory", "./_meta/data_memory.json"},
 	}
 
 	config := stackdriver.GetConfigForTest(t, "compute")

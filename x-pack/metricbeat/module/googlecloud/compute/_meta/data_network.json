@@ -5,15 +5,15 @@
             "id": "elastic-observability"
         },
         "instance": {
-            "id": "7208038667777737825",
-            "name": "gke-dev-next-oblt-dev-next-oblt-pool-404d7f0c-fgxk"
+            "id": "7692260917184259934",
+            "name": "instance-test-ks"
         },
         "machine": {
-            "type": "n1-standard-4"
+            "type": "e2-standard-2"
         },
         "provider": "googlecloud"
     },
-    "cloud.availability_zone": "europe-west1-c",
+    "cloud.availability_zone": "us-central1-a",
     "event": {
         "dataset": "googlecloud.compute",
         "duration": 115000,
@@ -24,23 +24,26 @@
             "instance": {
                 "network": {
                     "received_bytes_count": {
-                        "value": 17913
+                        "value": 13073
                     },
                     "received_packets_count": {
-                        "value": 128
+                        "value": 95
                     },
                     "sent_bytes_count": {
-                        "value": 841
+                        "value": 0
+                    },
+                    "sent_packets_count": {
+                        "value": 0
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "loadbalanced": "true"
+                "loadbalanced": "false"
             },
             "user": {
-                "goog-gke-node": ""
+                "created-by": "ks"
             }
         }
     },

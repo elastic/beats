@@ -59,6 +59,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
+- Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
 
 *Functionbeat*
 
@@ -103,6 +104,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - [Autodiscover] Check if runner is already running before starting again. {pull}18564[18564]
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
+- Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 
 *Auditbeat*
 
@@ -205,6 +207,9 @@ field. You can revert this change by configuring tags for the module and omittin
 - Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
 - Fix application_pool metricset after pdh changes. {pull}18477[18477]
 - Fix tags_filter for cloudwatch metricset in aws. {pull}18524[18524]
+- Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}18797[18797]
+- Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
+- Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 
 *Packetbeat*
 
@@ -440,6 +445,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
+- Add memory metrics into compute googlecloud. {pull}18802[18802]
 
 *Packetbeat*
 

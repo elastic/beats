@@ -25,14 +25,14 @@ import (
 type ClientLogger struct {
 	logFile       *pipereader.PipeReader
 	client        beat.Client
-	pipelineHash  string
+	pipelineHash  uint64
 	closer        chan struct{}
 	containerMeta logger.Info
 	logger        *logp.Logger
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hashstring string, info logger.Info) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -47,9 +47,9 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		return nil, err
 	}
 
-	clientLogger.Debugf("Created new logger for %s", hashstring)
+	clientLogger.Debugf("Created new logger for %d", hash)
 
-	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hashstring, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
+	return &ClientLogger{logFile: inputFile, client: client, pipelineHash: hash, closer: make(chan struct{}), containerMeta: info, logger: clientLogger}, nil
 }
 
 // Close closes the pipeline client and reader
