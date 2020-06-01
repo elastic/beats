@@ -26,7 +26,7 @@ import (
 // userConfig holds the parameters for a disk queue that are configurable
 // by the end user in the beats yml file.
 type userConfig struct {
-	PageSize uint32 `config:"page_size" validate:"min=128"`
+	Path string `config:"path"`
 }
 
 func (c *userConfig) Validate() error {
@@ -45,7 +45,5 @@ func SettingsForUserConfig(config *common.Config) (Settings, error) {
 		return Settings{}, err
 	}
 
-	return Settings{
-		PageSize: userConfig.PageSize,
-	}, nil
+	return Settings{}, nil
 }

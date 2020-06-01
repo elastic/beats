@@ -65,18 +65,6 @@ type bufferPosition struct {
 	byteIndex uint64
 }
 
-// This is the queue metadata that is saved to disk. Currently it only
-// tracks the read position in the queue; all other data is contained
-// in the segment files.
-type diskQueuePersistentState struct {
-	// The schema version for the state file (currently always 0).
-	version uint32
-	
-	// The oldest position in the queue. This is advanced as we receive ACKs from
-	// downstream consumers indicating it is safe to remove old events.
-	firstPosition bufferPosition
-}
-
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
 type diskQueue struct {
@@ -87,7 +75,7 @@ type diskQueue struct {
 	//state     diskQueuePersistentState
 	stateFile *stateFile
 
-	// 
+	//
 	firstPosition bufferPosition
 
 	// The position of the next event to read from the queue. If this equals
@@ -101,8 +89,6 @@ type diskQueue struct {
 	// in-memory state that should not persist through a restart.
 	readPosition bufferPosition
 }
-
-type stateFile os.File
 
 func init() {
 	queue.RegisterQueueType(
@@ -136,13 +122,13 @@ func queueFactory(
 // and settings, creating it if it doesn't exist.
 func NewQueue(settings Settings) (queue.Queue, error) {
 	// Create the given directory path if it doesn't exist.
-	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
+	err := os.MkdirAll(settings.Path, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't create disk queue directory: %w", err)
 	}
 
 	// Load the file handle for the queue state.
-	stateFile, state, err := stateFileForPath(settings.stateFilePath())
+	stateFile, err := stateFileForPath(settings.stateFilePath())
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
 	}
@@ -154,10 +140,28 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	// Decode the state from the file.
-	stateFile.Seek(0)
-
 	return &diskQueue{settings: settings}, nil
+}
+
+//
+// bookkeeping helpers to locate queue data on disk
+//
+
+func (settings Settings) directoryPath() string {
+	if settings.Path == "" {
+		return paths.Resolve(paths.Data, "diskqueue")
+	}
+	return settings.Path
+}
+
+func (settings Settings) stateFilePath() string {
+	return filepath.Join(settings.directoryPath(), "state.dat")
+}
+
+func (settings Settings) segmentFilePath(segmentID uint64) string {
+	return filepath.Join(
+		settings.directoryPath(),
+		fmt.Sprintf("%v.seg", segmentID))
 }
 
 //
@@ -182,40 +186,4 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 
 func (dq *diskQueue) Consumer() queue.Consumer {
 	panic("TODO: not implemented")
-}
-
-func (settings diskQueueSettings) directoryPath() string {
-	if settings.Path == "" {
-		return paths.Resolve(paths.Data, "diskqueue")
-	}
-	return settings.Path
-}
-
-func (settings diskQueueSettings) stateFilePath() string {
-	return filepath.Join(settings.directoryPath(), "state.dat")
-}
-
-func (settings diskQueueSettings) segmentFilePath(segmentID uint64) string {
-	return filepath.Join(settings.directoryPath(), "%v.seg", segmentID)
-}
-
-func queueStateFromPath(path string) (diskQueueState, error) {
-	return diskQueueState{}, nil
-}
-
-func stateFileForPath(path string) (*stateFile, error) {
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't open disk queue metadata file: %w", err)
-	}
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't stat disk queue metadata file: %w", err)
-	}
-	if 
-	return file, nil
-}
-
-func (stateFile *stateFile) saveState(state diskQueueState) error {
-	return nil
 }
