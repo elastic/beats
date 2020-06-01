@@ -32,7 +32,8 @@
         "source.ip": "10.123.123.123",
         "source.port": 53723,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -62,7 +63,8 @@
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -93,7 +95,8 @@
         "source.ip": "10.123.123.123",
         "source.port": 6316,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -126,7 +129,8 @@
         "source.ip": "10.123.123.123",
         "source.port": 57621,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -151,7 +155,8 @@
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

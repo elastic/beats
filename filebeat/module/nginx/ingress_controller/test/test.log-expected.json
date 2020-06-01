@@ -13,7 +13,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "post",
+        "http.request.method": "POST",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -58,7 +58,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -103,7 +103,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "delete",
+        "http.request.method": "DELETE",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -148,7 +148,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "patch",
+        "http.request.method": "PATCH",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -193,7 +193,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "patchp",
+        "http.request.method": "PATCHp",
         "http.response.body.bytes": 163,
         "http.response.status_code": 400,
         "http.version": "1.1",
@@ -265,7 +265,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -310,7 +310,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -358,7 +358,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -407,7 +407,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -455,7 +455,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -504,7 +504,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -552,7 +552,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/products/42",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -601,7 +601,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -649,7 +649,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -697,7 +697,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -746,7 +746,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -794,7 +794,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "http://hello-world.info/v2",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
@@ -843,7 +843,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -888,7 +888,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -936,7 +936,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 59,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -984,7 +984,7 @@
             "info"
         ],
         "fileset.name": "ingress_controller",
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.response.body.bytes": 61,
         "http.response.status_code": 200,
         "http.version": "1.1",

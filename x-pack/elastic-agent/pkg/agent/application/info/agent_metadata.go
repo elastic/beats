@@ -141,9 +141,9 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 
 		// Operating system
 		OS: &SystemECSMeta{
-			Family:   runtime.GOOS,
+			Family:   info.OS.Family,
 			Kernel:   info.KernelVersion,
-			Platform: info.OS.Family,
+			Platform: info.OS.Platform,
 			Version:  info.OS.Version,
 			Name:     info.OS.Name,
 			FullName: getFullOSName(info),
