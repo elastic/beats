@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -164,6 +165,7 @@ func getElasticCoClient() http.Client {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		packageName := r.URL.Path[len(sourcePattern):]
+		packageName = strings.TrimSuffix(packageName, ".sha512")
 		if _, ok := correctValues[packageName]; !ok {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
