@@ -157,6 +157,7 @@ func (s *Server) Start() error {
 
 	// start the watchdog
 	s.watchdogDone = make(chan bool)
+	s.watchdogWG.Add(1)
 	go s.watchdog()
 
 	return nil
@@ -758,7 +759,6 @@ func (as *ApplicationState) destroyCheckinStream() {
 
 // watchdog ensures that the current applications are checking in during the correct intervals of time.
 func (s *Server) watchdog() {
-	s.watchdogWG.Add(1)
 	defer s.watchdogWG.Done()
 	for {
 		select {
