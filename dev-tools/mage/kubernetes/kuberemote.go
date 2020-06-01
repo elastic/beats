@@ -164,14 +164,17 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 
 // deleteSSHKey deletes SSH key from the cluster.
 func (r *KubeRemote) deleteSSHKey() {
-	_ = r.cs.CoreV1().Secrets(r.namespace).Delete(r.secretName, &metav1.DeleteOptions{})
+	_ = r.cs.CoreV1().Secrets(r.namespace).Delete(context.TODO(), r.secretName, metav1.DeleteOptions{})
 }
 
 // syncSSHKey syncs the SSH key to the cluster.
 func (r *KubeRemote) syncSSHKey() error {
 	// delete before create
 	r.deleteSSHKey()
-	_, err := r.cs.CoreV1().Secrets(r.namespace).Create(createSecretManifest(r.secretName, r.publicKey))
+	_, err := r.cs.CoreV1().Secrets(r.namespace).Create(
+		context.TODO(),
+		createSecretManifest(r.secretName, r.publicKey),
+		metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -180,24 +183,32 @@ func (r *KubeRemote) syncSSHKey() error {
 
 // deleteServiceAccount syncs required service account.
 func (r *KubeRemote) deleteServiceAccount() {
-	_ = r.cs.RbacV1().ClusterRoleBindings().Delete(r.name, &metav1.DeleteOptions{})
-	_ = r.cs.RbacV1().ClusterRoles().Delete(r.name, &metav1.DeleteOptions{})
-	_ = r.cs.CoreV1().ServiceAccounts(r.namespace).Delete(r.svcAccName, &metav1.DeleteOptions{})
+	ctx := context.TODO()
+	_ = r.cs.RbacV1().ClusterRoleBindings().Delete(ctx, r.name, metav1.DeleteOptions{})
+	_ = r.cs.RbacV1().ClusterRoles().Delete(ctx, r.name, metav1.DeleteOptions{})
+	_ = r.cs.CoreV1().ServiceAccounts(r.namespace).Delete(ctx, r.svcAccName, metav1.DeleteOptions{})
 }
 
 // syncServiceAccount syncs required service account.
 func (r *KubeRemote) syncServiceAccount() error {
+	ctx := context.TODO()
 	// delete before create
 	r.deleteServiceAccount()
-	_, err := r.cs.CoreV1().ServiceAccounts(r.namespace).Create(createServiceAccountManifest(r.svcAccName))
+	_, err := r.cs.CoreV1().ServiceAccounts(r.namespace).Create(
+		ctx,
+		createServiceAccountManifest(r.svcAccName),
+		metav1.CreateOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to create service account")
 	}
-	_, err = r.cs.RbacV1().ClusterRoles().Create(createClusterRoleManifest(r.name))
+	_, err = r.cs.RbacV1().ClusterRoles().Create(ctx, createClusterRoleManifest(r.name), metav1.CreateOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to create cluster role")
 	}
-	_, err = r.cs.RbacV1().ClusterRoleBindings().Create(createClusterRoleBindingManifest(r.name, r.namespace, r.svcAccName))
+	_, err = r.cs.RbacV1().ClusterRoleBindings().Create(
+		ctx,
+		createClusterRoleBindingManifest(r.name, r.namespace, r.svcAccName),
+		metav1.CreateOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to create cluster role binding")
 	}
@@ -212,17 +223,20 @@ func (r *KubeRemote) createPod(env map[string]string, cmd ...string) (*apiv1.Pod
 	}
 	image := fmt.Sprintf("golang:%s", version)
 	r.deletePod() // ensure it doesn't already exist
-	return r.cs.CoreV1().Pods(r.namespace).Create(createPodManifest(r.name, image, env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName))
+	return r.cs.CoreV1().Pods(r.namespace).Create(
+		context.TODO(),
+		createPodManifest(r.name, image, env, cmd, r.workDir, r.destDir, r.secretName, r.svcAccName),
+		metav1.CreateOptions{})
 }
 
 // deletePod deletes the pod.
 func (r *KubeRemote) deletePod() {
-	_ = r.cs.CoreV1().Pods(r.namespace).Delete(r.name, &metav1.DeleteOptions{})
+	_ = r.cs.CoreV1().Pods(r.namespace).Delete(context.TODO(), r.name, metav1.DeleteOptions{})
 }
 
 // waitForPod waits for the created pod to match the given condition.
 func (r *KubeRemote) waitForPod(wait time.Duration, condition watchtools.ConditionFunc) (*apiv1.Pod, error) {
-	w, err := r.cs.CoreV1().Pods(r.namespace).Watch(metav1.SingleObject(metav1.ObjectMeta{Name: r.name}))
+	w, err := r.cs.CoreV1().Pods(r.namespace).Watch(context.TODO(), metav1.SingleObject(metav1.ObjectMeta{Name: r.name}))
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +290,7 @@ func (r *KubeRemote) streamLogs(container string, stdout io.Writer) error {
 		Container: container,
 		Follow:    true,
 	})
-	logs, err := req.Stream()
+	logs, err := req.Stream(context.TODO())
 	if err != nil {
 		return err
 	}
