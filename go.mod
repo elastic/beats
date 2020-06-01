@@ -57,6 +57,7 @@ require (
 	github.com/dustin/go-humanize v0.0.0-20171111073723-bb3d318650d4
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.5.0
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
 	github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
 	github.com/elastic/go-licenser v0.2.1
 	github.com/elastic/go-lookslike v0.3.0
@@ -80,9 +81,9 @@ require (
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.10.4
 	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
-	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.1
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.4.2
 	github.com/golang/snappy v0.0.1
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
 	github.com/google/go-cmp v0.4.0
@@ -94,7 +95,7 @@ require (
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/h2non/filetype v1.0.12
-	github.com/hashicorp/go-multierror v1.0.0
+	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/golang-lru v0.5.2-0.20190520140433-59383c442f7d // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20180716145214-633285ba52b2
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
@@ -134,7 +135,7 @@ require (
 	github.com/shirou/gopsutil v2.19.11+incompatible
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.5.0
+	github.com/stretchr/testify v1.5.1
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20190320122513-dd3d0e41124a
 	github.com/urso/ecslog v0.0.1
@@ -159,7 +160,7 @@ require (
 	golang.org/x/tools v0.0.0-20191227053925-7b8e75db28f4
 	google.golang.org/api v0.15.0
 	google.golang.org/genproto v0.0.0-20191230161307-f3c370f40bfb
-	google.golang.org/grpc v1.27.1
+	google.golang.org/grpc v1.29.1
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
