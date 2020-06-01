@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -61,8 +62,9 @@ type ApplicationState struct {
 	srv *Server
 	app interface{}
 
-	token string
-	cert  *authority.Pair
+	srvName string
+	token   string
+	cert    *authority.Pair
 
 	pendingExpected   chan *proto.StateExpected
 	expected          proto.StateExpected_State
@@ -193,13 +195,18 @@ func (s *Server) Register(app interface{}, config string) (*ApplicationState, er
 	if err != nil {
 		return nil, err
 	}
-	pair, err := s.ca.GeneratePair()
+	srvName, err := genServerName()
+	if err != nil {
+		return nil, err
+	}
+	pair, err := s.ca.GeneratePairWithName(srvName)
 	if err != nil {
 		return nil, err
 	}
 	appState := &ApplicationState{
 		srv:               s,
 		app:               app,
+		srvName:           srvName,
 		token:             id.String(),
 		cert:              pair,
 		pendingExpected:   make(chan *proto.StateExpected),
@@ -485,11 +492,12 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 // Note: If the writer implements io.Closer the writer is also closed.
 func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
 	connInfo := &proto.ConnInfo{
-		Addr:     as.srv.getListenAddr(),
-		Token:    as.token,
-		CaCert:   as.srv.ca.Crt(),
-		PeerCert: as.cert.Crt,
-		PeerKey:  as.cert.Key,
+		Addr:       as.srv.getListenAddr(),
+		ServerName: as.srvName,
+		Token:      as.token,
+		CaCert:     as.srv.ca.Crt(),
+		PeerCert:   as.cert.Crt,
+		PeerKey:    as.cert.Key,
 	}
 	infoBytes, err := protobuf.Marshal(connInfo)
 	if err != nil {
@@ -621,6 +629,9 @@ func (as *ApplicationState) PerformAction(name string, params map[string]interfa
 // server when the application status has changed.
 func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForReader bool) {
 	as.checkinLock.Lock()
+	expectedStatus := as.expected
+	expectedConfigIdx := as.expectedConfigIdx
+	expectedConfig := as.expectedConfig
 	prevStatus := as.status
 	prevMessage := as.statusMessage
 	as.status = checkin.Status
@@ -630,17 +641,17 @@ func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForRe
 	as.checkinLock.Unlock()
 
 	var expected *proto.StateExpected
-	if as.expected == proto.StateExpected_STOPPING && checkin.Status != proto.StateObserved_STOPPING {
+	if expectedStatus == proto.StateExpected_STOPPING && checkin.Status != proto.StateObserved_STOPPING {
 		expected = &proto.StateExpected{
-			State:          as.expected,
-			ConfigStateIdx: as.statusConfigIdx, // stopping always inform that the config it has is correct
+			State:          expectedStatus,
+			ConfigStateIdx: checkin.ConfigStateIdx, // stopping always inform that the config it has is correct
 			Config:         "",
 		}
-	} else if checkin.ConfigStateIdx != as.expectedConfigIdx {
+	} else if checkin.ConfigStateIdx != expectedConfigIdx {
 		expected = &proto.StateExpected{
-			State:          as.expected,
-			ConfigStateIdx: as.expectedConfigIdx,
-			Config:         as.expectedConfig,
+			State:          expectedStatus,
+			ConfigStateIdx: expectedConfigIdx,
+			Config:         expectedConfig,
 		}
 	}
 	if expected != nil {
@@ -801,12 +812,12 @@ func (s *Server) getByToken(token string) (*ApplicationState, bool) {
 }
 
 // getCertificate returns the TLS certificate based on the clientHello or errors if not found.
-func (s *Server) getCertificate(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+func (s *Server) getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
-	for _, serverApp := range s.apps {
-		if err := clientHello.SupportsCertificate(serverApp.cert.Certificate); err == nil {
-			return serverApp.cert.Certificate, nil
+	for _, app := range s.apps {
+		if app.srvName == chi.ServerName {
+			return app.cert.Certificate, nil
 		}
 	}
 	return nil, errors.New("no supported TLS certificate", errors.TypeSecurity)
@@ -851,4 +862,12 @@ func reportableErr(err error) bool {
 		return false
 	}
 	return true
+}
+
+func genServerName() (string, error) {
+	u, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	return strings.Replace(u.String(), "-", "", -1), nil
 }

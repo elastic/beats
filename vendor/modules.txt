@@ -415,7 +415,7 @@ github.com/eclipse/paho.mqtt.golang
 github.com/eclipse/paho.mqtt.golang/packets
 # github.com/elastic/ecs v1.5.0
 github.com/elastic/ecs/code/go/ecs
-# github.com/elastic/elastic-agent-client/v7 v7.0.0-20200527171518-f4b379d5629b
+# github.com/elastic/elastic-agent-client/v7 v7.0.0-20200601155656-d6a9eb4f6d07
 github.com/elastic/elastic-agent-client/v7/pkg/client
 github.com/elastic/elastic-agent-client/v7/pkg/proto
 github.com/elastic/elastic-agent-client/v7/pkg/utils

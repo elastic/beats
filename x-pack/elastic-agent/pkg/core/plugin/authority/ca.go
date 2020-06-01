@@ -97,12 +97,17 @@ func NewCA() (*CertificateAuthority, error) {
 
 // GeneratePair generates child certificate
 func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
+	return c.GeneratePairWithName("localhost")
+}
+
+// GeneratePairWithName generates child certificate with provided name as the common name.
+func (c *CertificateAuthority) GeneratePairWithName(commonName string) (*Pair, error) {
 	// Prepare certificate
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
-			CommonName:   "localhost",
+			CommonName:   commonName,
 		},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(10, 0, 0),

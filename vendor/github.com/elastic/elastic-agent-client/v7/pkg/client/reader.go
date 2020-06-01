@@ -7,12 +7,12 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"google.golang.org/grpc/credentials"
 	"io"
 	"io/ioutil"
 
 	protobuf "github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -35,7 +35,7 @@ func NewFromReader(reader io.Reader, impl StateInterface, actions ...Action) (*C
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(connInfo.CaCert)
 	trans := credentials.NewTLS(&tls.Config{
-		ServerName:   "localhost",
+		ServerName:   connInfo.ServerName,
 		Certificates: []tls.Certificate{cert},
 		RootCAs:      caCertPool,
 	})

@@ -1683,7 +1683,7 @@ limitations under the License.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/elastic-agent-client/v7
 Version: v7.0.0
-Revision: f4b379d5629b
+Revision: d6a9eb4f6d07
 License type (autodetected): ELASTIC
 ./vendor/github.com/elastic/elastic-agent-client/v7/LICENSE.txt:
 --------------------------------------------------------------------
