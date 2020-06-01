@@ -11,5 +11,5 @@ var:
     default: syslog
 
 ingest_pipeline: 
-  - ingest/pipeline.json
+  - ingest/pipeline.yml
 input: config/firewall.yml

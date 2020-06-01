@@ -21,8 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
@@ -33,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -113,7 +111,6 @@ func TestGenerateHints_Node(t *testing.T) {
 }
 
 func TestEmitEvent_Node(t *testing.T) {
-	k, _ := keystore.NewFileKeystore("test")
 	name := "metricbeat"
 	nodeIP := "192.168.0.1"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
@@ -162,7 +159,6 @@ func TestEmitEvent_Node(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"keystore": k,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
 						"name": "metricbeat",
@@ -222,7 +218,6 @@ func TestEmitEvent_Node(t *testing.T) {
 				"host":     "",
 				"id":       uid,
 				"provider": UUID,
-				"keystore": k,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
 						"name": "metricbeat",
@@ -245,7 +240,7 @@ func TestEmitEvent_Node(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -256,7 +251,6 @@ func TestEmitEvent_Node(t *testing.T) {
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
-				keystore:  k,
 			}
 
 			no := &node{

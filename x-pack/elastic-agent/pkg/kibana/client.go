@@ -21,7 +21,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-const kibanaPort = 5601
+const (
+	kibanaPort      = 5601
+	kibanaHTTPSPort = 443
+)
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
 type wrapperFunc func(rt http.RoundTripper) (http.RoundTripper, error)
@@ -144,7 +147,12 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 		p = p + "/"
 	}
 
-	kibanaURL, err := common.MakeURL(string(cfg.Protocol), p, cfg.Host, kibanaPort)
+	usedDefaultPort := kibanaPort
+	if cfg.Protocol == "https" {
+		usedDefaultPort = kibanaHTTPSPort
+	}
+
+	kibanaURL, err := common.MakeURL(string(cfg.Protocol), p, cfg.Host, usedDefaultPort)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid Kibana endpoint")
 	}
