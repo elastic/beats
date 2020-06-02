@@ -2330,7 +2330,7 @@ https://github.com/elastic/beats/compare/v6.8.5...v6.8.6[View commits]
 *Metricbeat*
 
 - Fix marshaling of ms-since-epoch values in `elasticsearch/cluster_stats` metricset. {pull}14378[14378]
-- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
+- Fix bug with `elasticsearch/cluster_stats` metricset not recording license ID in the correct field. {pull}14592[14592]
 
 [[release-notes-6.8.5]]
 === Beats version 6.8.5
