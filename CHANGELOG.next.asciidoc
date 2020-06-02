@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
 - Make error message about locked data path actionable. {pull}18667[18667]
+- Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 
 *Auditbeat*
 
