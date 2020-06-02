@@ -266,7 +266,7 @@ pipeline {
             }
           }
         }
-        stage('Auditbeat oss'){
+        stage('Auditbeat oss Linux'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -275,48 +275,52 @@ pipeline {
               return env.BUILD_AUDITBEAT != "false"
             }
           }
-          stages {
-            stage('Auditbeat Linux'){
-              steps {
-                makeTarget(context: "Auditbeat oss Linux", target: "-C auditbeat testsuite", withModule: true)
-              }
+          steps {
+            makeTarget(context: "Auditbeat oss Linux", target: "-C auditbeat testsuite", withModule: true)
+          }
+        }
+        stage('Auditbeat crosscompile'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false"
             }
-            stage('Auditbeat crosscompile'){
-              steps {
-                makeTarget(context: "Auditbeat oss crosscompile", target: "-C auditbeat crosscompile")
-              }
+          }
+          steps {
+            makeTarget(context: "Auditbeat oss crosscompile", target: "-C auditbeat crosscompile")
+          }
+        }
+        stage('Auditbeat oss Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.macosTest
             }
-            stage('Auditbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget(context: "Auditbeat oss Mac OS X", directory: "auditbeat", target: "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            mageTarget(context: "Auditbeat oss Mac OS X", directory: "auditbeat", target: "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Auditbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin(context: "Auditbeat Windows Unit test", directory: "auditbeat", target: "build unitTest")
-              }
+          }
+        }
+        stage('Auditbeat oss Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
+          }
+          steps {
+            mageTargetWin(context: "Auditbeat oss Windows Unit test", directory: "auditbeat", target: "build unitTest")
           }
         }
         stage('Auditbeat x-pack'){
@@ -330,6 +334,32 @@ pipeline {
           }
           steps {
             mageTarget(context: "Auditbeat x-pack Linux", directory: "x-pack/auditbeat", target: "update build test", withModule: true)
+          }
+        }
+        stage('Auditbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget(context: "Auditbeat x-pack Mac OS X", directory: "x-pack/auditbeat", target: "build unitTest")
+          }
+        }
+        stage('Auditbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin(context: "Auditbeat x-pack Windows", directory: "x-pack/auditbeat", target: "build unitTest")
           }
         }
         stage('Libbeat'){
@@ -767,7 +797,10 @@ def delete() {
 }
 
 def fixPermissions(location) {
-  sh(label: 'Fix permissions', script: "script/fix_permissions.sh ${location}")
+  sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+    source ./dev-tools/common.bash
+    docker_setup
+    script/fix_permissions.sh ${location}""")
 }
 
 def makeTarget(Map args = [:]) {
@@ -1030,8 +1063,8 @@ def k8sTest(versions){
           withBeatsEnv(archive: false, withModule: false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
             sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
-            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }

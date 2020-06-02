@@ -30,8 +30,9 @@ type CertificateAuthority struct {
 
 // Pair is a x509 Key/Cert pair
 type Pair struct {
-	Crt []byte
-	Key []byte
+	Crt         []byte
+	Key         []byte
+	Certificate *tls.Certificate
 }
 
 // NewCA creates a new certificate authority capable of generating child certificates
@@ -96,12 +97,17 @@ func NewCA() (*CertificateAuthority, error) {
 
 // GeneratePair generates child certificate
 func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
+	return c.GeneratePairWithName("localhost")
+}
+
+// GeneratePairWithName generates child certificate with provided name as the common name.
+func (c *CertificateAuthority) GeneratePairWithName(commonName string) (*Pair, error) {
 	// Prepare certificate
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			Organization: []string{"elastic-fleet"},
-			CommonName:   "localhost",
+			CommonName:   commonName,
 		},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(10, 0, 0),
@@ -134,9 +140,16 @@ func (c *CertificateAuthority) GeneratePair() (*Pair, error) {
 		return nil, errors.New(err, "generating private key", errors.TypeSecurity)
 	}
 
+	// TLS Certificate
+	tlsCert, err := tls.X509KeyPair(certOut.Bytes(), keyOut.Bytes())
+	if err != nil {
+		return nil, errors.New(err, "creating TLS certificate", errors.TypeSecurity)
+	}
+
 	return &Pair{
-		Crt: certOut.Bytes(),
-		Key: keyOut.Bytes(),
+		Crt:         certOut.Bytes(),
+		Key:         keyOut.Bytes(),
+		Certificate: &tlsCert,
 	}, nil
 }
 
