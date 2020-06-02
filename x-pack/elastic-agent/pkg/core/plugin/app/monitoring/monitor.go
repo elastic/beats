@@ -18,7 +18,7 @@ type Monitor interface {
 	MetricsPathPrefixed(process, pipelineID string) string
 
 	Prepare(process, pipelineID string, uid, gid int) error
-	EnrichArgs(string, string, []string) []string
+	EnrichArgs(string, string, []string, bool) []string
 	Cleanup(process, pipelineID string) error
 	Reload(cfg *config.Config) error
 	IsMonitoringEnabled() bool

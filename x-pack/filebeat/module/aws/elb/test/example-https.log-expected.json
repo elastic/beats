@@ -20,7 +20,7 @@
         "event.outcome": "success",
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
-        "http.request.method": "get",
+        "http.request.method": "GET",
         "http.request.referrer": "https://www.example.com:443/",
         "http.response.body.bytes": 57,
         "http.response.status_code": 200,

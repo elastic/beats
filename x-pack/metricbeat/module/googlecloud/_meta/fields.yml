@@ -9,15 +9,21 @@
       fields:
         - name: labels
           type: object
+          description: >
+            Google cloud monitoring metrics labels
           fields:
             - name: user.*
               type: object
+              object_type: keyword
             - name: metadata.*
               type: object
+              object_type: keyword
             - name: metrics.*
               type: object
+              object_type: keyword
             - name: system.*
               type: object
+              object_type: keyword
         - name: "stackdriver.*.*.*.*"
           type: object
           object_type: double
