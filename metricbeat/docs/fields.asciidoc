@@ -1604,16 +1604,12 @@ type: keyword
 
 
 
-[float]
-=== SuccessfulRequestLatency
-
-The latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
-
-
-
 *`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`*::
 +
 --
+The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
+
+
 type: double
 
 --
@@ -1621,6 +1617,9 @@ type: double
 *`aws.dynamodb.metrics.SuccessfulRequestLatency.max`*::
 +
 --
+The maximum latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
+
+
 type: double
 
 --
@@ -1655,16 +1654,12 @@ type: double
 
 --
 
-[float]
-=== ConsumedReadCapacityUnits
-
-The number of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
-
-
-
 *`aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg`*::
 +
 --
+The average number of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
 type: double
 
 --
@@ -1672,20 +1667,19 @@ type: double
 *`aws.dynamodb.metrics.ConsumedReadCapacityUnits.sum`*::
 +
 --
+The sum of read capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
 type: long
 
 --
 
-[float]
-=== ConsumedWriteCapacityUnits
-
-The number of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
-
-
-
 *`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.avg`*::
 +
 --
+The average number of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
 type: double
 
 --
@@ -1693,20 +1687,19 @@ type: double
 *`aws.dynamodb.metrics.ConsumedWriteCapacityUnits.sum`*::
 +
 --
+The sum of write capacity units consumed over the specified time period, so you can track how much of your provisioned throughput is used.
+
+
 type: long
 
 --
 
-[float]
-=== ReplicationLatency
-
-The elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
-
-
-
 *`aws.dynamodb.metrics.ReplicationLatency.avg`*::
 +
 --
+The average elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
+
+
 type: double
 
 --
@@ -1714,20 +1707,19 @@ type: double
 *`aws.dynamodb.metrics.ReplicationLatency.max`*::
 +
 --
+The maximum elapsed time between an updated item appearing in the DynamoDB stream for one replica table, and that item appearing in another replica in the global table.
+
+
 type: double
 
 --
 
-[float]
-=== TransactionConflict
-
-Rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
-
-
-
 *`aws.dynamodb.metrics.TransactionConflict.avg`*::
 +
 --
+Average rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
+
+
 type: double
 
 --
@@ -1735,6 +1727,9 @@ type: double
 *`aws.dynamodb.metrics.TransactionConflict.sum`*::
 +
 --
+Total rejected item-level requests due to transactional conflicts between concurrent requests on the same items.
+
+
 type: long
 
 --
