@@ -435,7 +435,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 
 *Auditbeat*
 
-- system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
+- system/socket: Fix compatibility issue with kernel 5.x. {pull}15771[15771]
 
 *Filebeat*
 
