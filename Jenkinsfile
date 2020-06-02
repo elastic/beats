@@ -216,7 +216,7 @@ pipeline {
             mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
           }
         }
-        stage('Heartbeat'){
+        stage('Heartbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -225,43 +225,39 @@ pipeline {
               return env.BUILD_HEARTBEAT != "false"
             }
           }
-          stages {
-            stage('Heartbeat oss'){
-              steps {
-                makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
-              }
+          steps {
+            makeTarget("Heartbeat oss Linux", "-C heartbeat testsuite")
+          }
+        }
+        stage('Heartbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_HEARTBEAT != "false" && params.macosTest
             }
-            stage('Heartbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Heartbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
-              }
+          }
+        }
+        stage('Heartbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_HEARTBEAT != "false" && params.windowsTest
             }
+          }
+          steps {
+            mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
           }
         }
         stage('Auditbeat oss Linux'){
@@ -360,7 +356,7 @@ pipeline {
             mageTargetWin("Auditbeat x-pack Windows", "x-pack/auditbeat", "build unitTest")
           }
         }
-        stage('Libbeat'){
+        stage('Libbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -369,22 +365,34 @@ pipeline {
               return env.BUILD_LIBBEAT != "false"
             }
           }
-          stages {
-            stage('Libbeat oss'){
-              steps {
-                makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
-              }
+          steps {
+            makeTarget("Libbeat oss Linux", "-C libbeat testsuite")
+          }
+        }
+        stage('Libbeat crosscompile'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_LIBBEAT != "false"
             }
-            stage('Libbeat crosscompile'){
-              steps {
-                makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
-              }
+          }
+          steps {
+            makeTarget("Libbeat oss crosscompile", "-C libbeat crosscompile")
+          }
+        }
+        stage('Libbeat stress-tests'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_LIBBEAT != "false"
             }
-            stage('Libbeat stress-tests'){
-              steps {
-                makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
-              }
-            }
+          }
+          steps {
+            makeTarget("Libbeat stress-tests", "STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests")
           }
         }
         stage('Libbeat x-pack'){
@@ -544,7 +552,7 @@ pipeline {
             mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
           }
         }
-        stage('Packetbeat'){
+        stage('Packetbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -553,15 +561,11 @@ pipeline {
               return env.BUILD_PACKETBEAT != "false"
             }
           }
-          stages {
-            stage('Packetbeat oss'){
-              steps {
-                makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
-              }
-            }
+          steps {
+            makeTarget("Packetbeat oss Linux", "-C packetbeat testsuite")
           }
         }
-        stage('dockerlogbeat'){
+        stage('Dockerlogbeat'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -570,15 +574,11 @@ pipeline {
               return env.BUILD_DOCKERLOGBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Dockerlogbeat'){
-              steps {
-                mageTarget("Elastic Docker Logging Driver Plugin unit tests", "x-pack/dockerlogbeat", "update build test")
-              }
-            }
+          steps {
+            mageTarget("Elastic Docker Logging Driver Plugin unit tests", "x-pack/dockerlogbeat", "update build test")
           }
         }
-        stage('Winlogbeat'){
+        stage('Winlogbeat oss crosscompile'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -587,25 +587,21 @@ pipeline {
               return env.BUILD_WINLOGBEAT != "false"
             }
           }
-          stages {
-            stage('Winlogbeat oss'){
-              steps {
-                makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
-              }
+          steps {
+            makeTarget("Winlogbeat oss crosscompile", "-C winlogbeat crosscompile")
+          }
+        }
+        stage('Winlogbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_WINLOGBEAT != "false" && params.windowsTest
             }
-            stage('Winlogbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
-              }
-            }
+          }
+          steps {
+            mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
           }
         }
         stage('Winlogbeat Windows x-pack'){
@@ -621,7 +617,7 @@ pipeline {
             mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
           }
         }
-        stage('Functionbeat'){
+        stage('Functionbeat x-pack'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -630,49 +626,45 @@ pipeline {
               return env.BUILD_FUNCTIONBEAT_XPACK != "false"
             }
           }
-          stages {
-            stage('Functionbeat x-pack'){
-              steps {
-                mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
-                withEnv(["GO_VERSION=1.13.1"]){
-                  makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
-                }
-              }
-            }
-            stage('Functionbeat Mac OS X x-pack'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
-            }
-            stage('Functionbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
-              }
+          steps {
+            mageTarget("Functionbeat x-pack Linux", "x-pack/functionbeat", "update build test")
+            withEnv(["GO_VERSION=1.13.1"]){
+              makeTarget("Functionbeat x-pack Linux", "-C x-pack/functionbeat test-gcp-functions")
             }
           }
         }
-        stage('Journalbeat'){
+        stage('Functionbeat Mac OS X x-pack'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FUNCTIONBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Functionbeat Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FUNCTIONBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+          }
+        }
+        stage('Journalbeat oss'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -681,15 +673,11 @@ pipeline {
               return env.BUILD_JOURNALBEAT != "false"
             }
           }
-          stages {
-            stage('Journalbeat oss'){
-              steps {
-                makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
-              }
-            }
+          steps {
+            makeTarget("Journalbeat Linux", "-C journalbeat testsuite")
           }
         }
-        stage('Generators'){
+        stage('Generators Metricbeat Linux'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -698,66 +686,70 @@ pipeline {
               return env.BUILD_GENERATOR != "false"
             }
           }
-          stages {
-            stage('Generators Metricbeat Linux'){
-              steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
-                  makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
-                }
-              }
+          steps {
+            // FIXME see https://github.com/elastic/beats/issues/18132
+            catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+              makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test")
+              makeTarget("Generators Metricbeat Linux", "-C generator/_templates/metricbeat test-package")
             }
-            stage('Generators Beat Linux'){
-              steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
-                  makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
-                }
-              }
+          }
+        }
+        stage('Generators Beat Linux'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_GENERATOR != "false"
             }
-            stage('Generators Metricbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
-                }
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+          steps {
+            // FIXME see https://github.com/elastic/beats/issues/18132
+            catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+              makeTarget("Generators Beat Linux", "-C generator/_templates/beat test")
+              makeTarget("Generators Beat Linux", "-C generator/_templates/beat test-package")
             }
-            stage('Generators Beat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                // FIXME see https://github.com/elastic/beats/issues/18132
-                catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
-                  makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
-                }
-              }
-              post {
-                always {
-                  delete()
-                }
-              }
+          }
+        }
+        stage('Generators Metricbeat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_GENERATOR != "false" && params.macosTest
+            }
+          }
+          steps {
+            // FIXME see https://github.com/elastic/beats/issues/18132
+            catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+              makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
+            }
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Generators Beat Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_GENERATOR != "false" && params.macosTest
+            }
+          }
+          steps {
+            // FIXME see https://github.com/elastic/beats/issues/18132
+            catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
+              makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+            }
+          }
+          post {
+            always {
+              delete()
             }
           }
         }
