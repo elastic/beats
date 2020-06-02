@@ -800,7 +800,7 @@ def fixPermissions(location) {
   sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
     source ./dev-tools/common.bash
     docker_setup
-    script/fix_permissions.sh ${location}""")
+    script/fix_permissions.sh ${location}""", returnStatus: true)
 }
 
 def makeTarget(Map args = [:]) {

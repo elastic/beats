@@ -19585,6 +19585,16 @@ type: long
 
 --
 
+*`haproxy.info.threads`*::
++
+--
+Number of threads.
+
+
+type: long
+
+--
+
 *`haproxy.info.pid`*::
 +
 --
@@ -19600,6 +19610,76 @@ alias to: process.pid
 *`haproxy.info.run_queue`*::
 +
 --
+
+
+type: long
+
+--
+
+*`haproxy.info.stopping`*::
++
+--
+Number of stopping jobs.
+
+
+type: long
+
+--
+
+*`haproxy.info.jobs`*::
++
+--
+Number of all jobs.
+
+
+type: long
+
+--
+
+*`haproxy.info.unstoppable_jobs`*::
++
+--
+Number of unstoppable jobs.
+
+
+type: long
+
+--
+
+*`haproxy.info.listeners`*::
++
+--
+Number of listeners.
+
+
+type: long
+
+--
+
+*`haproxy.info.dropped_logs`*::
++
+--
+Number of dropped logs.
+
+
+type: long
+
+--
+
+*`haproxy.info.busy_polling`*::
++
+--
+Number of busy polling.
+
+
+type: long
+
+--
+
+*`haproxy.info.failed_resolutions`*::
++
+--
+Number of failed resolutions.
 
 
 type: long
@@ -19634,6 +19714,80 @@ Maximum amount of memory usage in bytes (the 'Memmax_MB' value converted to byte
 type: long
 
 format: bytes
+
+--
+
+
+
+*`haproxy.info.bytes.out.total`*::
++
+--
+Number of bytes sent out.
+
+
+type: long
+
+--
+
+*`haproxy.info.bytes.out.rate`*::
++
+--
+Average bytes output rate.
+
+
+type: long
+
+--
+
+
+*`haproxy.info.peers.active`*::
++
+--
+Number of active peers.
+
+
+type: long
+
+--
+
+*`haproxy.info.peers.connected`*::
++
+--
+Number of connected peers.
+
+
+type: long
+
+--
+
+
+*`haproxy.info.pool.allocated`*::
++
+--
+Size of the allocated pool.
+
+
+type: long
+
+--
+
+*`haproxy.info.pool.used`*::
++
+--
+Number of members used from the allocated pool.
+
+
+type: long
+
+--
+
+*`haproxy.info.pool.failed`*::
++
+--
+Number of failed connections to pool members.
+
+
+type: long
 
 --
 
@@ -20167,6 +20321,26 @@ type: long
 
 --
 
+*`haproxy.stat.cookie`*::
++
+--
+Cookie value of the server or the name of the cookie of the backend.
+
+
+type: keyword
+
+--
+
+*`haproxy.stat.load_balancing_algorithm`*::
++
+--
+Load balancing algorithm.
+
+
+type: keyword
+
+--
+
 
 *`haproxy.stat.connection.total`*::
 +
@@ -20198,6 +20372,88 @@ type: long
 
 --
 
+*`haproxy.stat.connection.rate`*::
++
+--
+Number of connections over the last second.
+
+
+type: long
+
+--
+
+*`haproxy.stat.connection.rate_max`*::
++
+--
+Highest value of connection.rate.
+
+
+type: long
+
+--
+
+*`haproxy.stat.connection.attempt.total`*::
++
+--
+Number of connection establishment attempts.
+
+
+type: long
+
+--
+
+*`haproxy.stat.connection.reuse.total`*::
++
+--
+Number of connection reuses.
+
+
+type: long
+
+--
+
+
+*`haproxy.stat.connection.idle.total`*::
++
+--
+Number of idle connections available for reuse.
+
+
+type: long
+
+--
+
+*`haproxy.stat.connection.idle.limit`*::
++
+--
+Limit on idle connections available for reuse.
+
+
+type: long
+
+--
+
+
+*`haproxy.stat.connection.cache.lookup.total`*::
++
+--
+Number of cache lookups.
+
+
+type: long
+
+--
+
+*`haproxy.stat.connection.cache.hits`*::
++
+--
+Number of cache hits.
+
+
+type: long
+
+--
+
 
 *`haproxy.stat.request.denied`*::
 +
@@ -20206,6 +20462,26 @@ Requests denied because of security concerns.
 
   * For TCP this is because of a matched tcp-request content rule.
   * For HTTP this is because of a matched http-request or tarpit rule.
+
+
+type: long
+
+--
+
+*`haproxy.stat.request.denied_by_connection_rules`*::
++
+--
+Requests denied because of TCP request connection rules.
+
+
+type: long
+
+--
+
+*`haproxy.stat.request.denied_by_session_rules`*::
++
+--
+Requests denied because of TCP request session rules.
 
 
 type: long
@@ -20299,6 +20575,16 @@ type: long
 +
 --
 Total number of HTTP requests received.
+
+
+type: long
+
+--
+
+*`haproxy.stat.request.intercepted`*::
++
+--
+Number of intercepted requests.
 
 
 type: long
@@ -20404,6 +20690,19 @@ type: long
 --
 
 
+
+
+*`haproxy.stat.header.rewrite.failed.total`*::
++
+--
+Number of failed header rewrite warnings.
+
+
+type: long
+
+--
+
+
 *`haproxy.stat.session.current`*::
 +
 --
@@ -20428,6 +20727,16 @@ type: long
 +
 --
 Configured session limit.
+
+
+type: long
+
+--
+
+*`haproxy.stat.session.total`*::
++
+--
+Number of all sessions.
 
 
 type: long
@@ -20703,6 +21012,16 @@ type: keyword
 
 --
 
+*`haproxy.stat.proxy.mode`*::
++
+--
+Proxy mode (tcp, http, health, unknown).
+
+
+type: keyword
+
+--
+
 [float]
 === queue
 
@@ -20726,6 +21045,144 @@ The average queue time in ms over the last 1024 requests.
 
 
 type: integer
+
+--
+
+[float]
+=== agent
+
+
+
+
+*`haproxy.stat.agent.status`*::
++
+--
+Status of the last health check. One of:
+
+  UNK     -> unknown
+  INI     -> initializing
+  SOCKERR -> socket error
+  L4OK    -> check passed on layer 4, no upper layers enabled
+  L4TOUT  -> layer 1-4 timeout
+  L4CON   -> layer 1-4 connection problem, for example
+            "Connection refused" (tcp rst) or "No route to host" (icmp)
+  L7OK    -> agent reported "up"
+  L7STS   -> agent reported "fail", "stop" or "down"
+
+
+type: keyword
+
+--
+
+*`haproxy.stat.agent.description`*::
++
+--
+Human readable version of agent.status.
+
+
+type: keyword
+
+--
+
+*`haproxy.stat.agent.code`*::
++
+--
+Value reported by agent.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.rise`*::
++
+--
+Rise value of agent.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.fall`*::
++
+--
+Fall value of agent.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.health`*::
++
+--
+Health parameter of agent. Between 0 and `agent.rise`+`agent.fall`-1.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.duration`*::
++
+--
+Duration of the last check in ms.
+
+
+type: integer
+
+--
+
+
+*`haproxy.stat.agent.check.rise`*::
++
+--
+Rise value of server.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.check.fall`*::
++
+--
+Fall value of server.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.check.health`*::
++
+--
+Health parameter of server. Between 0 and `agent.check.rise`+`agent.check.fall`-1.
+
+
+type: integer
+
+--
+
+*`haproxy.stat.agent.check.description`*::
++
+--
+Human readable version of check.
+
+
+type: keyword
+
+--
+
+
+*`haproxy.stat.source.address`*::
++
+--
+Address of the source.
+
+
+type: text
 
 --
 
