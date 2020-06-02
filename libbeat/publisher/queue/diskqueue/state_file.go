@@ -36,14 +36,13 @@ type diskQueuePersistentState struct {
 	firstPosition bufferPosition
 }
 
-// A wrapper around os.File that caches the most recently read / written
-// state data.
+// A wrapper around os.File that saves and loads the queue state.
 type stateFile struct {
 	// An open file handle to the queue's state file.
 	file *os.File
 
 	// A pointer to the disk queue state that was read when this queue was
-	// opened, or nil if a new state file was created.
+	// opened, or nil if there was no preexisting state file.
 	loadedState *diskQueuePersistentState
 
 	// If there was a non-fatal error loading the queue state, it is stored
@@ -64,20 +63,18 @@ func persistentStateFromHandle(
 	state := diskQueuePersistentState{}
 
 	reader := bufio.NewReader(file)
-	err = binary.Read(reader, binary.LittleEndian,
-		&state.version)
+	err = binary.Read(reader, binary.LittleEndian, &state.version)
 	if err != nil {
 		return nil, err
 	}
 
-	err = binary.Read(reader, binary.LittleEndian,
-		&state.firstPosition.segmentIndex)
+	err = binary.Read(reader, binary.LittleEndian, &state.firstPosition.segment)
 	if err != nil {
 		return nil, err
 	}
 
-	err = binary.Read(reader, binary.LittleEndian,
-		&state.firstPosition.byteIndex)
+	err = binary.Read(
+		reader, binary.LittleEndian, &state.firstPosition.byteIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -98,20 +95,17 @@ func writePersistentStateToHandle(
 	}
 
 	var version uint32 = 0
-	err = binary.Write(file, binary.LittleEndian,
-		&version)
+	err = binary.Write(file, binary.LittleEndian, &version)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian,
-		&firstPosition.segmentIndex)
+	err = binary.Write(file, binary.LittleEndian, &firstPosition.segment)
 	if err != nil {
 		return err
 	}
 
-	err = binary.Write(file, binary.LittleEndian,
-		&firstPosition.byteIndex)
+	err = binary.Write(file, binary.LittleEndian, &firstPosition.byteIndex)
 	if err != nil {
 		return err
 	}

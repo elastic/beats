@@ -18,14 +18,19 @@
 package diskqueue
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type diskQueueConsumer struct {
+	queue  *diskQueue
+	closed bool
 }
 
 type diskQueueBatch struct {
+	events []publisher.Event
 }
 
 //
@@ -33,11 +38,27 @@ type diskQueueBatch struct {
 //
 
 func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
+	if consumer.closed {
+		return nil, fmt.Errorf("Tried to read from closed disk queue consumer")
+	}
+	// lock mutex --->
+	/*position := consumer.queue.readPosition
+	segment, err := consumer.queue.getSegment(position.segment)
+	if err != nil {
+
+	}
+
+	// <-- lock mutex
+	//reader, err := consumer.queue.segments.reader()
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't read from queue: %w", err)
+	}*/
 	panic("TODO: not implemented")
 }
 
 func (consumer *diskQueueConsumer) Close() error {
-	panic("TODO: not implemented")
+	consumer.closed = true
+	return nil
 }
 
 //
@@ -45,7 +66,7 @@ func (consumer *diskQueueConsumer) Close() error {
 //
 
 func (batch *diskQueueBatch) Events() []publisher.Event {
-	panic("TODO: not implemented")
+	return batch.events
 }
 
 func (batch *diskQueueBatch) ACK() {

@@ -17,33 +17,12 @@
 
 package diskqueue
 
-import (
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-)
+import "github.com/elastic/beats/v7/libbeat/publisher"
 
-type diskQueueProducer struct {
-	// The disk queue that created this producer.
-	queue *diskQueue
-
-	// The configuration this producer was created with.
-	config queue.ProducerConfig
-}
-
-//
-// diskQueueProducer implementation of the queue.Producer interface
-//
-
-func (producer *diskQueueProducer) Publish(event publisher.Event) bool {
-	//data := dataForEvent(event)
-
+func dataForEvent(event publisher.Event) []byte {
 	panic("TODO: not implemented")
 }
 
-func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
-	panic("TODO: not implemented")
-}
-
-func (producer *diskQueueProducer) Cancel() int {
+func eventForData(data []byte) publisher.Event {
 	panic("TODO: not implemented")
 }

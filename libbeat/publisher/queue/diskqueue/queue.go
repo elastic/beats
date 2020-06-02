@@ -57,9 +57,11 @@ type Settings struct {
 	WriteToOutputACKListener queue.ACKListener
 }
 
+type segmentID uint64
+
 type bufferPosition struct {
 	// The index of this position's segment within the overall buffer.
-	segmentIndex uint64
+	segment segmentID
 
 	// The byte offset of this position within its segment.
 	byteIndex uint64
@@ -70,10 +72,10 @@ type bufferPosition struct {
 type diskQueue struct {
 	settings Settings
 
-	// The persistent queue state. After a filesystem sync this should be
-	// identical to the queue's metadata file.
-	//state     diskQueuePersistentState
+	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
+
+	segments *segmentManager
 
 	//
 	firstPosition bufferPosition
@@ -143,6 +145,10 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 	return &diskQueue{settings: settings}, nil
 }
 
+func (dq *diskQueue) getSegment(id segmentID) (*segmentFile, error) {
+	panic("TODO: not implemented")
+}
+
 //
 // bookkeeping helpers to locate queue data on disk
 //
@@ -177,10 +183,6 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	/*return &diskQueueProducer{
-		queue:  dq,
-		config: cfg,
-	}*/
 	panic("TODO: not implemented")
 }
 
