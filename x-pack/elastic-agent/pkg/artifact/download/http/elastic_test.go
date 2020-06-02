@@ -107,7 +107,6 @@ func TestVerify(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			fmt.Println(artifact)
 			testVerifier, err := NewVerifier(config)
 			if err != nil {
 				t.Fatal(err)
