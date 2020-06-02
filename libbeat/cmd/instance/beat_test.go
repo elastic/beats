@@ -24,9 +24,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 
-	"go.elastic.co/apm"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
@@ -121,8 +122,26 @@ func TestEmptyMetaJson(t *testing.T) {
 }
 
 func TestAPMTracerDisabledByDefault(t *testing.T) {
-	tracer, err := apm.NewTracer("", "")
+	b, err := NewBeat("filebeat", "testidx", "0.9")
 	require.NoError(t, err)
+
+	tracer := b.Instrumentation.GetTracer()
 	defer tracer.Close()
 	assert.False(t, tracer.Active())
+}
+
+func TestAPMInstrumentationConfig(t *testing.T) {
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"instrumentation": map[string]interface{}{
+			"enabled": "true",
+		},
+	})
+	instrumentation, err := beat.CreateInstrumentation(cfg, beat.Info{Name: "filebeat", Version: "8.0"})
+	require.NoError(t, err)
+
+	assert.NotNil(t, instrumentation.Listener)
+
+	tracer := instrumentation.GetTracer()
+	defer tracer.Close()
+	assert.True(t, tracer.Active())
 }

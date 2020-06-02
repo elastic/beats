@@ -94,8 +94,8 @@ type HeapProfiling struct {
 	Interval time.Duration `config:"interval" validate:"positive"`
 }
 
-// CreateTracer configures and returns an instrumentation object for tracing
-func CreateTracer(cfg *common.Config, info Info) (*Instrumentation, error) {
+// CreateInstrumentation configures and returns an instrumentation object for tracing
+func CreateInstrumentation(cfg *common.Config, info Info) (*Instrumentation, error) {
 	if !cfg.HasField("instrumentation") {
 		return nil, nil
 	}

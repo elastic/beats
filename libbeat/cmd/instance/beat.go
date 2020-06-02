@@ -595,12 +595,12 @@ func (b *Beat) configure(settings Settings) error {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		common.OverwriteConfigOpts(configOpts(store))
 	}
-	//tracer, _ := apm.NewTracer("foo", "bar")
-	tracer, err := beat.CreateTracer(cfg, b.Info)
+
+	instrumentation, err := beat.CreateInstrumentation(cfg, b.Info)
 	if err != nil {
 		return err
 	}
-	b.Beat.Instrumentation = tracer
+	b.Beat.Instrumentation = instrumentation
 
 	b.keystore = store
 	b.Beat.Keystore = store
