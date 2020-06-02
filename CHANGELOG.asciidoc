@@ -49,7 +49,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add support for basic ECS logging. {pull}17974[17974]
 - Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
 - Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
-- Add keystore support for autodiscover static configurations. {pull]16306[16306]
+- Add keystore support for autodiscover static configurations. {pull}16306[16306]
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 
