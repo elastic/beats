@@ -111,7 +111,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add dashboard for googlecloud storage metricset. {pull}18172[18172]
 - Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
 - Remove requirement to connect as sysdba in Oracle module. {issue}15846[15846] {pull}18182[18182]
-- Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
+- Update MSSQL module to fix some SSPI authentication and add brackets to USE statements. {pull}17862[17862]
 
 *Winlogbeat*
 
