@@ -28,7 +28,8 @@
         "source.geo.region_name": "Moscow",
         "source.ip": "1.2.3.4",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ],
         "user.email": "firsname.lastname@domain.net"
     }

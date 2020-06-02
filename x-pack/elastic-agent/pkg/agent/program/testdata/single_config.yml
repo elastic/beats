@@ -26,6 +26,8 @@ datasources:
       streams:
         - metricset: status
           dataset: docker.status
+        - metricset: info
+          dataset: ""
       hosts: ["http://127.0.0.1:8080"]
     - type: logs
       streams:

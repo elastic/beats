@@ -55,7 +55,8 @@
         "source.ip": "10.0.1.20",
         "source.port": 55644,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -116,7 +117,8 @@
         "source.ip": "10.0.1.20",
         "source.port": 55868,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -173,7 +175,8 @@
         "source.ip": "10.0.100.30",
         "source.port": 21,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -230,7 +233,8 @@
         "source.ip": "10.0.100.30",
         "source.port": 21,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
