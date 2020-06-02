@@ -41,7 +41,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 
 - Update supported versions of `redis` output. {pull}17198[17198]
 - Add `replace` processor for replacing string values of fields. {pull}17342[17342]
-- Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
+- Add `urldecode` processor for decoding URL-encoded fields. {pull}17505[17505]
 - Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
