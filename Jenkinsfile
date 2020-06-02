@@ -856,13 +856,8 @@ def withBeatsEnv(boolean archive, Closure body) {
 }
 
 /**
-  This method archives and report the tests output.
-    It searches for certain folders to bypass some issues when working with big repositories. In addition,
-
-    OUTPUT:
-      - JUnit
-      - Artifacts in Jenkins
-      - Artifacts in GCP
+  This method archives and report the tests output, for such, it searches in certain folders
+  to bypass some issues when working with big repositories.
 */
 def archiveTestOutput(Map args = [:]) {
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
