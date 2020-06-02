@@ -1223,7 +1223,7 @@ type: keyword
 --
 The parameters, if any, that were sent with the request.
 
-type: keyword
+type: object
 
 --
 
@@ -1232,7 +1232,7 @@ type: keyword
 --
 The response element for actions that make changes (create, update, or delete actions).
 
-type: keyword
+type: object
 
 --
 
@@ -1241,7 +1241,7 @@ type: keyword
 --
 Additional data about the event that was not part of the request or response.
 
-type: keyword
+type: object
 
 --
 
@@ -1337,7 +1337,7 @@ type: keyword
 --
 Identifies the service event, including what triggered the event and the result.
 
-type: keyword
+type: object
 
 --
 

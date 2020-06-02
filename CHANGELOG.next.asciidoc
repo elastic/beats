@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- In aws cloudtrail fileset change type of field from string to object for request_parameters, response_elements, additional_eventdata & service_event_details. {issue}18866[18866] {pull}18909[18909]
 
 *Heartbeat*
 

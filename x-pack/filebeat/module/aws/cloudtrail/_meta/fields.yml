@@ -87,16 +87,16 @@
       description: >-
         If the request returns an error, the description of the error.
     - name: request_parameters
-      type: keyword
+      type: object
       description: >-
         The parameters, if any, that were sent with the request.
     - name: response_elements
-      type: keyword
+      type: object
       description: >-
         The response element for actions that make changes (create,
         update, or delete actions).
     - name: additional_eventdata
-      type: keyword
+      type: object
       description: >-
         Additional data about the event that was not part of the
         request or response.
@@ -145,7 +145,7 @@
       description: >-
         Represents the account ID that received this event.
     - name: service_event_details
-      type: keyword
+      type: object
       description: >-
         Identifies the service event, including what triggered the
         event and the result.
