@@ -176,7 +176,7 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 		Release:     "1",
 		Arch:        "amd64",
 		License:     "bar",
-		InstallTime: time.Unix(1591021924, 0),
+		InstallTime: time.Unix(1591021924, 0).UTC(),
 		Size:        1234,
 		Summary:     "Foo stuff",
 		URL:         "http://foo.example.com",
