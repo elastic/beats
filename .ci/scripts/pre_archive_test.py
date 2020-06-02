@@ -4,20 +4,6 @@ import os
 import distutils
 from distutils import dir_util
 
-# Support filtering in the distutils.dir_util.copy_tree
-#ORIG_COPY_TREE = distutils.dir_util.copy_tree
-#
-#
-# def my_copy_tree(src, *args, **kwargs):
-#    '''function my_copy_tree
-#        Override distutils.dir_util.copy_tree to filter the system-tests
-#    '''
-#    if src.endswith('system-tests'):
-#        return []
-#    return ORIG_COPY_TREE(src, *args, **kwargs)
-#
-#
-#distutils.dir_util.copy_tree = my_copy_tree
 
 if __name__ == "__main__":
 
