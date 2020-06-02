@@ -67,7 +67,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 *Filebeat*
 
 - Add source field in k8s events {pull}17209[17209]
-- Added new module `crowdstrike` for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
+- Add new `crowdstrike` module for ingesting Crowdstrike Falcon streaming API endpoint event data. {pull}16988[16988]
 - Improve ECS categorization field mappings in mongodb module. {issue}16170[16170] {pull}17371[17371]
 - Improve ECS categorization field mappings for mssql module. {issue}16171[16171] {pull}17376[17376]
 - Improve ECS categorization field mappings for mysql module. {issue}16172[16172] {pull}17491[17491]
