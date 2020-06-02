@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 
 *Affecting all Beats*
 
-- Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
+- Introduce APM instrumentation, which is active when running the beat with `ELASTIC_APM_ACTIVE=true`. {pull}17938[17938]
 
 *Filebeat*
 
