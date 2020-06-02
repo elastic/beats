@@ -206,7 +206,28 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config '%s', won't start runner", common.DebugString(config, true))))
+			a.logger.Debug(errors.Wrap(err, fmt.Sprintf(
+				"Auto discover config check failed for config '%s', won't start runner",
+				common.DebugString(config, true))))
+			checkConfigAttempts := 0
+			maxCheckConfigAttempts := 5
+			for {
+				err = a.factory.CheckConfig(config)
+				if err == nil {
+					a.logger.Debug(errors.Wrap(err, fmt.Sprintf(
+						"Auto discover config check failed for config '%s'[attempt %v], won't start runner",
+						common.DebugString(config, true), checkConfigAttempts + 1)))
+					break
+				}
+				if checkConfigAttempts > maxCheckConfigAttempts {
+					a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+						"Auto discover config check failed for config '%s' after max attempts, won't start runner",
+						common.DebugString(config, true))))
+					break
+				}
+				time.Sleep(3 * time.Second)
+				checkConfigAttempts += 1
+			}
 			continue
 		}
 

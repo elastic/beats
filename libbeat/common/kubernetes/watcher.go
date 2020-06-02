@@ -70,6 +70,7 @@ type WatchOptions struct {
 
 type item struct {
 	object interface{}
+	objectRaw interface{}
 	state  string
 }
 
@@ -175,8 +176,7 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	if err != nil {
 		return
 	}
-
-	w.queue.Add(&item{key, state})
+	w.queue.Add(&item{key, obj, state})
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -204,6 +204,11 @@ func (w *watcher) process(ctx context.Context) bool {
 			return nil
 		}
 		if !exists {
+			if entry.state == delete {
+				w.logger.Errorf("Object was not found in the store, deleting anyway!")
+				// delete anyway in order to clean states
+				w.handler.OnDelete(entry.objectRaw)
+			}
 			return nil
 		}
 

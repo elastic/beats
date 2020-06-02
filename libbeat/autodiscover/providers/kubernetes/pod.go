@@ -124,7 +124,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 // OnAdd ensures processing of service objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
-	p.logger.Debugf("Watcher Node add: %+v", obj)
+	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
@@ -149,13 +149,12 @@ func (p *pod) OnUpdate(obj interface{}) {
 
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(pod, "stop")
-	time.Sleep(5 * time.Second)
 	p.emit(pod, "start")
 }
 
 // GenerateHints creates hints needed for hints builder
 func (p *pod) OnDelete(obj interface{}) {
-	p.logger.Debugf("Watcher Node delete: %+v", obj)
+	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 
