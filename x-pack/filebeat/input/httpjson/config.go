@@ -17,6 +17,7 @@ import (
 
 // Config contains information about httpjson configuration
 type config struct {
+	OAuth2               *OAuth2           `config:"oauth2"`
 	APIKey               string            `config:"api_key"`
 	AuthenticationScheme string            `config:"authentication_scheme"`
 	HTTPClientTimeout    time.Duration     `config:"http_client_timeout"`
@@ -30,6 +31,14 @@ type config struct {
 	RateLimit            *RateLimit        `config:"rate_limit"`
 	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  string            `config:"url" validate:"required"`
+}
+
+// OAuth2 contains information about oauth2 authentication settings.
+type OAuth2 struct {
+	TokenURL     string   `config:"token_url"`
+	ClientID     string   `config:"client_id"`
+	ClientSecret string   `config:"client_secret"`
+	Scopes       []string `config:"scopes"`
 }
 
 // Pagination contains information about httpjson pagination settings
@@ -82,6 +91,11 @@ func (c *config) Validate() error {
 			if c.Pagination.RequestField != "" || c.Pagination.IDField != "" || len(c.Pagination.ExtraBodyContent) > 0 {
 				return errors.Errorf("invalid configuration: both pagination.header and pagination.req_field or pagination.id_field or pagination.extra_body_content cannot be set simultaneously")
 			}
+		}
+	}
+	if c.OAuth2 != nil {
+		if c.APIKey != "" || c.AuthenticationScheme != "" {
+			return errors.Errorf("invalid configuration: both oauth2 and api_key or authentication_scheme cannot be set simultaneously")
 		}
 	}
 	return nil
