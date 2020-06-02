@@ -40,9 +40,6 @@ processors:
         ctx.event.outcome = 'failure';
       }
 
-- lowercase:
-    field: http.request.method
-    ignore_missing: true
 - set:
     field: host.id
     value: "{{elasticsearch.node.id}}"
