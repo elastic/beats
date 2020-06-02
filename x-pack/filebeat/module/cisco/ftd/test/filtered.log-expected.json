@@ -18,7 +18,8 @@
         "process.pid": 1234,
         "service.type": "cisco",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]
