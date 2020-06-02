@@ -869,37 +869,19 @@ def archiveTestOutput(Map args = [:]) {
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
     }
-    shOrBat(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
     dir('build') {
       junitAndStore(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-      def folder = shOrBat(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py')
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py')
       log(level: 'INFO', text: "system-tests has been found in ${folder}")
       if (folder.trim()) {
         def name = folder.replaceAll('/', '-').replaceAll('\\', '-').replaceAll('build', '')
         tar(file: "${name}.tgz", archive: true, dir: folder)
       }
     }
-  }
-}
-
-/**
-  This method encapsulates the OS shell.
-*/
-def shOrBat(Map args = [:]) {
-  if (isUnix()) {
-    return sh(args)
-  } else {
-    def command = args.script
-    if (args.containsKey('returnStdout') && args.returnStdout) {
-      command = """@echo off
-      ${args.script}
-      """
-      args.script = command
-    }
-    return bat(args)
   }
 }
 
