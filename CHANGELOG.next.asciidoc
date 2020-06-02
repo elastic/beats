@@ -18,7 +18,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Ensure dynamic template names are unique for the same field. {pull}18849[18849]
-- Update to Golang 1.14.3 and remove usage of -mod=vendor. {pull}18829[18829]
 - Update to Golang 1.14.4 and remove usage of -mod=vendor. {pull}18829[18829]
 
 *Auditbeat*
