@@ -29,9 +29,6 @@ type testCase struct {
 }
 
 func TestVerify(t *testing.T) {
-	// skip so beats are not fetched from upstream, test only locally when change is made
-	// t.Skip()
-
 	targetDir, err := ioutil.TempDir(os.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
