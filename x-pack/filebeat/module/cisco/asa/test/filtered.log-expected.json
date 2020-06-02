@@ -17,7 +17,8 @@
         "process.pid": 1234,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -49,7 +50,8 @@
         "source.ip": "10.13.12.11",
         "source.port": 45321,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     }
 ]

@@ -1,0 +1,20 @@
+  
+---
+
+##### GLOBAL METADATA
+
+- meta:
+    cluster: beats-ci
+
+##### JOB DEFAULTS
+
+- job:
+    logrotate:
+      numToKeep: 20
+    node: linux
+    concurrent: true
+    publishers:
+      - email:
+          recipients: infra-root+build@elastic.co
+    periodic-folder-trigger: 1w
+    prune-dead-branches: true
