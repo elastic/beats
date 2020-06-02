@@ -22,7 +22,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -48,7 +49,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -74,7 +76,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -127,7 +130,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 46915,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -193,7 +197,8 @@
         "source.nat.port": 26680,
         "source.port": 61794,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -246,7 +251,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 36749,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -309,7 +315,8 @@
         "source.nat.port": 10012,
         "source.port": 41566,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -362,7 +369,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 55799,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -425,7 +433,8 @@
         "source.nat.port": 10013,
         "source.port": 48698,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -478,7 +487,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 48658,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -541,7 +551,8 @@
         "source.nat.port": 10014,
         "source.port": 61150,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -594,7 +605,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 59800,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -657,7 +669,8 @@
         "source.nat.port": 26681,
         "source.port": 55110,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -710,7 +723,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 49780,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -773,7 +787,8 @@
         "source.nat.port": 26682,
         "source.port": 48718,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -826,7 +841,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 33536,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -889,7 +905,8 @@
         "source.nat.port": 26683,
         "source.port": 62206,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -942,7 +959,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 61767,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1005,7 +1023,8 @@
         "source.nat.port": 26684,
         "source.port": 41596,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1058,7 +1077,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 48728,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1121,7 +1141,8 @@
         "source.nat.port": 10015,
         "source.port": 61180,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1174,7 +1195,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 64364,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1237,7 +1259,8 @@
         "source.nat.port": 10016,
         "source.port": 48732,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1290,7 +1313,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 54002,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1353,7 +1377,8 @@
         "source.nat.port": 43354,
         "source.port": 62222,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1406,7 +1431,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 40677,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1469,7 +1495,8 @@
         "source.nat.port": 10017,
         "source.port": 61188,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1522,7 +1549,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 53589,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1585,7 +1613,8 @@
         "source.nat.port": 26685,
         "source.port": 41624,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1638,7 +1667,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 36166,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1701,7 +1731,8 @@
         "source.nat.port": 10018,
         "source.port": 48758,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1754,7 +1785,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 43736,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1817,7 +1849,8 @@
         "source.nat.port": 10019,
         "source.port": 62246,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1870,7 +1903,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 46065,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1933,7 +1967,8 @@
         "source.nat.port": 10020,
         "source.port": 41638,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -1986,7 +2021,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 43388,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2049,7 +2085,8 @@
         "source.nat.port": 43355,
         "source.port": 61224,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2102,7 +2139,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 61851,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2149,7 +2187,8 @@
         "source.user.id": "{FF0154DE-7D18-4396-B0C2-7E8951B393A4}",
         "source.user.name": "admin",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2212,7 +2251,8 @@
         "source.nat.port": 43356,
         "source.port": 48776,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2238,7 +2278,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2304,7 +2345,8 @@
         "source.nat.port": 26686,
         "source.port": 51436,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2357,7 +2399,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 36896,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2410,7 +2453,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 38864,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2463,7 +2507,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 59284,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2526,7 +2571,8 @@
         "source.nat.port": 26687,
         "source.port": 62396,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2579,7 +2625,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 43379,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2642,7 +2689,8 @@
         "source.nat.port": 26688,
         "source.port": 48914,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2695,7 +2743,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 41365,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2758,7 +2807,8 @@
         "source.nat.port": 10021,
         "source.port": 41844,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2811,7 +2861,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 47951,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2874,7 +2925,8 @@
         "source.nat.port": 26689,
         "source.port": 62468,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2927,7 +2979,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 36526,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -2990,7 +3043,8 @@
         "source.nat.port": 26690,
         "source.port": 61434,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3043,7 +3097,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 34981,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3106,7 +3161,8 @@
         "source.nat.port": 26691,
         "source.port": 41856,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3153,7 +3209,8 @@
         "source.user.id": "{597182F7-E1BA-460F-B6E0-D4996295B5CC}",
         "source.user.name": "admin",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3206,7 +3263,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 61445,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3269,7 +3327,8 @@
         "source.nat.port": 26692,
         "source.port": 48990,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3322,7 +3381,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 64618,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3385,7 +3445,8 @@
         "source.nat.port": 26693,
         "source.port": 62478,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3438,7 +3499,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 61203,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3501,7 +3563,8 @@
         "source.nat.port": 10022,
         "source.port": 41864,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3554,7 +3617,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 35209,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3617,7 +3681,8 @@
         "source.nat.port": 43357,
         "source.port": 61446,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3670,7 +3735,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 35787,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3733,7 +3799,8 @@
         "source.nat.port": 43358,
         "source.port": 48998,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3796,7 +3863,8 @@
         "source.nat.port": 43359,
         "source.port": 41870,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3849,7 +3917,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 46851,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3902,7 +3971,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 37927,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -3965,7 +4035,8 @@
         "source.nat.port": 26694,
         "source.port": 62488,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4018,7 +4089,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 45589,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4081,7 +4153,8 @@
         "source.nat.port": 10023,
         "source.port": 61454,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4107,7 +4180,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4133,7 +4207,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4159,7 +4234,8 @@
         "observer.vendor": "Checkpoint",
         "service.type": "checkpoint",
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4225,7 +4301,8 @@
         "source.nat.port": 43360,
         "source.port": 62122,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4278,7 +4355,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 40928,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4331,7 +4409,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 51957,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4394,7 +4473,8 @@
         "source.nat.port": 26695,
         "source.port": 55424,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4447,7 +4527,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 37029,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4510,7 +4591,8 @@
         "source.nat.port": 26696,
         "source.port": 49026,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4563,7 +4645,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 61725,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4626,7 +4709,8 @@
         "source.nat.port": 26697,
         "source.port": 62514,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4679,7 +4763,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 59562,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4742,7 +4827,8 @@
         "source.nat.port": 10024,
         "source.port": 41902,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4795,7 +4881,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 60754,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4858,7 +4945,8 @@
         "source.nat.port": 43361,
         "source.port": 61490,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4911,7 +4999,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 36577,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -4974,7 +5063,8 @@
         "source.nat.port": 26698,
         "source.port": 49042,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5027,7 +5117,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 39956,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5090,7 +5181,8 @@
         "source.nat.port": 26699,
         "source.port": 41914,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5143,7 +5235,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 46729,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5206,7 +5299,8 @@
         "source.nat.port": 10025,
         "source.port": 62534,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5259,7 +5353,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 37133,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5322,7 +5417,8 @@
         "source.nat.port": 10026,
         "source.port": 61500,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5375,7 +5471,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 44417,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5438,7 +5535,8 @@
         "source.nat.port": 10027,
         "source.port": 41938,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5491,7 +5589,8 @@
         "source.ip": "192.168.1.100",
         "source.port": 37245,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     },
     {
@@ -5554,7 +5653,8 @@
         "source.nat.port": 43362,
         "source.port": 49102,
         "tags": [
-            "checkpoint-firewall"
+            "checkpoint-firewall",
+            "forwarded"
         ]
     }
 ]
