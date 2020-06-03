@@ -189,9 +189,34 @@ GROUPLOOP:
 				continue GROUPLOOP
 			}
 
-			enabledVal, found := cm[enabledKey]
+			// is enabled set
+			settingsObj, found := cm["settings"]
 			if !found {
-				t.Errorf("monitoring.enabled not found for '%s'", group)
+				t.Errorf("settings not found for '%s(%s)': %v", group, p.Spec.Name, cm)
+				continue GROUPLOOP
+			}
+
+			settingsMap, ok := settingsObj.(map[string]interface{})
+			if !ok {
+				t.Errorf("settings not a map for '%s(%s)': %v", group, p.Spec.Name, cm)
+				continue GROUPLOOP
+			}
+
+			monitoringObj, found := settingsMap["monitoring"]
+			if !found {
+				t.Errorf("settings.monitoring not found for '%s(%s)': %v", group, p.Spec.Name, cm)
+				continue GROUPLOOP
+			}
+
+			monitoringMap, ok := monitoringObj.(map[string]interface{})
+			if !ok {
+				t.Errorf("settings.monitoring not a map for '%s(%s)': %v", group, p.Spec.Name, cm)
+				continue GROUPLOOP
+			}
+
+			enabledVal, found := monitoringMap["enabled"]
+			if !found {
+				t.Errorf("monitoring.enabled not found for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
 			}
 
