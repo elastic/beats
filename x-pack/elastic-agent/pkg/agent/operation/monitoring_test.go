@@ -116,6 +116,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	l := getLogger()
 
 	fetcher := &DummyDownloader{}
+	verifier := &DummyVerifier{}
 	installer := &DummyInstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
@@ -124,7 +125,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 	ctx := context.Background()
 
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil, m)
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}
