@@ -61,7 +61,7 @@ type ConnectionSettings struct {
 
 	Username string
 	Password string
-	APIKey   string
+	APIKey   string // Raw API key, NOT base64-encoded
 	Headers  map[string]string
 
 	TLS      *tlscommon.TLSConfig
