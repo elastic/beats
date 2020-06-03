@@ -21,7 +21,7 @@ content_type:
 {{ if .api }}
 api:
 {{ range $k, $v := .api }}
- - {{ $k }}: {{ $v -}}
+  {{ $k }}: {{ $v -}}
 {{ end }}
 {{ end }}
 
