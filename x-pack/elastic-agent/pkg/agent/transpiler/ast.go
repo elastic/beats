@@ -64,7 +64,7 @@ type Dict struct {
 	value []Node
 }
 
-// NewList creates a new list with provided nodes.
+// NewDict creates a new dict with provided nodes.
 func NewDict(nodes []Node) *Dict {
 	return &Dict{nodes}
 }

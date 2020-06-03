@@ -197,7 +197,7 @@ GROUPLOOP:
 
 			monitoringEnabled, ok := enabledVal.(bool)
 			if !ok {
-				t.Errorf("monitoring.enabled isnot a bool for '%s'", group)
+				t.Errorf("monitoring.enabled is not a bool for '%s'", group)
 				continue GROUPLOOP
 			}
 
