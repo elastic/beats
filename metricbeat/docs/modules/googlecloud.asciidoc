@@ -244,15 +244,14 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  stackdriver:
-    metrics:
-      - aligner: ALIGN_NONE
-        service: compute
-        metric_types:
-          - "instance/cpu/reserved_cores"
-          - "instance/cpu/usage_time"
-          - "instance/cpu/utilization"
-          - "instance/uptime"
+  metrics:
+    - aligner: ALIGN_NONE
+      service: compute
+      metric_types:
+        - "instance/cpu/reserved_cores"
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+        - "instance/uptime"
 ----
 
 [float]

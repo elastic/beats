@@ -40,7 +40,7 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 				Aligner:     "ALIGN_NONE",
 				MetricTypes: []string{"instance/uptime"},
 			}
-			config["stackdriver.metrics"] = stackDriverConfig
+			config["metrics"] = stackDriverConfig
 		}
 	}
 	return config
