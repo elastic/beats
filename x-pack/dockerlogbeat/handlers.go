@@ -7,8 +7,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/docker/docker/daemon/logger"
 
@@ -38,12 +36,17 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 			return
 		}
 
-		pm.Logger.Debugf("Homepath: %v\n", filepath.Dir(os.Args[0]))
 		pm.Logger.Infof("Got start request object from container %#v\n", startReq.Info.ContainerName)
 		pm.Logger.Debugf("Got a container with the following labels: %#v\n", startReq.Info.ContainerLabels)
 		pm.Logger.Debugf("Got a container with the following log opts: %#v\n", startReq.Info.Config)
 
-		cl, err := pm.CreateClientWithConfig(startReq.Info, startReq.File)
+		cfg, err := pipelinemanager.NewCfgFromRaw(startReq.Info.Config)
+		if err != nil {
+			http.Error(w, errors.Wrap(err, "error creating client config").Error(), http.StatusBadRequest)
+			return
+		}
+		pm.Logger.Debugf("Got config: %#v", cfg)
+		cl, err := pm.CreateClientWithConfig(cfg, startReq.Info, startReq.File)
 		if err != nil {
 			http.Error(w, errors.Wrap(err, "error creating client").Error(), http.StatusBadRequest)
 			return

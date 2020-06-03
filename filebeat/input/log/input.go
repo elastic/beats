@@ -85,6 +85,22 @@ func NewInput(
 		}
 	}
 
+	inputConfig := defaultConfig
+
+	if err := cfg.Unpack(&inputConfig); err != nil {
+		return nil, err
+	}
+	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
+	}
+	if err := inputConfig.normalizeGlobPatterns(); err != nil {
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
+	}
+
+	if len(inputConfig.Paths) == 0 {
+		return nil, fmt.Errorf("each input must have at least one path defined")
+	}
+
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
 	//  on the timings the outlets must be closed/unblocked.
@@ -113,7 +129,7 @@ func NewInput(
 	}
 
 	p := &Input{
-		config:      defaultConfig,
+		config:      inputConfig,
 		cfg:         cfg,
 		harvesters:  harvester.NewRegistry(),
 		outlet:      out,
@@ -123,25 +139,11 @@ func NewInput(
 		meta:        meta,
 	}
 
-	if err := cfg.Unpack(&p.config); err != nil {
-		return nil, err
-	}
-	if err := p.config.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
-	}
-	if err := p.config.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
-	}
-
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
 	_, err = p.createHarvester(file.State{}, nil)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(p.config.Paths) == 0 {
-		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
 	err = p.loadStates(context.States)

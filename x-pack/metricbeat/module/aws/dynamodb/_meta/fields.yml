@@ -7,16 +7,16 @@
     - name: metrics
       type: group
       fields:
-        - name: SuccessfulRequestLatency
-          type: group
+        - name: SuccessfulRequestLatency.avg
+          type: double
           description: >
-            The latency of successful requests to DynamoDB or Amazon DynamoDB Streams
+            The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams
             during the specified time period.
-          fields:
-            - name: avg
-              type: double
-            - name: max
-              type: double
+        - name: SuccessfulRequestLatency.max
+          type: double
+          description: >
+            The maximum latency of successful requests to DynamoDB or Amazon DynamoDB Streams
+            during the specified time period.
         - name: OnlineIndexPercentageProgress.avg
           type: double
           description: >
@@ -29,46 +29,46 @@
           type: double
           description: >
             The number of provisioned read capacity units for a table or a global secondary index.
-        - name: ConsumedReadCapacityUnits
-          type: group
+        - name: ConsumedReadCapacityUnits.avg
+          type: double
           description: >
-            The number of read capacity units consumed over the specified time period,
+            The average number of read capacity units consumed over the specified time period,
             so you can track how much of your provisioned throughput is used.
-          fields:
-            - name: avg
-              type: double
-            - name: sum
-              type: long
-        - name: ConsumedWriteCapacityUnits
-          type: group
+        - name: ConsumedReadCapacityUnits.sum
+          type: long
           description: >
-            The number of write capacity units consumed over the specified time period,
+            The sum of read capacity units consumed over the specified time period,
             so you can track how much of your provisioned throughput is used.
-          fields:
-            - name: avg
-              type: double
-            - name: sum
-              type: long
-        - name: ReplicationLatency
-          type: group
+        - name: ConsumedWriteCapacityUnits.avg
+          type: double
           description: >
-            The elapsed time between an updated item appearing in the DynamoDB stream for
+            The average number of write capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ConsumedWriteCapacityUnits.sum
+          type: long
+          description: >
+            The sum of write capacity units consumed over the specified time period,
+            so you can track how much of your provisioned throughput is used.
+        - name: ReplicationLatency.avg
+          type: double
+          description: >
+            The average elapsed time between an updated item appearing in the DynamoDB stream for
             one replica table, and that item appearing in another replica in the global table.
-          fields:
-            - name: avg
-              type: double
-            - name: max
-              type: double
-        - name: TransactionConflict
-          type: group
+        - name: ReplicationLatency.max
+          type: double
           description: >
-            Rejected item-level requests due to transactional conflicts between concurrent
+            The maximum elapsed time between an updated item appearing in the DynamoDB stream for
+            one replica table, and that item appearing in another replica in the global table.
+        - name: TransactionConflict.avg
+          type: double
+          description: >
+            Average rejected item-level requests due to transactional conflicts between concurrent
             requests on the same items.
-          fields:
-            - name: avg
-              type: double
-            - name: sum
-              type: long
+        - name: TransactionConflict.sum
+          type: long
+          description: >
+            Total rejected item-level requests due to transactional conflicts between concurrent
+            requests on the same items.
         - name: AccountProvisionedReadCapacityUtilization.avg
           type: double
           description: >

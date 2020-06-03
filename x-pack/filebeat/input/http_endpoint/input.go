@@ -196,9 +196,6 @@ func (in *HttpEndpoint) validateHeader(w http.ResponseWriter, r *http.Request) (
 		return http.StatusUnsupportedMediaType, in.createErrorMessage("Wrong Content-Type header, expecting application/json")
 	}
 
-	if r.Header.Get("Accept") != "application/json" {
-		return http.StatusNotAcceptable, in.createErrorMessage("Wrong Accept header, expecting application/json")
-	}
 	return 0, ""
 }
 
