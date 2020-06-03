@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
 - Make error message about locked data path actionable. {pull}18667[18667]
+- Ensure dynamic template names are unique for the same field. {pull}18849[18849]
 
 *Auditbeat*
 
@@ -117,6 +118,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Gives monitoring reporter hosts, if configured, total precedence over corresponding output hosts. {issue}17937[17937] {pull}17991[17991]
 - [Autodiscover] Check if runner is already running before starting again. {pull}18564[18564]
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
+- Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 
 *Auditbeat*
 
@@ -313,7 +315,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kerberos support to Elasticsearch output. {pull}17927[17927]
 - Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
 - Update RPM packages contained in Beat Docker images. {issue}17035[17035]
-- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 
@@ -520,6 +521,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements {pull}17862[17862]]
 - Add client address to events from http server module {pull}18336[18336]
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
+- Add new fields to HAProxy module. {issue}18523[18523]
 
 *Packetbeat*
 
