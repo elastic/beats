@@ -9,6 +9,11 @@ import groovy.transform.Field
 */
 @Field def stashedTestReports = [:]
 
+/**
+ List of supported windows versions to be tested with
+*/
+@Field def windowsVersions = ['windows-2019', 'windows-2016', 'windows-2012-r2', 'windows-10', 'windows-2008-r2', 'windows-7', 'windows-7-32-bit']
+
 pipeline {
   agent { label 'ubuntu && immutable' }
   environment {
@@ -77,7 +82,8 @@ pipeline {
     stage('Build and Test'){
       when {
         beforeAgent true
-        expression { return env.ONLY_DOCS == "false" }
+        //expression { return env.ONLY_DOCS == "false" }
+        expression { return false }
       }
       failFast false
       parallel {
@@ -776,6 +782,181 @@ pipeline {
         }
       }
     }
+    stage('Build and Test Windows'){
+      when {
+        beforeAgent true
+        expression { return false }
+      }
+      failFast false
+      parallel {
+        stage('Elastic Agent x-pack Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Elastic Agent x-pack Windows Unit test", "x-pack/elastic-agent", "build unitTest")
+          }
+        }
+        stage('Filebeat Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+          }
+        }
+        stage('Filebeat x-pack Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
+          }
+        }
+        stage('Heartbeat'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_HEARTBEAT != "false"
+            }
+          }
+          stages {
+            stage('Heartbeat Windows'){
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
+              steps {
+                mageTargetWin("Heartbeat oss Windows Unit test", "heartbeat", "build unitTest")
+              }
+            }
+          }
+        }
+        stage('Auditbeat oss Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Auditbeat oss Windows Unit test", "auditbeat", "build unitTest")
+          }
+        }
+        stage('Auditbeat x-pack Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Auditbeat x-pack Windows", "x-pack/auditbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat x-pack Windows'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
+          }
+        }
+        stage('Winlogbeat'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_WINLOGBEAT != "false"
+            }
+          }
+          stages {
+            stage('Winlogbeat Windows'){
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
+              steps {
+                mageTargetWin("Winlogbeat Windows Unit test", "winlogbeat", "build unitTest")
+              }
+            }
+          }
+        }
+        stage('Winlogbeat Windows x-pack'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
+            }
+          }
+          steps {
+            mageTargetWin("Winlogbeat Windows Unit test", "x-pack/winlogbeat", "build unitTest")
+          }
+        }
+        stage('Functionbeat'){
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FUNCTIONBEAT_XPACK != "false"
+            }
+          }
+          stages {
+            stage('Functionbeat Windows'){
+              agent { label 'windows-immutable && windows-2019' }
+              options { skipDefaultCheckout() }
+              when {
+                beforeAgent true
+                expression {
+                  return params.windowsTest
+                }
+              }
+              steps {
+                mageTargetWin("Functionbeat Windows Unit test", "x-pack/functionbeat", "build unitTest")
+              }
+            }
+          }
+        }
+      }
+    }
   }
   post {
     always {
@@ -834,15 +1015,29 @@ def mageTarget(String context, String directory, String target) {
 
 def mageTargetWin(String context, String directory, String target) {
   withGithubNotify(context: "${context}") {
-    withBeatsEnvWin() {
-      whenTrue(params.debug) {
-        dumpFilteredEnvironment()
-        dumpMageWin()
-      }
+    def tasks = [:]
+    windowsVersions.each { os ->
+      tasks["${context}-${os}"] = mageTargetWin(context, directory, target, os)
+    }
+    parallel(tasks)
+  }
+}
 
-      def verboseFlag = params.debug ? "-v" : ""
-      dir(directory) {
-        bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+def mageTargetWin(String context, String directory, String target, String label) {
+  return {
+    log(level: 'INFO', text: "context=${context} directory=${directory} target=${target} os=${label}")
+    def immutable = label.equals('windows-7-32-bit') ? 'windows-immutable-32-bit' : 'windows-immutable'
+    node("${immutable} && ${label}"){
+      withBeatsEnvWin() {
+        whenTrue(params.debug) {
+          dumpFilteredEnvironment()
+          dumpMageWin()
+        }
+
+        def verboseFlag = params.debug ? "-v" : ""
+        dir(directory) {
+          bat(label: "Mage ${target}", script: "mage ${verboseFlag} ${target}")
+        }
       }
     }
   }
