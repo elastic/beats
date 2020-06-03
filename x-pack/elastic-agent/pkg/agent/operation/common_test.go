@@ -46,6 +46,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 	l := getLogger()
 
 	fetcher := &DummyDownloader{}
+	verifier := &DummyVerifier{}
 	installer := &DummyInstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
@@ -53,7 +54,7 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, installer, stateResolver, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,8 +82,7 @@ type TestConfig struct {
 	TestFile string
 }
 
-type DummyDownloader struct {
-}
+type DummyDownloader struct{}
 
 func (*DummyDownloader) Download(_ context.Context, p, v string) (string, error) {
 	return "", nil
@@ -90,8 +90,15 @@ func (*DummyDownloader) Download(_ context.Context, p, v string) (string, error)
 
 var _ download.Downloader = &DummyDownloader{}
 
-type DummyInstaller struct {
+type DummyVerifier struct{}
+
+func (*DummyVerifier) Verify(p, v string) (bool, error) {
+	return true, nil
 }
+
+var _ download.Verifier = &DummyVerifier{}
+
+type DummyInstaller struct{}
 
 func (*DummyInstaller) Install(p, v, _ string) error {
 	return nil
