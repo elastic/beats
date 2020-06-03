@@ -260,7 +260,7 @@ pipeline {
       runbld()
     }
     cleanup {
-      notifyBuildResult(prComment: true, createIssue: [ enabled: true, onbranches: true] )
+      notifyBuildResult(prComment: true)
     }
   }
 }
