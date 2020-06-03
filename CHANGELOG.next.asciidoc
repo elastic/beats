@@ -266,7 +266,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
 - Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
-- Change ownership of files in docker images so they can be used in secured environments. {pull}12905[12905]
 - Upgrade k8s.io/client-go and k8s keystore tests. {pull}18817[18817]
 
 *Auditbeat*
@@ -454,6 +453,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add client address to events from http server module {pull}18336[18336]
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
+- Add new fields to HAProxy module. {issue}18523[18523]
 
 *Packetbeat*
 
