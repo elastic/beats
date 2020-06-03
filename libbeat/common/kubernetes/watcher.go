@@ -69,9 +69,9 @@ type WatchOptions struct {
 }
 
 type item struct {
-	object interface{}
+	object    interface{}
 	objectRaw interface{}
-	state  string
+	state     string
 }
 
 type watcher struct {

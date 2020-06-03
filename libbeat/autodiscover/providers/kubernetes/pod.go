@@ -122,7 +122,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	return p, nil
 }
 
-// OnAdd ensures processing of service objects that are newly added
+// OnAdd ensures processing of pod objects that are newly added
 func (p *pod) OnAdd(obj interface{}) {
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
@@ -152,12 +152,13 @@ func (p *pod) OnUpdate(obj interface{}) {
 	p.emit(pod, "start")
 }
 
-// GenerateHints creates hints needed for hints builder
+// OnDelete stops pod objects that are deleted
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
 	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 }
 
+// GenerateHints creates hints needed for hints builder
 func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
