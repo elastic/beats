@@ -415,7 +415,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log: 
+  log:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -424,7 +424,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-  
+
   falcon:
     enabled: true
 
@@ -469,7 +469,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log: 
+  log:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -546,6 +546,16 @@ filebeat.modules:
     # Credentials file for the service account with authorization to read from
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+#------------------------------ Greenplum Module ------------------------------
+- module: greenplum
+  # All logs
+  {fileset}:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
@@ -700,7 +710,7 @@ filebeat.modules:
 
     # URL of the MISP REST API
     #var.url
-   
+
     # You can also pass SSL options. For example:
     #var.ssl: |-
     #  {
@@ -866,7 +876,7 @@ filebeat.modules:
     # URL of the Okta REST API
     #var.url
 
-    # Disable SSL verification 
+    # Disable SSL verification
     #var.ssl: |-
     #  {
     #    "verification_mode": "none"
@@ -997,7 +1007,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true    
+    enabled: true
   irc:
     enabled: true
   kerberos:
@@ -2949,4 +2959,3 @@ logging.files:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
-

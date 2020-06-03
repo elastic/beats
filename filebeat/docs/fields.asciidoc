@@ -31,6 +31,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-fortinet>>
 * <<exported-fields-googlecloud>>
+* <<exported-fields-greenplum>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-ibmmq>>
@@ -6731,7 +6732,7 @@ type: integer
 *`checkpoint.duration`*::
 +
 --
-Scan duration.      
+Scan duration.
 
 
 type: keyword
@@ -6821,7 +6822,7 @@ type: integer
 *`checkpoint.next_scheduled_scan_date`*::
 +
 --
-Next scan scheduled time according to time object.     
+Next scan scheduled time according to time object.
 
 
 type: keyword
@@ -12585,6 +12586,393 @@ example: sda
 
 --
 
+[[exported-fields-greenplum]]
+== greenplum fields
+
+greenplum Module
+
+
+
+[float]
+=== greenplum
+
+
+
+
+[float]
+=== log
+
+The log which can be queried via gp_log_database
+
+
+*`greenplum.log.timestamp`*::
++
+--
+The timestamp of the log message
+
+example: 2020-01-29 00:00:01.606881 UTC
+
+--
+
+*`greenplum.log.user`*::
++
+--
+The name of the database user
+
+type: keyword
+
+example: gpadmin
+
+--
+
+*`greenplum.log.database`*::
++
+--
+The name of the database
+
+type: keyword
+
+example: postgres
+
+--
+
+*`greenplum.log.process_id`*::
++
+--
+The associated process id (prefixed with "p")
+
+type: keyword
+
+example: p713507
+
+--
+
+*`greenplum.log.thread_id`*::
++
+--
+The associated thread count
+
+type: keyword
+
+example: 1452697472
+
+--
+
+*`greenplum.log.host`*::
++
+--
+The segment or master host name
+
+type: text
+
+example: [local]
+
+--
+
+*`greenplum.log.port`*::
++
+--
+The segment or master port
+
+type: long
+
+example: 43940
+
+--
+
+*`greenplum.log.session_start`*::
++
+--
+Time session connection was opened
+
+example: 2020-01-29 00:00:01 UTC
+
+--
+
+*`greenplum.log.transaction_id`*::
++
+--
+Global transaction id
+
+type: long
+
+example: 0
+
+--
+
+*`greenplum.log.session_id`*::
++
+--
+The session identifier (prefixed with "con")
+
+type: keyword
+
+example: con408754
+
+--
+
+*`greenplum.log.command_count`*::
++
+--
+The command number within a session
+
+type: long
+
+example: 1
+
+--
+
+[float]
+=== gp_segment
+
+The segment content identifier
+
+
+*`greenplum.log.gp_segment.type`*::
++
+--
+The segment type
+
+type: keyword
+
+example: seg
+
+--
+
+*`greenplum.log.gp_segment.id`*::
++
+--
+The segment identifier
+
+type: keyword
+
+example: 1
+
+--
+
+*`greenplum.log.slice_id`*::
++
+--
+The slice id (portion of the query plan being executed)
+
+type: long
+
+example: 1
+
+--
+
+*`greenplum.log.distributed_transaction_id`*::
++
+--
+Distributed transaction id
+
+type: keyword
+
+example: dx853045
+
+--
+
+*`greenplum.log.local_transaction_id`*::
++
+--
+Local transaction id
+
+type: keyword
+
+example: x193249667
+
+--
+
+*`greenplum.log.subtransaction_id`*::
++
+--
+Subtransaction id
+
+type: keyword
+
+example: sx1
+
+--
+
+*`greenplum.log.level`*::
++
+--
+Severity of the log. LOG, ERROR, FATAL, PANIC, DEBUG1 or DEBUG2
+
+type: keyword
+
+example: LOG
+
+--
+
+*`greenplum.log.state_code`*::
++
+--
+SQL state code associated with the log message
+
+type: keyword
+
+example: 00000
+
+--
+
+*`greenplum.log.message`*::
++
+--
+Log or error message text
+
+type: text
+
+example: connection received: host=[local]
+
+--
+
+*`greenplum.log.detail`*::
++
+--
+Detail message text associated with an error message
+
+type: text
+
+example:
+Running: /usr/local/application/CPPORCReader_centos3-14.6.9  -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/* -t orc -rb 10000 -s 0 -ts 1152 -config /usr/local/application/hdfs-client-CPPORCReader.xml
+CPPORCReader: caught 2 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader: caught 13 and exiting.
+CPPORCReader:
+Command: execute:$CNVRHOME/CPPORCReader.sh -c 74 -i /app/hive/warehouse/gp_link.db/even_better_business_table/partition_start_date=20200125/partition_end_date=20200125/dtm_id0_flag=0/source_code=*/*
+
+--
+
+*`greenplum.log.hint`*::
++
+--
+Hint message text associated with an error message
+
+type: text
+
+example: Use ALTER EXTERNAL TABLE instead
+
+--
+
+*`greenplum.log.query`*::
++
+--
+The internally-generated query text
+
+type: text
+
+example: CREATE EXTERNAL WEB TABLE gpdb.new_great_business_table_1_prt_20200218_ext
+(like gp_logs.raw_log_ext_template)
+EXECUTE $EOF$$CNVRHOME/CPPORCReader.sh -c 34 -i /app/hive/warehouse/gpdb.db/raw_ecpm_log/partition_start_date=20200218/partition_end_date=20200218/dtm_id0_flag=0/*$EOF$ ON ALL FORMAT 'TEXT' (delimiter ' ' null '\\N' escape '\\')
+
+--
+
+*`greenplum.log.query_position`*::
++
+--
+The cursor index into the internally-generated query text
+
+type: long
+
+example: 338
+
+--
+
+*`greenplum.log.context`*::
++
+--
+The context in which this message gets generated
+
+type: text
+
+example: PL/pgSQL function ""gp_generate_external_partition"" line 177 at execute statement
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )""
+PL/pgSQL function ""gp_generate_external_partition"" line 80 at return
+SQL statement ""SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 )""
+PL/pgSQL function ""usp_mgmt_add_internal_external_range_partition"" line 154 at assignment
+
+--
+
+*`greenplum.log.debug`*::
++
+--
+Query string with full detail for debugging
+
+type: text
+
+example: SELECT  gpdb.gp_generate_external_partition( $1 ,  $2 ,  $3 ,  $4 ,  $5 )
+
+--
+
+*`greenplum.log.cursor_position`*::
++
+--
+The cursor index into the query string
+
+type: long
+
+example: 0
+
+--
+
+[float]
+=== file
+
+Descriptions in child fields
+
+
+*`greenplum.log.file.name`*::
++
+--
+The log file in which this message is generated
+
+type: text
+
+example: scan.l
+
+--
+
+*`greenplum.log.file.line`*::
++
+--
+The line in the log file in which this message is generated
+
+type: long
+
+example: 1238
+
+--
+
+*`greenplum.log.stack`*::
++
+--
+Full text of the stack trace associated with this message
+
+type: text
+
+example: Stack trace:
+1    0xb0d20e postgres errstart (elog.c:502)
+2    0xbe5e15 postgres cdbdisp_finishCommand (cdbdisp.c:1320)
+3    0xbe5fe8 postgres cdbdisp_handleError (cdbdisp.c:1406)
+4    0x76f7fc postgres mppExecutorCleanup (execUtils.c:2377)
+5    0x7544d5 postgres ExecutorRun (execMain.c:954)
+6    0x9a6b49 postgres PortalRun (pquery.c:1260)
+7    0x99d7dc postgres <symbol not found> (postgres.c:1825)
+8    0x9a1bf9 postgres PostgresMain (postgres.c:4788)
+9    0x8fc319 postgres <symbol not found> (postmaster.c:6672)
+10   0x8fedc0 postgres PostmasterMain (postmaster.c:7603)
+11   0x7feccf postgres main (main.c:206)
+12   0x7fb0c1c98545 libc.so.6 __libc_start_main + 0xf5
+13   0x4bef79 postgres <symbol not found> + 0x4bef79
+
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
 *`file.directory`*::
 +
 --
@@ -17829,7 +18217,7 @@ type: float
 *`elasticsearch.gc.phase.cpu_time.sys_sec`*::
 +
 --
-CPU time spent inside the kernel. 
+CPU time spent inside the kernel.
 
 
 type: float
@@ -17999,7 +18387,7 @@ Young GC
 
 type: long
 
-example: 
+example:
 
 --
 
@@ -18010,7 +18398,7 @@ example:
 
 type: long
 
-example: 
+example:
 
 --
 
@@ -18082,7 +18470,7 @@ Types
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -18126,7 +18514,7 @@ Extra source information
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -18170,7 +18558,7 @@ Id
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -18454,7 +18842,7 @@ type: keyword
 *`fortinet.firewall.analyticssubmit`*::
 +
 --
-The flag for analytics submission 
+The flag for analytics submission
 
 
 type: keyword
@@ -19554,7 +19942,7 @@ type: keyword
 *`fortinet.firewall.ds`*::
 +
 --
-Direction with distribution system 
+Direction with distribution system
 
 
 type: keyword
@@ -19734,7 +20122,7 @@ type: keyword
 *`fortinet.firewall.eapolcnt`*::
 +
 --
-EAPOL packet count 
+EAPOL packet count
 
 
 type: integer
@@ -19754,7 +20142,7 @@ type: keyword
 *`fortinet.firewall.encrypt`*::
 +
 --
-Whether the packet is encrypted or not 
+Whether the packet is encrypted or not
 
 
 type: integer
@@ -19834,7 +20222,7 @@ type: keyword
 *`fortinet.firewall.expiry`*::
 +
 --
-FortiGuard override expiry timestamp 
+FortiGuard override expiry timestamp
 
 
 type: keyword
@@ -21594,7 +21982,7 @@ type: keyword
 *`fortinet.firewall.shapersentname`*::
 +
 --
-Traffic shaper name for sent traffic 
+Traffic shaper name for sent traffic
 
 
 type: keyword
@@ -22074,7 +22462,7 @@ type: integer
 *`fortinet.firewall.totalsession`*::
 +
 --
-Total Number of Sessions 
+Total Number of Sessions
 
 
 type: integer
@@ -22773,14 +23161,14 @@ type: keyword
 [float]
 === authentication_info
 
-Authentication information. 
+Authentication information.
 
 
 
 *`googlecloud.audit.authentication_info.principal_email`*::
 +
 --
-The email address of the authenticated user making the request. 
+The email address of the authenticated user making the request.
 
 
 type: keyword
@@ -22790,7 +23178,7 @@ type: keyword
 *`googlecloud.audit.authentication_info.authority_selector`*::
 +
 --
-The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
+The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority.
 
 
 type: keyword
@@ -22857,7 +23245,7 @@ type: keyword
 *`googlecloud.audit.request.name`*::
 +
 --
-Name of the request. 
+Name of the request.
 
 
 type: keyword
@@ -22867,7 +23255,7 @@ type: keyword
 *`googlecloud.audit.request.resource_name`*::
 +
 --
-Name of the request resource. 
+Name of the request resource.
 
 
 type: keyword
@@ -22884,7 +23272,7 @@ Metadata about the request.
 *`googlecloud.audit.request_metadata.caller_ip`*::
 +
 --
-The IP address of the caller. 
+The IP address of the caller.
 
 
 type: ip
@@ -22968,7 +23356,7 @@ type: keyword
 *`googlecloud.audit.response.status`*::
 +
 --
-Status of the response. 
+Status of the response.
 
 
 type: keyword
@@ -23015,14 +23403,14 @@ type: keyword
 [float]
 === status
 
-The status of the overall operation. 
+The status of the overall operation.
 
 
 
 *`googlecloud.audit.status.code`*::
 +
 --
-The status code, which should be an enum value of google.rpc.Code. 
+The status code, which should be an enum value of google.rpc.Code.
 
 
 type: integer
@@ -23032,7 +23420,7 @@ type: integer
 *`googlecloud.audit.status.message`*::
 +
 --
-A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
+A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client.
 
 
 type: keyword
@@ -25783,7 +26171,7 @@ type: text
 *`misp.identity.identity_class`*::
 +
 --
-The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov 
+The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov
 
 
 type: keyword
@@ -25793,7 +26181,7 @@ type: keyword
 *`misp.identity.labels`*::
 +
 --
-The list of roles that this Identity performs.  
+The list of roles that this Identity performs.
 
 
 type: keyword
@@ -25806,7 +26194,7 @@ example: CEO
 *`misp.identity.sectors`*::
 +
 --
-The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov 
+The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov
 
 
 type: keyword
@@ -26056,7 +26444,7 @@ Fields provide support for specifying information about threat indicators, and r
 *`misp.threat_indicator.labels`*::
 +
 --
-list of type open-vocab that specifies the type of indicator.  
+list of type open-vocab that specifies the type of indicator.
 
 
 type: keyword
@@ -26205,7 +26593,7 @@ format: string
 *`misp.threat_indicator.attack_pattern`*::
 +
 --
-The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning. 
+The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning.
 
 
 type: keyword
@@ -26218,7 +26606,7 @@ example: [destination:ip = '91.219.29.188/32']
 *`misp.threat_indicator.attack_pattern_kql`*::
 +
 --
-The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
+The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format.
 
 
 type: keyword
@@ -27033,7 +27421,7 @@ type: long
 *`mysql.slowlog.sort_range_count`*::
 +
 --
-Number of sorts that were done using ranges. 
+Number of sorts that were done using ranges.
 
 
 type: long
@@ -27133,7 +27521,7 @@ type: long
 *`mysql.slowlog.read_rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 type: long
@@ -40633,4 +41021,3 @@ Logging of certificate is suppressed if set to F.
 type: boolean
 
 --
-

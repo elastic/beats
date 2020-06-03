@@ -27,6 +27,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/fortinet"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/googlecloud"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/greenplum"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/ibmmq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/iptables"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/misp"

@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-greenplum-log-Dashboard
+  file: Filebeat-greenplum-log.json
