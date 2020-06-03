@@ -1563,6 +1563,22 @@ type: object
 --
 
 [float]
+=== autodiscover
+
+`autodiscover` contains the metrics that reports what services are running on a specific AWS account.
+
+
+
+*`aws.autodiscover.resource`*::
++
+--
+AWS resource
+
+type: object
+
+--
+
+[float]
 === billing
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.

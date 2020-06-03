@@ -40,3 +40,7 @@
   metricsets:
     - s3_daily_storage
     - s3_request
+- module: aws
+  period: 1h
+  metricsets:
+    - autodiscover
