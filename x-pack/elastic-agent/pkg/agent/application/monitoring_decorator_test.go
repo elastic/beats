@@ -222,12 +222,12 @@ GROUPLOOP:
 
 			monitoringEnabled, ok := enabledVal.(bool)
 			if !ok {
-				t.Errorf("monitoring.enabled is not a bool for '%s'", group)
+				t.Errorf("settings.monitoring.enabled is not a bool for '%s'", group)
 				continue GROUPLOOP
 			}
 
 			if monitoringEnabled {
-				t.Errorf("monitoring.enabled is enabled, should be disabled for '%s'", group)
+				t.Errorf("settings.monitoring.enabled is enabled, should be disabled for '%s'", group)
 				continue GROUPLOOP
 			}
 		}
