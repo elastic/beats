@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 // operationStart start installed process
@@ -18,6 +19,7 @@ import (
 type operationStart struct {
 	logger         *logger.Logger
 	program        Descriptor
+	srv            *server.Server
 	operatorConfig *config.Config
 	cfg            map[string]interface{}
 	eventProcessor callbackHooks
@@ -28,6 +30,7 @@ type operationStart struct {
 func newOperationStart(
 	logger *logger.Logger,
 	program Descriptor,
+	srv *server.Server,
 	operatorConfig *config.Config,
 	cfg map[string]interface{},
 	eventProcessor callbackHooks) *operationStart {
@@ -36,6 +39,7 @@ func newOperationStart(
 	return &operationStart{
 		logger:         logger,
 		program:        program,
+		srv: 			srv,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
 		eventProcessor: eventProcessor,
@@ -73,5 +77,5 @@ func (o *operationStart) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	return application.Start(ctx, o.program, o.cfg)
+	return application.Start(ctx, o.program, o.srv, o.cfg)
 }

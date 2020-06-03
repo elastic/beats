@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 // operation is an operation definition
@@ -31,7 +32,7 @@ type operation interface {
 // Application is an application capable of being started, stopped and configured.
 type Application interface {
 	Name() string
-	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
+	Start(ctx context.Context, p app.Taggable, srv *server.Server, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
 	State() state.State

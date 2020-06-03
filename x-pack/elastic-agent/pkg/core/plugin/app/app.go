@@ -7,6 +7,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"os"
 	"path/filepath"
 	"sync"
@@ -19,8 +21,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -44,11 +44,11 @@ type Application struct {
 	pipelineID      string
 	logLevel        string
 	spec            Specifier
-	state           state.State
-	grpcClient      remoteconfig.Client
-	clientFactory   remoteconfig.ConnectionCreator
+	srv 			*server.Server
+	state 			*server.ApplicationState
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
+	proc            *os.Process
 
 	uid int
 	gid int
@@ -73,7 +73,7 @@ func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
 	spec Specifier,
-	factory remoteconfig.ConnectionCreator,
+	srv *server.Server,
 	cfg *config.Config,
 	logger *logger.Logger,
 	failureReporter ReportFailureFunc,
@@ -93,7 +93,7 @@ func NewApplication(
 		pipelineID:      pipelineID,
 		logLevel:        logLevel,
 		spec:            spec,
-		clientFactory:   factory,
+		srv: srv,
 		processConfig:   cfg.ProcessConfig,
 		downloadConfig:  cfg.DownloadConfig,
 		retryConfig:     cfg.RetryConfig,
@@ -145,14 +145,6 @@ func (a *Application) Stop() {
 	}
 }
 
-// State returns the state of the application [Running, Stopped].
-func (a *Application) State() state.State {
-	a.appLock.Lock()
-	defer a.appLock.Unlock()
-
-	return a.state
-}
-
 func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
@@ -166,21 +158,20 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, c
 		}
 
 		a.appLock.Lock()
-		s := a.state.Status
-		a.state.Status = state.Stopped
-		a.state.ProcessInfo = nil
+		a.proc = nil
+		state := a.state
 		a.appLock.Unlock()
 
-		if procState.Success() {
+		if state.Expected() == proto.StateExpected_STOPPING {
 			return
 		}
 
-		if s == state.Running {
-			// it was a crash, report it async not to block
-			// process management with networking issues
-			go a.reportCrash(ctx)
-			a.Start(ctx, p, cfg)
-		}
+		state.SetStatus(proto.StateObserved_FAILED, fmt.Sprintf("Exited with code: %d", procState.ExitCode()))
+
+		// it was a crash, report it async not to block
+		// process management with networking issues
+		go a.reportCrash(ctx)
+		a.Start(ctx, p, cfg)
 	}()
 }
 

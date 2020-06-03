@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 const (
@@ -43,6 +44,7 @@ type Operator struct {
 	config         *operatorCfg.Config
 	handlers       map[string]handleFunc
 	stateResolver  *stateresolver.StateResolver
+	srv            *server.Server
 	eventProcessor callbackHooks
 	monitor        monitoring.Monitor
 	isMonitoring   int
@@ -67,6 +69,7 @@ func NewOperator(
 	verifier download.Verifier,
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
+	srv *server.Server,
 	eventProcessor callbackHooks,
 	monitor monitoring.Monitor) (*Operator, error) {
 
@@ -92,6 +95,7 @@ func NewOperator(
 		verifier:       verifier,
 		installer:      installer,
 		stateResolver:  stateResolver,
+		srv:            srv,
 		apps:           make(map[string]Application),
 		eventProcessor: eventProcessor,
 		monitor:        monitor,

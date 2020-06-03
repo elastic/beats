@@ -625,6 +625,37 @@ func (as *ApplicationState) PerformAction(name string, params map[string]interfa
 	return res.result, res.err
 }
 
+// Expected returns the expected state of the process.
+func (as *ApplicationState) Expected() proto.StateExpected_State {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.expected
+}
+
+// Status returns the current observed status.
+func (as *ApplicationState) Status() proto.StateObserved_Status {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.status
+}
+
+// SetStatus allows the status to be overwritten by the agent.
+//
+// This status will be overwritten by the client if it reconnects and updates it status.
+func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg string) {
+	as.checkinLock.RLock()
+	prevStatus := as.status
+	prevMessage := as.statusMessage
+	as.status = status
+	as.statusMessage = msg
+	as.checkinLock.RUnlock()
+
+	// alert the service handler that status has changed for the application
+	if prevStatus != status || prevMessage != msg {
+		as.srv.handler.OnStatusChange(as, status, msg)
+	}
+}
+
 // updateStatus updates the current observed status from the application, sends the expected state back to the
 // application if the server expects it to be different then its observed state, and alerts the handler on the
 // server when the application status has changed.

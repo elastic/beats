@@ -14,13 +14,14 @@ import (
 	"time"
 	"unicode"
 
+	"gopkg.in/yaml.v2"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 const (
@@ -46,29 +47,20 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	if a.state.Status == state.Running {
+	// running application will have a state.
+	if a.state != nil {
 		return nil
 	}
 
 	defer func() {
-		if err != nil {
-			// reportError()
-			a.state.Status = state.Stopped
+		if err != nil && a.state != nil {
+			a.state.Destroy()
+			a.state = nil
 		}
 	}()
 
 	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
 		return err
-	}
-
-	// TODO: provider -> client
-	ca, err := generateCA()
-	if err != nil {
-		return errors.New(err, errors.TypeSecurity)
-	}
-	processCreds, err := generateConfigurable(ca)
-	if err != nil {
-		return errors.New(err, errors.TypeSecurity)
 	}
 
 	if a.limiter != nil {
@@ -87,13 +79,14 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	// of the beat with same data path fails to start
 	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 
-	a.state.ProcessInfo, err = process.Start(
+	a.state, err = a.srv.Register(a, )
+
+	a.proc, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
 		a.processConfig,
 		a.uid,
 		a.gid,
-		processCreds,
 		spec.Args...)
 	if err != nil {
 		return err
@@ -293,20 +286,6 @@ func updateSpecConfig(spec *ProcessSpec, configPath string) error {
 
 	spec.Args = append(spec.Args, configurationFlag, configPath)
 	return nil
-}
-
-func getProcessCredentials(ca *authority.CertificateAuthority) (*process.Creds, error) {
-	// processPK and Cert serves as a server credentials
-	processPair, err := ca.GeneratePair()
-	if err != nil {
-		return nil, errors.New(err, "failed to generate credentials")
-	}
-
-	return &process.Creds{
-		CaCert: ca.Crt(),
-		PK:     processPair.Key,
-		Cert:   processPair.Crt,
-	}, nil
 }
 
 func isWindowsPath(path string) bool {
