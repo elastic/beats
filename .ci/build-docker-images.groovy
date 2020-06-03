@@ -27,7 +27,7 @@ pipeline {
     quietPeriod(10)
   }
   triggers {
-    cron '@daily'
+    cron 'H H(0-5) * * 1-5'
   }
   parameters {
     booleanParam(name: "RELEASE_TEST_IMAGES", defaultValue: "true", description: "If it's needed to build & push Beats' test images")

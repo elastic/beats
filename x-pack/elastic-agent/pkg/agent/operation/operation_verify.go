@@ -6,18 +6,35 @@ package operation
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
 // operationVerify verifies downloaded artifact for correct signature
 // skips if artifact is already installed
 type operationVerify struct {
 	eventProcessor callbackHooks
+	program        Descriptor
+	operatorConfig *config.Config
+	verifier       download.Verifier
 }
 
-func newOperationVerify(eventProcessor callbackHooks) *operationVerify {
-	return &operationVerify{eventProcessor: eventProcessor}
+func newOperationVerify(
+	program Descriptor,
+	operatorConfig *config.Config,
+	verifier download.Verifier,
+	eventProcessor callbackHooks) *operationVerify {
+	return &operationVerify{
+		program:        program,
+		operatorConfig: operatorConfig,
+		eventProcessor: eventProcessor,
+		verifier:       verifier,
+	}
 }
 
 // Name is human readable name identifying an operation
@@ -30,7 +47,18 @@ func (o *operationVerify) Name() string {
 // - Start does not need to run if process is running
 // - Fetch does not need to run if package is already present
 func (o *operationVerify) Check() (bool, error) {
-	return false, nil
+	downloadConfig := o.operatorConfig.DownloadConfig
+	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	if err != nil {
+		return false, err
+	}
+
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return false, errors.New(errors.TypeApplication,
+			fmt.Sprintf("%s.%s package does not exist in %s. Skipping operation %s", o.program.BinaryName(), o.program.Version(), fullPath, o.Name()))
+	}
+
+	return true, err
 }
 
 // Run runs the operation
@@ -44,6 +72,19 @@ func (o *operationVerify) Run(ctx context.Context, application Application) (err
 			o.eventProcessor.OnFailing(ctx, application.Name(), err)
 		}
 	}()
+
+	isVerified, err := o.verifier.Verify(o.program.BinaryName(), o.program.Version())
+	if err != nil {
+		return errors.New(err,
+			fmt.Sprintf("operation '%s' failed to verify %s.%s", o.Name(), o.program.BinaryName(), o.program.Version()),
+			errors.TypeSecurity)
+	}
+
+	if !isVerified {
+		return errors.New(err,
+			fmt.Sprintf("operation '%s' marked '%s.%s' corrupted", o.Name(), o.program.BinaryName(), o.program.Version()),
+			errors.TypeSecurity)
+	}
 
 	return nil
 }

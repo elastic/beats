@@ -78,6 +78,11 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 	}
 
 	fetcher := downloader.NewDownloader(operatorConfig.DownloadConfig)
+	verifier, err := downloader.NewVerifier(operatorConfig.DownloadConfig)
+	if err != nil {
+		return nil, errors.New(err, "initiating verifier")
+	}
+
 	installer, err := install.NewInstaller(operatorConfig.DownloadConfig)
 	if err != nil {
 		return nil, errors.New(err, "initiating installer")
@@ -94,6 +99,7 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		id,
 		config,
 		fetcher,
+		verifier,
 		installer,
 		stateResolver,
 		r,
