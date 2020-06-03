@@ -35,10 +35,11 @@ type config struct {
 
 // OAuth2 contains information about oauth2 authentication settings.
 type OAuth2 struct {
-	TokenURL     string   `config:"token_url"`
-	ClientID     string   `config:"client_id"`
-	ClientSecret string   `config:"client_secret"`
-	Scopes       []string `config:"scopes"`
+	TokenURL       string              `config:"token_url"`
+	EndpointParams map[string][]string `config:"endpoint_params"`
+	ClientID       string              `config:"client_id"`
+	ClientSecret   string              `config:"client_secret"`
+	Scopes         []string            `config:"scopes"`
 }
 
 // Pagination contains information about httpjson pagination settings

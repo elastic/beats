@@ -474,12 +474,12 @@ func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error
 	}
 
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
-
 	creds := clientcredentials.Config{
-		ClientID:     in.config.OAuth2.ClientID,
-		ClientSecret: in.config.OAuth2.ClientSecret,
-		TokenURL:     in.config.OAuth2.TokenURL,
-		Scopes:       in.config.OAuth2.Scopes,
+		ClientID:       in.config.OAuth2.ClientID,
+		ClientSecret:   in.config.OAuth2.ClientSecret,
+		TokenURL:       in.config.OAuth2.TokenURL,
+		Scopes:         in.config.OAuth2.Scopes,
+		EndpointParams: in.config.OAuth2.EndpointParams,
 	}
 
 	return creds.Client(ctx), nil
