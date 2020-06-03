@@ -41,57 +41,44 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	// if monitoring is not specified use default one where everything is enabled
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		monitoringNode := transpiler.NewDict([]transpiler.Node{
-			transpiler.NewKey(enabledKey, transpiler.NewBoolVal(true)),
-			transpiler.NewKey(logsKey, transpiler.NewBoolVal(true)),
-			transpiler.NewKey(metricsKey, transpiler.NewBoolVal(true)),
-			transpiler.NewKey(monitoringUseOutputKey, transpiler.NewStrVal("default")),
+			transpiler.NewKey("enabled", transpiler.NewBoolVal(true)),
+			transpiler.NewKey("logs", transpiler.NewBoolVal(true)),
+			transpiler.NewKey("metrics", transpiler.NewBoolVal(true)),
+			transpiler.NewKey("use_output", transpiler.NewStrVal("default")),
 		})
 
-		transpiler.Insert(rootAst, monitoringNode, monitoringKey)
+		transpiler.Insert(rootAst, transpiler.NewKey("monitoring", monitoringNode), "settings")
 	}
 
-	isMonitoringEnabled := false
-	if enabledNode, found := transpiler.Lookup(rootAst, enabledKey); found {
-		if enabledVal, ok := enabledNode.Value().(*transpiler.BoolVal); ok {
-			isMonitoringEnabled = enabledVal.Value().(bool)
+	// get monitoring output name to be used
+	monitoringOutputName := defaultOutputName
+	useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
+	if found {
+		monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
+		if !ok {
+			return programsToRun, nil
 		}
+
+		monitoringOutputName = monitoringOutputNameKey.String()
 	}
 
-	// flag disabled monitoring in both cases
-	config[enabledKey] = isMonitoringEnabled
-
-	// do the math only for enabled monitoring
-	if isMonitoringEnabled {
-		// get monitoring output name to be used
-		monitoringOutputName := defaultOutputName
-		useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
-		if found {
-			monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
-			if !ok {
-				return programsToRun, nil
-			}
-
-			monitoringOutputName = monitoringOutputNameKey.String()
-		}
-
-		ast := rootAst.Clone()
-		if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
-			return programsToRun, err
-		}
-
-		config, err = ast.Map()
-		if err != nil {
-			return programsToRun, err
-		}
-
-		programList := make([]string, 0, len(programsToRun))
-		for _, p := range programsToRun {
-			programList = append(programList, p.Spec.Cmd)
-		}
-		// making program list part of the config
-		// so it will get regenerated with every change
-		config[programsKey] = programList
+	ast := rootAst.Clone()
+	if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
+		return programsToRun, err
 	}
+
+	config, err = ast.Map()
+	if err != nil {
+		return programsToRun, err
+	}
+
+	programList := make([]string, 0, len(programsToRun))
+	for _, p := range programsToRun {
+		programList = append(programList, p.Spec.Cmd)
+	}
+	// making program list part of the config
+	// so it will get regenerated with every change
+	config[programsKey] = programList
 
 	monitoringProgram.Config, err = transpiler.NewAST(config)
 	if err != nil {
