@@ -7,12 +7,15 @@ package s3
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -326,4 +329,47 @@ func TestConvertOffsetToString(t *testing.T) {
 		assert.Equal(t, c.expectedString, output)
 	}
 
+}
+
+func TestIsStreamGzipped(t *testing.T) {
+	logBytes := []byte(`May 28 03:00:52 Shaunaks-MacBook-Pro-Work syslogd[119]: ASL Sender Statistics
+May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED USE in libdispatch client: Changing the target of a source after it has been activated; set a breakpoint on _dispatch_bug_deprecated to debug
+May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED USE in libdispatch client: Changing target queue hierarchy after xpc connection was activated; set a breakpoint on _dispatch_bug_deprecated to debug
+`)
+
+	var b bytes.Buffer
+	gz := gzip.NewWriter(&b)
+	_, err := gz.Write(logBytes)
+	require.NoError(t, err)
+
+	err = gz.Close()
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		contents []byte
+		expected bool
+	}{
+		"not_gzipped": {
+			logBytes,
+			false,
+		},
+		"gzipped": {
+			b.Bytes(),
+			true,
+		},
+		"empty": {
+			[]byte{},
+			false,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			r := bufio.NewReader(bytes.NewReader(test.contents))
+			actual, err := isStreamGzipped(r)
+
+			require.NoError(t, err)
+			require.Equal(t, test.expected, actual)
+		})
+	}
 }

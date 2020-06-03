@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
@@ -436,7 +437,25 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 
 	reader := bufio.NewReader(resp.Body)
 
-	// Check if expand_event_list_from_field is given with document conent-type = "application/json"
+	isS3ObjGzipped, err := isStreamGzipped(reader)
+	if err != nil {
+		err = errors.Wrap(err, "could not determine if S3 object is gzipped")
+		p.logger.Error(err)
+		return err
+	}
+
+	if isS3ObjGzipped {
+		gzipReader, err := gzip.NewReader(reader)
+		if err != nil {
+			err = errors.Wrapf(err, "gzip.NewReader failed for '%s' from S3 bucket '%s'", info.key, info.name)
+			p.logger.Error(err)
+			return err
+		}
+		reader = bufio.NewReader(gzipReader)
+		gzipReader.Close()
+	}
+
+	// Check if expand_event_list_from_field is given with document content-type = "application/json"
 	if resp.ContentType != nil && *resp.ContentType == "application/json" && p.config.ExpandEventListFromField == "" {
 		err := errors.New("expand_event_list_from_field parameter is missing in config for application/json content-type file")
 		p.logger.Error(err)
@@ -453,18 +472,6 @@ func (p *s3Input) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info, s3C
 			return err
 		}
 		return nil
-	}
-
-	// Check content-type = "application/x-gzip" or filename ends with ".gz"
-	if (resp.ContentType != nil && *resp.ContentType == "application/x-gzip") || strings.HasSuffix(info.key, ".gz") {
-		gzipReader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			err = errors.Wrapf(err, "gzip.NewReader failed for '%s' from S3 bucket '%s'", info.key, info.name)
-			p.logger.Error(err)
-			return err
-		}
-		reader = bufio.NewReader(gzipReader)
-		gzipReader.Close()
 	}
 
 	// handle s3 objects that are not json content-type
@@ -667,4 +674,23 @@ func (c *s3Context) Inc() {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 	c.refs++
+}
+
+// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
+// stream without consuming it. This makes it convenient for code executed after this function call
+// to consume the stream if it wants.
+func isStreamGzipped(r *bufio.Reader) (bool, error) {
+	// Why 512? See https://godoc.org/net/http#DetectContentType
+	buf, err := r.Peek(512)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+
+	switch http.DetectContentType(buf) {
+	case "application/x-gzip", "application/zip":
+		return true, nil
+	default:
+		return false, nil
+	}
 }
