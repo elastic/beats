@@ -19,10 +19,7 @@ content_type:
 {{ end }}
 {{ end }}
 {{ if .api }}
-api:
-{{ range $k, $v := .api }}
-  {{ $k }}: {{ $v -}}
-{{ end }}
+api: {{.api | tojson }}
 {{ end }}
 
 {{ else if eq .input "file" }}
