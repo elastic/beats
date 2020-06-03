@@ -20,6 +20,8 @@ const (
 	outputKey                 = "output"
 
 	enabledKey        = "settings.monitoring.enabled"
+	logsKey           = "settings.monitoring.logs"
+	metricsKey        = "settings.monitoring.metrics"
 	outputsKey        = "outputs"
 	elasticsearchKey  = "elasticsearch"
 	typeKey           = "type"
@@ -35,16 +37,35 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 		},
 	}
 
-	var config map[string]interface{}
+	config := make(map[string]interface{})
+	// if monitoring is not specified use default one where everything is enabled
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
-		config = make(map[string]interface{})
-		config[enabledKey] = false
-	} else {
+		monitoringNode := transpiler.NewDict([]transpiler.Node{
+			transpiler.NewKey(enabledKey, transpiler.NewBoolVal(true)),
+			transpiler.NewKey(logsKey, transpiler.NewBoolVal(true)),
+			transpiler.NewKey(metricsKey, transpiler.NewBoolVal(true)),
+			transpiler.NewKey(monitoringUseOutputKey, transpiler.NewStrVal("default")),
+		})
+
+		transpiler.Insert(rootAst, monitoringNode, monitoringKey)
+	}
+
+	isMonitoringEnabled := false
+	if enabledNode, found := transpiler.Lookup(rootAst, enabledKey); found {
+		if enabledVal, ok := enabledNode.Value().(*transpiler.BoolVal); ok {
+			isMonitoringEnabled = enabledVal.Value().(bool)
+		}
+	}
+
+	// flag disabled monitoring in both cases
+	config[enabledKey] = isMonitoringEnabled
+
+	// do the math only for enabled monitoring
+	if isMonitoringEnabled {
 		// get monitoring output name to be used
 		monitoringOutputName := defaultOutputName
 		useOutputNode, found := transpiler.Lookup(rootAst, monitoringUseOutputKey)
 		if found {
-
 			monitoringOutputNameKey, ok := useOutputNode.Value().(*transpiler.StrVal)
 			if !ok {
 				return programsToRun, nil
