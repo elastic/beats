@@ -33,6 +33,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/pipe"
 )
 
+func init() {
+	// we need to close the default tracer to prevent the beat sending events to localhost:8200
+	apm.DefaultTracer.Close()
+}
+
 // Instrumentation holds an APM tracer a net.Listener
 type Instrumentation struct {
 	tracer *apm.Tracer

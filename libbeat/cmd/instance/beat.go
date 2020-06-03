@@ -33,8 +33,6 @@ import (
 	"strings"
 	"time"
 
-	"go.elastic.co/apm"
-
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -124,7 +122,6 @@ var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
-	preventDefaultTracing()
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -142,11 +139,6 @@ func initRand() {
 		seed = n.Int64()
 	}
 	rand.Seed(seed)
-}
-
-func preventDefaultTracing() {
-	// we need to close the default tracer to prevent the beat sending events to localhost:8200
-	apm.DefaultTracer.Close()
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the

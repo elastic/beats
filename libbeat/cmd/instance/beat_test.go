@@ -24,11 +24,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
 	"github.com/gofrs/uuid"
@@ -119,29 +114,4 @@ func TestEmptyMetaJson(t *testing.T) {
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
-}
-
-func TestAPMTracerDisabledByDefault(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9")
-	require.NoError(t, err)
-
-	tracer := b.Instrumentation.GetTracer()
-	defer tracer.Close()
-	assert.False(t, tracer.Active())
-}
-
-func TestAPMInstrumentationConfig(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"instrumentation": map[string]interface{}{
-			"enabled": "true",
-		},
-	})
-	instrumentation, err := beat.CreateInstrumentation(cfg, beat.Info{Name: "filebeat", Version: "8.0"})
-	require.NoError(t, err)
-
-	assert.NotNil(t, instrumentation.Listener)
-
-	tracer := instrumentation.GetTracer()
-	defer tracer.Close()
-	assert.True(t, tracer.Active())
 }
