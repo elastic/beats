@@ -344,14 +344,6 @@ include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
-
-ifdef::autodiscoverHints[]
-[[configuration-autodiscover-hints]]
-=== Hints based autodiscover
-
-include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
-endif::autodiscoverHints[]
-
 ifdef::autodiscoverAWSEC2[]
 [float]
 ===== Amazon EC2s
@@ -396,6 +388,13 @@ include::../../{beatname_lc}/docs/autodiscover-aws-ec2-config.asciidoc[]
 This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
 
 endif::autodiscoverAWSEC2[]
+
+ifdef::autodiscoverHints[]
+[[configuration-autodiscover-hints]]
+=== Hints based autodiscover
+
+include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
+endif::autodiscoverHints[]
 
 [[configuration-autodiscover-advanced]]
 === Advanced usage
