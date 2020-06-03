@@ -18,6 +18,7 @@
 package eslegclient
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -436,7 +437,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	}
 
 	if conn.APIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
+		encoded := base64.StdEncoding.EncodeToString([]byte(conn.APIKey))
+		req.Header.Add("Authorization", "ApiKey "+encoded)
 	}
 
 	for name, value := range conn.Headers {
