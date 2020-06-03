@@ -18,12 +18,18 @@
 package k8skeystore
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGetKeystore(t *testing.T) {
@@ -35,32 +41,169 @@ func TestGetKeystore(t *testing.T) {
 	assert.NotEqual(t, k2, k3)
 }
 
-// TODO: upgrade client dependency and use fake client to test retrieve
-//func TestGetKeystoreAndRetrieve(t *testing.T) {
-//	client := k8sfake.NewSimpleClientset()
-//	ns := "test_namespace"
-//	pass := "testing_passpass"
-//	secret := &v1.Secret{
-//		TypeMeta: metav1.TypeMeta{
-//			Kind:       "Secret",
-//			APIVersion: "apps/v1beta1",
-//		},
-//		ObjectMeta: metav1.ObjectMeta{
-//			Name:      "testing_secret",
-//			Namespace: ns,
-//		},
-//		Data: map[string][]byte{
-//			"secret_value": []byte(pass),
-//		},
-//	}
-//	client.CoreV1().Secrets(ns).Create(context.TODO(), secret, metav1.CreateOptions{})
-//
-//	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
-//	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
-//	key := "kubernetes.test_namespace.testing_secret.secret_value"
-//	secretVal, err := k1.Retrieve(key)
-//	if err != nil {
-//		t.Fatalf("could not retrive k8s secret", err)
-//	}
-//	assert.Equal(t, pass, secretVal)
-//}
+func TestGetKeystoreAndRetrieve(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret: %v", err)
+	}
+
+	kRegistry := NewKubernetesKeystoresRegistry(nil, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace.testing_secret.secret_value"
+	secure, err := k1.Retrieve(key)
+	if err != nil {
+		t.Fatalf("could not retrive k8s secret: %v", err)
+	}
+	secretVal, err := secure.Get()
+	assert.NoError(t, err)
+	bytePassword := []byte(pass)
+	assert.Equal(t, bytePassword, secretVal)
+}
+
+func TestGetKeystoreAndRetrieveWithNonAllowedNamespace(t *testing.T) {
+	logger := logp.NewLogger("test_k8s_secrets")
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret: %v", err)
+	}
+
+	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace_HACK.testing_secret.secret_value"
+	_, err = k1.Retrieve(key)
+	assert.Error(t, err)
+}
+
+func TestGetKeystoreAndRetrieveWithWrongKeyFormat(t *testing.T) {
+	logger := logp.NewLogger("test_k8s_secrets")
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret: %v", err)
+	}
+
+	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "HACK_test_namespace_HACK.testing_secret.secret_value"
+	_, err = k1.Retrieve(key)
+	assert.Error(t, err)
+}
+
+func TestGetKeystoreAndRetrieveWithNoSecretsExistent(t *testing.T) {
+	logger := logp.NewLogger("test_k8s_secrets")
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+
+	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace.testing_secret.secret_value"
+	_, err := k1.Retrieve(key)
+	assert.Error(t, err)
+}
+
+func TestGetKeystoreAndRetrieveWithWrongSecretName(t *testing.T) {
+	logger := logp.NewLogger("test_k8s_secrets")
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret: %v", err)
+	}
+
+	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace.testing_secret_WRONG.secret_value"
+	_, err = k1.Retrieve(key)
+	assert.Error(t, err)
+}
+
+func TestGetKeystoreAndRetrieveWithWrongSecretValue(t *testing.T) {
+	logger := logp.NewLogger("test_k8s_secrets")
+	client := k8sfake.NewSimpleClientset()
+	ns := "test_namespace"
+	pass := "testing_passpass"
+	secret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Secret",
+			APIVersion: "apps/v1beta1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testing_secret",
+			Namespace: ns,
+		},
+		Data: map[string][]byte{
+			"secret_value": []byte(pass),
+		},
+	}
+	_, err := client.CoreV1().Secrets(ns).Create(context.Background(), secret, metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create k8s secret: %v", err)
+	}
+
+	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
+	key := "kubernetes.test_namespace.testing_secret.secret_value_WRONG"
+	_, err = k1.Retrieve(key)
+	assert.Error(t, err)
+}
