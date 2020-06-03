@@ -54,7 +54,10 @@ type Settings struct {
 
 	// A listener that receives ACKs when events are removed from the queue
 	// and written to their output.
-	WriteToOutputACKListener queue.ACKListener
+	// This can only be effective for events that are added to the queue
+	// after it is opened (there is no way to acknowledge input from a
+	// previous execution). It is ignored for events before that.
+	//WriteToOutputACKListener queue.ACKListener
 }
 
 type segmentID uint64
@@ -67,6 +70,16 @@ type bufferPosition struct {
 	byteIndex uint64
 }
 
+type diskQueueOutput struct {
+	data []byte
+
+	// The segment file this data was read from.
+	segment *segmentFile
+
+	// The index of this data's frame within its segment.
+	frameIndex int
+}
+
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
 type diskQueue struct {
@@ -75,9 +88,30 @@ type diskQueue struct {
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
 
-	segments *segmentManager
+	// A list of all segments that have been completely written but have
+	// not yet been handed off to a segmentReader.
+	// Sorted by increasing segment ID.
+	segments []segmentFile
 
-	//
+	// The total bytes occupied by all segment files. This is the value
+	// we check to see if there is enough space to add an incoming event
+	// to the queue.
+	bytesOnDisk uint64
+
+	// The memory queue of data blobs waiting to be written to disk.
+	// To add something to the queue internally, send it to this channel.
+	inChan chan byte[]
+
+	outChan chan diskQueueOutput
+
+	// The currently active segment reader, or nil if there is none.
+	reader *segmentReader
+
+	// The currently active segment writer. When the corresponding segment
+	// is full it is appended to segments.
+	writer *segmentWriter
+
+	// The ol
 	firstPosition bufferPosition
 
 	// The position of the next event to read from the queue. If this equals
@@ -142,11 +176,44 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	return &diskQueue{settings: settings}, nil
+	segments, err := segmentFilesForPath(settings.directoryPath())
+	if err != nil {
+		return nil, err
+	}
+
+	return &diskQueue{
+		settings: settings,
+		segments: segments,
+	}, nil
 }
 
-func (dq *diskQueue) getSegment(id segmentID) (*segmentFile, error) {
-	panic("TODO: not implemented")
+func (dq *diskQueue) nextSegmentReader() (*segmentReader, error) {
+	if len(dq.segments) > 0 {
+		return nil, nil
+	}
+	nextSegment := dq.segments[0]
+
+}
+
+// readNextFrame reads the next pending data frame in the queue
+// and returns its contents.
+func (dq *diskQueue) readNextFrame() ([]byte, error) {
+	// READER LOCK --->
+	if dq.reader != nil {
+		frameData, err := dq.reader.nextDataFrame()
+		if err != nil {
+			return nil, err
+		}
+		if frameData != nil {
+			return frameData, nil
+		}
+		// If we made it here then the active reader was empty and
+		// we need to fetch a new one.
+	}
+	reader, err := dq.nextSegmentReader()
+	dq.reader = reader
+	return reader.nextDataFrame()
+	// <--- READER LOCK
 }
 
 //
@@ -157,6 +224,7 @@ func (settings Settings) directoryPath() string {
 	if settings.Path == "" {
 		return paths.Resolve(paths.Data, "diskqueue")
 	}
+
 	return settings.Path
 }
 
