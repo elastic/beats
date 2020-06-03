@@ -372,7 +372,7 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	if version != nil {
 		pkg.Version = C.GoString(version)
 	} else {
-		pkg.Error = errors.New("Failed to get package version")
+		pkg.error = errors.New("failed to get package version")
 	}
 
 	pkg.Release = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_RELEASE))
