@@ -870,7 +870,7 @@ def archiveTestOutput(Map args = [:]) {
       archiveArtifacts(allowEmptyArchive: true, artifacts: args.artifacts)
     }
     catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py')
+      def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
       log(level: 'INFO', text: "system-tests has been found in ${folder}")
       if (folder.trim()) {
         def name = folder.replaceAll('/', '-').replaceAll('\\', '-').replaceAll('build', '')
