@@ -51,6 +51,7 @@ type Operator struct {
 	appsLock sync.Mutex
 
 	downloader download.Downloader
+	verifier   download.Verifier
 	installer  install.Installer
 }
 
@@ -63,6 +64,7 @@ func NewOperator(
 	pipelineID string,
 	config *config.Config,
 	fetcher download.Downloader,
+	verifier download.Verifier,
 	installer install.Installer,
 	stateResolver *stateresolver.StateResolver,
 	eventProcessor callbackHooks,
@@ -87,6 +89,7 @@ func NewOperator(
 		pipelineID:     pipelineID,
 		logger:         logger,
 		downloader:     fetcher,
+		verifier:       verifier,
 		installer:      installer,
 		stateResolver:  stateResolver,
 		apps:           make(map[string]Application),
@@ -155,7 +158,7 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 	flow := []operation{
 		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
-		newOperationVerify(o.eventProcessor),
+		newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
 		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
 		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
 		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
