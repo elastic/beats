@@ -69,7 +69,7 @@ type config struct {
 	CredentialsFilePath string `config:"credentials_file_path"`
 
 	opt    []option.ClientOption
-	period duration.Duration
+	period *duration.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -93,7 +93,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m.stackDriverConfig = stackDriverConfigs.StackDriverMetrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
-	m.config.period.Seconds = int64(m.Module().Config().Period.Seconds())
+	m.config.period = &duration.Duration{
+		Seconds: int64(m.Module().Config().Period.Seconds()),
+	}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
 		return nil, err
