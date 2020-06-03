@@ -365,6 +365,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
+- The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
 
 *Heartbeat*
 
