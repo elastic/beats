@@ -390,7 +390,7 @@
             }
           }
         },
-        "title": "Logon Successful vs Failed [Winlobeat Security]",
+        "title": "Logon Successful vs Failed [Winlogbeat Security]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -467,7 +467,7 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Logon Successful vs Failed [Winlobeat Security]",
+          "title": "Logon Successful vs Failed [Winlogbeat Security]",
           "type": "pie"
         }
       },
@@ -1389,7 +1389,7 @@
             }
           }
         },
-        "title": "Logon Failed Source IP [Winlobeat Security]",
+        "title": "Logon Failed Source IP [Winlogbeat Security]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1450,7 +1450,7 @@
             "scale": "linear",
             "showLabel": false
           },
-          "title": "Logon Failed Source IP [Winlobeat Security]",
+          "title": "Logon Failed Source IP [Winlogbeat Security]",
           "type": "tagcloud"
         }
       },

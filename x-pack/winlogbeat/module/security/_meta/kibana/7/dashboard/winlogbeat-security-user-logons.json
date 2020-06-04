@@ -818,7 +818,7 @@
             "desc"
           ]
         ],
-        "title": "User Logons [Winlobeat Security]",
+        "title": "User Logons [Winlogbeat Security]",
         "version": 1
       },
       "id": "ce71c9a0-a25e-11e9-a422-d144027429da",
@@ -1292,7 +1292,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Logon Sources [Winlobeat Security]",
+        "title": "Logon Sources [Winlogbeat Security]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1328,7 +1328,7 @@
             "scale": "linear",
             "showLabel": false
           },
-          "title": "Logon Sources [Winlobeat Security]",
+          "title": "Logon Sources [Winlogbeat Security]",
           "type": "tagcloud"
         }
       },
@@ -1412,7 +1412,7 @@
             "desc"
           ]
         ],
-        "title": "Remote Interactive Connections and Disconnections [Winlobeat Security]",
+        "title": "Remote Interactive Connections and Disconnections [Winlogbeat Security]",
         "version": 1
       },
       "id": "6f4071a0-7a78-11ea-bc9a-0baf2ca323a3",
@@ -1670,7 +1670,7 @@
             "desc"
           ]
         ],
-        "title": "User Logouts [Winlobeat Security]",
+        "title": "User Logouts [Winlogbeat Security]",
         "version": 1
       },
       "id": "06b6b060-7a80-11ea-bc9a-0baf2ca323a3",
