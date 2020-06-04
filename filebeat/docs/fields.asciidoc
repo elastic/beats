@@ -35752,7 +35752,7 @@ type: keyword
 [float]
 === dnp3
 
-Fields exported by the Zeek SSH log
+Fields exported by the Zeek DNP3 log
 
 
 
