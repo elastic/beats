@@ -76,6 +76,8 @@ type ConnectionSettings struct {
 
 	Timeout         time.Duration
 	IdleConnTimeout time.Duration
+
+	encodedAPIKey string // Base64-encoded API key
 }
 
 // NewConnection returns a new Elasticsearch client
@@ -156,6 +158,10 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			return nil, err
 		}
 		logp.Info("kerberos client created")
+	}
+
+	if s.APIKey != "" {
+		s.encodedAPIKey = base64.StdEncoding.EncodeToString([]byte(s.APIKey))
 	}
 
 	return &Connection{
@@ -436,9 +442,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.APIKey != "" {
-		encoded := base64.StdEncoding.EncodeToString([]byte(conn.APIKey))
-		req.Header.Add("Authorization", "ApiKey "+encoded)
+	if conn.encodedAPIKey != "" {
+		req.Header.Add("Authorization", "ApiKey "+conn.encodedAPIKey)
 	}
 
 	for name, value := range conn.Headers {
