@@ -59,10 +59,38 @@ func (t *Instrumentation) GetTracer() *apm.Tracer {
 type InstrumentationConfig struct {
 	Enabled     *bool           `config:"enabled"`
 	Environment *string         `config:"environment"`
-	Hosts       []*url.URL      `config:"hosts"`
+	Hosts       urls            `config:"hosts"`
 	Profiling   ProfilingConfig `config:"profiling"`
 	APIKey      string          `config:"api_key"`
 	SecretToken string          `config:"secret_token"`
+}
+
+type urls []*url.URL
+
+func (u *urls) Unpack(c interface{}) error {
+	if c == nil {
+		return nil
+	}
+	hosts, ok := c.([]interface{})
+	if !ok {
+		return fmt.Errorf("hosts must be a list, got: %#v", c)
+	}
+
+	nu := make(urls, len(hosts))
+	for i, host := range hosts {
+		h, ok := host.(string)
+		if !ok {
+			return fmt.Errorf("host must be a string, got: %#v", host)
+		}
+		url, err := url.Parse(h)
+		if err != nil {
+			return err
+		}
+		nu[i] = url
+	}
+	*u = nu
+
+	return nil
 }
 
 // ProfilingConfig holds config information about self profiling the APM Server
@@ -152,38 +180,43 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 
 	var tracerTransport transport.Transport
 	var tracerListener net.Listener
-	if cfg.Hosts != nil {
-		// tracing destined for host explicitly set
-		t, err := transport.NewHTTPTransport()
 
-		if err != nil {
-			return nil, err
-		}
-		t.SetServerURL(cfg.Hosts...)
-		if cfg.APIKey != "" {
-			t.SetAPIKey(cfg.APIKey)
-		} else {
-			t.SetSecretToken(cfg.SecretToken)
-		}
-		tracerTransport = t
-		logger.Infof("APM tracer directed to %s", cfg.Hosts)
-	} else {
-		// if the host is not set, the running beat is assumed to be an APM Server sending traces to itself
-		// if another beat is running without an APM Server host configured, we default to localhost
+	if cfg.Hosts == nil && info.Name == "apm-server" {
 		pipeListener := pipe.NewListener()
 		pipeTransport, err := transport.NewHTTPTransport()
 		if err != nil {
 			return nil, err
 		}
-		pipeTransport.SetServerURL(&url.URL{Scheme: "http", Host: "localhost"})
+		pipeTransport.SetServerURL(&url.URL{Scheme: "http", Host: "localhost:8200"})
 		pipeTransport.Client.Transport = &http.Transport{
 			DialContext:     pipeListener.DialContext,
 			MaxIdleConns:    100,
 			IdleConnTimeout: 90 * time.Second,
 		}
 		tracerTransport = pipeTransport
-		// the traceListener will allow APM Server to create a ad-hoc server for tracing
+		// the traceListener will allow APM Server to create an ad-hoc server for tracing
 		tracerListener = pipeListener
+
+	} else {
+		t, err := transport.NewHTTPTransport()
+		if err != nil {
+			return nil, err
+		}
+		hosts := cfg.Hosts
+		if hosts == nil {
+			hosts = []*url.URL{{
+				Scheme: "http",
+				Host:   "localhost:8200",
+			}}
+		}
+		t.SetServerURL(hosts...)
+		if cfg.APIKey != "" {
+			t.SetAPIKey(cfg.APIKey)
+		} else {
+			t.SetSecretToken(cfg.SecretToken)
+		}
+		tracerTransport = t
+		logger.Infof("APM tracer directed to %s", hosts)
 	}
 
 	var environment string
@@ -199,7 +232,7 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	tracer.SetLogger(logger)
 	return &Instrumentation{
 		tracer:   tracer,

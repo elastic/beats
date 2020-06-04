@@ -18,7 +18,6 @@
 package beat
 
 import (
-	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,7 +42,7 @@ func TestAPMTracerDisabledByDefault(t *testing.T) {
 	assert.False(t, tracer.Active())
 }
 
-func TestAPMInstrumentationConfig(t *testing.T) {
+func TestInstrumentationConfig(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
@@ -51,27 +50,40 @@ func TestAPMInstrumentationConfig(t *testing.T) {
 	})
 	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "my-beat", Version: version.GetDefaultVersion()})
 	require.NoError(t, err)
-
-	assert.NotNil(t, instrumentation.Listener)
 
 	tracer := instrumentation.GetTracer()
 	defer tracer.Close()
 	assert.True(t, tracer.Active())
+	assert.Nil(t, instrumentation.Listener)
 }
 
-func TestAPMInstrumentationExplicitHosts(t *testing.T) {
+func TestInstrumentationConfigExplicitHosts(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
-			"hosts": []url.URL{{
-				Scheme: "http",
-				Host:   "localhost:8200",
-			}},
+			"hosts":   []string{"localhost:8200"},
 		},
-	})
+	},
+	)
 	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "my-beat", Version: version.GetDefaultVersion()})
 	require.NoError(t, err)
-	defer instrumentation.GetTracer().Close()
-
+	tracer := instrumentation.GetTracer()
+	defer tracer.Close()
+	assert.True(t, tracer.Active())
 	assert.Nil(t, instrumentation.Listener)
+}
+
+func TestInstrumentationConfigListener(t *testing.T) {
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"instrumentation": map[string]interface{}{
+			"enabled": "true",
+		},
+	})
+	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "apm-server", Version: version.GetDefaultVersion()})
+	require.NoError(t, err)
+
+	tracer := instrumentation.GetTracer()
+	defer tracer.Close()
+	assert.True(t, tracer.Active())
+	assert.NotNil(t, instrumentation.Listener)
 }
