@@ -10,6 +10,13 @@ function OktaSystem(keep_original_message) {
         target: "json",
     });
 
+    var setId = function(evt) {
+        var oktaUuid = evt.Get("json.uuid");
+        if (oktaUuid) {
+            evt.Put("@metadata._id", oktaUuid);
+        }
+    };
+
     var parseTimestamp = new processor.Timestamp({
         field: "json.published",
         timezone: "UTC",
@@ -101,58 +108,59 @@ function OktaSystem(keep_original_message) {
             { from: "okta.security_context.domain", to: "client.domain" },
             { from: "okta.security_context.domain", to: "source.domain" },
             { from: "okta.uuid", to: "event.id" },
-            { from: "okta.uuid", to: "_id" },
         ],
         ignore_missing: true,
         fail_on_error: false,
     });
 
     var setEventOutcome = function(evt) {
-        var outcome = evt.Get("okta.outcome.result")
-        if (outcome != null) {
-            var o = outcome.toLowerCase();
-            if (o == "success" || o == "allow") {
+        var outcome = evt.Get("okta.outcome.result");
+        if (outcome) {
+            outcome = outcome.toLowerCase();
+            if (outcome === "success" || outcome === "allow") {
                 evt.Put("event.outcome", "success");
-            } else if (o == "failure" || o == "deny") {
+            } else if (outcome === "failure" || outcome === "deny") {
                 evt.Put("event.outcome", "failure");
             } else {
                 evt.Put("event.outcome", "unknown");
             }
         }
-    }
- 
-    // Update nested fields 
+    };
+
+    // Update nested fields
     var renameNestedFields = function(evt) {
         var arr = evt.Get("okta.target");
-        if (arr != null) {
+        if (arr) {
             for (var i = 0; i < arr.length; i++) {
                 arr[i].alternate_id = arr[i].alternateId;
                 arr[i].display_name = arr[i].displayName;
                 delete arr[i].alternateId;
                 delete arr[i].displayName;
                 delete arr[i].detailEntry;
-	    }
+	        }
         }
     };
 
     // Set user info if actor type is User
     var setUserInfo = function(evt) {
         if (evt.Get("okta.actor.type") === "User") {
-	    evt.Put("client.user.full_name", evt.Get("okta.actor.display_name"));
-	    evt.Put("source.user.full_name", evt.Get("okta.actor.display_name"));
-	    evt.Put("related.user", evt.Get("okta.actor.display_name"));
-	    evt.Put("client.user.id", evt.Get("okta.actor.id"));
-	    evt.Put("source.user.id", evt.Get("okta.actor.id"));
+            evt.Put("client.user.full_name", evt.Get("okta.actor.display_name"));
+            evt.Put("source.user.full_name", evt.Get("okta.actor.display_name"));
+            evt.Put("related.user", evt.Get("okta.actor.display_name"));
+            evt.Put("client.user.id", evt.Get("okta.actor.id"));
+            evt.Put("source.user.id", evt.Get("okta.actor.id"));
         }
     };
 
     // Set related.ip field
     var setRelatedIP = function(event) {
-        if (event.Get("source.ip") != null) {
-            event.AppendTo("related.ip", event.Get("source.ip"));
+        var ip = event.Get("source.ip");
+        if (ip) {
+            event.AppendTo("related.ip", ip);
         }
-        if (event.Get("destination.ip") != null) {
-            event.AppendTo("related.ip", event.Get("destination.ip"));
+        ip = event.Get("destination.ip");
+        if (ip) {
+            event.AppendTo("related.ip", ip);
         }
     };
 
@@ -166,15 +174,16 @@ function OktaSystem(keep_original_message) {
         function dropNull(obj) {
             Object.keys(obj).forEach(function(key) {
                 (obj[key] && typeof obj[key] === 'object') && dropNull(obj[key]) ||
-                (obj[key] === null) && delete obj[key]
+                (obj[key] === null) && delete obj[key];
             });
             return obj;
-        };
+        }
         dropNull(evt);
     };
 
     var pipeline = new processor.Chain()
         .Add(decodeJson)
+        .Add(setId)
         .Add(parseTimestamp)
         .Add(saveOriginalMessage)
         .Add(dropOriginalMessage)
@@ -192,7 +201,7 @@ function OktaSystem(keep_original_message) {
     return {
         process: pipeline.Run,
     };
-};
+}
 
 var oktaSystem;
 

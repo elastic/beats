@@ -28,7 +28,8 @@
         "source.port": 27218,
         "syslog.facility": 165,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -55,7 +56,8 @@
         "source.address": "192.168.132.46",
         "source.ip": "192.168.132.46",
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -97,7 +99,8 @@
         "source.nat.port": "11234",
         "source.port": 1234,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

@@ -12,6 +12,22 @@ To build and install, just run `mage Package`. The build process happens entire 
 `docker run --log-driver=elastic-logging-plugin:8.0.0 --log-opt output.elasticsearch.hosts="172.18.0.2:9200" --log-opt output.elasticsearch.index="dockerbeat-test" -it debian:jessie /bin/bash`
 
 
+## Config Options
+
+The Plugin supports a number of Elasticsearch config options:
+
+```
+docker run --log-driver=elastic/{log-driver-alias}:{version} \
+           --log-opt endpoint="myhost:9200" \
+           --log-opt user="myusername" \
+           --log-opt password="mypassword" \
+           -it debian:jessie /bin/bash
+```
+
+You can find complete documentation on the [Elastic site](https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-configuration.html).
+
+
+
 ## How it works
 
 Logging plugins work by starting up an HTTP server that reads over a unix socket. When a container starts up that requests the logging plugin, a request is sent to `/LogDriver.StartLogging` with the name of the log handler and a struct containing the config of the container, including labels and other metadata. The actual log reading requires the file handle to be passed to a new routine which uses protocol buffers to read from the log handler. When the container stops, a request is sent to `/LogDriver.StopLogging`.
