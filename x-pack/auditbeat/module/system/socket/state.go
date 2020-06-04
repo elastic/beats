@@ -397,6 +397,7 @@ var kernelProcess = process{
 func NewState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
 	s := makeState(r, log, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
 	go s.reapLoop()
+	go s.logStateLoop()
 	return s
 }
 
@@ -461,8 +462,6 @@ func (s *state) logState() {
 func (s *state) reapLoop() {
 	reportTicker := time.NewTicker(reapInterval)
 	defer reportTicker.Stop()
-	logTicker := time.NewTicker(logInterval)
-	defer logTicker.Stop()
 	for {
 		select {
 		case <-s.reporter.Done():
@@ -489,6 +488,17 @@ func (s *state) reapLoop() {
 					return
 				}
 			}
+		}
+	}
+}
+
+func (s *state) logStateLoop() {
+	logTicker := time.NewTicker(logInterval)
+	defer logTicker.Stop()
+	for {
+		select {
+		case <-s.reporter.Done():
+			return
 		case <-logTicker.C:
 			s.logState()
 		}
