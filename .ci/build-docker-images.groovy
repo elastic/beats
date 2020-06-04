@@ -62,7 +62,7 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${BASE_DIR}"){
+        dir("${HOME}/${BASE_DIR}"){
           retry(3){
             sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/metricbeat'")
           }
@@ -78,7 +78,7 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${BASE_DIR}"){
+        dir("${HOME}/${BASE_DIR}"){
           retry(3){
             sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/metricbeat'")
           }
@@ -94,7 +94,7 @@ pipeline {
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        dir("${BASE_DIR}"){
+        dir("${HOME}/${BASE_DIR}"){
           retry(3){
             sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/filebeat'")
           }
