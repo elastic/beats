@@ -6,16 +6,16 @@ set -exo pipefail
 #
 # Parameters:
 #   - GO_VERSION - that's the version which will be installed and enabled.
-#   - METRICBEAT_DIR - that's the location of the metricbeat directory.
+#   - BEAT_BASE_DIR - that's the base directory of the Beat.
 #
 
 readonly GO_VERSION="${1?Please define the Go version to be used}"
-readonly METRICBEAT_DIR="${2?Please define the location of the Metricbeat directory}"
+readonly BEAT_BASE_DIR="${2?Please define the location of the Beat directory}"
 
 function build_test_images() {
-    local metricbeatDir="${1}"
+    local baseDir="${1}"
 
-    cd "${metricbeatDir}"
+    cd "${baseDir}"
     mage compose:buildSupportedVersions
 }
 
@@ -28,25 +28,25 @@ function install_go() {
 }
 
 function install_mage() {
-    local metricbeatDir="${1}"
+    local baseDir="${1}"
 
-    cd "${metricbeatDir}"
+    cd "${baseDir}"
     make mage
 }
 
 function push_test_images() {
-    local metricbeatDir="${1}"
+    local baseDir="${1}"
 
-    cd "${metricbeatDir}"
+    cd "${baseDir}"
     mage compose:pushSupportedVersions
 }
 
 function main() {
     install_go "${GO_VERSION}"
-    install_mage "${METRICBEAT_DIR}"
+    install_mage "${BEAT_BASE_DIR}"
 
-    build_test_images "${METRICBEAT_DIR}"
-    push_test_images "${METRICBEAT_DIR}"
+    build_test_images "${BEAT_BASE_DIR}"
+    push_test_images "${BEAT_BASE_DIR}"
 }
 
 main "$@"
