@@ -65,9 +65,9 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 }
 
 // buildConfig is a helper function that builds configs from a kubeconfig filepath.
-// If neither masterUrl or kubeconfigPath are passed in we fallback to inClusterConfig.
+// If kubeconfigPath is not passed in we fallback to inClusterConfig.
 // If inClusterConfig fails, we fallback to the default config.
-// This is copy of `clientcmd.BuildConfigFromFlags` of `client-go` but without the annoying
+// This is a copy of `clientcmd.BuildConfigFromFlags` of `client-go` but without the annoying
 // klog messages that are not possible to be disabled.
 func buildConfig(kubeconfigPath string) (*restclient.Config, error) {
 	if kubeconfigPath == "" {
