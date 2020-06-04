@@ -1,17 +1,11 @@
 [role="xpack"]
 [[beats-api-keys]]
-=== Grant access using API keys
+== Grant access using API keys
 
 Instead of using usernames and passwords, you can use API keys to grant
 access to {es} resources. You can set API keys to expire at a certain time,
 and you can explicitly invalidate them. Any user with the `manage_api_key`
 or `manage_own_api_key` cluster privilege can create API keys.
-
-See the {es} API key documentation for more information:
-
-* {ref}/security-api-create-api-key.html[Create API key]
-* {ref}/security-api-get-api-key.html[Get API key information]
-* {ref}/security-api-invalidate-api-key.html[Invalidate API key]
 
 {beatname_uc} instances typically send both collected data and monitoring
 information to {es}. If you are sending both to the same cluster, you can use the same
@@ -20,8 +14,9 @@ API key. For different clusters, you need to use an API key per cluster.
 NOTE: For security reasons, we recommend using a unique API key per {beatname_uc} instance.
 You can create as many API keys per user as necessary.
 
+[float]
 [[beats-api-key-publish]]
-==== Create an API key for publishing
+=== Create an API key for publishing
 To create an API key to use for writing data to {es}, use the
 {ref}/security-api-create-api-key.html[Create API key API], for example:
 
@@ -67,8 +62,9 @@ output.elasticsearch:
 --------------------
 <1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
 
+[float]
 [[beats-api-key-monitor]]
-==== Create an API key for monitoring
+=== Create an API key for monitoring
 To create an API key to use for sending monitoring data to {es}, use the
 {ref}/security-api-create-api-key.html[Create API key API], for example:
 
@@ -114,3 +110,12 @@ monitoring.elasticsearch:
 --------------------
 <1> Format is `id:api_key` (as returned by {ref}/security-api-create-api-key.html[Create API key])
 
+[[learn-more-api-keys]]
+[float]
+=== Learn more about API keys
+
+See the {es} API key documentation for more information:
+
+* {ref}/security-api-create-api-key.html[Create API key]
+* {ref}/security-api-get-api-key.html[Get API key information]
+* {ref}/security-api-invalidate-api-key.html[Invalidate API key]
