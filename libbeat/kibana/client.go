@@ -38,6 +38,7 @@ import (
 	"golang.org/x/net/http/httpproxy"
 )
 
+// Connection represents a connection to Kibana
 type Connection struct {
 	URL      string
 	Username string
@@ -47,6 +48,7 @@ type Connection struct {
 	Version common.Version
 }
 
+// Client represents a Kibana client
 type Client struct {
 	Connection
 	log *logp.Logger
@@ -135,8 +137,12 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 
 	// check to see if we have a proxy_host set
 	var proxy func(*http.Request) (*url.URL, error)
-	if config.ProxyHost != nil {
-		proxy = http.ProxyURL(config.ProxyHost)
+	if config.ProxyHost != "" {
+		proxyURL, err := url.Parse(config.ProxyHost)
+		if err != nil {
+			return nil, errors.Wrapf(err, "could not convert %s to url", config.ProxyHost)
+		}
+		proxy = http.ProxyURL(proxyURL)
 	} else if envCfg := httpproxy.FromEnvironment(); envCfg.HTTPProxy != "" || envCfg.HTTPSProxy != "" {
 		proxy = http.ProxyFromEnvironment
 	}

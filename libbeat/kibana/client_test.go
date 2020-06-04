@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,5 +73,21 @@ func TestSuccess(t *testing.T) {
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, http.Header{"foo": []string{"bar"}}, nil)
 	assert.Equal(t, http.StatusOK, code)
+	assert.NoError(t, err)
+}
+
+func TestClientSetup(t *testing.T) {
+	kibanaConfig := common.NewConfig()
+	kibanaConfig.SetString("username", -1, "user")
+	kibanaConfig.SetString("password", -1, "password")
+	kibanaConfig.SetString("proxy_url", -1, "http://proxy:3128")
+
+	config := DefaultClientConfig()
+	if err := kibanaConfig.Unpack(&config); err != nil {
+		assert.NoError(t, err)
+	}
+
+	config.IgnoreVersion = true
+	_, err := NewClientWithConfig(&config)
 	assert.NoError(t, err)
 }
