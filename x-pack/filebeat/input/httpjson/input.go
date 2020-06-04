@@ -17,8 +17,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -469,20 +467,11 @@ func (in *HttpjsonInput) newHTTPClient(ctx context.Context) (*http.Client, error
 		Timeout: in.config.HTTPClientTimeout,
 	}
 
-	if in.config.OAuth2 == nil {
-		return client, nil
+	if in.config.OAuth2.IsEnabled() {
+		return in.config.OAuth2.Client(ctx, client)
 	}
 
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
-	creds := clientcredentials.Config{
-		ClientID:       in.config.OAuth2.ClientID,
-		ClientSecret:   in.config.OAuth2.ClientSecret,
-		TokenURL:       in.config.OAuth2.TokenURL,
-		Scopes:         in.config.OAuth2.Scopes,
-		EndpointParams: in.config.OAuth2.EndpointParams,
-	}
-
-	return creds.Client(ctx), nil
+	return client, nil
 }
 
 func makeEvent(body string) beat.Event {

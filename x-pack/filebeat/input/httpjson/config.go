@@ -33,15 +33,6 @@ type config struct {
 	URL                  string            `config:"url" validate:"required"`
 }
 
-// OAuth2 contains information about oauth2 authentication settings.
-type OAuth2 struct {
-	TokenURL       string              `config:"token_url"`
-	EndpointParams map[string][]string `config:"endpoint_params"`
-	ClientID       string              `config:"client_id"`
-	ClientSecret   string              `config:"client_secret"`
-	Scopes         []string            `config:"scopes"`
-}
-
 // Pagination contains information about httpjson pagination settings
 type Pagination struct {
 	Enabled          *bool         `config:"enabled"`
@@ -72,9 +63,7 @@ type RateLimit struct {
 
 func (c *config) Validate() error {
 	switch strings.ToUpper(c.HTTPMethod) {
-	case "GET":
-		break
-	case "POST":
+	case "GET", "POST":
 		break
 	default:
 		return errors.Errorf("httpjson input: Invalid http_method, %s", c.HTTPMethod)
@@ -97,6 +86,9 @@ func (c *config) Validate() error {
 	if c.OAuth2 != nil {
 		if c.APIKey != "" || c.AuthenticationScheme != "" {
 			return errors.Errorf("invalid configuration: both oauth2 and api_key or authentication_scheme cannot be set simultaneously")
+		}
+		if err := c.OAuth2.validate(); err != nil {
+			return err
 		}
 	}
 	return nil
