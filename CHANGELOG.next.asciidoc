@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 
 *Heartbeat*
