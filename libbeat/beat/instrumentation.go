@@ -196,12 +196,13 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 		ServiceEnvironment: environment,
 		Transport:          tracerTransport,
 	})
-	if tracer != nil {
-		tracer.SetLogger(logger)
+	if err != nil {
+		return nil, err
 	}
-
+	
+	tracer.SetLogger(logger)
 	return &Instrumentation{
 		tracer:   tracer,
 		Listener: tracerListener,
-	}, err
+	}, nil
 }
