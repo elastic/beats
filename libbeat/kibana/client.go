@@ -31,11 +31,12 @@ import (
 
 	"github.com/pkg/errors"
 
+	"golang.org/x/net/http/httpproxy"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"golang.org/x/net/http/httpproxy"
 )
 
 // Connection represents a connection to Kibana
