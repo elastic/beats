@@ -16,7 +16,7 @@ include::{libbeat-dir}/tab-widgets/open-kibana-widget.asciidoc[]
 sure the predefined +{beatname_lc}-*+ index pattern is selected.
 +
 --
-TIP: If you don’t see data in {kib}, try changing the date range to a larger
+TIP: If you don’t see data in {kib}, try changing the time filter to a larger
 range. By default, {kib} shows the last 15 minutes.
 --
 
