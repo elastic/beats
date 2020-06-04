@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/beats"
+	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
 )
 
 // Monitor is a monitoring interface providing information about the way
@@ -27,17 +28,19 @@ type Monitor interface {
 }
 
 type wrappedConfig struct {
-	DownloadConfig *artifact.Config `yaml:"download" config:"download"`
+	DownloadConfig   *artifact.Config                   `yaml:"download" config:"download"`
+	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
 }
 
 // NewMonitor creates a monitor based on a process configuration.
 func NewMonitor(config *config.Config) (Monitor, error) {
 	cfg := &wrappedConfig{
-		DownloadConfig: artifact.DefaultConfig(),
+		DownloadConfig:   artifact.DefaultConfig(),
+		MonitoringConfig: monitoringConfig.DefaultConfig(),
 	}
 
 	if err := config.Unpack(&cfg); err != nil {
 		return nil, err
 	}
-	return beats.NewMonitor(cfg.DownloadConfig), nil
+	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig), nil
 }
