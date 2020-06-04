@@ -19,6 +19,10 @@ tags: {{.tags}}
 
 processors:
   - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0
   - script:
       lang: javascript
       id: cisco_ios
