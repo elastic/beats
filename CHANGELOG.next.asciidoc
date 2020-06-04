@@ -614,6 +614,7 @@ port. {pull}19209[19209]
 
 *Elastic Log Driver*
 - Add support for `docker logs` command {pull}19531[19531]
+- Add new winlogbeat security dashboard {pull}18775[18775]
 
 ==== Deprecated
 
