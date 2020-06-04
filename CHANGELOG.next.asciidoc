@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 
 *Heartbeat*
 
@@ -164,6 +165,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
+- Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 
 *Heartbeat*
 
