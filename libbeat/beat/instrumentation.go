@@ -168,7 +168,7 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 		tracerTransport = t
 		logger.Infof("APM tracer directed to %s", cfg.Hosts)
 	} else {
-		// if the host is not set, the running beat is an APM Server sending traces to itself
+		// if the host is not set, the running beat is assumed to be an APM Server sending traces to itself
 		// if another beat is running without an APM Server host configured, we default to localhost
 		pipeListener := pipe.NewListener()
 		pipeTransport, err := transport.NewHTTPTransport()
