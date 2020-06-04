@@ -601,6 +601,8 @@ func (s *state) onSockTerminated(sock *socket) {
 	delete(s.socks, sock.sock)
 	if sock.closing {
 		s.closing.remove(sock)
+	} else {
+		s.moveToClosing(sock)
 	}
 }
 
@@ -699,7 +701,6 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 	if !found {
 		return nil
 	}
-
 	// Enrich with pid
 	if sock.pid == 0 && pid != 0 {
 		sock.pid = pid
@@ -710,12 +711,16 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 	// Keep the sock around in case it's a connected TCP socket, as still some
 	// packets can be received shortly after/during inet_release.
 	if !sock.closing {
-		sock.closeTime = time.Now()
-		sock.closing = true
-		s.socketLRU.remove(sock)
-		s.closing.add(sock)
+		s.moveToClosing(sock)
 	}
 	return nil
+}
+
+func (s *state) moveToClosing(sock *socket) {
+	sock.closeTime = time.Now()
+	sock.closing = true
+	s.socketLRU.remove(sock)
+	s.closing.add(sock)
 }
 
 // UpdateFlow receives a partial flow and creates or updates an existing flow.
