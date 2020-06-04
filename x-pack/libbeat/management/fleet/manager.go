@@ -10,10 +10,11 @@ import (
 	"os"
 	"sort"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -54,10 +55,10 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	log := logp.NewLogger(management.DebugK)
 
 	m := &Manager{
-		config:     c,
-		logger:     log.Named("fleet"),
-		beatUUID:   beatUUID,
-		registry:   registry,
+		config:   c,
+		logger:   log.Named("fleet"),
+		beatUUID: beatUUID,
+		registry: registry,
 	}
 
 	var err error
