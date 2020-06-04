@@ -15,39 +15,28 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 func TestMain(m *testing.M) {
 	// init supported with test cases
 	shortSpec := program.Spec{
-		Name:         "short",
-		Cmd:          "/bin/echo",
-		Configurable: "file",
-		Args:         []string{"123"},
+		Name: "short",
+		Cmd:  "/bin/echo",
+		Args: []string{"123"},
 	}
 	longSpec := program.Spec{
-		Name:         "long",
-		Cmd:          "/bin/sh",
-		Configurable: "file",
-		Args:         []string{"-c", "echo 123; sleep 100"},
+		Name: "long",
+		Cmd:  "/bin/sh",
+		Args: []string{"-c", "echo 123; sleep 100"},
 	}
 	configurableSpec := program.Spec{
-		Name:         "configurable",
-		Cmd:          "configurable",
-		Configurable: "file",
-		Args:         []string{},
-	}
-	configByFileSpec := program.Spec{
-		Name:         "configurablebyfile",
-		Cmd:          "configurablebyfile",
-		Configurable: "file",
-		Args:         []string{},
+		Name: "configurable",
+		Cmd:  "configurable",
+		Args: []string{},
 	}
 
-	program.Supported = append(program.Supported, shortSpec, longSpec, configurableSpec, configByFileSpec)
+	program.Supported = append(program.Supported, shortSpec, longSpec, configurableSpec)
 }
 
 func TestNotSupported(t *testing.T) {
@@ -292,72 +281,6 @@ func TestConfigurableRun(t *testing.T) {
 
 	// check process stopped
 	proc, err := os.FindProcess(pid)
-	if err != nil && proc != nil {
-		t.Fatal("Process found")
-	}
-}
-
-func TestConfigurableByFileRun(t *testing.T) {
-	cfg := make(map[string]interface{})
-	cfg["TestFile"] = "tstFilePath"
-	downloadCfg := &artifact.Config{
-		InstallPath:     installPath,
-		OperatingSystem: "darwin",
-	}
-
-	p := app.NewDescriptor("configurablebyfile", "1.0", downloadCfg, nil)
-	installPath := "tests/scripts"
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
-
-	operator, _ := getTestOperator(t, installPath)
-	if err := operator.start(p, cfg); err != nil {
-		t.Fatal(err)
-	}
-
-	// wait for watcher so we know it was now cancelled immediately
-	<-time.After(1 * time.Second)
-
-	items := operator.State()
-	item0, ok := items[p.ID()]
-	if !ok || item0.Status != state.Running {
-		t.Fatalf("Process not running %#v", items)
-	}
-
-	// check it is still running
-	<-time.After(2 * time.Second)
-
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status != state.Running {
-		t.Fatalf("Process not running anymore %#v", items)
-	}
-
-	if item0.ProcessInfo.PID != item1.ProcessInfo.PID {
-		t.Fatalf("Process crashed in between first pid: '%v' second pid: '%v'", item0.ProcessInfo.PID, item1.ProcessInfo.PID)
-	}
-
-	// stop the process
-	if err := operator.stop(p); err != nil {
-		t.Fatalf("Failed to stop process with PID %d: %v", item1.ProcessInfo.PID, err)
-	}
-
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	// check reattach collection cleaned up
-	items = operator.State()
-	item2, ok := items[p.ID()]
-	if !ok || item2.Status == state.Running {
-		t.Fatalf("Process still running after stop %#v", items)
-	}
-
-	// check process stopped
-	proc, err := os.FindProcess(item1.ProcessInfo.PID)
 	if err != nil && proc != nil {
 		t.Fatal("Process found")
 	}
