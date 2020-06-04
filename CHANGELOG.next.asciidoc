@@ -56,7 +56,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
-- Add Tomcat overview dashboard {pull}14026[14026]
 
 *Packetbeat*
 
@@ -460,6 +459,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
+- Add Tomcat overview dashboard {pull}14026[14026]
 
 *Packetbeat*
 
