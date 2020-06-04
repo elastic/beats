@@ -13,7 +13,6 @@ import (
 	"github.com/urso/ecslog/backend/layout"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -69,7 +68,7 @@ func (c *IntrospectOutputCmd) introspectOutputs() error {
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
-		return errors.New("no fleet config retrieved yet")
+		return fmt.Errorf("no fleet config retrieved yet")
 	}
 
 	return listOutputsFromMap(l, fleetConfig)
@@ -122,7 +121,7 @@ func (c *IntrospectOutputCmd) introspectOutput() error {
 	if err != nil {
 		return err
 	} else if fleetConfig == nil {
-		return errors.New("no fleet config retrieved yet")
+		return fmt.Errorf("no fleet config retrieved yet")
 	}
 
 	return printOutputFromMap(l, c.output, c.program, fleetConfig)
@@ -153,16 +152,16 @@ func printOutputFromConfig(log *logger.Logger, output, programName string, cfg *
 		}
 
 		if !programFound {
-			fmt.Printf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs.\n",
+			return fmt.Errorf("program '%s' is not recognized within output '%s', try running `elastic-agent introspect output` to find available outputs",
 				programName,
 				output)
 		}
+
 		return nil
 	}
 
-	fmt.Printf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs.\n", output)
+	return fmt.Errorf("output '%s' is not recognized, try running `elastic-agent introspect output` to find available outputs", output)
 
-	return nil
 }
 
 func printOutputFromMap(log *logger.Logger, output, programName string, cfg map[string]interface{}) error {

@@ -270,13 +270,14 @@ type dashboardObject struct {
 		Title                 string `json:"title"`
 		KibanaSavedObjectMeta *struct {
 			SearchSourceJSON struct {
-				Index string `json:"index"`
+				Index *string `json:"index"`
 			} `json:"searchSourceJSON,omitempty"`
 		} `json:"kibanaSavedObjectMeta"`
 		VisState *struct {
-			Params struct {
-				Controls []struct {
-					IndexPattern string
+			Params *struct {
+				IndexPattern *string `json:"index_pattern"`
+				Controls     []struct {
+					IndexPattern *string
 				} `json:"controls"`
 			} `json:"params"`
 		} `json:"visState,omitempty"`
@@ -346,20 +347,23 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 
 func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error {
 	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
-		if index := objectMeta.SearchSourceJSON.Index; index != "" && index != expectedIndex {
-			return errors.Errorf("unexpected index pattern reference found in object meta: %s", index)
+		if index := objectMeta.SearchSourceJSON.Index; index != nil && *index != expectedIndex {
+			return errors.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	if visState := o.Attributes.VisState; visState != nil {
 		for _, control := range visState.Params.Controls {
-			if index := control.IndexPattern; index != "" && index != expectedIndex {
-				return errors.Errorf("unexpected index pattern reference found in visualization state: %s", index)
+			if index := control.IndexPattern; index != nil && *index != expectedIndex {
+				return errors.Errorf("unexpected index pattern reference found in visualization state: `%s` in visualization `%s`", *index, o.Attributes.Title)
 			}
+		}
+		if index := visState.Params.IndexPattern; index != nil && *index != expectedIndex {
+			return errors.Errorf("unexpected index pattern reference found in visualization state params: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	for _, reference := range o.References {
 		if reference.Type == "index-pattern" && reference.ID != expectedIndex {
-			return errors.Errorf("unexpected reference to index pattern %s", reference.ID)
+			return errors.Errorf("unexpected reference to index pattern `%s`", reference.ID)
 		}
 	}
 	return nil

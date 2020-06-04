@@ -985,7 +985,7 @@
               "query": "event.code:4732 OR event.code:4728 OR event.code:4756"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -1070,7 +1070,7 @@
               "query": "event.code:4734 OR event.code:4730 OR event.code:4758"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -1155,7 +1155,7 @@
               "query": "event.code:4731 OR event.code:4727 OR event.code:\"4754\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -1240,7 +1240,7 @@
               "query": "event.code:4735 OR event.code:4737 OR event.code:\"4755\" OR event.code:\"4764\"  "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "60d",
             "series": [
               {
@@ -1319,7 +1319,7 @@
               "query": "event.code:4733 OR event.code:4727 OR event.code:4729"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -1398,7 +1398,7 @@
               "query": "event.code:4799"
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {

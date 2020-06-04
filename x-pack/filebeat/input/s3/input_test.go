@@ -7,12 +7,15 @@ package s3
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -86,6 +89,30 @@ func TestHandleMessage(t *testing.T) {
 				{
 					name: "test-s3-ks-2",
 					key:  "server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA",
+				},
+			},
+		},
+		{
+			"sqs message with event source aws:s3, event name ObjectCreated:Put and encoded filename",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"year%3D2020/month%3D05/test1.txt\"}}}]}"),
+			},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "year=2020/month=05/test1.txt",
+				},
+			},
+		},
+		{
+			"sqs message with event source aws:s3, event name ObjectCreated:Put and gzip filename",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"428152502467_CloudTrail_us-east-2_20191219T1655Z_WXCas1PVnOaTpABD.json.gz\"}}}]}"),
+			},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "428152502467_CloudTrail_us-east-2_20191219T1655Z_WXCas1PVnOaTpABD.json.gz",
 				},
 			},
 		},
@@ -302,4 +329,47 @@ func TestConvertOffsetToString(t *testing.T) {
 		assert.Equal(t, c.expectedString, output)
 	}
 
+}
+
+func TestIsStreamGzipped(t *testing.T) {
+	logBytes := []byte(`May 28 03:00:52 Shaunaks-MacBook-Pro-Work syslogd[119]: ASL Sender Statistics
+May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED USE in libdispatch client: Changing the target of a source after it has been activated; set a breakpoint on _dispatch_bug_deprecated to debug
+May 28 03:03:29 Shaunaks-MacBook-Pro-Work VTDecoderXPCService[57953]: DEPRECATED USE in libdispatch client: Changing target queue hierarchy after xpc connection was activated; set a breakpoint on _dispatch_bug_deprecated to debug
+`)
+
+	var b bytes.Buffer
+	gz := gzip.NewWriter(&b)
+	_, err := gz.Write(logBytes)
+	require.NoError(t, err)
+
+	err = gz.Close()
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		contents []byte
+		expected bool
+	}{
+		"not_gzipped": {
+			logBytes,
+			false,
+		},
+		"gzipped": {
+			b.Bytes(),
+			true,
+		},
+		"empty": {
+			[]byte{},
+			false,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			r := bufio.NewReader(bytes.NewReader(test.contents))
+			actual, err := isStreamGzipped(r)
+
+			require.NoError(t, err)
+			require.Equal(t, test.expected, actual)
+		})
+	}
 }

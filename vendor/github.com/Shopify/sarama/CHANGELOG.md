@@ -1,5 +1,74 @@
 # Changelog
 
+#### Unreleased
+
+#### Version 1.26.1 (2020-02-04)
+
+Improvements:
+- Add requests-in-flight metric ([1539](https://github.com/Shopify/sarama/pull/1539))
+- Fix misleading example for cluster admin ([1595](https://github.com/Shopify/sarama/pull/1595))
+- Replace Travis with GitHub Actions, linters housekeeping ([1573](https://github.com/Shopify/sarama/pull/1573))
+- Allow BalanceStrategy to provide custom assignment data ([1592](https://github.com/Shopify/sarama/pull/1592))
+
+Bug Fixes:
+- Adds back Consumer.Offsets.CommitInterval to fix API ([1590](https://github.com/Shopify/sarama/pull/1590))
+- Fix error message s/CommitInterval/AutoCommit.Interval ([1589](https://github.com/Shopify/sarama/pull/1589))
+
+#### Version 1.26.0 (2020-01-24)
+
+New Features:
+- Enable zstd compression
+  ([1574](https://github.com/Shopify/sarama/pull/1574),
+  [1582](https://github.com/Shopify/sarama/pull/1582))
+- Support headers in tools kafka-console-producer
+  ([1549](https://github.com/Shopify/sarama/pull/1549))
+
+Improvements:
+- Add SASL AuthIdentity to SASL frames (authzid)
+  ([1585](https://github.com/Shopify/sarama/pull/1585)).
+
+Bug Fixes:
+- Sending messages with ZStd compression enabled fails in multiple ways
+  ([1252](https://github.com/Shopify/sarama/issues/1252)).
+- Use the broker for any admin on BrokerConfig
+  ([1571](https://github.com/Shopify/sarama/pull/1571)).
+- Set DescribeConfigRequest Version field
+  ([1576](https://github.com/Shopify/sarama/pull/1576)).
+- ConsumerGroup flooding logs with client/metadata update req
+  ([1578](https://github.com/Shopify/sarama/pull/1578)).
+- MetadataRequest version in DescribeCluster
+  ([1580](https://github.com/Shopify/sarama/pull/1580)).
+- Fix deadlock in consumer group handleError
+  ([1581](https://github.com/Shopify/sarama/pull/1581))
+- Fill in the Fetch{Request,Response} protocol
+  ([1582](https://github.com/Shopify/sarama/pull/1582)).
+- Retry topic request on ControllerNotAvailable
+  ([1586](https://github.com/Shopify/sarama/pull/1586)).
+
+#### Version 1.25.0 (2020-01-13)
+
+New Features:
+- Support TLS protocol in kafka-producer-performance
+  ([1538](https://github.com/Shopify/sarama/pull/1538)).
+- Add support for kafka 2.4.0
+  ([1552](https://github.com/Shopify/sarama/pull/1552)).
+
+Improvements:
+- Allow the Consumer to disable auto-commit offsets
+  ([1164](https://github.com/Shopify/sarama/pull/1164)).
+- Produce records with consistent timestamps
+  ([1455](https://github.com/Shopify/sarama/pull/1455)).
+
+Bug Fixes:
+- Fix incorrect SetTopicMetadata name mentions
+  ([1534](https://github.com/Shopify/sarama/pull/1534)).
+- Fix client.tryRefreshMetadata Println
+  ([1535](https://github.com/Shopify/sarama/pull/1535)).
+- Fix panic on calling updateMetadata on closed client
+  ([1531](https://github.com/Shopify/sarama/pull/1531)).
+- Fix possible faulty metrics in TestFuncProducing
+  ([1545](https://github.com/Shopify/sarama/pull/1545)).
+
 #### Version 1.24.1 (2019-10-31)
 
 New Features:

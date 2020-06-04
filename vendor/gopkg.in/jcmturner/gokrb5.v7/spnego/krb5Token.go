@@ -70,7 +70,13 @@ func (m *KRB5Token) Unmarshal(b []byte) error {
 	if err != nil {
 		return fmt.Errorf("error unmarshalling KRB5Token OID: %v", err)
 	}
+	if !oid.Equal(gssapi.OID(gssapi.OIDKRB5)) {
+		return fmt.Errorf("error unmarshalling KRB5Token, OID is %s not %s", oid.String(), gssapi.OID(gssapi.OIDKRB5).String())
+	}
 	m.OID = oid
+	if len(r) < 2 {
+		return fmt.Errorf("krb5token too short")
+	}
 	m.tokID = r[0:2]
 	switch hex.EncodeToString(m.tokID) {
 	case TOK_ID_KRB_AP_REQ:
