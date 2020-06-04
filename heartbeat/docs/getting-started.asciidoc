@@ -111,7 +111,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 The `setup` command loads the recommended index template for writing to {es}.
 It does not install {beatname_uc} dashboards.  Heartbeat dashboards and 
 installation steps are available in the
-https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
+https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
 
 [TIP]
 =====
