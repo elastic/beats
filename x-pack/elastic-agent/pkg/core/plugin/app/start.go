@@ -7,6 +7,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -45,29 +46,37 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	a.tag = t
 
 	// Failed applications can be started again.
-	if a.state != nil {
-		status, _ := a.state.Status()
+	if a.srvState != nil {
+		status, _ := a.srvState.Status()
 		if status != proto.StateObserved_FAILED {
 			return nil
 		}
-		a.state.SetStatus(proto.StateObserved_STARTING, "Starting")
-		a.state.UpdateConfig(string(cfgStr))
+		a.srvState.SetStatus(proto.StateObserved_STARTING, "Starting")
+		a.srvState.UpdateConfig(string(cfgStr))
 	} else {
-		a.state, err = a.srv.Register(a, string(cfgStr))
+		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
 	}
+	if a.state.Status != state.Stopped {
+		// restarting as it was previously in a different state
+		a.state.Status = state.Restarting
+		a.state.Message = "Restarting"
+	} else {
+		a.state.Status = state.Starting
+		a.state.Message = "Starting"
+	}
 
 	defer func() {
 		if err != nil {
-			if a.state != nil {
-				a.state.Destroy()
-				a.state = nil
+			if a.srvState != nil {
+				a.srvState.Destroy()
+				a.srvState = nil
 			}
-			if a.proc != nil {
-				_ = a.proc.Process.Kill()
-				a.proc = nil
+			if a.state.ProcessInfo != nil {
+				_ = a.state.ProcessInfo.Process.Kill()
+				a.state.ProcessInfo = nil
 			}
 		}
 	}()
@@ -92,7 +101,7 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	// of the beat with same data path fails to start
 	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 
-	a.proc, err = process.Start(
+	a.state.ProcessInfo, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
 		a.processConfig,
@@ -103,17 +112,17 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		return err
 	}
 
-	err = a.state.WriteConnInfo(a.proc.Stdin)
+	err = a.srvState.WriteConnInfo(a.state.ProcessInfo.Stdin)
 	if err != nil {
 		return err
 	}
-	err = a.proc.Stdin.Close()
+	err = a.state.ProcessInfo.Stdin.Close()
 	if err != nil {
 		return err
 	}
 
 	// setup watcher
-	a.watch(ctx, t, a.proc, cfg)
+	a.watch(ctx, t, a.state.ProcessInfo, cfg)
 
 	return nil
 }

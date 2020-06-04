@@ -7,6 +7,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"os"
@@ -45,12 +46,12 @@ type Application struct {
 	logLevel        string
 	spec            Specifier
 	srv 			*server.Server
-	state 			*server.ApplicationState
+	srvState 		*server.ApplicationState
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
 	startContext    context.Context
 	tag             Taggable
-	proc            *process.Info
+	state           state.State
 
 	uid int
 	gid int
@@ -113,15 +114,11 @@ func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
 }
 
-// Status returns the application status.
-func (a *Application) Status() (proto.StateObserved_Status, string) {
+// State returns the application state.
+func (a *Application) State() state.State {
 	a.appLock.Lock()
-	state := a.state
-	a.appLock.Unlock()
-	if state == nil {
-		return proto.StateObserved_STARTING, ""
-	}
-	return state.Status()
+	defer a.appLock.Unlock()
+	return a.state
 }
 
 // Name returns application name
@@ -134,20 +131,24 @@ func (a *Application) Stop() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
+	if a.state.Status == state.Stopped {
+		return
+	}
+
 	stopSig := os.Interrupt
-	if a.state != nil {
-		if err := a.state.Stop(a.processConfig.StopTimeout); err != nil {
+	if a.srvState != nil {
+		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
 			// kill the process if stop through GRPC doesn't work
 			stopSig = os.Kill
 		}
-		a.state = nil
+		a.srvState = nil
 	}
-	if a.proc != nil {
-		if err := a.proc.Process.Signal(stopSig); err == nil {
+	if a.state.ProcessInfo != nil {
+		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
 			// no error on signal, so wait for it to stop
-			_, _ = a.proc.Process.Wait()
+			_, _ = a.state.ProcessInfo.Process.Wait()
 		}
-		a.proc = nil
+		a.state.ProcessInfo = nil
 
 		// remove generated configuration if present
 		filename := fmt.Sprintf(configFileTempl, a.id)
@@ -175,15 +176,19 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		}
 
 		a.appLock.Lock()
-		a.proc = nil
-		state := a.state
+		a.state.ProcessInfo = nil
+		srvState := a.srvState
 		a.appLock.Unlock()
 
-		if state.Expected() == proto.StateExpected_STOPPING {
+		if srvState.Expected() == proto.StateExpected_STOPPING {
+			a.state.Status = state.Stopped
 			return
 		}
 
-		state.SetStatus(proto.StateObserved_FAILED, fmt.Sprintf("Exited with code: %d", procState.ExitCode()))
+		msg := fmt.Sprintf("Exited with code: %d", procState.ExitCode())
+		srvState.SetStatus(proto.StateObserved_FAILED, msg)
+		a.state.Status = state.Crashed
+		a.state.Message = msg
 
 		// it was a crash, report it async not to block
 		// process management with networking issues

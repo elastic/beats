@@ -17,13 +17,15 @@ import (
 
 type ApplicationStatusHandler struct{}
 
-func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, status proto.StateObserved_Status, _ string) {
+func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, status proto.StateObserved_Status, msg string) {
 	app, ok := state.App().(*Application)
 	if !ok {
 		panic(errors.New("only *Application can be registered when using the ApplicationStatusHandler", errors.TypeUnexpected))
 	}
 
 	app.appLock.Lock()
+	app.state.UpdateFromProto(status)
+	app.state.Message = msg
 	if status == proto.StateObserved_FAILED {
 		// ignore when expected state is stopping
 		if state.Expected() == proto.StateExpected_STOPPING {
@@ -36,9 +38,9 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 		go app.reportCrash(context.Background())
 
 		// kill the process
-		if app.proc != nil {
-			_ = app.proc.Process.Kill()
-			app.proc = nil
+		if app.state.ProcessInfo != nil {
+			_ = app.state.ProcessInfo.Process.Kill()
+			app.state.ProcessInfo = nil
 		}
 		ctx := app.startContext
 		tag := app.tag

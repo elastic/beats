@@ -6,10 +6,10 @@ package operation
 
 import (
 	"context"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 )
 
 // operation is an operation definition
@@ -35,7 +35,7 @@ type Application interface {
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
-	Status() (proto.StateObserved_Status, string)
+	State() state.State
 }
 
 // Descriptor defines a program which needs to be run.

@@ -6,6 +6,7 @@ package app
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -32,7 +33,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		}
 	}()
 
-	if a.state.Status() == state.Stopped {
+	if a.state.Status == state.Stopped {
 		return errors.New(ErrAppNotRunning)
 	}
 
@@ -40,7 +41,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
-	err = a.state.UpdateConfig(string(cfgStr))
+	err = a.srvState.UpdateConfig(string(cfgStr))
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
