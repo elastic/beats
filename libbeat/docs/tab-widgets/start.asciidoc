@@ -5,7 +5,7 @@ sudo service {beatname_pkg} start
 ----------------------------------------------------------------------
 
 // tag::initd-note[]
-NOTE: If you use an init.d script to start {beatname_uc}, you can't specify command
+NOTE: If you use an `init.d` script to start {beatname_uc}, you can't specify command
 line flags (see <<command-line-options>>). To specify flags, start {beatname_uc} in
 the foreground.
 
