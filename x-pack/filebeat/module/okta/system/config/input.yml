@@ -1,19 +1,48 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
+
+{{ if .api_key }}
 api_key: {{ .api_key }}
-authentication_scheme: {{.authentication_scheme}}
+{{ end }}
+
+authentication_scheme: {{ .authentication_scheme }}
+
+{{ if .http_client_timeout }}
 http_client_timeout: {{ .http_client_timeout }}
+{{ end }}
+
+{{ if .http_method }}
 http_method: {{ .http_method }}
-http_headers: {{ .http_headers }}
+{{ end }}
+
+{{ if .http_headers }}
+http_headers: {{ .http_headers | tojson }}
+{{ end }}
+
+{{ if .http_request_body }}
 http_request_body: {{ .http_request_body }}
-no_http_body: {{ .no_http_body }}
+{{ end }}
+
 interval: {{ .interval }}
+
+{{ if .json_objects_array }}
 json_objects_array: {{ .json_objects_array }}
-pagination: {{ .pagination }}
-rate_limit: {{ .rate_limit }}
+{{ end }}
+
+no_http_body: {{ .no_http_body }}
+
+pagination: {{ .pagination | tojson }}
+
+rate_limit: {{ .rate_limit | tojson }}
+
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
+{{ if .url }}
 url: {{ .url }}
-ssl: {{ .ssl }}
+{{ end }}
 
 {{ else if eq .input "file" }}
 
