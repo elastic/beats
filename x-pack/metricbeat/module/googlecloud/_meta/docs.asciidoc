@@ -170,6 +170,11 @@ For L3 load balancing:
 image::./images/metricbeat-googlecloud-load-balancing-l3-overview.png[]
 
 [float]
+==== TCP/SSL/Proxy
+For TCP/SSL/Proxy load balancing:
+image::./images/metricbeat-googlecloud-load-balancing-tcp-ssl-proxy-overview.png[]
+
+[float]
 === `pubsub`
 This metricset fetches metrics from https://cloud.google.com/pubsub/[Pub/Sub]
 topics and subscriptions in Google Cloud Platform. The `pubsub` metricset
