@@ -87,7 +87,11 @@ var powershell = (function () {
     // countChunksDelimitedBy will return the number of chunks contained in a field
     // that are delimited by the given delimiter.
     var countChunksDelimitedBy = function(evt, fromField, delimiter) {
-        return evt.Get(fromField).split(delimiter).length-1;
+        var str = evt.Get(fromField);
+        if (!str) {
+            return 0;
+        }
+        return str.split(delimiter).length-1;
     };
 
     var dissect4xxAnd600 = function (evt) {
