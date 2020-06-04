@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"golang.org/x/net/http/httpproxy"
 )
 
 type Connection struct {
@@ -132,6 +133,14 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		return nil, err
 	}
 
+	// check to see if we have a proxy_host set
+	var proxy func(*http.Request) (*url.URL, error)
+	if config.ProxyHost != nil {
+		proxy = http.ProxyURL(config.ProxyHost)
+	} else if envCfg := httpproxy.FromEnvironment(); envCfg.HTTPProxy != "" || envCfg.HTTPSProxy != "" {
+		proxy = http.ProxyFromEnvironment
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      kibanaURL,
@@ -139,6 +148,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			Password: password,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
+					Proxy:           proxy,
 					Dial:            dialer.Dial,
 					DialTLS:         tlsDialer.Dial,
 					TLSClientConfig: tlsConfig.ToConfig(),
@@ -158,6 +168,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 	return client, nil
 }
 
+// Request sends a request to the kibana connection
 func (conn *Connection) Request(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (int, []byte, error) {
 
@@ -181,7 +192,7 @@ func (conn *Connection) Request(method, extraPath string,
 	return resp.StatusCode, result, retError
 }
 
-// Sends an application/json request to Kibana with appropriate kbn headers
+// Send an application/json request to Kibana with appropriate kbn headers
 func (conn *Connection) Send(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 

@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -33,19 +34,21 @@ type ClientConfig struct {
 	Password      string            `config:"password" yaml:"password,omitempty"`
 	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl"`
 	Timeout       time.Duration     `config:"timeout" yaml:"timeout"`
+	ProxyHost     *url.URL          `config:"proxy_url" yaml:"proxy_host,omitempty"`
 	IgnoreVersion bool
 }
 
 // DefaultClientConfig connects to a locally running kibana over HTTP
 func DefaultClientConfig() ClientConfig {
 	return ClientConfig{
-		Protocol: "http",
-		Host:     "localhost:5601",
-		Path:     "",
-		SpaceID:  "",
-		Username: "",
-		Password: "",
-		Timeout:  90 * time.Second,
-		TLS:      nil,
+		Protocol:  "http",
+		Host:      "localhost:5601",
+		Path:      "",
+		SpaceID:   "",
+		Username:  "",
+		Password:  "",
+		Timeout:   90 * time.Second,
+		TLS:       nil,
+		ProxyHost: nil,
 	}
 }

@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -279,7 +278,7 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 	defer out.Close()
 
 	// Get the data
-	resp, err := http.Get(url)
+	resp, err := imp.loader.client.HTTP.Get(url)
 	if err != nil {
 		return targetPath, err
 	}

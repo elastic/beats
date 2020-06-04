@@ -766,7 +766,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 	if b.Config.Dashboards.Enabled() {
 
-		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
+		// Initialize kibana config. If username, password and proxy_url is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
@@ -1054,12 +1054,16 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 	if esConfig.Enabled() {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)
+		proxy, _ := esConfig.String("proxy_url", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
 			kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
 			kibanaConfig.SetString("password", -1, password)
+		}
+		if !kibanaConfig.HasField("proxy_url") && proxy != "" {
+			kibanaConfig.SetString("proxy_url", -1, proxy)
 		}
 	}
 	return kibanaConfig, nil

@@ -39,6 +39,12 @@ setup.kibana:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
+  # Proxy Host
+  # Specify a proxy host that will route kibana setup tasks.
+  # This can be either an HTTP or HTTPS URL. If no value is set, 
+  # the HTTPS_PROXY and HTTP_PROXY environment variables will be checked.
+  #proxy_url: "https://proxy:3128"
+
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
   # the Default Space will be used.
