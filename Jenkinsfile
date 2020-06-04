@@ -84,7 +84,7 @@ pipeline {
             makeTarget("Lint", "check")
           }
         }
-        stages {
+        stage('Parallel') {
           parallel {
             stage('Linux'){
               agent { label 'ubuntu && immutable' }
