@@ -74,7 +74,7 @@ pipeline {
       when {
         beforeAgent true
         expression {
-          return env.ONLY_DOCS == "false" && env["${TRIGGER}"] != "false"
+          return env.ONLY_DOCS == "false" && env."${TRIGGER}" != "false"
         }
       }
       stages {
