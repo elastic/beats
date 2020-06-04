@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -105,6 +107,22 @@ func NewOperator(
 	os.MkdirAll(operatorConfig.DownloadConfig.InstallPath, 0755)
 
 	return operator, nil
+}
+
+// State describes the current state of the system.
+// Reports all known applications and theirs states. Whether they are running
+// or not, and if they are information about process is also present.
+func (o *Operator) State() map[string]state.State {
+	result := make(map[string]state.State)
+
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	for k, v := range o.apps {
+		result[k] = v.State()
+	}
+
+	return result
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.

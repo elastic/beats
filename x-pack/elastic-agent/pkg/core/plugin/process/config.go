@@ -8,7 +8,7 @@ import "time"
 
 // Config for fine tuning new process
 type Config struct {
-	SpawnTimeout  time.Duration `yaml:"spawn_timeout" config:"spawn_timeout"`
+	SpawnTimeout time.Duration `yaml:"spawn_timeout" config:"spawn_timeout"`
 	StopTimeout  time.Duration `yaml:"stop_timeout" config:"stop_timeout"`
 
 	// TODO: cgroups and namespaces
@@ -17,7 +17,7 @@ type Config struct {
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
 	return &Config{
-		SpawnTimeout:  30 * time.Second,
+		SpawnTimeout: 30 * time.Second,
 		StopTimeout:  30 * time.Second,
 	}
 }

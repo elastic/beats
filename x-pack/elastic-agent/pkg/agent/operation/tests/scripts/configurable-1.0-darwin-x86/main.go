@@ -6,58 +6,83 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/server"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
 func main() {
 	f, _ := os.OpenFile(filepath.Join(os.TempDir(), "testing.out"), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	f.WriteString("starting \n")
-	s := &configServer{}
-	if err := server.NewGrpcServer(os.Stdin, s); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	s := &configServer{
+		f:      f,
+		ctx:    ctx,
+		cancel: cancel,
+	}
+	client, err := client.NewFromReader(os.Stdin, s)
+	if err != nil {
 		f.WriteString(err.Error())
 		panic(err)
 	}
+	s.client = client
+	err = client.Start(ctx)
+	if err != nil {
+		f.WriteString(err.Error())
+		panic(err)
+	}
+	<-ctx.Done()
 	f.WriteString("finished \n")
 }
 
 type configServer struct {
+	f      *os.File
+	ctx    context.Context
+	cancel context.CancelFunc
+	client *client.Client
 }
 
-// TestConfig is a configuration for testing Config calls
-type TestConfig struct {
-	TestFile string `config:"TestFile" yaml:"TestFile"`
-}
-
-func (*configServer) Config(ctx context.Context, req *grpc.ConfigRequest) (*grpc.ConfigResponse, error) {
-	cfgString := req.GetConfig()
+func (s *configServer) OnConfig(cfgString string) {
+	s.client.Status(proto.StateObserved_CONFIGURING, "Writing config file")
 
 	testCfg := &TestConfig{}
 	if err := yaml.Unmarshal([]byte(cfgString), &testCfg); err != nil {
-		return &grpc.ConfigResponse{}, err
+		s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to unmarshall config: %s", err))
+		return
 	}
 
 	if testCfg.TestFile != "" {
 		tf, err := os.Create(testCfg.TestFile)
 		if err != nil {
-			return &grpc.ConfigResponse{}, err
+			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to create file %s: %s", testCfg.TestFile, err))
+			return
 		}
 
 		err = tf.Close()
 		if err != nil {
-			return &grpc.ConfigResponse{}, err
+			s.client.Status(proto.StateObserved_FAILED, fmt.Sprintf("Failed to close file %s: %s", testCfg.TestFile, err))
+			return
 		}
 	}
 
-	return &grpc.ConfigResponse{}, nil
+	s.client.Status(proto.StateObserved_HEALTHY, "Wrote configuration")
 }
 
-// Status return ok.
-func (*configServer) Status(ctx context.Context, req *grpc.StatusRequest) (*grpc.StatusResponse, error) {
-	return &grpc.StatusResponse{Status: "ok"}, nil
+func (s *configServer) OnStop() {
+	s.client.Status(proto.StateObserved_STOPPING, "Stopping")
+	s.cancel()
+}
+
+func (s *configServer) OnError(err error) {
+	s.f.WriteString(err.Error())
+}
+
+// TestConfig is a configuration for testing Config calls
+type TestConfig struct {
+	TestFile string `config:"TestFile" yaml:"TestFile"`
 }

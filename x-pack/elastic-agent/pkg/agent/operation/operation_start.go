@@ -39,7 +39,7 @@ func newOperationStart(
 	return &operationStart{
 		logger:         logger,
 		program:        program,
-		srv: 			srv,
+		srv:            srv,
 		operatorConfig: operatorConfig,
 		cfg:            cfg,
 		eventProcessor: eventProcessor,

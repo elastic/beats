@@ -7,10 +7,11 @@ package application
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"

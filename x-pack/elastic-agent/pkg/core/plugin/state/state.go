@@ -27,7 +27,7 @@ const (
 	Failed
 	// Stopping is status describing application is stopping.
 	Stopping
-	// Crashing is status describing application is crashed.
+	// Crashed is status describing application is crashed.
 	Crashed
 	// Restarting is status describing application is restarting.
 	Restarting
@@ -41,7 +41,7 @@ type State struct {
 }
 
 // UpdateFromProto updates the status from the status from the GRPC protocol.
-func (s* State) UpdateFromProto(status proto.StateObserved_Status) {
+func (s *State) UpdateFromProto(status proto.StateObserved_Status) {
 	switch status {
 	case proto.StateObserved_STARTING:
 		s.Status = Starting

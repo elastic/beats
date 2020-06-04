@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -53,8 +55,12 @@ func getTestOperator(t *testing.T, installPath string) (*Operator, *operatorCfg.
 	if err != nil {
 		t.Fatal(err)
 	}
+	srv, err := server.New(l, ":0", &app.ApplicationStatusHandler{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, noop.NewMonitor())
 	if err != nil {
 		t.Fatal(err)
 	}

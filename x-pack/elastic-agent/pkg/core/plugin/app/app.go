@@ -7,13 +7,14 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
@@ -45,8 +46,8 @@ type Application struct {
 	pipelineID      string
 	logLevel        string
 	spec            Specifier
-	srv 			*server.Server
-	srvState 		*server.ApplicationState
+	srv             *server.Server
+	srvState        *server.ApplicationState
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
 	startContext    context.Context
@@ -96,7 +97,7 @@ func NewApplication(
 		pipelineID:      pipelineID,
 		logLevel:        logLevel,
 		spec:            spec,
-		srv: srv,
+		srv:             srv,
 		processConfig:   cfg.ProcessConfig,
 		downloadConfig:  cfg.DownloadConfig,
 		retryConfig:     cfg.RetryConfig,

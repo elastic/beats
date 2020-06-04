@@ -8,15 +8,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/sanathkr/go-yaml"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
+// ApplicationStatusHandler expects that only Application is registered in the server and updates the
+// current state of the application from the OnStatusChange callback from inside the server.
+//
+// In the case that an application is reported as failed by the server it will then restart the application, unless
+// it expects that the application should be stopping.
 type ApplicationStatusHandler struct{}
 
+// OnStatusChange is the handler called by the GRPC server code.
+//
+// It updates the status of the application and handles restarting the application is needed.
 func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, status proto.StateObserved_Status, msg string) {
 	app, ok := state.App().(*Application)
 	if !ok {
@@ -60,4 +69,3 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 		}
 	}
 }
-

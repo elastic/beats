@@ -43,8 +43,8 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, arg
 	}
 
 	return &Info{
-		PID: cmd.Process.Pid,
+		PID:     cmd.Process.Pid,
 		Process: cmd.Process,
-		Stdin: stdin,
+		Stdin:   stdin,
 	}, err
 }

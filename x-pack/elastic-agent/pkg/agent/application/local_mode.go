@@ -6,6 +6,7 @@ package application
 
 import (
 	"context"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"

@@ -7,13 +7,15 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
