@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -79,7 +80,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 		log.Infof("kubernetes: Using node %s provided in the config", host)
 		return host
 	}
-
+	ctx := context.TODO()
 	if inCluster {
 		ns, err := inClusterNamespace()
 		if err != nil {
@@ -92,7 +93,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 			return defaultNode
 		}
 		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod, err := client.CoreV1().Pods(ns).Get(podName, metav1.GetOptions{})
+		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
 		if err != nil {
 			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
 			return defaultNode
@@ -107,7 +108,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 		return defaultNode
 	}
 
-	nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
 		return defaultNode
