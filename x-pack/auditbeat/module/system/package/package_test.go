@@ -7,9 +7,15 @@
 package pkg
 
 import (
+	"bytes"
+	"encoding/gob"
+	"errors"
+	"flag"
+	"io/ioutil"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,6 +24,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
+
+var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")
 
 func TestData(t *testing.T) {
 	if runtime.GOOS == "darwin" {
@@ -158,5 +166,70 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":   "system",
 		"datasets": []string{"package"},
+	}
+}
+
+func TestPackageGobEncodeDecode(t *testing.T) {
+	pkg := Package{
+		Name:        "foo",
+		Version:     "1.2.3",
+		Release:     "1",
+		Arch:        "amd64",
+		License:     "bar",
+		InstallTime: time.Unix(1591021924, 0).UTC(),
+		Size:        1234,
+		Summary:     "Foo stuff",
+		URL:         "http://foo.example.com",
+		Type:        "rpm",
+	}
+
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(pkg); err != nil {
+		t.Fatal(err)
+	}
+
+	const gobTestFile = "testdata/package.v1.gob"
+	if *flagUpdateGob {
+		// NOTE: If you are updating this file then you may have introduced a
+		// a breaking change.
+		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	t.Run("decode", func(t *testing.T) {
+		var pkgDecoded Package
+		if err := gob.NewDecoder(buf).Decode(&pkgDecoded); err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, pkg, pkgDecoded)
+	})
+
+	// Validate that we get the same result when decoding an earlier saved version.
+	// This detects breakages to the struct or to the encoding/decoding pkgs.
+	t.Run("decode_from_file", func(t *testing.T) {
+		contents, err := ioutil.ReadFile(gobTestFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var pkgDecoded Package
+		if err := gob.NewDecoder(bytes.NewReader(contents)).Decode(&pkgDecoded); err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, pkg, pkgDecoded)
+	})
+}
+
+// Regression test for https://github.com/elastic/beats/issues/18536 to verify
+// that error isn't made public.
+func TestPackageWithErrorGobEncode(t *testing.T) {
+	pkg := Package{
+		error: errors.New("test"),
+	}
+
+	buf := new(bytes.Buffer)
+	if err := gob.NewEncoder(buf).Encode(pkg); err != nil {
+		t.Fatal(err)
 	}
 }
