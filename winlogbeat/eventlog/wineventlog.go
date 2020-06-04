@@ -136,6 +136,7 @@ type winEventLog struct {
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
 	logPrefix string // String to prefix on log messages.
+	evt       windows.Handle
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -144,48 +145,36 @@ func (l *winEventLog) Name() string {
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
-	var bookmark win.EvtHandle
-	var err error
-	if len(state.Bookmark) > 0 {
-		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
-	} else if state.RecordNumber > 0 {
-		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
-	}
-	if err != nil {
-		return err
-	}
-	defer win.Close(bookmark)
-
 	if l.file {
-		return l.openFile(state, bookmark)
+		return l.openFile(state)
 	}
-	return l.openChannel(bookmark)
+	return l.OpenChannel()
 }
 
-func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
+func (l *winEventLog) openChannel() error {
+	var err error
+
+	flags := win.EvtSubscribeToFutureEvents
+	if l.config.SimpleQuery.IgnoreOlder > 0 {
+		flags = win.EvtSubscribeStartAtOldestRecord
+	}
+
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+	l.evt, err = windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
 		return nil
-	}
-	defer windows.CloseHandle(signalEvent)
-
-	var flags win.EvtSubscribeFlag
-	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
-	} else {
-		flags = win.EvtSubscribeStartAtOldestRecord
 	}
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
-		0, // Session - nil for localhost
-		signalEvent,
-		"",       // Channel - empty b/c channel is in the query
-		l.query,  // Query - nil means all events
-		bookmark, // Bookmark - for resuming from a specific event
-		flags)
+		0,       // Session - nil for localhost
+		l.evt,   //signalEvent
+		"",      // Channel - empty b/c channel is in the query
+		l.query, // Query - nil means all events
+		0,       // Bookmark - for resuming from a specific event
+		flags,   // Bookmark - for resuming from a specific event
+	)
 	if err != nil {
 		return err
 	}
@@ -197,37 +186,10 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryChannelPath|win.EvtQueryReverseDirection)
 	if err != nil {
 		return errors.Wrapf(err, "failed to get handle to event log file %v", path)
 	}
-
-	if bookmark > 0 {
-		debugf("%s Seeking to bookmark. timestamp=%v bookmark=%v",
-			l.logPrefix, state.Timestamp, state.Bookmark)
-
-		// This seeks to the last read event and strictly validates that the
-		// bookmarked record number exists.
-		if err = win.EvtSeek(h, 0, bookmark, win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
-			// Then we advance past the last read event to avoid sending that
-			// event again. This won't fail if we're at the end of the file.
-			err = errors.Wrap(
-				win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark),
-				"failed to seek past bookmarked position")
-		} else {
-			logp.Warn("%s Failed to seek to bookmarked location in %v (error: %v). "+
-				"Recovering by reading the log from the beginning. (Did the file "+
-				"change since it was last read?)", l.logPrefix, path, err)
-			err = errors.Wrap(
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst),
-				"failed to seek to beginning of log")
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-
 	l.subscription = h
 	return nil
 }
@@ -280,6 +242,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
+	windows.SetEvent(l.evt)
 	return win.Close(l.subscription)
 }
 
@@ -297,7 +260,9 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		if l.config.NoMoreEvents == Stop {
 			return nil, maxRead, io.EOF
 		}
-		return nil, maxRead, nil
+		detailf("%s Waiting...", l.logPrefix)
+		_, err := windows.WaitForSingleObject(l.evt, windows.INFINITE)
+		return nil, 0, err
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
@@ -315,12 +280,9 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 }
 
 func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
-	includeXML := l.config.IncludeXML
 	e, err := sys.UnmarshalEventXML(x)
 	if err != nil {
-		e.RenderErr = append(e.RenderErr, err.Error())
-		// Add raw XML to event.original when decoding fails
-		includeXML = true
+		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
 	}
 
 	err = sys.PopulateAccount(&e.User)
@@ -355,7 +317,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		r.File = l.channelName
 	}
 
-	if includeXML {
+	if l.config.IncludeXML {
 		r.XML = string(x)
 	}
 
@@ -369,7 +331,11 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
 		return nil, err
 	}
-
+	// cover case when we have Provider as empty string in config
+	// so we want to query to all events with Level and EventID
+	if len(c.SimpleQuery.Provider) != 0 && c.SimpleQuery.Provider[0] == "" {
+		c.SimpleQuery.Provider = nil
+	}
 	query, err := win.Query{
 		Log:         c.Name,
 		IgnoreOlder: c.SimpleQuery.IgnoreOlder,

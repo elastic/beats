@@ -21,6 +21,7 @@ package eventlogging
 
 import (
 	"syscall"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -96,6 +97,8 @@ func _ReadEventLog(eventLog Handle, readFlags EventLogReadFlag, recordOffset uin
 	r1, _, e1 := syscall.Syscall9(procReadEventLogW.Addr(), 7, uintptr(eventLog), uintptr(readFlags), uintptr(recordOffset), uintptr(unsafe.Pointer(buffer)), uintptr(numberOfBytesToRead), uintptr(unsafe.Pointer(bytesRead)), uintptr(unsafe.Pointer(minNumberOfBytesNeeded)), 0, 0)
 	if r1 == 0 {
 		if e1 != 0 {
+			// if an error is apeared, wait one second
+			time.Sleep(time.Second)
 			err = errnoErr(e1)
 		} else {
 			err = syscall.EINVAL
