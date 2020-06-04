@@ -36,11 +36,6 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		}
 	}()
 
-	spec := a.spec.Spec()
-	if spec.Configurable != ConfigurableGrpc {
-		return nil
-	}
-
 	if a.state.Status == state.Stopped {
 		return errors.New(ErrAppNotRunning)
 	}

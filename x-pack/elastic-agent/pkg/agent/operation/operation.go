@@ -45,6 +45,5 @@ type Descriptor interface {
 	Version() string
 	ID() string
 	Directory() string
-	IsGrpcConfigurable() bool
 	Tags() map[app.Tag]string
 }

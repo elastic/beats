@@ -14,8 +14,6 @@ import (
 	"time"
 	"unicode"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
@@ -63,17 +61,12 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		return err
 	}
 
-	spec := a.spec.Spec()
-	if err := a.configureByFile(&spec, cfg); err != nil {
-		return errors.New(err, errors.TypeApplication)
-	}
-
 	// TODO: provider -> client
-	ca, err := generateCA(spec.Configurable)
+	ca, err := generateCA()
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
 	}
-	processCreds, err := generateConfigurable(spec.Configurable, ca)
+	processCreds, err := generateConfigurable(ca)
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
 	}
@@ -82,6 +75,7 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		a.limiter.Add()
 	}
 
+	spec := a.spec.Spec()
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 
 	// use separate file
@@ -107,7 +101,7 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 
 	a.waitForGrpc(spec, ca)
 
-	a.grpcClient, err = generateClient(spec.Configurable, a.state.ProcessInfo.Address, a.clientFactory, ca)
+	a.grpcClient, err = generateClient(a.state.ProcessInfo.Address, a.clientFactory, ca)
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
 	}
@@ -147,11 +141,6 @@ func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAut
 		retries       int           = 5
 		retryTimeout  time.Duration = 2 * time.Second
 	)
-
-	// no need to wait, program is configured by file
-	if spec.Configurable != ConfigurableGrpc {
-		return nil
-	}
 
 	checkFn := func(ctx context.Context, address string) error {
 		return a.checkGrpcHTTP(ctx, address, ca)
@@ -209,7 +198,7 @@ func (a *Application) checkGrpcPipe(ctx context.Context, address string) error {
 }
 
 func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *authority.CertificateAuthority) error {
-	grpcClient, err := generateClient(ConfigurableGrpc, a.state.ProcessInfo.Address, a.clientFactory, ca)
+	grpcClient, err := generateClient(a.state.ProcessInfo.Address, a.clientFactory, ca)
 	if err != nil {
 		return errors.New(err, errors.TypeSecurity)
 	}
@@ -241,11 +230,7 @@ func injectDataPath(args []string, pipelineID, id string) []string {
 	return append(args, "-E", "path.data="+dataPath)
 }
 
-func generateCA(configurable string) (*authority.CertificateAuthority, error) {
-	if !isGrpcConfigurable(configurable) {
-		return nil, nil
-	}
-
+func generateCA() (*authority.CertificateAuthority, error) {
 	ca, err := authority.NewCA()
 	if err != nil {
 		return nil, errors.New(err, "app.Start", errors.TypeSecurity)
@@ -254,87 +239,36 @@ func generateCA(configurable string) (*authority.CertificateAuthority, error) {
 	return ca, nil
 }
 
-func generateConfigurable(configurable string, ca *authority.CertificateAuthority) (*process.Creds, error) {
-	var processCreds *process.Creds
-	var err error
-
-	if isGrpcConfigurable(configurable) {
-		processCreds, err = getProcessCredentials(configurable, ca)
-		if err != nil {
-			return nil, errors.New(err, errors.TypeSecurity)
-		}
+func generateConfigurable(ca *authority.CertificateAuthority) (*process.Creds, error) {
+	processCreds, err := getProcessCredentials(ca)
+	if err != nil {
+		return nil, errors.New(err, errors.TypeSecurity)
 	}
 
 	return processCreds, nil
 }
 
-func generateClient(configurable, address string, factory remoteconfig.ConnectionCreator, ca *authority.CertificateAuthority) (remoteconfig.Client, error) {
-	var grpcClient remoteconfig.Client
+func generateClient(address string, factory remoteconfig.ConnectionCreator, ca *authority.CertificateAuthority) (remoteconfig.Client, error) {
+	connectionProvider, err := getConnectionProvider(ca, address)
+	if err != nil {
+		return nil, errors.New(err, errors.TypeNetwork)
+	}
 
-	if isGrpcConfigurable(configurable) {
-		connectionProvider, err := getConnectionProvider(configurable, ca, address)
-		if err != nil {
-			return nil, errors.New(err, errors.TypeNetwork)
-		}
-
-		grpcClient, err = factory.NewConnection(connectionProvider)
-		if err != nil {
-			return nil, errors.New(err, "creating connection", errors.TypeNetwork)
-		}
+	grpcClient, err := factory.NewConnection(connectionProvider)
+	if err != nil {
+		return nil, errors.New(err, "creating connection", errors.TypeNetwork)
 	}
 
 	return grpcClient, nil
 }
 
-func getConnectionProvider(configurable string, ca *authority.CertificateAuthority, address string) (*grpc.ConnectionProvider, error) {
-	if !isGrpcConfigurable(configurable) {
-		return nil, nil
-	}
-
+func getConnectionProvider(ca *authority.CertificateAuthority, address string) (*grpc.ConnectionProvider, error) {
 	clientPair, err := ca.GeneratePair()
 	if err != nil {
 		return nil, errors.New(err, errors.TypeNetwork)
 	}
 
 	return grpc.NewConnectionProvider(address, ca.Crt(), clientPair.Key, clientPair.Crt), nil
-}
-
-func isGrpcConfigurable(configurable string) bool {
-	return configurable == ConfigurableGrpc
-}
-
-func (a *Application) configureByFile(spec *ProcessSpec, config map[string]interface{}) error {
-	// check if configured by file
-	if spec.Configurable != ConfigurableFile {
-		return nil
-	}
-
-	// save yaml as filebeat_id.yml
-	filename := fmt.Sprintf(configFileTempl, a.id)
-	filePath, err := filepath.Abs(filepath.Join(a.downloadConfig.InstallPath, filename))
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-
-	f, err := os.OpenFile(filePath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, configFilePermissions)
-	if err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-	defer f.Close()
-
-	// change owner
-	if err := changeOwner(filePath, a.uid, a.gid); err != nil {
-		return err
-	}
-
-	encoder := yaml.NewEncoder(f)
-	if err := encoder.Encode(config); err != nil {
-		return errors.New(err, errors.TypeFilesystem)
-	}
-	defer encoder.Close()
-
-	// update args
-	return updateSpecConfig(spec, filePath)
 }
 
 func updateSpecConfig(spec *ProcessSpec, configPath string) error {
@@ -361,24 +295,18 @@ func updateSpecConfig(spec *ProcessSpec, configPath string) error {
 	return nil
 }
 
-func getProcessCredentials(configurable string, ca *authority.CertificateAuthority) (*process.Creds, error) {
-	var processCreds *process.Creds
-
-	if isGrpcConfigurable(configurable) {
-		// processPK and Cert serves as a server credentials
-		processPair, err := ca.GeneratePair()
-		if err != nil {
-			return nil, errors.New(err, "failed to generate credentials")
-		}
-
-		processCreds = &process.Creds{
-			CaCert: ca.Crt(),
-			PK:     processPair.Key,
-			Cert:   processPair.Crt,
-		}
+func getProcessCredentials(ca *authority.CertificateAuthority) (*process.Creds, error) {
+	// processPK and Cert serves as a server credentials
+	processPair, err := ca.GeneratePair()
+	if err != nil {
+		return nil, errors.New(err, "failed to generate credentials")
 	}
 
-	return processCreds, nil
+	return &process.Creds{
+		CaCert: ca.Crt(),
+		PK:     processPair.Key,
+		Cert:   processPair.Crt,
+	}, nil
 }
 
 func isWindowsPath(path string) bool {
