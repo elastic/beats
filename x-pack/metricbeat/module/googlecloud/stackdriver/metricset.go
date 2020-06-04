@@ -92,7 +92,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.stackDriverConfig = stackDriverConfigs.StackDriverMetrics
-	fmt.Println("m.stackDriverConfig = ", m.stackDriverConfig)
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
