@@ -49,8 +49,9 @@ type Connection struct {
 	Encoder BodyEncoder
 	HTTP    esHTTPClient
 
-	version common.Version
-	log     *logp.Logger
+	encodedAPIKey string // Base64-encoded API key
+	version       common.Version
+	log           *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -76,8 +77,6 @@ type ConnectionSettings struct {
 
 	Timeout         time.Duration
 	IdleConnTimeout time.Duration
-
-	encodedAPIKey string // Base64-encoded API key
 }
 
 // NewConnection returns a new Elasticsearch client
@@ -160,16 +159,18 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logp.Info("kerberos client created")
 	}
 
-	if s.APIKey != "" {
-		s.encodedAPIKey = base64.StdEncoding.EncodeToString([]byte(s.APIKey))
-	}
-
-	return &Connection{
+	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               httpClient,
 		Encoder:            encoder,
 		log:                logp.NewLogger("esclientleg"),
-	}, nil
+	}
+
+	if s.APIKey != "" {
+		conn.encodedAPIKey = base64.StdEncoding.EncodeToString([]byte(s.APIKey))
+	}
+
+	return &conn, nil
 }
 
 func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
