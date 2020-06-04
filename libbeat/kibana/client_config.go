@@ -34,6 +34,7 @@ type ClientConfig struct {
 	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl"`
 	Timeout       time.Duration     `config:"timeout" yaml:"timeout"`
 	ProxyHost     string            `config:"proxy_url" yaml:"proxy_host,omitempty"`
+	ProxyDisable  bool              `config:"proxy_disable" yaml:"proxy_disable"`
 	IgnoreVersion bool
 }
 

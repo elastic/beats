@@ -1055,6 +1055,7 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)
 		proxy, _ := esConfig.String("proxy_url", -1)
+		ignore, ierr := esConfig.Bool("proxy_disable", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
 			kibanaConfig.SetString("username", -1, username)
@@ -1064,6 +1065,9 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 		}
 		if !kibanaConfig.HasField("proxy_url") && proxy != "" {
 			kibanaConfig.SetString("proxy_url", -1, proxy)
+		}
+		if !kibanaConfig.HasField("proxy_disable") && ierr == nil {
+			kibanaConfig.SetBool("proxy_disable", -1, ignore)
 		}
 	}
 	return kibanaConfig, nil
