@@ -143,7 +143,7 @@ events to your defined output.
 
 {beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing the
 status of your services. The dashboards are available in the
-https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
+https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
 
 If you loaded the dashboards earlier, open them now.
 
@@ -156,4 +156,3 @@ Now that you have your uptime data streaming into {es}, learn how to unify your
 logs, metrics, uptime, and application performance data.
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[]
-
