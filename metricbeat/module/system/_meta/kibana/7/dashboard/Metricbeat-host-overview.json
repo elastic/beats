@@ -480,7 +480,7 @@
                             "query": "-system.network.name:l*"
                         },
                         "id": "da1046f0-faa0-11e6-86b1-cd7735ff7e23",
-                        "index_pattern": "*",
+                        "index_pattern": "metricbeat-*",
                         "interval": "auto",
                         "series": [
                             {
@@ -719,7 +719,7 @@
                             "query": "-system.network.name:l*"
                         },
                         "id": "da1046f0-faa0-11e6-86b1-cd7735ff7e23",
-                        "index_pattern": "*",
+                        "index_pattern": "metricbeat-*",
                         "interval": "auto",
                         "series": [
                             {

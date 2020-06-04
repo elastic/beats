@@ -90,7 +90,8 @@
         "source.packets": 1,
         "source.port": 57379,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -188,7 +189,8 @@
         "source.packets": 1,
         "source.port": 51389,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -284,7 +286,8 @@
         "source.packets": 1,
         "source.port": 53033,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -382,7 +385,8 @@
         "source.packets": 1,
         "source.port": 55371,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -479,7 +483,8 @@
         "source.packets": 1,
         "source.port": 60441,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -575,7 +580,8 @@
         "source.packets": 1,
         "source.port": 59714,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -674,7 +680,8 @@
         "source.packets": 1,
         "source.port": 55105,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -770,7 +777,8 @@
         "source.packets": 1,
         "source.port": 57141,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -867,7 +875,8 @@
         "source.packets": 1,
         "source.port": 47260,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -965,7 +974,8 @@
         "source.packets": 1,
         "source.port": 58082,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1064,7 +1074,8 @@
         "source.packets": 1,
         "source.port": 33973,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1156,7 +1167,8 @@
         "source.packets": 6,
         "source.port": 39541,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1253,7 +1265,8 @@
         "source.packets": 1,
         "source.port": 41672,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1349,7 +1362,8 @@
         "source.packets": 1,
         "source.port": 59577,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1446,7 +1460,8 @@
         "source.packets": 1,
         "source.port": 35998,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1544,7 +1559,8 @@
         "source.packets": 1,
         "source.port": 55105,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1640,7 +1656,8 @@
         "source.packets": 1,
         "source.port": 47260,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1736,7 +1753,8 @@
         "source.packets": 1,
         "source.port": 53033,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1832,7 +1850,8 @@
         "source.packets": 1,
         "source.port": 57141,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -1926,7 +1945,8 @@
         "source.packets": 1,
         "source.port": 46093,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -2024,7 +2044,8 @@
         "source.packets": 1,
         "source.port": 58082,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"

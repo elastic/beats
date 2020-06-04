@@ -30,24 +30,32 @@ processors:
     field: fortinet.firewall.remip
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.destination?.ip == null"
-- rename:
+    if: "ctx.destination?.ip == null"  
+- convert:
     field: fortinet.firewall.dst_port
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.remport
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.destination?.port == null"
-- rename:
+- convert:
     field: fortinet.firewall.dstport
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.destination?.port == null"
-- rename:
+- convert:
     field: fortinet.firewall.rcvdbyte
     target_field: destination.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.recipient
@@ -61,18 +69,31 @@ processors:
     field: fortinet.firewall.locip
     target_field: source.ip
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.locport
     target_field: source.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.src_port
     target_field: source.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.source?.port == null"
-- rename:
+- convert:
+    field: fortinet.firewall.srcport
+    target_field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.source?.port == null"
+- convert:
     field: fortinet.firewall.sentbyte
     target_field: source.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.srcdomain
@@ -87,11 +108,6 @@ processors:
     field: fortinet.firewall.srcmac
     target_field: source.mac
     ignore_missing: true
-- rename:
-    field: fortinet.firewall.srcport
-    target_field: source.port
-    ignore_missing: true
-    if: "ctx.source?.port == null"
 - rename:
     field: fortinet.firewall.unauthuser
     target_field: source.user.name
@@ -171,9 +187,11 @@ processors:
     field: fortinet.firewall.filename
     target_field: file.name
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.filesize
     target_field: file.size
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.filetype
@@ -390,6 +408,18 @@ processors:
     field: related.hash
     value: "{{fortinet.file.hash.crc32}}"
     if: "ctx.fortinet?.file?.hash?.crc32 != null"
+- remove:
+    field:
+    - fortinet.firewall.dst_port
+    - fortinet.firewall.remport
+    - fortinet.firewall.dstport
+    - fortinet.firewall.rcvdbyte
+    - fortinet.firewall.locport
+    - fortinet.firewall.src_port
+    - fortinet.firewall.srcport
+    - fortinet.firewall.sentbyte
+    - fortinet.firewall.filesize
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

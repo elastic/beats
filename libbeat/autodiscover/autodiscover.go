@@ -191,7 +191,6 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 	}
 
 	if a.logger.IsDebug() {
-
 		for _, c := range configs {
 			a.logger.Debugf("Generated config: %+v", common.DebugString(c, true))
 		}
