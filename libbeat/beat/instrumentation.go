@@ -41,7 +41,7 @@ func init() {
 // Instrumentation holds an APM tracer a net.Listener
 type Instrumentation struct {
 	tracer *apm.Tracer
-	// the Listener is only relevant for APM Server sending tracing data to itself
+	// Listener is only relevant for APM Server sending tracing data to itself
 	// APM Server needs this Listener to create an ad-hoc tracing server
 	Listener net.Listener
 }
