@@ -10,7 +10,7 @@ filebeat:
       var: value
     processors:
       - add_fields:
-          target: "stream"
+          target: "dataset"
           fields:
             type: logs
             dataset: generic

@@ -6,7 +6,7 @@ metricbeat:
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:
-        target: "stream"
+        target: "dataset"
         fields:
           type: metrics
           dataset: docker.status
@@ -17,7 +17,7 @@ metricbeat:
     hosts: ["http://127.0.0.1:8080"]
     processors:
     - add_fields:
-        target: "stream"
+        target: "dataset"
         fields:
           type: metrics
           dataset: generic
@@ -31,7 +31,7 @@ metricbeat:
           fields:
             should_be: first
       - add_fields:
-          target: "stream"
+          target: "dataset"
           fields:
             type: metrics
             dataset: generic

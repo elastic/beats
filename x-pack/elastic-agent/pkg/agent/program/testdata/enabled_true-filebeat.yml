@@ -9,7 +9,7 @@ filebeat:
     index: logs-generic-default
     processors:
       - add_fields:
-          target: "stream"
+          target: "dataset"
           fields:
             type: logs
             dataset: generic
