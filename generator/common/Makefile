@@ -16,7 +16,7 @@ test: prepare-test
 	git config user.name "beats-jenkins" || exit 1 ; \
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
-	$(MAKE) unit
+	mage test
 
 .PHONY: test-package
 test-package: test

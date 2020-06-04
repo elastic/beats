@@ -3,6 +3,7 @@
 # This file is an example configuration file highlighting only the most common
 # options. The elastic-agent.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
+
 ######################################
 # Fleet configuration
 ######################################
@@ -128,3 +129,4 @@ datasources:
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
 #logging.level: trace
+

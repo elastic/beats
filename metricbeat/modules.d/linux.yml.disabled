@@ -1,0 +1,12 @@
+# Module: linux
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-linux.html
+
+- module: linux
+  period: 10s
+  metricsets:
+    - "pageinfo"
+    # - ksm
+    # - conntrack
+  enabled: true
+  #hostfs: /hostfs
+

@@ -33,7 +33,8 @@
         "source.ip": "198.51.100.197",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -71,7 +72,8 @@
         "source.ip": "198.51.100.2",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -108,7 +110,8 @@
         "source.ip": "198.51.100.1",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -147,7 +150,8 @@
         "source.packets": 9,
         "source.port": 1027,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -186,7 +190,8 @@
         "source.packets": 1,
         "source.port": 55250,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -225,7 +230,8 @@
         "source.ip": "198.51.100.1",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -264,7 +270,8 @@
         "source.packets": 1,
         "source.port": 60677,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -309,7 +316,8 @@
         "source.packets": 1,
         "source.port": 59825,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -348,7 +356,8 @@
         "source.packets": 1,
         "source.port": 56723,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -387,7 +396,8 @@
         "source.packets": 1,
         "source.port": 54473,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -426,7 +436,8 @@
         "source.packets": 1,
         "source.port": 33568,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -465,7 +476,8 @@
         "source.packets": 1,
         "source.port": 35207,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -504,7 +516,8 @@
         "source.packets": 1,
         "source.port": 37063,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -543,7 +556,8 @@
         "source.packets": 1,
         "source.port": 54309,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -563,7 +577,8 @@
         "message": "access-list logging rate-limited or missed 18 packets",
         "service.type": "cisco",
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -602,7 +617,8 @@
         "source.packets": 1,
         "source.port": 43989,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -641,7 +657,8 @@
         "source.packets": 1,
         "source.port": 53432,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -680,7 +697,8 @@
         "source.packets": 1,
         "source.port": 58674,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -725,7 +743,8 @@
         "source.packets": 1,
         "source.port": 59830,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -764,7 +783,8 @@
         "source.packets": 1,
         "source.port": 52377,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -803,7 +823,8 @@
         "source.packets": 1,
         "source.port": 42695,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -842,7 +863,8 @@
         "source.packets": 1,
         "source.port": 58393,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -887,7 +909,8 @@
         "source.packets": 1,
         "source.port": 59832,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -926,7 +949,8 @@
         "source.packets": 1,
         "source.port": 60908,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -971,7 +995,8 @@
         "source.packets": 1,
         "source.port": 59415,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1016,7 +1041,8 @@
         "source.packets": 1,
         "source.port": 53,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1036,7 +1062,8 @@
         "message": "access-list logging rate-limited or missed 23 packets",
         "service.type": "cisco",
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1075,7 +1102,8 @@
         "source.ip": "198.51.100.12",
         "source.packets": 32,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1120,7 +1148,8 @@
         "source.packets": 1,
         "source.port": 59834,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1159,7 +1188,8 @@
         "source.packets": 1,
         "source.port": 54532,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1198,7 +1228,8 @@
         "source.packets": 1,
         "source.port": 57831,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1237,7 +1268,8 @@
         "source.packets": 1,
         "source.port": 138,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1276,7 +1308,8 @@
         "source.packets": 1,
         "source.port": 42988,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
@@ -1321,7 +1354,8 @@
         "source.packets": 1,
         "source.port": 59836,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     }
 ]

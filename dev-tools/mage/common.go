@@ -115,7 +115,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 		return args[0]
 	}
 
-	var out map[string]interface{}
+	out := map[string]interface{}{}
 	for _, m := range args {
 		for k, v := range m {
 			out[k] = v

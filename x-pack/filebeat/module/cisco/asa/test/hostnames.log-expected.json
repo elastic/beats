@@ -23,7 +23,8 @@
         "source.domain": "Prod-host.name.addr",
         "source.nat.ip": "10.0.55.66",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -52,7 +53,8 @@
         "source.address": "192.0.2.134",
         "source.ip": "192.0.2.134",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     }
 ]

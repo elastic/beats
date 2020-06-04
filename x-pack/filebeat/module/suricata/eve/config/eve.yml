@@ -403,3 +403,7 @@ processors:
         - suricata.eve.dns.version
         - suricata.eve.dns.flags
         - suricata.eve.dns.grouped
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.5.0

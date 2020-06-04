@@ -17,7 +17,7 @@ from .compose import ComposeMixin
 
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
-                        "agent.type", "agent.hostname", "agent.version"]
+                        "agent.type", "agent.name", "agent.version"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 

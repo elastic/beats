@@ -21,6 +21,8 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
+    JOB_GCS_BUCKET = 'beats-ci-temp'
+    JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
   }
   options {
     timeout(time: 2, unit: 'HOURS')
@@ -29,7 +31,8 @@ pipeline {
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
-    disableConcurrentBuilds()
+    quietPeriod(10)
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
@@ -53,9 +56,10 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
           loadConfigEnvVars()
         }
@@ -71,6 +75,10 @@ pipeline {
       }
     }
     stage('Build and Test'){
+      when {
+        beforeAgent true
+        expression { return env.ONLY_DOCS == "false" }
+      }
       failFast false
       parallel {
         stage('Elastic Agent x-pack'){
@@ -113,6 +121,11 @@ pipeline {
           steps {
             mageTarget("Elastic Agent x-pack Mac OS X", "x-pack/elastic-agent", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
         }
 
         stage('Filebeat oss'){
@@ -153,6 +166,29 @@ pipeline {
           steps {
             mageTarget("Filebeat oss Mac OS X", "filebeat", "build unitTest")
           }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
+        stage('Filebeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_XPACK_FILEBEAT != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Filebeat x-pack Mac OS X", "x-pack/filebeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
         }
         stage('Filebeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
@@ -165,6 +201,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Filebeat oss Windows Unit test", "filebeat", "build unitTest")
+          }
+        }
+        stage('Filebeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Filebeat x-pack Windows", "x-pack/filebeat", "build unitTest")
           }
         }
         stage('Heartbeat'){
@@ -194,6 +243,11 @@ pipeline {
               steps {
                 mageTarget("Heartbeat oss Mac OS X", "heartbeat", "build unitTest")
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Heartbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -210,7 +264,7 @@ pipeline {
             }
           }
         }
-        stage('Auditbeat oss'){
+        stage('Auditbeat oss Linux'){
           agent { label 'ubuntu && immutable' }
           options { skipDefaultCheckout() }
           when {
@@ -219,43 +273,52 @@ pipeline {
               return env.BUILD_AUDITBEAT != "false"
             }
           }
-          stages {
-            stage('Auditbeat Linux'){
-              steps {
-                makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
-              }
+          steps {
+            makeTarget("Auditbeat oss Linux", "-C auditbeat testsuite")
+          }
+        }
+        stage('Auditbeat crosscompile'){
+          agent { label 'ubuntu && immutable' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false"
             }
-            stage('Auditbeat crosscompile'){
-              steps {
-                makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
-              }
+          }
+          steps {
+            makeTarget("Auditbeat oss crosscompile", "-C auditbeat crosscompile")
+          }
+        }
+        stage('Auditbeat oss Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.macosTest
             }
-            stage('Auditbeat Mac OS X'){
-              agent { label 'macosx' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.macosTest
-                }
-              }
-              steps {
-                mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
-              }
+          }
+          steps {
+            mageTarget("Auditbeat oss Mac OS X", "auditbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
             }
-            stage('Auditbeat Windows'){
-              agent { label 'windows-immutable && windows-2019' }
-              options { skipDefaultCheckout() }
-              when {
-                beforeAgent true
-                expression {
-                  return params.windowsTest
-                }
-              }
-              steps {
-                mageTargetWin("Auditbeat Windows Unit test", "auditbeat", "build unitTest")
-              }
+          }
+        }
+        stage('Auditbeat oss Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
+          }
+          steps {
+            mageTargetWin("Auditbeat oss Windows Unit test", "auditbeat", "build unitTest")
           }
         }
         stage('Auditbeat x-pack'){
@@ -269,6 +332,32 @@ pipeline {
           }
           steps {
             mageTarget("Auditbeat x-pack Linux", "x-pack/auditbeat", "update build test")
+          }
+        }
+        stage('Auditbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Auditbeat x-pack Mac OS X", "x-pack/auditbeat", "build unitTest")
+          }
+        }
+        stage('Auditbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Auditbeat x-pack Windows", "x-pack/auditbeat", "build unitTest")
           }
         }
         stage('Libbeat'){
@@ -411,6 +500,24 @@ pipeline {
             mageTarget("Metricbeat OSS Mac OS X", "metricbeat", "build unitTest")
           }
         }
+        stage('Metricbeat x-pack Mac OS X'){
+          agent { label 'macosx' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.macosTest
+            }
+          }
+          steps {
+            mageTarget("Metricbeat x-pack Mac OS X", "x-pack/metricbeat", "build unitTest")
+          }
+          post {
+            always {
+              delete()
+            }
+          }
+        }
         stage('Metricbeat Windows'){
           agent { label 'windows-immutable && windows-2019' }
           options { skipDefaultCheckout() }
@@ -422,6 +529,19 @@ pipeline {
           }
           steps {
             mageTargetWin("Metricbeat Windows Unit test", "metricbeat", "build unitTest")
+          }
+        }
+        stage('Metricbeat x-pack Windows'){
+          agent { label 'windows-immutable && windows-2019' }
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression {
+              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+            }
+          }
+          steps {
+            mageTargetWin("Metricbeat x-pack Windows", "x-pack/metricbeat", "build unitTest")
           }
         }
         stage('Packetbeat'){
@@ -531,6 +651,11 @@ pipeline {
               steps {
                 mageTarget("Functionbeat x-pack Mac OS X", "x-pack/functionbeat", "build unitTest")
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Functionbeat Windows'){
               agent { label 'windows-immutable && windows-2019' }
@@ -607,6 +732,11 @@ pipeline {
                   makeTarget("Generators Metricbeat Mac OS X", "-C generator/_templates/metricbeat test")
                 }
               }
+              post {
+                always {
+                  delete()
+                }
+              }
             }
             stage('Generators Beat Mac OS X'){
               agent { label 'macosx' }
@@ -621,6 +751,11 @@ pipeline {
                 // FIXME see https://github.com/elastic/beats/issues/18132
                 catchError(buildResult: 'SUCCESS', message: 'Ignore error temporally', stageResult: 'UNSTABLE') {
                   makeTarget("Generators Beat Mac OS X", "-C generator/_templates/beat test")
+                }
+              }
+              post {
+                always {
+                  delete()
                 }
               }
             }
@@ -652,6 +787,20 @@ pipeline {
   }
 }
 
+def delete() {
+  dir("${env.BASE_DIR}") {
+    fixPermissions("${WORKSPACE}")
+  }
+  deleteDir()
+}
+
+def fixPermissions(location) {
+  sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+    source ./dev-tools/common.bash
+    docker_setup
+    script/fix_permissions.sh ${location}""", returnStatus: true)
+}
+
 def makeTarget(String context, String target, boolean clean = true) {
   withGithubNotify(context: "${context}") {
     withBeatsEnv(true) {
@@ -660,8 +809,8 @@ def makeTarget(String context, String target, boolean clean = true) {
         dumpMage()
       }
       sh(label: "Make ${target}", script: "make ${target}")
-      if (clean) {
-        sh(script: 'script/fix_permissions.sh ${HOME}')
+      whenTrue(clean) {
+        fixPermissions("${HOME}")
       }
     }
   }
@@ -716,7 +865,7 @@ def withBeatsEnv(boolean archive, Closure body) {
     "DOCKER_PULL=0",
   ]) {
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     if(isDockerInstalled()){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
@@ -757,7 +906,7 @@ def withBeatsEnvWin(Closure body) {
     "RACE_DETECTOR=true",
   ]){
     deleteDir()
-    unstash 'source'
+    unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     dir("${env.BASE_DIR}"){
       installTools()
       try {
@@ -874,8 +1023,8 @@ def k8sTest(versions){
           withBeatsEnv(false) {
             sh(label: "Install kind", script: ".ci/scripts/install-kind.sh")
             sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh")
-            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+            sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
             sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             sh(label: 'Delete cluster', script: 'kind delete cluster')
           }
@@ -1021,7 +1170,7 @@ def terraformCleanup(String stashName, String directory) {
   stage("Remove cloud scenarios in ${directory}"){
     withCloudTestEnv() {
       withBeatsEnv(false) {
-        unstash "terraform-${stashName}"
+        unstash("terraform-${stashName}")
         retry(2) {
           sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
         }
@@ -1100,6 +1249,28 @@ def loadConfigEnvVars(){
   generatorPatterns.addAll(getVendorPatterns('generator/common/beatgen'))
   generatorPatterns.addAll(getVendorPatterns('metricbeat/beater'))
   env.BUILD_GENERATOR = isChangedOSSCode(generatorPatterns)
+
+  // Skip all the stages for changes only related to the documentation
+  env.ONLY_DOCS = isDocChangedOnly()
+
+  // Run the ITs by running only if the changeset affects a specific module.
+  // For such, it's required to look for changes under the module folder and exclude anything else
+  // such as ascidoc and png files.
+  env.MODULE = getGitMatchingGroup(pattern: '[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*', exclude: '^(((?!\\/module\\/).)*$|.*\\.asciidoc|.*\\.png)')
+}
+
+/**
+  This method verifies if the changeset for the current pull request affect only changes related
+  to documentation, such as asciidoc and png files.
+*/
+def isDocChangedOnly(){
+  if (params.runAllStages || !env.CHANGE_ID?.trim()) {
+    log(level: 'INFO', text: 'Speed build for docs only is disabled for branches/tags or when forcing with the runAllStages parameter.')
+    return 'false'
+  } else {
+    log(level: "INFO", text: 'Check if the speed build for docs is enabled.')
+    return isGitRegionMatch(patterns: ['.*\\.(asciidoc|png)'], shouldMatchAll: true)
+  }
 }
 
 /**
@@ -1153,7 +1324,7 @@ def runbld() {
         // Unstash the test reports
         stashedTestReports.each { k, v ->
           dir(k) {
-            unstash v
+            unstash(v)
           }
         }
         sh(label: 'Process JUnit reports with runbld',

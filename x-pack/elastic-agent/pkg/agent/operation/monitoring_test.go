@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
@@ -115,6 +116,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	l := getLogger()
 
 	fetcher := &DummyDownloader{}
+	verifier := &DummyVerifier{}
 	installer := &DummyInstaller{}
 
 	stateResolver, err := stateresolver.NewStateResolver(l)
@@ -123,7 +125,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 	ctx := context.Background()
 
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, installer, stateResolver, nil, m)
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,9 +139,11 @@ type testMonitorableApp struct {
 	monitor monitoring.Monitor
 }
 
-func (*testMonitorableApp) Name() string                                              { return "" }
-func (*testMonitorableApp) Start(_ context.Context, cfg map[string]interface{}) error { return nil }
-func (*testMonitorableApp) Stop()                                                     {}
+func (*testMonitorableApp) Name() string { return "" }
+func (*testMonitorableApp) Start(_ context.Context, _ app.Taggable, cfg map[string]interface{}) error {
+	return nil
+}
+func (*testMonitorableApp) Stop() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
@@ -153,7 +157,7 @@ type testMonitor struct {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *testMonitor) EnrichArgs(_ string, _ string, args []string) []string { return args }
+func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []string { return args }
 
 // Cleanup cleans up all drops.
 func (b *testMonitor) Cleanup(string, string) error { return nil }

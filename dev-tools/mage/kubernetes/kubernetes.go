@@ -19,11 +19,13 @@ package kubernetes
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
@@ -102,17 +104,22 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	// Apply the manifest from the dir. This is the requirements for the tests that will
 	// run inside the cluster.
-	if err := mage.KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
+	if err := KubectlApply(env, stdOut, stdErr, manifestPath); err != nil {
 		return errors.Wrapf(err, "failed to apply manifest %s", manifestPath)
 	}
 	defer func() {
 		if mg.Verbose() {
 			fmt.Println(">> Deleting module manifest from cluster...")
 		}
-		if err := mage.KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
+		if err := KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
 			log.Printf("%s", errors.Wrapf(err, "failed to apply manifest %s", manifestPath))
 		}
 	}()
+
+	err = waitKubeStateMetricsReadiness(env, stdOut, stdErr)
+	if err != nil {
+		return err
+	}
 
 	// Pass all environment variables inside the pod, except for KUBECONFIG as the test
 	// should use the environment set by kubernetes on the pod.
@@ -125,7 +132,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	workDir := filepath.Join(destDir, repo.SubDir)
-	remote, err := mage.NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
+	remote, err := NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
 	if err != nil {
 		return err
 	}
@@ -140,6 +147,29 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 // InsideTest performs the tests inside of environment.
 func (d *KubernetesIntegrationTester) InsideTest(test func() error) error {
 	return test()
+}
+
+// waitKubeStateMetricsReadiness waits until kube-state-metrics Pod is ready to receive requests
+func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writer) error {
+	checkKubeStateMetricsReadyAttempts := 10
+	readyAttempts := 1
+	for {
+		err := KubectlWait(env, stdOut, stdErr, "condition=ready", "pod", "app=kube-state-metrics")
+		if err != nil {
+			if mg.Verbose() {
+				fmt.Println("Kube-state-metrics is not ready yet...retrying")
+			}
+		} else {
+			break
+		}
+		if readyAttempts > checkKubeStateMetricsReadyAttempts {
+			return errors.Wrapf(err, "Timeout waiting for kube-state-metrics")
+		}
+		time.Sleep(6 * time.Second)
+		readyAttempts += 1
+	}
+	// kube-state-metrics ready, return with no error
+	return nil
 }
 
 // kubernetesPodName returns the pod name to use with kubernetes.

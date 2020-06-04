@@ -27,6 +27,11 @@ type agentError struct {
 	meta    map[string]interface{}
 }
 
+// Unwrap returns nested error.
+func (e agentError) Unwrap() error {
+	return e.err
+}
+
 // Error returns a string consisting of a message and originating error.
 func (e agentError) Error() string {
 	if e.msg != "" {

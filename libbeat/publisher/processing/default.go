@@ -149,9 +149,6 @@ func WithAgentMeta() modifier {
 			"name":         info.Hostname,
 			"type":         info.Beat,
 			"version":      info.Version,
-			// hostname is deprecated. To be removed for 8.0. It's not in ECS.
-			// See https://github.com/elastic/beats/issues/16377.
-			"hostname": info.Hostname,
 		}
 		if info.Name != "" {
 			metadata["name"] = info.Name
@@ -269,6 +266,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
 	builtin := b.builtinMeta
+	if cfg.DisableHost {
+		tmp := builtin.Clone()
+		tmp.Delete("host")
+		builtin = tmp
+	}
+
 	var clientFields common.MapStr
 	for _, mod := range b.modifiers {
 		m := mod.ClientFields(b.info, cfg)

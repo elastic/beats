@@ -88,6 +88,12 @@ func TestGetFilterForMetric(t *testing.T) {
 			stackdriverMetricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
+		{
+			"compute service with no region/zone in config",
+			"compute.googleapis.com/firewall/dropped_bytes_count",
+			stackdriverMetricsRequester{config: config{}},
+			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\"",
+		},
 	}
 
 	for _, c := range cases {
@@ -103,7 +109,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 		title            string
 		ingestDelay      time.Duration
 		samplePeriod     time.Duration
-		collectionPeriod duration.Duration
+		collectionPeriod *duration.Duration
 		inputAligner     string
 		expectedAligner  string
 	}{
@@ -111,7 +117,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			duration.Duration{
+			&duration.Duration{
 				Seconds: int64(60),
 			},
 			"",
@@ -121,7 +127,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod larger than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			duration.Duration{
+			&duration.Duration{
 				Seconds: int64(300),
 			},
 			"ALIGN_MEAN",
@@ -131,7 +137,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod smaller than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			duration.Duration{
+			&duration.Duration{
 				Seconds: int64(30),
 			},
 			"ALIGN_MAX",
@@ -141,7 +147,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod with given aligner",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			duration.Duration{
+			&duration.Duration{
 				Seconds: int64(60),
 			},
 			"ALIGN_MEAN",

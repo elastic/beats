@@ -3,6 +3,7 @@
 # This file is an example configuration file highlighting only the most common
 # options. The elastic-agent.reference.yml file from the same directory contains all the
 # supported options with more comments. You can use it as a reference.
+
 ######################################
 # Fleet configuration
 ######################################
@@ -27,6 +28,14 @@ datasources:
             dataset: system.network
           - metricset: filesystem
             dataset: system.filesystem
+
+# settings.monitoring:
+#   # enabled turns on monitoring of running processes
+#   enabled: true
+#   # enables log monitoring
+#   logs: true
+#   # enables metrics monitoring
+#   metrics: true
 
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:
@@ -117,14 +126,7 @@ datasources:
 #   # Default is false
 #   exponential: false
 
-# settings.monitoring:
-#   # enabled turns on monitoring of running processes
-#   enabled: false
-#   # enables log monitoring
-#   logs: false
-#   # enables metrics monitoring
-#   metrics: false
-
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
 #logging.level: trace
+

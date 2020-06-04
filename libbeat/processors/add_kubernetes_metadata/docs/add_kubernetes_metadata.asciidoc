@@ -53,23 +53,39 @@ examples in <<kubernetes-indexers-and-matchers>>.
 The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
-[source,yaml]
+[source,yaml,subs="attributes+"]
 -------------------------------------------------------------------------------
 processors:
-- add_kubernetes_metadata:
+  - add_kubernetes_metadata:
+ifndef::kubernetes_default_indexers[]
+      # Defining indexers and matchers manually is required for {beatname_lc}, for instance:
+      #indexers:
+      #  - ip_port:
+      #matchers:
+      #  - fields:
+      #      lookup_fields: ["metricset.host"]
+endif::kubernetes_default_indexers[]
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
 the Kubernetes node.
 
-[source,yaml]
+[source,yaml,subs="attributes+"]
 -------------------------------------------------------------------------------
 processors:
-- add_kubernetes_metadata:
-    host: <hostname>
-    # If kube_config is not set, KUBECONFIG environment variable will be checked
-    # and if not present it will fall back to InCluster
-    kube_config: ${HOME}/.kube/config
+  - add_kubernetes_metadata:
+      host: <hostname>
+      # If kube_config is not set, KUBECONFIG environment variable will be checked
+      # and if not present it will fall back to InCluster
+      kube_config: ${HOME}/.kube/config
+ifndef::kubernetes_default_indexers[]
+      # Defining indexers and matchers manually is required for {beatname_lc}, for instance:
+      #indexers:
+      #  - ip_port:
+      #matchers:
+      #  - fields:
+      #      lookup_fields: ["metricset.host"]
+endif::kubernetes_default_indexers[]
 -------------------------------------------------------------------------------
 
 The configuration below has the default indexers and matchers disabled and
@@ -78,18 +94,18 @@ enables ones that the user is interested in.
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_kubernetes_metadata:
-    host: <hostname>
-    # If kube_config is not set, KUBECONFIG environment variable will be checked
-    # and if not present it will fall back to InCluster
-    kube_config: ~/.kube/config
-    default_indexers.enabled: false
-    default_matchers.enabled: false
-    indexers:
-      - ip_port:
-    matchers:
-      - fields:
-          lookup_fields: ["metricset.host"]
+  - add_kubernetes_metadata:
+      host: <hostname>
+      # If kube_config is not set, KUBECONFIG environment variable will be checked
+      # and if not present it will fall back to InCluster
+      kube_config: ~/.kube/config
+      default_indexers.enabled: false
+      default_matchers.enabled: false
+      indexers:
+        - ip_port:
+      matchers:
+        - fields:
+            lookup_fields: ["metricset.host"]
 -------------------------------------------------------------------------------
 
 The `add_kubernetes_metadata` processor has the following configuration settings:

@@ -27,7 +27,7 @@ func GetConfigForTest(t *testing.T, metricSetName string) map[string]interface{}
 	} else {
 		config = map[string]interface{}{
 			"module":                "googlecloud",
-			"period":                "5m",
+			"period":                "1m",
 			"metricsets":            []string{metricSetName},
 			"project_id":            projectID,
 			"credentials_file_path": credentialsFilePath,

@@ -10,3 +10,12 @@ type MonitoringConfig struct {
 	MonitorLogs    bool `yaml:"logs" config:"logs"`
 	MonitorMetrics bool `yaml:"metrics" config:"metrics"`
 }
+
+// DefaultConfig creates a config with pre-set default values.
+func DefaultConfig() *MonitoringConfig {
+	return &MonitoringConfig{
+		Enabled:        true,
+		MonitorLogs:    true,
+		MonitorMetrics: true,
+	}
+}

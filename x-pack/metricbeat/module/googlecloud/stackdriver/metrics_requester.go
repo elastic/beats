@@ -46,7 +46,7 @@ func (r *stackdriverMetricsRequester) Metric(ctx context.Context, metricType str
 		Filter:   r.getFilterForMetric(metricType),
 		Aggregation: &monitoringpb.Aggregation{
 			PerSeriesAligner: googlecloud.AlignersMapToGCP[aligner],
-			AlignmentPeriod:  &r.config.period,
+			AlignmentPeriod:  r.config.period,
 		},
 	}
 
@@ -105,6 +105,9 @@ var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
 // if they have a region specified.
 func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 	f = fmt.Sprintf(`metric.type="%s"`, m)
+	if r.config.Zone == "" && r.config.Region == "" {
+		return
+	}
 
 	service := serviceRegexp.ReplaceAllString(m, "${service}")
 
@@ -140,7 +143,7 @@ func (r *stackdriverMetricsRequester) getFilterForMetric(m string) (f string) {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
 	currentTime = time.Now().UTC()
