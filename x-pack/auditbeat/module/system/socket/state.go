@@ -178,7 +178,7 @@ type flow struct {
 	process           *process
 	local, remote     endpoint
 	complete          bool
-
+	done              bool
 	// these are automatically calculated by state from kernelTimes above
 	createdTime, lastSeenTime time.Time
 }
@@ -794,7 +794,11 @@ func (f *flow) updateWith(ref flow, s *state) {
 }
 
 func (s *state) onFlowTerminated(f *flow) {
+	if f.done {
+		return
+	}
 	s.flowLRU.remove(f)
+	f.done = true
 	// Unbind this flow from its parent
 	if parent, found := s.socks[f.sock]; found {
 		delete(parent.flows, f.remote.addr.String())
