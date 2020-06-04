@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Uses Simple Metric Visualizations",
+        "description": "Group management activity with TSVB metrics.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

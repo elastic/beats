@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "User logon activity dashboard with TSVB metrics.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -825,7 +825,7 @@
             }
           }
         },
-        "title": "User Logon Dashboard [Winlogbeat Security] ",
+        "title": "User Logon Dashboard [Winlogbeat Security]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {

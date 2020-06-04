@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "with TSVB Metrics",
+        "description": "Failed and blocked accounts with TSVB metrics.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

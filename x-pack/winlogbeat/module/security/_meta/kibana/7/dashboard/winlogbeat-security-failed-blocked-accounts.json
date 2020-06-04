@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Uses Simple Metric Visualizations",
+        "description": "Failed and blocked accounts.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
