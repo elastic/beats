@@ -6,6 +6,7 @@ package http
 
 import (
 	"context"
+	"crypto/sha512"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -13,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -70,9 +72,6 @@ func TestDownload(t *testing.T) {
 }
 
 func TestVerify(t *testing.T) {
-	// skip so beats are not fetched from upstream, test only locally when change is made
-	t.Skip()
-
 	targetDir, err := ioutil.TempDir(os.TempDir(), "")
 	if err != nil {
 		t.Fatal(err)
@@ -80,6 +79,7 @@ func TestVerify(t *testing.T) {
 
 	timeout := 30 * time.Second
 	testCases := getRandomTestCases()
+	elasticClient := getElasticCoClient()
 
 	config := &artifact.Config{
 		BeatsSourceURI:  source,
@@ -93,8 +93,7 @@ func TestVerify(t *testing.T) {
 			config.OperatingSystem = testCase.system
 			config.Architecture = testCase.arch
 
-			testClient := NewDownloader(config)
-
+			testClient := NewDownloaderWithClient(config, elasticClient)
 			artifact, err := testClient.Download(context.Background(), beatName, version)
 			if err != nil {
 				t.Fatal(err)
@@ -120,6 +119,7 @@ func TestVerify(t *testing.T) {
 			}
 
 			os.Remove(artifact)
+			os.Remove(artifact + ".sha512")
 		})
 	}
 }
@@ -164,11 +164,20 @@ func getElasticCoClient() http.Client {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		packageName := r.URL.Path[len(sourcePattern):]
+		isShaReq := strings.HasSuffix(packageName, ".sha512")
+		packageName = strings.TrimSuffix(packageName, ".sha512")
+
 		if _, ok := correctValues[packageName]; !ok {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-		w.Write([]byte(packageName))
+		content := []byte(packageName)
+		if isShaReq {
+			hash := sha512.Sum512(content)
+			w.Write([]byte(fmt.Sprintf("%x %s", hash, packageName)))
+		} else {
+			w.Write(content)
+		}
 	})
 	server := httptest.NewServer(handler)
 

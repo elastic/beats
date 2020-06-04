@@ -50,8 +50,10 @@ func (e *Downloader) Download(_ context.Context, programName, version string) (s
 	path, err := e.download(e.config.OS(), programName, version)
 	if err != nil {
 		os.Remove(path)
+		return "", err
 	}
 
+	_, err = e.downloadHash(e.config.OS(), programName, version)
 	return path, err
 }
 
@@ -66,6 +68,27 @@ func (e *Downloader) download(operatingSystem, programName, version string) (str
 		return "", errors.New(err, "generating package path failed")
 	}
 
+	return e.downloadFile(filename, fullPath)
+}
+
+func (e *Downloader) downloadHash(operatingSystem, programName, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+	if err != nil {
+		return "", errors.New(err, "generating package name failed")
+	}
+
+	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	if err != nil {
+		return "", errors.New(err, "generating package path failed")
+	}
+
+	filename = filename + ".sha512"
+	fullPath = fullPath + ".sha512"
+
+	return e.downloadFile(filename, fullPath)
+}
+
+func (e *Downloader) downloadFile(filename, fullPath string) (string, error) {
 	sourcePath := filepath.Join(e.dropPath, filename)
 	sourceFile, err := os.Open(sourcePath)
 	if err != nil {
