@@ -625,6 +625,11 @@ func (as *ApplicationState) PerformAction(name string, params map[string]interfa
 	return res.result, res.err
 }
 
+// App returns the registered app for the state.
+func (as *ApplicationState) App() interface{} {
+	return as.app
+}
+
 // Expected returns the expected state of the process.
 func (as *ApplicationState) Expected() proto.StateExpected_State {
 	as.checkinLock.RLock()
@@ -632,11 +637,18 @@ func (as *ApplicationState) Expected() proto.StateExpected_State {
 	return as.expected
 }
 
-// Status returns the current observed status.
-func (as *ApplicationState) Status() proto.StateObserved_Status {
+// Config returns the expected config of the process.
+func (as *ApplicationState) Config() string {
 	as.checkinLock.RLock()
 	defer as.checkinLock.RUnlock()
-	return as.status
+	return as.expectedConfig
+}
+
+// Status returns the current observed status.
+func (as *ApplicationState) Status() (proto.StateObserved_Status, string) {
+	as.checkinLock.RLock()
+	defer as.checkinLock.RUnlock()
+	return as.status, as.statusMessage
 }
 
 // SetStatus allows the status to be overwritten by the agent.

@@ -7,7 +7,7 @@ package application
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"io"
 	"net/http"
 	"net/url"
@@ -47,12 +47,6 @@ type Managed struct {
 	agentInfo   *info.AgentInfo
 	gateway     *fleetGateway
 	srv         *server.Server
-}
-
-type StubOnConfig struct {}
-
-func (StubOnConfig) OnStatusChange(state *server.ApplicationState, status proto.StateObserved_Status, s2 string) {
-
 }
 
 func newManaged(
@@ -119,7 +113,7 @@ func newManaged(
 	}
 
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
-	managedApplication.srv, err = server.New(log, ":6789", &StubOnConfig{})
+	managedApplication.srv, err = server.New(log, ":6789", &app.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}

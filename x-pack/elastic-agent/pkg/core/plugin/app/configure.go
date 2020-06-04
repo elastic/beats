@@ -6,16 +6,12 @@ package app
 
 import (
 	"context"
-	"net"
 	"time"
 
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/retry"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig"
 )
 
 const (
@@ -36,44 +32,17 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		}
 	}()
 
-	if a.state.Status == state.Stopped {
+	if a.state.Status() == state.Stopped {
 		return errors.New(ErrAppNotRunning)
 	}
 
-	retryFn := func(ctx context.Context) error {
-		a.appLock.Lock()
-		defer a.appLock.Unlock()
-
-		// TODO: check versions(logical clock) in between retries in case newer version sneaked in
-
-		ctx, cancelFn := context.WithTimeout(ctx, DefaultTimeout)
-		defer cancelFn()
-
-		if a.grpcClient == nil {
-			return errors.New(ErrClientNotFound)
-		}
-
-		rawYaml, err := yaml.Marshal(config)
-		if err != nil {
-			return errors.New(err, errors.TypeApplication)
-		}
-
-		configClient, ok := a.grpcClient.(remoteconfig.ConfiguratorClient)
-		if !ok {
-			return errors.New(ErrClientNotConfigurable, errors.TypeApplication)
-		}
-
-		a.logger.Debugf("configuring application %s: %s", a.Name(), string(rawYaml))
-		err = configClient.Config(ctx, string(rawYaml))
-
-		if netErr, ok := err.(net.Error); ok && (netErr.Timeout() || netErr.Temporary()) {
-			// not fatal, we will retry
-			return errors.New(netErr, errors.TypeApplication)
-		}
-
-		// if not transient mark as fatal
-		return retry.ErrorMakeFatal(err)
+	cfgStr, err := yaml.Marshal(config)
+	if err != nil {
+		return errors.New(err, errors.TypeApplication)
 	}
-
-	return retry.Do(ctx, a.retryConfig, retryFn)
+	err = a.state.UpdateConfig(string(cfgStr))
+	if err != nil {
+		return errors.New(err, errors.TypeApplication)
+	}
+	return nil
 }

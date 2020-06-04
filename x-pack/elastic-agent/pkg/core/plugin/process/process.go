@@ -48,14 +48,3 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, arg
 		Stdin: stdin,
 	}, err
 }
-
-// Stop stops the process based on the process id
-func Stop(logger *logger.Logger, pid int) error {
-	proc, err := os.FindProcess(pid)
-	if err != nil {
-		// Process not found (it is already killed) we treat as a success
-		return nil
-	}
-
-	return proc.Signal(os.Interrupt)
-}

@@ -77,5 +77,5 @@ func (o *operationStart) Run(ctx context.Context, application Application) (err 
 		}
 	}()
 
-	return application.Start(ctx, o.program, o.srv, o.cfg)
+	return application.Start(ctx, o.program, o.cfg)
 }

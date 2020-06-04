@@ -6,6 +6,7 @@ package application
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -80,7 +81,7 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
-	localApplication.srv, err = server.New(log, ":6789", &StubOnConfig{})
+	localApplication.srv, err = server.New(log, ":6789", &app.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}

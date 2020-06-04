@@ -22,8 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	rconfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/remoteconfig/grpc"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
@@ -109,22 +107,6 @@ func NewOperator(
 	return operator, nil
 }
 
-// State describes the current state of the system.
-// Reports all known beats and theirs states. Whether they are running
-// or not, and if they are information about process is also present.
-func (o *Operator) State() map[string]state.State {
-	result := make(map[string]state.State)
-
-	o.appsLock.Lock()
-	defer o.appsLock.Unlock()
-
-	for k, v := range o.apps {
-		result[k] = v.State()
-	}
-
-	return result
-}
-
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, steps, ack, err := o.stateResolver.Resolve(cfg)
@@ -164,7 +146,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
 		newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
 		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
-		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
+		newOperationStart(o.logger, p, o.srv, o.config, cfg, o.eventProcessor),
 		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
 	}
 	return o.runFlow(p, flow)
@@ -234,8 +216,6 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		return a, nil
 	}
 
-	factory := rconfig.NewConnFactory(o.config.RetryConfig.Delay, o.config.RetryConfig.MaxDelay)
-
 	specifier, ok := p.(app.Specifier)
 	if !ok {
 		return nil, fmt.Errorf("descriptor is not an app.Specifier")
@@ -249,7 +229,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		o.pipelineID,
 		o.config.LoggingConfig.Level.String(),
 		specifier,
-		factory,
+		o.srv,
 		o.config,
 		o.logger,
 		o.eventProcessor.OnFailing,

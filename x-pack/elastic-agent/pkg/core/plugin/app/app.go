@@ -48,7 +48,9 @@ type Application struct {
 	state 			*server.ApplicationState
 	limiter         *tokenbucket.Bucket
 	failureReporter ReportFailureFunc
-	proc            *os.Process
+	startContext    context.Context
+	tag             Taggable
+	proc            *process.Info
 
 	uid int
 	gid int
@@ -111,6 +113,17 @@ func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
 }
 
+// Status returns the application status.
+func (a *Application) Status() (proto.StateObserved_Status, string) {
+	a.appLock.Lock()
+	state := a.state
+	a.appLock.Unlock()
+	if state == nil {
+		return proto.StateObserved_STARTING, ""
+	}
+	return state.Status()
+}
+
 // Name returns application name
 func (a *Application) Name() string {
 	return a.name
@@ -121,16 +134,20 @@ func (a *Application) Stop() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	if a.state.Status == state.Running && a.state.ProcessInfo != nil {
-		if closeClient, ok := a.grpcClient.(closer); ok {
-			closeClient.Close()
+	stopSig := os.Interrupt
+	if a.state != nil {
+		if err := a.state.Stop(a.processConfig.StopTimeout); err != nil {
+			// kill the process if stop through GRPC doesn't work
+			stopSig = os.Kill
 		}
-
-		process.Stop(a.logger, a.state.ProcessInfo.PID)
-
-		a.state.Status = state.Stopped
-		a.state.ProcessInfo = nil
-		a.grpcClient = nil
+		a.state = nil
+	}
+	if a.proc != nil {
+		if err := a.proc.Process.Signal(stopSig); err == nil {
+			// no error on signal, so wait for it to stop
+			_, _ = a.proc.Process.Wait()
+		}
+		a.proc = nil
 
 		// remove generated configuration if present
 		filename := fmt.Sprintf(configFileTempl, a.id)
@@ -145,12 +162,12 @@ func (a *Application) Stop() {
 	}
 }
 
-func (a *Application) watch(ctx context.Context, p Taggable, proc *os.Process, cfg map[string]interface{}) {
+func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
 	go func() {
 		var procState *os.ProcessState
 
 		select {
-		case ps := <-a.waitProc(proc):
+		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
 			a.Stop()

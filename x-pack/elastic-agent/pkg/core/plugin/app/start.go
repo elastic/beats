@@ -10,16 +10,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
-	"time"
-	"unicode"
 
-	"gopkg.in/yaml.v2"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
@@ -29,12 +25,6 @@ const (
 	configFileTempl       = "%s.yml" // providing beat id
 	configFilePermissions = 0644     // writable only by owner
 )
-
-// ConfiguratorClient is the client connecting elastic-agent and a process
-type stateClient interface {
-	Status(ctx context.Context) (string, error)
-	Close() error
-}
 
 // Start starts the application with a specified config.
 func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]interface{}) (err error) {
@@ -47,15 +37,38 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
 
-	// running application will have a state.
+	cfgStr, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	a.startContext = ctx
+	a.tag = t
+
+	// Failed applications can be started again.
 	if a.state != nil {
-		return nil
+		status, _ := a.state.Status()
+		if status != proto.StateObserved_FAILED {
+			return nil
+		}
+		a.state.SetStatus(proto.StateObserved_STARTING, "Starting")
+		a.state.UpdateConfig(string(cfgStr))
+	} else {
+		a.state, err = a.srv.Register(a, string(cfgStr))
+		if err != nil {
+			return err
+		}
 	}
 
 	defer func() {
-		if err != nil && a.state != nil {
-			a.state.Destroy()
-			a.state = nil
+		if err != nil {
+			if a.state != nil {
+				a.state.Destroy()
+				a.state = nil
+			}
+			if a.proc != nil {
+				_ = a.proc.Process.Kill()
+				a.proc = nil
+			}
 		}
 	}()
 
@@ -79,8 +92,6 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 	// of the beat with same data path fails to start
 	spec.Args = injectDataPath(spec.Args, a.pipelineID, a.id)
 
-	a.state, err = a.srv.Register(a, )
-
 	a.proc, err = process.Start(
 		a.logger,
 		spec.BinaryPath,
@@ -92,16 +103,17 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		return err
 	}
 
-	a.waitForGrpc(spec, ca)
-
-	a.grpcClient, err = generateClient(a.state.ProcessInfo.Address, a.clientFactory, ca)
+	err = a.state.WriteConnInfo(a.proc.Stdin)
 	if err != nil {
-		return errors.New(err, errors.TypeSecurity)
+		return err
 	}
-	a.state.Status = state.Running
+	err = a.proc.Stdin.Close()
+	if err != nil {
+		return err
+	}
 
 	// setup watcher
-	a.watch(ctx, t, a.state.ProcessInfo.Process, cfg)
+	a.watch(ctx, t, a.proc, cfg)
 
 	return nil
 }
@@ -127,141 +139,9 @@ func injectLogLevel(logLevel string, args []string) []string {
 	return append(args, "-E", "logging.level="+level)
 }
 
-func (a *Application) waitForGrpc(spec ProcessSpec, ca *authority.CertificateAuthority) error {
-	const (
-		rounds        int           = 3
-		roundsTimeout time.Duration = 30 * time.Second
-		retries       int           = 5
-		retryTimeout  time.Duration = 2 * time.Second
-	)
-
-	checkFn := func(ctx context.Context, address string) error {
-		return a.checkGrpcHTTP(ctx, address, ca)
-	}
-	if isPipe(a.state.ProcessInfo.Address) {
-		checkFn = a.checkGrpcPipe
-	}
-
-	for round := 1; round <= rounds; round++ {
-		for retry := 1; retry <= retries; retry++ {
-			c, cancelFn := context.WithTimeout(a.bgContext, retryTimeout)
-			err := checkFn(c, a.state.ProcessInfo.Address)
-			if err == nil {
-				cancelFn()
-				return nil
-			}
-			cancelFn()
-
-			// do not wait on last
-			if retry != retries {
-				select {
-				case <-time.After(retryTimeout):
-				case <-a.bgContext.Done():
-					return nil
-				}
-			}
-		}
-
-		// do not wait on last
-		if round != rounds {
-			select {
-			case <-time.After(time.Duration(round) * roundsTimeout):
-			case <-a.bgContext.Done():
-				return nil
-			}
-		}
-	}
-
-	// do not err out, config calls will fail with after some more retries
-	return nil
-}
-
-func isPipe(address string) bool {
-	address = strings.TrimPrefix(address, "http+")
-	return strings.HasPrefix(address, "file:") ||
-		strings.HasPrefix(address, "unix:") ||
-		strings.HasPrefix(address, "npipe") ||
-		strings.HasPrefix(address, `\\.\pipe\`) ||
-		isWindowsPath(address)
-}
-
-func (a *Application) checkGrpcPipe(ctx context.Context, address string) error {
-	// TODO: not supported yet
-	return nil
-}
-
-func (a *Application) checkGrpcHTTP(ctx context.Context, address string, ca *authority.CertificateAuthority) error {
-	grpcClient, err := generateClient(a.state.ProcessInfo.Address, a.clientFactory, ca)
-	if err != nil {
-		return errors.New(err, errors.TypeSecurity)
-	}
-
-	stateClient, ok := grpcClient.(stateClient)
-	if !ok {
-		// does not support getting state
-		// let successive calls fail/succeed
-		return nil
-	}
-
-	result, err := stateClient.Status(ctx)
-	defer stateClient.Close()
-	if err != nil {
-		return errors.New(err, "getting state failed", errors.TypeNetwork)
-	}
-
-	if strings.ToLower(result) != "ok" {
-		return errors.New(
-			fmt.Sprintf("getting state failed. not ok state received: '%s'", result),
-			errors.TypeNetwork)
-	}
-
-	return nil
-}
-
 func injectDataPath(args []string, pipelineID, id string) []string {
 	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
-}
-
-func generateCA() (*authority.CertificateAuthority, error) {
-	ca, err := authority.NewCA()
-	if err != nil {
-		return nil, errors.New(err, "app.Start", errors.TypeSecurity)
-	}
-
-	return ca, nil
-}
-
-func generateConfigurable(ca *authority.CertificateAuthority) (*process.Creds, error) {
-	processCreds, err := getProcessCredentials(ca)
-	if err != nil {
-		return nil, errors.New(err, errors.TypeSecurity)
-	}
-
-	return processCreds, nil
-}
-
-func generateClient(address string, factory remoteconfig.ConnectionCreator, ca *authority.CertificateAuthority) (remoteconfig.Client, error) {
-	connectionProvider, err := getConnectionProvider(ca, address)
-	if err != nil {
-		return nil, errors.New(err, errors.TypeNetwork)
-	}
-
-	grpcClient, err := factory.NewConnection(connectionProvider)
-	if err != nil {
-		return nil, errors.New(err, "creating connection", errors.TypeNetwork)
-	}
-
-	return grpcClient, nil
-}
-
-func getConnectionProvider(ca *authority.CertificateAuthority, address string) (*grpc.ConnectionProvider, error) {
-	clientPair, err := ca.GeneratePair()
-	if err != nil {
-		return nil, errors.New(err, errors.TypeNetwork)
-	}
-
-	return grpc.NewConnectionProvider(address, ca.Crt(), clientPair.Key, clientPair.Crt), nil
 }
 
 func updateSpecConfig(spec *ProcessSpec, configPath string) error {
@@ -286,13 +166,6 @@ func updateSpecConfig(spec *ProcessSpec, configPath string) error {
 
 	spec.Args = append(spec.Args, configurationFlag, configPath)
 	return nil
-}
-
-func isWindowsPath(path string) bool {
-	if len(path) < 4 {
-		return false
-	}
-	return unicode.IsLetter(rune(path[0])) && path[1] == ':'
 }
 
 func changeOwner(path string, uid, gid int) error {
