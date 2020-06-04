@@ -3480,7 +3480,7 @@
               "query": "event.code: \"4725\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3564,7 +3564,7 @@
               "query": "event.code: \"4722\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3648,7 +3648,7 @@
               "query": "event.code: \"4726\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3732,7 +3732,7 @@
               "query": "event.code: \"4720\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3816,7 +3816,7 @@
               "query": "event.code: \"4767\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3900,7 +3900,7 @@
               "query": "event.code: \"4723\"  OR event.code: \"4724\""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -3984,7 +3984,7 @@
               "query": "event.code: \"4740\""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -4068,7 +4068,7 @@
               "query": "event.code: \"4738\" "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
@@ -4152,7 +4152,7 @@
               "query": "event.code: \"4781\"  "
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "winlogbeat-*",
             "interval": "90d",
             "series": [
               {
