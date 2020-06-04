@@ -9,49 +9,66 @@
 ++++
 
 The following topics provide information about securing the {beatname_uc}
-process and securing communication between {beatname_uc} and other products in
-the Elastic stack:
+process and connecting to a cluster that has {security-features} enabled.
 
-ifdef::apm-server[]
-* <<secure-communication-agents>>
-endif::[]
+You can use role-based access control and optionally, API keys to grant {beatname_uc} users access to
+secured resources.
+
+* <<feature-roles>>
+* <<beats-api-keys>>.
+
+After privileged users have been created, use authentication to connect to a secured Elastic cluster.
+
 * <<securing-communication-elasticsearch>>
 ifndef::no-output-logstash[]
 * <<configuring-ssl-logstash>>
 endif::[]
-* <<securing-beats>>
+
+ifdef::apm-server[]
+For secure communication between APM Server and APM Agents, see <<secure-communication-agents>>.
+endif::[]
+
 ifndef::serverless[]
+On Linux, {beatname_uc} can take advantage of secure computing mode to restrict the
+system calls that a process can issue.
+
 * <<linux-seccomp>>
 endif::[]
 
+// APM HTTPS information
 ifdef::beat-specific-security[]
 include::{beat-specific-security}[]
 endif::[]
 
 --
 
+// APM privileges
+ifdef::apm-server[]
+include::{docdir}/feature-roles.asciidoc[]
+endif::[]
+
+// Beat privileges
+ifndef::apm-server[]
+include::./security/users.asciidoc[]
+endif::[]
+
+// API Keys
+include::./security/api-keys.asciidoc[]
+
+// APM Agent security
 ifdef::apm-server[]
 include::{docdir}/secure-communication-agents.asciidoc[]
 endif::[]
 
-//sets block macro for https.asciidoc included in next section
-
-[[securing-communication-elasticsearch]]
-== Secure communication with Elasticsearch
-
+// Elasticsearch security
 include::./https.asciidoc[]
 
-//sets block macro for shared-ssl-logstash-config.asciidoc included in next section
-
+// Logstash security
 ifndef::no-output-logstash[]
-[[configuring-ssl-logstash]]
-== Secure communication with Logstash
-
 include::./shared-ssl-logstash-config.asciidoc[]
 endif::[]
 
-include::./security/securing-beats.asciidoc[]
-
+// Linux Seccomp
 ifndef::serverless[]
 include::./security/linux-seccomp.asciidoc[]
 endif::[]
