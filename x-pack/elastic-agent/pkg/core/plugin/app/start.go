@@ -6,10 +6,7 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 
@@ -20,13 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
-)
-
-const (
-	configurationFlag     = "-c"
-	configFileTempl       = "%s.yml" // providing beat id
-	configFilePermissions = 0644     // writable only by owner
 )
 
 // Start starts the application with a specified config.
@@ -153,37 +143,4 @@ func injectLogLevel(logLevel string, args []string) []string {
 func injectDataPath(args []string, pipelineID, id string) []string {
 	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
-}
-
-func updateSpecConfig(spec *ProcessSpec, configPath string) error {
-	// check if config is already provided
-	configIndex := -1
-	for i, v := range spec.Args {
-		if v == configurationFlag {
-			configIndex = i
-			break
-		}
-	}
-
-	if configIndex != -1 {
-		// -c provided
-		if len(spec.Args) == configIndex+1 {
-			// -c is last argument, appending
-			spec.Args = append(spec.Args, configPath)
-		}
-		spec.Args[configIndex+1] = configPath
-		return nil
-	}
-
-	spec.Args = append(spec.Args, configurationFlag, configPath)
-	return nil
-}
-
-func changeOwner(path string, uid, gid int) error {
-	if runtime.GOOS == "windows" {
-		// on windows it always returns the syscall.EWINDOWS error, wrapped in *PathError
-		return nil
-	}
-
-	return os.Chown(path, uid, gid)
 }

@@ -6,26 +6,16 @@ package app
 
 import (
 	"context"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
-	"time"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const (
-	// DefaultTimeout is the default timeout for network calls
-	DefaultTimeout = 60 * time.Second
-)
-
-type backoffClient interface {
-	Backoff() backoff.Backoff
-}
-
 // Configure configures the application with the passed configuration.
-func (a *Application) Configure(ctx context.Context, config map[string]interface{}) (err error) {
+func (a *Application) Configure(_ context.Context, config map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata

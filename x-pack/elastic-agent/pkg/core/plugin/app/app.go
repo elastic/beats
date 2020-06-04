@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -150,14 +149,6 @@ func (a *Application) Stop() {
 			_, _ = a.state.ProcessInfo.Process.Wait()
 		}
 		a.state.ProcessInfo = nil
-
-		// remove generated configuration if present
-		filename := fmt.Sprintf(configFileTempl, a.id)
-		filePath, err := filepath.Abs(filepath.Join(a.downloadConfig.InstallPath, filename))
-		if err == nil {
-			// ignoring error: not critical
-			os.Remove(filePath)
-		}
 
 		// cleanup drops
 		a.monitor.Cleanup(a.name, a.pipelineID)
