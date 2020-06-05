@@ -1289,6 +1289,93 @@ processors:
       target_field: cisco.{< .internal_prefix >}.rule_name
       ignore_missing: true
 
+  # ECS categorization
+  - script:
+      lang: painless
+      params:
+        connection-finished:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - end
+        connection-started:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - start
+        file-detected:
+          kind: alert
+          category:
+            - malware
+          type:
+            - info
+        firewall-rule:
+          kind: event
+          category:
+            - network
+          type:
+            - info
+        flow-expiration:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - end
+        intrusion-detected:
+          kind: alert
+          category:
+            - intrusion_detection
+          type:
+            - info
+        malware-detected:
+          kind: alert
+          category:
+            - malware
+          type:
+            - info
+      source: >-
+        if (ctx?.event?.action == null || !params.containsKey(ctx.event.action)) {
+          return;
+        }
+        ctx.event.kind = params.get(ctx.event.action).get('kind');
+        ctx.event.category = params.get(ctx.event.action).get('category').clone();
+        ctx.event.type = params.get(ctx.event.action).get('type').clone();
+
+        if (ctx?.event?.outcome == null) {
+          return;
+        }
+        if (ctx.event.category.contains('network') || ctx.event.category.contains('intrusion_detection')) {
+          if (ctx.event.outcome == 'allow') {
+            ctx.event.type.add('allowed');
+          }
+          if (ctx.event.outcome == 'deny') {
+            ctx.event.type.add('denied');
+          }
+          if (ctx.event.outcome == 'block') {
+            ctx.event.type.add('denied');
+          }
+        }
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      if: "ctx?.source?.ip != null"
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      if: "ctx?.destination?.ip != null"
+  - append:
+      field: related.user
+      value: "{{user.name}}"
+      if: "ctx?.user?.name != null"
+  - append:
+      field: related.hash
+      value: "{{file.hash.sha256}}"
+      if: "ctx?.file?.hash?.sha256 != null"
 on_failure:
   # Copy any fields under _temp_.cisco to its final destination. Those can help
   # with diagnosing the failure.

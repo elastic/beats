@@ -71,6 +71,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
+- Fix Powershell processing of downgraded engine events. {pull}18966[18966]
+- Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
 
 *Functionbeat*
 
@@ -117,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 
 *Auditbeat*
 
@@ -231,7 +234,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436{18436}
+- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
+- Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 
 *Functionbeat*
 
@@ -370,7 +374,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
+- Improve ECS categorization field mappings in cisco module. {issue}16028[16028] {pull}18537[18537]
 - The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
+
 
 *Heartbeat*
 
@@ -476,6 +482,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
+- Add new winlogbeat security dashboard {pull}18775[18775]
 
 ==== Deprecated
 

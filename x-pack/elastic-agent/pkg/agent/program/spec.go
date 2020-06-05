@@ -29,7 +29,6 @@ var ErrMissingWhen = errors.New("program must define a 'When' expression")
 type Spec struct {
 	Name             string               `yaml:"name"`
 	Cmd              string               `yaml:"cmd"`
-	Configurable     string               `yaml:"configurable"`
 	Args             []string             `yaml:"args"`
 	Rules            *transpiler.RuleList `yaml:"rules"`
 	PostInstallSteps *transpiler.StepList `yaml:"post_install"`
