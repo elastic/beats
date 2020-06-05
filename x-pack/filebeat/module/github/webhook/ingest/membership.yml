@@ -1,0 +1,54 @@
+description: Pipeline to parse member github wehhooks
+processors:
+- set:
+    field: observer.name
+    value: '{{github.repository.name}}'
+- set:
+    field: observer.product
+    value: Webhook
+- set:
+    field: observer.vendor
+    value: Github
+- append:
+    field: related.user
+    value: '{{github.sender.login}}'
+    if: ctx.github?.sender?.type == 'User'
+- append:
+    field: related.user
+    value: '{{github.member.login}}'
+    if: ctx.github?.member?.type == 'User' && !(ctx.related.user).contains(ctx.github.member.login)
+- append:
+    field: event.type
+    value:
+    - info
+    - group
+    - iam
+- append:
+    field: event.type
+    value: creation
+    if: ctx.github?.action == 'added'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx.github?.action == 'removed'
+- set:
+    field: event.outcome
+    value: success
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: membership-{{github.action}}
+- rename:
+    field: github.sender.login
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: github.sender.id
+    target_field: source.user.id
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

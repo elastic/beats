@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-github-webhook-Dashboard
+  file: Filebeat-github-webhook.json

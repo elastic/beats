@@ -1,0 +1,4 @@
+type: http_endpoint
+listen_address: 0.0.0.0
+listen_port: 8000
+

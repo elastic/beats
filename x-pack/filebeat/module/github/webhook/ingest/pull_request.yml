@@ -1,0 +1,74 @@
+Error: open pull_request.json: no such file or directory
+Usage:
+  yq read [yaml_file] [path_expression] [flags]
+
+Aliases:
+  read, r
+
+Examples:
+
+yq read things.yaml 'a.b.c'
+yq r - 'a.b.c' # reads from stdin
+yq r things.yaml 'a.*.c'
+yq r things.yaml 'a.**.c' # deep splat
+yq r things.yaml 'a.(child.subchild==co*).c'
+yq r -d1 things.yaml 'a.array[0].blah'
+yq r things.yaml 'a.array[*].blah'
+yq r -- things.yaml '--key-starting-with-dashes.blah'
+      
+
+Flags:
+  -c, --collect               collect results into array
+  -D, --defaultValue string   default value printed when there are no results
+  -d, --doc string            process document index number (0 based, * for all documents) (default "0")
+  -X, --explodeAnchors        explode anchors
+  -h, --help                  help for read
+  -l, --length                print length of results
+  -p, --printMode string      print mode (v (values, default), p (paths), pv (path and value pairs) (default "v")
+      --stripComments         print yaml without any comments
+      --unwrapScalar          unwrap scalar, print the value with no quotes, colors or comments (default true)
+
+Global Flags:
+  -C, --colors        print with colors
+  -I, --indent int    sets indent level for output (default 2)
+  -P, --prettyPrint   pretty print
+  -j, --tojson        output as json. By default it prints a json document in one line, use the prettyPrint flag to print a formatted doc.
+  -v, --verbose       verbose mode
+
+Error: open pull_request.json: no such file or directory
+Usage:
+  yq read [yaml_file] [path_expression] [flags]
+
+Aliases:
+  read, r
+
+Examples:
+
+yq read things.yaml 'a.b.c'
+yq r - 'a.b.c' # reads from stdin
+yq r things.yaml 'a.*.c'
+yq r things.yaml 'a.**.c' # deep splat
+yq r things.yaml 'a.(child.subchild==co*).c'
+yq r -d1 things.yaml 'a.array[0].blah'
+yq r things.yaml 'a.array[*].blah'
+yq r -- things.yaml '--key-starting-with-dashes.blah'
+      
+
+Flags:
+  -c, --collect               collect results into array
+  -D, --defaultValue string   default value printed when there are no results
+  -d, --doc string            process document index number (0 based, * for all documents) (default "0")
+  -X, --explodeAnchors        explode anchors
+  -h, --help                  help for read
+  -l, --length                print length of results
+  -p, --printMode string      print mode (v (values, default), p (paths), pv (path and value pairs) (default "v")
+      --stripComments         print yaml without any comments
+      --unwrapScalar          unwrap scalar, print the value with no quotes, colors or comments (default true)
+
+Global Flags:
+  -C, --colors        print with colors
+  -I, --indent int    sets indent level for output (default 2)
+  -P, --prettyPrint   pretty print
+  -j, --tojson        output as json. By default it prints a json document in one line, use the prettyPrint flag to print a formatted doc.
+  -v, --verbose       verbose mode
+

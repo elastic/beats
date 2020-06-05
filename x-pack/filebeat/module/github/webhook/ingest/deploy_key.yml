@@ -1,0 +1,60 @@
+description: Pipeline to parse deploy_key github wehhooks
+processors:
+- set:
+    field: observer.name
+    value: '{{github.repository.name}}'
+- set:
+    field: observer.product
+    value: Webhook
+- set:
+    field: observer.vendor
+    value: Github
+- append:
+    field: related.user
+    value: '{{github.sender.login}}'
+    if: ctx.github?.sender?.type == 'User'
+- append:
+    field: event.category
+    value: iam
+- append:
+    field: event.type
+    value:
+    - info
+    - access
+- append:
+    field: event.type
+    value: creation
+    if: ctx.github?.action == 'created'
+- append:
+    field: event.type
+    value: deletion
+    if: ctx.github?.action == 'deleted'
+- set:
+    field: event.outcome
+    value: success
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: deploy_key-{{github.action}}
+- rename:
+    field: github.key.id
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: github.key.url
+    target_field: event.url
+    ignore_missing: true
+- rename:
+    field: github.sender.login
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: github.sender.id
+    target_field: source.user.id
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

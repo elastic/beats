@@ -1,0 +1,9 @@
+- key: github
+  title: "github"
+  description: >
+    github Module
+  fields:
+    - name: github
+      type: group
+      description: >
+      fields:

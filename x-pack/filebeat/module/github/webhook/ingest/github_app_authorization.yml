@@ -1,0 +1,41 @@
+description: Pipeline to parse github_app_authorization github wehhooks
+processors:
+- set:
+    field: observer.name
+    value: '{{github.repository.name}}'
+- set:
+    field: observer.product
+    value: Webhook
+- set:
+    field: observer.vendor
+    value: Github
+- append:
+    field: related.user
+    value: '{{github.sender.login}}'
+    if: ctx.github?.sender?.type == 'User'
+- append:
+    field: event.type
+    value:
+    - info
+    - deletion
+- set:
+    field: event.outcome
+    value: success
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: github_app_authorization-{{github.action}}
+- rename:
+    field: github.sender.login
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: github.sender.id
+    target_field: source.user.id
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

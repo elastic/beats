@@ -1,0 +1,146 @@
+description: Pipeline to parse check_run and check_suite github wehhooks
+processors:
+- set:
+    field: event.outcome
+    value: success
+    if: ctx.github?.check_run?.conclusion == 'success' || ctx.github?.check_suite?.conclusion == 'success'
+- set:
+    field: event.outcome
+    value: failure
+    if: "['failure', 'cancelled', 'timed_out', 'stale'].contains(ctx.github?.check_run?.conclusion) || ['failure', 'cancelled', 'timed_out', 'stale'].contains(ctx.github?.check_suite?.conclusion) "
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: check_run-{{github.action}}
+    if: ctx.github?.check_run != null
+- set:
+    field: event.action
+    value: check_suite-{{github.action}}
+    if: ctx.github?.check_suite != null
+- append:
+    field: event.category
+    value: web
+- append:
+    field: event.type
+    value: info
+- append:
+    field: event.type
+    value: start
+    if: "['created', 'rerequested'].contains(ctx.github?.action)"
+- append:
+    field: event.type
+    value: end
+    if: ctx.github?.action == 'completed'
+# Only events which have action completed has both started_at and completed_at
+- date:
+    field: github.check_run.started_at
+    target_field: event.start
+    if: ctx.github?.action == 'completed' && ctx.github?.check_run != null
+- date:
+    field: github.check_run.completed_at
+    target_field: event.end
+    if: ctx.github?.action == 'completed' && ctx.github?.check_run != null
+# Since we are removing all unecessary at the end of the pipeline, we first rename
+# we are interested in
+- rename:
+    field: github.check_run.html_url
+    target_field: event.url
+    ignore_missing: true
+- rename:
+    field: github.check_suite.html_url
+    target_field: event.url
+    ignore_missing: true
+- rename:
+    field: github.sender.login
+    target_field: source.user.name
+    ignore_missing: true
+- rename:
+    field: github.sender.id
+    target_field: source.user.id
+    ignore_missing: true
+- rename:
+    field: github.check_run.app.name
+    target_field: github.related.app
+    ignore_missing: true
+- rename:
+    field: github.check_suite.app.name
+    target_field: github.related.app
+    ignore_missing: true
+- rename:
+    field: github.check_run.status
+    target_field: github.status
+    ignore_missing: true
+- rename:
+    field: github.check_suite.status
+    target_field: github.status
+    ignore_missing: true
+- rename:
+    field: github.check_run.conclusion
+    target_field: github.conclusion
+    ignore_missing: true
+- rename:
+    field: github.check_suite.conclusion
+    target_field: github.conclusion
+    ignore_missing: true
+- rename:
+    field: github.check_run.name
+    target_field: github.check_name
+    ignore_missing: true
+- rename:
+    field: github.check_run.id
+    target_field: github.check_id
+    ignore_missing: true
+- rename:
+    field: github.check_run.check_suite.name
+    target_field: github.related.suite
+    ignore_missing: true
+- rename:
+    field: github.check_suite.name
+    target_field: github.check_name
+    ignore_missing: true
+- rename:
+    field: github.repository.full_name
+    target_field: github.related.repository
+    ignore_missing: true
+# Since PR's is in arrays of objects we want to create an array of strings with the relevant info
+# to prevent nested datatypes
+- foreach:
+    field: github.check_run.pull_requests
+    processor:
+      append:
+        field: github.related.pull_requests
+        value: "{{_ingest._value.head.sha}}"
+- foreach:
+    field: github.check_suite.pull_requests
+    processor:
+      append:
+        field: github.related.pull_requests
+        value: "{{_ingest._value.head.sha}}"
+    if: ctx.github?.check_suite?.pull_requests != null
+- script:
+    lang: painless
+    source: ctx.github.related.pull_requests_count = (ctx.github.check_run.pull_requests).length
+    if: ctx.github?.check_run?.pull_requests != null
+- script:
+    lang: painless
+    source: ctx.github.related.pull_requests_count = (ctx.github.check_suite.pull_requests).length
+    if: ctx.github?.check_suite?.pull_requests != null
+- remove:
+    field:
+    - github.check_run
+    - github.check_suite
+    - github.repository
+    - github.organization
+    - github.installation
+    - github.sender
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+
+
+
+
