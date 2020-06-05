@@ -84,8 +84,21 @@ var powershell = (function () {
         });
     };
 
+    // countChunksDelimitedBy will return the number of chunks contained in a field
+    // that are delimited by the given delimiter.
+    var countChunksDelimitedBy = function(evt, fromField, delimiter) {
+        var str = evt.Get(fromField);
+        if (!str) {
+            return 0;
+        }
+        return str.split(delimiter).length-1;
+    };
+
     var dissect4xxAnd600 = function (evt) {
-        dissectField("winlog.event_data.param3", "winlog.event_data", 15, "\t", "=").Run(evt);
+        var delimiter = "\t";
+        var chunks = countChunksDelimitedBy(evt, "winlog.event_data.param3", delimiter);
+
+        dissectField("winlog.event_data.param3", "winlog.event_data", chunks, delimiter, "=").Run(evt);
 
         // these fields contain redundant information.
         evt.Delete("winlog.event_data.param1");
@@ -94,7 +107,10 @@ var powershell = (function () {
     };
 
     var dissect800Detail = function (evt) {
-        dissectField("winlog.event_data.param2", "winlog.event_data", 13, "\t", "=").Run(evt);
+        var delimiter = "\t";
+        var chunks = countChunksDelimitedBy(evt, "winlog.event_data.param2", delimiter);
+
+        dissectField("winlog.event_data.param2", "winlog.event_data", chunks, "\t", "=").Run(evt);
 
         // these fields contain redundant information.
         evt.Delete("winlog.event_data.param1");
@@ -102,7 +118,10 @@ var powershell = (function () {
     };
 
     var dissect4103 = function (evt) {
-        dissectField("winlog.event_data.ContextInfo", "winlog.event_data", 16, "        ", " = ").Run(evt);
+        var delimiter = "        ";
+        var chunks = countChunksDelimitedBy(evt, "winlog.event_data.ContextInfo", delimiter);
+
+        dissectField("winlog.event_data.ContextInfo", "winlog.event_data", chunks, delimiter, " = ").Run(evt);
 
         // these fields contain redundant information.
         evt.Delete("winlog.event_data.ContextInfo");
@@ -170,7 +189,7 @@ var powershell = (function () {
     var addProcessArgs = function (evt) {
         splitCommandLine(evt, "process.command_line", "process.args");
         var args = evt.Get("process.args");
-        if (args.length > 0) {
+        if (args && args.length > 0) {
             evt.Put("process.args_count", args.length);
         }
     };

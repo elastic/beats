@@ -21,10 +21,9 @@ import (
 
 func TestSerialization(t *testing.T) {
 	spec := Spec{
-		Name:         "hello",
-		Cmd:          "hellocmd",
-		Configurable: "file",
-		Args:         []string{"-c", "first"},
+		Name: "hello",
+		Cmd:  "hellocmd",
+		Args: []string{"-c", "first"},
 		Rules: transpiler.NewRuleList(
 			transpiler.Copy("inputs", "filebeat"),
 			transpiler.Filter("filebeat", "output", "keystore"),
@@ -52,7 +51,6 @@ func TestSerialization(t *testing.T) {
 	}
 	yml := `name: hello
 cmd: hellocmd
-configurable: file
 args:
 - -c
 - first
