@@ -27018,7 +27018,7 @@ type: keyword
 --
 Ingress Hostname
 
-type: ip
+type: keyword
 
 --
 
