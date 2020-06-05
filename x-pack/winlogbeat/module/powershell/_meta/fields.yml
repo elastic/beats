@@ -5,27 +5,27 @@
   release: beta
   fields:
 
-    - name: id
+    - name: powershell.id
       type: keyword
       description: Shell Id.
       example: Microsoft Powershell
 
-    - name: pipeline_id
+    - name: powershell.pipeline_id
       type: keyword
       description: Pipeline id.
       example: "1"
 
-    - name: runspace_id
+    - name: powershell.runspace_id
       type: keyword
       description: Runspace id.
       example: "4fa9074d-45ab-4e53-9195-e91981ac2bbb"
 
-    - name: sequence
+    - name: powershell.sequence
       type: long
       description: Sequence number of the powershell execution.
       example: 1
 
-    - name: total
+    - name: powershell.total
       type: long
       description: Total number of messages in the sequence.
       example: 10
