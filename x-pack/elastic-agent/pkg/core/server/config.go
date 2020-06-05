@@ -25,7 +25,7 @@ func DefaultGRPCConfig() *Config {
 	}
 }
 
-// New creates a new GRPC server for clients to connect to.
+// NewFromConfig creates a new GRPC server for clients to connect to.
 func NewFromConfig(logger *logger.Logger, cfg *config.Config, handler Handler) (*Server, error) {
 	wrappedConfig := &struct {
 		GRPC *Config `config:"grpc"`
