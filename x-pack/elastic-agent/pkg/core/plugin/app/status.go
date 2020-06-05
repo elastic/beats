@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sanathkr/go-yaml"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
@@ -68,4 +68,5 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 				errors.M(errors.MetaKeyAppName, app.id)))
 		}
 	}
+	app.appLock.Unlock()
 }

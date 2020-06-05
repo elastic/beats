@@ -82,7 +82,7 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
-	localApplication.srv, err = server.New(log, ":6789", &app.ApplicationStatusHandler{})
+	localApplication.srv, err = server.NewFromConfig(log, rawConfig, &app.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}

@@ -164,7 +164,7 @@ func (o *Operator) start(p Descriptor, cfg map[string]interface{}) (err error) {
 		newOperationFetch(o.logger, p, o.config, o.downloader, o.eventProcessor),
 		newOperationVerify(p, o.config, o.verifier, o.eventProcessor),
 		newOperationInstall(o.logger, p, o.config, o.installer, o.eventProcessor),
-		newOperationStart(o.logger, p, o.srv, o.config, cfg, o.eventProcessor),
+		newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
 		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
 	}
 	return o.runFlow(p, flow)

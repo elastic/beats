@@ -14,7 +14,7 @@ type Status int
 
 const (
 	// Stopped is status describing not running application.
-	Stopped Status = 0
+	Stopped Status = iota
 	// Starting is status describing application is starting.
 	Starting
 	// Configuring is status describing application is configuring.

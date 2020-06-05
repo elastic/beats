@@ -131,6 +131,7 @@ func (cm *Manager) OnConfig(s string) {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
 		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		return
 	}
 
 	err = uconfig.Unpack(&configMap)
@@ -138,6 +139,7 @@ func (cm *Manager) OnConfig(s string) {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.logger.Error(err)
 		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		return
 	}
 
 	blocks, err := cm.toConfigBlocks(configMap)
@@ -145,12 +147,14 @@ func (cm *Manager) OnConfig(s string) {
 		err = errors.Wrap(err, "could not apply the configuration")
 		cm.logger.Error(err)
 		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		return
 	}
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
 		err = errors.Wrap(err, "could not apply the configuration")
 		cm.logger.Error(err)
 		cm.client.Status(proto.StateObserved_FAILED, err.Error())
+		return
 	}
 
 	cm.client.Status(proto.StateObserved_HEALTHY, "Running")
