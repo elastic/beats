@@ -8,14 +8,6 @@ import (
 	"os/user"
 )
 
-const (
-	// ConfigurableGrpc is a flag telling elastic-agent that program has capability of Grpc server with a Config endpoint
-	ConfigurableGrpc = "grpc"
-	// ConfigurableFile is a flag telling elastic-agent that program has capability of being configured by accepting `-c filepath`
-	// argument with a configuration file provided
-	ConfigurableFile = "file"
-)
-
 // Specifier returns a process specification.
 type Specifier interface {
 	Spec() ProcessSpec
@@ -27,12 +19,7 @@ type ProcessSpec struct {
 	BinaryPath string
 
 	// Set of arguments.
-	Args []string
-
-	// Allows running third party application without
-	// the requirement for Config endpoint
-	// recognized options are: [grpc, file]
-	Configurable  string
+	Args          []string
 	Configuration map[string]interface{}
 
 	// Under what user we can run the program. (example: apm-server is not running as root, isolation and cgroup)

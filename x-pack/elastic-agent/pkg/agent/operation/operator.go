@@ -177,19 +177,8 @@ func (o *Operator) stop(p Descriptor) (err error) {
 
 // PushConfig tries to push config to a running process
 func (o *Operator) pushConfig(p Descriptor, cfg map[string]interface{}) error {
-	var flow []operation
-	configurable := p.IsGrpcConfigurable()
-
-	if configurable {
-		flow = []operation{
-			newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
-		}
-	} else {
-		flow = []operation{
-			// updates a configuration file and restarts a process
-			newOperationStop(o.logger, o.config, o.eventProcessor),
-			newOperationStart(o.logger, p, o.config, cfg, o.eventProcessor),
-		}
+	flow := []operation{
+		newOperationConfig(o.logger, o.config, cfg, o.eventProcessor),
 	}
 
 	return o.runFlow(p, flow)

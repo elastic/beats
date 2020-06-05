@@ -41,3 +41,7 @@
 
 # Winlogbeat
 /x-pack/winlogbeat/ @elastic/siem
+
+# CI Specific
+/.ci/ @elastic/observablt-robots
+/Jenkinsfile @elastic/observablt-robots
