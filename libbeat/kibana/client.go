@@ -143,11 +143,12 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		proxyEnv.HTTPSProxy = config.ProxyHost
 		proxyEnv.HTTPProxy = config.ProxyHost
 	}
-	proxy := func(req *http.Request) (*url.URL, error) {
-		if config.ProxyDisable {
-			return nil, nil
-		}
-		return proxyEnv.ProxyFunc()(req.URL)
+
+	var proxy func(_ *http.Request) (*url.URL, error)
+	if !config.ProxyDisable {
+		proxyFunc := proxyEnv.ProxyFunc()
+
+		proxy = func(req *http.Request) (*url.URL, error) { return proxyFunc(req.URL) }
 	}
 
 	client := &Client{
