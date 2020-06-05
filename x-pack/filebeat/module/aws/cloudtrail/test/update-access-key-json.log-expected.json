@@ -4,7 +4,9 @@
         "aws.cloudtrail.event_type": "AwsApiCall",
         "aws.cloudtrail.event_version": "1.05",
         "aws.cloudtrail.recipient_account_id": "0123456789012",
-        "aws.cloudtrail.request_parameters": "{accessKeyId=EXAMPLE_KEY_ID, userName=Bob, status=Inactive}",
+        "aws.cloudtrail.request_parameters.accessKeyId": "EXAMPLE_KEY_ID",
+        "aws.cloudtrail.request_parameters.status": "Inactive",
+        "aws.cloudtrail.request_parameters.userName": "Bob",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",
         "aws.cloudtrail.user_identity.invoked_by": "signin.amazonaws.com",
@@ -25,9 +27,6 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
-        "related.user": [
-            "Bob"
-        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

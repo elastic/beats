@@ -118,26 +118,20 @@ processors:
       field: "json.errorMessage"
       target_field: "aws.cloudtrail.error_message"
       ignore_failure: true
-  - script:
-      lang: painless
-      source: |
-        if (ctx.json.requestParameters != null) {
-          ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
-        }
+  - rename:
+      field: "json.requestParameters"
+      target_field: "aws.cloudtrail.request_parameters"
+      if: "ctx.json.requestParameters != null"
       ignore_failure: true
-  - script:
-      lang: painless
-      source: |
-        if (ctx.json.responseElements != null) {
-          ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
-        }
+  - rename:
+      field: "json.responseElements"
+      target_field: "aws.cloudtrail.response_elements"
+      if: "ctx.json.responseElements != null"
       ignore_failure: true
-  - script:
-      lang: painless
-      source: |
-        if (ctx.json.additionalEventData != null) {
-          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
-        }
+  - rename:
+      field: "json.additionalEventData"
+      target_field: "aws.cloudtrail.additional_eventdata"
+      if: "ctx.json.additionalEventData != null"
       ignore_failure: true
   - rename:
       field: "json.requestId"
@@ -179,12 +173,10 @@ processors:
       field: "json.recipientAccountId"
       target_field: "aws.cloudtrail.recipient_account_id"
       ignore_failure: true
-  - script:
-      lang: painless
-      source: |
-        if (ctx.json.serviceEventDetails != null) {
-          ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
-        }
+  - rename:
+      field: "json.serviceEventDetails"
+      target_field: "aws.cloudtrail.service_event_details"
+      if: "ctx.json.serviceEventDetails != null"
       ignore_failure: true
   - rename:
       field: "json.sharedEventId"
