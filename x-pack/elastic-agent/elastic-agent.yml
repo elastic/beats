@@ -29,13 +29,13 @@ datasources:
           - metricset: filesystem
             dataset: system.filesystem
 
-settings.monitoring:
-  # enabled turns on monitoring of running processes
-  enabled: true
-  # enables log monitoring
-  logs: true
-  # enables metrics monitoring
-  metrics: true
+# settings.monitoring:
+#   # enabled turns on monitoring of running processes
+#   enabled: true
+#   # enables log monitoring
+#   logs: true
+#   # enables metrics monitoring
+#   metrics: true
 
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:
