@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
+- Fix Powershell processing of downgraded engine events. {pull}18966[18966]
 
 *Functionbeat*
 
