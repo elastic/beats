@@ -52,29 +52,29 @@ processors:
       formats:
         - ISO8601
   - rename:
-      field: "json.userIdentity.invokedBy"
-      target_field: "aws.cloudtrail.user_identity.invoked_by"
-      ignore_failure: true
-  - rename:
-      field: "json.userIdentity.sessionIssuer.type"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.type"
+      field: "json.userIdentity.sessionContext.sessionIssuer.type"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.type"
       ignore_failure: true
 # userIdentity.sessionIssuer.userName is only set with assumed roles.
   - rename:
-      field: "json.userIdentity.sessionIssuer.userName"
+      field: "json.userIdentity.sessionContext.sessionIssuer.userName"
       target_field: "user.name"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.principalId"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.principal_id"
+      field: "json.userIdentity.sessionContext.sessionIssuer.principalId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.principal_id"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.arn"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.arn"
+      field: "json.userIdentity.sessionContext.sessionIssuer.arn"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.arn"
       ignore_failure: true
   - rename:
-      field: "json.userIdentity.sessionIssuer.accountId"
-      target_field: "aws.cloudtrail.user_identity.session_issuer.account_id"
+      field: "json.userIdentity.sessionContext.sessionIssuer.accountId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.invokedBy"
+      target_field: "aws.cloudtrail.user_identity.invoked_by"
       ignore_failure: true
   - rename:
       field: "json.eventSource"

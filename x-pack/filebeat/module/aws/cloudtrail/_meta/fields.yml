@@ -46,38 +46,38 @@
               type: date
               description: >-
                 The date and time when the temporary security credentials were issued.
+            - name: session_issuer
+              type: group
+              description: >-
+                If the request was made with temporary security
+                credentials, an element that provides information about
+                how the credentials were obtained.
+              fields:
+                - name: type
+                  type: keyword
+                  description: >-
+                    The source of the temporary security credentials, such
+                    as Root, IAMUser, or Role.
+                - name: principal_id
+                  type: keyword
+                  description: >-
+                    The internal ID of the entity that was used to get
+                    credentials.
+                - name: arn
+                  type: keyword
+                  description: >-
+                    The ARN of the source (account, IAM user, or role)
+                    that was used to get temporary security credentials.
+                - name: account_id
+                  type: keyword
+                  description: >-
+                    The account that owns the entity that was used to get
+                    credentials.
         - name: invoked_by
           type: keyword
           description: >-
             The name of the AWS service that made the request, such as
             Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
-        - name: session_issuer
-          type: group
-          description: >-
-            If the request was made with temporary security
-            credentials, an element that provides information about
-            how the credentials were obtained.
-          fields:
-            - name: type
-              type: keyword
-              description: >-
-                The source of the temporary security credentials, such
-                as Root, IAMUser, or Role.
-            - name: principal_id
-              type: keyword
-              description: >-
-                The internal ID of the entity that was used to get
-                credentials.
-            - name: arn
-              type: keyword
-              description: >-
-                The ARN of the source (account, IAM user, or role)
-                that was used to get temporary security credentials.
-            - name: account_id
-              type: keyword
-              description: >-
-                The account that owns the entity that was used to get
-                credentials.
     - name: error_code
       type: keyword
       description: >-
