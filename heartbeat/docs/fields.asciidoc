@@ -7283,7 +7283,7 @@ type: keyword
 
 --
 
-*`http.response.headers`*::
+*`http.response.headers.*`*::
 +
 --
 The canonical headers of the monitored HTTP response.
