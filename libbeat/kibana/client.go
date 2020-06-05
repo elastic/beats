@@ -138,16 +138,15 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 
 	// check to see if we have a proxy_host set
 
-	proxyEnv := httpproxy.FromEnvironment()
-	if config.ProxyHost != "" {
-		proxyEnv.HTTPSProxy = config.ProxyHost
-		proxyEnv.HTTPProxy = config.ProxyHost
-	}
-
 	var proxy func(_ *http.Request) (*url.URL, error)
 	if !config.ProxyDisable {
-		proxyFunc := proxyEnv.ProxyFunc()
+		proxyEnv := httpproxy.FromEnvironment()
+		if config.ProxyHost != "" {
+			proxyEnv.HTTPSProxy = config.ProxyHost
+			proxyEnv.HTTPProxy = config.ProxyHost
+		}
 
+		proxyFunc := proxyEnv.ProxyFunc()
 		proxy = func(req *http.Request) (*url.URL, error) { return proxyFunc(req.URL) }
 	}
 
