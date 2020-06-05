@@ -1227,6 +1227,13 @@ type: keyword
 
 --
 
+*`aws.cloudtrail.request_parameters.text`*::
++
+--
+type: text
+
+--
+
 *`aws.cloudtrail.response_elements`*::
 +
 --
@@ -1236,12 +1243,26 @@ type: keyword
 
 --
 
+*`aws.cloudtrail.response_elements.text`*::
++
+--
+type: text
+
+--
+
 *`aws.cloudtrail.additional_eventdata`*::
 +
 --
 Additional data about the event that was not part of the request or response.
 
 type: keyword
+
+--
+
+*`aws.cloudtrail.additional_eventdata.text`*::
++
+--
+type: text
 
 --
 
@@ -1338,6 +1359,13 @@ type: keyword
 Identifies the service event, including what triggered the event and the result.
 
 type: keyword
+
+--
+
+*`aws.cloudtrail.service_event_details.text`*::
++
+--
+type: text
 
 --
 

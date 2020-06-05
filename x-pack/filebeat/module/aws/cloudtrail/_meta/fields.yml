@@ -90,16 +90,25 @@
       type: keyword
       description: >-
         The parameters, if any, that were sent with the request.
+      multi_fields:
+        - name: text
+          type: text
     - name: response_elements
       type: keyword
       description: >-
         The response element for actions that make changes (create,
         update, or delete actions).
+      multi_fields:
+        - name: text
+          type: text
     - name: additional_eventdata
       type: keyword
       description: >-
         Additional data about the event that was not part of the
         request or response.
+      multi_fields:
+        - name: text
+          type: text
     - name: request_id
       type: keyword
       description: >-
@@ -149,6 +158,9 @@
       description: >-
         Identifies the service event, including what triggered the
         event and the result.
+      multi_fields:
+        - name: text
+          type: text
     - name: shared_event_id
       type: keyword
       description: >-
