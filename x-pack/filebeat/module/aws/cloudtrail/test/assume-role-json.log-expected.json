@@ -10,6 +10,10 @@
         "aws.cloudtrail.user_identity.arn": "arn:aws:sts::111111111111:assumed-role/JohnDoe/JohnRole1",
         "aws.cloudtrail.user_identity.session_context.creation_date": "2019-10-02T21:50:54.000Z",
         "aws.cloudtrail.user_identity.session_context.mfa_authenticated": "false",
+        "aws.cloudtrail.user_identity.session_context.session_issuer.account_id": "111111111111",
+        "aws.cloudtrail.user_identity.session_context.session_issuer.arn": "arn:aws:iam::111111111111:role/JohnRole1",
+        "aws.cloudtrail.user_identity.session_context.session_issuer.principal_id": "AROAIN5ATK5U7KEXAMPLE",
+        "aws.cloudtrail.user_identity.session_context.session_issuer.type": "Role",
         "aws.cloudtrail.user_identity.type": "AssumedRole",
         "cloud.account.id": "111111111111",
         "cloud.region": "us-east-2",
@@ -38,6 +42,7 @@
             "forwarded"
         ],
         "user.id": "AROAIN5ATK5U7KEXAMPLE:JohnRole1",
+        "user.name": "JohnDoe",
         "user_agent.device.name": "Spider",
         "user_agent.name": "aws-cli",
         "user_agent.original": "aws-cli/1.16.248 Python/3.4.7 Linux/4.9.184-0.1.ac.235.83.329.metal1.x86_64 botocore/1.12.239",
