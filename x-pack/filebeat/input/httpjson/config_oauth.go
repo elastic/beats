@@ -34,21 +34,21 @@ func (p OAuth2Provider) canonical() OAuth2Provider {
 // OAuth2 contains information about oauth2 authentication settings.
 type OAuth2 struct {
 	// common oauth fields
-	ClientID       string              `config:"client_id"`
-	ClientSecret   string              `config:"client_secret"`
+	ClientID       string              `config:"client.id"`
+	ClientSecret   string              `config:"client.secret"`
 	Enabled        *bool               `config:"enabled"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
-	Provider       OAuth2Provider      `config:"provider"`
+	Provider       string              `config:"provider"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
 
 	// google specific
-	GoogleCredentialsFile string `config:"google_credentials_file"`
-	GoogleCredentialsJSON []byte `config:"google_credentials_json"`
-	GoogleJWTFile         string `config:"google_jwt_file"`
+	GoogleCredentialsFile string `config:"google.credentials_file"`
+	GoogleCredentialsJSON []byte `config:"google.credentials_json"`
+	GoogleJWTFile         string `config:"google.jwt_file"`
 
 	// microsoft azure specific
-	AzureTenantID string `config:"azure_tenant_id"`
+	AzureTenantID string `config:"azure.tenant_id"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
@@ -59,34 +59,43 @@ func (o *OAuth2) IsEnabled() bool {
 func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
-	if o.Provider != OAuth2ProviderGoogle {
-		creds := clientcredentials.Config{
-			ClientID:       o.ClientID,
-			ClientSecret:   o.ClientSecret,
-			TokenURL:       o.GetTokenURL(),
-			Scopes:         o.Scopes,
-			EndpointParams: o.EndpointParams,
+	switch o.GetProvider() {
+	case OAuth2ProviderGoogle:
+		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+		if err != nil {
+			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
 		}
-		return creds.Client(ctx), nil
+		return oauth2.NewClient(ctx, creds.TokenSource), nil
 	}
 
-	creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
-	if err != nil {
-		return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+	creds := clientcredentials.Config{
+		ClientID:       o.ClientID,
+		ClientSecret:   o.ClientSecret,
+		TokenURL:       o.GetTokenURL(),
+		Scopes:         o.Scopes,
+		EndpointParams: o.EndpointParams,
 	}
 
-	return oauth2.NewClient(ctx, creds.TokenSource), nil
+	return creds.Client(ctx), nil
 }
 
 func (o *OAuth2) GetTokenURL() string {
-	if o.Provider == OAuth2ProviderAzure && o.TokenURL == "" {
-		return endpoints.AzureAD(o.AzureTenantID).TokenURL
+	switch o.GetProvider() {
+	case OAuth2ProviderAzure:
+		if o.TokenURL == "" {
+			return endpoints.AzureAD(o.AzureTenantID).TokenURL
+		}
 	}
+
 	return o.TokenURL
 }
 
-func (o *OAuth2) validate() error {
-	switch o.Provider.canonical() {
+func (o OAuth2) GetProvider() OAuth2Provider {
+	return OAuth2Provider(o.Provider).canonical()
+}
+
+func (o *OAuth2) Validate() error {
+	switch o.GetProvider() {
 	case OAuth2ProviderAzure:
 		return o.validateAzureProvider()
 	case OAuth2ProviderGoogle:
@@ -96,7 +105,7 @@ func (o *OAuth2) validate() error {
 			return errors.New("invalid configuration: both token_url and client credentials must be provided")
 		}
 	default:
-		return fmt.Errorf("invalid configuration: unknown provider %q", o.Provider)
+		return fmt.Errorf("invalid configuration: unknown provider %q", o.GetProvider())
 	}
 	return nil
 }
@@ -104,7 +113,7 @@ func (o *OAuth2) validate() error {
 func (o *OAuth2) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != "" ||
 		o.AzureTenantID != "" || len(o.EndpointParams) > 0 {
-		return errors.New("invalid configuration: none of token_url and client credentials can be used, use google_credentials_file or google_jwt_file instead")
+		return errors.New("invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead")
 	}
 
 	// credentials_json
@@ -124,7 +133,8 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if _, err := google.FindDefaultCredentials(ctx, o.Scopes...); err == nil {
+	if creds, err := google.FindDefaultCredentials(ctx, o.Scopes...); err == nil {
+		o.GoogleCredentialsJSON = creds.JSON
 		return nil
 	}
 
@@ -133,12 +143,12 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 func (o *OAuth2) populateCredentialsJSONFromFile(file string) error {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
-		return fmt.Errorf("the file %q cannot be found", file)
+		return fmt.Errorf("invalid configuration: the file %q cannot be found", file)
 	}
 
 	credBytes, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("the file %q cannot be read", file)
+		return fmt.Errorf("invalid configuration: the file %q cannot be read", file)
 	}
 
 	o.GoogleCredentialsJSON = credBytes

@@ -85,10 +85,7 @@ func (c *config) Validate() error {
 	}
 	if c.OAuth2 != nil {
 		if c.APIKey != "" || c.AuthenticationScheme != "" {
-			return errors.Errorf("invalid configuration: both oauth2 and api_key or authentication_scheme cannot be set simultaneously")
-		}
-		if err := c.OAuth2.validate(); err != nil {
-			return err
+			return errors.Errorf("invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously")
 		}
 	}
 	return nil
