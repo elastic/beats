@@ -49,9 +49,9 @@ type Connection struct {
 	Encoder BodyEncoder
 	HTTP    esHTTPClient
 
-	encodedAPIKey string // Base64-encoded API key
-	version       common.Version
-	log           *logp.Logger
+	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
+	version          common.Version
+	log              *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -167,7 +167,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	if s.APIKey != "" {
-		conn.encodedAPIKey = base64.StdEncoding.EncodeToString([]byte(s.APIKey))
+		conn.apiKeyAuthHeader = "ApiKey " + base64.StdEncoding.EncodeToString([]byte(s.APIKey))
 	}
 
 	return &conn, nil
@@ -443,8 +443,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.encodedAPIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.encodedAPIKey)
+	if conn.apiKeyAuthHeader != "" {
+		req.Header.Add("Authorization", conn.apiKeyAuthHeader)
 	}
 
 	for name, value := range conn.Headers {
