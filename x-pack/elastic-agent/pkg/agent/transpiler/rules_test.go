@@ -22,6 +22,86 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
+		"fix streams": {
+			givenYAML: `
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+  - name: Specified dataset
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified with empty strings
+    namespace: ""
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: ""
+`,
+			expectedYAML: `
+datasources:
+  - name: All default
+    namespace: default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+          dataset: generic
+  - name: Specified namespace
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: generic
+  - name: Specified dataset
+    namespace: default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified
+    namespace: nsns
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: dsds
+  - name: All specified with empty strings
+    namespace: default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: generic
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					FixStream(),
+				},
+			},
+		},
+
 		"inject index": {
 			givenYAML: `
 datasources:
@@ -49,6 +129,13 @@ datasources:
       streams:
         - paths: /var/log/mysql/access.log
           dataset: dsds
+  - name: All specified with empty strings
+    namespace: ""
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: ""
 `,
 			expectedYAML: `
 datasources:
@@ -80,6 +167,14 @@ datasources:
         - paths: /var/log/mysql/access.log
           dataset: dsds
           index: mytype-dsds-nsns
+  - name: All specified with empty strings
+    namespace: ""
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/access.log
+          dataset: ""
+          index: mytype-generic-default
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -564,6 +659,7 @@ func TestSerialization(t *testing.T) {
 		InjectStreamProcessor("insert_after", "index-type"),
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
+		FixStream(),
 	)
 
 	y := `- rename:
@@ -623,6 +719,7 @@ func TestSerialization(t *testing.T) {
     - a
     - b
     on_conflict: insert_before
+- fix_stream: {}
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

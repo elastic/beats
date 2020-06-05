@@ -47,6 +47,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-docker>>
 * <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
 * <<{beatname_lc}-input-kafka>>
 * <<{beatname_lc}-input-log>>
@@ -72,6 +73,8 @@ include::inputs/input-container.asciidoc[]
 include::inputs/input-docker.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-httpjson.asciidoc[]
 

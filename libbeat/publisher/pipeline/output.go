@@ -25,7 +25,6 @@ import (
 
 	"go.elastic.co/apm"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
@@ -49,12 +48,12 @@ type netClientWorker struct {
 
 	batchSize  int
 	batchSizer func() int
-	logger     *logp.Logger
+	logger     logger
 
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
 		observer: observer,
 		qu:       qu,
@@ -70,7 +69,7 @@ func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Clie
 		c = &netClientWorker{
 			worker: w,
 			client: nc,
-			logger: logp.NewLogger("publisher_pipeline_output"),
+			logger: logger,
 			tracer: tracer,
 		}
 	} else {

@@ -23,6 +23,12 @@ type wrappedConfig struct {
 	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
 }
 
+func defaultWrappedConfig() *wrappedConfig {
+	return &wrappedConfig{
+		MonitoringConfig: monitoringConfig.DefaultConfig(),
+	}
+}
+
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
 type Monitor struct {
@@ -32,23 +38,27 @@ type Monitor struct {
 }
 
 // NewMonitor creates a beats monitor.
-func NewMonitor(downloadConfig *artifact.Config) *Monitor {
+func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig) *Monitor {
+	if monitoringCfg == nil {
+		monitoringCfg = monitoringConfig.DefaultConfig()
+	}
+
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
 		installPath:     downloadConfig.InstallPath,
-		config:          &monitoringConfig.MonitoringConfig{},
+		config:          monitoringCfg,
 	}
 }
 
 // Reload reloads state of the monitoring based on config.
 func (b *Monitor) Reload(rawConfig *config.Config) error {
-	cfg := &wrappedConfig{}
+	cfg := defaultWrappedConfig()
 	if err := rawConfig.Unpack(&cfg); err != nil {
 		return err
 	}
 
 	if cfg == nil || cfg.MonitoringConfig == nil {
-		b.config = &monitoringConfig.MonitoringConfig{}
+		b.config = monitoringConfig.DefaultConfig()
 	} else {
 		b.config = cfg.MonitoringConfig
 	}
@@ -80,22 +90,30 @@ func (b *Monitor) generateLoggingPath(process, pipelineID string) string {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(process, pipelineID string, args []string) []string {
+func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSidecar bool) []string {
 	appendix := make([]string, 0, 7)
 
 	monitoringEndpoint := b.generateMonitoringEndpoint(process, pipelineID)
 	if monitoringEndpoint != "" {
+		endpoint := monitoringEndpoint
+		if isSidecar {
+			endpoint += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "http.enabled=true",
-			"-E", "http.host="+monitoringEndpoint,
+			"-E", "http.host="+endpoint,
 		)
 	}
 
 	loggingPath := b.generateLoggingPath(process, pipelineID)
 	if loggingPath != "" {
+		logFile := process
+		if isSidecar {
+			logFile += "_monitor"
+		}
 		appendix = append(appendix,
 			"-E", "logging.files.path="+loggingPath,
-			"-E", "logging.files.name="+process,
+			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
 			"-E", "logging.files.permission=0644",
 			"-E", "logging.files.interval=1h",

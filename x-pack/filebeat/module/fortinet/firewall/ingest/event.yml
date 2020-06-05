@@ -61,19 +61,25 @@ processors:
     field: fortinet.firewall.remip
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.destination?.ip == null"
-- rename:
+    if: "ctx.destination?.ip == null"  
+- convert:
     field: fortinet.firewall.dstport
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.remport
     target_field: destination.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.destination?.port == null"
-- rename:
+- convert:
     field: fortinet.firewall.rcvdbyte
     target_field: destination.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.daddr
@@ -93,9 +99,11 @@ processors:
     field: fortinet.firewall.group
     target_field: source.user.group.name
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.sentbyte
     target_field: source.bytes
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.srcip
@@ -115,13 +123,17 @@ processors:
     target_field: source.mac
     ignore_missing: true
     if: "ctx.source?.mac == null"
-- rename:
+- convert:
     field: fortinet.firewall.srcport
     target_field: source.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.locport
     target_field: source.port
+    type: long
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.source?.port == null"
 - rename:
@@ -140,9 +152,11 @@ processors:
     field: fortinet.firewall.file
     target_field: file.name
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.filesize
     target_field: file.size
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: fortinet.firewall.level
@@ -197,9 +211,11 @@ processors:
     field: fortinet.firewall.url
     target_field: url.path
     ignore_missing: true
-- rename:
+- convert:
     field: fortinet.firewall.sess_duration
+    type: long
     target_field: event.duration
+    ignore_failure: true
     ignore_missing: true
     if: "ctx.event?.duration == null"
 - geoip:
@@ -289,6 +305,17 @@ processors:
     field: related.user
     value: "{{source.user.name}}"
     if: "ctx.source?.user?.name != null"
+- remove:
+    field:
+    - fortinet.firewall.dstport
+    - fortinet.firewall.remport
+    - fortinet.firewall.rcvdbyte
+    - fortinet.firewall.sentbyte
+    - fortinet.firewall.srcport
+    - fortinet.firewall.locport
+    - fortinet.firewall.filesize
+    - fortinet.firewall.sess_duration
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message
