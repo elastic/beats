@@ -232,7 +232,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436{18436}
+- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
+- Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 
 *Functionbeat*
 
