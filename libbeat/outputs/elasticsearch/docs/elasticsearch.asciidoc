@@ -136,8 +136,8 @@ The default value is 1.
 
 ===== `api_key`
 
-Instead of using usernames and passwords,
-you can use API keys to secure communication with {es}.
+Instead of using usernames and passwords, you can use API keys to secure communication
+with {es}. The value must be the ID of the API key and the API key joined by a colon.
 For more information, see <<beats-api-keys>>.
 
 ===== `username`
