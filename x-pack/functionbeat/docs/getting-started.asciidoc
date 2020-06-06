@@ -32,7 +32,7 @@ include::{libbeat-dir}/tab-widgets/install-linux-mac-win-short-widget.asciidoc[]
 
 [float]
 [[set-connection]]
-=== Step 2: Set the connection information
+=== Step 2: Connect to the {stack}
 
 include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 

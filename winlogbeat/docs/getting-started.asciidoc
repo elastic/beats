@@ -59,7 +59,7 @@ execution policy for the current session to allow the script to run. For example
 
 [float]
 [[set-connection]]
-=== Step 2: Set the connection information
+=== Step 2: Connect to the {stack}
 
 include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
