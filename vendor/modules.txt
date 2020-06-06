@@ -155,6 +155,7 @@ github.com/aws/aws-sdk-go-v2/service/cloudformation
 github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface
 github.com/aws/aws-sdk-go-v2/service/cloudwatch
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs
 github.com/aws/aws-sdk-go-v2/service/ec2
 github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2
@@ -615,7 +616,7 @@ github.com/insomniacslk/dhcp/iana
 # github.com/jcmturner/gofork v1.0.0
 github.com/jcmturner/gofork/encoding/asn1
 github.com/jcmturner/gofork/x/crypto/pbkdf2
-# github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
+# github.com/jmespath/go-jmespath v0.3.0
 github.com/jmespath/go-jmespath
 # github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 github.com/jmoiron/sqlx

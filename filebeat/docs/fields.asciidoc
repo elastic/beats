@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
+* <<exported-fields-awscloudwatch>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cef>>
@@ -2043,6 +2044,12 @@ The type of traffic: IPv4, IPv6, or EFA.
 type: keyword
 
 --
+
+[[exported-fields-awscloudwatch]]
+== awscloudwatch fields
+
+Fields from awscloudwatch input.
+
 
 [[exported-fields-azure]]
 == Azure fields
