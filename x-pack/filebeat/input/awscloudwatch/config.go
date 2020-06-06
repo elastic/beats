@@ -27,8 +27,8 @@ func defaultConfig() config {
 		ForwarderConfig: harvester.ForwarderConfig{
 			Type: "awscloudwatch",
 		},
-		Limit:      100,
-		APITimeout: 120 * time.Second,
+		Limit:         100,
+		APITimeout:    120 * time.Second,
 		ScanFrequency: 10 * time.Second,
 	}
 }

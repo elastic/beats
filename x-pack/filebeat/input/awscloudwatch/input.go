@@ -6,11 +6,11 @@ package awscloudwatch
 
 import (
 	"context"
-	"fmt"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
@@ -85,6 +85,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 
+	logger.Info("awscloudwatch input config = ", config)
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
@@ -124,12 +125,14 @@ func (p *awsCloudWatchInput) Run() {
 	awsConfig.Region = p.config.RegionName
 
 	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(p.config.AwsConfig.Endpoint, "cloudwatchlogs", p.config.RegionName, awsConfig)
+	p.run(cwConfig)
+
 	for {
 		select {
-		case <- p.close:
+		case <-p.close:
 			p.logger.Info("awscloudwatch input stopped")
 			return
-		case <- time.After(p.config.ScanFrequency):
+		case <-time.After(p.config.ScanFrequency):
 			p.logger.Info("start awscloudwatch input")
 			p.run(cwConfig)
 		}
@@ -147,23 +150,24 @@ func (p *awsCloudWatchInput) run(cwConfig awssdk.Config) {
 	startTime, endTime := aws.GetStartTimeEndTime(p.config.ScanFrequency)
 	p.logger.Info("startTime = ", startTime)
 	p.logger.Info("endTime = ", endTime)
-	startTimeMS := int64(startTime.Nanosecond())/int64(time.Millisecond)
-	endTimeMS := int64(endTime.Nanosecond())/int64(time.Millisecond)
+	startTimeMS := int64(startTime.Nanosecond()) / int64(time.Millisecond)
+	endTimeMS := int64(endTime.Nanosecond()) / int64(time.Millisecond)
 
 	svc := cloudwatchlogs.New(cwConfig)
 	for p.context.Err() == nil {
 		getLogEventsInput := &cloudwatchlogs.GetLogEventsInput{
 			LogGroupName:  awssdk.String(p.config.LogGroup),
 			LogStreamName: awssdk.String(p.config.LogStream),
-			StartTime: &startTimeMS,
-			EndTime: &endTimeMS,
+			StartTime:     &startTimeMS,
+			EndTime:       &endTimeMS,
 			Limit:         awssdk.Int64(int64(p.config.Limit)),
 		}
 
 		req := svc.GetLogEventsRequest(getLogEventsInput)
 		resp, err := req.Send(ctx)
 		if err != nil {
-			fmt.Println("GetLogEventsRequest failed: ", err.Error())
+			p.logger.Error("GetLogEventsRequest failed", err)
+			continue
 		}
 
 		events := resp.Events
@@ -190,9 +194,8 @@ func (p *awsCloudWatchInput) run(cwConfig awssdk.Config) {
 			}
 			err = p.forwardEvent(beatEvent)
 			if err != nil {
-				err = errors.Wrap(err, "forwardEvent failed")
-				p.logger.Error(err)
-				fmt.Println("forwardEvent failed: ", err.Error())
+				p.logger.Error("forwardEvent failed", err)
+				continue
 			}
 		}
 	}
