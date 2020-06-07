@@ -128,26 +128,33 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function changeTabs(e) {
   const target = e.target;
-  const parent = target.parentNode;
-  const grandparent = parent.parentNode;
+  
+  var tabButtons = document.querySelectorAll('[role="tab"]');
+  for (var i = 0; i < tabButtons.length; i++) {
+    
+    parent = tabButtons[i].parentNode
+    grandparent = parent.parentNode
+    
+    if (target.innerText == tabButtons[i].innerText) {
+      // Remove all current selected tabs
+      parent
+        .querySelectorAll('[aria-selected="true"]')
+        .forEach(t => t.setAttribute("aria-selected", false));
 
-  // Remove all current selected tabs
-  parent
-    .querySelectorAll('[aria-selected="true"]')
-    .forEach(t => t.setAttribute("aria-selected", false));
+      // Set this tab as selected
+      tabButtons[i].setAttribute("aria-selected", true);
 
-  // Set this tab as selected
-  target.setAttribute("aria-selected", true);
+      // Hide all tab panels
+      grandparent
+        .querySelectorAll('[role="tabpanel"]')
+        .forEach(p => p.setAttribute("hidden", true));
 
-  // Hide all tab panels
-  grandparent
-    .querySelectorAll('[role="tabpanel"]')
-    .forEach(p => p.setAttribute("hidden", true));
-
-  // Show the selected panel
-  grandparent.parentNode
-    .querySelector(`#${target.getAttribute("aria-controls")}`)
-    .removeAttribute("hidden");
+      // Show the selected panel
+      grandparent.parentNode
+        .querySelector(`#${tabButtons[i].getAttribute("aria-controls")}`)
+        .removeAttribute("hidden");
+    }
+  }
 }
 </script>
 ++++
