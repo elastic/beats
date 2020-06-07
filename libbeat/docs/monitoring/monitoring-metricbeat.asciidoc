@@ -92,9 +92,9 @@ endif::[]
 === Install and configure {metricbeat} to collect monitoring data
 
 ifeval::["{beatname_lc}"!="metricbeat"]
-. {metricbeat-ref}/metricbeat-installation.html[Install {metricbeat}] on the
-same server as {beatname_uc}. If you already have {metricbeat} installed on the
-server, skip this step.
+. Install {metricbeat} on the same server as {beatname_uc}. To learn how, see
+{metricbeat-ref}/metricbeat-installation-configuration.html[Get started with {metricbeat}].
+If you already have {metricbeat} installed on the server, skip this step.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 . The next step depends on how you want to run {metricbeat}:
@@ -103,11 +103,9 @@ take the the steps required for your environment to run two instances of
 {metricbeat} as a service. The steps for doing this vary by platform and are
 beyond the scope of this documentation.
 * If you're running the binary directly in the foreground and want to run a
-separate monitoring instance,
-{metricbeat-ref}/metricbeat-installation.html[install {metricbeat}] to a
-different path. If necessary, set `path.config`, `path.data`, and `path.log`
-to point to the correct directories. See <<directory-layout>> for the default
-locations.
+separate monitoring instance, install {metricbeat} to a different path. If
+necessary, set `path.config`, `path.data`, and `path.log` to point to the
+correct directories. See <<directory-layout>> for the default locations.
 endif::[]
 
 . Enable the `beat-xpack` module in {metricbeat}. +
