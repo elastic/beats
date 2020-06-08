@@ -67,7 +67,7 @@ func TestDissectConversion(t *testing.T) {
 		},
 		{
 			Name: "Greedy padding skip test ->",
-			Tok:  "id=%{id|integer->} padding_removed=%{padding_removed|boolean->} length=%{length|long->} msg=\"%{message}\"",
+			Tok:  "id=%{id->|integer} padding_removed=%{padding_removed->|boolean} length=%{length->|long} msg=\"%{message}\"",
 			Msg:  "id=1945     padding_removed=true    length=123456789    msg=\"Testing for padding\"}",
 			Expected: map[string]interface{}{
 				"id":              int32(1945),

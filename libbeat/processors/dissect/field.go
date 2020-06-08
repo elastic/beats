@@ -51,10 +51,6 @@ type baseField struct {
 
 type dataType uint8
 
-var (
-	dataTypeSeparator = "|"
-)
-
 // List of dataTypes.
 const (
 	unset dataType = iota
@@ -67,15 +63,18 @@ const (
 	IP
 )
 
+var (
+	unsetDataType = "[unset]"
+)
 var dataTypeNames = map[string]dataType{
-	"[unset]": unset,
-	"integer": Integer,
-	"long":    Long,
-	"float":   Float,
-	"double":  Double,
-	"string":  String,
-	"boolean": Boolean,
-	"ip":      IP,
+	unsetDataType: unset,
+	"integer":     Integer,
+	"long":        Long,
+	"float":       Float,
+	"double":      Double,
+	"string":      String,
+	"boolean":     Boolean,
+	"ip":          IP,
 }
 
 func (f baseField) IsGreedy() bool {
@@ -386,19 +385,6 @@ func newNormalField(id int, key string, dataType string, ordinal int, length int
 func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, length int, greedy bool) {
 	m := suffixRE.FindAllStringSubmatch(rawKey, -1)
 
-	if m[0][1] != "" {
-		parts := strings.Split(m[0][1], dataTypeSeparator)
-		if len(parts) > 1 {
-			key = parts[0]
-			if parts[1] == "" {
-				dataType = "[unset]"
-			} else {
-				dataType = parts[1]
-			}
-		} else {
-			key = m[0][1]
-		}
-	}
 	if m[0][3] != "" {
 		ordinal, _ = strconv.Atoi(m[0][3])
 	}
@@ -411,5 +397,13 @@ func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, l
 		greedy = true
 	}
 
-	return key, dataType, ordinal, length, greedy
+	if m[0][7] != "" {
+		if m[0][8] == "" {
+			dataType = unsetDataType
+		} else {
+			dataType = m[0][8]
+		}
+	}
+
+	return m[0][1], dataType, ordinal, length, greedy
 }
