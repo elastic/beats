@@ -6652,7 +6652,7 @@ format: bytes
 Number of disk fetches.
 
 
-type: long
+type: double
 
 --
 
@@ -6710,7 +6710,7 @@ format: percent
 Number of operations per second.
 
 
-type: long
+type: double
 
 --
 
@@ -6807,7 +6807,7 @@ type: long
 Memory quota setting for the Index service (Mbyte).
 
 
-type: long
+type: double
 
 --
 
@@ -6817,7 +6817,7 @@ type: long
 Memory quota setting for the cluster (Mbyte).
 
 
-type: long
+type: double
 
 --
 
@@ -6918,7 +6918,7 @@ Couchbase node metrics.
 Number of get commands
 
 
-type: long
+type: double
 
 --
 

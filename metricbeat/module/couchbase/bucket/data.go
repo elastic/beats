@@ -31,12 +31,12 @@ type BucketQuota struct {
 
 type BucketBasicStats struct {
 	QuotaPercentUsed float64 `json:"quotaPercentUsed"`
-	OpsPerSec        int64   `json:"opsPerSec"`
-	DiskFetches      int64   `json:"diskFetches"`
-	ItemCount        int64   `json:"itemCount"`
-	DiskUsed         int64   `json:"diskUsed"`
-	DataUsed         int64   `json:"dataUsed"`
-	MemUsed          int64   `json:"memUsed"`
+	OpsPerSec        float64 `json:"opsPerSec"`
+	DiskFetches      int64 `json:"diskFetches"`
+	ItemCount        int64 `json:"itemCount"`
+	DiskUsed         int64 `json:"diskUsed"`
+	DataUsed         int64 `json:"dataUsed"`
+	MemUsed          int64 `json:"memUsed"`
 }
 
 type Buckets []struct {
