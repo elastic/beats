@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build linux darwin
-
 package operation
 
 import (
@@ -328,5 +326,55 @@ func TestConfigurableCrash(t *testing.T) {
 	proc, err := os.FindProcess(pid)
 	if err != nil && proc != nil {
 		t.Fatal("Process found")
+	}
+}
+
+func TestConfigurableStartStop(t *testing.T) {
+	p := getProgram("configurable", "1.0")
+
+	spec := p.Spec()
+	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
+		t.Fatalf("binary not available %s", spec.BinaryPath)
+	} else {
+		t.Logf("found file %v", spec.BinaryPath)
+	}
+
+	operator, _ := getTestOperator(t, downloadPath, installPath, p)
+	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
+
+	// start and stop it 3 times
+	for i := 0; i < 3; i++ {
+		if err := operator.start(p, nil); err != nil {
+			t.Fatal(err)
+		}
+
+		waitFor(t, func() error {
+			items := operator.State()
+			item, ok := items[p.ID()]
+			if !ok {
+				return fmt.Errorf("no state for process")
+			}
+			if item.Status != state.Running {
+				return fmt.Errorf("process never went to running")
+			}
+			return nil
+		})
+
+		// stop the process
+		if err := operator.stop(p); err != nil {
+			t.Fatalf("Failed to stop process: %v", err)
+		}
+
+		waitFor(t, func() error {
+			items := operator.State()
+			item, ok := items[p.ID()]
+			if !ok {
+				return fmt.Errorf("no state for process")
+			}
+			if item.Status != state.Stopped {
+				return fmt.Errorf("process never went to stopped")
+			}
+			return nil
+		})
 	}
 }
