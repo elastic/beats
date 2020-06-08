@@ -109,7 +109,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Stack Monitoring modules now auto-configure required metricsets when `xpack.enabled: true` is set. {issue}16471[[16471] {pull}17609[17609]
 - Add static mapping for metricsets under aws module. {pull}17614[17614] {pull}17650[17650]
 - Add dashboard for googlecloud storage metricset. {pull}18172[18172]
-- Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue} {pull}17992[17992]
+- Collect new `bulk` indexing metrics from Elasticsearch when `xpack.enabled:true` is set. {issue}17977[17977] {pull}17992[17992]
 - Remove requirement to connect as sysdba in Oracle module. {issue}15846[15846] {pull}18182[18182]
 - Update MSSQL module to fix some SSPI authentication and add brackets to USE statements. {pull}17862[17862]
 
