@@ -120,7 +120,7 @@ func TestConfigForDataType(t *testing.T) {
 	})
 	t.Run("invalid data type", func(t *testing.T) {
 		c, err := common.NewConfigFrom(map[string]interface{}{
-			"tokenizer": "%{value1|int} %{value2|short} %{value3|char} %{value4|void} %{value5|unsigned}",
+			"tokenizer": "%{value1|int} %{value2|short} %{value3|char} %{value4|void} %{value5|unsigned} id=%{id|xyz} status=%{status|abc} msg=\"%{message}\"",
 			"field":     "message",
 		})
 		if !assert.NoError(t, err) {
@@ -129,7 +129,7 @@ func TestConfigForDataType(t *testing.T) {
 
 		cfg := config{}
 		err = c.Unpack(&cfg)
-		if !assert.NoError(t, err) {
+		if !assert.Error(t, err) {
 			return
 		}
 	})
@@ -144,7 +144,7 @@ func TestConfigForDataType(t *testing.T) {
 
 		cfg := config{}
 		err = c.Unpack(&cfg)
-		if !assert.NoError(t, err) {
+		if !assert.Error(t, err) {
 			return
 		}
 	})

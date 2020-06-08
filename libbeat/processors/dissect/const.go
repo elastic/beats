@@ -55,4 +55,6 @@ var (
 	errMixedPrefixIndirectAppend = errors.New("mixed prefix `&+`")
 	errMixedPrefixAppendIndirect = errors.New("mixed prefix `&+`")
 	errEmptyKey                  = errors.New("empty key")
+	errInvalidDatatype           = errors.New("invalid data type")
+	errMissingDatatype           = errors.New("missing data type")
 )
