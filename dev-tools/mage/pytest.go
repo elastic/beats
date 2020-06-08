@@ -210,6 +210,11 @@ func PythonVirtualenv() (string, error) {
 		args = append(args, "-Ur", req)
 	}
 
+	// First ensure that wheel is installed so that bdists build cleanly.
+	if err = sh.RunWith(env, pip, "install", "-U", "wheel"); err != nil {
+		return "", err
+	}
+
 	// Execute pip to install the dependencies.
 	if err := sh.RunWith(env, pip, args...); err != nil {
 		return "", err
