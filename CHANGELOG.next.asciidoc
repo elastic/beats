@@ -162,6 +162,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
+- Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 
 *Heartbeat*
 
