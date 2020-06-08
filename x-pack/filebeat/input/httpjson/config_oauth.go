@@ -56,6 +56,7 @@ type OAuth2 struct {
 
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
+	AzureResource string `config:"azure.resource"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
@@ -81,7 +82,7 @@ func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client,
 		ClientSecret:   o.ClientSecret,
 		TokenURL:       o.GetTokenURL(),
 		Scopes:         o.Scopes,
-		EndpointParams: o.EndpointParams,
+		EndpointParams: o.GetEndpointParams(),
 	}
 
 	return creds.Client(ctx), nil
@@ -102,6 +103,21 @@ func (o *OAuth2) GetTokenURL() string {
 // GetProvider returns provider in its canonical form.
 func (o OAuth2) GetProvider() OAuth2Provider {
 	return o.Provider.canonical()
+}
+
+// GetEndpointParams returns endpoint params with any provider ones combined.
+func (o OAuth2) GetEndpointParams() map[string][]string {
+	switch o.GetProvider() {
+	case OAuth2ProviderAzure:
+		if o.AzureResource != "" {
+			if o.EndpointParams == nil {
+				o.EndpointParams = map[string][]string{}
+			}
+			o.EndpointParams["resource"] = []string{o.AzureResource}
+		}
+	}
+
+	return o.EndpointParams
 }
 
 // Validate checks if oauth2 config is valid.
@@ -126,7 +142,7 @@ var findDefaultGoogleCredentials = google.FindDefaultCredentials
 
 func (o *OAuth2) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != "" ||
-		o.AzureTenantID != "" || len(o.EndpointParams) > 0 {
+		o.AzureTenantID != "" || o.AzureResource != "" || len(o.EndpointParams) > 0 {
 		return errors.New("invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead")
 	}
 

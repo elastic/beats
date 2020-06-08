@@ -4,7 +4,10 @@
 
 package httpjson
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestProviderCanonical(t *testing.T) {
 	const (
@@ -48,8 +51,8 @@ func TestIsEnabled(t *testing.T) {
 func TestGetTokenURL(t *testing.T) {
 	const expected = "http://localhost"
 	oauth2 := OAuth2{TokenURL: "http://localhost"}
-	if oauth2.GetTokenURL() != expected {
-		t.Fatal("GetTokenURL should return the provided TokenURL")
+	if got := oauth2.GetTokenURL(); got != expected {
+		t.Fatalf("GetTokenURL should return the provided TokenURL but got %q", got)
 	}
 }
 
@@ -65,5 +68,27 @@ func TestGetTokenURLWithAzure(t *testing.T) {
 	const expectedWithTenantID = "https://login.microsoftonline.com/a_tenant_id/oauth2/v2.0/token"
 	if got := oauth2.GetTokenURL(); got != expectedWithTenantID {
 		t.Fatalf("GetTokenURL should return the generated TokenURL but got %q", got)
+	}
+}
+
+func TestGetEndpointParams(t *testing.T) {
+	var expected = map[string][]string{"foo": {"bar"}}
+	oauth2 := OAuth2{EndpointParams: map[string][]string{"foo": {"bar"}}}
+	if got := oauth2.GetEndpointParams(); !reflect.DeepEqual(got, expected) {
+		t.Fatalf("GetEndpointParams should return the provided EndpointParams but got %q", got)
+	}
+}
+
+func TestGetEndpointParamsWithAzure(t *testing.T) {
+	var expectedWithoutResource = map[string][]string{"foo": {"bar"}}
+	oauth2 := OAuth2{Provider: "azure", EndpointParams: map[string][]string{"foo": {"bar"}}}
+	if got := oauth2.GetEndpointParams(); !reflect.DeepEqual(got, expectedWithoutResource) {
+		t.Fatalf("GetEndpointParams should return the provided EndpointParams but got %q", got)
+	}
+
+	oauth2.AzureResource = "baz"
+	var expectedWithResource = map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
+	if got := oauth2.GetEndpointParams(); !reflect.DeepEqual(got, expectedWithResource) {
+		t.Fatalf("GetEndpointParams should return the provided EndpointParams but got %q", got)
 	}
 }
