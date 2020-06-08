@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
@@ -98,15 +97,17 @@ func TestConfigurableRun(t *testing.T) {
 		t.Fatalf("Failed to stop process with PID %d: %v", pid, err)
 	}
 
-	// let the watcher kick in
-	<-time.After(1 * time.Second)
-
-	// check reattach collection cleaned up
-	items = operator.State()
-	item1, ok := items[p.ID()]
-	if !ok || item1.Status == state.Running {
-		t.Fatalf("Process still running after stop %#v", items)
-	}
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if !ok {
+			return fmt.Errorf("no state for process")
+		}
+		if item.Status != state.Stopped {
+			return fmt.Errorf("process never went to stopped")
+		}
+		return nil
+	})
 
 	// check process stopped
 	proc, err := os.FindProcess(pid)
