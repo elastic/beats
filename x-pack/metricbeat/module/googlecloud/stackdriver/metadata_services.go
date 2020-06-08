@@ -11,8 +11,8 @@ import (
 
 // NewMetadataServiceForConfig returns a service to fetch metadata from a config struct. It must return the Compute
 // abstraction to fetch metadata, the pubsub abstraction, etc.
-func NewMetadataServiceForConfig(c config) (googlecloud.MetadataService, error) {
-	switch c.ServiceName {
+func NewMetadataServiceForConfig(c config, serviceName string) (googlecloud.MetadataService, error) {
+	switch serviceName {
 	case googlecloud.ServiceCompute:
 		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.opt...)
 	default:

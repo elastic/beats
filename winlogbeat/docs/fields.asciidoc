@@ -7484,7 +7484,7 @@ These are the event fields specific to the module for the Microsoft-Windows-Powe
 
 
 
-*`id`*::
+*`powershell.id`*::
 +
 --
 Shell Id.
@@ -7495,7 +7495,7 @@ example: Microsoft Powershell
 
 --
 
-*`pipeline_id`*::
+*`powershell.pipeline_id`*::
 +
 --
 Pipeline id.
@@ -7506,7 +7506,7 @@ example: 1
 
 --
 
-*`runspace_id`*::
+*`powershell.runspace_id`*::
 +
 --
 Runspace id.
@@ -7517,7 +7517,7 @@ example: 4fa9074d-45ab-4e53-9195-e91981ac2bbb
 
 --
 
-*`sequence`*::
+*`powershell.sequence`*::
 +
 --
 Sequence number of the powershell execution.
@@ -7528,7 +7528,7 @@ example: 1
 
 --
 
-*`total`*::
+*`powershell.total`*::
 +
 --
 Total number of messages in the sequence.
