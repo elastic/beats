@@ -117,7 +117,7 @@ Elastic Agent is capable of running in two modes: standalone or fleet. Differenc
 With standalone mode agent is configured locally and managed manually. Each agent is configured to be in this mode by default after installation.
 Elastic Agent reads configuration file provided by `-c` argument while agent is being started or uses a default configuration located in the same directory called `elastic-agent.yml`.
 
-For configuration options see `elastic-agent_configuration_example.yml`
+For configuration options see link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
 
 === Fleet mode
 
@@ -250,6 +250,6 @@ datasources:
 This configuration configures gathering cpu, memory, network and filesystem metrics and sending them to default output.
 If `use_output` option is not specified, output called `default` is used.
 
-For more examples please refer to `elastic-agent_configuration_example.yml`
+For more examples please refer to link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
 
 
