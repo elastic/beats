@@ -170,10 +170,10 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		a.appLock.Lock()
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
-		a.appLock.Unlock()
 
 		if srvState.Expected() == proto.StateExpected_STOPPING {
 			a.state.Status = state.Stopped
+			a.appLock.Unlock()
 			return
 		}
 
@@ -181,6 +181,7 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		srvState.SetStatus(proto.StateObserved_FAILED, msg)
 		a.state.Status = state.Crashed
 		a.state.Message = msg
+		a.appLock.Unlock()
 
 		// it was a crash, report it async not to block
 		// process management with networking issues

@@ -67,6 +67,7 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 				errors.M(errors.MetaKeyAppName, app.name),
 				errors.M(errors.MetaKeyAppName, app.id)))
 		}
+		return
 	}
 	app.appLock.Unlock()
 }
