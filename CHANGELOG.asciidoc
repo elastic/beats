@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 
 *Affecting all Beats*
 
-- Fix goroutine leak and Elasticsearch output file descriptor leak when output reloading is in use. {issue}10491[10491] {pull}17381[17381]
+- Fix a bug in config reloading that could result in memory leaks or lost events when an output was rapidly reloaded multiple times. {issue}10491[10491] {pull}17381[17381]
 - Fix panic when assigning a key to a `nil` value in an event. {pull}18143[18143]
 
 *Heartbeat*
@@ -32,7 +32,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 
 *Metricbeat*
 
-- Further revise check for bad data in docker/memory. {pull}17400[17400]
+- No longer send NaNs for memory metrics that don't exist on the platform being monitored. {pull}17400[17400]
 - Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
 
 ==== Added
