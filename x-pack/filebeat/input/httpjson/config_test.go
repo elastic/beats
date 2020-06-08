@@ -5,8 +5,12 @@
 package httpjson
 
 import (
+	"context"
 	"os"
 	"testing"
+
+	"github.com/pkg/errors"
+	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -262,6 +266,13 @@ func TestConfigValidationCase16(t *testing.T) {
 }
 
 func TestConfigValidationCase17(t *testing.T) {
+	// we change the default function to force a failure
+	findDefaultGoogleCredentials = func(context.Context, ...string) (*google.Credentials, error) {
+		return nil, errors.New("failed")
+	}
+
+	defer func() { findDefaultGoogleCredentials = google.FindDefaultCredentials }()
+
 	const expectedErr = "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'"
 	m := map[string]interface{}{
 		"oauth2": map[string]interface{}{
@@ -362,7 +373,7 @@ func TestConfigValidationCase23(t *testing.T) {
 				"project_id":     "foo",
 				"private_key_id": "x",
 				"client_email":   "foo@bar.com",
-				"client_id":      "0",
+				"client_id":      "0"
 			}`),
 		},
 		"url": "localhost",
@@ -371,5 +382,37 @@ func TestConfigValidationCase23(t *testing.T) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
+	}
+}
+
+func TestConfigValidationCase24(t *testing.T) {
+	const expectedErr = "invalid configuration: google.credentials_json must be valid JSON accessing 'oauth2'"
+	m := map[string]interface{}{
+		"oauth2": map[string]interface{}{
+			"provider":                "google",
+			"google.credentials_json": []byte(`invalid`),
+		},
+		"url": "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
+		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
+	}
+}
+
+func TestConfigValidationCase25(t *testing.T) {
+	const expectedErr = "invalid configuration: the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'oauth2'"
+	m := map[string]interface{}{
+		"oauth2": map[string]interface{}{
+			"provider":                "google",
+			"google.credentials_file": "./testdata/invalid_credentials.json",
+		},
+		"url": "localhost",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := defaultConfig()
+	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
+		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
 	}
 }

@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -19,13 +20,19 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+// An OAuth2Provider represents a supported oauth provider.
 type OAuth2Provider string
 
 const (
-	OAuth2ProviderDefault OAuth2Provider = ""
-	OAuth2ProviderAzure   OAuth2Provider = "azure"
-	OAuth2ProviderGoogle  OAuth2Provider = "google"
+	OAuth2ProviderDefault OAuth2Provider = ""       // OAuth2ProviderDefault means no specific provider is set.
+	OAuth2ProviderAzure   OAuth2Provider = "azure"  // OAuth2ProviderAzure AzureAD.
+	OAuth2ProviderGoogle  OAuth2Provider = "google" // OAuth2ProviderGoogle Google.
 )
+
+func (p *OAuth2Provider) Unpack(in string) error {
+	*p = OAuth2Provider(in)
+	return nil
+}
 
 func (p OAuth2Provider) canonical() OAuth2Provider {
 	return OAuth2Provider(strings.ToLower(string(p)))
@@ -38,7 +45,7 @@ type OAuth2 struct {
 	ClientSecret   string              `config:"client.secret"`
 	Enabled        *bool               `config:"enabled"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
-	Provider       string              `config:"provider"`
+	Provider       OAuth2Provider      `config:"provider"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
 
@@ -56,6 +63,7 @@ func (o *OAuth2) IsEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
+// Client wraps the given http.Client and returns a new one that will use the oauth authentication.
 func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
@@ -79,6 +87,7 @@ func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client,
 	return creds.Client(ctx), nil
 }
 
+// GetTokenURL returns the TokenURL.
 func (o *OAuth2) GetTokenURL() string {
 	switch o.GetProvider() {
 	case OAuth2ProviderAzure:
@@ -90,10 +99,12 @@ func (o *OAuth2) GetTokenURL() string {
 	return o.TokenURL
 }
 
+// GetProvider returns provider in its canonical form.
 func (o OAuth2) GetProvider() OAuth2Provider {
-	return OAuth2Provider(o.Provider).canonical()
+	return o.Provider.canonical()
 }
 
+// Validate checks if oauth2 config is valid.
 func (o *OAuth2) Validate() error {
 	switch o.GetProvider() {
 	case OAuth2ProviderAzure:
@@ -110,6 +121,9 @@ func (o *OAuth2) Validate() error {
 	return nil
 }
 
+// findDefaultGoogleCredentials will default to google.FindDefaultCredentials and will only be changed for testing purposes
+var findDefaultGoogleCredentials = google.FindDefaultCredentials
+
 func (o *OAuth2) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != "" ||
 		o.AzureTenantID != "" || len(o.EndpointParams) > 0 {
@@ -118,6 +132,9 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 	// credentials_json
 	if len(o.GoogleCredentialsJSON) > 0 {
+		if !json.Valid(o.GoogleCredentialsJSON) {
+			return errors.New("invalid configuration: google.credentials_json must be valid JSON")
+		}
 		return nil
 	}
 
@@ -133,7 +150,7 @@ func (o *OAuth2) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := google.FindDefaultCredentials(ctx, o.Scopes...); err == nil {
+	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
 		o.GoogleCredentialsJSON = creds.JSON
 		return nil
 	}
@@ -149,6 +166,10 @@ func (o *OAuth2) populateCredentialsJSONFromFile(file string) error {
 	credBytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("invalid configuration: the file %q cannot be read", file)
+	}
+
+	if !json.Valid(credBytes) {
+		return fmt.Errorf("invalid configuration: the file %q does not contain valid JSON", file)
 	}
 
 	o.GoogleCredentialsJSON = credBytes
