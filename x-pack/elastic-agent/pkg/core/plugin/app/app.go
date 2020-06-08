@@ -171,14 +171,13 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
 
-		if srvState.Expected() == proto.StateExpected_STOPPING {
+		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
 			a.state.Status = state.Stopped
 			a.appLock.Unlock()
 			return
 		}
 
 		msg := fmt.Sprintf("Exited with code: %d", procState.ExitCode())
-		srvState.SetStatus(proto.StateObserved_FAILED, msg)
 		a.state.Status = state.Crashed
 		a.state.Message = msg
 		a.appLock.Unlock()

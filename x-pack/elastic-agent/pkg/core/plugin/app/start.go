@@ -6,7 +6,10 @@ package app
 
 import (
 	"context"
+	"io"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 
@@ -27,30 +30,38 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
 		}
 	}()
-	a.appLock.Lock()
-	defer a.appLock.Unlock()
 
 	cfgStr, err := yaml.Marshal(cfg)
 	if err != nil {
 		return err
 	}
+
+	// because `Start` can be called by `ApplicationStatusHandler` to perform a restart on failure
+	// the locking needs to be handled in the correct order.
+	a.appLock.Lock()
 	a.startContext = ctx
 	a.tag = t
+	srvState := a.srvState
+	a.appLock.Unlock()
 
 	// Failed applications can be started again.
-	if a.srvState != nil {
-		status, _ := a.srvState.Status()
-		if status != proto.StateObserved_FAILED {
-			return nil
-		}
-		a.srvState.SetStatus(proto.StateObserved_STARTING, "Starting")
-		a.srvState.UpdateConfig(string(cfgStr))
+	if srvState != nil {
+		srvState.SetStatus(proto.StateObserved_STARTING, "Starting")
+		srvState.UpdateConfig(string(cfgStr))
 	} else {
+		a.appLock.Lock()
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
+		a.appLock.Unlock()
 	}
+
+	// now that `SetStatus` would call `ApplicationStatusHandler` has occurred the
+	// reset of `Start` can be held by the lock.
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
 	if a.state.Status != state.Stopped {
 		// restarting as it was previously in a different state
 		a.state.Status = state.Restarting
@@ -104,19 +115,21 @@ func (a *Application) Start(ctx context.Context, t Taggable, cfg map[string]inte
 		return err
 	}
 
-	err = a.srvState.WriteConnInfo(a.state.ProcessInfo.Stdin)
-	if err != nil {
-		return err
-	}
-	err = a.state.ProcessInfo.Stdin.Close()
-	if err != nil {
-		return err
-	}
+	// write connect info to stdin
+	go a.writeToStdin(a.srvState, a.state.ProcessInfo.Stdin)
 
 	// setup watcher
 	a.watch(ctx, t, a.state.ProcessInfo, cfg)
 
 	return nil
+}
+
+func (a *Application) writeToStdin(as *server.ApplicationState, wc io.WriteCloser) {
+	err := as.WriteConnInfo(wc)
+	if err != nil {
+		a.logger.Errorf("failed writing connection info to spawned application: %s", err)
+	}
+	_ = wc.Close()
 }
 
 func injectLogLevel(logLevel string, args []string) []string {

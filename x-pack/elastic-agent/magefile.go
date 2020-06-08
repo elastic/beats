@@ -166,7 +166,7 @@ func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
 
 	return combineErr(
-		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86", "main.go")),
+		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 	)
 }
 

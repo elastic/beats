@@ -23,6 +23,9 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 		}
 	}()
 
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
 	if a.state.Status == state.Stopped {
 		return errors.New(ErrAppNotRunning)
 	}

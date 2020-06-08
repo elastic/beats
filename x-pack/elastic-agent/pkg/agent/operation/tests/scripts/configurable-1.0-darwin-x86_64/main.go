@@ -70,7 +70,15 @@ func (s *configServer) OnConfig(cfgString string) {
 		}
 	}
 
-	s.client.Status(proto.StateObserved_HEALTHY, "Wrote configuration")
+	if testCfg.Crash {
+		os.Exit(2)
+	}
+
+	if testCfg.Status != nil {
+		s.client.Status(*testCfg.Status, "Custom status")
+	} else {
+		s.client.Status(proto.StateObserved_HEALTHY, "Running")
+	}
 }
 
 func (s *configServer) OnStop() {
@@ -84,5 +92,7 @@ func (s *configServer) OnError(err error) {
 
 // TestConfig is a configuration for testing Config calls
 type TestConfig struct {
-	TestFile string `config:"TestFile" yaml:"TestFile"`
+	TestFile string                      `config:"TestFile" yaml:"TestFile"`
+	Status   *proto.StateObserved_Status `config:"Status" yaml:"Status"`
+	Crash    bool                        `config:"Crash" yaml:"Crash"`
 }
