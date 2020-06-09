@@ -178,7 +178,7 @@ type flow struct {
 	process           *process
 	local, remote     endpoint
 	complete          bool
-
+	done              bool
 	// these are automatically calculated by state from kernelTimes above
 	createdTime, lastSeenTime time.Time
 }
@@ -253,7 +253,6 @@ type socket struct {
 	process *process
 	// This signals that the socket is in the closeTimeout list.
 	closing    bool
-	closeTime  time.Time
 	prev, next linkedElement
 
 	createdTime, lastSeenTime time.Time
@@ -281,7 +280,7 @@ func (s *socket) SetNext(e linkedElement) {
 
 // Timestamp returns the time reference used to expire sockets.
 func (s *socket) Timestamp() time.Time {
-	return s.closeTime
+	return s.lastSeenTime
 }
 
 type dnsTracker struct {
@@ -372,13 +371,16 @@ type state struct {
 	closing linkedList
 
 	dns dnsTracker
+
+	// Decouple time.Now()
+	clock func() time.Time
 }
 
 func (s *state) getSocket(sock uintptr) *socket {
 	if socket, found := s.socks[sock]; found {
 		return socket
 	}
-	now := time.Now()
+	now := s.clock()
 	socket := &socket{
 		sock:         sock,
 		createdTime:  now,
@@ -397,6 +399,7 @@ var kernelProcess = process{
 func NewState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
 	s := makeState(r, log, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
 	go s.reapLoop()
+	go s.logStateLoop()
 	return s
 }
 
@@ -412,6 +415,7 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 		closeTimeout:    closeTimeout,
 		clockMaxDrift:   clockMaxDrift,
 		dns:             newDNSTracker(inactiveTimeout * 2),
+		clock:           time.Now,
 	}
 }
 
@@ -438,7 +442,7 @@ func (s *state) logState() {
 	events := atomic.LoadUint64(&eventCount)
 	s.Unlock()
 
-	now := time.Now()
+	now := s.clock()
 	took := now.Sub(lastTime)
 	newEvs := events - lastEvents
 	lastEvents = events
@@ -461,8 +465,6 @@ func (s *state) logState() {
 func (s *state) reapLoop() {
 	reportTicker := time.NewTicker(reapInterval)
 	defer reportTicker.Stop()
-	logTicker := time.NewTicker(logInterval)
-	defer logTicker.Stop()
 	for {
 		select {
 		case <-s.reporter.Done():
@@ -489,6 +491,17 @@ func (s *state) reapLoop() {
 					return
 				}
 			}
+		}
+	}
+}
+
+func (s *state) logStateLoop() {
+	logTicker := time.NewTicker(logInterval)
+	defer logTicker.Stop()
+	for {
+		select {
+		case <-s.reporter.Done():
+			return
 		case <-logTicker.C:
 			s.logState()
 		}
@@ -498,7 +511,7 @@ func (s *state) reapLoop() {
 func (s *state) ExpireOlder() {
 	s.Lock()
 	defer s.Unlock()
-	deadline := time.Now().Add(-s.inactiveTimeout)
+	deadline := s.clock().Add(-s.inactiveTimeout)
 	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if flow, ok := item.(*flow); ok {
 			s.onFlowTerminated(flow)
@@ -507,8 +520,7 @@ func (s *state) ExpireOlder() {
 		}
 		item = s.flowLRU.peek()
 	}
-
-	deadline = time.Now().Add(-s.socketTimeout)
+	deadline = s.clock().Add(-s.socketTimeout)
 	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			s.onSockDestroyed(sock.sock, 0)
@@ -517,8 +529,7 @@ func (s *state) ExpireOlder() {
 		}
 		item = s.socketLRU.peek()
 	}
-
-	deadline = time.Now().Add(-s.closeTimeout)
+	deadline = s.clock().Add(-s.closeTimeout)
 	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			s.onSockTerminated(sock)
@@ -601,6 +612,8 @@ func (s *state) onSockTerminated(sock *socket) {
 	delete(s.socks, sock.sock)
 	if sock.closing {
 		s.closing.remove(sock)
+	} else {
+		s.moveToClosing(sock)
 	}
 }
 
@@ -659,7 +672,7 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 		f.process = sock.process
 	}
 	if !sock.closing {
-		sock.lastSeenTime = time.Now()
+		sock.lastSeenTime = s.clock()
 		s.socketLRU.remove(sock)
 		s.socketLRU.add(sock)
 	}
@@ -699,7 +712,6 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 	if !found {
 		return nil
 	}
-
 	// Enrich with pid
 	if sock.pid == 0 && pid != 0 {
 		sock.pid = pid
@@ -710,12 +722,16 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 	// Keep the sock around in case it's a connected TCP socket, as still some
 	// packets can be received shortly after/during inet_release.
 	if !sock.closing {
-		sock.closeTime = time.Now()
-		sock.closing = true
-		s.socketLRU.remove(sock)
-		s.closing.add(sock)
+		s.moveToClosing(sock)
 	}
 	return nil
+}
+
+func (s *state) moveToClosing(sock *socket) {
+	sock.lastSeenTime = s.clock()
+	sock.closing = true
+	s.socketLRU.remove(sock)
+	s.closing.add(sock)
 }
 
 // UpdateFlow receives a partial flow and creates or updates an existing flow.
@@ -794,7 +810,11 @@ func (f *flow) updateWith(ref flow, s *state) {
 }
 
 func (s *state) onFlowTerminated(f *flow) {
+	if f.done {
+		return
+	}
 	s.flowLRU.remove(f)
+	f.done = true
 	// Unbind this flow from its parent
 	if parent, found := s.socks[f.sock]; found {
 		delete(parent.flows, f.remote.addr.String())
@@ -1011,8 +1031,8 @@ func (s *state) kernTimestampToTime(ts kernelTime) time.Time {
 	}
 	if s.kernelEpoch == (time.Time{}) {
 		// This is the first event and time sync hasn't happened yet.
-		// Take a temporary epoch relative to time.Now()
-		now := time.Now()
+		// Take a temporary epoch relative to current time.
+		now := s.clock()
 		s.kernelEpoch = now.Add(-time.Duration(ts))
 		return now
 	}
