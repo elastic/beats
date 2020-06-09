@@ -130,7 +130,7 @@ To enroll an Elastic Agent to Fleet:
 
 . Stop the agent.
 
-Enrolling an agent look like following:
+. Enroll the agent:
 
 [source,shell]
 ----------------------------------------------------------------------
