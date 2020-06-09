@@ -29,13 +29,13 @@ datasources:
           - metricset: filesystem
             dataset: system.filesystem
 
-settings.monitoring:
-  # enabled turns on monitoring of running processes
-  enabled: false
-  # enables log monitoring
-  logs: true
-  # enables metrics monitoring
-  metrics: true
+# settings.monitoring:
+#   # enabled turns on monitoring of running processes
+#   enabled: true
+#   # enables log monitoring
+#   logs: true
+#   # enables metrics monitoring
+#   metrics: true
 
 # management:
 #   # Mode of management, the Elastic Agent support two modes of operation:
@@ -104,7 +104,7 @@ settings.monitoring:
 
 # process:
 #   # timeout for creating new processes. when process is not successfully created by this timeout
-#   # start operation is considered a failure.
+#   # start operation is considered a failure
 #   spawn_timeout: 30s
 #   # timeout for stopping processes. when process is not stopped by this timeout then the process.
 #   # is force killed
