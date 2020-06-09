@@ -350,7 +350,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.oldest_unacked_message_age",
+                    "field": "googlecloud.pubsub.subscription.oldest_unacked_message_age.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -421,7 +421,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages",
+                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -509,7 +509,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.backlog_bytes",
+                    "field": "googlecloud.pubsub.subscription.backlog_bytes.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -587,7 +587,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.pull_request_count",
+                    "field": "googlecloud.pubsub.subscription.pull_request_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -666,7 +666,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.topic.message_sizes.bucket_options.Options.ExponentialBuckets.num_finite_buckets",
+                    "field": "googlecloud.pubsub.topic.message_sizes.bucket_options.Options.ExponentialBuckets.num_finite_buckets.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -732,7 +732,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages",
+                    "field": "googlecloud.pubsub.subscription.num_undelivered_messages.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -811,7 +811,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.pull_message_operation_count",
+                    "field": "googlecloud.pubsub.subscription.pull_message_operation_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -890,7 +890,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "googlecloud.pubsub.subscription.sent_message_count",
+                    "field": "googlecloud.pubsub.subscription.sent_message_count.value",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
