@@ -18,11 +18,15 @@
 package diskqueue
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
@@ -47,6 +51,10 @@ type Settings struct {
 	// ever occupy on disk. A value of 0 means the queue can grow until the
 	// disk is full (this is not recommended on a primary system disk).
 	MaxBufferSize uint64
+
+	// MaxSegmentSize is the maximum number of bytes that should be written
+	// to a single segment file before creating a new one.
+	MaxSegmentSize uint64
 
 	// A listener that receives ACKs when events are written to the queue's
 	// disk buffer.
@@ -76,8 +84,9 @@ type diskQueueOutput struct {
 	// The segment file this data was read from.
 	segment *segmentFile
 
-	// The index of this data's frame within its segment.
-	frameIndex int
+	// The index of this data's frame (the sequential read order
+	// of all frames during this execution).
+	frame frameID
 }
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -88,10 +97,29 @@ type diskQueue struct {
 	// The persistent queue state (wraps diskQueuePersistentState on disk).
 	stateFile *stateFile
 
-	// A list of all segments that have been completely written but have
-	// not yet been handed off to a segmentReader.
-	// Sorted by increasing segment ID.
-	segments []segmentFile
+	// segmentLock must be held to read or write segmentFile, readingSegments
+	// and completedSegments.
+	segmentLock sync.Mutex
+
+	// The segment that is currently being written.
+	writingSegment *segmentFile
+
+	// A list of the segments that have been completely written but have
+	// not yet been processed by the reader loop, sorted by increasing
+	// segment ID. Segments are always read in order. When a segment has
+	// been read completely, it is removed from the front of this list and
+	// appended to completedSegments.
+	readingSegments []*segmentFile
+
+	// A list of the segments that have been read but have not yet been
+	// completely acknowledged, sorted by increasing segment ID. When the
+	// first entry of this list is completely acknowledged, it is removed
+	// from this list and the underlying file is deleted.
+	completedSegments []*segmentFile
+
+	// The next sequential unused segment ID. This is what will be assigned
+	// to the next segmentFile we create.
+	nextSegmentID segmentID
 
 	// The total bytes occupied by all segment files. This is the value
 	// we check to see if there is enough space to add an incoming event
@@ -100,16 +128,16 @@ type diskQueue struct {
 
 	// The memory queue of data blobs waiting to be written to disk.
 	// To add something to the queue internally, send it to this channel.
-	inChan chan byte[]
+	inChan chan []byte
 
 	outChan chan diskQueueOutput
 
 	// The currently active segment reader, or nil if there is none.
-	reader *segmentReader
+	//reader *segmentReader
 
 	// The currently active segment writer. When the corresponding segment
 	// is full it is appended to segments.
-	writer *segmentWriter
+	//writer *segmentWriter
 
 	// The ol
 	firstPosition bufferPosition
@@ -124,6 +152,43 @@ type diskQueue struct {
 	// This is part of diskQueue and not diskQueueState since it represents
 	// in-memory state that should not persist through a restart.
 	readPosition bufferPosition
+
+	// A condition that is signalled when a segment file is deleted.
+	// Used by writerLoop when the queue is full, to detect when to try again.
+	// When the queue is closed, this condition will receive a broadcast after
+	// diskQueue.closed is set to true.
+	segmentDeletedCond sync.Cond
+
+	// A condition that is signalled when a frame has been completely
+	// written to disk.
+	// Used by readerLoop when the queue is empty, to detect when to try again.
+	// When the queue is closed, this condition will receive a broadcast after
+	// diskQueue.closed is set to true.
+	frameWrittenCond sync.Cond
+
+	// The oldest frame id that is still stored on disk.
+	// This will usually be less than ackedUpTo, since oldestFrame can't
+	// advance until the entire segment file has been acknowledged and
+	// deleted.
+	oldestFrame frameID
+
+	// This lock must be held to read and write acked and ackedUpTo.
+	ackLock sync.Mutex
+
+	// The lowest frame id that has not yet been acknowledged.
+	ackedUpTo frameID
+
+	// A map of all acked indices that are above ackedUpTo (and thus
+	// can't yet be acknowledged as a continuous block).
+	acked map[frameID]bool
+
+	// Whether the queue has been closed. Code that can't check the done
+	// channel (e.g. code that must wait on a condition variable) should
+	// always check this value when waking up.
+	closed atomic.Bool
+
+	// The channel to signal our goroutines to shut down.
+	done chan struct{}
 }
 
 func init() {
@@ -176,28 +241,90 @@ func NewQueue(settings Settings) (queue.Queue, error) {
 		}
 	}()
 
-	segments, err := segmentFilesForPath(settings.directoryPath())
+	segments, err := segmentFilesForPath(
+		settings.directoryPath(), settings.Logger)
 	if err != nil {
 		return nil, err
 	}
 
 	return &diskQueue{
-		settings: settings,
-		segments: segments,
+		settings:        settings,
+		readingSegments: segments,
+		closed:          atomic.MakeBool(false),
+		done:            make(chan struct{}),
 	}, nil
 }
 
-func (dq *diskQueue) nextSegmentReader() (*segmentReader, error) {
-	if len(dq.segments) > 0 {
-		return nil, nil
+// This is only called by readerLoop.
+func (dq *diskQueue) nextSegmentReader() (*segmentReader, []error) {
+	// TODO: make sure we hold the right locks to mess with segments here.
+	errors := []error{}
+	for len(dq.readingSegments) > 0 {
+		segment := dq.readingSegments[0]
+		segmentPath := dq.settings.segmentFilePath(segment.id)
+		reader, err := tryLoad(segment, segmentPath)
+		if err != nil {
+			// TODO: Handle this: depending on the type of error, either delete
+			// the segment or log an error and leave it alone, then skip to the
+			// next one.
+			errors = append(errors, err)
+			dq.readingSegments = dq.readingSegments[1:]
+			continue
+		}
+		// Remove the segment from the active list and move it to
+		// completedSegments until all its data has been acknowledged.
+		dq.readingSegments = dq.readingSegments[1:]
+		dq.completedSegments = append(dq.completedSegments, segment)
+		return reader, errors
 	}
-	nextSegment := dq.segments[0]
+	// TODO: if readingSegments is empty we may still be able to
+	// read partial data from writingSegment which is still being
+	// written.
+	return nil, errors
+}
 
+func tryLoad(segment *segmentFile, path string) (*segmentReader, error) {
+	// this is a strangely fine-grained lock maybe?
+	segment.lock.Lock()
+	defer segment.lock.Unlock()
+
+	// dataSize is guaranteed to be positive because we don't add
+	// anything to the segments list unless it is.
+	dataSize := segment.size - segmentHeaderSize
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Couldn't open segment %d: %w", segment.id, err)
+	}
+	reader := bufio.NewReader(file)
+	header, err := readSegmentHeader(reader)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't read segment header: %w", err)
+	}
+	if header.version != 0 {
+		return nil, fmt.Errorf("Segment %d: unrecognized schema version %d",
+			segment.id, header.version)
+	}
+	return &segmentReader{
+		raw:          reader,
+		curPosition:  0,
+		endPosition:  dataSize,
+		checksumType: header.checksumType,
+	}, nil
+}
+
+type segmentHeader struct {
+	version      uint32
+	checksumType checksumType
+}
+
+func readSegmentHeader(in io.Reader) (*segmentHeader, error) {
+	return nil, nil
 }
 
 // readNextFrame reads the next pending data frame in the queue
 // and returns its contents.
-func (dq *diskQueue) readNextFrame() ([]byte, error) {
+/*func (dq *diskQueue) readNextFrame() ([]byte, error) {
 	// READER LOCK --->
 	if dq.reader != nil {
 		frameData, err := dq.reader.nextDataFrame()
@@ -210,11 +337,11 @@ func (dq *diskQueue) readNextFrame() ([]byte, error) {
 		// If we made it here then the active reader was empty and
 		// we need to fetch a new one.
 	}
-	reader, err := dq.nextSegmentReader()
+	reader, _ := dq.nextSegmentReader()
 	dq.reader = reader
 	return reader.nextDataFrame()
 	// <--- READER LOCK
-}
+}*/
 
 //
 // bookkeeping helpers to locate queue data on disk
@@ -232,7 +359,7 @@ func (settings Settings) stateFilePath() string {
 	return filepath.Join(settings.directoryPath(), "state.dat")
 }
 
-func (settings Settings) segmentFilePath(segmentID uint64) string {
+func (settings Settings) segmentFilePath(segmentID segmentID) string {
 	return filepath.Join(
 		settings.directoryPath(),
 		fmt.Sprintf("%v.seg", segmentID))
@@ -243,7 +370,12 @@ func (settings Settings) segmentFilePath(segmentID uint64) string {
 //
 
 func (dq *diskQueue) Close() error {
-	panic("TODO: not implemented")
+	if dq.closed.Swap(true) {
+		return fmt.Errorf("Can't close disk queue: queue already closed")
+	}
+	// TODO: wait for worker threads?
+	close(dq.done)
+	return nil
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {

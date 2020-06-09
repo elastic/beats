@@ -32,6 +32,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// Every data frame read from the queue is assigned a unique sequential
+// integer, which is used to keep track of which frames have been
+// acknowledged.
+type frameID uint64
+
 // The metadata for a single segment file.
 type segmentFile struct {
 	logger *logp.Logger
@@ -45,32 +50,23 @@ type segmentFile struct {
 	// a complete data frame.
 	size int64
 
-	// The number of data frames in this segment file.
-	// This is used for ack handling: when a consumer reads an event, the
-	// the resulting diskQueueBatch encodes the event's index. It is safe
-	// to delete a segment file when all indices from 0...(frameCount-1)
-	// have been acknowledged.
-	// This value may be zero for segment files that already existed when
-	// the queue was opened; in that case it is not populated until the
-	// segment file has been completely read. In particular, we will not
-	// delete the file for a segment if frameCount == 0.
-	frameCount int
-
-	// The lowest frame index that has not yet been acknowledged.
-	ackedUpTo int
-
-	// A map of all acked indices that are above ackedUpTo (and thus
-	// can't yet be acknowledged as a continuous block).
-	acked map[int]bool
+	// The number of frames read from this segment, or zero if it has not
+	// yet been completely read.
+	// It is safe to delete a segment when framesRead > 0 and all those
+	// frames have been acknowledged.
+	framesRead int64
 }
 
 // segmentReader is a wrapper around io.Reader that provides helpers and
 // metadata for decoding segment files.
 type segmentReader struct {
-	// The underlying data reader
+	// The segment this reader was generated from.
+	segment *segmentFile
+
+	// The underlying data reader.
 	raw io.Reader
 
-	// The current byte offset of the reader within the file
+	// The current byte offset of the reader within the file.
 	curPosition int64
 
 	// The position at which this reader should stop reading. This is often
@@ -101,7 +97,7 @@ const frameMetadataSize = 12
 const segmentHeaderSize = 8
 
 // Sort order: we store loaded segments in ascending order by their id.
-type bySegmentID []segmentFile
+type bySegmentID []*segmentFile
 
 func (s bySegmentID) Len() int           { return len(s) }
 func (s bySegmentID) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
@@ -109,21 +105,27 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].size < s[j].size }
 
 func segmentFilesForPath(
 	path string, logger *logp.Logger,
-) ([]segmentFile, error) {
+) ([]*segmentFile, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't read queue directory '%s': %w", path, err)
 	}
 
-	segments := []segmentFile{}
+	segments := []*segmentFile{}
 	for _, file := range files {
+		if file.Size() <= segmentHeaderSize {
+			// Ignore segments that don't have at least some data beyond the
+			// header (this will always be true of segments we write unless there
+			// is an error).
+			continue
+		}
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
 			// don't match the "[uint64].seg" pattern.
 			if id, err := strconv.ParseUint(components[0], 10, 64); err == nil {
 				segments = append(segments,
-					segmentFile{
+					&segmentFile{
 						logger: logger,
 						id:     segmentID(id),
 						size:   file.Size(),
@@ -201,13 +203,13 @@ func (reader *segmentReader) nextDataFrame() ([]byte, error) {
 }
 
 // returns the number of indices by which ackedUpTo was advanced.
-func (s *segmentFile) ack(index int) int {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	s.acked[index] = true
+func (dq *diskQueue) ack(frame frameID) int {
+	dq.ackLock.Lock()
+	defer dq.ackLock.Unlock()
+	dq.acked[frame] = true
 	ackedCount := 0
-	for ; s.acked[s.ackedUpTo]; s.ackedUpTo++ {
-		delete(s.acked, s.ackedUpTo)
+	for ; dq.acked[dq.ackedUpTo]; dq.ackedUpTo++ {
+		delete(dq.acked, dq.ackedUpTo)
 		ackedCount++
 	}
 	return ackedCount
