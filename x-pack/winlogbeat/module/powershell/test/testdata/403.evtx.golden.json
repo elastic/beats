@@ -175,5 +175,56 @@
       "record_id": 1766,
       "task": "Engine Lifecycle"
     }
+  },
+  {
+    "@timestamp": "2020-06-04T07:20:28.6861939Z",
+    "event": {
+      "action": "Engine Lifecycle",
+      "category": [
+        "process"
+      ],
+      "code": 403,
+      "kind": "event",
+      "module": "powershell",
+      "provider": "PowerShell",
+      "sequence": 10,
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "powershell": {
+      "engine": {
+        "new_state": "Stopped",
+        "previous_state": "Available",
+        "version": "2.0"
+      },
+      "process": {
+        "executable_version": "2.0"
+      },
+      "runspace_id": "6ebeca05-d618-4c66-a0d8-4269d800d099"
+    },
+    "process": {
+      "entity_id": "7018c049-c75b-4e02-9c0f-6761b97e1657",
+      "title": "ConsoleHost"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Windows PowerShell",
+      "computer_name": "vagrant",
+      "event_id": 403,
+      "keywords": [
+        "Classic"
+      ],
+      "opcode": "Info",
+      "provider_name": "PowerShell",
+      "record_id": 18592,
+      "task": "Engine Lifecycle"
+    }
   }
 ]

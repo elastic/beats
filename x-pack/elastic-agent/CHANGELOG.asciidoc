@@ -69,3 +69,4 @@
 - When not port are specified and the https is used fallback to 443 {pull}18844[18844]
 - Change monitoring defaults for agent {pull}18927[18927]
 - Agent verifies packages before using them {pull}18876[18876]
+- Change stream.* to dataset.* fields {pull}18967[18967]
