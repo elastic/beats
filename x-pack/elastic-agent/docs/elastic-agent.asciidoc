@@ -121,7 +121,7 @@ For configuration options see link:elastic-agent_configuration_example.yml[Elast
 
 === Fleet mode
 
-With fleet mode agent is managed remotely. It uses trusted kibana instance with enabled _Ingest Manager_ and _Fleet_ to retrieve configurations from and report any agent events to.
+With _fleet mode_, you manage Elastic Agent remotely. The agent uses a trusted {kib} instance to retrieve configurations and report agent events. This trusted {kib} instance must have Ingest Manager and Fleet enabled.
 
 Process of creating trusted communication channel between _Elastic Agent_ and _Kibana_ is called `enrolling an agent`.
 
