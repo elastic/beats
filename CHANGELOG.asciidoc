@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 *Metricbeat*
 
 - No longer send NaNs for memory metrics that don't exist on the platform being monitored. {pull}17400[17400]
-- Add a switch to the driver definition on SQL module to use pretty names {pull}17378[17378]
+- Add a switch to the driver definition on SQL module to use pretty names. {pull}17378[17378]
 
 ==== Added
 
