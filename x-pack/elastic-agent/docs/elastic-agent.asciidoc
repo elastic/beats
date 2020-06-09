@@ -125,7 +125,7 @@ With _fleet mode_, you manage Elastic Agent remotely. The agent uses a trusted {
 
 To create a trusted communication channel between Elastic Agent and {kib}, you enroll the agent to Fleet.
 
-To enroll an _Elastic Agent_ to _Fleet_ agent provides an `enroll` command.
+To enroll an Elastic Agent to Fleet:
 
 
 [NOTE]
