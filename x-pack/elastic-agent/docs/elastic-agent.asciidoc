@@ -245,4 +245,4 @@ datasources:
 
 If `use_output` is not specified, the `default` output is used.
 
-For more examples please refer to link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
+For more examples, see link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
