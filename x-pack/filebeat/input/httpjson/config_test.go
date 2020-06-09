@@ -109,310 +109,260 @@ func TestConfigValidationCase7(t *testing.T) {
 	}
 }
 
-func TestConfigValidationCase8(t *testing.T) {
-	const expectedErr = "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config"
-	m := map[string]interface{}{
-		"api_key": "an_api_key",
-		"oauth2": map[string]interface{}{
-			"token_url": "localhost",
-			"client": map[string]interface{}{
-				"id":     "a_client_id",
-				"secret": "a_client_secret",
+func TestConfigOauth2Validation(t *testing.T) {
+	cases := []struct {
+		name        string
+		expectedErr string
+		input       map[string]interface{}
+		setup       func()
+		teardown    func()
+	}{
+		{
+			name:        "can't set oauth2 and api_key together",
+			expectedErr: "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config",
+			input: map[string]interface{}{
+				"api_key": "an_api_key",
+				"oauth2": map[string]interface{}{
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+				"url": "localhost",
 			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase9(t *testing.T) {
-	const expectedErr = "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config"
-	m := map[string]interface{}{
-		"authentication_scheme": "an_api_key",
-		"oauth2": map[string]interface{}{
-			"token_url": "localhost",
-			"client": map[string]interface{}{
-				"id":     "a_client_id",
-				"secret": "a_client_secret",
+		{
+			name:        "can't set oauth2 and authentication_scheme",
+			expectedErr: "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config",
+			input: map[string]interface{}{
+				"authentication_scheme": "a_scheme",
+				"oauth2": map[string]interface{}{
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+				"url": "localhost",
 			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase10(t *testing.T) {
-	const expectedErr = "invalid configuration: both token_url and client credentials must be provided accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{},
-		"url":    "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase11(t *testing.T) {
-	const expectedErr = "invalid configuration: unknown provider \"unknown\" accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "unknown",
-		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase12(t *testing.T) {
-	const expectedErr = "invalid configuration: at least one of token_url or tenant_id must be provided accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "azure",
-		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase13(t *testing.T) {
-	const expectedErr = "invalid configuration: only one of token_url and tenant_id can be used accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":        "azure",
-			"azure.tenant_id": "a_tenant_id",
-			"token_url":       "localhost",
-		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase14(t *testing.T) {
-	const expectedErr = "invalid configuration: client credentials must be provided accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":        "azure",
-			"azure.tenant_id": "a_tenant_id",
-		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase15(t *testing.T) {
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "azure",
-			"azure": map[string]interface{}{
-				"tenant_id": "a_tenant_id",
+		{
+			name:        "token_url and client credentials must be set",
+			expectedErr: "invalid configuration: both token_url and client credentials must be provided accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{},
+				"url":    "localhost",
 			},
-			"client.id":     "a_client_id",
-			"client.secret": "a_client_secret",
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
-	}
-}
-
-func TestConfigValidationCase16(t *testing.T) {
-	const expectedErr = "invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "google",
-			"azure": map[string]interface{}{
-				"tenant_id": "a_tenant_id",
+		{
+			name:        "must fail with an unknown provider",
+			expectedErr: "invalid configuration: unknown provider \"unknown\" accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "unknown",
+				},
+				"url": "localhost",
 			},
-			"client.id":     "a_client_id",
-			"client.secret": "a_client_secret",
-			"token_url":     "localhost",
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase17(t *testing.T) {
-	// we change the default function to force a failure
-	findDefaultGoogleCredentials = func(context.Context, ...string) (*google.Credentials, error) {
-		return nil, errors.New("failed")
-	}
-
-	defer func() { findDefaultGoogleCredentials = google.FindDefaultCredentials }()
-
-	const expectedErr = "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "google",
+		{
+			name:        "azure must have either tenant_id or token_url",
+			expectedErr: "invalid configuration: at least one of token_url or tenant_id must be provided accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "azure",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase18(t *testing.T) {
-	const expectedErr = "invalid configuration: the file \"./wrong\" cannot be found accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":                "google",
-			"google.credentials_file": "./wrong",
+		{
+			name:        "azure must have only one of token_url and tenant_id",
+			expectedErr: "invalid configuration: only one of token_url and tenant_id can be used accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":        "azure",
+					"azure.tenant_id": "a_tenant_id",
+					"token_url":       "localhost",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase19(t *testing.T) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./wrong")
-	const expectedErr = "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "google",
+		{
+			name:        "azure must have client credentials set",
+			expectedErr: "invalid configuration: client credentials must be provided accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":        "azure",
+					"azure.tenant_id": "a_tenant_id",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase20(t *testing.T) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./testdata/credentials.json")
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "google",
+		{
+			name: "azure config is valid",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "azure",
+					"azure": map[string]interface{}{
+						"tenant_id": "a_tenant_id",
+					},
+					"client.id":     "a_client_id",
+					"client.secret": "a_client_secret",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
-	}
-}
-
-func TestConfigValidationCase21(t *testing.T) {
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":                "google",
-			"google.credentials_file": "./testdata/credentials.json",
+		{
+			name:        "google can't have token_url or client credentials set",
+			expectedErr: "invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "google",
+					"azure": map[string]interface{}{
+						"tenant_id": "a_tenant_id",
+					},
+					"client.id":     "a_client_id",
+					"client.secret": "a_client_secret",
+					"token_url":     "localhost",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
-	}
-}
-
-func TestConfigValidationCase22(t *testing.T) {
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":        "google",
-			"google.jwt_file": "./testdata/credentials.json",
+		{
+			name:        "google must fail if no ADC available",
+			expectedErr: "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "google",
+				},
+				"url": "localhost",
+			},
+			setup: func() {
+				// we change the default function to force a failure
+				findDefaultGoogleCredentials = func(context.Context, ...string) (*google.Credentials, error) {
+					return nil, errors.New("failed")
+				}
+			},
+			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentials },
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
-	}
-}
-
-func TestConfigValidationCase23(t *testing.T) {
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider": "google",
-			"google.credentials_json": []byte(`{
-				"type":           "service_account",
-				"project_id":     "foo",
-				"private_key_id": "x",
-				"client_email":   "foo@bar.com",
-				"client_id":      "0"
-			}`),
+		{
+			name:        "google must fail if credentials file not found",
+			expectedErr: "invalid configuration: the file \"./wrong\" cannot be found accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                "google",
+					"google.credentials_file": "./wrong",
+				},
+				"url": "localhost",
+			},
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		t.Fatalf("Configuration validation failed. no error expected but got %q", err)
-	}
-}
-
-func TestConfigValidationCase24(t *testing.T) {
-	const expectedErr = "invalid configuration: google.credentials_json must be valid JSON accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":                "google",
-			"google.credentials_json": []byte(`invalid`),
+		{
+			name:        "google must fail if ADC is wrongly set",
+			expectedErr: "invalid configuration: no authentication credentials were configured or detected (ADC) accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "google",
+				},
+				"url": "localhost",
+			},
+			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./wrong") },
 		},
-		"url": "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
-	}
-}
-
-func TestConfigValidationCase25(t *testing.T) {
-	const expectedErr = "invalid configuration: the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'oauth2'"
-	m := map[string]interface{}{
-		"oauth2": map[string]interface{}{
-			"provider":                "google",
-			"google.credentials_file": "./testdata/invalid_credentials.json",
+		{
+			name: "google must work if ADC is set up",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "google",
+				},
+				"url": "localhost",
+			},
+			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./testdata/credentials.json") },
 		},
-		"url": "localhost",
+		{
+			name: "google must work if credentials_file is correct",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                "google",
+					"google.credentials_file": "./testdata/credentials.json",
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name: "google must work if jwt_file is correct",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":        "google",
+					"google.jwt_file": "./testdata/credentials.json",
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name: "google must work if credentials_json is correct",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider": "google",
+					"google.credentials_json": []byte(`{
+						"type":           "service_account",
+						"project_id":     "foo",
+						"private_key_id": "x",
+						"client_email":   "foo@bar.com",
+						"client_id":      "0"
+					}`),
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name:        "google must fail if credentials_json is not a valid JSON",
+			expectedErr: "invalid configuration: google.credentials_json must be valid JSON accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                "google",
+					"google.credentials_json": []byte(`invalid`),
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name:        "google must fail if the provided credentials file is not a valid JSON",
+			expectedErr: "invalid configuration: the file \"./testdata/invalid_credentials.json\" does not contain valid JSON accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                "google",
+					"google.credentials_file": "./testdata/invalid_credentials.json",
+				},
+				"url": "localhost",
+			},
+		},
 	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil || err.Error() != expectedErr {
-		t.Fatalf("Configuration validation failed. expecting %q error but got %q", expectedErr, err)
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.name, func(t *testing.T) {
+			if c.setup != nil {
+				c.setup()
+			}
+
+			if c.teardown != nil {
+				defer c.teardown()
+			}
+
+			cfg := common.MustNewConfigFrom(c.input)
+			conf := defaultConfig()
+			err := cfg.Unpack(&conf)
+
+			switch {
+			case c.expectedErr == "":
+				if err != nil {
+					t.Fatalf("Configuration validation failed. no error expected but got %q", err)
+				}
+
+			case c.expectedErr != "":
+				if err == nil || err.Error() != c.expectedErr {
+					t.Fatalf("Configuration validation failed. expecting %q error but got %q", c.expectedErr, err)
+				}
+			}
+		})
 	}
 }

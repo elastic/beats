@@ -69,23 +69,24 @@ func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client,
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.GetProvider() {
+	case OAuth2ProviderAzure, OAuth2ProviderDefault:
+		creds := clientcredentials.Config{
+			ClientID:       o.ClientID,
+			ClientSecret:   o.ClientSecret,
+			TokenURL:       o.GetTokenURL(),
+			Scopes:         o.Scopes,
+			EndpointParams: o.GetEndpointParams(),
+		}
+		return creds.Client(ctx), nil
 	case OAuth2ProviderGoogle:
 		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
 		if err != nil {
 			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
+	default:
+		return nil, errors.New("oauth2 client: unknown provider")
 	}
-
-	creds := clientcredentials.Config{
-		ClientID:       o.ClientID,
-		ClientSecret:   o.ClientSecret,
-		TokenURL:       o.GetTokenURL(),
-		Scopes:         o.Scopes,
-		EndpointParams: o.GetEndpointParams(),
-	}
-
-	return creds.Client(ctx), nil
 }
 
 // GetTokenURL returns the TokenURL.
