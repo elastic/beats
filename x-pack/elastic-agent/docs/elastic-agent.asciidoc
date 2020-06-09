@@ -16,7 +16,7 @@ Elastic Agent is a single, unified agent that you can deploy to hosts or contain
 * <<elastic-agent-configuration>>
 
 [[elastic-agent-installation]]
-== Installation
+== Install Elastic Agent
 
 === Step 1: Download Elastic Agent
 
@@ -251,4 +251,3 @@ This configuration configures gathering cpu, memory, network and filesystem metr
 If `use_output` option is not specified, output called `default` is used.
 
 For more examples please refer to link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
-
