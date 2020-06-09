@@ -253,7 +253,6 @@ type socket struct {
 	process *process
 	// This signals that the socket is in the closeTimeout list.
 	closing    bool
-	closeTime  time.Time
 	prev, next linkedElement
 
 	createdTime, lastSeenTime time.Time
@@ -281,7 +280,7 @@ func (s *socket) SetNext(e linkedElement) {
 
 // Timestamp returns the time reference used to expire sockets.
 func (s *socket) Timestamp() time.Time {
-	return s.closeTime
+	return s.lastSeenTime
 }
 
 type dnsTracker struct {
@@ -372,13 +371,16 @@ type state struct {
 	closing linkedList
 
 	dns dnsTracker
+
+	// Decouple time.Now()
+	clock func() time.Time
 }
 
 func (s *state) getSocket(sock uintptr) *socket {
 	if socket, found := s.socks[sock]; found {
 		return socket
 	}
-	now := time.Now()
+	now := s.clock()
 	socket := &socket{
 		sock:         sock,
 		createdTime:  now,
@@ -413,6 +415,7 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 		closeTimeout:    closeTimeout,
 		clockMaxDrift:   clockMaxDrift,
 		dns:             newDNSTracker(inactiveTimeout * 2),
+		clock:           time.Now,
 	}
 }
 
@@ -439,7 +442,7 @@ func (s *state) logState() {
 	events := atomic.LoadUint64(&eventCount)
 	s.Unlock()
 
-	now := time.Now()
+	now := s.clock()
 	took := now.Sub(lastTime)
 	newEvs := events - lastEvents
 	lastEvents = events
@@ -508,7 +511,7 @@ func (s *state) logStateLoop() {
 func (s *state) ExpireOlder() {
 	s.Lock()
 	defer s.Unlock()
-	deadline := time.Now().Add(-s.inactiveTimeout)
+	deadline := s.clock().Add(-s.inactiveTimeout)
 	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if flow, ok := item.(*flow); ok {
 			s.onFlowTerminated(flow)
@@ -517,8 +520,7 @@ func (s *state) ExpireOlder() {
 		}
 		item = s.flowLRU.peek()
 	}
-
-	deadline = time.Now().Add(-s.socketTimeout)
+	deadline = s.clock().Add(-s.socketTimeout)
 	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			s.onSockDestroyed(sock.sock, 0)
@@ -527,8 +529,7 @@ func (s *state) ExpireOlder() {
 		}
 		item = s.socketLRU.peek()
 	}
-
-	deadline = time.Now().Add(-s.closeTimeout)
+	deadline = s.clock().Add(-s.closeTimeout)
 	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
 			s.onSockTerminated(sock)
@@ -671,7 +672,7 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 		f.process = sock.process
 	}
 	if !sock.closing {
-		sock.lastSeenTime = time.Now()
+		sock.lastSeenTime = s.clock()
 		s.socketLRU.remove(sock)
 		s.socketLRU.add(sock)
 	}
@@ -727,7 +728,7 @@ func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
 }
 
 func (s *state) moveToClosing(sock *socket) {
-	sock.closeTime = time.Now()
+	sock.lastSeenTime = s.clock()
 	sock.closing = true
 	s.socketLRU.remove(sock)
 	s.closing.add(sock)
@@ -1030,8 +1031,8 @@ func (s *state) kernTimestampToTime(ts kernelTime) time.Time {
 	}
 	if s.kernelEpoch == (time.Time{}) {
 		// This is the first event and time sync hasn't happened yet.
-		// Take a temporary epoch relative to time.Now()
-		now := time.Now()
+		// Take a temporary epoch relative to current time.
+		now := s.clock()
 		s.kernelEpoch = now.Add(-time.Duration(ts))
 		return now
 	}
