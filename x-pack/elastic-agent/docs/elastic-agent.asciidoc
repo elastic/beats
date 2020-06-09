@@ -196,7 +196,7 @@ Notice that they use different authentication methods. The first one uses a user
 A default output configuration is required.
 ==============
 
-=== Enable/Disable Beats monitoring
+=== Configure Beats monitoring
 
 To disable or enable monitoring of managed Beats following section is available:
 
