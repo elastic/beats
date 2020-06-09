@@ -220,7 +220,7 @@ To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the 
 
 Set `use_output` to specify the output to which monitoring events are sent.
 
-=== Specifying data sources
+=== Specify data sources
 
 By default Elastic Agent ingests some system metrics. Its default configuration can look like this:
 
