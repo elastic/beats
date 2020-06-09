@@ -86,7 +86,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 - Add support for Google Application Default Credentials to the Google Pub/Sub input and Google Cloud modules. {pull}15668[15668]
 - Improve ECS categorization field mappings for zeek module. {issue}16029[16029] {pull}17738[17738]
 - Improve ECS categorization field mappings for netflow module. {issue}16135[16135] {pull}18108[18108]
-- Add an input option `publisher_pipeline.disable_host` to disable `host.name`
+- Add an input option `publisher_pipeline.disable_host` to disable `host.name`. {pull}18456[18456]
 - Improve ECS categorization field mappings in system module. {issue}16031[16031] {pull}18065[18065]
 - Improve ECS categorization field mappings in osquery module. {issue}16176[16176] {pull}17881[17881]
 - Add support for v10, v11 and v12 logs on Postgres {issue}13810[13810] {pull}17732[17732]
