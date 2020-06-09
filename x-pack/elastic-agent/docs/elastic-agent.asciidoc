@@ -114,7 +114,7 @@ Elastic Agent runs in two modes: standalone or fleet. The two modes differ in ho
 [float]
 === Standalone mode
 
-With standalone mode agent is configured locally and managed manually. Each agent is configured to be in this mode by default after installation.
+With _standalone mode_, you manually configure and manage the agent locally. Each agent is configured to be in standalone mode by default after installation.
 Elastic Agent reads configuration file provided by `-c` argument while agent is being started or uses a default configuration located in the same directory called `elastic-agent.yml`.
 
 For configuration options see link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
