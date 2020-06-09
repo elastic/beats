@@ -3,20 +3,24 @@ input:
   module: googlecloud
   metricset: stackdriver
   defaults:
-    stackdriver:
-      service: compute
-      metrics:
-        - metric_types:
-            - "compute.googleapis.com/firewall/dropped_bytes_count"
-            - "compute.googleapis.com/firewall/dropped_packets_count"
-            - "compute.googleapis.com/instance/cpu/reserved_cores"
-            - "compute.googleapis.com/instance/cpu/usage_time"
-            - "compute.googleapis.com/instance/cpu/utilization"
-            - "compute.googleapis.com/instance/disk/read_bytes_count"
-            - "compute.googleapis.com/instance/disk/read_ops_count"
-            - "compute.googleapis.com/instance/disk/write_bytes_count"
-            - "compute.googleapis.com/instance/disk/write_ops_count"
-            - "compute.googleapis.com/instance/network/received_bytes_count"
-            - "compute.googleapis.com/instance/network/received_packets_count"
-            - "compute.googleapis.com/instance/network/sent_bytes_count"
-            - "compute.googleapis.com/instance/uptime"
+    metrics:
+      - service: compute
+        metric_types:
+          - "firewall/dropped_bytes_count"
+          - "firewall/dropped_packets_count"
+          - "instance/cpu/reserved_cores"
+          - "instance/cpu/usage_time"
+          - "instance/cpu/utilization"
+          - "instance/disk/read_bytes_count"
+          - "instance/disk/read_ops_count"
+          - "instance/disk/write_bytes_count"
+          - "instance/disk/write_ops_count"
+          - "instance/memory/balloon/ram_size"
+          - "instance/memory/balloon/ram_used"
+          - "instance/memory/balloon/swap_in_bytes_count"
+          - "instance/memory/balloon/swap_out_bytes_count"
+          - "instance/network/received_bytes_count"
+          - "instance/network/received_packets_count"
+          - "instance/network/sent_bytes_count"
+          - "instance/network/sent_packets_count"
+          - "instance/uptime"

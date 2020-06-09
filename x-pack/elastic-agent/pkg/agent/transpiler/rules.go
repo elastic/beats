@@ -75,7 +75,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "make_array"
 		case *RemoveKeyRule:
 			name = "remove_key"
-
+		case *FixStreamRule:
+			name = "fix_stream"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -153,6 +154,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &MakeArrayRule{}
 		case "remove_key":
 			r = &RemoveKeyRule{}
+		case "fix_stream":
+			r = &FixStreamRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -345,6 +348,100 @@ func CopyAllToList(to, onMerge string, except ...string) *CopyAllToListRule {
 	}
 }
 
+// FixStreamRule fixes streams to contain default values
+// in case no value or invalid value are provided
+type FixStreamRule struct {
+}
+
+// Apply stream fixes.
+func (r *FixStreamRule) Apply(ast *AST) error {
+	const defaultNamespace = "default"
+	const defaultDataset = "generic"
+
+	datasourcesNode, found := Lookup(ast, "datasources")
+	if !found {
+		return nil
+	}
+
+	datasourcesList, ok := datasourcesNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, datasourceNode := range datasourcesList.value {
+		nsNode, found := datasourceNode.Find("namespace")
+		if found {
+			nsKey, ok := nsNode.(*Key)
+			if ok {
+				if newNamespace := nsKey.value.String(); newNamespace == "" {
+					nsKey.value = &StrVal{value: defaultNamespace}
+				}
+			}
+		} else {
+			datasourceMap, ok := datasourceNode.(*Dict)
+			if !ok {
+				continue
+			}
+			datasourceMap.value = append(datasourceMap.value, &Key{
+				name:  "namespace",
+				value: &StrVal{value: defaultNamespace},
+			})
+		}
+
+		// get input
+		inputNode, found := datasourceNode.Find("inputs")
+		if !found {
+			continue
+		}
+
+		inputsList, ok := inputNode.Value().(*List)
+		if !ok {
+			continue
+		}
+
+		for _, inputNode := range inputsList.value {
+			streamsNode, ok := inputNode.Find("streams")
+			if !ok {
+				continue
+			}
+
+			streamsList, ok := streamsNode.Value().(*List)
+			if !ok {
+				continue
+			}
+
+			for _, streamNode := range streamsList.value {
+				streamMap, ok := streamNode.(*Dict)
+				if !ok {
+					continue
+				}
+
+				dsNode, found := streamNode.Find("dataset")
+				if found {
+					dsKey, ok := dsNode.(*Key)
+					if ok {
+						if newDataset := dsKey.value.String(); newDataset == "" {
+							dsKey.value = &StrVal{value: defaultDataset}
+						}
+					}
+				} else {
+					streamMap.value = append(streamMap.value, &Key{
+						name:  "dataset",
+						value: &StrVal{value: defaultDataset},
+					})
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// FixStream creates a FixStreamRule
+func FixStream() *FixStreamRule {
+	return &FixStreamRule{}
+}
+
 // InjectIndexRule injects index to each input.
 // Index is in form {type}-{namespace}-{dataset-type}
 // type: is provided to the rule.
@@ -375,7 +472,9 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
-				namespace = nsKey.value.String()
+				if newNamespace := nsKey.value.String(); newNamespace != "" {
+					namespace = newNamespace
+				}
 			}
 		}
 
@@ -413,7 +512,9 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 				if found {
 					dsKey, ok := dsNode.(*Key)
 					if ok {
-						dataset = dsKey.value.String()
+						if newDataset := dsKey.value.String(); newDataset != "" {
+							dataset = newDataset
+						}
 					}
 
 				}
@@ -464,7 +565,9 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
-				namespace = nsKey.value.String()
+				if newNamespace := nsKey.value.String(); newNamespace != "" {
+					namespace = newNamespace
+				}
 			}
 		}
 
@@ -502,7 +605,9 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 				if found {
 					dsKey, ok := dsNode.(*Key)
 					if ok {
-						dataset = dsKey.value.String()
+						if newDataset := dsKey.value.String(); newDataset != "" {
+							dataset = newDataset
+						}
 					}
 				}
 
@@ -523,15 +628,29 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 				}
 
 				processorMap := &Dict{value: make([]Node, 0)}
-				processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "stream"}})
+				processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "dataset"}})
 				processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+					&Key{name: "type", value: &StrVal{value: r.Type}},
+					&Key{name: "namespace", value: &StrVal{value: namespace}},
+					&Key{name: "name", value: &StrVal{value: dataset}},
+				}}})
+
+				addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
+
+				// add this for backwards compatibility remove later
+				streamProcessorMap := &Dict{value: make([]Node, 0)}
+				streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "target", value: &StrVal{value: "stream"}})
+				streamProcessorMap.value = append(streamProcessorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
 					&Key{name: "type", value: &StrVal{value: r.Type}},
 					&Key{name: "namespace", value: &StrVal{value: namespace}},
 					&Key{name: "dataset", value: &StrVal{value: dataset}},
 				}}})
 
-				addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
-				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, addFieldsMap)
+				streamAddFieldsMap := &Dict{value: []Node{&Key{"add_fields", streamProcessorMap}}}
+
+				processorsList.value = mergeStrategy(r.OnConflict).InjectItem(processorsList.value, streamAddFieldsMap)
+				// end of backward compatibility section
 			}
 		}
 	}

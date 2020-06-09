@@ -33,8 +33,15 @@
 - Fix default configuration after enroll {pull}18232[18232]
 - Fix make sure the collected logs or metrics include streams information. {pull}18261[18261]
 - Stop monitoring on config change {pull}18284[18284]
+- Enable more granular control of monitoring {pull}18346[18346]
 - Fix jq: command not found {pull}18408[18408]
 - Avoid Chown on windows {pull}18512[18512]
+- Remove fleet admin from setup script {pull}18611[18611]
+- Correctly report platform and family. {issue}18665[18665]
+- Clean action store after enrolling to new configuration {pull}18656[18656]
+- Avoid watching monitor logs {pull}18723[18723]
+- Guard against empty stream.datasource and namespace {pull}18769[18769]
+- Fix install service script for windows {pull}18814[18814]
 
 ==== New features
 
@@ -58,3 +65,8 @@
 - Use nested objects so fleet can handle metadata correctly {pull}18234[18234]
 - More clear output of inspect command {pull}18405[18405]
 - Pick up version from libbeat {pull}18350[18350]
+- Use shorter hash for application differentiator {pull}18770[18770]
+- When not port are specified and the https is used fallback to 443 {pull}18844[18844]
+- Change monitoring defaults for agent {pull}18927[18927]
+- Agent verifies packages before using them {pull}18876[18876]
+- Change stream.* to dataset.* fields {pull}18967[18967]

@@ -167,7 +167,6 @@ func (Build) TestBinaries() error {
 
 	return combineErr(
 		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86", "configurable"), filepath.Join(p, "configurable-1.0-darwin-x86", "main.go")),
-		RunGo("build", "-o", filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "configurablebyfile"), filepath.Join(p, "configurablebyfile-1.0-darwin-x86", "main.go")),
 	)
 }
 
@@ -419,7 +418,7 @@ func (Demo) NoEnroll() error {
 }
 
 func runAgent(env map[string]string) error {
-	supportedEnvs := map[string]int{"FLEET_ADMIN_PASSWORD": 0, "FLEET_ADMIN_USERNAME": 0, "FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
+	supportedEnvs := map[string]int{"FLEET_CONFIG_ID": 0, "FLEET_ENROLLMENT_TOKEN": 0, "FLEET_ENROLL": 0, "FLEET_SETUP": 0, "FLEET_TOKEN_NAME": 0, "KIBANA_HOST": 0, "KIBANA_PASSWORD": 0, "KIBANA_USERNAME": 0}
 
 	tag := dockerTag()
 	dockerImageOut, err := sh.Output("docker", "image", "ls")
