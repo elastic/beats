@@ -189,7 +189,7 @@ outputs:
 -------------------------------------------------------------------------------------
 
 This example configures two outputs:`default` and  `monitoring`.
-Difference between them is in authentication method they are using, while first one uses username password pair second one contains api key.
+Notice that they use different authentication methods. The first one uses a username and password pair, and the second one contains an api key.
 
 [NOTE]
 ==============
