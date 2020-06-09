@@ -21,18 +21,14 @@ func TestNoopState(t *testing.T) {
 	t.Run("new state", func(t *testing.T) {
 		st := newStateStorage(noopPersister{})
 		cur, err := st.Load(myStream)
-		if !assert.NoError(t, err) {
-			t.Fatal(err)
-		}
+		assert.Equal(t, errStateNotFound, err)
 		empty := newCursor(myStream, time.Time{})
 		assert.Equal(t, empty, cur)
 	})
 	t.Run("update state", func(t *testing.T) {
 		st := newStateStorage(noopPersister{})
 		cur, err := st.Load(myStream)
-		if !assert.NoError(t, err) {
-			t.Fatal(err)
-		}
+		assert.Equal(t, errStateNotFound, err)
 		advanced := cur.TryAdvance(content{
 			Type:       tn,
 			ID:         "1234",
