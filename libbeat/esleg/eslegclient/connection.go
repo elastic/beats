@@ -18,6 +18,7 @@
 package eslegclient
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,8 +49,9 @@ type Connection struct {
 	Encoder BodyEncoder
 	HTTP    esHTTPClient
 
-	version common.Version
-	log     *logp.Logger
+	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
+	version          common.Version
+	log              *logp.Logger
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -60,7 +62,7 @@ type ConnectionSettings struct {
 
 	Username string
 	Password string
-	APIKey   string
+	APIKey   string // Raw API key, NOT base64-encoded
 	Headers  map[string]string
 
 	TLS      *tlscommon.TLSConfig
@@ -157,12 +159,18 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logp.Info("kerberos client created")
 	}
 
-	return &Connection{
+	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               httpClient,
 		Encoder:            encoder,
 		log:                logp.NewLogger("esclientleg"),
-	}, nil
+	}
+
+	if s.APIKey != "" {
+		conn.apiKeyAuthHeader = "ApiKey " + base64.StdEncoding.EncodeToString([]byte(s.APIKey))
+	}
+
+	return &conn, nil
 }
 
 func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
@@ -435,8 +443,8 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	if conn.APIKey != "" {
-		req.Header.Add("Authorization", "ApiKey "+conn.APIKey)
+	if conn.apiKeyAuthHeader != "" {
+		req.Header.Add("Authorization", conn.apiKeyAuthHeader)
 	}
 
 	for name, value := range conn.Headers {
