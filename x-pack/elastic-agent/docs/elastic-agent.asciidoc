@@ -136,7 +136,7 @@ To enroll an Elastic Agent to Fleet:
 ----------------------------------------------------------------------
 $ ./elastic-agent http://localhost:5601 $token
 ----------------------------------------------------------------------
-
++
 `$token` is an Enrollment token acquired from fleet.
 
 [[elastic-agent-cmd-options]]
