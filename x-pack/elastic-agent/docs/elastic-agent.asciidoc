@@ -150,7 +150,7 @@ The home directory of the Elastic Agent. `path.home` determines the location of 
 
 ==== `-c`
 
-This flags specifies configuration file to load.
+The configuration file to load.
 If this is omitted elastic agent uses `{path.home}/elastic-agent.yml`.
 
 
