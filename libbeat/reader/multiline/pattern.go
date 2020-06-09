@@ -70,25 +70,10 @@ func newMultilinePatternReader(
 	maxBytes int,
 	config *Config,
 ) (reader.Reader, error) {
-	types := map[string]func(match.Matcher) (matcher, error){
-		"before": beforeMatcher,
-		"after":  afterMatcher,
-	}
 
-	matcherType, ok := types[config.Match]
-	if !ok {
-		return nil, fmt.Errorf("unknown matcher type: %s", config.Match)
-	}
-
-	matcher, err := matcherType(*config.Pattern)
+	matcher, err := setupPatternMatcher(config)
 	if err != nil {
 		return nil, err
-	}
-
-	flushMatcher := config.FlushPattern
-
-	if config.Negate {
-		matcher = negatedMatcher(matcher)
 	}
 
 	maxLines := defaultMaxLines
@@ -99,9 +84,6 @@ func newMultilinePatternReader(
 	tout := defaultMultilineTimeout
 	if config.Timeout != nil {
 		tout = *config.Timeout
-		if tout < 0 {
-			return nil, fmt.Errorf("timeout %v must not be negative", config.Timeout)
-		}
 	}
 
 	if tout > 0 {
@@ -111,12 +93,35 @@ func newMultilinePatternReader(
 	pr := &patternReader{
 		reader:       r,
 		pred:         matcher,
-		flushMatcher: flushMatcher,
+		flushMatcher: config.FlushPattern,
 		state:        (*patternReader).readFirst,
 		msgBuffer:    newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
 		logger:       logp.NewLogger("reader_multiline"),
 	}
 	return pr, nil
+}
+
+func setupPatternMatcher(config *Config) (matcher, error) {
+	types := map[string]func(match.Matcher) (matcher, error){
+		"before": beforeMatcher,
+		"after":  afterMatcher,
+	}
+
+	matcherType, ok := types[config.Match]
+	if !ok {
+		return nil, fmt.Errorf("unknown matcher type: %s", config.Match)
+	}
+
+	m, err := matcherType(*config.Pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	if config.Negate {
+		m = negatedMatcher(m)
+	}
+
+	return m, nil
 }
 
 // Next returns next multi-line event.
@@ -144,8 +149,7 @@ func (pr *patternReader) readFirst() (reader.Message, error) {
 		}
 
 		// Start new multiline event
-		pr.msgBuffer.clear()
-		pr.msgBuffer.load(message)
+		pr.msgBuffer.startNewMessage(message)
 		pr.setState((*patternReader).readNext)
 		return pr.readNext()
 	}
@@ -179,10 +183,7 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 				}
 
 				// lines buffered, return multiline and error on next read
-				msg := pr.msgBuffer.finalize()
-				pr.msgBuffer.setErr(err)
-				pr.setState((*patternReader).readFailed)
-				return msg, nil
+				return pr.collectMessageAfterError(err)
 			}
 
 			// handle error with some content being returned by reader and
@@ -191,10 +192,7 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 				pr.msgBuffer.addLine(message)
 
 				// return multiline and error on next read
-				msg := pr.msgBuffer.finalize()
-				pr.msgBuffer.setErr(err)
-				pr.setState((*patternReader).readFailed)
-				return msg, nil
+				return pr.collectMessageAfterError(err)
 			}
 
 			// no match, return current multiline and retry with current line on next
@@ -229,6 +227,13 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 		// add line to current multiline event
 		pr.msgBuffer.addLine(message)
 	}
+}
+
+func (pr *patternReader) collectMessageAfterError(err error) (reader.Message, error) {
+	msg := pr.msgBuffer.finalize()
+	pr.msgBuffer.setErr(err)
+	pr.setState((*patternReader).readFailed)
+	return msg, nil
 }
 
 // readFailed returns empty message and error and resets line reader

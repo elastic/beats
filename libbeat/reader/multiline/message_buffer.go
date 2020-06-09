@@ -44,6 +44,11 @@ func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool
 	}
 }
 
+func (b *messageBuffer) startNewMessage(msg reader.Message) {
+	b.clear()
+	b.load(msg)
+}
+
 // load loads the reader with the given message. It is recommend to either
 // run clear or finalize before.
 func (b *messageBuffer) load(m reader.Message) {

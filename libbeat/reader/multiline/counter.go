@@ -18,14 +18,12 @@
 package multiline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 type counterReader struct {
 	reader    reader.Reader
 	state     func(*counterReader) (reader.Message, error)
-	logger    *logp.Logger
 	msgBuffer *messageBuffer
 }
 
@@ -37,9 +35,8 @@ func newMultilineCountReader(
 ) (reader.Reader, error) {
 	return &counterReader{
 		reader:    r,
-		state:     (*counterReader).readFirstCount,
+		state:     (*counterReader).readFirst,
 		msgBuffer: newMessageBuffer(maxBytes, config.LinesCount, []byte(separator), config.SkipNewLine),
-		logger:    logp.NewLogger("reader_counter_multiline"),
 	}, nil
 }
 
@@ -48,19 +45,7 @@ func (cr *counterReader) Next() (reader.Message, error) {
 	return cr.state(cr)
 }
 
-func (cr *counterReader) readFailedCount() (reader.Message, error) {
-	err := cr.msgBuffer.err
-	cr.msgBuffer.setErr(nil)
-	cr.resetCountState()
-	return reader.Message{}, err
-}
-
-// resetCountState sets state of the reader to readFirst
-func (cr *counterReader) resetCountState() {
-	cr.setState((*counterReader).readFirstCount)
-}
-
-func (cr *counterReader) readFirstCount() (reader.Message, error) {
+func (cr *counterReader) readFirst() (reader.Message, error) {
 	for {
 		message, err := cr.reader.Next()
 		if err != nil {
@@ -71,15 +56,13 @@ func (cr *counterReader) readFirstCount() (reader.Message, error) {
 			continue
 		}
 
-		// Start new multiline event
-		cr.msgBuffer.clear()
-		cr.msgBuffer.load(message)
-		cr.setState((*counterReader).readNextCount)
-		return cr.readNextCount()
+		cr.msgBuffer.startNewMessage(message)
+		cr.setState((*counterReader).readNext)
+		return cr.readNext()
 	}
 }
 
-func (cr *counterReader) readNextCount() (reader.Message, error) {
+func (cr *counterReader) readNext() (reader.Message, error) {
 	for {
 		message, err := cr.reader.Next()
 		if err != nil {
@@ -93,7 +76,7 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 				// lines buffered, return multiline and error on next read
 				msg := cr.msgBuffer.finalize()
 				cr.msgBuffer.setErr(err)
-				cr.setState((*counterReader).readFailedCount)
+				cr.setState((*counterReader).readFailed)
 				return msg, nil
 			}
 
@@ -105,7 +88,7 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 				// return multiline and error on next read
 				msg := cr.msgBuffer.finalize()
 				cr.msgBuffer.setErr(err)
-				cr.setState((*counterReader).readFailedCount)
+				cr.setState((*counterReader).readFailed)
 				return msg, nil
 			}
 		}
@@ -122,9 +105,16 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 	}
 }
 
+func (cr *counterReader) readFailed() (reader.Message, error) {
+	err := cr.msgBuffer.err
+	cr.msgBuffer.setErr(nil)
+	cr.resetState()
+	return reader.Message{}, err
+}
+
 // resetState sets state of the reader to readFirst
 func (cr *counterReader) resetState() {
-	cr.setState((*counterReader).readFirstCount)
+	cr.setState((*counterReader).readFirst)
 }
 
 // setState sets state to the given function
