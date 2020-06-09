@@ -215,7 +215,7 @@ settings.monitoring:
 
 
 To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to `false`, Beats monitoring is turned off, and all other options in this section are ignored.
-If `settings.monitoring.enabled` is set to `true` Elastic Agent watches Metrics or Logs of Beats according to `settings.monitoring.metrics` or `settings.monitoring.logs` values.
+To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the `logs` and `metrics` settings to control whether logs, metrics, or both are collected. If neither setting is specified, monitoring is disabled.
 
 Having both set to `false` results in the same behavior as disabling monitoring.
 
