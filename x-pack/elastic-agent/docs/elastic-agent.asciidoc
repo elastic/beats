@@ -111,7 +111,7 @@ $ ./elastic-agent run
 == Execution modes
 
 Elastic Agent runs in two modes: standalone or fleet. The two modes differ in how you configure and manage the agent.
-
+[float]
 === Standalone mode
 
 With standalone mode agent is configured locally and managed manually. Each agent is configured to be in this mode by default after installation.
