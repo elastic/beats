@@ -92,13 +92,7 @@ func makeRedis(
 		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
 
-	key, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "key",
-		MultiKey:         "keys",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-		Case:             outil.SelectorKeepCase,
-	})
+	key, err := buildKeySelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -174,4 +168,14 @@ func makeRedis(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildKeySelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "key",
+		MultiKey:         "keys",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+		Case:             outil.SelectorKeepCase,
+	})
 }
