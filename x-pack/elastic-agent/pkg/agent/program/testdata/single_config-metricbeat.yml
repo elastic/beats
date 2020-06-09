@@ -9,6 +9,12 @@ metricbeat:
         target: "dataset"
         fields:
           type: metrics
+          name: docker.status
+          namespace: default
+    - add_fields:
+        target: "stream"
+        fields:
+          type: metrics
           dataset: docker.status
           namespace: default
   - module: docker
@@ -18,6 +24,12 @@ metricbeat:
     processors:
     - add_fields:
         target: "dataset"
+        fields:
+          type: metrics
+          name: generic
+          namespace: default
+    - add_fields:
+        target: "stream"
         fields:
           type: metrics
           dataset: generic
@@ -34,8 +46,15 @@ metricbeat:
           target: "dataset"
           fields:
             type: metrics
+            name: generic
+            namespace: testing
+      - add_fields:
+          target: "stream"
+          fields:
+            type: metrics
             dataset: generic
             namespace: testing
+
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
