@@ -163,7 +163,7 @@ If not specified, Elastic Agent uses `{path.home}/data`.
 [[elastic-agent-configuration]]
 == Configure Elastic Agent
 
-By default Elastic Agent is configured to run in a standalone mode ingesting system data and sending them to local Elasticsearch on port 9200 with demo credentials of `elastic` user. It's also configured to monitor behavior of managed Beats in a form of tracking their logs and metrics and sending them to the same Elasticsearch instance.
+By default Elastic Agent runs in standalone mode to ingest system data and send it to a local {es} instance running on port 9200. It uses the demo credentials of the `elastic` user. It's also configured to monitor all Beats managed by the agent and send the Beats logs and metrics to the same {es) instance.
 
 To alter this behavior user has following options:
 
