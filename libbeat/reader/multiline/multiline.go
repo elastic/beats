@@ -28,14 +28,13 @@ import (
 func New(
 	r reader.Reader,
 	separator string,
-	skipNewline bool,
 	maxBytes int,
 	config *Config,
 ) (reader.Reader, error) {
 	if config.Type == patternMode {
-		return newMultilinePatternReader(r, separator, skipNewline, maxBytes, config)
+		return newMultilinePatternReader(r, separator, maxBytes, config)
 	} else if config.Type == countMode {
-		return newMultilineCountReader(r, separator, skipNewline, maxBytes, config)
+		return newMultilineCountReader(r, separator, maxBytes, config)
 	}
 	return nil, fmt.Errorf("unknown multiline type")
 }

@@ -131,9 +131,9 @@ func (b *messageBuffer) setErr(err error) {
 }
 
 func (b *messageBuffer) isEmpty() bool {
-	return cr.numLines == 0
+	return b.numLines == 0
 }
 
 func (b *messageBuffer) isEmptyMessage() bool {
-	return cr.message.Bytes == 0
+	return b.message.Bytes == 0
 }

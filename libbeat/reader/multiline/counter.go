@@ -24,7 +24,6 @@ import (
 
 type counterReader struct {
 	reader    reader.Reader
-	err       error // last seen error
 	state     func(*counterReader) (reader.Message, error)
 	logger    *logp.Logger
 	msgBuffer *messageBuffer
@@ -33,14 +32,13 @@ type counterReader struct {
 func newMultilineCountReader(
 	r reader.Reader,
 	separator string,
-	skipNewline bool,
 	maxBytes int,
 	config *Config,
 ) (reader.Reader, error) {
 	return &counterReader{
 		reader:    r,
 		state:     (*counterReader).readFirstCount,
-		msgBuffer: newMessageBuffer(maxBytes, config.LinesCount, []byte(separator), skipNewline),
+		msgBuffer: newMessageBuffer(maxBytes, config.LinesCount, []byte(separator), config.SkipNewLine),
 		logger:    logp.NewLogger("reader_counter_multiline"),
 	}, nil
 }
@@ -51,8 +49,8 @@ func (cr *counterReader) Next() (reader.Message, error) {
 }
 
 func (cr *counterReader) readFailedCount() (reader.Message, error) {
-	err := cr.err
-	cr.err = nil
+	err := cr.msgBuffer.err
+	cr.msgBuffer.setErr(nil)
 	cr.resetCountState()
 	return reader.Message{}, err
 }
@@ -94,7 +92,7 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 
 				// lines buffered, return multiline and error on next read
 				msg := cr.msgBuffer.finalize()
-				cr.err = err
+				cr.msgBuffer.setErr(err)
 				cr.setState((*counterReader).readFailedCount)
 				return msg, nil
 			}
@@ -102,20 +100,20 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 			// handle error with some content being returned by reader and
 			// line matching multiline criteria or no multiline started yet
 			if cr.msgBuffer.isEmptyMessage() {
-				cr.msgBudffer.addLine(message)
+				cr.msgBuffer.addLine(message)
 
 				// return multiline and error on next read
 				msg := cr.msgBuffer.finalize()
-				cr.err = err
+				cr.msgBuffer.setErr(err)
 				cr.setState((*counterReader).readFailedCount)
 				return msg, nil
 			}
 		}
 
 		// if enough lines are aggregated, return multiline event
-		if cr.message.Bytes > 0 && cr.numLines == cr.linesCount {
-			msg := cr.finalize()
-			cr.load(message)
+		if !cr.msgBuffer.isEmptyMessage() && cr.msgBuffer.numLines == cr.msgBuffer.maxLines {
+			msg := cr.msgBuffer.finalize()
+			cr.msgBuffer.load(message)
 			return msg, nil
 		}
 
@@ -126,7 +124,7 @@ func (cr *counterReader) readNextCount() (reader.Message, error) {
 
 // resetState sets state of the reader to readFirst
 func (cr *counterReader) resetState() {
-	cr.setState((*counterReader).readFirst)
+	cr.setState((*counterReader).readFirstCount)
 }
 
 // setState sets state to the given function

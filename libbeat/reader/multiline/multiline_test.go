@@ -320,7 +320,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg Config) reade
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	r, err = New(readfile.NewStripNewline(r, readfile.LineFeed), "\n", false, 1<<20, &cfg)
+	r, err = New(readfile.NewStripNewline(r, readfile.LineFeed), "\n", 1<<20, &cfg)
 	if err != nil {
 		t.Fatalf("failed to initialize reader: %v", err)
 	}

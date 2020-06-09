@@ -43,7 +43,7 @@ type patternReader struct {
 	reader       reader.Reader
 	pred         matcher
 	flushMatcher *match.Matcher
-	state        func(*Reader) (reader.Message, error)
+	state        func(*patternReader) (reader.Message, error)
 	logger       *logp.Logger
 	msgBuffer    *messageBuffer
 }
@@ -67,10 +67,9 @@ var (
 func newMultilinePatternReader(
 	r reader.Reader,
 	separator string,
-	skipNewline bool,
 	maxBytes int,
 	config *Config,
-) (*Reader, error) {
+) (reader.Reader, error) {
 	types := map[string]func(match.Matcher) (matcher, error){
 		"before": beforeMatcher,
 		"after":  afterMatcher,
@@ -109,36 +108,32 @@ func newMultilinePatternReader(
 		r = readfile.NewTimeoutReader(r, sigMultilineTimeout, tout)
 	}
 
-	mlr := &Reader{
+	pr := &patternReader{
 		reader:       r,
 		pred:         matcher,
 		flushMatcher: flushMatcher,
-		state:        (*Reader).readFirst,
-		maxBytes:     maxBytes,
-		maxLines:     maxLines,
-		separator:    []byte(separator),
-		skipNewline:  skipNewline,
-		message:      reader.Message{},
+		state:        (*patternReader).readFirst,
+		msgBuffer:    newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
 		logger:       logp.NewLogger("reader_multiline"),
 	}
-	return mlr, nil
+	return pr, nil
 }
 
 // Next returns next multi-line event.
-func (mlr *Reader) Next() (reader.Message, error) {
-	return mlr.state(mlr)
+func (pr *patternReader) Next() (reader.Message, error) {
+	return pr.state(pr)
 }
 
-func (mlr *Reader) readFirst() (reader.Message, error) {
+func (pr *patternReader) readFirst() (reader.Message, error) {
 	for {
-		message, err := mlr.reader.Next()
+		message, err := pr.reader.Next()
 		if err != nil {
 			// no lines buffered -> ignore timeout
 			if err == sigMultilineTimeout {
 				continue
 			}
 
-			mlr.logger.Debug("Multiline event flushed because timeout reached.")
+			pr.logger.Debug("Multiline event flushed because timeout reached.")
 
 			// pass error to caller (next layer) for handling
 			return message, err
@@ -149,109 +144,109 @@ func (mlr *Reader) readFirst() (reader.Message, error) {
 		}
 
 		// Start new multiline event
-		mlr.clear()
-		mlr.load(message)
-		mlr.setState((*Reader).readNext)
-		return mlr.readNext()
+		pr.msgBuffer.clear()
+		pr.msgBuffer.load(message)
+		pr.setState((*patternReader).readNext)
+		return pr.readNext()
 	}
 }
 
-func (mlr *Reader) readNext() (reader.Message, error) {
+func (pr *patternReader) readNext() (reader.Message, error) {
 	for {
-		message, err := mlr.reader.Next()
+		message, err := pr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
 			if err == sigMultilineTimeout {
 				// no lines buffered -> ignore timeout
-				if mlr.numLines == 0 {
+				if pr.msgBuffer.isEmpty() {
 					continue
 				}
 
-				mlr.logger.Debug("Multiline event flushed because timeout reached.")
+				pr.logger.Debug("Multiline event flushed because timeout reached.")
 
 				// return collected multiline event and
 				// empty buffer for new multiline event
-				msg := mlr.finalize()
-				mlr.resetState()
+				msg := pr.msgBuffer.finalize()
+				pr.resetState()
 				return msg, nil
 			}
 
 			// handle error without any bytes returned from reader
 			if message.Bytes == 0 {
 				// no lines buffered -> return error
-				if mlr.numLines == 0 {
+				if pr.msgBuffer.isEmpty() {
 					return reader.Message{}, err
 				}
 
 				// lines buffered, return multiline and error on next read
-				msg := mlr.finalize()
-				mlr.err = err
-				mlr.setState((*Reader).readFailed)
+				msg := pr.msgBuffer.finalize()
+				pr.msgBuffer.setErr(err)
+				pr.setState((*patternReader).readFailed)
 				return msg, nil
 			}
 
 			// handle error with some content being returned by reader and
 			// line matching multiline criteria or no multiline started yet
-			if mlr.message.Bytes == 0 || mlr.pred(mlr.last, message.Content) {
-				mlr.addLine(message)
+			if pr.msgBuffer.isEmptyMessage() || pr.pred(pr.msgBuffer.last, message.Content) {
+				pr.msgBuffer.addLine(message)
 
 				// return multiline and error on next read
-				msg := mlr.finalize()
-				mlr.err = err
-				mlr.setState((*Reader).readFailed)
+				msg := pr.msgBuffer.finalize()
+				pr.msgBuffer.setErr(err)
+				pr.setState((*patternReader).readFailed)
 				return msg, nil
 			}
 
 			// no match, return current multiline and retry with current line on next
 			// call to readNext awaiting the error being reproduced (or resolved)
 			// in next call to Next
-			msg := mlr.finalize()
-			mlr.load(message)
+			msg := pr.msgBuffer.finalize()
+			pr.msgBuffer.load(message)
 			return msg, nil
 		}
 
 		// handle case when endPattern is reached
-		if mlr.flushMatcher != nil {
-			endPatternReached := (mlr.flushMatcher.Match(message.Content))
+		if pr.flushMatcher != nil {
+			endPatternReached := (pr.flushMatcher.Match(message.Content))
 
 			if endPatternReached == true {
 				// return collected multiline event and
 				// empty buffer for new multiline event
-				mlr.addLine(message)
-				msg := mlr.finalize()
-				mlr.resetState()
+				pr.msgBuffer.addLine(message)
+				msg := pr.msgBuffer.finalize()
+				pr.resetState()
 				return msg, nil
 			}
 		}
 
 		// if predicate does not match current multiline -> return multiline event
-		if mlr.message.Bytes > 0 && !mlr.pred(mlr.last, message.Content) {
-			msg := mlr.finalize()
-			mlr.load(message)
+		if !pr.msgBuffer.isEmptyMessage() && !pr.pred(pr.msgBuffer.last, message.Content) {
+			msg := pr.msgBuffer.finalize()
+			pr.msgBuffer.load(message)
 			return msg, nil
 		}
 
 		// add line to current multiline event
-		mlr.addLine(message)
+		pr.msgBuffer.addLine(message)
 	}
 }
 
 // readFailed returns empty message and error and resets line reader
-func (mlr *Reader) readFailed() (reader.Message, error) {
-	err := mlr.err
-	mlr.err = nil
-	mlr.resetState()
+func (pr *patternReader) readFailed() (reader.Message, error) {
+	err := pr.msgBuffer.err
+	pr.msgBuffer.setErr(nil)
+	pr.resetState()
 	return reader.Message{}, err
 }
 
 // resetState sets state of the reader to readFirst
-func (mlr *Reader) resetState() {
-	mlr.setState((*Reader).readFirst)
+func (pr *patternReader) resetState() {
+	pr.setState((*patternReader).readFirst)
 }
 
 // setState sets state to the given function
-func (mlr *Reader) setState(next func(mlr *Reader) (reader.Message, error)) {
-	mlr.state = next
+func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, error)) {
+	pr.state = next
 }
 
 // matchers
