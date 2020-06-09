@@ -53,31 +53,51 @@ pipeline {
         sh(label: 'Install virtualenv', script: 'pip install --user virtualenv')
       }
     }
-    stage('Release Beats Test Docker images'){
+    stage('Metricbeat Test Docker images'){
       options {
-        warnError('Release Beats Docker images failed')
+        warnError('Metricbeat Test Docker images failed')
       }
       when {
         expression { return params.RELEASE_TEST_IMAGES }
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        retry(3){
-          sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/metricbeat'")
+        dir("${HOME}/${BASE_DIR}"){
+          retry(3){
+            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/metricbeat'")
+          }
         }
       }
     }
-    stage('Release X-Pack Beats Test Docker images'){
+    stage('Metricbeat x-pack Test Docker images'){
       options {
-        warnError('Release X-Pack Beats Docker images failed')
+        warnError('Metricbeat x-pack Docker images failed')
       }
       when {
         expression { return params.RELEASE_TEST_IMAGES }
       }
       steps {
         dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
-        retry(3){
-          sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/metricbeat'")
+        dir("${HOME}/${BASE_DIR}"){
+          retry(3){
+            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/metricbeat'")
+          }
+        }
+      }
+    }
+    stage('Filebeat x-pack Test Docker images'){
+      options {
+        warnError('Filebeat x-pack Test Docker images failed')
+      }
+      when {
+        expression { return params.RELEASE_TEST_IMAGES }
+      }
+      steps {
+        dockerLogin(secret: "${env.DOCKER_REGISTRY_SECRET}", registry: "${env.DOCKER_REGISTRY}")
+        dir("${HOME}/${BASE_DIR}"){
+          retry(3){
+            sh(label: 'Build ', script: ".ci/scripts/build-beats-integrations-test-images.sh '${GO_VERSION}' '${HOME}/${BASE_DIR}/x-pack/filebeat'")
+          }
         }
       }
     }

@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
+- Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 
 *Heartbeat*
 
@@ -55,6 +57,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
 - Add Tomcat overview dashboard {pull}14026[14026]
+- Move service config under metrics and simplify metric types. {pull}18691[18691]
 
 *Packetbeat*
 
@@ -68,6 +71,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Add Powershell module. Support for event ID's: `400`, `403`, `600`, `800`, `4103`, `4014`, `4105`, `4106`. {issue}16262[16262] {pull}18526[18526]
+- Fix Powershell processing of downgraded engine events. {pull}18966[18966]
+- Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
 
 *Functionbeat*
 
@@ -114,12 +119,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix an issue where error messages are not accurate in mapstriface. {issue}18662[18662] {pull}18663[18663]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
+- Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 
 *Auditbeat*
 
 - system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
+- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
+- system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033]
+- system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 
 *Filebeat*
 
@@ -163,6 +174,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `googlecloud.audit` pipeline to only take in fields that are explicitly defined by the dataset. {issue}18465[18465] {pull}18472[18472]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
+- Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
+- Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
+- Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 
 *Heartbeat*
 
@@ -219,6 +233,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}18797[18797]
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
+- Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 
 *Packetbeat*
 
@@ -226,7 +241,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436{18436}
+- Fix invalid IP addresses in DNS query results from Sysmon data. {issue}18432[18432] {pull}18436[18436]
+- Fields from Winlogbeat modules were not being included in index templates and patterns. {pull}18983[18983]
 
 *Functionbeat*
 
@@ -365,11 +381,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
+- Improve ECS categorization field mappings in cisco module. {issue}16028[16028] {pull}18537[18537]
+- The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
+- Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
+- Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
+- Record HTTP response headers. {pull}18327[18327]
 
 *Journalbeat*
 
@@ -455,6 +476,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
 - Add memory metrics into compute googlecloud. {pull}18802[18802]
 - Add new fields to HAProxy module. {issue}18523[18523]
+- Add Tomcat overview dashboard {pull}14026[14026]
 
 *Packetbeat*
 
@@ -468,6 +490,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
 - Add support for event IDs 4673,4674,4697,4698,4699,4700,4701,4702,4768,4769,4770,4771,4776,4778,4779,4964 to the Security module {pull}17517[17517]
 - Add registry and code signature information and ECS categorization fields for sysmon module {pull}18058[18058]
+- Add new winlogbeat security dashboard {pull}18775[18775]
 
 ==== Deprecated
 

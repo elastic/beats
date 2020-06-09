@@ -40,6 +40,6 @@
     #   authentication_endpoint: "https://login.microsoftonline.us/"
     #   resource: "https://manage.office365.us"
     #
-    #   max_retention: 7d
+    #   max_retention: 168h
     #   max_requests_per_minute: 2000
     #   poll_interval: 3m
