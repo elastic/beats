@@ -193,7 +193,7 @@ Notice that they use different authentication methods. The first one uses a user
 
 [NOTE]
 ==============
-Configuration is invalid without definition of default output
+A default output configuration is required.
 ==============
 
 === Enable/Disable Beats monitoring
