@@ -19,7 +19,6 @@ package elasticsearch
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -84,7 +83,7 @@ func NewClient(
 		URL:              s.URL,
 		Username:         s.Username,
 		Password:         s.Password,
-		APIKey:           base64.StdEncoding.EncodeToString([]byte(s.APIKey)),
+		APIKey:           s.APIKey,
 		Headers:          s.Headers,
 		TLS:              s.TLS,
 		Kerberos:         s.Kerberos,
