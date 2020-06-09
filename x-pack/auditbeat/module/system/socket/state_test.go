@@ -706,5 +706,55 @@ func TestUDPSendMsgAltLogic(t *testing.T) {
 		ev.AltRAddrA, ev.AltRAddrB = ipv6("fddd::cafe")
 		assert.Equal(t, expectedIPv6, ev.String())
 	})
+}
 
+func TestSocketReuse(t *testing.T) {
+	const (
+		localIP            = "192.168.33.10"
+		remoteIP           = "172.19.12.13"
+		localPort          = 38842
+		remotePort         = 53
+		sock       uintptr = 0xff1234
+	)
+	st := makeState(nil, (*logWrapper)(t), time.Hour, time.Hour, 0, time.Hour)
+	lPort, rPort := be16(localPort), be16(remotePort)
+	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
+	evs := []event{
+		&clockSyncCall{
+			Meta: meta(uint32(os.Getpid()), 1235, 5),
+			Ts:   uint64(time.Now().UnixNano()),
+		},
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+		// Asume inetRelease lost.
+		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
+		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
+		&udpSendMsgCall{
+			Meta:     meta(1234, 1235, 6),
+			Sock:     sock,
+			Size:     123,
+			LAddr:    lAddr,
+			AltRAddr: rAddr,
+			LPort:    lPort,
+			AltRPort: rPort,
+		},
+	}
+	if err := feedEvents(evs, st, t); err != nil {
+		t.Fatal(err)
+	}
+	st.ExpireOlder()
+	flows, err := getFlows(st.DoneFlows(), all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, flows, 1)
 }
