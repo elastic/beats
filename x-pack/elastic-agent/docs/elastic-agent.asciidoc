@@ -222,7 +222,7 @@ Set `use_output` to specify the output to which monitoring events are sent.
 
 === Specify data sources
 
-By default Elastic Agent ingests some system metrics. Its default configuration can look like this:
+By default Elastic Agent collects system metrics, such as cpu, memory, network, and filesystem metrics, and sends them to the default output. For example:
 
 
 [source,yaml]
