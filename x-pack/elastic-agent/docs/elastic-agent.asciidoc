@@ -142,7 +142,7 @@ $ ./elastic-agent http://localhost:5601 $token
 [[elastic-agent-cmd-options]]
 == Command line options
 
-`elastic-agent run` commands provides few flags which can alter the behavior of an agent.
+The `elastic-agent run` command provides flags that alter the behavior of an agent.
 
 ==== `-path.home`
 
