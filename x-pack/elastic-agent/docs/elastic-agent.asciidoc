@@ -1,12 +1,9 @@
-[[elastic-agent-getting-started]]
+[[elastic-agent-installation-configuration]]
 == Get started with {beatname_uc}
 
 ++++
 <titleabbrev>Get started</titleabbrev>
 ++++
-
-== What is Elastic Agent
-
 
 Elastic Agent is a single, unified agent that you can deploy to hosts or containers to collect data and send it to the {stack}. Behind the scenes, Elastic Agent runs the {beats} shippers or Endpoint required for your configuration.
 
@@ -20,8 +17,7 @@ Elastic Agent is a single, unified agent that you can deploy to hosts or contain
 
 === Step 1: Download Elastic Agent
 
-See our https://www.elastic.co/downloads/beats/{beatname_lc}[download page] for
-other installation options, such as 32-bit images.
+Download the package from the https://www.elastic.co/downloads/beats/{beatname_lc}[download page].
 
 === Step 2: Unpack archive
 
@@ -117,7 +113,7 @@ Elastic Agent runs in two modes: standalone or fleet. The two modes differ in ho
 With _standalone mode_, you manually configure and manage the agent locally. Each agent is configured to be in standalone mode by default after installation.
 At startup, Elastic Agent reads the configuration file specified by the `-c` argument or uses the default configuration, `elastic-agent.yml`, which is located in the same directory as the agent.
 
-For configuration options see link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
+For configuration options see `elastic-agent_configuration_example.yml`
 
 === Fleet mode
 
@@ -171,7 +167,9 @@ To alter this behavior, configure the output.
 
 Elastic Agent enables definition of multiple outputs where each data source can be paired with different output.
 
-E.g
+At the moment Elastic Agent works only with Elasticsearch output.
+Sample configuration can look like the example below:
+
 [source,yaml]
 -------------------------------------------------------------------------------------
 outputs:
@@ -245,4 +243,4 @@ datasources:
 
 If `use_output` is not specified, the `default` output is used.
 
-For more examples, see link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
+For more examples, see `elastic-agent_configuration_example.yml`
