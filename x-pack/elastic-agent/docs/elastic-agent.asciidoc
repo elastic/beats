@@ -243,6 +243,6 @@ datasources:
             dataset: system.filesystem
 -------------------------------------------------------------------------------------
 
-If `use_output` option is not specified, output called `default` is used.
+If `use_output` is not specified, the `default` output is used.
 
 For more examples please refer to link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
