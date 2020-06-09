@@ -54,6 +54,7 @@ happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the cef and panw modules will no longer send the `host`
 field. You can revert this change by configuring tags for the module and omitting
 `forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
+- Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
 
 *Heartbeat*
 
@@ -201,6 +202,7 @@ field. You can revert this change by configuring tags for the module and omittin
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
 - Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
+- Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 
 *Heartbeat*
 
