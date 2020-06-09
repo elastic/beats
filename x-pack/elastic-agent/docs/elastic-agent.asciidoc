@@ -167,7 +167,7 @@ By default Elastic Agent runs in standalone mode to ingest system data and send 
 
 To alter this behavior, configure the output.
 
-=== Configuring output
+=== Configure the output
 
 Elastic Agent enables definition of multiple outputs where each data source can be paired with different output.
 
