@@ -146,7 +146,7 @@ The `elastic-agent run` command provides flags that alter the behavior of an age
 
 ==== `-path.home`
 
-Specifies home directory of an agent. `path.home` is used for determining location of configuration file or data directory.
+The home directory of the Elastic Agent. `path.home` determines the location of the configuration files and data directory.
 
 ==== `-c`
 
