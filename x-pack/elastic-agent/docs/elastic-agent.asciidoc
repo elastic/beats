@@ -158,7 +158,7 @@ If not specified, Elastic Agent uses `{path.home}/elastic-agent.yml`.
 
 The data directory used by Elastic Agent to store downloaded artifacts. Also stores logs for any Beats started and managed by Elastic Agent.
 
-If not specified `{path.home}/data` is used.
+If not specified, Elastic Agent uses `{path.home}/data`.
 
 [[elastic-agent-configuration]]
 == Configuring Elastic Agent
