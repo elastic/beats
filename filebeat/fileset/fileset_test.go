@@ -288,6 +288,7 @@ func TestGetTemplateFunctions(t *testing.T) {
 	templateFunctions, err := getTemplateFunctions(vars)
 	assert.NoError(t, err)
 	assert.IsType(t, template.FuncMap{}, templateFunctions)
-	assert.Len(t, templateFunctions, 1)
+	assert.Contains(t, templateFunctions, "inList")
+	assert.Contains(t, templateFunctions, "tojson")
 	assert.Contains(t, templateFunctions, "IngestPipeline")
 }

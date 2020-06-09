@@ -39,6 +39,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
+will no longer send the `host` field that contains information about the host Filebeat is
+running on. This is because the `host` field specifies the host on which the event
+happened. {issue}13920[13920] {pull}18223[18223]
+- With the default configuration the cef and panw modules will no longer send the `host`
+field. You can revert this change by configuring tags for the module and omitting
+`forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
 
 *Heartbeat*
 
@@ -434,6 +441,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
 - Added http_endpoint input{pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
+- Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
