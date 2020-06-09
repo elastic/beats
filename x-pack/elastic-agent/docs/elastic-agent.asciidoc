@@ -99,7 +99,7 @@ endif::[]
 
 === Step 3: Run Elastic Agent
 
-If Elastic Agent is not installed as an auto-starting service it is possible to start in manually running.
+If Elastic Agent is not installed as an auto-starting service, start it manually:
 
 
 [source,shell]
