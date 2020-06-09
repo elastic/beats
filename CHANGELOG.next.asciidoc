@@ -38,11 +38,23 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
 - Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
+- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
+  will no longer send the `host` field that contains information about the host Filebeat is
+  running on. This is because the `host` field specifies the host on which the event
+  happened. {issue}13920[13920] {pull}18223[18223]
 - With the default configuration the following modules will no longer send the `host`
   field. You can revert this change by configuring tags for the module and omitting
   `forwarded` from the list. {issue}13920[13920]
 * Cisco {pull}18753[18753]
+* Checkpoint {pull}18754[18754]
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
+will no longer send the `host` field that contains information about the host Filebeat is
+running on. This is because the `host` field specifies the host on which the event
+happened. {issue}13920[13920] {pull}18223[18223]
+- With the default configuration the cef and panw modules will no longer send the `host`
+field. You can revert this change by configuring tags for the module and omitting
+`forwarded` from the list. {issue}13920[13920] {pull}18223[18223]
 
 *Heartbeat*
 
@@ -127,12 +139,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `keystore add` hanging under Windows. {issue}18649[18649] {pull}18654[18654]
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
+- Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 
 *Auditbeat*
 
 - system/socket: Fixed compatibility issue with kernel 5.x. {pull}15771[15771]
 - system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
+- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 
 *Filebeat*
 
@@ -186,6 +201,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed ingestion of some Cisco ASA and FTD messages when a hostname was used instead of an IP for NAT fields. {issue}14034[14034] {pull}18376[18376]
 - Fix `o365.audit` failing to ingest events when ip address is surrounded by square brackets. {issue}18587[18587] {pull}18591[18591]
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
+- Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 
 *Heartbeat*
 
@@ -256,6 +272,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}18797[18797]
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
+- Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 
 *Packetbeat*
 
@@ -433,18 +450,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for Google Cloud Audit and AWS CloudTrail. {pull}17379[17379]
 - Added http_endpoint input{pull}18298[18298]
 - Add support for array parsing in azure-eventhub input. {pull}18585[18585]
+- Added `observer.vendor`, `observer.product`, and `observer.type` to PANW module events. {pull}18223[18223]
 - The `logstash` module can now automatically detect the log file format (JSON or plaintext) and process it accordingly. {issue}9964[9964] {pull}18095[18095]
 - Improve ECS categorization field mappings in coredns module. {issue}16159[16159] {pull}18424[18424]
 - Improve ECS categorization field mappings in envoyproxy module. {issue}16161[16161] {pull}18395[18395]
 - Improve ECS categorization field mappings in cisco module. {issue}16028[16028] {pull}18537[18537]
 - The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
-
+- Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
+- Record HTTP response headers. {pull}18327[18327]
 
 *Heartbeat*
 
