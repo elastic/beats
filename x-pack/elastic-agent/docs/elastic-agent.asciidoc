@@ -161,7 +161,7 @@ The data directory used by Elastic Agent to store downloaded artifacts. Also sto
 If not specified, Elastic Agent uses `{path.home}/data`.
 
 [[elastic-agent-configuration]]
-== Configuring Elastic Agent
+== Configure Elastic Agent
 
 By default Elastic Agent is configured to run in a standalone mode ingesting system data and sending them to local Elasticsearch on port 9200 with demo credentials of `elastic` user. It's also configured to monitor behavior of managed Beats in a form of tracking their logs and metrics and sending them to the same Elasticsearch instance.
 
