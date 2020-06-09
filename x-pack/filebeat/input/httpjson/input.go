@@ -337,7 +337,7 @@ func (in *HttpjsonInput) processHTTPRequest(ctx context.Context, client *http.Cl
 					return err
 				}
 			} else {
-				v, err = common.MapStr(mm).GetValue(in.config.JSONObjects)
+				v, err = common.MapStr(obj).GetValue(in.config.JSONObjects)
 				if err != nil {
 					return err
 				}

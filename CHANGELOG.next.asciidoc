@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix regression in `add_kubernetes_metadata`, so configured `indexers` and `matchers` are used if defaults are not disabled. {issue}18481[18481] {pull}18818[18818]
 - Fix potential race condition in fingerprint processor. {pull}18738[18738]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
+- The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
 
 *Auditbeat*
 
@@ -172,6 +173,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Kubernetes Watcher goroutine leaks when input config is invalid and `input.reload` is enabled. {issue}18629[18629] {pull}18630[18630]
 - Okta module now sets the Elasticsearch `_id` field to the Okta UUID value contained in each system log to minimize the possibility of duplicating events. {pull}18953[18953]
 - Fix improper nesting of session_issuer object in aws cloudtrail fileset. {issue}18894[18894] {pull}18915[18915]
+- Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
 
 *Heartbeat*
 
@@ -229,6 +231,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 - Update Couchbase to version 6.5 {issue}18595[18595] {pull}19055[19055]
+- Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
 
 *Packetbeat*
 
@@ -379,12 +382,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS categorization field mappings in cisco module. {issue}16028[16028] {pull}18537[18537]
 - The s3 input can now automatically detect gzipped objects. {issue}18283[18283] {pull}18764[18764]
 - Add geoip AS lookup & improve ECS categorization in aws cloudtrail fileset. {issue}18644[18644] {pull}18958[18958]
-
+- Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
 
 *Heartbeat*
 
 - Allow a list of status codes for HTTP checks. {pull}15587[15587]
 - Add additional ECS compatible fields for TLS information. {pull}17687[17687]
+- Record HTTP response headers. {pull}18327[18327]
 
 *Journalbeat*
 
