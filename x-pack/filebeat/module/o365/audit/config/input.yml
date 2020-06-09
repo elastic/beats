@@ -21,7 +21,7 @@ content_type:
 {{ if .api }}
 api:
 {{ range $k, $v := .api }}
- - {{ $k }}: {{ $v -}}
+  {{ $k }}: {{ $v -}}
 {{ end }}
 {{ end }}
 
@@ -49,6 +49,7 @@ processors:
         - 2006-01-02T15:04:05
 {{ end }}
   - script:
+      when.has_fields: ['o365audit']
       lang: javascript
       id: o365audit_script
       file: ${path.home}/module/o365/audit/config/pipeline.js
