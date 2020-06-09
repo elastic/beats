@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -27,6 +28,16 @@ func TestMain(m *testing.M) {
 
 	program.Supported = append(program.Supported, configurableSpec)
 
+	p := getProgram("configurable", "1.0")
+	spec := p.Spec()
+	path := spec.BinaryPath
+	if runtime.GOOS == "windows" {
+		path += ".exe"
+	}
+	if s, err := os.Stat(path); err != nil || s == nil {
+		panic(fmt.Errorf("binary not available %s", spec.BinaryPath))
+	}
+
 	os.Exit(m.Run())
 }
 
@@ -42,13 +53,6 @@ func TestNotSupported(t *testing.T) {
 
 func TestConfigurableRun(t *testing.T) {
 	p := getProgram("configurable", "1.0")
-
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
 
 	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
@@ -116,13 +120,6 @@ func TestConfigurableRun(t *testing.T) {
 
 func TestConfigurableFailed(t *testing.T) {
 	p := getProgram("configurable", "1.0")
-
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
 
 	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
@@ -224,13 +221,6 @@ func TestConfigurableFailed(t *testing.T) {
 func TestConfigurableCrash(t *testing.T) {
 	p := getProgram("configurable", "1.0")
 
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
-
 	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	if err := operator.start(p, nil); err != nil {
 		t.Fatal(err)
@@ -331,13 +321,6 @@ func TestConfigurableCrash(t *testing.T) {
 
 func TestConfigurableStartStop(t *testing.T) {
 	p := getProgram("configurable", "1.0")
-
-	spec := p.Spec()
-	if s, err := os.Stat(spec.BinaryPath); err != nil || s == nil {
-		t.Fatalf("binary not available %s", spec.BinaryPath)
-	} else {
-		t.Logf("found file %v", spec.BinaryPath)
-	}
 
 	operator, _ := getTestOperator(t, downloadPath, installPath, p)
 	defer operator.stop(p) // failure catch, to ensure no sub-process stays running
