@@ -42,11 +42,10 @@ func (o *operationVerify) Name() string {
 	return "operation-verify"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationVerify) Check() (bool, error) {
+// Check checks whether verify needs to occur.
+//
+// Only if the artifacts exists does it need to be verified.
+func (o *operationVerify) Check(_ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {

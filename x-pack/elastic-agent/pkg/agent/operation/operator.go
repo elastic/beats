@@ -204,7 +204,7 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 			return err
 		}
 
-		shouldRun, err := op.Check()
+		shouldRun, err := op.Check(app)
 		if err != nil {
 			return err
 		}
