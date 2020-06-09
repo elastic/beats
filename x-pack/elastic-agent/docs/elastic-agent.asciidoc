@@ -196,7 +196,7 @@ A default output configuration is required.
 
 === Configure Beats monitoring
 
-To disable or change monitoring settings, set options under `settings.monitoring`:
+Elastic Agent is monitoring _Beats_ by default. To disable or change monitoring settings, set options under `settings.monitoring`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
