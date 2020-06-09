@@ -131,7 +131,7 @@ To enroll an Elastic Agent to Fleet:
 . Stop the agent.
 
 . Enroll the agent:
-
++
 [source,shell]
 ----------------------------------------------------------------------
 $ ./elastic-agent http://localhost:5601 $token
