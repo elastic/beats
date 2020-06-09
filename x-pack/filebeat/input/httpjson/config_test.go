@@ -133,6 +133,21 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name: "can set oauth2 and api_key together if oauth2 is disabled",
+			input: map[string]interface{}{
+				"api_key": "an_api_key",
+				"oauth2": map[string]interface{}{
+					"enabled":   false,
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+				"url": "localhost",
+			},
+		},
+		{
 			name:        "can't set oauth2 and authentication_scheme",
 			expectedErr: "invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously accessing config",
 			input: map[string]interface{}{
