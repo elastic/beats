@@ -12,7 +12,7 @@ filebeat:
           target: "dataset"
           fields:
             type: logs
-            dataset: generic
+            name: generic
             namespace: default
 output:
   elasticsearch:

@@ -9,7 +9,7 @@ metricbeat:
         target: "dataset"
         fields:
           type: metrics
-          dataset: docker.status
+          name: docker.status
           namespace: default
   - module: docker
     metricsets: [info]
@@ -20,7 +20,7 @@ metricbeat:
         target: "dataset"
         fields:
           type: metrics
-          dataset: generic
+          name: generic
           namespace: default
   - module: apache
     metricsets: [info]
@@ -34,7 +34,7 @@ metricbeat:
           target: "dataset"
           fields:
             type: metrics
-            dataset: generic
+            name: generic
             namespace: testing
 output:
   elasticsearch:
