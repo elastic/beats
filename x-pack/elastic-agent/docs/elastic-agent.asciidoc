@@ -198,7 +198,7 @@ A default output configuration is required.
 
 === Configure Beats monitoring
 
-To disable or enable monitoring of managed Beats following section is available:
+To disable or change monitoring settings, set options under `settings.monitoring`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
