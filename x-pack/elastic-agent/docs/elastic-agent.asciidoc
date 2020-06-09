@@ -188,7 +188,7 @@ outputs:
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 -------------------------------------------------------------------------------------
 
-In the example above 2 outputs are provided. One called `default` and one called `monitoring`.
+This example configures two outputs:`default` and  `monitoring`.
 Difference between them is in authentication method they are using, while first one uses username password pair second one contains api key.
 
 [NOTE]
