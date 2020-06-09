@@ -729,7 +729,10 @@ function AuditProcessor(tenant_names, debug) {
         tokenizer: '[%{_ip}]:%{port}',
         field: 'client.address',
         target_prefix: 'client',
-        'when.contains.client.address': ']:',
+        'when.and': [
+            {'not.has_fields': ['client._ip', 'client.port']},
+            {'contains.client.address': ']:'},
+        ],
     }));
     builder.Add("extractClientIPv4Port", new processor.Dissect({
         tokenizer: '%{_ip}:%{port}',
