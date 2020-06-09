@@ -8,7 +8,7 @@
 == What is Elastic Agent
 
 
-Elastic Agent is single, unified agent that users can deploy to hosts or containers. Based on configuration provided, it controls which data is collected from the host or containers and where the data is sent. It will run Beats or Endpoint as needed.
+Elastic Agent is a single, unified agent that you can deploy to hosts or containers to collect data and send it to the {stack}. Behind the scenes, Elastic Agent runs the {beats} shippers or Endpoint required for your configuration.
 
 * <<elastic-agent-installation>>
 * <<elastic-agent-execution-modes>>
@@ -251,5 +251,4 @@ This configuration configures gathering cpu, memory, network and filesystem metr
 If `use_output` option is not specified, output called `default` is used.
 
 For more examples please refer to link:elastic-agent_configuration_example.yml[Elastic Agent Configuration Example]
-
 
