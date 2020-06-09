@@ -217,7 +217,6 @@ settings.monitoring:
 To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to `false`, Beats monitoring is turned off, and all other options in this section are ignored.
 To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the `logs` and `metrics` settings to control whether logs, metrics, or both are collected. If neither setting is specified, monitoring is disabled.
 
-Having both set to `false` results in the same behavior as disabling monitoring.
 
 `use_output` option specifies output to which events will be send.
 
