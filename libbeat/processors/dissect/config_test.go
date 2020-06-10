@@ -135,7 +135,7 @@ func TestConfigForDataType(t *testing.T) {
 	})
 	t.Run("missing data type", func(t *testing.T) {
 		c, err := common.NewConfigFrom(map[string]interface{}{
-			"tokenizer": "%{value1|} %{value2|} %{value3|} %{value4|} %{value5|}",
+			"tokenizer": "%{value1|} %{value2|}",
 			"field":     "message",
 		})
 		if !assert.NoError(t, err) {

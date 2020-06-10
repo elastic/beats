@@ -63,18 +63,15 @@ const (
 	IP
 )
 
-var (
-	unsetDataType = "[unset]"
-)
 var dataTypeNames = map[string]dataType{
-	unsetDataType: unset,
-	"integer":     Integer,
-	"long":        Long,
-	"float":       Float,
-	"double":      Double,
-	"string":      String,
-	"boolean":     Boolean,
-	"ip":          IP,
+	"[unset]": unset,
+	"integer": Integer,
+	"long":    Long,
+	"float":   Float,
+	"double":  Double,
+	"string":  String,
+	"boolean": Boolean,
+	"ip":      IP,
 }
 
 func (f baseField) IsGreedy() bool {
@@ -292,14 +289,14 @@ func newField(id int, rawKey string, previous delimiter) (field, error) {
 	}
 
 	key, dataType, ordinal, length, greedy := extractKeyParts(rawKey)
-	if len(dataType) > 0 {
-		dt, ok := dataTypeNames[dataType]
-		if !ok {
-			return nil, errInvalidDatatype
-		}
 
-		if dt == unset {
-			return nil, errMissingDatatype
+	// rawKey will have | as suffix when data type is missing
+	if strings.HasSuffix(rawKey, dataTypeIndicator) {
+		return nil, errMissingDatatype
+	}
+	if len(dataType) > 0 {
+		if _, ok := dataTypeNames[dataType]; !ok {
+			return nil, errInvalidDatatype
 		}
 	}
 
@@ -397,13 +394,7 @@ func extractKeyParts(rawKey string) (key string, dataType string, ordinal int, l
 		greedy = true
 	}
 
-	if m[0][7] != "" {
-		if m[0][8] == "" {
-			dataType = unsetDataType
-		} else {
-			dataType = m[0][8]
-		}
-	}
+	dataType = m[0][8]
 
 	return m[0][1], dataType, ordinal, length, greedy
 }

@@ -38,7 +38,8 @@ var (
 	indirectAppendPrefix = "&+"
 	greedySuffix         = "->"
 	pointerFieldPrefix   = "*"
-	dataTypeSeparator    = "\\|"
+	dataTypeIndicator    = "|"
+	dataTypeSeparator    = "\\|" // Needed for regexp
 
 	numberRE = "\\d{1,2}"
 	alphaRE  = "[[:alpha:]]*"
