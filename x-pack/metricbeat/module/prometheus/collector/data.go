@@ -67,7 +67,7 @@ func (g *typedGenerator) Stop() {
 			return
 		}
 		attempts++
-		time.Sleep(5*time.Second)
+		time.Sleep(5 * time.Second)
 	}
 	logp.Debug("prometheus.collector.cache", "stopping counterCache")
 	g.counterCache.Stop()
