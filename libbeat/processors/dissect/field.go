@@ -53,8 +53,7 @@ type dataType uint8
 
 // List of dataTypes.
 const (
-	unset dataType = iota
-	Integer
+	Integer dataType = iota
 	Long
 	Float
 	Double
@@ -64,7 +63,6 @@ const (
 )
 
 var dataTypeNames = map[string]dataType{
-	"[unset]": unset,
 	"integer": Integer,
 	"long":    Long,
 	"float":   Float,
@@ -93,6 +91,7 @@ func (f baseField) Length() int {
 func (f baseField) Key() string {
 	return f.key
 }
+
 func (f baseField) DataType() string {
 	return f.dataType
 }
