@@ -65,7 +65,6 @@ func (o *retryableOperations) Run(ctx context.Context, application Application) 
 
 // Run runs the operation
 func (o *retryableOperations) runOnce(application Application) func(context.Context) error {
-	o.logger.Debugf("retrying config: %v", o.retryConfig)
 	return func(ctx context.Context) error {
 		for _, op := range o.operations {
 			if ctx.Err() != nil {
