@@ -235,6 +235,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
+- Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 
 *Packetbeat*
 
