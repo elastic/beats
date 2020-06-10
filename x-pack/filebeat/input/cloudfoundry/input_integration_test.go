@@ -20,8 +20,17 @@ import (
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
-func TestInput(t *testing.T) {
+func TestInputV1(t *testing.T) {
+	testInput(t, "v1")
+}
+
+func TestInputV2(t *testing.T) {
+	testInput(t, "v2")
+}
+
+func testInput(t *testing.T, version string) {
 	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
+	config.SetString("version", -1, version)
 
 	events := make(chan beat.Event)
 	connector := channel.ConnectorFunc(func(*common.Config, beat.ClientConfig) (channel.Outleter, error) {
