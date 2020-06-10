@@ -1912,6 +1912,15 @@ SOFTWARE
   to the Commercial Software.
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-concert
+Version: v0.0.2
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-concert/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit/v2
 Version: v2.0.0
 Revision: 92371bef3fb8

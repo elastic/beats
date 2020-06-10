@@ -419,6 +419,11 @@ github.com/elastic/ecs/code/go/ecs
 github.com/elastic/elastic-agent-client/v7/pkg/client
 github.com/elastic/elastic-agent-client/v7/pkg/proto
 github.com/elastic/elastic-agent-client/v7/pkg/utils
+# github.com/elastic/go-concert v0.0.2
+github.com/elastic/go-concert
+github.com/elastic/go-concert/atomic
+github.com/elastic/go-concert/chorus
+github.com/elastic/go-concert/unison
 # github.com/elastic/go-libaudit/v2 v2.0.0-20200515221334-92371bef3fb8
 github.com/elastic/go-libaudit/v2
 github.com/elastic/go-libaudit/v2/aucoalesce
