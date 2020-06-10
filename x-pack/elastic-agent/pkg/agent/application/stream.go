@@ -77,8 +77,8 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		return nil, err
 	}
 
-	fetcher := downloader.NewDownloader(operatorConfig.DownloadConfig)
-	verifier, err := downloader.NewVerifier(operatorConfig.DownloadConfig)
+	fetcher := downloader.NewDownloader(log, operatorConfig.DownloadConfig)
+	verifier, err := downloader.NewVerifier(log, operatorConfig.DownloadConfig)
 	if err != nil {
 		return nil, errors.New(err, "initiating verifier")
 	}
