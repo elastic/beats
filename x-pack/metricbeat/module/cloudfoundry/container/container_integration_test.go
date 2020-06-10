@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	config := mtest.GetConfig(t, "container")
 
 	ms := mbtest.NewPushMetricSetV2(t, config)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+	events := mbtest.RunPushMetricSetV2(60*time.Second, 1, ms)
 
 	require.NotEmpty(t, events)
 }
@@ -30,7 +30,7 @@ func TestData(t *testing.T) {
 	config := mtest.GetConfig(t, "container")
 
 	ms := mbtest.NewPushMetricSetV2(t, config)
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+	events := mbtest.RunPushMetricSetV2(60*time.Second, 1, ms)
 
 	require.NotEmpty(t, events)
 
