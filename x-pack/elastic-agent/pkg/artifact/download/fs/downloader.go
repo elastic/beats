@@ -39,7 +39,16 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(_ context.Context, programName, version string) (string, error) {
+func (e *Downloader) Download(_ context.Context, programName, version string) (_ string, err error) {
+	downloadedFiles := make([]string, 0, 2)
+	defer func() {
+		if err != nil {
+			for _, path := range downloadedFiles {
+				os.Remove(path)
+			}
+		}
+	}()
+
 	// create a destination directory root/program
 	destinationDir := filepath.Join(e.config.TargetDirectory, programName)
 	if err := os.MkdirAll(destinationDir, 0755); err != nil {
@@ -48,12 +57,13 @@ func (e *Downloader) Download(_ context.Context, programName, version string) (s
 
 	// download from source to dest
 	path, err := e.download(e.config.OS(), programName, version)
+	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
-		os.Remove(path)
 		return "", err
 	}
 
-	_, err = e.downloadHash(e.config.OS(), programName, version)
+	hashPath, err := e.downloadHash(e.config.OS(), programName, version)
+	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
 
