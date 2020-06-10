@@ -330,12 +330,12 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	// Report central management state
 	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
-	monitoring.NewBool(mgmt, "enabled").Set(b.ConfigManager.Enabled())
+	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	debugf("Initializing output plugins")
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
-		if b.ConfigManager.Enabled() {
+		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
 			msg := "No outputs are defined. Please define one under the output section."
@@ -462,8 +462,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	// Launch config manager
-	b.ConfigManager.Start(beater.Stop)
-	defer b.ConfigManager.Stop()
+	b.Manager.Start(beater.Stop)
+	defer b.Manager.Stop()
 
 	return beater.Run(&b.Beat)
 }
@@ -643,12 +643,12 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
+	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
 
-	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
+	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}
 
