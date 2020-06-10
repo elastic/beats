@@ -45,6 +45,11 @@ processors:
 - append:
     field: event.type
     value: error
+- urldecode:
+    field: message
+    target_field: message
+    ignore_missing: true
+    ignore_failure: true
 on_failure:
 - set:
     field: error.message

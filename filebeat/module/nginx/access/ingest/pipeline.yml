@@ -158,6 +158,11 @@ processors:
     field: related.user
     value: "{{user.name}}"
     if: "ctx?.user?.name != null"
+- urldecode:
+    field: url.original
+    target_field: url.original
+    ignore_missing: true
+    ignore_failure: true
 on_failure:
 - set:
     field: error.message
