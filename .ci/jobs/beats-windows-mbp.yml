@@ -13,7 +13,7 @@
           discover-pr-forks-trust: permission
           discover-pr-origin: merge-current          
           discover-tags: false
-          head-filter-regex: 'master'
+          head-filter-regex: '(master|PR-.*)'
           notification-context: 'beats-ci'
           repo: beats
           repo-owner: elastic
@@ -27,6 +27,15 @@
             - regular-branches: true
             - change-request:
                 ignore-target-only-changes: false
+          property-strategies:
+            - named-branches:
+              - defaults:
+                - suppress-scm-triggering: true
+              - exceptions:
+                - exception:
+                    branch-name: master
+                    properties:
+                      - suppress-scm-triggering: false
           clean:
             after: true
             before: true

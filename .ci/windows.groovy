@@ -66,7 +66,7 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          loadConfigEnvVars()
+          //loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
@@ -75,6 +75,9 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
+      when {
+        expression { return false }
+      }
       steps {
         makeTarget("Lint", "check")
       }
@@ -91,7 +94,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -103,7 +107,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_FILEBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -115,7 +120,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -127,7 +133,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_HEARTBEAT != "false"
+              return params.windowsTest
+              //return env.BUILD_HEARTBEAT != "false"
             }
           }
           stages {
@@ -150,7 +157,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -162,7 +170,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -174,7 +183,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_METRICBEAT != "false" && params.windowsTest
             }
           }
           steps {
@@ -186,7 +196,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
+              return params.windowsTest
+              //return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
             }
           }
           steps {
@@ -198,7 +209,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return env.BUILD_WINLOGBEAT != "false"
+              return params.windowsTest
+              //return env.BUILD_WINLOGBEAT != "false"
             }
           }
           stages {
@@ -221,7 +233,8 @@ pipeline {
           when {
             beforeAgent true
             expression {
-              return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
+              return params.windowsTest
+              //return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
             }
           }
           steps {
