@@ -1,78 +1,242 @@
-Agent's notes
+[[elastic-agent-installation-configuration]]
+== Get started with {beatname_uc}
+
+++++
+<titleabbrev>Get started</titleabbrev>
+++++
+
+Elastic Agent is a single, unified agent that you can deploy to hosts or containers to collect data and send it to the {stack}. Behind the scenes, Elastic Agent runs the {beats} shippers or Endpoint required for your configuration.
+
+* <<elastic-agent-installation>>
+* <<elastic-agent-execution-modes>>
+* <<elastic-agent-cmd-options>>
+* <<elastic-agent-configuration>>
+
+[[elastic-agent-installation]]
+== Install Elastic Agent
+
+=== Step 1: Unpack archive
 
 
-[[requirements]]
-Requirements
+[[mac]]
+*mac:*
 
-The remote Kibana version of the Agent must be equal or higher than the Agent version, if this is not met
-Kibana will refuse the connection.
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-darwin-x86_64.tar.gz
+tar xzvf elastic-agent-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{version}-linux-x86_64.tar.gz
+tar xzvf elastic-agent-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[win]]
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the Elastic Agent Windows zip file from the
+https://www.elastic.co/downloads/beats/elastic-agent[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `elastic-agent-<version>-windows` directory to `Elastic-Agent`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. From the PowerShell prompt, run the following commands to install Filebeat as a
+Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Elastic-Agent'
+PS C:\Program Files\Elastic-Agent> .\install-service-elastic-agent.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-elastic-agent.ps1`.
+
+endif::[]
+
+=== Step 2: Run Elastic Agent
+
+If Elastic Agent is not installed as an auto-starting service, start it manually:
 
 
-[[Supported Actions by the Agent]]
+[source,shell]
+----------------------------------------------------------------------
+$ ./elastic-agent run
+----------------------------------------------------------------------
 
-The Elastic Agent supports the following actions received by Fleet.
+[[elastic-agent-execution-modes]]
+== Execution modes
 
-Implemented:
+Elastic Agent runs in two modes: standalone or fleet. The two modes differ in how you configure and manage the agent.
+[float]
+=== Standalone mode
 
-[[Configuration change]]
+With _standalone mode_, you manually configure and manage the agent locally. Each agent is configured to be in standalone mode by default after installation.
+At startup, Elastic Agent reads the configuration file specified by the `-c` argument or uses the default configuration, `elastic-agent.yml`, which is located in the same directory as the agent.
 
-The Elastic Agent receives a configuration encoded as a JSON object.
+For configuration options see `elastic-agent_configuration_example.yml`
 
-[source,json]
-------------------------------------------------------------------------------
-	{
-		"type": "CONFIG_CHANGE",
-		"id": "id1",
-		"data": {
-			"config": {
-				"id": "policy-id",
-				"outputs": {
-					"default": {
-						"hosts": "https://localhost:9200"
-					}
-				},
-				"datasources": [{
-					"id": "string",
-					"enabled": true,
-					"use_output": "default",
-					"inputs": [{
-						"type": "logs",
-						"streams": [{
-							"paths": ["/var/log/hello.log"]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-------------------------------------------------------------------------------
+=== Fleet mode
 
-[[Planned but not implemented]]
+With _fleet mode_, you manage Elastic Agent remotely. The agent uses a trusted {kib} instance to retrieve configurations and report agent events. This trusted {kib} instance must have Ingest Manager and Fleet enabled.
 
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "UPGRADE",
-  "id": "id1",
-  "target_version": "7.2.1"
-}
-------------------------------------------------------------------------------
+To create a trusted communication channel between Elastic Agent and {kib}, you enroll the agent to Fleet.
 
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "DOWNGRADE",
-  "id": "id1",
-  "target_version": "7.2.1"
-}
-------------------------------------------------------------------------------
+To enroll an Elastic Agent to Fleet:
 
-[source,json]
-------------------------------------------------------------------------------
-{
-  "type": "RELAY",
-  "id": "id1",
-  "destination": {"name":"endpoint"}
-  "data": {}
-}
-------------------------------------------------------------------------------
+
+. Stop the agent.
+
+. Enroll the agent:
++
+[source,shell]
+----------------------------------------------------------------------
+$ ./elastic-agent http://localhost:5601 $token
+----------------------------------------------------------------------
++
+`$token` is an enrollment token acquired from Fleet.
+
+[[elastic-agent-cmd-options]]
+== Command line options
+
+The `elastic-agent run` command provides flags that alter the behavior of an agent.
+
+==== `-path.home`
+
+The home directory of the Elastic Agent. `path.home` determines the location of the configuration files and data directory.
+
+==== `-c`
+
+The configuration file to load.
+If not specified, Elastic Agent uses `{path.home}/elastic-agent.yml`.
+
+
+==== `-path.data`
+
+The data directory used by Elastic Agent to store downloaded artifacts. Also stores logs for any Beats started and managed by Elastic Agent.
+
+If not specified, Elastic Agent uses `{path.home}/data`.
+
+[[elastic-agent-configuration]]
+== Configure Elastic Agent
+
+By default Elastic Agent runs in standalone mode to ingest system data and send it to a local {es} instance running on port 9200. It uses the demo credentials of the `elastic` user. It's also configured to monitor all Beats managed by the agent and send the Beats logs and metrics to the same {es) instance.
+
+To alter this behavior, configure the output.
+
+=== Configure the output
+
+Elastic Agent enables definition of multiple outputs where each data source can be paired with different output.
+
+At the moment Elastic Agent works only with Elasticsearch output.
+Sample configuration can look like the example below:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200]
+    username: elastic
+    password: changeme
+
+  monitoring:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["localhost:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+-------------------------------------------------------------------------------------
+
+This example configures two outputs: `default` and  `monitoring`.
+Notice that they use different authentication methods. The first one uses a username and password pair, and the second one contains an api key.
+
+[NOTE]
+==============
+A default output configuration is required.
+==============
+
+=== Configure Beats monitoring
+
+Elastic Agent is monitoring _Beats_ by default. To disable or change monitoring settings, set options under `settings.monitoring`:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+settings.monitoring:
+  # enabled turns on monitoring of running processes
+  enabled: true
+  # enables log monitoring
+  logs: true
+  # enables metrics monitoring
+  metrics: true
+  # specifies output to be used
+  use_output: monitoring
+-------------------------------------------------------------------------------------
+
+
+To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to `false`, Beats monitoring is turned off, and all other options in this section are ignored.
+To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the `logs` and `metrics` settings to control whether logs, metrics, or both are collected. If neither setting is specified, monitoring is disabled.
+
+
+Set `use_output` to specify the output to which monitoring events are sent.
+
+=== Specify data sources
+
+By default Elastic Agent collects system metrics, such as cpu, memory, network, and filesystem metrics, and sends them to the default output. For example:
+
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+datasources:
+  - namespace: default
+    use_output: default
+    inputs:
+      - type: system/metrics
+        streams:
+          - metricset: cpu
+            dataset: system.cpu
+          - metricset: memory
+            dataset: system.memory
+          - metricset: network
+            dataset: system.network
+          - metricset: filesystem
+            dataset: system.filesystem
+-------------------------------------------------------------------------------------
+
+If `use_output` is not specified, the `default` output is used.
+
+For more examples, see `elastic-agent_configuration_example.yml`
