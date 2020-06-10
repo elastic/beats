@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -327,7 +328,7 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 	if event.Meta != nil {
 		if pipeline, exists := event.Meta["pipeline"]; exists {
 			if p, ok := pipeline.(string); ok {
-				return p, nil
+				return strings.ToLower(p), nil
 			}
 			return "", errors.New("pipeline metadata is no string")
 		}

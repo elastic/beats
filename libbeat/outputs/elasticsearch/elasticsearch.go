@@ -132,12 +132,7 @@ func buildSelectors(
 		return index, pipeline, err
 	}
 
-	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "pipeline",
-		MultiKey:         "pipelines",
-		EnableSingleOnly: true,
-		FailEmpty:        false,
-	})
+	pipelineSel, err := buildPipelineSelector(cfg)
 	if err != nil {
 		return index, pipeline, err
 	}
@@ -147,4 +142,14 @@ func buildSelectors(
 	}
 
 	return index, pipeline, err
+}
+
+func buildPipelineSelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+		Case:             outil.SelectorLowerCase,
+	})
 }
