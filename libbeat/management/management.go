@@ -42,7 +42,9 @@ const (
 	Running
 	// Degraded is status describing application is degraded.
 	Degraded
-	// Failed is status describing application is failed.
+	// Failed is status describing application is failed. This status should
+	// only be used in the case the beat should stop running as the failure
+	// cannot be recovered.
 	Failed
 	// Stopping is status describing application is stopping.
 	Stopping
