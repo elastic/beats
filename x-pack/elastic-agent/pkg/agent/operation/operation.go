@@ -23,7 +23,7 @@ type operation interface {
 	// examples:
 	// - Start does not need to run if process is running
 	// - Fetch does not need to run if package is already present
-	Check() (bool, error)
+	Check(application Application) (bool, error)
 	// Run runs the operation
 	Run(ctx context.Context, application Application) error
 }
@@ -34,8 +34,8 @@ type Application interface {
 	Start(ctx context.Context, p app.Taggable, cfg map[string]interface{}) error
 	Stop()
 	Configure(ctx context.Context, config map[string]interface{}) error
-	State() state.State
 	Monitor() monitoring.Monitor
+	State() state.State
 }
 
 // Descriptor defines a program which needs to be run.

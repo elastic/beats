@@ -40,7 +40,7 @@ type ConfigManager interface {
 	Enabled() bool
 
 	// Start the config manager
-	Start()
+	Start(func())
 
 	// Stop the config manager
 	Stop()
@@ -98,6 +98,6 @@ func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, err
 }
 
 func (nilManager) Enabled() bool                           { return false }
-func (nilManager) Start()                                  {}
+func (nilManager) Start(_ func())                          {}
 func (nilManager) Stop()                                   {}
 func (nilManager) CheckRawConfig(cfg *common.Config) error { return nil }

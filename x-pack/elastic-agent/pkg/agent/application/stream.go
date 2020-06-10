@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
 // EventProcessor is an processor of application event
@@ -56,10 +57,10 @@ func (b *operatorStream) Execute(cfg *configRequest) error {
 	return b.configHandler.HandleConfig(cfg)
 }
 
-func streamFactory(ctx context.Context, cfg *config.Config, client sender, r reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
+func streamFactory(ctx context.Context, cfg *config.Config, srv *server.Server, r reporter, m monitoring.Monitor) func(*logger.Logger, routingKey) (stream, error) {
 	return func(log *logger.Logger, id routingKey) (stream, error) {
 		// new operator per stream to isolate processes without using tags
-		operator, err := newOperator(ctx, log, id, cfg, r, m)
+		operator, err := newOperator(ctx, log, id, cfg, srv, r, m)
 		if err != nil {
 			return nil, err
 		}
@@ -71,7 +72,7 @@ func streamFactory(ctx context.Context, cfg *config.Config, client sender, r rep
 	}
 }
 
-func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *config.Config, r reporter, m monitoring.Monitor) (*operation.Operator, error) {
+func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config *config.Config, srv *server.Server, r reporter, m monitoring.Monitor) (*operation.Operator, error) {
 	operatorConfig := operatorCfg.DefaultConfig()
 	if err := config.Unpack(&operatorConfig); err != nil {
 		return nil, err
@@ -102,6 +103,7 @@ func newOperator(ctx context.Context, log *logger.Logger, id routingKey, config 
 		verifier,
 		installer,
 		stateResolver,
+		srv,
 		r,
 		m,
 	)
