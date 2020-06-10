@@ -29,6 +29,9 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 	if a.state.Status == state.Stopped {
 		return errors.New(ErrAppNotRunning)
 	}
+	if a.srvState == nil {
+		return errors.New(ErrAppNotRunning)
+	}
 
 	cfgStr, err := yaml.Marshal(config)
 	if err != nil {

@@ -101,12 +101,9 @@ func TestConfigurableRun(t *testing.T) {
 
 	waitFor(t, func() error {
 		items := operator.State()
-		item, ok := items[p.ID()]
-		if !ok {
-			return fmt.Errorf("no state for process")
-		}
-		if item.Status != state.Stopped {
-			return fmt.Errorf("process never went to stopped")
+		_, ok := items[p.ID()]
+		if ok {
+			return fmt.Errorf("state for process, should be removed")
 		}
 		return nil
 	})
@@ -350,12 +347,9 @@ func TestConfigurableStartStop(t *testing.T) {
 
 		waitFor(t, func() error {
 			items := operator.State()
-			item, ok := items[p.ID()]
-			if !ok {
-				return fmt.Errorf("no state for process")
-			}
-			if item.Status != state.Stopped {
-				return fmt.Errorf("process never went to stopped")
+			_, ok := items[p.ID()]
+			if ok {
+				return fmt.Errorf("state for process, should be removed")
 			}
 			return nil
 		})

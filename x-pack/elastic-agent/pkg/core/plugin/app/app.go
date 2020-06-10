@@ -153,6 +153,8 @@ func (a *Application) Stop() {
 		// cleanup drops
 		a.monitor.Cleanup(a.name, a.pipelineID)
 	}
+	a.state.Status = state.Stopped
+	a.state.Message = "Stopped"
 }
 
 func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -172,7 +174,6 @@ func (a *Application) watch(ctx context.Context, p Taggable, proc *process.Info,
 		srvState := a.srvState
 
 		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
-			a.state.Status = state.Stopped
 			a.appLock.Unlock()
 			return
 		}

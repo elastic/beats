@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	pstate "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
 
@@ -33,6 +34,14 @@ func (*ApplicationStatusHandler) OnStatusChange(state *server.ApplicationState, 
 	}
 
 	app.appLock.Lock()
+
+	// If the application is stopped, do not update the state. Stopped is a final state
+	// and should not be overridden.
+	if app.state.Status == pstate.Stopped {
+		app.appLock.Unlock()
+		return
+	}
+
 	app.state.UpdateFromProto(status)
 	app.state.Message = msg
 	if status == proto.StateObserved_FAILED {

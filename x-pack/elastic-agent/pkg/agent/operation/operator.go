@@ -220,6 +220,11 @@ func (o *Operator) runFlow(p Descriptor, operations []operation) error {
 		}
 	}
 
+	// when application is stopped remove from the operator
+	if app.State().Status == state.Stopped {
+		o.deleteApp(p)
+	}
+
 	return nil
 }
 
@@ -259,6 +264,16 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 
 	o.apps[id] = a
 	return a, nil
+}
+
+func (o *Operator) deleteApp(p Descriptor) {
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	id := p.ID()
+
+	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
+	delete(o.apps, id)
 }
 
 func isMonitorable(descriptor Descriptor) bool {
