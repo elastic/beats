@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	operatorCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -123,9 +125,13 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx := context.Background()
+	srv, err := server.New(l, ":0", &app.ApplicationStatusHandler{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, nil, m)
+	ctx := context.Background()
+	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, stateResolver, srv, nil, m)
 	if err != nil {
 		t.Fatal(err)
 	}

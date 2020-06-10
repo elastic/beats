@@ -46,11 +46,10 @@ func (o *operationConfig) Name() string {
 	return "operation-config"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationConfig) Check() (bool, error) { return true, nil }
+// Check checks whether config needs to be run.
+//
+// Always returns true.
+func (o *operationConfig) Check(_ Application) (bool, error) { return true, nil }
 
 // Run runs the operation
 func (o *operationConfig) Run(ctx context.Context, application Application) (err error) {
