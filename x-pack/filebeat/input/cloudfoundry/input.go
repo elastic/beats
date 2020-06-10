@@ -43,8 +43,8 @@ func NewInput(
 	}
 
 	switch conf.Version {
-	//case cloudfoundry.ConsumerVersionV1:
-	//return newInputV1(conf, out, context)
+	case cloudfoundry.ConsumerVersionV1:
+		return newInputV1(conf, out, context)
 	case cloudfoundry.ConsumerVersionV2:
 		return newInputV2(conf, out, context)
 	default:

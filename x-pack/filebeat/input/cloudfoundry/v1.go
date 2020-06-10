@@ -5,8 +5,9 @@
 package cloudfoundry
 
 import (
-	"context"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -16,34 +17,29 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 )
 
-// InputV2 defines a Cloudfoundry input that uses the consumer V2 API
-type InputV2 struct {
+// InputV1 defines a udp input to receive event on a specific host:port.
+type InputV1 struct {
 	sync.Mutex
-	listener *cloudfoundry.RlpListener
+	consumer *cloudfoundry.DopplerConsumer
 	started  bool
 	log      *logp.Logger
 	outlet   channel.Outleter
 }
 
-func newInputV2(conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV2, error) {
+func newInputV1(conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV1, error) {
 	log := logp.NewLogger("cloudfoundry")
 
 	hub := cloudfoundry.NewHub(&conf, "filebeat", log)
 	forwarder := harvester.NewForwarder(out)
-	callbacks := cloudfoundry.RlpListenerCallbacks{
-		HttpAccess: func(evt *cloudfoundry.EventHttpAccess) {
+
+	callbacks := cloudfoundry.DopplerCallbacks{
+		Log: func(evt cloudfoundry.Event) {
 			forwarder.Send(beat.Event{
 				Timestamp: evt.Timestamp(),
 				Fields:    evt.ToFields(),
 			})
 		},
-		Log: func(evt *cloudfoundry.EventLog) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
-		},
-		Error: func(evt *cloudfoundry.EventError) {
+		Error: func(evt cloudfoundry.EventError) {
 			forwarder.Send(beat.Event{
 				Timestamp: evt.Timestamp(),
 				Fields:    evt.ToFields(),
@@ -51,42 +47,42 @@ func newInputV2(conf cloudfoundry.Config, out channel.Outleter, context input.Co
 		},
 	}
 
-	listener, err := hub.RlpListener(callbacks)
+	consumer, err := hub.DopplerConsumer(callbacks)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "initializing doppler consumer")
 	}
-	return &InputV2{
+	return &InputV1{
 		outlet:   out,
-		listener: listener,
+		consumer: consumer,
 		started:  false,
 		log:      log,
 	}, nil
 }
 
-// Run starts the listener of cloudfoundry events
-func (p *InputV2) Run() {
+// Run starts the consumer of cloudfoundry events
+func (p *InputV1) Run() {
 	p.Lock()
 	defer p.Unlock()
 
 	if !p.started {
 		p.log.Info("starting cloudfoundry input")
-		p.listener.Start(context.TODO())
+		p.consumer.Run()
 		p.started = true
 	}
 }
 
-// Stop stops cloudfoundry listener
-func (p *InputV2) Stop() {
+// Stop stops cloudfoundry doppler consumer
+func (p *InputV1) Stop() {
 	defer p.outlet.Close()
 	p.Lock()
 	defer p.Unlock()
 
 	p.log.Info("stopping cloudfoundry input")
-	p.listener.Stop()
+	p.consumer.Stop()
 	p.started = false
 }
 
 // Wait waits for the input to finalize, and stops it
-func (p *InputV2) Wait() {
+func (p *InputV1) Wait() {
 	p.Stop()
 }
