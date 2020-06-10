@@ -72,7 +72,8 @@
         "source.ip": "10.0.100.30",
         "source.packets": 1,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -154,7 +155,8 @@
         "source.ip": "10.0.100.30",
         "source.packets": 1,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -245,7 +247,8 @@
         "source.packets": 1,
         "source.port": 50074,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -342,7 +345,8 @@
         "source.packets": 2,
         "source.port": 49264,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -427,7 +431,8 @@
         "source.packets": 2,
         "source.port": 43228,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -530,7 +535,8 @@
         "source.packets": 1359,
         "source.port": 43228,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.domain": "eu-central-1.ec2.archive.ubuntu.com",
         "url.original": "http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
@@ -618,7 +624,8 @@
         "source.packets": 2,
         "source.port": 46000,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -717,7 +724,8 @@
         "source.packets": 6,
         "source.port": 46000,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.domain": "www.eicar.org",
         "url.original": "http://www.eicar.org/download/eicar_com.zip",
@@ -794,7 +802,8 @@
         "source.ip": "10.0.100.30",
         "source.packets": 0,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required"
@@ -886,7 +895,8 @@
         "source.packets": 4,
         "source.port": 41544,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ],
         "url.domain": "10.0.100.30:8000",
         "url.original": "http://10.0.100.30:8000/eicar_com.zip",

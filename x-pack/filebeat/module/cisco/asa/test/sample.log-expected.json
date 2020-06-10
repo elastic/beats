@@ -40,7 +40,8 @@
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -84,7 +85,8 @@
         "source.ip": "10.1.2.30",
         "source.port": 63016,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -129,7 +131,8 @@
         "source.ip": "10.1.2.16",
         "source.port": 2241,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -174,7 +177,8 @@
         "source.ip": "172.29.2.101",
         "source.port": 1039,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -219,7 +223,8 @@
         "source.ip": "172.29.2.3",
         "source.port": 1065,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -246,7 +251,8 @@
         "log.offset": 812,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -273,7 +279,8 @@
         "log.offset": 938,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -300,7 +307,8 @@
         "log.offset": 1110,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -327,7 +335,8 @@
         "log.offset": 1237,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -354,7 +363,8 @@
         "log.offset": 1405,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -381,7 +391,8 @@
         "log.offset": 1531,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -428,7 +439,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -477,7 +489,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 53,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -517,7 +530,8 @@
         "source.address": "192.168.132.46",
         "source.ip": "192.168.132.46",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -544,7 +558,8 @@
         "log.offset": 2167,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -571,7 +586,8 @@
         "log.offset": 2293,
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -614,7 +630,8 @@
         "source.ip": "192.0.0.66",
         "source.port": 12981,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -658,7 +675,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2006,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -702,7 +720,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49734,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -746,7 +765,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49735,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -790,7 +810,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49736,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -834,7 +855,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49737,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -878,7 +900,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49738,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -922,7 +945,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49746,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -966,7 +990,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2007,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1010,7 +1035,8 @@
         "source.ip": "10.0.0.13",
         "source.port": 43013,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1054,7 +1080,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2008,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1097,7 +1124,8 @@
         "source.ip": "192.0.2.66",
         "source.port": 137,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1140,7 +1168,8 @@
         "source.ip": "192.0.2.66",
         "source.port": 12981,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1184,7 +1213,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2009,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1228,7 +1258,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49776,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1272,7 +1303,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2010,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1316,7 +1348,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2011,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1360,7 +1393,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2012,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1404,7 +1438,8 @@
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1448,7 +1483,8 @@
         "source.ip": "192.0.2.126",
         "source.port": 53638,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1492,7 +1528,8 @@
         "source.ip": "10.0.0.46",
         "source.port": 49840,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1536,7 +1573,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2013,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1581,7 +1619,8 @@
         "source.ip": "10.0.0.16",
         "source.port": 2241,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1609,7 +1648,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1637,7 +1677,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1682,7 +1723,8 @@
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1727,7 +1769,8 @@
         "source.ip": "192.168.1.33",
         "source.port": 5555,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1755,7 +1798,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1783,7 +1827,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1831,7 +1876,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1879,7 +1925,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1927,7 +1974,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -1970,7 +2018,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2013,7 +2062,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2058,7 +2108,8 @@
         "source.ip": "192.168.1.34",
         "source.port": 5679,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2086,7 +2137,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2114,7 +2166,8 @@
         "process.name": "<IP>",
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2162,7 +2215,8 @@
         "source.ip": "192.0.2.222",
         "source.port": 1234,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2209,7 +2263,8 @@
         "source.ip": "10.44.4.4",
         "source.port": 500,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2248,7 +2303,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2287,7 +2343,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2326,7 +2383,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2365,7 +2423,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2404,7 +2463,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2443,7 +2503,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2482,7 +2543,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2521,7 +2583,8 @@
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2566,7 +2629,8 @@
         "source.ip": "192.0.2.95",
         "source.port": 24069,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2606,7 +2670,8 @@
         "source.address": "10.2.3.5",
         "source.ip": "10.2.3.5",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2647,7 +2712,8 @@
         "source.address": "172.16.30.2",
         "source.ip": "172.16.30.2",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2699,7 +2765,8 @@
         "source.nat.port": "7890",
         "source.port": 6798,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2750,7 +2817,8 @@
         "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2802,7 +2870,8 @@
         "source.nat.port": "33340",
         "source.port": 33340,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
@@ -2839,7 +2908,8 @@
         "source.address": "10.30.30.30",
         "source.ip": "10.30.30.30",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ],
         "url.original": "/app"
     },
@@ -2877,7 +2947,8 @@
         "source.address": "10.5.111.32",
         "source.ip": "10.5.111.32",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ],
         "url.original": "http://example.com"
     },
@@ -2916,7 +2987,8 @@
         "source.address": "10.69.6.39",
         "source.ip": "10.69.6.39",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ],
         "url.original": "http://www.example.net/images/favicon.ico"
     }
