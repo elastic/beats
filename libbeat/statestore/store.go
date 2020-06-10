@@ -174,9 +174,3 @@ func (s *sharedStore) tryUnregister() bool {
 	s.reg.unregisterStore(s)
 	return true
 }
-
-func ifNot(b *bool, fn func()) {
-	if !(*b) {
-		fn()
-	}
-}
