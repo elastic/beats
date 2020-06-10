@@ -927,8 +927,10 @@ output.elasticsearch:
   # timing out. The default is 30s.
   #timeout: 30s
 
-# =============================== Console Output ===============================
 
+
+
+# ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
   #enabled: true
