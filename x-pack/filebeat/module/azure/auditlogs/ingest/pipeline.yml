@@ -31,7 +31,7 @@ processors:
 - rename:
     field: azure.auditlogs.properties.result
     target_field: event.outcome
-    ignore_missing: true
+    if: "ctx?.azure?.auditlogs?.properties?.result != null && ctx.azure.auditlogs.properties.result instanceof String && (ctx.azure.auditlogs.properties.result.toLowerCase() == 'success' || ctx.azure.auditlogs.properties.result.toLowerCase() == 'failure')"
 - rename:
     field: azure.auditlogs.level
     target_field: log.level
@@ -41,10 +41,12 @@ processors:
     - message
     - azure.auditlogs.time
     ignore_missing: true
-- rename:
-    field: azure.auditlogs.category
-    target_field: event.category
+- convert:
+    field: azure.auditlogs.operationName
+    target_field: event.action
+    type: string
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: azure.auditlogs.operationName
     target_field: azure.auditlogs.operation_name
@@ -95,23 +97,42 @@ processors:
     ignore_missing: true
 - script:
     lang: painless
-    source: if (ctx.azure.auditlogs.properties.targetResources != null) {ctx.azure.auditlogs.properties.target_resources
-      = new HashMap(); for (def i = 0; i < ctx.azure.auditlogs.properties.targetResources.length;
-      i++) { String index = String.valueOf(i); ctx.azure.auditlogs.properties.target_resources[index]=
-      new HashMap(); if(ctx.azure.auditlogs.properties.targetResources[i].displayName!=
-      null) {ctx.azure.auditlogs.properties.target_resources[index].display_name=ctx.azure.auditlogs.properties.targetResources[i].displayName;}ctx.azure.auditlogs.properties.target_resources[index].id=ctx.azure.auditlogs.properties.targetResources[i].id;ctx.azure.auditlogs.properties.target_resources[index].type=ctx.azure.auditlogs.properties.targetResources[i].type;
-      if(ctx.azure.auditlogs.properties.targetResources[i].ipAddress!= null) {ctx.azure.auditlogs.properties.target_resources[index].ip_address=ctx.azure.auditlogs.properties.targetResources[i].ipAddress;}
-      if (ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName!=null)
-      {ctx.azure.auditlogs.properties.target_resources[index].user_principal_name=ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName;}ctx.azure.auditlogs.properties.target_resources[index].modified_properties=
-      new HashMap(); for (def j = 0; j < ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties.length;
-      j++) { String n = String.valueOf(j);ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n]=
-      new HashMap();ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].display_name=ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].displayName;ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].new_value=ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].newValue;ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].old_value=ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].oldValue;  }}
-      ctx.azure.auditlogs.properties.remove('targetResources');}
+    source: >-
+      if (ctx.azure.auditlogs.properties.targetResources != null) {
+        ctx.azure.auditlogs.properties.target_resources = new HashMap();
+        for (def i = 0; i < ctx.azure.auditlogs.properties.targetResources.length; i++) {
+          String index = String.valueOf(i);
+          ctx.azure.auditlogs.properties.target_resources[index] = new HashMap();
+          if(ctx.azure.auditlogs.properties.targetResources[i].displayName != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].display_name = ctx.azure.auditlogs.properties.targetResources[i].displayName;
+          }
+          ctx.azure.auditlogs.properties.target_resources[index].id = ctx.azure.auditlogs.properties.targetResources[i].id;
+          ctx.azure.auditlogs.properties.target_resources[index].type = ctx.azure.auditlogs.properties.targetResources[i].type;
+          if (ctx.azure.auditlogs.properties.targetResources[i].ipAddress != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].ip_address = ctx.azure.auditlogs.properties.targetResources[i].ipAddress;
+          }
+          if (ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName != null) {
+            ctx.azure.auditlogs.properties.target_resources[index].user_principal_name = ctx.azure.auditlogs.properties.targetResources[i].userPrincipalName;
+          }
+          ctx.azure.auditlogs.properties.target_resources[index].modified_properties = new HashMap();
+          for (def j = 0; j < ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties.length; j++) {
+            String n = String.valueOf(j);
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n] = new HashMap();
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].display_name = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].displayName;
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].new_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].newValue;
+            ctx.azure.auditlogs.properties.target_resources[index].modified_properties[n].old_value = ctx.azure.auditlogs.properties.targetResources[i].modifiedProperties[j].oldValue;
+          }
+        }
+        ctx.azure.auditlogs.properties.remove('targetResources');
+      }
     ignore_failure: true
 - rename:
     field: azure.auditlogs.properties.initiatedBy
     target_field: azure.auditlogs.properties.initiated_by
     ignore_missing: true
+- set:
+    field: event.kind
+    value: event
 - pipeline:
     name: '{< IngestPipeline "azure-shared-pipeline" >}'
 on_failure:

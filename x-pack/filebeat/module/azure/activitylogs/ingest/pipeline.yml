@@ -52,22 +52,34 @@ processors:
     ignore_missing: true
 - script:
     lang: painless
-    source: if (ctx.azure.activitylogs.properties != null && ctx.azure.activitylogs.properties.eventCategory
-      != null) {ctx.eventCategory = ctx.azure.activitylogs.properties.eventCategory}
-      if (ctx.azure.activitylogs.properties != null && ctx.azure.activitylogs.properties.policies
-      != null)  { ctx.eventCategory = 'Policy'}  if (ctx.eventCategory == null) {ctx.eventCategory='Administrative'}
+    source: >-
+      if (ctx?.azure?.activitylogs?.properties?.eventCategory != null) {
+        ctx.azure.activitylogs.event_category = ctx.azure.activitylogs.properties.eventCategory;
+      }
+      else if (ctx?.azure?.activitylogs?.properties?.policies != null)  {
+        ctx.azure.activitylogs.event_category = 'Policy';
+      }
+      else {
+        ctx.azure.activitylogs.event_category = 'Administrative';
+      }
     ignore_failure: true
 - rename:
-    field: eventCategory
-    target_field: event.category
-    ignore_missing: true
-- rename:
     field: azure.activitylogs.resultType
-    target_field: event.outcome
+    target_field: azure.activitylogs.result_type
     ignore_missing: true
+- convert:
+    field: azure.activitylogs.result_type
+    target_field: event.outcome
+    type: string
+    if: "ctx?.azure?.activitylogs?.resultType != null && ctx.azure.activitylogs.resultType instanceof String && (ctx.azure.activitylogs.resultType.toLowerCase() == 'success' || ctx.azure.activitylogs.resultType.toLowerCase() == 'failure')"
 - rename:
     field: azure.activitylogs.operationName
     target_field: azure.activitylogs.operation_name
+    ignore_missing: true
+- convert:
+    field: azure.activitylogs.operation_name
+    target_field: event.action
+    type: string
     ignore_missing: true
 - rename:
     field: azure.activitylogs.resultSignature
@@ -119,21 +131,24 @@ processors:
     ignore_missing: true
 - script:
     lang: painless
-    source: if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
-      != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.surname
-      = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'];}
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.surname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'];
+      }
     ignore_failure: true
 - script:
     lang: painless
-    source: if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
-      != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.name =
-      ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];}
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.name = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+      }
     ignore_failure: true
 - script:
     lang: painless
-    source: if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname']
-      != null) {  ctx.azure.activitylogs.identity.claims_initiated_by_user.givenname
-      = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'];}
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] != null) {
+        ctx.azure.activitylogs.identity.claims_initiated_by_user.givenname = ctx.azure.activitylogs.identity.claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'];
+      }
     ignore_failure: true
 - set:
     if: ctx.azure.activitylogs.identity!= null && ctx.azure.activitylogs.identity.claims_initiated_by_user
@@ -144,11 +159,69 @@ processors:
     ignore_failure: true
 - script:
     lang: painless
-    source: 'if (ctx.azure.activitylogs.identity.claims != null) { ctx.temp_claims
-      = new HashMap(); for (String key : ctx.azure.activitylogs.identity.claims.keySet())
-      {  ctx.temp_claims[key.replace(''.'', ''_'')] = ctx.azure.activitylogs.identity.claims.get(key)
-      ;}ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove(''temp_claims'');}'
+    source: >-
+      if (ctx.azure.activitylogs.identity.claims != null) {
+        ctx.temp_claims = new HashMap();
+        for (String key : ctx.azure.activitylogs.identity.claims.keySet()) {
+          ctx.temp_claims[key.replace('.', '_')] = ctx.azure.activitylogs.identity.claims.get(key);
+        }
+        ctx.azure.activitylogs.identity.claims = ctx.temp_claims; ctx.remove('temp_claims');
+      }
     ignore_failure: true
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      "write":
+        type:
+          - change
+      "read":
+        type:
+          - access
+      "delete":
+        type:
+          - deletion
+      "action":
+        type:
+          - change
+    source: >-
+      if (ctx?.azure?.activitylogs?.category == null) {
+        return;
+      }
+      def hm = new HashMap(params.get(ctx.azure.activitylogs.category.toLowerCase()));
+      hm.forEach((k, v) -> ctx.event[k] = v);
+- geoip:
+    field: source.ip
+    target_field: source.geo
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- grok:
+    field: azure.activitylogs.identity.claims_initiated_by_user.name
+    patterns:
+      - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+    ignore_missing: true
+- convert:
+    field: azure.activitylogs.identity.claims_initiated_by_user.fullname
+    target_field: user.full_name
+    type: string
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
 - pipeline:
     name: '{< IngestPipeline "azure-shared-pipeline" >}'
 on_failure:

@@ -35,10 +35,9 @@ processors:
     field: azure.resource_id
     target_field: azure.resource.id
     ignore_missing: true
-- script:
-    source: if (ctx.event.outcome !=null) {ctx.event.outcome = ctx.event.outcome.substring(0,1).toUpperCase()
-      + ctx.event.outcome.substring(1,ctx.event.outcome.length()).toLowerCase();}
-    ignore_failure: true
+- lowercase:
+    field: event.outcome
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

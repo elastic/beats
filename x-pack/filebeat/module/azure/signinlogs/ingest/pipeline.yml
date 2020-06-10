@@ -47,15 +47,16 @@ processors:
     ignore_missing: true
 - rename:
     field: azure.signinlogs.resultType
-    target_field: event.outcome
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.category
-    target_field: event.category
+    target_field: azure.signinlogs.result_type
     ignore_missing: true
 - rename:
     field: azure.signinlogs.operationName
     target_field: azure.signinlogs.operation_name
+    ignore_missing: true
+- convert:
+    field: azure.signinlogs.operation_name
+    target_field: event.action
+    type: string
     ignore_missing: true
 - rename:
     field: azure.signinlogs.resultSignature
@@ -236,6 +237,59 @@ processors:
 - remove:
     field:
     - azure.signinlogs.properties.location
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value:
+      - authentication
+- set:
+    field: event.type
+    value:
+      - info
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code == null || ctx.azure.signinlogs.properties.status.error_code == 0"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null || ctx.azure.signinlogs.properties.status.error_code > 0"
+- grok:
+    field: azure.signinlogs.properties.user_principal_name
+    patterns:
+      - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+    ignore_missing: true
+- convert:
+    field: azure.signinlogs.properties.user_display_name
+    target_field: user.full_name
+    ignore_missing: true
+    type: string
+- convert:
+    field: azure.signinlogs.properties.user_id
+    target_field: user.id
+    ignore_missing: true
+    type: string
+- geoip:
+    field: source.ip
+    target_field: source.geo
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "azure-shared-pipeline" >}'
