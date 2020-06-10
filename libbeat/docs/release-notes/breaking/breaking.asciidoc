@@ -10,6 +10,7 @@ changes, but there are breaking changes between major versions (e.g. 6.x to
 7.x) is not recommended.
 
 See the following topics for a description of breaking changes:
+
 * <<breaking-changes-7.8>>
 
 * <<breaking-changes-7.7>>
