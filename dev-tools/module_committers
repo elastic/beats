@@ -36,7 +36,7 @@ done
 
 for found_dir in $found_dirs; do
     echo "Found matching $found_dir:"
-    cd $base_dir/$found_dir
+    cd $found_dir
     echo "  Recent top committers:"
     git log --since="one year ago" --pretty=format:"%an" -- . | sort | uniq -c | sort -nr | head -3 | awk '{$1 = ""; print "  -"$0}'
 done
