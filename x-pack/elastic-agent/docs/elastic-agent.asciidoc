@@ -15,11 +15,7 @@ Elastic Agent is a single, unified agent that you can deploy to hosts or contain
 [[elastic-agent-installation]]
 == Install Elastic Agent
 
-=== Step 1: Download Elastic Agent
-
-Download the package from the https://www.elastic.co/downloads/beats/{beatname_lc}[download page].
-
-=== Step 2: Unpack archive
+=== Step 1: Unpack archive
 
 
 [[mac]]
@@ -93,7 +89,7 @@ NOTE: If script execution is disabled on your system, you need to set the execut
 
 endif::[]
 
-=== Step 3: Run Elastic Agent
+=== Step 2: Run Elastic Agent
 
 If Elastic Agent is not installed as an auto-starting service, start it manually:
 
