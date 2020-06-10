@@ -7,9 +7,11 @@ package collector
 import (
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 
@@ -54,6 +56,20 @@ func (g *typedGenerator) Start() {
 }
 
 func (g *typedGenerator) Stop() {
+	attempts := 0
+	maxAttempts := 5
+	// this will wait for some time before trying to stop the counterCache in order to handel race conditions
+	// that might occur with runners started with some delay by autodiscover
+	for !g.counterCache.Started() {
+		logp.Debug("prometheus.collector.cache", "counterCache cannot be stopped yet, since it is not started")
+		if attempts > maxAttempts {
+			logp.Warn("leaving without stopping counterCache (is not started and cannot be stopped)")
+			return
+		}
+		attempts++
+		time.Sleep(5*time.Second)
+	}
+	logp.Debug("prometheus.collector.cache", "stopping counterCache")
 	g.counterCache.Stop()
 }
 

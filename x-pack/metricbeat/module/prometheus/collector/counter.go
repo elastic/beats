@@ -30,12 +30,16 @@ type CounterCache interface {
 	// and the value that was given in a previous call, and true if a previous value existed.
 	// It will return 0 and false on the first call.
 	RateFloat64(counterName string, value float64) (float64, bool)
+
+	// Started returns started state of the counterCache
+	Started() bool
 }
 
 type counterCache struct {
 	ints    *common.Cache
 	floats  *common.Cache
 	timeout time.Duration
+	started bool
 }
 
 // NewCounterCache initializes and returns a CounterCache. The timeout parameter will be
@@ -45,6 +49,7 @@ func NewCounterCache(timeout time.Duration) CounterCache {
 		ints:    common.NewCache(timeout, 0),
 		floats:  common.NewCache(timeout, 0),
 		timeout: timeout,
+		started: false,
 	}
 }
 
@@ -87,10 +92,17 @@ func (c *counterCache) RateFloat64(counterName string, value float64) (float64, 
 func (c *counterCache) Start() {
 	c.ints.StartJanitor(c.timeout)
 	c.floats.StartJanitor(c.timeout)
+	c.started = true
 }
 
 // Stop the cache cleanup worker. It mus be called when the cache is disposed
 func (c *counterCache) Stop() {
 	c.ints.StopJanitor()
 	c.floats.StopJanitor()
+	c.started = false
+}
+
+// Started returns started state of the counterCache
+func (c *counterCache) Started() bool {
+	return c.started
 }
