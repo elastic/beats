@@ -105,7 +105,7 @@ func makeURLEndpoint(u *url.URL, ports []string) (endpoint, error) {
 		if err != nil {
 			return endpoint{}, errors.Wrapf(err, "no port(s) defined for TCP endpoint %s", u)
 		}
-		ports = []string{string(pUint)}
+		ports = []string{strconv.FormatUint(pUint, 10)}
 	}
 
 	if len(ports) == 0 {
