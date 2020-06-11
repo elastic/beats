@@ -36,6 +36,15 @@ inputs:
         - /var/log/hello2.log
     vars:
       var: value
+  - type: logs
+    dataset.type: testtype
+    use_output: default
+    streams:
+      - paths:
+        - /var/log/hello3.log
+        - /var/log/hello4.log
+    vars:
+      var: value
   - type: apache/metrics
     dataset.namespace: testing
     use_output: default

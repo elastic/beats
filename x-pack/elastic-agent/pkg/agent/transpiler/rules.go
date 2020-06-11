@@ -465,6 +465,17 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 			}
 		}
 
+		datasetType := r.Type
+		typeNode, found := inputNode.Find("dataset.type")
+		if found {
+			typeKey, ok := typeNode.(*Key)
+			if ok {
+				if newDatasetType := typeKey.value.String(); newDatasetType != "" {
+					datasetType = newDatasetType
+				}
+			}
+		}
+
 		streamsNode, ok := inputNode.Find("streams")
 		if !ok {
 			continue
@@ -496,7 +507,7 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 
 			streamMap.value = append(streamMap.value, &Key{
 				name:  "index",
-				value: &StrVal{value: fmt.Sprintf("%s-%s-%s", r.Type, dataset, namespace)},
+				value: &StrVal{value: fmt.Sprintf("%s-%s-%s", datasetType, dataset, namespace)},
 			})
 		}
 	}
