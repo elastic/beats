@@ -35,21 +35,15 @@ settings.monitoring:
 #logging.level: trace
 
 inputs:
-  id?: nginx-x1
-  enabled?: true # default to true
-  title?: "This is a nice title for human"
-  # Package this config group is coming from. On importing, we know where it belongs
-  # The package tells the UI which application to link to
-  package?:
+  - type: logs
     name: epm/nginx
     version: 1.7.0
-  dataset.namespace: prod
-  constraints?:
-    # Contraints look are not final
-    - os.platform: { in: "windows" }
-    - agent.version: { ">=": "8.0.0" }
-  use_output: long_term_storage
-  - type: logs
+    dataset.namespace: prod
+    constraints?:
+      # Contraints look are not final
+      - os.platform: { in: "windows" }
+      - agent.version: { ">=": "8.0.0" }
+    use_output: long_term_storage
     processors?:
     streams:
       - id?: {id}
@@ -60,7 +54,15 @@ inputs:
         enabled?: true # default to true
         dataset.name: nginx.error
         paths: /var/log/nginx/error.log
-  - type: nginx/metrics
+  - type: nginx/metricspackage?:
+    name: epm/nginx
+    version: 1.7.0
+    dataset.namespace: prod
+    constraints?:
+      # Contraints look are not final
+      - os.platform: { in: "windows" }
+      - agent.version: { ">=": "8.0.0" }
+    use_output: long_term_storage
     streams:
       - id?: {id}
         enabled?: true # default to true
@@ -70,11 +72,11 @@ inputs:
 #################################################################################################
 # Custom Kafka datasource
 inputs:
-  id: kafka-x1
-  title: "Consume data from kafka"
-  dataset.namespace: prod
-  use_output: long_term_storage
   - type: kafka
+    id: kafka-x1
+    title: "Consume data from kafka"
+    dataset.namespace: prod
+    use_output: long_term_storage
     host: localhost:6566
     streams:
       - dataset.name: foo.dataset
@@ -86,12 +88,12 @@ inputs:
 #################################################################################################
 # System EPM package
 inputs:
-  id?: system
-  title: Collect system information and metrics
-  package:
-    name: epm/system
-    version: 1.7.0
   - type: system/metrics
+    id?: system
+    title: Collect system information and metrics
+    package:
+      name: epm/system
+      version: 1.7.0
     streams:
       - id?: {id}
         enabled?: false # default true
@@ -150,12 +152,12 @@ inputs:
 #################################################################################################
 # Elasticsearch package example
 inputs:
-  id?: my-endpoint
-  title: Collect Elasticsearch information
-  package:
-    name: epm/elasticsearch
-    version: 1.7.0
     - type: log
+      id?: my-endpoint
+      title: Collect Elasticsearch information
+      package:
+        name: epm/elasticsearch
+        version: 1.7.0
       streams:
       - id?: {id}
         enabled?: true # default to true
@@ -178,6 +180,11 @@ inputs:
         dataset.name: elasticsearch.slowlog
         paths: [/var/log/elasticsearch/*_index_search_slowlog.log, /var/log/elasticsearch/*_index_indexing_slowlog.log]
     - type: elasticsearch/metrics
+      id?: my-endpoint
+      title: Collect Elasticsearch information
+      package:
+        name: epm/elasticsearch
+        version: 1.7.0
       hosts: ["http://localhost:9200"]
       hosts: ["http://localhost:9200"]
       # api_key: xxxx
@@ -226,101 +233,106 @@ inputs:
 #################################################################################################
 # AWS module
 inputs:
-  id?: my-aws
-  title: Collect AWS
-  package:
-    name: epm/aws
-    version: 1.7.0
-    # Looking at the AWS modules, I believe each fileset need to be in their own
-    # buckets?
-    - type: s3
-      credential_profile_name: fb-aws
-      #shared_credential_file: /etc/filebeat/aws_credentials
-      streams:
-      - id?: {id}
-        dataset.name: aws.s3
-        queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
-      - id?: {id}
-        dataset.name: aws.s3access
-        queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
-      - id?: {id}
-        dataset.name: aws.vpcflow
-        queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
-      - id?: {id}
-        dataset.name: aws.cloudtrail
-        queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
-    - type: aws/metrics
-      access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-      secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-      session_token: '${AWS_SESSION_TOKEN:""}'
-      #credential_profile_name: test-mb
-      #shared_credential_file: ...
-      streams:
-      - id?: {id}
-        metricset: usage
-        dataset.name: aws.usage
-        period: 5m
-      - id?: {id}
-        metricset: cloudwatch
-        dataset.name: aws.cloudwatch
-        period: 5m
-        name: ["CPUUtilization", "DiskWriteOps"]
-        tags.resource_type_filter: ec2:instance
-        #dimensions:
-        #  - name: InstanceId
-        #    value: i-0686946e22cf9494a
-        statistic: ["Average", "Maximum"]
-      - id?: {id}
-        metricset: ebs
-        dataset.name: aws.ebs
-        period: 5m
-      - id?: {id}
-        metricset: ec2
-        dataset.name: aws.ec2
-        period: 5m
-      - id?: {id}
-        metricset: elb
-        dataset.name: aws.elb
-        period: 5m
-      - id?: {id}
-        metricset: sns
-        dataset.name: aws.sns
-        period: 5m
-      - id?: {id}
-        metricset: sqs
-        dataset.name: aws.sqs
-        period: 5m
-      - id?: {id}
-        metricset: rds
-        dataset.name: aws.rds
-        period: 5m
-      - id?: {id}
-        metricset: billing
-        dataset.name: aws.billing
-        period: 12h
-      - id?: {id}
-        metricset: billing
-        dataset.name: aws.billing
-        period: 12h
-      - id?: {id}
-        metricset: s3_daily_storage
-        dataset.name: aws.s3_daily_storage
-        period: 24h
-      - id?: {id}
-        metricset: s3_request
-        dataset.name: aws.s3_request
-        period: 24h
+  # Looking at the AWS modules, I believe each fileset need to be in their own
+  # buckets?
+  - type: s3
+    id?: my-aws
+    title: Collect AWS
+    package:
+      name: epm/aws
+      version: 1.7.0
+    credential_profile_name: fb-aws
+    #shared_credential_file: /etc/filebeat/aws_credentials
+    streams:
+    - id?: {id}
+      dataset.name: aws.s3
+      queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
+    - id?: {id}
+      dataset.name: aws.s3access
+      queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
+    - id?: {id}
+      dataset.name: aws.vpcflow
+      queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
+    - id?: {id}
+      dataset.name: aws.cloudtrail
+      queue_url: https://sqs.myregion.amazonaws.com/123456/sqs-queue
+  - type: aws/metrics
+    id?: my-aws
+    title: Collect AWS
+    package:
+      name: epm/aws
+      version: 1.7.0
+    access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+    secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+    session_token: '${AWS_SESSION_TOKEN:""}'
+    #credential_profile_name: test-mb
+    #shared_credential_file: ...
+    streams:
+    - id?: {id}
+      metricset: usage
+      dataset.name: aws.usage
+      period: 5m
+    - id?: {id}
+      metricset: cloudwatch
+      dataset.name: aws.cloudwatch
+      period: 5m
+      name: ["CPUUtilization", "DiskWriteOps"]
+      tags.resource_type_filter: ec2:instance
+      #dimensions:
+      #  - name: InstanceId
+      #    value: i-0686946e22cf9494a
+      statistic: ["Average", "Maximum"]
+    - id?: {id}
+      metricset: ebs
+      dataset.name: aws.ebs
+      period: 5m
+    - id?: {id}
+      metricset: ec2
+      dataset.name: aws.ec2
+      period: 5m
+    - id?: {id}
+      metricset: elb
+      dataset.name: aws.elb
+      period: 5m
+    - id?: {id}
+      metricset: sns
+      dataset.name: aws.sns
+      period: 5m
+    - id?: {id}
+      metricset: sqs
+      dataset.name: aws.sqs
+      period: 5m
+    - id?: {id}
+      metricset: rds
+      dataset.name: aws.rds
+      period: 5m
+    - id?: {id}
+      metricset: billing
+      dataset.name: aws.billing
+      period: 12h
+    - id?: {id}
+      metricset: billing
+      dataset.name: aws.billing
+      period: 12h
+    - id?: {id}
+      metricset: s3_daily_storage
+      dataset.name: aws.s3_daily_storage
+      period: 24h
+    - id?: {id}
+      metricset: s3_request
+      dataset.name: aws.s3_request
+      period: 24h
 
 
 #################################################################################################
 # Kubernetes
 inputs:
-  id?: my-kubernetes
-  title: Collect Kubernetes
-  package:
-    name: epm/kubernetes
-    version: 1.7.0
   - type: kubernetes-node/metrics
+    id?: my-kubernetes
+    title: Collect Kubernetes
+    package:
+      name: epm/kubernetes
+      version: 1.7.0
     hosts: ["localhost:10250"]
     bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
     ssl.certificate_authorities:
@@ -356,6 +368,11 @@ inputs:
         dataset.name: kubernetes.event
         period: 10s
   - type: kubernetes-state/metrics
+    id?: my-kubernetes
+    title: Collect Kubernetes
+    package:
+      name: epm/kubernetes
+      version: 1.7.0
     hosts: ["kube-state-metrics:8080"]
     streams:
       - id?: {id}
@@ -410,12 +427,12 @@ inputs:
 #################################################################################################
 # Docker
 inputs:
-  id?: my-docker
-  title: Collect docker
-  package:
-    name: epm/docker
-    version: 1.7.0
   - type: docker/metrics
+    id?: my-docker
+    title: Collect docker
+    package:
+      name: epm/docker
+      version: 1.7.0
     hosts: ["localhost:10250"]
     #labels.dedot: false
 
@@ -462,44 +479,44 @@ inputs:
 ### Suricata
 #
 inputs:
-  id?: suricata-x1
-  title: Suricata's data
-  dataset.namespace: "abc"
-  package:
-    name: suricata
-    version: x.x.x
-    - type: log
-      streams:
-        -  id?: {id}
-          type: "typeX"
-          dataset.name: suricata.logs
-          path: /var/log/surcata/eve.json
+  - type: log
+    id?: suricata-x1
+    title: Suricata's data
+    dataset.namespace: "abc"
+    package:
+      name: suricata
+      version: x.x.x
+    streams:
+      -  id?: {id}
+        type: "typeX"
+        dataset.name: suricata.logs
+        path: /var/log/surcata/eve.json
 
 #################################################################################################
 ### suggestion 1
 inputs:
-  id?: myendpoint-x1
-  title: Endpoint configuration
-  dataset.namespace: "canada"
-  package:
-    name: endpoint
-    version: xxx
   - type: endpoint # Reserved key word
-      streams:
-        - type: malware
-          detect: true
-          prevent: false
-          notify_user: false
-          threshold: recommended
-          platform: windows
+    id?: myendpoint-x1
+    title: Endpoint configuration
+    dataset.namespace: "canada"
+    package:
+      name: endpoint
+      version: xxx
+    streams:
+      - type: malware
+        detect: true
+        prevent: false
+        notify_user: false
+        threshold: recommended
+        platform: windows
 
-        - type: eventing
-          api: true
-          clr: false
-          dll_and_driver_load: false
-          dns: true
-          file: false
-          platform: windows
+      - type: eventing
+        api: true
+        clr: false
+        dll_and_driver_load: false
+        dns: true
+        file: false
+        platform: windows
 
       - type: malware
         detect: true
@@ -534,13 +551,13 @@ inputs:
 #################################################################################################
 ### suggestion 2
 inputs:
-  id?: myendpoint-1
-  title: Endpoint configuration
-  dataset.namespace: "canada"
-  package:
-    name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
-    version: xxx
   - type: endpoint # Reserved key word
+    id?: myendpoint-1
+    title: Endpoint configuration
+    dataset.namespace: "canada"
+    package:
+      name: epm/endpoint # This establish the link with the package and will allow to link it to endpoint app.
+      version: xxx
     windows:
         eventing:
             api: true
