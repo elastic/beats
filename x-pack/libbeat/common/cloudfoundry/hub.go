@@ -67,9 +67,6 @@ func (h *Hub) Client() (Client, error) {
 	if h.cfg.UaaAddress != "" {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
-	if h.cfg.RlpAddress != "" {
-		cf.Endpoint.LoggingEndpoint = h.cfg.RlpAddress
-	}
 	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.log), nil
 }
 
@@ -93,14 +90,7 @@ func (h *Hub) RlpListenerFromClient(client Client, callbacks RlpListenerCallback
 	if h.cfg.RlpAddress != "" {
 		rlpAddress = h.cfg.RlpAddress
 	} else {
-		endpoint, err := cfEndpoint(client)
-		if err != nil {
-			return nil, errors.Wrap(err, "getting endpoints from client")
-		}
-		rlpAddress = endpoint.LoggingEndpoint
-		if rlpAddress == "" {
-			rlpAddress = strings.Replace(h.cfg.APIAddress, "api", "log-stream", 1)
-		}
+		rlpAddress = strings.Replace(h.cfg.APIAddress, "api", "log-stream", 1)
 	}
 	doer, err := h.doerFromClient(client)
 	if err != nil {
