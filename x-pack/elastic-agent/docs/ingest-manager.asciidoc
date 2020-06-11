@@ -1,0 +1,14 @@
+[[xpack-ingest-manager]]
+= Ingest Manager
+
+The Elastic Agent can operates in two different execution modes which are _standalone_ or _managed_.
+The standalone mode allow you to manually configure your ingestion and send the data to Elasticsearch.
+But to experience our complete vision for data ingestion you try to the _managed_ mode with the Ingest Manager.
+
+This offer multiples advantages:
+
+* A central place to configure and monitor your beats.
+* An overview of the data ingest in your Elasticsearch cluster.
+* Multiples integrations to collect and transform data.
+
+Consult our {Ingest Manager} getting started guide.
