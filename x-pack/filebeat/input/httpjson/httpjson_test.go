@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"regexp"
 	"strconv"
 	"sync"
@@ -203,101 +204,51 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	return !o.done
 }
 
+func newOAuth2TestServer(t *testing.T) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != "POST" {
+			t.Errorf("expected POST request, got %v", r.Method)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			t.Errorf("no error expected, got %q", err)
+			return
+		}
+
+		if gt := r.FormValue("grant_type"); gt != "client_credentials" {
+			t.Errorf("expected grant_type was client_credentials, got %q", gt)
+			return
+		}
+
+		clientID := r.FormValue("client_id")
+		clientSecret := r.FormValue("client_secret")
+		if clientID == "" || clientSecret == "" {
+			clientID, clientSecret, _ = r.BasicAuth()
+		}
+		if clientID != "a_client_id" || clientSecret != "a_client_secret" {
+			t.Errorf("expected client credentials \"a_client_id:a_client_secret\", got \"%s:%s\"", clientID, clientSecret)
+		}
+
+		if s := r.FormValue("scope"); s != "scope1 scope2" {
+			t.Errorf("expected scope was scope1+scope2, got %q", s)
+			return
+		}
+
+		expectedParams := []string{"v1", "v2"}
+		if p := r.Form["param1"]; !reflect.DeepEqual(expectedParams, p) {
+			t.Errorf("expected params were %q, but got %q", expectedParams, p)
+			return
+		}
+
+		w.Header().Set("content-type", "application/json")
+		w.Write([]byte(`{"token_type":"Bearer","expires_in":"3599","access_token":"abcdef1234567890"}`))
+	}))
+}
+
 // --- Test Cases
-
-func TestConfigValidationCase1(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":       "GET",
-		"http_request_body": map[string]interface{}{"test": "abc"},
-		"no_http_body":      true,
-		"url":               "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase2(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase3(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "GET",
-		"no_http_body": true,
-		"pagination":   map[string]interface{}{"req_field": "abc"},
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase4(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "req_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase5(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "id_field": "abc"},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase6(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method": "GET",
-		"pagination":  map[string]interface{}{"header": map[string]interface{}{"field_name": "Link", "regex_pattern": "<([^>]+)>; *rel=\"next\"(?:,|$)"}, "extra_body_content": map[string]interface{}{"test": "abc"}},
-		"url":         "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
-	}
-}
-
-func TestConfigValidationCase7(t *testing.T) {
-	m := map[string]interface{}{
-		"http_method":  "DELETE",
-		"no_http_body": true,
-		"url":          "localhost",
-	}
-	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err == nil {
-		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
-	}
-}
 
 func TestGetNextLinkFromHeader(t *testing.T) {
 	header := make(http.Header)
@@ -544,5 +495,36 @@ func TestRunStop(t *testing.T) {
 		input.Stop()
 		input.Run()
 		input.Stop()
+	})
+}
+
+func TestOAuth2(t *testing.T) {
+	ts := newOAuth2TestServer(t)
+	m := map[string]interface{}{
+		"http_method":          "GET",
+		"oauth2.client.id":     "a_client_id",
+		"oauth2.client.secret": "a_client_secret",
+		"oauth2.token_url":     ts.URL,
+		"oauth2.endpoint_params": map[string][]string{
+			"param1": {"v1", "v2"},
+		},
+		"oauth2.scopes": []string{"scope1", "scope2"},
+		"interval":      0,
+	}
+	defer ts.Close()
+
+	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+		group, _ := errgroup.WithContext(context.Background())
+		group.Go(input.run)
+
+		events, ok := out.waitForEvents(1)
+		if !ok {
+			t.Fatalf("Expected 1 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		if err := group.Wait(); err != nil {
+			t.Fatal(err)
+		}
 	})
 }
