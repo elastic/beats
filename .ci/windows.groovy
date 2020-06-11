@@ -66,7 +66,9 @@ pipeline {
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
         dir("${BASE_DIR}"){
-          //loadConfigEnvVars()
+          // NOTE: commented to run faster the windows pipeline.
+          //       when required then it can be enabled.
+          // loadConfigEnvVars()
         }
         whenTrue(params.debug){
           dumpFilteredEnvironment()
@@ -75,11 +77,10 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
-      when {
-        expression { return false }
-      }
       steps {
-        makeTarget("Lint", "check")
+        // NOTE: commented to run the windows pipeline a bit faster.
+        //       when required then it can be enabled.
+        // makeTarget("Lint", "check")
       }
     }
     stage('Build and Test Windows'){
@@ -95,6 +96,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_ELASTIC_AGENT_XPACK != "false" && params.windowsTest
             }
           }
@@ -108,6 +110,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_FILEBEAT != "false" && params.windowsTest
             }
           }
@@ -121,6 +124,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_FILEBEAT_XPACK != "false" && params.windowsTest
             }
           }
@@ -134,6 +138,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_HEARTBEAT != "false"
             }
           }
@@ -158,6 +163,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_AUDITBEAT != "false" && params.windowsTest
             }
           }
@@ -171,6 +177,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_AUDITBEAT_XPACK != "false" && params.windowsTest
             }
           }
@@ -184,6 +191,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_METRICBEAT != "false" && params.windowsTest
             }
           }
@@ -197,6 +205,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_METRICBEAT_XPACK != "false" && params.windowsTest
             }
           }
@@ -210,6 +219,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return env.BUILD_WINLOGBEAT != "false"
             }
           }
@@ -234,6 +244,7 @@ pipeline {
             beforeAgent true
             expression {
               return params.windowsTest
+              // NOTE: commented to run all the windows stages.
               //return params.windowsTest && env.BUILD_WINLOGBEAT_XPACK != "false"
             }
           }
