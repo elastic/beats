@@ -67,7 +67,9 @@ func (h *Hub) Client() (Client, error) {
 	if h.cfg.UaaAddress != "" {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
-	// FIXME: Set logging address to RlpAddress?
+	if h.cfg.RlpAddress != "" {
+		cf.Endpoint.LoggingEndpoint = h.cfg.RlpAddress
+	}
 	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.log), nil
 }
 
