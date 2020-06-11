@@ -369,7 +369,6 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 	}
 
 	for _, inputNode := range inputsNodeList.value {
-
 		// fix this only if in compact form
 		if nsNode, found := inputNode.Find("dataset.namespace"); found {
 			nsKey, ok := nsNode.(*Key)
@@ -378,32 +377,39 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 					nsKey.value = &StrVal{value: defaultNamespace}
 				}
 			}
-		}
-
-		dsNode, found := inputNode.Find("dataset")
-		if found {
-			// got a dataset
-			datasetMap, ok := dsNode.Value().(*Dict)
-			if ok {
-				nsNode, found := datasetMap.Find("name")
-				if found {
-					nsKey, ok := nsNode.(*Key)
-					if ok {
-						if newNamespace := nsKey.value.String(); newNamespace == "" {
-							nsKey.value = &StrVal{value: defaultNamespace}
+		} else {
+			dsNode, found := inputNode.Find("dataset")
+			if found {
+				// got a dataset
+				datasetMap, ok := dsNode.Value().(*Dict)
+				if ok {
+					nsNode, found := datasetMap.Find("namespace")
+					if found {
+						nsKey, ok := nsNode.(*Key)
+						if ok {
+							if newNamespace := nsKey.value.String(); newNamespace == "" {
+								nsKey.value = &StrVal{value: defaultNamespace}
+							}
+						}
+					} else {
+						inputMap, ok := inputNode.(*Dict)
+						if ok {
+							inputMap.value = append(inputMap.value, &Key{
+								name:  "dataset.namespace",
+								value: &StrVal{value: defaultNamespace},
+							})
 						}
 					}
 				}
+			} else {
+				inputMap, ok := inputNode.(*Dict)
+				if ok {
+					inputMap.value = append(inputMap.value, &Key{
+						name:  "dataset.namespace",
+						value: &StrVal{value: defaultNamespace},
+					})
+				}
 			}
-		} else {
-			datasourceMap, ok := inputNode.(*Dict)
-			if !ok {
-				continue
-			}
-			datasourceMap.value = append(datasourceMap.value, &Key{
-				name:  "dataset.namespace",
-				value: &StrVal{value: defaultNamespace},
-			})
 		}
 
 		streamsNode, ok := inputNode.Find("streams")
@@ -430,22 +436,28 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 						dsKey.value = &StrVal{value: defaultDataset}
 					}
 				}
-			}
+			} else {
 
-			datasetNode, found := streamMap.Find("dataset")
-			if found {
-				datasetMap, ok := datasetNode.Value().(*Dict)
-				if !ok {
-					continue
-				}
-
-				dsNameNode, found := datasetMap.Find("name")
+				datasetNode, found := streamMap.Find("dataset")
 				if found {
-					dsKey, ok := dsNameNode.(*Key)
-					if ok {
-						if newDataset := dsKey.value.String(); newDataset == "" {
-							dsKey.value = &StrVal{value: defaultDataset}
+					datasetMap, ok := datasetNode.Value().(*Dict)
+					if !ok {
+						continue
+					}
+
+					dsNameNode, found := datasetMap.Find("name")
+					if found {
+						dsKey, ok := dsNameNode.(*Key)
+						if ok {
+							if newDataset := dsKey.value.String(); newDataset == "" {
+								dsKey.value = &StrVal{value: defaultDataset}
+							}
 						}
+					} else {
+						streamMap.value = append(streamMap.value, &Key{
+							name:  "dataset.name",
+							value: &StrVal{value: defaultDataset},
+						})
 					}
 				} else {
 					streamMap.value = append(streamMap.value, &Key{

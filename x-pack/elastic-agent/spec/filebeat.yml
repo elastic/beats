@@ -49,6 +49,10 @@ rules:
         key: use_output
     - remove_key:
         key: dataset
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
+        key: dataset.name
 
 - filter_values:
     selector: inputs

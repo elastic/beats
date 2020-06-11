@@ -66,6 +66,10 @@ rules:
     - remove_key:
         key: dataset
     - remove_key:
+        key: dataset.name
+    - remove_key:
+        key: dataset.namespace
+    - remove_key:
         key: use_output
 
 - copy:
