@@ -26,6 +26,7 @@ require (
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/antlr/antlr4 v0.0.0-20200225173536-225249fdaef5
+	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.6.0
 	github.com/aws/aws-sdk-go-v2 v0.9.0
@@ -123,6 +124,7 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160113212533-7b94f124d338
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
+	github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
 	github.com/prometheus/common v0.7.0
