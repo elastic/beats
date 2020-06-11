@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -336,7 +337,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Metrics:   reg,
 			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
 			Logger:    logp.L().Named("publisher"),
-			Tracer:    b.Instrumentation.GetTracer(),
+			Tracer:    b.Instrumentation.Tracer(),
 		},
 		b.Config.Pipeline,
 		b.processing,
@@ -429,7 +430,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	var stopBeat = func() {
-		b.Instrumentation.GetTracer().Close()
+		b.Instrumentation.Tracer().Close()
 		beater.Stop()
 	}
 	svc.HandleSignals(stopBeat, cancel)
@@ -588,7 +589,7 @@ func (b *Beat) configure(settings Settings) error {
 		common.OverwriteConfigOpts(configOpts(store))
 	}
 
-	instrumentation, err := beat.CreateInstrumentation(cfg, b.Info)
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
 	if err != nil {
 		return err
 	}

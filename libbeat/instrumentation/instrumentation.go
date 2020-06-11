@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat
+package instrumentation
 
 import (
 	"fmt"
@@ -26,11 +26,11 @@ import (
 	"time"
 
 	"go.elastic.co/apm"
-	"go.elastic.co/apm/transport"
+	apmtransport "go.elastic.co/apm/transport"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/pipe"
 )
 
 func init() {
@@ -38,25 +38,34 @@ func init() {
 	apm.DefaultTracer.Close()
 }
 
-// Instrumentation holds an APM tracer a net.Listener
-type Instrumentation struct {
-	tracer *apm.Tracer
-	// Listener is only relevant for APM Server sending tracing data to itself
-	// APM Server needs this Listener to create an ad-hoc tracing server
-	Listener net.Listener
+// Instrumentation is an interface that can return an APM tracer a net.listener
+type Instrumentation interface {
+	Tracer() *apm.Tracer
+	Listener() net.Listener
 }
 
-// GetTracer returns the configured tracer
+type instrumentation struct {
+	tracer   *apm.Tracer
+	listener net.Listener
+}
+
+// Tracer returns the configured tracer
 // If there is not configured tracer, it returns the DefaultTracer, which is always disabled
-func (t *Instrumentation) GetTracer() *apm.Tracer {
-	if t == nil || t.tracer == nil {
+func (t *instrumentation) Tracer() *apm.Tracer {
+	if t.tracer == nil {
 		return apm.DefaultTracer
 	}
 	return t.tracer
 }
 
-// InstrumentationConfig holds config information about self instrumenting the APM Server
-type InstrumentationConfig struct {
+// Listener is only relevant for APM Server sending tracing data to itself
+// APM Server needs this listener to create an ad-hoc tracing server
+func (t *instrumentation) Listener() net.Listener {
+	return t.listener
+}
+
+// Config holds config information about self instrumenting the APM Server
+type Config struct {
 	Enabled     *bool           `config:"enabled"`
 	Environment *string         `config:"environment"`
 	Hosts       urls            `config:"hosts"`
@@ -107,7 +116,7 @@ type CPUProfiling struct {
 }
 
 // IsEnabled indicates whether instrumentation is enabled
-func (c *InstrumentationConfig) IsEnabled() bool {
+func (c *Config) IsEnabled() bool {
 	return c != nil && c.Enabled != nil && *c.Enabled
 }
 
@@ -127,32 +136,32 @@ type HeapProfiling struct {
 	Interval time.Duration `config:"interval" validate:"positive"`
 }
 
-// CreateInstrumentation configures and returns an instrumentation object for tracing
-func CreateInstrumentation(cfg *common.Config, info Info) (*Instrumentation, error) {
+// New configures and returns an instrumentation object for tracing
+func New(cfg *common.Config, beatName, beatVersion string) (Instrumentation, error) {
 	if !cfg.HasField("instrumentation") {
-		return nil, nil
+		return &instrumentation{}, nil
 	}
 
-	instrumentation, err := cfg.Child("instrumentation", -1)
+	instrConfig, err := cfg.Child("instrumentation", -1)
 	if err != nil {
-		return nil, nil
+		return &instrumentation{}, nil
 	}
 
-	config := InstrumentationConfig{}
+	config := Config{}
 
-	if instrumentation == nil {
-		instrumentation = common.NewConfig()
+	if instrConfig == nil {
+		instrConfig = common.NewConfig()
 	}
-	err = instrumentation.Unpack(&config)
+	err = instrConfig.Unpack(&config)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create tracer, err: %v", err)
 	}
 
-	return initTracer(config, info)
+	return initTracer(config, beatName, beatVersion)
 }
 
-func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) {
+func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, error) {
 
 	logger := logp.NewLogger("tracing")
 
@@ -178,12 +187,12 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 		os.Setenv("ELASTIC_APM_HEAP_PROFILE_INTERVAL", fmt.Sprintf("%dms", int(interval.Seconds()*1000)))
 	}
 
-	var tracerTransport transport.Transport
+	var tracerTransport apmtransport.Transport
 	var tracerListener net.Listener
 
-	if cfg.Hosts == nil && info.Name == "apm-server" {
-		pipeListener := pipe.NewListener()
-		pipeTransport, err := transport.NewHTTPTransport()
+	if cfg.Hosts == nil {
+		pipeListener := transport.NewPipeListener()
+		pipeTransport, err := apmtransport.NewHTTPTransport()
 		if err != nil {
 			return nil, err
 		}
@@ -198,25 +207,19 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 		tracerListener = pipeListener
 
 	} else {
-		t, err := transport.NewHTTPTransport()
+		t, err := apmtransport.NewHTTPTransport()
 		if err != nil {
 			return nil, err
 		}
-		hosts := cfg.Hosts
-		if hosts == nil {
-			hosts = []*url.URL{{
-				Scheme: "http",
-				Host:   "localhost:8200",
-			}}
+		if len(cfg.Hosts) > 0 {
+			t.SetServerURL(cfg.Hosts...)
 		}
-		t.SetServerURL(hosts...)
 		if cfg.APIKey != "" {
 			t.SetAPIKey(cfg.APIKey)
 		} else {
 			t.SetSecretToken(cfg.SecretToken)
 		}
 		tracerTransport = t
-		logger.Infof("APM tracer directed to %s", hosts)
 	}
 
 	var environment string
@@ -224,8 +227,8 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 		environment = *cfg.Environment
 	}
 	tracer, err := apm.NewTracerOptions(apm.TracerOptions{
-		ServiceName:        info.Beat,
-		ServiceVersion:     info.Version,
+		ServiceName:        beatName,
+		ServiceVersion:     beatVersion,
 		ServiceEnvironment: environment,
 		Transport:          tracerTransport,
 	})
@@ -234,8 +237,8 @@ func initTracer(cfg InstrumentationConfig, info Info) (*Instrumentation, error) 
 	}
 
 	tracer.SetLogger(logger)
-	return &Instrumentation{
+	return &instrumentation{
 		tracer:   tracer,
-		Listener: tracerListener,
+		listener: tracerListener,
 	}, nil
 }

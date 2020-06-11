@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pipe
+package transport
 
 import (
 	"context"
@@ -26,14 +26,14 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 	assert.Implements(t, new(net.Listener), l)
 }
 
 func TestAddr(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 
@@ -44,7 +44,7 @@ func TestAddr(t *testing.T) {
 }
 
 func TestDialAccept(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 
@@ -72,7 +72,7 @@ func TestDialAccept(t *testing.T) {
 }
 
 func TestAcceptClosed(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 
@@ -83,7 +83,7 @@ func TestAcceptClosed(t *testing.T) {
 }
 
 func TestDialClosed(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 
@@ -94,7 +94,7 @@ func TestDialClosed(t *testing.T) {
 }
 
 func TestDialContextCanceled(t *testing.T) {
-	l := NewListener()
+	l := NewPipeListener()
 	assert.NotNil(t, l)
 	defer l.Close()
 

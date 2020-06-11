@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat
+package instrumentation
 
 import (
 	"testing"
@@ -27,34 +27,19 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
-func TestAPMTracerDisabledByDefault(t *testing.T) {
-	b := Beat{
-		Info: Info{
-			Beat:        "my-beat",
-			IndexPrefix: "my-beat-*",
-			Version:     version.GetDefaultVersion(),
-			Name:        "my-beat",
-		},
-	}
-	tracer := b.Instrumentation.GetTracer()
-	require.NotNil(t, tracer)
-	defer tracer.Close()
-	assert.False(t, tracer.Active())
-}
-
 func TestInstrumentationConfig(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"instrumentation": map[string]interface{}{
 			"enabled": "true",
 		},
 	})
-	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "my-beat", Version: version.GetDefaultVersion()})
+	instrumentation, err := New(cfg, "my-beat", version.GetDefaultVersion())
 	require.NoError(t, err)
 
-	tracer := instrumentation.GetTracer()
+	tracer := instrumentation.Tracer()
 	defer tracer.Close()
 	assert.True(t, tracer.Active())
-	assert.Nil(t, instrumentation.Listener)
+	assert.NotNil(t, instrumentation.Listener())
 }
 
 func TestInstrumentationConfigExplicitHosts(t *testing.T) {
@@ -65,12 +50,12 @@ func TestInstrumentationConfigExplicitHosts(t *testing.T) {
 		},
 	},
 	)
-	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "my-beat", Version: version.GetDefaultVersion()})
+	instrumentation, err := New(cfg, "my-beat", version.GetDefaultVersion())
 	require.NoError(t, err)
-	tracer := instrumentation.GetTracer()
+	tracer := instrumentation.Tracer()
 	defer tracer.Close()
 	assert.True(t, tracer.Active())
-	assert.Nil(t, instrumentation.Listener)
+	assert.Nil(t, instrumentation.Listener())
 }
 
 func TestInstrumentationConfigListener(t *testing.T) {
@@ -79,11 +64,19 @@ func TestInstrumentationConfigListener(t *testing.T) {
 			"enabled": "true",
 		},
 	})
-	instrumentation, err := CreateInstrumentation(cfg, Info{Name: "apm-server", Version: version.GetDefaultVersion()})
+	instrumentation, err := New(cfg, "apm-server", version.GetDefaultVersion())
 	require.NoError(t, err)
 
-	tracer := instrumentation.GetTracer()
+	tracer := instrumentation.Tracer()
 	defer tracer.Close()
 	assert.True(t, tracer.Active())
-	assert.NotNil(t, instrumentation.Listener)
+	assert.NotNil(t, instrumentation.Listener())
+}
+
+func TestAPMTracerDisabledByDefault(t *testing.T) {
+	instrumentation, err := New(common.NewConfig(), "beat", "8.0")
+	require.NoError(t, err)
+	tracer := instrumentation.Tracer()
+	require.NotNil(t, tracer)
+	assert.False(t, tracer.Active())
 }
