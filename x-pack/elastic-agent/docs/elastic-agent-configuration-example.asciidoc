@@ -1,0 +1,13 @@
+[[elastic-agent-configuration-example]]
+= Configuration example
+
+experimental[]
+
+The following example shows a full list of configuration options:
+
+//REVIEWERS: I'm not sure whether this is a true statement ^^.
+
+[source,yaml]
+----
+include::elastic-agent_configuration_example.yml[]
+----
