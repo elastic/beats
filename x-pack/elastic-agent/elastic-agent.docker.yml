@@ -10,6 +10,8 @@ outputs:
 
 inputs:
   - type: system/metrics
+    dataset.namespace: default
+    use_output: default
     streams:
       - metricset: cpu
         dataset.name: system.cpu

@@ -64,9 +64,7 @@ rules:
     - remove_key:
         key: enabled
     - remove_key:
-        key: dataset.name
-    - remove_key:
-        key: dataset.namespace
+        key: dataset
     - remove_key:
         key: use_output
 

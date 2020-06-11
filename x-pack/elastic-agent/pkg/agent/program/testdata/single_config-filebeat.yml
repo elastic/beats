@@ -31,13 +31,13 @@ filebeat:
       - add_fields:
           target: "dataset"
           fields:
-            type: logs
+            type: testtype
             name: generic
             namespace: default
       - add_fields:
           target: "stream"
           fields:
-            type: logs
+            type: testtype
             dataset: generic
             namespace: default
 output:
