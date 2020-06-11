@@ -14,6 +14,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "DeleteAccessKey",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-0698-46bd-998d-EXAMPLE",
         "event.kind": "event",
@@ -21,7 +24,10 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_ID\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-08T15:12:16Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-08T19:09:36Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteAccessKey\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"userName\":\"Bob\",\"accessKeyId\":\"EXAMPLE_ID\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-3bea-41fa-a0b4-EXAMPLE\",\"eventID\":\"EXAMPLE-0698-46bd-998d-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
@@ -31,6 +37,9 @@
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

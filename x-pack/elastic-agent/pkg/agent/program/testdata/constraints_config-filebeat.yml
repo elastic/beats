@@ -4,8 +4,15 @@ filebeat:
     paths:
       - /var/log/hello1.log
       - /var/log/hello2.log
+    dataset: generic
     index: logs-generic-default
     processors:
+      - add_fields:
+          target: "dataset"
+          fields:
+            type: logs
+            name: generic
+            namespace: default
       - add_fields:
           target: "stream"
           fields:

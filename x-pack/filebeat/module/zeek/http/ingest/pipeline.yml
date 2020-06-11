@@ -51,9 +51,6 @@ processors:
     field: user_agent.original
     ignore_missing: true
 - lowercase:
-    field: "http.request.method"
-    ignore_missing: true
-- lowercase:
     field: "event.action"
     ignore_missing: true
 - set:

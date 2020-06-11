@@ -18,6 +18,23 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 )
 
+func TestConfigHosts(t *testing.T) {
+	testHostEmpty := map[string]string{
+		"api_key": "keykey",
+	}
+	_, err := NewCfgFromRaw(testHostEmpty)
+	assert.Error(t, err)
+
+	testMultiHost := map[string]string{
+		"hosts": "endpoint1,endpoint2",
+	}
+	goodOut := []string{"endpoint1", "endpoint2"}
+	cfg, err := NewCfgFromRaw(testMultiHost)
+	assert.NoError(t, err)
+	assert.Equal(t, goodOut, cfg.Endpoint)
+
+}
+
 func TestNewClient(t *testing.T) {
 	logString := "This is a log line"
 	cfgObject := logger.Info{
@@ -68,7 +85,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	reader, err := pipereader.NewReaderFromReadCloser(pipelinemock.CreateTestInputFromLine(t, logString))
 	require.NoError(t, err)
 
-	client, err := newClientFromPipeline(mockConnector, reader, "aaa", cfgObject)
+	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject)
 	require.NoError(t, err)
 
 	return client

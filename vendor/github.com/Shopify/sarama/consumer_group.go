@@ -38,6 +38,9 @@ type ConsumerGroup interface {
 	// as quickly as possible to allow time for Cleanup() and the final offset commit. If the timeout
 	// is exceeded, the consumer will be removed from the group by Kafka, which will cause offset
 	// commit failures.
+	// This method should be called inside an infinite loop, when a
+	// server-side rebalance happens, the consumer session will need to be
+	// recreated to get the new claims.
 	Consume(ctx context.Context, topics []string, handler ConsumerGroupHandler) error
 
 	// Errors returns a read channel of errors that occurred during the consumer life-cycle.
@@ -120,9 +123,6 @@ func (c *consumerGroup) Close() (err error) {
 	c.closeOnce.Do(func() {
 		close(c.closed)
 
-		c.lock.Lock()
-		defer c.lock.Unlock()
-
 		// leave group
 		if e := c.leave(); e != nil {
 			err = e
@@ -175,6 +175,7 @@ func (c *consumerGroup) Consume(ctx context.Context, topics []string, handler Co
 
 	// loop check topic partition numbers changed
 	// will trigger rebalance when any topic partitions number had changed
+	// avoid Consume function called again that will generate more than loopCheckPartitionNumbers coroutine
 	go c.loopCheckPartitionNumbers(topics, sess)
 
 	// Wait for session exit signal
@@ -333,20 +334,14 @@ func (c *consumerGroup) syncGroupRequest(coordinator *Broker, plan BalanceStrate
 		MemberId:     c.memberID,
 		GenerationId: generationID,
 	}
+	strategy := c.config.Consumer.Group.Rebalance.Strategy
 	for memberID, topics := range plan {
 		assignment := &ConsumerGroupMemberAssignment{Topics: topics}
-
-		// Include topic assignments in group-assignment userdata for each consumer-group member
-		if c.config.Consumer.Group.Rebalance.Strategy.Name() == StickyBalanceStrategyName {
-			userDataBytes, err := encode(&StickyAssignorUserDataV1{
-				Topics:     topics,
-				Generation: generationID,
-			}, nil)
-			if err != nil {
-				return nil, err
-			}
-			assignment.UserData = userDataBytes
+		userDataBytes, err := strategy.AssignmentData(memberID, topics, generationID)
+		if err != nil {
+			return nil, err
 		}
+		assignment.UserData = userDataBytes
 		if err := req.AddGroupAssignmentMember(memberID, assignment); err != nil {
 			return nil, err
 		}
@@ -384,8 +379,10 @@ func (c *consumerGroup) balance(members map[string]ConsumerGroupMemberMetadata) 
 	return strategy.Plan(members, topics)
 }
 
-// Leaves the cluster, called by Close, protected by lock.
+// Leaves the cluster, called by Close.
 func (c *consumerGroup) leave() error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	if c.memberID == "" {
 		return nil
 	}
@@ -417,12 +414,6 @@ func (c *consumerGroup) leave() error {
 }
 
 func (c *consumerGroup) handleError(err error, topic string, partition int32) {
-	select {
-	case <-c.closed:
-		return
-	default:
-	}
-
 	if _, ok := err.(*ConsumerError); !ok && topic != "" && partition > -1 {
 		err = &ConsumerError{
 			Topic:     topic,
@@ -431,18 +422,27 @@ func (c *consumerGroup) handleError(err error, topic string, partition int32) {
 		}
 	}
 
-	if c.config.Consumer.Return.Errors {
-		select {
-		case c.errors <- err:
-		default:
-		}
-	} else {
+	if !c.config.Consumer.Return.Errors {
 		Logger.Println(err)
+		return
+	}
+
+	select {
+	case <-c.closed:
+		//consumer is closed
+		return
+	default:
+	}
+
+	select {
+	case c.errors <- err:
+	default:
+		// no error listener
 	}
 }
 
 func (c *consumerGroup) loopCheckPartitionNumbers(topics []string, session *consumerGroupSession) {
-	pause := time.NewTicker(c.config.Consumer.Group.Heartbeat.Interval * 2)
+	pause := time.NewTicker(c.config.Metadata.RefreshFrequency)
 	defer session.cancel()
 	defer pause.Stop()
 	var oldTopicToPartitionNum map[string]int
@@ -462,6 +462,10 @@ func (c *consumerGroup) loopCheckPartitionNumbers(topics []string, session *cons
 		}
 		select {
 		case <-pause.C:
+		case <-session.ctx.Done():
+			Logger.Printf("loop check partition number coroutine will exit, topics %s", topics)
+			// if session closed by other, should be exited
+			return
 		case <-c.closed:
 			return
 		}
@@ -469,10 +473,6 @@ func (c *consumerGroup) loopCheckPartitionNumbers(topics []string, session *cons
 }
 
 func (c *consumerGroup) topicToPartitionNumbers(topics []string) (map[string]int, error) {
-	if err := c.client.RefreshMetadata(topics...); err != nil {
-		Logger.Printf("Consumer Group refresh metadata failed %v", err)
-		return nil, err
-	}
 	topicToPartitionNum := make(map[string]int, len(topics))
 	for _, topic := range topics {
 		if partitionNum, err := c.client.Partitions(topic); err != nil {
@@ -760,7 +760,7 @@ func (s *consumerGroupSession) heartbeatLoop() {
 		case ErrRebalanceInProgress, ErrUnknownMemberId, ErrIllegalGeneration:
 			return
 		default:
-			s.parent.handleError(err, "", -1)
+			s.parent.handleError(resp.Err, "", -1)
 			return
 		}
 

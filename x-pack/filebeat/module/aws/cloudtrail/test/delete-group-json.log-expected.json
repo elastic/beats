@@ -14,6 +14,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "DeleteGroup",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-cbc2-4cc3-8bbc-EXAMPLE",
         "event.kind": "event",
@@ -21,13 +24,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"0123456789012\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-08T15:12:16Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-09T02:25:44Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteGroup\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"groupName\":\"TEST-GROUP\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-66cb-4775-a203-EXAMPLE\",\"eventID\":\"EXAMPLE-cbc2-4cc3-8bbc-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "deletion"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "0123456789012",
         "user.name": "Alice",
         "user_agent.device.name": "Other",
@@ -48,6 +57,9 @@
         "cloud.account.id": "0123456789012",
         "cloud.region": "us-east-1",
         "event.action": "DeleteGroup",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "aws.cloudtrail",
         "event.id": "EXAMPLE-5aa2-4b5f-a52a-EXAMPLE",
         "event.kind": "event",
@@ -55,13 +67,19 @@
         "event.original": "{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_PRINCIPLE\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY_ID\",\"userName\":\"Alice\"},\"eventTime\":\"2020-01-09T02:25:11Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"DeleteGroup\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"aws-cli/1.16.310 Python/3.8.1 Darwin/18.7.0 botocore/1.13.46\",\"errorCode\":\"DeleteConflictException\",\"errorMessage\":\"Cannot delete entity, must detach all policies first.\",\"requestParameters\":{\"groupName\":\"TEST-GROUP\"},\"responseElements\":null,\"requestID\":\"EXAMPLE-2a3c-4a94-b24f-EXAMPLE\",\"eventID\":\"EXAMPLE-5aa2-4b5f-a52a-EXAMPLE\",\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
         "event.outcome": "failure",
         "event.provider": "iam.amazonaws.com",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "deletion"
+        ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 747,
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_PRINCIPLE",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",

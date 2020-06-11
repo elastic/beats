@@ -8,7 +8,7 @@ var:
   - name: syslog_port
     default: 9004
   - name: input
-    default: syslog
+    default: udp
 
 ingest_pipeline:
   - ingest/pipeline.yml

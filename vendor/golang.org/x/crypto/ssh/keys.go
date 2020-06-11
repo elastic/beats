@@ -562,9 +562,11 @@ func parseED25519(in []byte) (out PublicKey, rest []byte, err error) {
 		return nil, nil, err
 	}
 
-	key := ed25519.PublicKey(w.KeyBytes)
+	if l := len(w.KeyBytes); l != ed25519.PublicKeySize {
+		return nil, nil, fmt.Errorf("invalid size %d for Ed25519 public key", l)
+	}
 
-	return (ed25519PublicKey)(key), w.Rest, nil
+	return ed25519PublicKey(w.KeyBytes), w.Rest, nil
 }
 
 func (k ed25519PublicKey) Marshal() []byte {
@@ -582,9 +584,11 @@ func (k ed25519PublicKey) Verify(b []byte, sig *Signature) error {
 	if sig.Format != k.Type() {
 		return fmt.Errorf("ssh: signature type %s for key type %s", sig.Format, k.Type())
 	}
+	if l := len(k); l != ed25519.PublicKeySize {
+		return fmt.Errorf("ssh: invalid size %d for Ed25519 public key", l)
+	}
 
-	edKey := (ed25519.PublicKey)(k)
-	if ok := ed25519.Verify(edKey, b, sig.Blob); !ok {
+	if ok := ed25519.Verify(ed25519.PublicKey(k), b, sig.Blob); !ok {
 		return errors.New("ssh: signature did not verify")
 	}
 
@@ -838,6 +842,10 @@ func parseSKEd25519(in []byte) (out PublicKey, rest []byte, err error) {
 		return nil, nil, err
 	}
 
+	if l := len(w.KeyBytes); l != ed25519.PublicKeySize {
+		return nil, nil, fmt.Errorf("invalid size %d for Ed25519 public key", l)
+	}
+
 	key := new(skEd25519PublicKey)
 	key.application = w.Application
 	key.PublicKey = ed25519.PublicKey(w.KeyBytes)
@@ -861,6 +869,9 @@ func (k *skEd25519PublicKey) Marshal() []byte {
 func (k *skEd25519PublicKey) Verify(data []byte, sig *Signature) error {
 	if sig.Format != k.Type() {
 		return fmt.Errorf("ssh: signature type %s for key type %s", sig.Format, k.Type())
+	}
+	if l := len(k.PublicKey); l != ed25519.PublicKeySize {
+		return fmt.Errorf("invalid size %d for Ed25519 public key", l)
 	}
 
 	h := sha256.New()
@@ -898,8 +909,7 @@ func (k *skEd25519PublicKey) Verify(data []byte, sig *Signature) error {
 
 	original := Marshal(blob)
 
-	edKey := (ed25519.PublicKey)(k.PublicKey)
-	if ok := ed25519.Verify(edKey, original, edSig.Signature); !ok {
+	if ok := ed25519.Verify(k.PublicKey, original, edSig.Signature); !ok {
 		return errors.New("ssh: signature did not verify")
 	}
 
@@ -1051,7 +1061,10 @@ func NewPublicKey(key interface{}) (PublicKey, error) {
 	case *dsa.PublicKey:
 		return (*dsaPublicKey)(key), nil
 	case ed25519.PublicKey:
-		return (ed25519PublicKey)(key), nil
+		if l := len(key); l != ed25519.PublicKeySize {
+			return nil, fmt.Errorf("ssh: invalid size %d for Ed25519 public key", l)
+		}
+		return ed25519PublicKey(key), nil
 	default:
 		return nil, fmt.Errorf("ssh: unsupported key type %T", key)
 	}
@@ -1233,15 +1246,23 @@ func passphraseProtectedOpenSSHKey(passphrase []byte) openSSHDecryptFunc {
 		}
 		key, iv := k[:32], k[32:]
 
-		if cipherName != "aes256-ctr" {
-			return nil, fmt.Errorf("ssh: unknown cipher %q, only supports %q", cipherName, "aes256-ctr")
-		}
 		c, err := aes.NewCipher(key)
 		if err != nil {
 			return nil, err
 		}
-		ctr := cipher.NewCTR(c, iv)
-		ctr.XORKeyStream(privKeyBlock, privKeyBlock)
+		switch cipherName {
+		case "aes256-ctr":
+			ctr := cipher.NewCTR(c, iv)
+			ctr.XORKeyStream(privKeyBlock, privKeyBlock)
+		case "aes256-cbc":
+			if len(privKeyBlock)%c.BlockSize() != 0 {
+				return nil, fmt.Errorf("ssh: invalid encrypted private key length, not a multiple of the block size")
+			}
+			cbc := cipher.NewCBCDecrypter(c, iv)
+			cbc.CryptBlocks(privKeyBlock, privKeyBlock)
+		default:
+			return nil, fmt.Errorf("ssh: unknown cipher %q, only supports %q or %q", cipherName, "aes256-ctr", "aes256-cbc")
+		}
 
 		return privKeyBlock, nil
 	}
@@ -1304,7 +1325,6 @@ func parseOpenSSHPrivateKey(key []byte, decrypt openSSHDecryptFunc) (crypto.Priv
 		return nil, errors.New("ssh: malformed OpenSSH key")
 	}
 
-	// we only handle ed25519 and rsa keys currently
 	switch pk1.Keytype {
 	case KeyAlgoRSA:
 		// https://github.com/openssh/openssh-portable/blob/master/sshkey.c#L2760-L2773
@@ -1366,6 +1386,57 @@ func parseOpenSSHPrivateKey(key []byte, decrypt openSSHDecryptFunc) (crypto.Priv
 		pk := ed25519.PrivateKey(make([]byte, ed25519.PrivateKeySize))
 		copy(pk, key.Priv)
 		return &pk, nil
+	case KeyAlgoECDSA256, KeyAlgoECDSA384, KeyAlgoECDSA521:
+		key := struct {
+			Curve   string
+			Pub     []byte
+			D       *big.Int
+			Comment string
+			Pad     []byte `ssh:"rest"`
+		}{}
+
+		if err := Unmarshal(pk1.Rest, &key); err != nil {
+			return nil, err
+		}
+
+		if err := checkOpenSSHKeyPadding(key.Pad); err != nil {
+			return nil, err
+		}
+
+		var curve elliptic.Curve
+		switch key.Curve {
+		case "nistp256":
+			curve = elliptic.P256()
+		case "nistp384":
+			curve = elliptic.P384()
+		case "nistp521":
+			curve = elliptic.P521()
+		default:
+			return nil, errors.New("ssh: unhandled elliptic curve: " + key.Curve)
+		}
+
+		X, Y := elliptic.Unmarshal(curve, key.Pub)
+		if X == nil || Y == nil {
+			return nil, errors.New("ssh: failed to unmarshal public key")
+		}
+
+		if key.D.Cmp(curve.Params().N) >= 0 {
+			return nil, errors.New("ssh: scalar is out of range")
+		}
+
+		x, y := curve.ScalarBaseMult(key.D.Bytes())
+		if x.Cmp(X) != 0 || y.Cmp(Y) != 0 {
+			return nil, errors.New("ssh: public key does not match private key")
+		}
+
+		return &ecdsa.PrivateKey{
+			PublicKey: ecdsa.PublicKey{
+				Curve: curve,
+				X:     X,
+				Y:     Y,
+			},
+			D: key.D,
+		}, nil
 	default:
 		return nil, errors.New("ssh: unhandled key type")
 	}

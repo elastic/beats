@@ -1149,22 +1149,13 @@ type: date
 
 --
 
-*`aws.cloudtrail.user_identity.invoked_by`*::
-+
---
-The name of the AWS service that made the request, such as Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
-
-type: keyword
-
---
-
 [float]
 === session_issuer
 
 If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
 
 
-*`aws.cloudtrail.user_identity.session_issuer.type`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.type`*::
 +
 --
 The source of the temporary security credentials, such as Root, IAMUser, or Role.
@@ -1173,7 +1164,7 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.principal_id`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.principal_id`*::
 +
 --
 The internal ID of the entity that was used to get credentials.
@@ -1182,7 +1173,7 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.arn`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.arn`*::
 +
 --
 The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
@@ -1191,10 +1182,19 @@ type: keyword
 
 --
 
-*`aws.cloudtrail.user_identity.session_issuer.account_id`*::
+*`aws.cloudtrail.user_identity.session_context.session_issuer.account_id`*::
 +
 --
 The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+--
+
+*`aws.cloudtrail.user_identity.invoked_by`*::
++
+--
+The name of the AWS service that made the request, such as Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
 
 type: keyword
 
@@ -3113,10 +3113,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
 
-type: keyword
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -3153,7 +3155,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -9519,6 +9521,16 @@ type: ip
 
 --
 
+*`cisco.asa.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.asa.mapped_source_port`*::
 +
 --
@@ -9536,6 +9548,16 @@ The translated destination IP address.
 
 
 type: ip
+
+--
+
+*`cisco.asa.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
@@ -9708,6 +9730,16 @@ type: ip
 
 --
 
+*`cisco.ftd.mapped_source_host`*::
++
+--
+The translated source host.
+
+
+type: keyword
+
+--
+
 *`cisco.ftd.mapped_source_port`*::
 +
 --
@@ -9725,6 +9757,16 @@ The translated destination IP address. Use ECS destination.nat.ip.
 
 
 type: ip
+
+--
+
+*`cisco.ftd.mapped_destination_host`*::
++
+--
+The translated destination host.
+
+
+type: keyword
 
 --
 
@@ -22859,6 +22901,80 @@ type: keyword
 
 --
 
+[float]
+=== response
+
+The operation response.
+
+
+
+*`googlecloud.audit.response.proto_name`*::
++
+--
+Type property of the response.
+
+
+type: keyword
+
+--
+
+[float]
+=== details
+
+The details of the response.
+
+
+
+*`googlecloud.audit.response.details.group`*::
++
+--
+The name of the group.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.kind`*::
++
+--
+The kind of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.name`*::
++
+--
+The name of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.details.uid`*::
++
+--
+The uid of the response details.
+
+
+type: keyword
+
+--
+
+*`googlecloud.audit.response.status`*::
++
+--
+Status of the response. 
+
+
+type: keyword
+
+--
+
 *`googlecloud.audit.resource_name`*::
 +
 --
@@ -35636,7 +35752,7 @@ type: keyword
 [float]
 === dnp3
 
-Fields exported by the Zeek SSH log
+Fields exported by the Zeek DNP3 log
 
 
 

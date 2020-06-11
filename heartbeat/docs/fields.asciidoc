@@ -40,10 +40,12 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-Deprecated - use agent.name or agent.id to identify an agent. Hostname of the agent.
+Deprecated - use agent.name or agent.id to identify an agent.
 
 
-type: keyword
+type: alias
+
+alias to: agent.name
 
 --
 
@@ -80,7 +82,7 @@ alias to: host.name
 --
 type: alias
 
-alias to: agent.hostname
+alias to: agent.name
 
 --
 
@@ -7278,6 +7280,18 @@ List of redirects followed to arrive at final content. Last item on the list is 
 
 
 type: keyword
+
+--
+
+*`http.response.headers.*`*::
++
+--
+The canonical headers of the monitored HTTP response.
+
+
+type: object
+
+Object is not enabled.
 
 --
 

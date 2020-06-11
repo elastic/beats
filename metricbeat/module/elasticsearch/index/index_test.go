@@ -37,7 +37,7 @@ func TestGetServiceURI(t *testing.T) {
 			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
-			esVersion:    common.MustNewVersion("7.8.0"),
+			esVersion:    common.MustNewVersion("8.0.0"),
 			expectedPath: strings.Replace(statsPath, statsMetrics, statsMetrics+",bulk", 1),
 		},
 	}
@@ -58,7 +58,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 		var uri string
 		var err error
 		for i := uint(0); i < numCalls; i++ {
-			uri, err = getServicePath(*common.MustNewVersion("7.8.0"))
+			uri, err = getServicePath(*common.MustNewVersion("8.0.0"))
 			if err != nil {
 				return false
 			}

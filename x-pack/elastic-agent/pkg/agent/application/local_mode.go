@@ -13,7 +13,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/app/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -39,6 +41,7 @@ type Local struct {
 	log         *logger.Logger
 	source      source
 	agentInfo   *info.AgentInfo
+	srv         *server.Server
 }
 
 type source interface {
@@ -78,6 +81,10 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
+	localApplication.srv, err = server.NewFromConfig(log, rawConfig, &app.ApplicationStatusHandler{})
+	if err != nil {
+		return nil, errors.New(err, "initialize GRPC listener")
+	}
 
 	reporter := reporting.NewReporter(localApplication.bgContext, log, localApplication.agentInfo, logR)
 
@@ -86,7 +93,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, rawConfig, nil, reporter, monitor))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, rawConfig, localApplication.srv, reporter, monitor))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -113,6 +120,9 @@ func (l *Local) Start() error {
 	l.log.Info("Agent is starting")
 	defer l.log.Info("Agent is stopped")
 
+	if err := l.srv.Start(); err != nil {
+		return err
+	}
 	if err := l.source.Start(); err != nil {
 		return err
 	}
@@ -123,6 +133,7 @@ func (l *Local) Start() error {
 // Stop stops a local agent.
 func (l *Local) Stop() error {
 	l.cancelCtxFn()
+	l.srv.Stop()
 	return l.source.Stop()
 }
 
