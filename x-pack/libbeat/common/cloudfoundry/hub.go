@@ -140,7 +140,7 @@ func (h *Hub) DopplerConsumerFromClient(client Client, callbacks DopplerCallback
 	}
 
 	tr := TokenRefresherFromCfClient(cfc)
-	return newDopplerConsumer(dopplerAddress, h.cfg.ShardID, httpClient, tr, callbacks)
+	return newDopplerConsumer(dopplerAddress, h.cfg.ShardID, h.log, httpClient, tr, callbacks)
 }
 
 // doerFromClient returns an auth token doer using uaa.
