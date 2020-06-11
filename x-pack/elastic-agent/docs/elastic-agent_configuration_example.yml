@@ -23,7 +23,12 @@ outputs:
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
 settings.monitoring:
-  use_output: monitoring
+  # enabled turns on monitoring of running processes
+  enabled: true
+  # enables log monitoring
+  logs: true
+  # enables metrics monitoring
+  metrics: true
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug

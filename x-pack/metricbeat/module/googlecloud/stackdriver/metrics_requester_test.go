@@ -25,37 +25,37 @@ func TestGetFilterForMetric(t *testing.T) {
 		{
 			"compute service with zone in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}},
+			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1-a\")",
 		},
 		{
 			"pubsub service with zone in config",
 			"pubsub.googleapis.com/subscription/ack_message_count",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}},
+			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with zone in config",
 			"loadbalancing.googleapis.com/https/backend_latencies",
-			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}},
+			stackdriverMetricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
 			"compute service with region in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}},
+			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-east1\")",
 		},
 		{
 			"pubsub service with region in config",
 			"pubsub.googleapis.com/subscription/ack_message_count",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}},
+			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with region in config",
 			"loadbalancing.googleapis.com/https/backend_latencies",
-			stackdriverMetricsRequester{config: config{Region: "us-east1"}},
+			stackdriverMetricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
@@ -91,7 +91,7 @@ func TestGetFilterForMetric(t *testing.T) {
 		{
 			"compute service with no region/zone in config",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
-			stackdriverMetricsRequester{config: config{}},
+			stackdriverMetricsRequester{config: config{}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\"",
 		},
 	}

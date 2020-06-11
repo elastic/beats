@@ -46,11 +46,10 @@ func (o *operationFetch) Name() string {
 	return "operation-fetch"
 }
 
-// Check checks whether operation needs to be run
-// examples:
-// - Start does not need to run if process is running
-// - Fetch does not need to run if package is already present
-func (o *operationFetch) Check() (bool, error) {
+// Check checks whether fetch needs to occur.
+//
+// If the artifacts already exists then fetch will not be ran.
+func (o *operationFetch) Check(_ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
 	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {

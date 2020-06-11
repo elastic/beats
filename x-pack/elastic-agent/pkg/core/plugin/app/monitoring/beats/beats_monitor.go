@@ -23,6 +23,12 @@ type wrappedConfig struct {
 	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"settings.monitoring" yaml:"settings.monitoring"`
 }
 
+func defaultWrappedConfig() *wrappedConfig {
+	return &wrappedConfig{
+		MonitoringConfig: monitoringConfig.DefaultConfig(),
+	}
+}
+
 // Monitor is a monitoring interface providing information about the way
 // how beat is monitored
 type Monitor struct {
@@ -32,23 +38,27 @@ type Monitor struct {
 }
 
 // NewMonitor creates a beats monitor.
-func NewMonitor(downloadConfig *artifact.Config) *Monitor {
+func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig) *Monitor {
+	if monitoringCfg == nil {
+		monitoringCfg = monitoringConfig.DefaultConfig()
+	}
+
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
 		installPath:     downloadConfig.InstallPath,
-		config:          &monitoringConfig.MonitoringConfig{},
+		config:          monitoringCfg,
 	}
 }
 
 // Reload reloads state of the monitoring based on config.
 func (b *Monitor) Reload(rawConfig *config.Config) error {
-	cfg := &wrappedConfig{}
+	cfg := defaultWrappedConfig()
 	if err := rawConfig.Unpack(&cfg); err != nil {
 		return err
 	}
 
 	if cfg == nil || cfg.MonitoringConfig == nil {
-		b.config = &monitoringConfig.MonitoringConfig{}
+		b.config = monitoringConfig.DefaultConfig()
 	} else {
 		b.config = cfg.MonitoringConfig
 	}
