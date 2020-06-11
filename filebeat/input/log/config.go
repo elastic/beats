@@ -68,7 +68,7 @@ var (
 			CloseRenamed:  false,
 			CloseEOF:      false,
 			CloseTimeout:  0,
-			IgnoreOldFileTruncate: true,
+			IgnoreOldFileTruncate: false,
 		},
 	}
 )
