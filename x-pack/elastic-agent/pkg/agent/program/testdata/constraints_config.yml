@@ -24,7 +24,7 @@ inputs:
   - type: apache/metrics
     constraints:
       - "validate_version(%{[agent.version]}, '1.0.0 - 7.0.0')"
-    namespace: testing
+    dataset.namespace: testing
     streams:
       - enabled: true
         metricset: info

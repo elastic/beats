@@ -369,7 +369,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 	}
 
 	for _, inputNode := range inputsNodeList.value {
-		nsNode, found := inputNode.Find("namespace")
+		nsNode, found := inputNode.Find("dataset.namespace")
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
@@ -383,7 +383,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				continue
 			}
 			datasourceMap.value = append(datasourceMap.value, &Key{
-				name:  "namespace",
+				name:  "dataset.namespace",
 				value: &StrVal{value: defaultNamespace},
 			})
 		}
@@ -404,7 +404,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				continue
 			}
 
-			dsNode, found := streamNode.Find("dataset")
+			dsNode, found := streamNode.Find("dataset.name")
 			if found {
 				dsKey, ok := dsNode.(*Key)
 				if ok {
@@ -414,7 +414,7 @@ func (r *FixStreamRule) Apply(ast *AST) error {
 				}
 			} else {
 				streamMap.value = append(streamMap.value, &Key{
-					name:  "dataset",
+					name:  "dataset.name",
 					value: &StrVal{value: defaultDataset},
 				})
 			}
@@ -455,7 +455,7 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 
 	for _, inputNode := range inputsList.value {
 		namespace := defaultNamespace
-		nsNode, found := inputNode.Find("namespace")
+		nsNode, found := inputNode.Find("dataset.namespace")
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
@@ -483,7 +483,7 @@ func (r *InjectIndexRule) Apply(ast *AST) error {
 
 			dataset := defaultDataset
 
-			dsNode, found := streamNode.Find("dataset")
+			dsNode, found := streamNode.Find("dataset.name")
 			if found {
 				dsKey, ok := dsNode.(*Key)
 				if ok {
@@ -535,7 +535,7 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 
 	for _, inputNode := range inputsList.value {
 		namespace := defaultNamespace
-		nsNode, found := inputNode.Find("namespace")
+		nsNode, found := inputNode.Find("dataset.namespace")
 		if found {
 			nsKey, ok := nsNode.(*Key)
 			if ok {
@@ -563,7 +563,7 @@ func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
 
 			dataset := defaultDataset
 
-			dsNode, found := streamNode.Find("dataset")
+			dsNode, found := streamNode.Find("dataset.name")
 			if found {
 				dsKey, ok := dsNode.(*Key)
 				if ok {
