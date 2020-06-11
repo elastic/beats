@@ -68,6 +68,7 @@ var (
 			CloseRenamed:  false,
 			CloseEOF:      false,
 			CloseTimeout:  0,
+			IgnoreOldFileTruncate: true,
 		},
 	}
 )
@@ -123,6 +124,7 @@ type LogConfig struct {
 	CloseRenamed  bool          `config:"close_renamed"`
 	CloseEOF      bool          `config:"close_eof"`
 	CloseTimeout  time.Duration `config:"close_timeout" validate:"min=0"`
+	IgnoreOldFileTruncate bool `config:"ignore_old_file_truncate"`
 }
 
 // Contains available scan options
