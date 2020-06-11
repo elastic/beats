@@ -100,7 +100,7 @@ type beatConfig struct {
 	Logging         *common.Config `config:"logging"`
 	MetricLogging   *common.Config `config:"logging.metrics"`
 	Keystore        *common.Config `config:"keystore"`
-	Instrumentation *common.Config `config:"pipe"`
+	Instrumentation *common.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
 	Pipeline pipeline.Config `config:",inline"`
