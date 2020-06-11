@@ -41,9 +41,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 * Cisco {pull}18753[18753]
 * iptables {pull}18756[18756]
 * Checkpoint {pull}18754[18754]
+* Netflow {pull}19087[19087]
+* Suricata {pull}19107[19107] (`forwarded` tag is not included by default)
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Adds check on `<no value>` config option value for the azure input `resource_manager_endpoint`. {pull}18890[18890]
 - Okta module now requires objects instead of JSON strings for the `http_headers`, `http_request_body`, `pagination`, `rate_limit`, and `ssl` variables. {pull}18953[18953]
+- Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
 
 *Heartbeat*
 
@@ -58,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make use of secure port when accessing Kubelet API {pull}16063[16063]
 - Add Tomcat overview dashboard {pull}14026[14026]
 - Move service config under metrics and simplify metric types. {pull}18691[18691]
+- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 
 *Packetbeat*
 
@@ -122,6 +126,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix the `translate_sid` processor's handling of unconfigured target fields. {issue}18990[18990] {pull}18991[18991]
 - Fixed a service restart failure under Windows. {issue}18914[18914] {pull}18916[18916]
 - The `monitoring.elasticsearch.api_key` value is correctly base64-encoded before being sent to the monitoring Elasticsearch cluster. {issue}18939[18939] {pull}18945[18945]
+- Fix kafka topic setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
+- Fix redis key setting not allowing upper case characters. {pull}18854[18854] {issue}18640[18640]
 
 *Auditbeat*
 
@@ -234,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
 - Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
 - Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
+- Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
 
 *Packetbeat*
 

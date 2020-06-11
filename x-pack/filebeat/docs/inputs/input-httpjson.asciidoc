@@ -48,6 +48,29 @@ Example configurations:
     url: http://localhost:9200/_search/scroll
 ----
 
+Additionally, it supports authentication via HTTP Headers, API key or oauth2.
+
+Example configurations with authentication:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  http_headers:
+    Authorization: 'Basic aGVsbG86d29ybGQ='
+  url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: httpjson
+  oauth2:
+    client.id: 12345678901234567890abcdef
+    client.secret: abcdef12345678901234567890
+    token_url: http://localhost/oauth2/token
+  url: http://localhost
+----
 
 ==== Configuration options
 
@@ -248,6 +271,110 @@ information.
 ==== `url`
 
 The URL of the HTTP API. Required.
+
+[float]
+==== `oauth2.enabled`
+
+The `enabled` setting can be used to disable the oauth2 configuration by
+setting it to `false`. The default value is `true`.
+
+NOTE: OAuth2 settings are disabled if either `enabled` is set to `false` or
+the `oauth2` section is missing.
+
+[float]
+==== `oauth2.provider`
+
+The `provider` setting can be used to configure supported oauth2 providers.
+Each supported provider will require specific settings. It is not set by default.
+Supported providers are: `azure`, `google`.
+
+[float]
+==== `oauth2.client.id`
+
+The `client.id` setting is used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `oauth2.client.secret`
+
+The `client.secret` setting is used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `oauth2.scopes`
+
+The `scopes` setting defines a list of scopes that will be requested during the oauth2 flow.
+It is optional for all providers.
+
+[float]
+==== `oauth2.token_url`
+
+The `token_url` setting specifies the endpoint that will be used to generate the
+tokens during the oauth2 flow. It is required if no provider is specified.
+
+NOTE: For `azure` provider either `token_url` or `azure.tenant_id` is required.
+
+[float]
+==== `oauth2.endpoint_params`
+
+The `endpoint_params` setting specifies a set of values that will be sent on each
+request to the `token_url`. Each param key can have multiple values.
+Can be set for all providers except `google`.
+
+["source","yaml",subs="attributes"]
+----
+- type: httpjson
+  oauth2:
+    endpoint_params:
+      Param1:
+        - ValueA
+        - ValueB
+      Param2:
+        - Value
+----
+
+[float]
+==== `oauth2.azure.tenant_id`
+
+The `azure.tenant_id` is used for authentication when using `azure` provider.
+Since it is used in the process to generate the `token_url`, it can't be used in
+combination with it. It is not required.
+
+For information about where to find it, you can refer to
+https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
+
+[float]
+==== `oauth2.azure.resource`
+
+The `azure.resource` is used to identify the accessed WebAPI resource when using `azure` provider.
+It is not required.
+
+[float]
+==== `oauth2.google.credentials_file`
+
+The `google.credentials_file` setting specifies the credentials file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `oauth2.google.credentials_json`
+
+The `google.credentials_json` setting allows to write your credentials information as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `oauth2.google.jwt_file`
+
+The `google.jwt_file` setting specifies the JWT Account Key file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
