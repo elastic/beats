@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"sync"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/cloudfoundry/noaa/consumer"
@@ -23,13 +24,17 @@ type DopplerCallbacks struct {
 }
 
 type DopplerConsumer struct {
+	sync.Mutex
+
 	subscriptionID string
 	callbacks      DopplerCallbacks
 	consumer       *consumer.Consumer
 	tokenRefresher consumer.TokenRefresher
 
-	log  *logp.Logger
-	stop chan struct{}
+	log     *logp.Logger
+	wg      sync.WaitGroup
+	stop    chan struct{}
+	started bool
 }
 
 func newDopplerConsumer(address string, id string, log *logp.Logger, client *http.Client, tr *TokenRefresher, callbacks DopplerCallbacks) (*DopplerConsumer, error) {
@@ -52,16 +57,30 @@ func newDopplerConsumer(address string, id string, log *logp.Logger, client *htt
 }
 
 func (c *DopplerConsumer) Run() {
-	// FIXME: ensure it is not run twice
+	c.Lock()
+	defer c.Unlock()
+	if c.started {
+		return
+	}
 	c.stop = make(chan struct{})
 
 	if c.callbacks.Log != nil {
-		go c.logsFirehose()
+		c.wg.Add(1)
+		go func() {
+			defer c.wg.Done()
+			c.logsFirehose()
+		}()
 	}
 
 	if c.callbacks.Metric != nil {
-		go c.metricsFirehose()
+		c.wg.Add(1)
+		go func() {
+			defer c.wg.Done()
+			c.metricsFirehose()
+		}()
 	}
+
+	c.started = true
 }
 
 func (c *DopplerConsumer) logsFirehose() {
@@ -133,11 +152,24 @@ func (c *DopplerConsumer) reportError(e EventError) {
 }
 
 func (c *DopplerConsumer) Stop() {
+	c.Lock()
+	defer c.Unlock()
+	if !c.started {
+		return
+	}
+
 	close(c.stop)
 	err := c.consumer.Close()
 	if err != nil {
 		c.log.Errorf("Error while closing doppler consumer: %v", err)
 	}
+
+	c.started = false
+}
+
+func (c *DopplerConsumer) Wait() {
+	c.Stop()
+	c.wg.Wait()
 }
 
 type TokenRefresher struct {

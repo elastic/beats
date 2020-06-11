@@ -85,4 +85,5 @@ func (p *InputV1) Stop() {
 // Wait waits for the input to finalize, and stops it
 func (p *InputV1) Wait() {
 	p.Stop()
+	p.consumer.Wait()
 }
