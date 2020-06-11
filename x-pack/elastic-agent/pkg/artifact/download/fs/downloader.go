@@ -49,12 +49,6 @@ func (e *Downloader) Download(_ context.Context, programName, version string) (_
 		}
 	}()
 
-	// create a destination directory root/program
-	destinationDir := filepath.Join(e.config.TargetDirectory, programName)
-	if err := os.MkdirAll(destinationDir, 0755); err != nil {
-		return "", errors.New(err, "creating directory for downloaded artifact failed", errors.TypeFilesystem, errors.M(errors.MetaKeyPath, destinationDir))
-	}
-
 	// download from source to dest
 	path, err := e.download(e.config.OS(), programName, version)
 	downloadedFiles = append(downloadedFiles, path)
@@ -113,6 +107,10 @@ func (e *Downloader) downloadFile(filename, fullPath string) (string, error) {
 	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return "", err
+	}
+
 	return fullPath, nil
 }
 
