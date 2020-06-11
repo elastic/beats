@@ -214,11 +214,12 @@ func GoIntegTest(ctx context.Context) error {
 // Use GENERATE=true to generate expected log files.
 // Use TESTING_FILEBEAT_MODULES=module[,module] to limit what modules to test.
 // Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
+// Use TESTING_FIELD_TYPES=True to check field/es types
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
+	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_", "PYTEST_"), "GENERATE")...)
 	if err != nil {
 		return err
 	}

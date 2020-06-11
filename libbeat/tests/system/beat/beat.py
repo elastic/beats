@@ -560,9 +560,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
             fields = []
             dictfields = []
             aliases = []
+            types = {}
 
             if doc_list is None:
-                return fields, dictfields, aliases
+                return fields, dictfields, aliases, types
 
             for field in doc_list:
 
@@ -577,14 +578,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     newName = field["name"]
 
                 if field.get("type") == "group":
-                    subfields, subdictfields, subaliases = extract_fields(field["fields"], newName)
+                    subfields, subdictfields, subaliases, subtypes = extract_fields(field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
                     aliases.extend(subaliases)
+                    types.update(subtypes)
                 else:
                     fields.append(newName)
                     if field.get("type") in ["object", "geo_point", "flattened"]:
                         dictfields.append(newName)
+                    types[newName] = field.get("type")
 
                 if field.get("type") == "object" and field.get("object_type") == "histogram":
                     fields.append(newName + ".values")
@@ -593,7 +596,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 if field.get("type") == "alias":
                     aliases.append(newName)
 
-            return fields, dictfields, aliases
+            return fields, dictfields, aliases, types
 
         global yaml_cache
 
@@ -619,13 +622,15 @@ class TestCase(unittest.TestCase, ComposeMixin):
             fields = []
             dictfields = []
             aliases = []
+            types = {}
 
             for item in doc:
-                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
+                subfields, subdictfields, subaliases, subtypes = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
                 aliases.extend(subaliases)
-            return fields, dictfields, aliases
+                types.update(subtypes)
+            return fields, dictfields, aliases, types
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
@@ -695,10 +700,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def assert_fields_are_documented(self, evt):
         """
-        Assert that all keys present in evt are documented in fields.yml.
+        Assert that all keys present in evt are documented in fields.yml and have compatible types.
         This reads from the global fields.yml, means `make collect` has to be run before the check.
         """
-        expected_fields, dict_fields, aliases = self.load_fields()
+        errors = []
+        expected_fields, dict_fields, aliases, types = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)
 
         def field_pattern_match(pattern, key):
@@ -721,14 +727,77 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return True
             return False
 
+        def has_compatible_format(field_name, value, types):
+            if field_name not in types:
+                # must be a pattern_match
+                return True
+            doc_type = types[field_name]
+            if doc_type in ['date']:
+                if isinstance(value, (str,)):
+                    if re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[zZ]|([-+]\d{2}:\d{2}))?', value):
+                        return True
+                    return False
+                if isinstance(value, (int,)):
+                    parsed = False
+                    try:
+                        datetime.utcfromtimestamp(value)
+                        parsed = True
+                    except:
+                        pass
+                    try:
+                        datetime.utcfromtimestamp(value / 1000)
+                        parsed = True
+                    except:
+                        pass
+                    if parsed:
+                        return True
+                    else:
+                        return False
+            return True
+
+        def has_compatible_type(field_name, value, types):
+            if field_name not in types:
+                # must be a pattern_match
+                return True
+            doc_type = types[field_name]
+            if doc_type in ['array']:
+                expected_types = (list, str, type(None))
+            elif doc_type in ['boolean']:
+                expected_types = (bool,)
+            elif doc_type in ['object', 'geo_point']:
+                expected_types = (dict, list, type(None))
+            elif doc_type in ['byte', 'short', 'integer', 'long', 'double', 'float', 'scaled_float']:
+                expected_types = (int, float, complex, list)
+            elif doc_type in ['date']:
+                expected_types = (int, str)
+            elif doc_type in ['ip', 'binary']:
+                expected_types = (str, list)
+            elif doc_type in ['flattened']:
+                expected_types = (dict, list)
+            else:
+                # everything else should be a string, number or array
+                expected_types = (str, int, float, complex, list, type(None))
+            return isinstance(value, expected_types)
+
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
             isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
             if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
+                errors.append("Key '{}' found in event is not documented!".format(key))
+                next
             if is_documented(key, aliases):
-                raise Exception("Key '{}' found in event is documented as an alias!".format(key))
+                errors.append("Key '{}' found in event is documented as an alias!".format(key))
+                next
+            if os.getenv('TESTING_FIELD_TYPES', default=False):
+                if not(has_compatible_type(key, flat[key], types)):
+                    errors.append("Key '{}' found in event has incompatible type expected '{}' got '{}'!".format(
+                        key, types[key], type(flat[key])))
+                if not(has_compatible_format(key, flat[key], types)):
+                    errors.append("Value '{}' for Key '{}' not in supported format!".format(flat[key], key))
+
+        if len(errors) > 0:
+            raise Exception("Documentation Errors:\n{}".format('\n'.join(errors)))
 
     def get_beat_version(self):
         proc = self.start_beat(extra_args=["version"], output="version")

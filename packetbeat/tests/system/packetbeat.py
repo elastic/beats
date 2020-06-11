@@ -134,5 +134,5 @@ class BaseTest(TestCase):
 
     def setUp(self):
 
-        self.expected_fields, self.dict_fields, _ = self.load_fields()
+        self.expected_fields, self.dict_fields, unused_aliases, unused_types = self.load_fields()
         super(BaseTest, self).setUp()
