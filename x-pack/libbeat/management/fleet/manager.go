@@ -129,15 +129,14 @@ func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 // UpdateStatus updates the manager with the current status for the beat.
 func (cm *Manager) UpdateStatus(status management.Status, msg string) {
 	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
 	if cm.status != status || cm.msg != msg {
 		cm.status = status
 		cm.msg = msg
-		cm.lock.Unlock()
 		cm.client.Status(statusToProtoStatus(status), msg)
 		cm.logger.Infof("Status change to %s: %s", status, msg)
-		return
 	}
-	cm.lock.Unlock()
 }
 
 func (cm *Manager) OnConfig(s string) {

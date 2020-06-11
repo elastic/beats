@@ -58,9 +58,17 @@ var DebugK = "centralmgmt"
 
 var centralMgmtKey = "x-pack-cm"
 
+// StatusReporter provides a method to update current status of the beat.
+type StatusReporter interface {
+	// UpdateStatus called when the status of the beat has changed.
+	UpdateStatus(status Status, msg string)
+}
+
 // Manager interacts with the beat to provide status updates and to receive
 // configurations.
 type Manager interface {
+	StatusReporter
+
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
 
@@ -73,9 +81,6 @@ type Manager interface {
 
 	// CheckRawConfig check settings are correct before launching the beat.
 	CheckRawConfig(cfg *common.Config) error
-
-	// UpdateStatus called when the status of the beat has changed.
-	UpdateStatus(status Status, msg string)
 }
 
 // PluginFunc for creating FactoryFunc if it matches a config
