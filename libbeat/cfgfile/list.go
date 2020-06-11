@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -91,7 +92,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		// Pass a copy of the config to the factory, this way if the factory modifies it,
 		// that doesn't affect the hash of the original one.
 		c, _ := common.NewConfigFrom(config.Config)
-		runner, err := r.factory.Create(r.pipeline, c, config.Meta)
+		runner, err := r.factory.Create(pipetool.WithDynamicFields(r.pipeline, config.Meta), c)
 		if err != nil {
 			r.logger.Errorf("Error creating runner from config: %s", err)
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
