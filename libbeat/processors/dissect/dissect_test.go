@@ -66,6 +66,16 @@ func TestDissectConversion(t *testing.T) {
 			Fail: false,
 		},
 		{
+			Name: "Convert 1 indirect field value",
+			Tok:  "%{?k1}=%{&k1|integer} msg=\"%{message}\"",
+			Msg:  "id=7736 msg=\"Single value OK\"}",
+			Expected: map[string]interface{}{
+				"id":      int32(7736),
+				"message": "Single value OK",
+			},
+			Fail: false,
+		},
+		{
 			Name: "Greedy padding skip test ->",
 			Tok:  "id=%{id->|integer} padding_removed=%{padding_removed->|boolean} length=%{length->|long} msg=\"%{message}\"",
 			Msg:  "id=1945     padding_removed=true    length=123456789    msg=\"Testing for padding\"}",

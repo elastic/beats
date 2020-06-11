@@ -160,17 +160,22 @@ func transformType(typ dataType, value string) (interface{}, error) {
 	}
 }
 
-func (f normalField) Apply(b string, m Map) {
-	if len(f.dataType) == 0 {
-		m[f.Key()] = b
+func convertData(typ string, b string) interface{} {
+	if len(typ) == 0 {
+		return b
 	} else {
-		if dt, ok := dataTypeNames[f.dataType]; ok {
+		if dt, ok := dataTypeNames[typ]; ok {
 			value, err := transformType(dt, b)
 			if err == nil {
-				m[f.Key()] = value
+				return value
 			}
 		}
 	}
+	return nil
+}
+
+func (f normalField) Apply(b string, m Map) {
+	m[f.Key()] = convertData(f.dataType, b)
 }
 
 // skipField is an skip field without a name like this: `%{}`, this is often used to
@@ -241,7 +246,7 @@ func (f indirectField) Apply(b string, m Map) {
 	v, ok := m[f.Key()]
 	if ok {
 		if v, ok := v.(string); ok {
-			m[v] = b
+			m[v] = convertData(f.dataType, b)
 		}
 		return
 	}
@@ -321,7 +326,7 @@ func newField(id int, rawKey string, previous delimiter) (field, error) {
 	}
 
 	if strings.HasPrefix(key, indirectFieldPrefix) {
-		return newIndirectField(id, key[1:], length), nil
+		return newIndirectField(id, key[1:], dataType, length), nil
 	}
 	return newNormalField(id, key, dataType, ordinal, length, greedy), nil
 }
@@ -355,12 +360,13 @@ func newAppendField(id int, key string, ordinal int, length int, greedy bool, pr
 	}
 }
 
-func newIndirectField(id int, key string, length int) indirectField {
+func newIndirectField(id int, key string, dataType string, length int) indirectField {
 	return indirectField{
 		baseField{
-			id:     id,
-			key:    key,
-			length: length,
+			id:       id,
+			key:      key,
+			length:   length,
+			dataType: dataType,
 		},
 	}
 }
