@@ -221,20 +221,19 @@ By default Elastic Agent collects system metrics, such as cpu, memory, network, 
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-datasources:
-  - namespace: default
+inputs:
+  - type: system/metrics
+    dataset.namespace: default
     use_output: default
-    inputs:
-      - type: system/metrics
-        streams:
-          - metricset: cpu
-            dataset: system.cpu
-          - metricset: memory
-            dataset: system.memory
-          - metricset: network
-            dataset: system.network
-          - metricset: filesystem
-            dataset: system.filesystem
+    streams:
+      - metricset: cpu
+        dataset.name: system.cpu
+      - metricset: memory
+        dataset.name: system.memory
+      - metricset: network
+        dataset.name: system.network
+      - metricset: filesystem
+        dataset.name: system.filesystem
 -------------------------------------------------------------------------------------
 
 If `use_output` is not specified, the `default` output is used.
