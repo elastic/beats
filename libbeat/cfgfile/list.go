@@ -89,10 +89,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	// Start new runners
 	for hash, config := range startList {
-		// Pass a copy of the config to the factory, this way if the factory modifies it,
-		// that doesn't affect the hash of the original one.
-		c, _ := common.NewConfigFrom(config.Config)
-		runner, err := r.factory.Create(pipetool.WithDynamicFields(r.pipeline, config.Meta), c)
+		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
 			r.logger.Errorf("Error creating runner from config: %s", err)
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
@@ -157,4 +154,11 @@ func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 		list[k] = v
 	}
 	return list
+}
+
+func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, config *reload.ConfigWithMeta) (Runner, error) {
+	// Pass a copy of the config to the factory, this way if the factory modifies it,
+	// that doesn't affect the hash of the original one.
+	c, _ := common.NewConfigFrom(config.Config)
+	return factory.Create(pipetool.WithDynamicFields(pipeline, config.Meta), c)
 }
