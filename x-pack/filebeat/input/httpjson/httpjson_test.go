@@ -513,7 +513,7 @@ func TestOAuth2(t *testing.T) {
 	}
 	defer ts.Close()
 
-	runTest(t, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
+	runTest(t, false, false, false, m, func(input *HttpjsonInput, out *stubOutleter, t *testing.T) {
 		group, _ := errgroup.WithContext(context.Background())
 		group.Go(input.run)
 
