@@ -277,17 +277,10 @@ func BenchmarkDissectNoConversionOneValue(b *testing.B) {
 	b.ReportAllocs()
 	benchmarkConversion("id=%{id} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
 }
+
 func BenchmarkDissectWithConversionOneValue(b *testing.B) {
 	b.ReportAllocs()
 	benchmarkConversion("id=%{id|integer} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
-}
-func BenchmarkDissectWithConversionOneValueMissingType(b *testing.B) {
-	b.ReportAllocs()
-	benchmarkConversion("id=%{id|} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
-}
-func BenchmarkDissectWithConversionOneValueInvalidType(b *testing.B) {
-	b.ReportAllocs()
-	benchmarkConversion("id=%{id|xyz} msg=\"%{message}\"", "id=7736 msg=\"Single value OK\"}", b)
 }
 
 func BenchmarkDissectNoConversionMultipleValues(b *testing.B) {
@@ -295,19 +288,10 @@ func BenchmarkDissectNoConversionMultipleValues(b *testing.B) {
 	benchmarkConversion("id=%{id} status=%{status} duration=%{duration} uptime=%{uptime} success=%{success} msg=\"%{message}\"",
 		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
 }
+
 func BenchmarkDissectWithConversionMultipleValues(b *testing.B) {
 	b.ReportAllocs()
 	benchmarkConversion("id=%{id|integer} status=%{status|integer} duration=%{duration|float} uptime=%{uptime|long} success=%{success|boolean} msg=\"%{message}\"",
-		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
-}
-func BenchmarkDissectWithConversionMultipleValuesMissingType(b *testing.B) {
-	b.ReportAllocs()
-	benchmarkConversion("id=%{id|} status=%{status|} duration=%{duration|} uptime=%{uptime|} success=%{success|} msg=\"%{message}\"",
-		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
-}
-func BenchmarkDissectWithConversionMultipleValuesInvalidType(b *testing.B) {
-	b.ReportAllocs()
-	benchmarkConversion("id=%{id|abc} status=%{status|def} duration=%{duration|jkl} uptime=%{uptime|tux} success=%{success|xyz} msg=\"%{message}\"",
 		"id=7736 status=202 duration=0.975 uptime=1588975628 success=true msg=\"Request accepted\"}", b)
 }
 
