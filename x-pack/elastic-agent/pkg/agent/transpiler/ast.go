@@ -213,7 +213,10 @@ func (l *List) Find(idx string) (Node, bool) {
 	if err != nil {
 		return nil, false
 	}
-	if i > len(l.value) || i < len(l.value) {
+	if l.value == nil {
+		return nil, false
+	}
+	if i > len(l.value) || i < 0 {
 		return nil, false
 	}
 
@@ -690,11 +693,20 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 	// Run through the graph and find matching nodes.
 	current := a.root
 	for _, part := range splitPath(selector) {
-		n, ok := current.Find(part)
-		if !ok {
-			return nil, false
+		var n Node
+		var ok bool
+		if part == "*" {
+			val := current.Value()
+			n, ok = val.(Node)
+			if !ok {
+				return nil, false
+			}
+		} else {
+			n, ok = current.Find(part)
+			if !ok {
+				return nil, false
+			}
 		}
-
 		current = n
 	}
 
@@ -735,6 +747,8 @@ func Insert(a *AST, node Node, to Selector) error {
 	}
 
 	switch node.(type) {
+	case *Dict:
+		d.value = node
 	case *List:
 		d.value = node
 	default:

@@ -1,0 +1,100 @@
+name: Endpoint
+rules:
+- fix_stream: {}
+
+- extract_list_items:
+    path: datasources
+    item: inputs
+    to: inputs
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - endpoint
+
+- filter_values:
+    selector: inputs
+    key: enabled
+    values:
+    - true
+
+- copy_on_platform:
+    from: inputs.0.policy.linux.malware.*
+    to: malware
+    platform: linux
+
+- copy_on_platform:
+    from: inputs.0.policy.linux.advanced.*
+    to: advanced
+    platform: linux
+
+- copy_on_platform:
+    from: inputs.0.policy.linux.logging.*
+    to: logging
+    platform: linux
+
+- copy_on_platform:
+    from: inputs.0.policy.linux.events.*
+    to: events
+    platform: linux
+
+- copy_on_platform:
+    from: inputs.0.policy.mac.malware.*
+    to: malware
+    platform: darwin
+
+- copy_on_platform:
+    from: inputs.0.policy.mac.advanced.*
+    to: advanced
+    platform: darwin
+
+- copy_on_platform:
+    from: inputs.0.policy.mac.logging.*
+    to: logging
+    platform: darwin
+
+- copy_on_platform:
+    from: inputs.0.policy.mac.events.*
+    to: events
+    platform: darwin
+
+- copy_on_platform:
+    from: inputs.0.policy.windows.malware.*
+    to: malware
+    platform: windows
+
+- copy_on_platform:
+    from: inputs.0.policy.windows.advanced.*
+    to: advanced
+    platform: windows
+
+- copy_on_platform:
+    from: inputs.0.policy.windows.logging.*
+    to: logging
+    platform: windows
+
+- copy_on_platform:
+    from: inputs.0.policy.windows.events.*
+    to: events
+    platform: windows
+
+- filter:
+    selectors:
+      - fleet
+      - malware
+      - advanced
+      - logging
+      - events
+      - output
+
+when: HasAny('fleet') && HasAny('malware', 'events') && HasNamespace('output', 'elasticsearch')
+
+post_rules:
+- filter:
+    selectors:
+      - malware
+      - advanced
+      - logging
+      - events
+      - output

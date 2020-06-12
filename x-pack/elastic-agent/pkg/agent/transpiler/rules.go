@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"runtime"
 
 	"gopkg.in/yaml.v2"
 
@@ -51,6 +52,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "copy_to_list"
 		case *CopyAllToListRule:
 			name = "copy_all_to_list"
+		case *CopyOnPlatformRule:
+			name = "copy_on_platform"
 		case *RenameRule:
 			name = "rename"
 		case *TranslateRule:
@@ -130,6 +133,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &CopyToListRule{}
 		case "copy_all_to_list":
 			r = &CopyAllToListRule{}
+		case "copy_on_platform":
+			r = &CopyOnPlatformRule{}
 		case "rename":
 			r = &RenameRule{}
 		case "translate":
@@ -775,6 +780,39 @@ func Copy(from, to Selector) *CopyRule {
 
 // Apply copy a part of a tree into a new destination.
 func (r CopyRule) Apply(ast *AST) error {
+	node, ok := Lookup(ast, r.From)
+	// skip when the `from` node is not found.
+	if !ok {
+		return nil
+	}
+
+	if err := Insert(ast, node, r.To); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// CopyOnPlatformRule take a from Selector and a destination selector and will insert an existing node into
+// the destination, when it the running platform matches.
+type CopyOnPlatformRule struct {
+	From     Selector
+	To       Selector
+	Platform string
+}
+
+// CopyOnPlatformRule creates a copy on platform rule.
+func CopyOnPlatform(from, to Selector, platform string) *CopyOnPlatformRule {
+	return &CopyOnPlatformRule{From: from, To: to, Platform: platform}
+}
+
+// Apply copy a part of a tree into a new destination.
+func (r CopyOnPlatformRule) Apply(ast *AST) error {
+	// skip platform doesn't match
+	if runtime.GOOS != r.Platform {
+		return nil
+	}
+
 	node, ok := Lookup(ast, r.From)
 	// skip when the `from` node is not found.
 	if !ok {

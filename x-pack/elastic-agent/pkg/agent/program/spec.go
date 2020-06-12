@@ -31,6 +31,7 @@ type Spec struct {
 	Cmd              string               `yaml:"cmd"`
 	Args             []string             `yaml:"args"`
 	Rules            *transpiler.RuleList `yaml:"rules"`
+	PostRules        *transpiler.RuleList `yaml:"post_rules"`
 	PostInstallSteps *transpiler.StepList `yaml:"post_install"`
 	When             string               `yaml:"when"`
 }

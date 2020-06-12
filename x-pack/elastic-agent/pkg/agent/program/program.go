@@ -92,6 +92,13 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 			continue
 		}
 
+		if spec.PostRules != nil {
+			err = spec.PostRules.Apply(specificAST)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		program := Program{
 			Spec:   spec,
 			Config: specificAST,

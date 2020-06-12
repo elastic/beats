@@ -6,6 +6,7 @@ package transpiler
 
 import (
 	"regexp"
+	"runtime"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -619,13 +620,52 @@ logs:
 				require.NoError(t, err)
 			}
 
-			if !assert.True(t, cmp.Equal(v.Content, m)) {
-				diff := cmp.Diff(v.Content, m)
+			if !assert.True(t, cmp.Equal(m, v.Content)) {
+				diff := cmp.Diff(m, v.Content)
 				if diff != "" {
 					t.Errorf("mismatch (-want +got):\n%s", diff)
 				}
 			}
 		})
+	}
+}
+
+func TestCopyOnPlatformRule(t *testing.T) {
+	givenYAML := `
+key:
+  linux:
+    linux: true
+  darwin:
+    darwin: true
+  windows:
+    windows: true
+`
+	a, err := makeASTFromYAML(givenYAML)
+	require.NoError(t, err)
+
+	rules := []Rule{
+		CopyOnPlatform("key.linux.*", "platform", "linux"),
+		CopyOnPlatform("key.darwin.*", "platform", "darwin"),
+		CopyOnPlatform("key.windows.*", "platform", "windows"),
+		Filter("platform"),
+	}
+	for _, rule := range rules {
+		require.NoError(t, rule.Apply(a))
+	}
+
+	v := &MapVisitor{}
+	a.Accept(v)
+
+	m := map[string]interface{}{
+		"platform": map[string]interface{}{
+			runtime.GOOS: true,
+		},
+	}
+	if !assert.True(t, cmp.Equal(m, v.Content)) {
+		diff := cmp.Diff(m, v.Content)
+		if diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
 	}
 }
 
@@ -642,6 +682,7 @@ func TestSerialization(t *testing.T) {
 	value := NewRuleList(
 		Rename("from-value", "to-value"),
 		Copy("from-value", "to-value"),
+		CopyOnPlatform("from-value", "to-value", "windows"),
 		Translate("path-value", map[string]interface{}{
 			"key-v-1": "value-v-1",
 			"key-v-2": "value-v-2",
@@ -668,6 +709,10 @@ func TestSerialization(t *testing.T) {
 - copy:
     from: from-value
     to: to-value
+- copy_on_platform:
+    from: from-value
+    to: to-value
+    platform: windows
 - translate:
     path: path-value
     mapper:
