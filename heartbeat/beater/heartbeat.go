@@ -86,7 +86,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.ConfigManager.Enabled() {
+	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
 	}
 
