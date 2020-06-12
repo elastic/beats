@@ -47,10 +47,10 @@ func (o *retryableOperations) Name() string {
 // examples:
 // - Start does not need to run if process is running
 // - Fetch does not need to run if package is already present
-func (o *retryableOperations) Check() (bool, error) {
+func (o *retryableOperations) Check(application Application) (bool, error) {
 	for _, op := range o.operations {
 		// finish early if at least one operation needs to be run or errored out
-		if run, err := op.Check(); err != nil || run {
+		if run, err := op.Check(application); err != nil || run {
 			return run, err
 		}
 	}
@@ -71,7 +71,7 @@ func (o *retryableOperations) runOnce(application Application) func(context.Cont
 				return ctx.Err()
 			}
 
-			shouldRun, err := op.Check()
+			shouldRun, err := op.Check(application)
 			if err != nil {
 				return err
 			}
@@ -90,3 +90,6 @@ func (o *retryableOperations) runOnce(application Application) func(context.Cont
 		return nil
 	}
 }
+
+// check interface
+var _ operation = &retryableOperations{}
