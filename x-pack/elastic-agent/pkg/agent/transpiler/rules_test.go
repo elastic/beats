@@ -6,7 +6,6 @@ package transpiler
 
 import (
 	"regexp"
-	"runtime"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -23,6 +22,36 @@ func TestRules(t *testing.T) {
 		expectedYAML string
 		rule         Rule
 	}{
+		"overwrite": {
+			givenYAML: `
+fleet:
+  kibana_url: contents
+output:
+  elasticsearch:
+    hosts: []
+datasources:
+  - name: All default
+    inputs:
+    - type: file
+      streams:
+        - paths: /var/log/mysql/error.log
+`,
+			expectedYAML: `
+type: file
+streams:
+  - paths: /var/log/mysql/error.log
+fleet:
+  kibana_url: contents
+output:
+  elasticsearch:
+    hosts: []
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					Overwrite("datasources.0.inputs.0", "", "fleet", "output"),
+				},
+			},
+		},
 		"fix streams": {
 			givenYAML: `
 datasources:
@@ -630,45 +659,6 @@ logs:
 	}
 }
 
-func TestCopyOnPlatformRule(t *testing.T) {
-	givenYAML := `
-key:
-  linux:
-    linux: true
-  darwin:
-    darwin: true
-  windows:
-    windows: true
-`
-	a, err := makeASTFromYAML(givenYAML)
-	require.NoError(t, err)
-
-	rules := []Rule{
-		CopyOnPlatform("key.linux.*", "platform", "linux"),
-		CopyOnPlatform("key.darwin.*", "platform", "darwin"),
-		CopyOnPlatform("key.windows.*", "platform", "windows"),
-		Filter("platform"),
-	}
-	for _, rule := range rules {
-		require.NoError(t, rule.Apply(a))
-	}
-
-	v := &MapVisitor{}
-	a.Accept(v)
-
-	m := map[string]interface{}{
-		"platform": map[string]interface{}{
-			runtime.GOOS: true,
-		},
-	}
-	if !assert.True(t, cmp.Equal(m, v.Content)) {
-		diff := cmp.Diff(m, v.Content)
-		if diff != "" {
-			t.Errorf("mismatch (-want +got):\n%s", diff)
-		}
-	}
-}
-
 func makeASTFromYAML(yamlStr string) (*AST, error) {
 	var m map[string]interface{}
 	if err := yaml.Unmarshal([]byte(yamlStr), &m); err != nil {
@@ -682,7 +672,6 @@ func TestSerialization(t *testing.T) {
 	value := NewRuleList(
 		Rename("from-value", "to-value"),
 		Copy("from-value", "to-value"),
-		CopyOnPlatform("from-value", "to-value", "windows"),
 		Translate("path-value", map[string]interface{}{
 			"key-v-1": "value-v-1",
 			"key-v-2": "value-v-2",
@@ -701,6 +690,7 @@ func TestSerialization(t *testing.T) {
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
+		Overwrite("t1", "t2", "a", "b"),
 	)
 
 	y := `- rename:
@@ -709,10 +699,6 @@ func TestSerialization(t *testing.T) {
 - copy:
     from: from-value
     to: to-value
-- copy_on_platform:
-    from: from-value
-    to: to-value
-    platform: windows
 - translate:
     path: path-value
     mapper:
@@ -765,6 +751,12 @@ func TestSerialization(t *testing.T) {
     - b
     on_conflict: insert_before
 - fix_stream: {}
+- overwrite:
+    from: t1
+    to: t2
+    except:
+    - a
+    - b
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {

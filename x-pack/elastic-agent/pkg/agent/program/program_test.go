@@ -461,9 +461,6 @@ func TestConfiguration(t *testing.T) {
 		"endpoint_no_fleet": {
 			expected: 0,
 		},
-		"endpoint_no_malware_events": {
-			expected: 0,
-		},
 		"endpoint_unknown_output": {
 			expected: 0,
 		},

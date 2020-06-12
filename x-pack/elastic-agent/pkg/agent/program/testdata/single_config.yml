@@ -1,4 +1,4 @@
-name:	Production Website DB Servers
+name: Production Website DB Servers
 fleet:
     kibana_url: https://kibana.mydomain.com:5601
     ca_hash: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=

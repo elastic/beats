@@ -115,6 +115,13 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// sort sorts the keys in the dictionary
+func (d *Dict) sort() {
+	sort.Slice(d.value, func(i, j int) bool {
+		return d.value[i].(*Key).name < d.value[j].(*Key).name
+	})
+}
+
 // Key represents a Key / value pair in the dictionary.
 type Key struct {
 	name  string
@@ -551,6 +558,9 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 }
 
 func splitPath(s Selector) []string {
+	if s == "" {
+		return nil
+	}
 	return strings.Split(s, selectorSep)
 }
 
@@ -693,19 +703,9 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 	// Run through the graph and find matching nodes.
 	current := a.root
 	for _, part := range splitPath(selector) {
-		var n Node
-		var ok bool
-		if part == "*" {
-			val := current.Value()
-			n, ok = val.(Node)
-			if !ok {
-				return nil, false
-			}
-		} else {
-			n, ok = current.Find(part)
-			if !ok {
-				return nil, false
-			}
+		n, ok := current.Find(part)
+		if !ok {
+			return nil, false
 		}
 		current = n
 	}
@@ -725,9 +725,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
 
-				sort.Slice(t.value, func(i, j int) bool {
-					return t.value[i].(*Key).name < t.value[j].(*Key).name
-				})
+				t.sort()
 
 				current = newNode
 				continue
@@ -747,8 +745,6 @@ func Insert(a *AST, node Node, to Selector) error {
 	}
 
 	switch node.(type) {
-	case *Dict:
-		d.value = node
 	case *List:
 		d.value = node
 	default:
