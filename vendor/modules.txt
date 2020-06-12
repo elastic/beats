@@ -861,7 +861,7 @@ go.elastic.co/apm/transport/transporttest
 go.elastic.co/apm/module/apmelasticsearch
 # go.elastic.co/apm/module/apmhttp v1.7.2
 go.elastic.co/apm/module/apmhttp
-# go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+# go.elastic.co/ecszap v0.2.0
 go.elastic.co/ecszap
 go.elastic.co/ecszap/internal
 # go.elastic.co/fastjson v1.0.0
