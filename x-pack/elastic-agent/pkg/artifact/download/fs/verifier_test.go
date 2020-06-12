@@ -14,8 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
 const (
