@@ -3,13 +3,13 @@
         "@timestamp": "2020-04-23T12:17:48.000-05:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
-        "destination.bytes": "1130",
+        "destination.bytes": 1130,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "ftgd_blk",
         "event.category": [
             "network"
@@ -40,7 +40,7 @@
         "log.level": "warning",
         "log.offset": 0,
         "message": "URL belongs to a denied category in policy",
-        "network.bytes": "11521130",
+        "network.bytes": 2282,
         "network.direction": "outgoing",
         "network.iana_number": "6",
         "network.protocol": "https",
@@ -62,9 +62,9 @@
         "rule.id": "100602",
         "rule.ruleset": "elasticruleset",
         "service.type": "fortinet",
-        "source.bytes": "1152",
+        "source.bytes": 1152,
         "source.ip": "192.168.2.1",
-        "source.port": "61930",
+        "source.port": 61930,
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
@@ -77,13 +77,13 @@
         "@timestamp": "2020-04-23T12:17:45.000-05:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
-        "destination.bytes": "6812",
+        "destination.bytes": 6812,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "ftgd_allow",
         "event.category": [
             "network"
@@ -114,7 +114,7 @@
         "log.level": "notice",
         "log.offset": 707,
         "message": "URL belongs to an allowed category in policy",
-        "network.bytes": "35456812",
+        "network.bytes": 10357,
         "network.direction": "outgoing",
         "network.iana_number": "6",
         "network.protocol": "https",
@@ -136,9 +136,9 @@
         "rule.id": "38",
         "rule.ruleset": "elasticruleset",
         "service.type": "fortinet",
-        "source.bytes": "3545",
+        "source.bytes": 3545,
         "source.ip": "192.168.2.1",
-        "source.port": "65236",
+        "source.port": 65236,
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
@@ -156,7 +156,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "signature",
         "event.category": [
             "network"
@@ -210,7 +210,7 @@
         "rule.ruleset": "elasticruleset",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "59790",
+        "source.port": 59790,
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
@@ -229,7 +229,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "53",
+        "destination.port": 53,
         "dns.id": "2234",
         "dns.question.class": "IN",
         "dns.question.name": "elastic.example.com",
@@ -281,7 +281,7 @@
         "rule.ruleset": "test",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "53430",
+        "source.port": 53430,
         "tags": [
             "fortinet-firewall"
         ]
@@ -295,7 +295,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "signature",
         "event.category": [
             "network"
@@ -349,7 +349,7 @@
         "rule.ruleset": "elasticruleset",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "63012",
+        "source.port": 63012,
         "source.user.group.name": "elasticgroup",
         "source.user.name": "elasticuser",
         "tags": [
@@ -367,7 +367,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "53",
+        "destination.port": 53,
         "dns.id": "2352",
         "dns.question.class": "IN",
         "dns.question.name": "elastic.co",
@@ -419,7 +419,7 @@
         "rule.ruleset": "elastictest",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "54438",
+        "source.port": 54438,
         "tags": [
             "fortinet-firewall"
         ]
@@ -433,7 +433,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "53",
+        "destination.port": 53,
         "dns.id": "235",
         "dns.question.class": "IN",
         "dns.question.name": "elastic.co",
@@ -478,7 +478,7 @@
         "rule.ruleset": "elastictest",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "54788",
+        "source.port": 54788,
         "tags": [
             "fortinet-firewall"
         ]
@@ -492,7 +492,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.4.4",
-        "destination.port": "443",
+        "destination.port": 443,
         "event.action": "ssl-anomalies",
         "event.category": [
             "network"
@@ -540,7 +540,7 @@
         "rule.ruleset": "somecerts",
         "service.type": "fortinet",
         "source.ip": "192.168.2.1",
-        "source.port": "59726",
+        "source.port": 59726,
         "source.user.group.name": "elasticgroup2",
         "source.user.name": "elasticuser2",
         "tags": [
@@ -601,7 +601,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.4.4",
-        "destination.port": "500",
+        "destination.port": 500,
         "event.category": [
             "network"
         ],
@@ -650,7 +650,7 @@
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "8.8.8.8",
-        "source.port": "500",
+        "source.port": 500,
         "tags": [
             "fortinet-firewall"
         ]
@@ -664,7 +664,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.4.5.4",
-        "destination.port": "500",
+        "destination.port": 500,
         "event.category": [
             "network"
         ],
@@ -717,7 +717,7 @@
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
         "source.ip": "9.9.9.9",
-        "source.port": "500",
+        "source.port": 500,
         "tags": [
             "fortinet-firewall"
         ]
@@ -821,7 +821,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.5.4",
-        "destination.port": "500",
+        "destination.port": 500,
         "event.category": [
             "network"
         ],
@@ -872,7 +872,7 @@
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "7.6.3.4",
-        "source.port": "500",
+        "source.port": 500,
         "tags": [
             "fortinet-firewall"
         ]
@@ -1160,7 +1160,7 @@
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.port": "53",
+        "destination.port": 53,
         "event.action": "dns",
         "event.category": [
             "network"
@@ -1213,7 +1213,7 @@
         "rule.uuid": "2345de-b143-52134d8-6654f-4654sdfg16f431",
         "service.type": "fortinet",
         "source.ip": "192.168.1.6",
-        "source.port": "53438",
+        "source.port": 53438,
         "tags": [
             "fortinet-firewall"
         ]
@@ -1222,14 +1222,14 @@
         "@timestamp": "2020-04-23T12:11:51.000-05:00",
         "destination.as.number": 40386,
         "destination.as.organization.name": "Bloomip Inc.",
-        "destination.bytes": "65446",
+        "destination.bytes": 65446,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.6.4.7",
-        "destination.packets": "1045601",
-        "destination.port": "6000",
+        "destination.packets": 1045601,
+        "destination.port": 6000,
         "event.action": "accept",
         "event.category": [
             "network"
@@ -1265,9 +1265,9 @@
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 11142,
-        "network.bytes": "43865065446",
+        "network.bytes": 504096,
         "network.iana_number": "17",
-        "network.packets": "7234171045601",
+        "network.packets": 1769018,
         "network.protocol": "portname",
         "observer.egress.interface.name": "wan1",
         "observer.ingress.interface.name": "port1",
@@ -1288,7 +1288,7 @@
         "service.type": "fortinet",
         "source.as.number": 4808,
         "source.as.organization.name": "China Unicom Beijing Province Network",
-        "source.bytes": "438650",
+        "source.bytes": 438650,
         "source.geo.city_name": "Beijing",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
@@ -1298,9 +1298,9 @@
         "source.geo.region_name": "Beijing",
         "source.ip": "192.168.10.10",
         "source.nat.ip": "123.123.123.123",
-        "source.nat.port": "60964",
-        "source.packets": "723417",
-        "source.port": "6000",
+        "source.nat.port": 60964,
+        "source.packets": 723417,
+        "source.port": 6000,
         "tags": [
             "fortinet-firewall"
         ]
@@ -1309,13 +1309,13 @@
         "@timestamp": "2020-04-23T12:11:48.000-05:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
-        "destination.bytes": "20",
+        "destination.bytes": 20,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "2001:4860:4860::8888",
-        "destination.packets": "0",
+        "destination.packets": 0,
         "event.action": "accept",
         "event.category": [
             "network"
@@ -1348,9 +1348,9 @@
         "log.level": "notice",
         "log.offset": 11876,
         "network.application": "icmp6/25/0",
-        "network.bytes": "301420",
+        "network.bytes": 3034,
         "network.iana_number": "58",
-        "network.packets": "40",
+        "network.packets": 4,
         "network.protocol": "icmp6/1/0",
         "observer.egress.interface.name": "unknown0",
         "observer.ingress.interface.name": "port1",
@@ -1369,13 +1369,13 @@
         "service.type": "fortinet",
         "source.as.number": 15169,
         "source.as.organization.name": "Google LLC",
-        "source.bytes": "3014",
+        "source.bytes": 3014,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "2001:4860:4860::8888",
-        "source.packets": "4",
+        "source.packets": 4,
         "tags": [
             "fortinet-firewall"
         ]
@@ -1384,13 +1384,13 @@
         "@timestamp": "2020-04-23T13:10:57.000-04:00",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
-        "destination.bytes": "10",
+        "destination.bytes": 10,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
-        "destination.packets": "40",
+        "destination.packets": 40,
         "event.action": "accept",
         "event.category": [
             "network"
@@ -1425,9 +1425,9 @@
         "log.level": "notice",
         "log.offset": 12426,
         "network.application": "PING",
-        "network.bytes": "010",
+        "network.bytes": 10,
         "network.iana_number": "1",
-        "network.packets": "040",
+        "network.packets": 40,
         "network.protocol": "ping",
         "observer.egress.interface.name": "unknown0",
         "observer.ingress.interface.name": "wan1",
@@ -1444,13 +1444,13 @@
         "rule.id": "0",
         "rule.ruleset": "rulepolicy",
         "service.type": "fortinet",
-        "source.bytes": "0",
+        "source.bytes": 0,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "9.7.7.7",
-        "source.packets": "0",
+        "source.packets": 0,
         "tags": [
             "fortinet-firewall"
         ]
@@ -1458,7 +1458,7 @@
     {
         "@timestamp": "2020-04-23T12:14:39.000-05:00",
         "destination.ip": "192.168.100.100",
-        "destination.port": "1235",
+        "destination.port": 1235,
         "event.action": "ip-conn",
         "event.category": [
             "network"
@@ -1515,7 +1515,7 @@
         "rule.uuid": "654cc-b6542-53467u8-e45234-1566casd35f7836",
         "service.type": "fortinet",
         "source.ip": "192.168.1.1",
-        "source.port": "62493",
+        "source.port": 62493,
         "source.user.name": "elasticsuper",
         "tags": [
             "fortinet-firewall"

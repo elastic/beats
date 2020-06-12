@@ -116,7 +116,7 @@ func (cm *ConfigManager) Enabled() bool {
 }
 
 // Start the config manager
-func (cm *ConfigManager) Start() {
+func (cm *ConfigManager) Start(_ func()) {
 	if !cm.Enabled() {
 		return
 	}

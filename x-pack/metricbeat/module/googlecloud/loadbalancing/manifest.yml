@@ -3,22 +3,21 @@ input:
   module: googlecloud
   metricset: stackdriver
   defaults:
-    stackdriver:
-      service: loadbalancing
-      metrics:
-        - metric_types:
-          - "loadbalancing.googleapis.com/https/backend_request_bytes_count"
-          - "loadbalancing.googleapis.com/https/backend_request_count"
-          - "loadbalancing.googleapis.com/https/backend_response_bytes_count"
-          - "loadbalancing.googleapis.com/https/request_bytes_count"
-          - "loadbalancing.googleapis.com/https/request_count"
-          - "loadbalancing.googleapis.com/https/response_bytes_count"
-          - "loadbalancing.googleapis.com/l3/internal/egress_bytes_count"
-          - "loadbalancing.googleapis.com/l3/internal/egress_packets_count"
-          - "loadbalancing.googleapis.com/l3/internal/ingress_bytes_count"
-          - "loadbalancing.googleapis.com/l3/internal/ingress_packets_count"
-          - "loadbalancing.googleapis.com/tcp_ssl_proxy/closed_connections"
-          - "loadbalancing.googleapis.com/tcp_ssl_proxy/egress_bytes_count"
-          - "loadbalancing.googleapis.com/tcp_ssl_proxy/ingress_bytes_count"
-          - "loadbalancing.googleapis.com/tcp_ssl_proxy/new_connections"
-          - "loadbalancing.googleapis.com/tcp_ssl_proxy/open_connections"
+    metrics:
+      - service: loadbalancing
+        metric_types:
+          - "https/backend_request_bytes_count"
+          - "https/backend_request_count"
+          - "https/backend_response_bytes_count"
+          - "https/request_bytes_count"
+          - "https/request_count"
+          - "https/response_bytes_count"
+          - "l3/internal/egress_bytes_count"
+          - "l3/internal/egress_packets_count"
+          - "l3/internal/ingress_bytes_count"
+          - "l3/internal/ingress_packets_count"
+          - "tcp_ssl_proxy/closed_connections"
+          - "tcp_ssl_proxy/egress_bytes_count"
+          - "tcp_ssl_proxy/ingress_bytes_count"
+          - "tcp_ssl_proxy/new_connections"
+          - "tcp_ssl_proxy/open_connections"

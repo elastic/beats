@@ -1,7 +1,17 @@
 Stackdriver provides visibility into the performance, uptime, and overall health
 of cloud-powered applications. It collects metrics, events, and metadata from
 different services from Google Cloud. This metricset is to collect monitoring
-metrics from Google Cloud using `ListTimeSeries` API.
+metrics from Google Cloud using `ListTimeSeries` API. The full list of metric
+types that Google Cloud monitoring supports can be found in
+https://cloud.google.com/monitoring/api/metrics_gcp#gcp[Google Cloud Metrics].
+
+Each monitoring metric from stackdriver has a sample period and/or ingest delay.
+Sample period is the time interval between consecutive data points for metrics
+that are written periodically. Ingest delay represents the time for data points
+older than this value are guaranteed to be available to read. Sample period and
+ingest delay are obtained from making
+https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list[ListMetricDescriptors API]
+call.
 
 [float]
 == Metricset config and parameters
@@ -12,8 +22,12 @@ type. Metric type is to used for identifying a specific time series.
 
 * *aligner*: A single string with which aggregation operation need to be applied
 onto time series data for ListTimeSeries API. If it's not given, default aligner
-is set to be `ALIGN_NONE`. Sample period of each metric type is obtained from
-making https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors/list [ListMetricDescriptors API] call.
+is set to be `ALIGN_NONE`. Google Cloud also supports `ALIGN_DELTA`, `ALIGN_RATE`,
+`ALIGN_MIN`, `ALIGN_MAX`, `ALIGN_MEAN`, `ALIGN_COUNT`, `ALIGN_SUM` and etc.
+Please see
+https://cloud.google.com/monitoring/api/ref_v3/rpc/google.monitoring.v3#aligner[Aggregation Aligner]
+for the full list of aligners.
+
 
 [float]
 === Example Configuration
@@ -36,16 +50,16 @@ given aggregation aligner applied for each metric type.
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 300s
-  stackdriver:
-    service: compute
-    metrics:
-      - aligner: ALIGN_MEAN
-        metric_types:
-          - "compute.googleapis.com/instance/cpu/usage_time"
-          - "compute.googleapis.com/instance/cpu/utilization"
-      - aligner: ALIGN_SUM
-        metric_types:
-          - "compute.googleapis.com/instance/uptime"
+  metrics:
+    - aligner: ALIGN_MEAN
+      service: compute
+      metric_types:
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+    - aligner: ALIGN_SUM
+      service: compute
+      metric_types:
+        - "instance/uptime"
 
 ----
 
@@ -69,14 +83,14 @@ ignored.
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 60s
-  stackdriver:
-    service: compute
-    metrics:
-      - aligner: ALIGN_MEAN
-        metric_types:
-          - "compute.googleapis.com/instance/cpu/usage_time"
-          - "compute.googleapis.com/instance/cpu/utilization"
-      - aligner: ALIGN_SUM
-        metric_types:
-          - "compute.googleapis.com/instance/uptime"
+  metrics:
+    - aligner: ALIGN_MEAN
+      service: compute
+      metric_types:
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+    - aligner: ALIGN_SUM
+      service: compute
+      metric_types:
+        - "instance/uptime"
 ----

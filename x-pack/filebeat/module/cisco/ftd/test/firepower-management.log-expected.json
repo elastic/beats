@@ -14,7 +14,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -32,7 +33,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -50,7 +52,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -68,7 +71,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -86,7 +90,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -104,7 +109,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -122,7 +128,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -140,7 +147,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -158,7 +166,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -176,7 +185,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -194,7 +204,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -212,7 +223,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -230,7 +242,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -248,7 +261,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -266,7 +280,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -284,7 +299,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -302,7 +318,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -320,7 +337,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -338,7 +356,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -356,7 +375,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -374,7 +394,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -392,7 +413,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -410,7 +432,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -428,7 +451,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -446,7 +470,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -464,7 +489,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -482,7 +508,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -500,7 +527,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -518,7 +546,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -536,7 +565,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -554,7 +584,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -572,7 +603,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -590,7 +622,8 @@
         "service.type": "cisco",
         "syslog.facility": 14,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     },
     {
@@ -609,7 +642,8 @@
         "syslog.facility": 14,
         "syslog.priority": 2,
         "tags": [
-            "cisco-ftd"
+            "cisco-ftd",
+            "forwarded"
         ]
     }
 ]

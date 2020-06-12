@@ -26,6 +26,8 @@
         "log.offset": 0,
         "service.type": "aws",
         "source.address": "205.251.233.182",
+        "source.as.number": 16509,
+        "source.as.organization.name": "Amazon.com, Inc.",
         "source.geo.city_name": "Boardman",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -34,6 +36,9 @@
         "source.geo.region_iso_code": "US-OR",
         "source.geo.region_name": "Oregon",
         "source.ip": "205.251.233.182",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EX_PRINCIPAL_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Spider",
@@ -73,6 +78,9 @@
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
         "user.id": "EXAMPLE_ID",
         "user.name": "Alice",
         "user_agent.device.name": "Other",

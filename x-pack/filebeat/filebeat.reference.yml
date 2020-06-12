@@ -357,10 +357,6 @@ filebeat.modules:
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
 
-    # Set the log level from 1 (alerts only) to 7 (include all messages).
-    # Messages with a log level higher than the specified will be dropped.
-    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
-    #var.log_level: 7
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
@@ -485,14 +481,14 @@ filebeat.modules:
   firewall:
     enabled: true
 
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9004.
+    # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
 
 #----------------------------- Google Cloud Module -----------------------------
@@ -856,7 +852,7 @@ filebeat.modules:
     #   authentication_endpoint: "https://login.microsoftonline.us/"
     #   resource: "https://manage.office365.us"
     #
-    #   max_retention: 7d
+    #   max_retention: 168h
     #   max_requests_per_minute: 2000
     #   poll_interval: 3m
 
@@ -864,17 +860,10 @@ filebeat.modules:
 - module: okta
   system:
     enabled: true
-    # API key to access Okta
-    #var.api_key
-
-    # URL of the Okta REST API
-    #var.url
-
-    # Disable SSL verification 
-    #var.ssl: |-
-    #  {
-    #    "verification_mode": "none"
-    #  }
+    # You must configure the URL with your Okta domain and provide an
+    # API token to access the logs API.
+    #var.url: https://yourOktaDomain/api/v1/logs
+    #var.api_key: 'yourApiTokenHere'
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -1023,8 +1012,6 @@ filebeat.modules:
   rdp:
     enabled: true
   rfb:
-    enabled: true
-  signatures:
     enabled: true
   sip:
     enabled: true

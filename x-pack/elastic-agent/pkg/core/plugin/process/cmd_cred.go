@@ -7,6 +7,7 @@
 package process
 
 import (
+	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -33,4 +34,8 @@ func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg 
 	}
 
 	return cmd
+}
+
+func isInt32(val int) bool {
+	return val >= 0 && val <= math.MaxInt32
 }
