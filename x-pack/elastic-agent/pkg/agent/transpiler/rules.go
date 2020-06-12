@@ -801,7 +801,7 @@ type CopyOnPlatformRule struct {
 	Platform string
 }
 
-// CopyOnPlatformRule creates a copy on platform rule.
+// CopyOnPlatform creates a copy on platform rule.
 func CopyOnPlatform(from, to Selector, platform string) *CopyOnPlatformRule {
 	return &CopyOnPlatformRule{From: from, To: to, Platform: platform}
 }
